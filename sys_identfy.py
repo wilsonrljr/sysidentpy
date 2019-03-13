@@ -1,4 +1,3 @@
-# - Teste Edição 2
 #-*- coding: utf-8 -*-
 # Copyright 2019 The SysIdentfy. All Rights Reserved.
 #
