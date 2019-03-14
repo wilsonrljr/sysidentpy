@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Copyright 2019 The SysIdentfy. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,7 @@ class sys_identfy:
     import pandas as pd
     global get_regresvec
     global genreg
-    # global get_regresvec
+    global get_regresvec
     global max_lag
 
 
@@ -35,6 +35,7 @@ class sys_identfy:
             ulag = Max lag of output
 
     """
+
     def __init__(self,non_degree_,ylag_,ulag_):
         self.non_degree=non_degree_ # non_degree stores the nonlinearity degree
         self.ylag=ylag_             # ylag stores the maximum output lag
@@ -62,7 +63,6 @@ class sys_identfy:
                 [200n 200n] = u(k-n)u(k-n)
     """
     def genreg(non_degree, ylag, ulag):
-        # assert type(non_degree)==int and type(ylag)==int and type(ulag)==int,"Non_degree, ylag and ulag must be integer"
         from itertools import combinations_with_replacement
         import numpy as np
         # regressor's code
@@ -70,12 +70,11 @@ class sys_identfy:
         ulagmax = 2001 + ulag
         y_vec = np.arange(1001, ylagmax)
         u_vec = np.arange(2001, ulagmax)
-        r = np.array([0])
-        r = np.concatenate([r, y_vec, u_vec])
+        reg_aux = np.array([0])
+        reg_aux = np.concatenate([reg_aux, y_vec, u_vec])
         # generate the matrix with all possible regressors and retur the number of cols(a) and rols(b)
-        reg_code = list(combinations_with_replacement(r, non_degree))
+        reg_code = list(combinations_with_replacement(reg_aux, non_degree))
         reg_code = np.array(reg_code)
-        [a, b] = reg_code.shape
         max_lag = max(ylag, ulag)
         return reg_code, max_lag
     #=============================================================================================================================================================
@@ -99,53 +98,52 @@ class sys_identfy:
         if reg_code_[i,j] == 0:
             vec = np.ones(len(y)-(self.max_lag))
         if aux_1[i,j] > 0 and aux_1[i,j] < 100:
-            pra=int(max_lag-aux_1[i,j])
-            prb=int(len(y)-aux_1[i,j])
-            vec = y[pra:prb]
+            index_a=int(max_lag-aux_1[i,j])
+            index_b=int(len(y)-aux_1[i,j])
+            vec = y[index_a:index_b]
         if aux_2[i,j] > 0 and aux_2[i,j] < 100:
-            pra=int(max_lag-aux_2[i,j])
-            prb=int(len(u)-aux_2[i,j])
-            vec = u[pra:prb]
+            index_a=int(max_lag-aux_2[i,j])
+            index_b=int(len(u)-aux_2[i,j])
+            vec = u[index_a:index_b]
         return vec
     #=============================================================================================================================================================
 
     """
     This function returns the regressor matrix from a given dataset and the referencied model object.
         Args:
-            reg_code = Matrix with codification of regressor elements
             y = Vec that contains the outputs
             u = Vec that contains the inputs
         Raises:
-            w = Regressor matrix from the referencied model object
+            regress_matrix = Regressor matrix from the referencied model object
     """
-    def get_regressmatrx(self,reg_code,y,u):
+    def get_regressmatrx(self,y,u):
         import numpy as np
-        # reg_code=self.reg_code
-        [aux_a, aux_b] = reg_code.shape
-        w=get_regresvec(self,reg_code,0,0,y,u)
-        w_aux=get_regresvec(self,reg_code,0,0,y,u)
-        for i in range(1, aux_a):   #The first roll is read outside the loop, becouse that the range starts in 1.
-            if aux_b == 1:
-                w_aux=get_regresvec(self,reg_code,i,0,y,u)
-                w=np.vstack((w,w_aux))
+        reg_code=self.reg_code
+        [row_number, col_number] = reg_code.shape
+        regress_matrix=get_regresvec(self,reg_code,0,0,y,u)
+        regress_matrix_aux=get_regresvec(self,reg_code,0,0,y,u)
+        for i in range(1, row_number):   #The first roll is read outside the loop, becouse that the range starts in 1.
+            if col_number == 1:
+                regress_matrix_aux=get_regresvec(self,reg_code,i,0,y,u)
+                regress_matrix=np.vstack((regress_matrix,regress_matrix_aux))
             else:
-                for j in range (0,aux_b):
+                for j in range (0,col_number):
                     if reg_code[i,j] != 0:
                         if j == 0:
-                            w_aux=(get_regresvec(self,reg_code,i,j,y,u))*(get_regresvec(self,reg_code,i,j+1,y,u))
+                            regress_matrix_aux=(get_regresvec(self,reg_code,i,j,y,u))*(get_regresvec(self,reg_code,i,j+1,y,u))
                         else:
-                            if j == aux_b-1:
+                            if j == col_number-1:
                                 if reg_code[i,j-1] == 0:
-                                    w_aux=get_regresvec(self,reg_code,i,j,y,u)
+                                    regress_matrix_aux=get_regresvec(self,reg_code,i,j,y,u)
                             else:
                                 if reg_code[i,j-1] == 0:
-                                    w_aux=(get_regresvec(self,reg_code,i,j,y,u))*(get_regresvec(self,reg_code,i,j+1,y,u))
+                                    regress_matrix_aux=(get_regresvec(self,reg_code,i,j,y,u))*(get_regresvec(self,reg_code,i,j+1,y,u))
                                 else:
-                                    w_aux=w_aux*(get_regresvec(self,reg_code,i,j+1,y,u))
-                w=np.vstack((w,w_aux))
-                w_aux=get_regresvec(self,reg_code,0,0,y,u)
-        w=w.T
-        return  w
+                                    regress_matrix_aux=regress_matrix_aux*(get_regresvec(self,reg_code,i,j+1,y,u))
+                regress_matrix=np.vstack((regress_matrix,regress_matrix_aux))
+                regress_matrix_aux=get_regresvec(self,reg_code,0,0,y,u)
+        regress_matrix=regress_matrix.T
+        return  regress_matrix
     #=============================================================================================================================================================
     """
     This function performes a house transformation
@@ -171,9 +169,6 @@ class sys_identfy:
     def rowhouse(self,RA, v):
         import numpy as np
         b = -2/(v.T@v)
-        # print(b)
-        # print('A é',A)
-        # print('V é',v)
         w = b*RA.T@v
         m = w.size
         w = w.reshape(1, m)
@@ -188,55 +183,55 @@ class sys_identfy:
     It returns also a vec that contains the index of the coluns of the regressor matrix that corresponds a such order. The Psi matrix are given
         Args:
             y = Vec that contains the outputs
-            w = Regressor matrix to performe the ERR
-            ntp = Process Term Numbers
+            regress_matrix = Regressor matrix to performe the ERR
+            process_term_number = Process Term Numbers
         Raises:
             err = A vec that contains the ERR indices in order
             piv = A vec that contains the index to put the regressors in order
             psi_final = The Psi matrix
     """
-    def ERR(self,y,w,ntp):
+    def ERR(self,y,regress_matrix,process_term_number):
         import numpy as np
-        sq_y = y[self.max_lag: -1].T@y[self.max_lag: -1]
-        A=np.array(w)
+        squared_y = y[self.max_lag: -1].T@y[self.max_lag: -1]
+        aux_regress_matrix=np.array(regress_matrix)
         y = np.array([y[self.max_lag:]]).T
-        A=np.concatenate((A,y), axis=1)
-        [a,b]=A.shape
-        piv=np.arange(b-1)
-        c = np.zeros(b-1)
-        err = np.zeros(b-1)
-        for i in np.arange(0,b-1):
-            for j in np.arange(i,b-1):
-                num = np.array(A[i:a, j].T@A[i:a, b-1])
+        aux_regress_matrix=np.concatenate((aux_regress_matrix,y), axis=1)
+        [row_number,col_number]=aux_regress_matrix.shape
+        piv=np.arange(col_number-1)
+        err_aux = np.zeros(col_number-1)
+        err = np.zeros(col_number-1)
+        for i in np.arange(0,col_number-1):
+            for j in np.arange(i,col_number-1):
+                num = np.array(aux_regress_matrix[i:row_number, j].T@aux_regress_matrix[i:row_number, col_number-1])
                 num = np.power(num,2)
-                den = np.array( (A[i:a, j].T@A[i:a, j]) * sq_y)
+                den = np.array( (aux_regress_matrix[i:row_number, j].T@aux_regress_matrix[i:row_number, j]) * squared_y)
                 d = num/den
-                c[j]=num/den
-            c = list(c)
-            f = c.index(max(c[i:]))
-            err[i] = c[f]
-            temp = np.copy(A[:, i])
-            A[:, i] = np.copy(A[:, f])
-            A[:, f] = np.copy(temp)
+                err_aux[j]=num/den
+            err_aux = list(err_aux)
+            index = err_aux.index(max(err_aux[i:]))
+            err[i] = err_aux[index]
+            temp = np.copy(aux_regress_matrix[:, i])
+            aux_regress_matrix[:, i] = np.copy(aux_regress_matrix[:, index])
+            aux_regress_matrix[:, index] = np.copy(temp)
             temp2 = np.copy(piv[i])
-            piv[i] = np.copy(f)
-            piv[f] = np.copy(temp2)
-            x = A[i: a, i]
+            piv[i] = np.copy(index)
+            piv[index] = np.copy(temp2)
+            x = aux_regress_matrix[i: row_number, i]
             v = self.house(x)
-            aux_1 = A[i: a, i: b]
+            aux_1 = aux_regress_matrix[i: row_number, i: col_number]
             row_result = self.rowhouse(aux_1, v)
-            A[i: a, i: b] = np.copy(row_result)
-            if i ==ntp:
+            aux_regress_matrix[i: row_number, i: col_number] = np.copy(row_result)
+            if i ==process_term_number:
                 break
-        Piv = piv[0: ntp]
-        psi_doidao = np.array(w)
-        psi_final = np.copy(psi_doidao[:, Piv])
+        Piv = piv[0: process_term_number]
+        psi_aux = np.array(regress_matrix)
+        psi_final = np.copy(psi_aux[:, Piv])
         reg_code_buffer=self.reg_code
         model_code=np.copy(reg_code_buffer[Piv, :])
 
         return model_code, err, piv, psi_final
-    #=============================================================================================================================================================
-
+    #=========================================================================================================================================================
+    
     """
     This function estimate the parameters from a model given a psi matrix and a output vec. It uses the Last Square Method and returns a vec that contains
     the estimated parameters.
@@ -265,16 +260,16 @@ class sys_identfy:
             u_valid = input validation data set
     """
 
-    def prepare_data(y_path,u_path,porcent):
+    def prepare_data(y_path,u_path,percent):
         import numpy as np
         y = np.loadtxt(y_path)
         u = np.loadtxt(u_path)
         y_size=y.size
-        n_ident=round((y_size*porcent)/100)
-        y_ident=y[0:n_ident]
-        u_ident=u[0:n_ident]
-        y_valid=y[n_ident+1:y_size+1]
-        u_valid=y[n_ident+1:y_size+1]
+        size_ident=round((y_size*percent)/100)
+        y_ident=y[0:size_ident]
+        u_ident=u[0:size_ident]
+        y_valid=y[size_ident+1:y_size+1]
+        u_valid=y[size_ident+1:y_size+1]
         return y_ident, u_ident, y_valid, u_valid
     #============================================================================================================================================================
     
@@ -297,7 +292,8 @@ class sys_identfy:
         den2 = np.sqrt(np.power(np.sum((y-media), 2)))
         rmse = np.divide(num2, den2)
         return rmse, mse
-    #=========================================================================================================================================================
+    #=========================================================================================================================================================   
+    
     """
     This function calculates the autocorrelation function for a given vector
         Args:
@@ -308,4 +304,3 @@ class sys_identfy:
         result = np.correlate(x, x, mode='full')
         half_of_simmetry = int(np.floor(result.size/2))
         return result[half_of_simmetry:]
-
