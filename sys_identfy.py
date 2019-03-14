@@ -21,7 +21,7 @@ class sys_identfy:
     import pandas as pd
     global get_regresvec
     global genreg
-    global get_regresvec
+    # global get_regresvec
     global max_lag
 
 
@@ -112,14 +112,15 @@ class sys_identfy:
     """
     This function returns the regressor matrix from a given dataset and the referencied model object.
         Args:
+            reg_code = Matrix with codification of regressor elements
             y = Vec that contains the outputs
             u = Vec that contains the inputs
         Raises:
             w = Regressor matrix from the referencied model object
     """
-    def get_regressmatrx(self,y,u):
+    def get_regressmatrx(self,reg_code,y,u):
         import numpy as np
-        reg_code=self.reg_code
+        # reg_code=self.reg_code
         [aux_a, aux_b] = reg_code.shape
         w=get_regresvec(self,reg_code,0,0,y,u)
         w_aux=get_regresvec(self,reg_code,0,0,y,u)
@@ -305,5 +306,6 @@ class sys_identfy:
     def autocorr(x):
         import numpy as np
         result = np.correlate(x, x, mode='full')
-        return result[result.size/2:]
+        half_of_simmetry = int(np.floor(result.size/2))
+        return result[half_of_simmetry:]
 
