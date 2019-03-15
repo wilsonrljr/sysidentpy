@@ -116,9 +116,9 @@ class sys_identfy:
         Raises:
             regress_matrix = Regressor matrix from the referencied model object
     """
-    def get_regressmatrx(self,y,u):
+    def get_regressmatrx(self,reg_code,y,u):
         import numpy as np
-        reg_code=self.reg_code
+        # reg_code=self.reg_code
         [row_number, col_number] = reg_code.shape
         regress_matrix=get_regresvec(self,reg_code,0,0,y,u)
         regress_matrix_aux=get_regresvec(self,reg_code,0,0,y,u)
@@ -180,7 +180,7 @@ class sys_identfy:
     #=============================================================================================================================================================
     """
     This function returns the Error Reduction Ration indice from a given regressor matrix. The results are ordenated from the bigger to the smaller ERR índices.
-    It returns also a vec that contains the index of the coluns of the regressor matrix that corresponds a such order. The Psi matrix are given
+    It returns also a vec that contains the index of the coluns of the regressor matrix that corresponds a such order. The Psi matrix are also given
         Args:
             y = Vec that contains the outputs
             regress_matrix = Regressor matrix to performe the ERR
@@ -304,3 +304,27 @@ class sys_identfy:
         result = np.correlate(x, x, mode='full')
         half_of_simmetry = int(np.floor(result.size/2))
         return result[half_of_simmetry:]
+    #=========================================================================================================================================================
+    """
+    This function returns the values of predicted model
+        Args:
+            --
+        Rises:
+            predicted_values = the values of predicted model
+    """
+    def model_prediction(self,model,y_initial,entrace_u,estimated_paramters):
+        import numpy as np
+        if len(y_initial)<self.max_lag:
+            raise Exception('Insufficient initial conditions elements!')
+        predicted_values = np.zeros((len(entrace_u)))
+        predicted_values[0:len(y_initial)] = y_initial
+        # print(predicted_values)
+        analised_elements_number = self.max_lag + 1
+        # print(analised_elements_number)
+        for i in range(0,len(entrace_u)-self.max_lag-1):
+            # print(i)
+            temporary_regressor_matrix =  self.get_regressmatrx(model,predicted_values[i:i+analised_elements_number],entrace_u[i:i+analised_elements_number])
+            # print(temporary_regressor_matrix)
+            predicted_values[i+self.max_lag] = temporary_regressor_matrix @ estimated_paramters
+        print(i)
+        return predicted_values
