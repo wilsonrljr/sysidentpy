@@ -7,16 +7,26 @@ import matplotlib.pyplot as plt
 non_degree = 2
 ylag = 2
 ulag = 2
-ntp = 15
+ntp = 4
 porcent=70
-y_caminho='y1.txt'
-u_caminho='u1.txt'
+# y_caminho='y1.txt'
+# u_caminho='u1.txt'
 
-[y_ident_,u_ident_,y_valid_,u_valid_] = sys_identfy.prepare_data(y_caminho,u_caminho,porcent)
+# [y_ident_,u_ident_,y_valid_,u_valid_] = sys_identfy.prepare_data(y_caminho,u_caminho,porcent)
 
 
-y=y_ident_
-u=u_ident_
+# y=y_ident_
+# u=u_ident_
+
+decimacao = 12
+
+file_loaded = np.loadtxt('buck_id.dat')
+y = file_loaded[0::decimacao,2]
+u = file_loaded[0::decimacao,1]
+
+file_loaded = np.loadtxt('buck_val.dat')
+y_val = file_loaded[0::decimacao,2]
+u_val = file_loaded[0::decimacao,1]
 
 
 model1=sys_identfy(non_degree,ylag,ulag)
@@ -45,11 +55,11 @@ print(pivv)
 # y_test2 = w_temp2@theta
 
 #Testando o método de simulação livre
-y_test3 = model1.model_prediction(model,pivv,y[0:2],u,theta)
+y_test3 = model1.model_prediction(model,pivv,y_val,u_val,theta)
 
-# plt.plot(y)
-# plt.plot(y_test3)
-# plt.show()
+plt.plot(y_val)
+plt.plot(y_test3,'r--')
+plt.show()
 
 #Corrigir, está dando valor estranho
 # [rmse, mse] = model1.validation_index(y,y_test3)
@@ -59,10 +69,10 @@ y_test3 = model1.model_prediction(model,pivv,y[0:2],u,theta)
 
 
 
-jaik = model1.akaike_information_criterion(y,u)
+# jaik = model1.akaike_information_criterion(y,u)
 
-plt.plot(jaik)
-plt.show()
+# plt.plot(jaik)
+# plt.show()
 
 
 

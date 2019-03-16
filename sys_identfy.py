@@ -328,7 +328,8 @@ class sys_identfy:
         if len(y_initial)<self.max_lag:
             raise Exception('Insufficient initial conditions elements!')
         predicted_values = np.zeros((len(entrace_u)))
-        predicted_values[0:len(y_initial)] = y_initial
+        predicted_values[0:self.max_lag] = y_initial[0:self.max_lag]
+        print(predicted_values[0:10])
         analised_elements_number = self.max_lag + 1
         effective_pivot_vector = model_pivot[0:len(model_elements_count)]
         for i in range(0,len(entrace_u)-self.max_lag):
