@@ -116,9 +116,9 @@ class sys_identfy:
         Raises:
             regress_matrix = Regressor matrix from the referencied model object
     """
-    def get_regressmatrx(self,reg_code,y,u):
+    def get_regressmatrx(self,y,u):
         import numpy as np
-        # reg_code=self.reg_code
+        reg_code=self.reg_code
         [row_number, col_number] = reg_code.shape
         regress_matrix=get_regresvec(self,reg_code,0,0,y,u)
         regress_matrix_aux=get_regresvec(self,reg_code,0,0,y,u)
@@ -198,8 +198,11 @@ class sys_identfy:
         aux_regress_matrix=np.concatenate((aux_regress_matrix,y), axis=1)
         [row_number,col_number]=aux_regress_matrix.shape
         piv=np.arange(col_number-1)
+        print('inicial')
+        print(piv)
         err_aux = np.zeros(col_number-1)
         err = np.zeros(col_number-1)
+        print('iterações')
         for i in np.arange(0,col_number-1):
             for j in np.arange(i,col_number-1):
                 num = np.array(aux_regress_matrix[i:row_number, j].T@aux_regress_matrix[i:row_number, col_number-1])
@@ -216,14 +219,17 @@ class sys_identfy:
             temp2 = np.copy(piv[i])
             piv[i] = np.copy(index)
             piv[index] = np.copy(temp2)
+            print('index', index , '\tvetor',piv , sep=':\t')
             x = aux_regress_matrix[i: row_number, i]
             v = self.house(x)
             aux_1 = aux_regress_matrix[i: row_number, i: col_number]
             row_result = self.rowhouse(aux_1, v)
             aux_regress_matrix[i: row_number, i: col_number] = np.copy(row_result)
-            if i ==process_term_number:
+            if i == process_term_number:
                 break
         Piv = piv[0: process_term_number]
+        print('final')
+        print(piv)
         psi_aux = np.array(regress_matrix)
         psi_final = np.copy(psi_aux[:, Piv])
         reg_code_buffer=self.reg_code
@@ -282,14 +288,14 @@ class sys_identfy:
             rmse = The RMSE index
             mse = The MSE index
     """
-    def validation_index(y, ysim):
+    def validation_index(self,y, ysim):
         import numpy as np
-        num = np.power((np.linalg.norm(y - ysim,2), 2))
+        num = np.power(np.linalg.norm((y - ysim)), 2)
         den = y.size
         mse = np.divide(num, den)
         media = np.mean(y)
-        num2 = np.sqrt(np.power(np.sum((y-ysim), 2)))
-        den2 = np.sqrt(np.power(np.sum((y-media), 2)))
+        num2 = np.sqrt(np.power(np.sum((y - ysim)), 2))
+        den2 = np.sqrt(np.power(np.sum((y-media)), 2))
         rmse = np.divide(num2, den2)
         return rmse, mse
     #=========================================================================================================================================================   
@@ -308,23 +314,55 @@ class sys_identfy:
     """
     This function returns the values of predicted model
         Args:
-            --
+            model_elements_count = Matrix with regressor codes
+            model_pivot = Vector with regressor order (from ERR)
+            y_initial = "max_lag" number of values of output mensured to start recursive process
+            entrace_u = Vector with entrace values to be used to simulate the model
+            estimated_paramters = Paramters estimated to simulated model
         Rises:
             predicted_values = the values of predicted model
     """
-    def model_prediction(self,model,y_initial,entrace_u,estimated_paramters):
+    def model_prediction(self,model_elements_count,model_pivot,y_initial,entrace_u,estimated_paramters):
         import numpy as np
+        # import pandas as pd
         if len(y_initial)<self.max_lag:
             raise Exception('Insufficient initial conditions elements!')
         predicted_values = np.zeros((len(entrace_u)))
         predicted_values[0:len(y_initial)] = y_initial
-        # print(predicted_values)
         analised_elements_number = self.max_lag + 1
-        # print(analised_elements_number)
-        for i in range(0,len(entrace_u)-self.max_lag-1):
+        effective_pivot_vector = model_pivot[0:len(model_elements_count)]
+        for i in range(0,len(entrace_u)-self.max_lag):
             # print(i)
-            temporary_regressor_matrix =  self.get_regressmatrx(model,predicted_values[i:i+analised_elements_number],entrace_u[i:i+analised_elements_number])
-            # print(temporary_regressor_matrix)
+            temporary_regressor_matrix = self.get_regressmatrx(predicted_values[i:i+analised_elements_number],entrace_u[i:i+analised_elements_number])
+            # print('Unsorted:')
+            # print(pd.DataFrame(temporary_regressor_matrix))
+            temporary_regressor_matrix = np.copy(temporary_regressor_matrix[:, effective_pivot_vector])
+            # print('Sorted:')
+            # print(pd.DataFrame(temporary_regressor_matrix))
             predicted_values[i+self.max_lag] = temporary_regressor_matrix @ estimated_paramters
-        print(i)
+            # input('Debug: Press ENTER to continue...')
+        # print(i)
         return predicted_values
+    #=========================================================================================================================================================
+    """
+    This function returns the values information criterion to determine the size of model
+        Args:
+            output_y = Measured system output
+            input_u = Measured system input
+        Rises:
+            akaike_vector = Vector with values of akaike's information criterion for models with N terms (where N is the vector position + 1)
+    """
+    def akaike_information_criterion(self,output_y,input_u):
+        import numpy as np
+        akaike_vector = np.zeros(len(self.reg_code))
+        akaike_vector[:] = float('NaN')
+        regressor_matrix = self.get_regressmatrx(output_y,input_u)
+        [null, null, model_pivot, regressor_matrix] = self.ERR(output_y, regressor_matrix, len(self.reg_code))
+        # regressor_matrix = np.copy(regressor_matrix[:, model_pivot])
+        for i in range(0,len(self.reg_code)):
+            temporary_estimated_paramters = self.last_squares(regressor_matrix[:,0:i+1],output_y)
+            temporary_simulated_output = regressor_matrix[:,0:i+1] @ temporary_estimated_paramters
+            temporary_residual = output_y[self.max_lag:] - temporary_simulated_output
+            residual_variance = np.var(temporary_residual)
+            akaike_vector[i] = len(output_y) * residual_variance + 2*(i+1)
+        return akaike_vector
