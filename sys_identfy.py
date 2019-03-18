@@ -35,15 +35,12 @@ class sys_identfy:
             ulag = Max lag of output
 
     """
-
     def __init__(self,non_degree_,ylag_,ulag_):
         self.non_degree=non_degree_ # non_degree stores the nonlinearity degree
         self.ylag=ylag_             # ylag stores the maximum output lag
         self.ulag=ulag_             # ulag ylag stores the maximum input lag
         [self.reg_code,self.max_lag]=genreg(non_degree_,ylag_,ulag_) # reg_code stores all possible combinations
     #=============================================================================================================================================================
-
-
     """
     This function generates a codification from all possibles regressors given the maximum lag of the
     input and output.
@@ -78,7 +75,6 @@ class sys_identfy:
         max_lag = max(ylag, ulag)
         return reg_code, max_lag
     #=============================================================================================================================================================
-
     """
     This function extrac a givn regressor from a dataset
         Args:
@@ -107,7 +103,6 @@ class sys_identfy:
             vec = u[index_a:index_b]
         return vec
     #=============================================================================================================================================================
-
     """
     This function returns the regressor matrix from a given dataset and the referencied model object.
         Args:
@@ -149,7 +144,6 @@ class sys_identfy:
     This function performes a house transformation
 
     """
-
     def house(self,x):
         import numpy as np
         n= len(x)
@@ -237,7 +231,6 @@ class sys_identfy:
 
         return model_code, err, piv, psi_final
     #=========================================================================================================================================================
-    
     """
     This function estimate the parameters from a model given a psi matrix and a output vec. It uses the Last Square Method and returns a vec that contains
     the estimated parameters.
@@ -252,7 +245,6 @@ class sys_identfy:
         theta= (np.linalg.pinv(psi.T@psi))@psi.T@y[self.max_lag:]
         return theta
     #=============================================================================================================================================================
-
     """
     This function split the data in identificatioin and validation subsets.
         Args:
@@ -265,7 +257,6 @@ class sys_identfy:
             y_valid = output validation data set
             u_valid = input validation data set
     """
-
     def prepare_data(y_path,u_path,percent):
         import numpy as np
         y = np.loadtxt(y_path)
@@ -296,7 +287,6 @@ class sys_identfy:
         rmse = np.sqrt(np.divide(num2, den2))
         return rmse, mse
     #=========================================================================================================================================================
-
     """
     This function calculates the autocorrelation function for a given vector
         Args:
@@ -311,7 +301,7 @@ class sys_identfy:
     """
     This function returns the values of predicted model
         Args:
-            model_elements_count = Matrix with regressor codes
+            model_elements = Matrix with regressor codes
             model_pivot = Vector with regressor order (from ERR)
             y_initial = "max_lag" number of values of output mensured to start recursive process
             entrace_u = Vector with entrace values to be used to simulate the model
@@ -319,27 +309,18 @@ class sys_identfy:
         Rises:
             predicted_values = the values of predicted model
     """
-    def model_prediction(self,model_elements_count,model_pivot,y_initial,entrace_u,estimated_paramters):
+    def model_prediction(self,model_elements,model_pivot,y_initial,entrace_u,estimated_paramters):
         import numpy as np
-        # import pandas as pd
         if len(y_initial)<self.max_lag:
             raise Exception('Insufficient initial conditions elements!')
         predicted_values = np.zeros((len(entrace_u)))
-        predicted_values[0:self.max_lag] = y_initial[0:self.max_lag]
-        print(predicted_values[0:10])
+        predicted_values[0:self.max_lag] = y_initial[0:self.max_lag] #Discard unnecessary initial values
         analised_elements_number = self.max_lag + 1
-        effective_pivot_vector = model_pivot[0:len(model_elements_count)]
+        effective_pivot_vector = model_pivot[0:len(model_elements)]
         for i in range(0,len(entrace_u)-self.max_lag):
-            # print(i)
             temporary_regressor_matrix = self.get_regressmatrx(predicted_values[i:i+analised_elements_number],entrace_u[i:i+analised_elements_number])
-            # print('Unsorted:')
-            # print(pd.DataFrame(temporary_regressor_matrix))
             temporary_regressor_matrix = np.copy(temporary_regressor_matrix[:, effective_pivot_vector])
-            # print('Sorted:')
-            # print(pd.DataFrame(temporary_regressor_matrix))
             predicted_values[i+self.max_lag] = temporary_regressor_matrix @ estimated_paramters
-            # input('Debug: Press ENTER to continue...')
-        # print(i)
         return predicted_values
     #=========================================================================================================================================================
     """
@@ -369,13 +350,13 @@ class sys_identfy:
             temporary_residual = output_y[self.max_lag:] - temporary_simulated_output
             residual_variance = np.var(temporary_residual)
 
-            if calculation_method == 1:
+            if calculation_method == 1: #BIC
                 model_factor = model_elements * np.log(effective_output_elements_count)
-            elif calculation_method == 2:
+            elif calculation_method == 2: #FPE
                 model_factor = effective_output_elements_count * np.log((effective_output_elements_count + model_elements) / (effective_output_elements_count - model_elements))
-            elif calculation_method == 3:
+            elif calculation_method == 3: #LILC
                 model_factor = 2 * model_elements * np.log(np.log(effective_output_elements_count))
-            else:
+            else: #AIC-2
                 model_factor =  + 2 * model_elements
 
             residual_factor = (effective_output_elements_count)*np.log(residual_variance)
