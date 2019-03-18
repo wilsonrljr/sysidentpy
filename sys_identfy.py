@@ -198,11 +198,11 @@ class sys_identfy:
         aux_regress_matrix=np.concatenate((aux_regress_matrix,y), axis=1)
         [row_number,col_number]=aux_regress_matrix.shape
         piv=np.arange(col_number-1)
-        print('inicial')
-        print(piv)
+        # print('inicial')
+        # print(piv)
         err_aux = np.zeros(col_number-1)
         err = np.zeros(col_number-1)
-        print('iterações')
+        # print('iterações')
         for i in np.arange(0,col_number-1):
             for j in np.arange(i,col_number-1):
                 num = np.array(aux_regress_matrix[i:row_number, j].T@aux_regress_matrix[i:row_number, col_number-1])
@@ -219,7 +219,7 @@ class sys_identfy:
             temp2 = np.copy(piv[i])
             piv[i] = np.copy(index)
             piv[index] = np.copy(temp2)
-            print('index', index , '\tvetor',piv , sep=':\t')
+            # print('index', index , '\tvetor',piv , sep=':\t')
             x = aux_regress_matrix[i: row_number, i]
             v = self.house(x)
             aux_1 = aux_regress_matrix[i: row_number, i: col_number]
@@ -228,8 +228,8 @@ class sys_identfy:
             if i == process_term_number:
                 break
         Piv = piv[0: process_term_number]
-        print('final')
-        print(piv)
+        # print('final')
+        # print(piv)
         psi_aux = np.array(regress_matrix)
         psi_final = np.copy(psi_aux[:, Piv])
         reg_code_buffer=self.reg_code
@@ -357,13 +357,13 @@ class sys_identfy:
         import numpy as np
         akaike_vector = np.zeros(len(self.reg_code))
         akaike_vector[:] = float('NaN')
-        regressor_matrix = self.get_regressmatrx(output_y,input_u)
-        [null, null, model_pivot, regressor_matrix] = self.ERR(output_y, regressor_matrix, len(self.reg_code))
-        # regressor_matrix = np.copy(regressor_matrix[:, model_pivot])
+        base_regressor_matrix = self.get_regressmatrx(output_y,input_u)
+        [null, null, null, regressor_matrix] = self.ERR(output_y, base_regressor_matrix, len(self.reg_code))
         for i in range(0,len(self.reg_code)):
-            temporary_estimated_paramters = self.last_squares(regressor_matrix[:,0:i+1],output_y)
-            temporary_simulated_output = regressor_matrix[:,0:i+1] @ temporary_estimated_paramters
+            temporary_estimated_paramters = self.last_squares(regressor_matrix[:,0:(i+1)],output_y)
+            temporary_simulated_output = regressor_matrix[:,0:(i+1)] @ temporary_estimated_paramters
             temporary_residual = output_y[self.max_lag:] - temporary_simulated_output
             residual_variance = np.var(temporary_residual)
-            akaike_vector[i] = len(output_y) * residual_variance + 2*(i+1)
+            print(residual_variance)
+            akaike_vector[i] = (len(output_y)-self.max_lag)*np.log(residual_variance) + 2*(i+1)
         return akaike_vector

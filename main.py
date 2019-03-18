@@ -38,7 +38,7 @@ theta=model1.last_squares(psi,y)
 
 #print(theta)
 print(pd.DataFrame(model))
-# print(errr)
+print(errr)
 print(pivv)
 # print(theta)
 
@@ -55,11 +55,11 @@ print(pivv)
 # y_test2 = w_temp2@theta
 
 #Testando o método de simulação livre
-y_test3 = model1.model_prediction(model,pivv,y_val,u_val,theta)
+# y_test3 = model1.model_prediction(model,pivv,y_val,u_val,theta)
 
-plt.plot(y_val)
-plt.plot(y_test3,'r--')
-plt.show()
+# plt.plot(y_val)
+# plt.plot(y_test3,'r--')
+# plt.show()
 
 #Corrigir, está dando valor estranho
 # [rmse, mse] = model1.validation_index(y,y_test3)
@@ -69,10 +69,10 @@ plt.show()
 
 
 
-# jaik = model1.akaike_information_criterion(y,u)
+aic = model1.akaike_information_criterion(y,u)
 
-# plt.plot(jaik)
-# plt.show()
+plt.plot(aic)
+plt.show()
 
 
 
