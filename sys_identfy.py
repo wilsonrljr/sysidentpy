@@ -278,7 +278,7 @@ class sys_identfy:
         u_valid=y[size_ident+1:y_size+1]
         return y_ident, u_ident, y_valid, u_valid
     #============================================================================================================================================================
-    
+
     """
     This function function returns the values of RMSE and MSE from a given simulated output and a real output.
         Args:
@@ -290,16 +290,13 @@ class sys_identfy:
     """
     def validation_index(self,y, ysim):
         import numpy as np
-        num = np.power(np.linalg.norm((y - ysim)), 2)
-        den = y.size
-        mse = np.divide(num, den)
-        media = np.mean(y)
-        num2 = np.sqrt(np.power(np.sum((y - ysim)), 2))
-        den2 = np.sqrt(np.power(np.sum((y-media)), 2))
-        rmse = np.divide(num2, den2)
+        mse = np.mean(np.square((y - ysim)))
+        num2 = np.sum(np.square((ysim - y)))
+        den2 = np.sum(np.square((ysim - np.mean(y, axis=0))))
+        rmse = np.sqrt(np.divide(num2, den2))
         return rmse, mse
-    #=========================================================================================================================================================   
-    
+    #=========================================================================================================================================================
+
     """
     This function calculates the autocorrelation function for a given vector
         Args:

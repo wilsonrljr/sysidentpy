@@ -58,18 +58,6 @@ print(errr)
 print(pivv)
 # print(theta)
 
-# y_control=psi@theta
-
-#Esse método funcionou direito (mesmo resultado do y_control)
-# w_temp1 = model1.get_regressmatrx(y,u) #usando a matriz código de regressores total, montou-se a matriz W
-# pivv_temp = pivv[0:len(model)] #Tomou-se o vetor de reorganização de mesmo tamanho do modelo desejado (já já o Akaike "come solto, calma")
-# w_temp1 = np.copy(w_temp1[:, pivv_temp]) #Reorganiza-se a matriz de regressores W de acordo com o vetor pivô retirando-se as colunas indesejadas
-# y_test1=w_temp1@theta #Olha aí o sinal simulado do modelo...... Espero que funcione na função... desgraça!
-
-#Esse método está dando muito errado (o sinal de saída apresenta módulo discrepante e misteriosamente com sinal invertido)
-# w_temp2 = model1.get_regressmatrx(model,y,u) #lembrar de modificar esse método caso queira usar, mas não deu certo mesmo... então dane-se
-# y_test2 = w_temp2@theta
-
 #Testando o método de simulação livre
 y_test3 = model1.model_prediction(model,pivv,y_valid_,u_valid_,theta)
 
@@ -77,12 +65,10 @@ plt.plot(y_valid_)
 plt.plot(y_test3,'r--')
 plt.show()
 
-#Corrigir, está dando valor estranho
-# [rmse, mse] = model1.validation_index(y_valid_,y_test3)
+[rmse, mse] = model1.validation_index(y_valid_,y_test3)
 
-# print(rmse)
-# print(mse)
-
+print('rmse calculated: ', rmse)
+print('mse calculated: ', mse)
 
 
 
