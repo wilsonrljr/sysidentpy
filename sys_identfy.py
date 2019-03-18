@@ -219,7 +219,7 @@ class sys_identfy:
             temp2 = np.copy(piv[i])
             piv[i] = np.copy(index)
             piv[index] = np.copy(temp2)
-            # print('index', index , '\tvetor',piv , sep=':\t')
+            print('index', index , '\tvetor',piv , sep=':\t')
             x = aux_regress_matrix[i: row_number, i]
             v = self.house(x)
             aux_1 = aux_regress_matrix[i: row_number, i: col_number]
@@ -350,20 +350,38 @@ class sys_identfy:
         Args:
             output_y = Measured system output
             input_u = Measured system input
+            calculation_method = 0 - Akaike's Information Criterion with critical value 2 (AIC) (default)
+                                 1 - Bayes Information Criterion (BIC)
+                                 2 - Final Prediction Error (FPE)
+                                 3 - Khundrin’s law ofiterated logarithm criterion (LILC)
         Rises:
-            akaike_vector = Vector with values of akaike's information criterion for models with N terms (where N is the vector position + 1)
+            output_vector = Vector with values of akaike's information criterion for models with N terms (where N is the vector position + 1)
     """
-    def akaike_information_criterion(self,output_y,input_u):
+    def information_criterion(self,output_y,input_u,calculation_method):
         import numpy as np
-        akaike_vector = np.zeros(len(self.reg_code))
-        akaike_vector[:] = float('NaN')
+        output_vector = np.zeros(len(self.reg_code))
+        output_vector[:] = float('NaN')
         base_regressor_matrix = self.get_regressmatrx(output_y,input_u)
         [null, null, null, regressor_matrix] = self.ERR(output_y, base_regressor_matrix, len(self.reg_code))
+        effective_output_elements_count = len(output_y)-self.max_lag
+
         for i in range(0,len(self.reg_code)):
-            temporary_estimated_paramters = self.last_squares(regressor_matrix[:,0:(i+1)],output_y)
-            temporary_simulated_output = regressor_matrix[:,0:(i+1)] @ temporary_estimated_paramters
+            model_elements = i + 1
+            temporary_estimated_paramters = self.last_squares(regressor_matrix[:,0:model_elements],output_y)
+            temporary_simulated_output = regressor_matrix[:,0:model_elements] @ temporary_estimated_paramters
             temporary_residual = output_y[self.max_lag:] - temporary_simulated_output
             residual_variance = np.var(temporary_residual)
-            print(residual_variance)
-            akaike_vector[i] = (len(output_y)-self.max_lag)*np.log(residual_variance) + 2*(i+1)
-        return akaike_vector
+
+            if calculation_method == 1:
+                model_factor = model_elements * np.log(effective_output_elements_count)
+            elif calculation_method == 2:
+                model_factor = effective_output_elements_count * np.log((effective_output_elements_count + model_elements) / (effective_output_elements_count - model_elements))
+            elif calculation_method == 3:
+                model_factor = 2 * model_elements * np.log(np.log(effective_output_elements_count))
+            else:
+                model_factor =  + 2 * model_elements
+
+            residual_factor = (effective_output_elements_count)*np.log(residual_variance)
+            output_vector[i] = residual_factor + model_factor
+
+        return output_vector
