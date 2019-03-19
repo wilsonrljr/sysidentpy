@@ -220,7 +220,7 @@ class sys_identfy:
             row_result = self.rowhouse(aux_1, v)
             y_aux[i: row_number] = self.rowhouse(y_aux[i: row_number], v)
             aux_regress_matrix[i: row_number, i: col_number] = np.copy(row_result)
-            
+
         Piv = piv[0: process_term_number]
         # print('final')
         # print(piv)
@@ -272,23 +272,85 @@ class sys_identfy:
         return y_ident, u_ident, y_valid, u_valid
     #============================================================================================================================================================
 
-    """
-    This function function returns the values of RMSE and MSE from a given simulated output and a real output.
-        Args:
-            y = Real sistem output
-            ysim = Simulated output from a model
-        Raises:
-            rmse = The RMSE index
-            mse = The MSE index
-    """
-    def validation_index(self, y, ysim):
+
+    def forecast_error(self, y, ysim):
         import numpy as np
-        mse = np.mean(np.square((y - ysim)))
-        num2 = np.sum(np.square((ysim - y)))
-        den2 = np.sum(np.square((ysim - np.mean(y, axis=0))))
-        rmse = np.sqrt(np.divide(num2, den2))
-        return rmse, mse
-    #=========================================================================================================================================================
+        return y - ysim
+
+    def mean_forecast_error(self, y, ysim):
+        import numpy as np
+        return np.average(y - ysim)
+
+    def mean_squared_error(self, y, ysim):
+        import numpy as np
+        output_error = np.average((y - ysim) ** 2)
+        return np.average(output_error)
+
+    def root_mean_squared_error(self, y, ysim):
+        import numpy as np
+        return np.sqrt(self.mean_squared_error(y, ysim))
+
+    def normalized_root_mean_squared_error(self, y, ysim):
+        import numpy as np
+        return self.root_mean_squared_error(y, ysim) / (y.max() - y.min())
+
+
+    def root_relative_squared_error(self, y, ysim):
+        import numpy as np
+        numerator = np.sum(np.square((ysim - y)))
+        denominator = np.sum(np.square((ysim - np.mean(y, axis=0))))
+        return np.sqrt(np.divide(numerator, denominator))
+
+    def mean_absolute_error(self, y, ysim):
+        import numpy as np
+        output_errors = np.average(np.abs(y - ysim))
+        return np.average(output_errors)
+
+    def mean_squared_log_error(self, y, ysim):
+        import numpy as np
+        return self.mean_squared_error(np.log1p(y), np.log1p(ysim))
+
+    def median_absolute_error(self, y, ysim):
+        import numpy as np
+        return np.median(np.abs(y - ysim))
+
+    def explained_variance_score(self, y, ysim):
+        import numpy as np
+        y_diff_avg = np.average(y - ysim)
+        numerator = np.average((y - ysim - y_diff_avg) ** 2)
+        y_avg = np.average(y)
+        denominator = np.average((y- y_avg) ** 2)
+        nonzero_numerator = numerator != 0
+        nonzero_denominator = denominator != 0
+        valid_score = nonzero_numerator & nonzero_denominator
+        output_scores = np.ones(y.shape[0])
+        output_scores[valid_score] = 1 - (numerator[valid_score] /
+                                      denominator[valid_score])
+        output_scores[nonzero_numerator & ~nonzero_denominator] = 0.
+        return np.average(output_scores)
+
+    def r2_score(self, y, ysim):
+        import numpy as np
+        numerator = ((y - ysim) ** 2).sum(axis=0, dtype=np.float64)
+        denominator = ((y - np.average(y, axis=0)) ** 2).sum(axis=0, dtype=np.float64)
+        nonzero_denominator = denominator != 0
+        nonzero_numerator = numerator != 0
+        valid_score = nonzero_denominator & nonzero_numerator
+        output_scores = np.ones([y.shape[0]])
+        output_scores[valid_score] = 1 - (numerator[valid_score] /
+                                      denominator[valid_score])
+        # arbitrary set to zero to avoid -inf scores, having a constant
+        # y_true is not interesting for scoring a regression anyway
+        output_scores[nonzero_numerator & ~nonzero_denominator] = 0.
+
+        return np.average(output_scores)
+
+    def s_mape(self, y, ysim):
+        import numpy as np
+        return 100/len(y) * np.sum(2*np.abs(ysim - y) / (np.abs(y) + np.abs(ysim)))
+        #return np.mean((np.abs(ysim - y) * 200/ (np.abs(ysim) + np.abs(y))))
+
+
     """
     This function calculates the autocorrelation function for a given vector
         Args:

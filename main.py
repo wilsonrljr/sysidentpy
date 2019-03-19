@@ -3,7 +3,6 @@ from sys_identfy import *
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
 non_degree = 2
 ylag = 2
 ulag = 2
@@ -66,9 +65,39 @@ plt.plot(y_valid_)
 plt.plot(y_test3,'r--')
 plt.show()
 
-[rmse, mse] = model1.validation_index(y_valid_,y_test3)
+[rmse, mse] = model1.validation_index(y_valid_, y_test3)
 
-# print('rmse calculated: ', rmse)
-# print('mse calculated: ', mse)
+mean_forecast = model1.mean_forecast_error(y_valid_, y_test3)
+print('mean fore', mean_forecast)
+
+msle = model1.mean_squared_log_error(y_valid_, y_test3)
+print('msle', msle)
+
+mse1 = model1.mean_squared_error(y_valid_, y_test3)
+print('mse1', mse1)
+
+rmse1 = model1.root_mean_squared_error(y_valid_, y_test3)
+print('rmse1', rmse1)
+
+nrmse = model1.normalized_root_mean_squared_error(y_valid_, y_test3)
+print('nrmse', nrmse)
+
+expl = model1.explained_variance_score(y_valid_, y_test3)
+print('expl', expl)
+
+rrse = model1.root_relative_squared_error(y_valid_, y_test3)
+print('rrse', rrse)
+
+mae = model1.mean_absolute_error(y_valid_, y_test3)
+print('mae', mae)
+
+med_ae = model1.median_absolute_error(y_valid_, y_test3)
+print('med_ae', med_ae)
+
+r2 = model1.r2_score(y_valid_, y_test3)
+print('r2', r2)
+
+s_mape = model1.s_mape(y_valid_, y_test3)
+print('s_mape', s_mape)
 
 print('fim')
