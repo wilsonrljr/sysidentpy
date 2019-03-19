@@ -34,13 +34,13 @@ aic = model1.information_criterion(y,u,0)
 plt.plot(reference, aic, 'o--')
 plt.show()
 
-bic = model1.information_criterion(y,u,1)
-plt.plot(reference, bic, 'o--')
-plt.show()
+# bic = model1.information_criterion(y,u,1)
+# plt.plot(reference, bic, 'o--')
+# plt.show()
 
-fpe = model1.information_criterion(y,u,2)
-plt.plot(reference, fpe, 'o--')
-plt.show()
+# fpe = model1.information_criterion(y,u,2)
+# plt.plot(reference, fpe, 'o--')
+# plt.show()
 
 lilc = model1.information_criterion(y,u,3)
 plt.plot(reference, lilc, 'o--')
@@ -48,14 +48,15 @@ plt.show()
 #model_length = input('Number of model elements:')
 #model_length = int(model_length)
 
+
 [model, errr, pivv, psi] = model1.ERR(y,w,model_length)
 theta = model1.last_squares(psi,y)
 
 
 #print(theta)
-print(pd.DataFrame(model))
-print(errr)
-print(pivv)
+# print(pd.DataFrame(model))
+# print(errr)
+# print(pivv)
 # print(theta)
 
 #Testando o método de simulação livre
@@ -67,8 +68,8 @@ plt.show()
 
 [rmse, mse] = model1.validation_index(y_valid_,y_test3)
 
-print('rmse calculated: ', rmse)
-print('mse calculated: ', mse)
+# print('rmse calculated: ', rmse)
+# print('mse calculated: ', mse)
 
 
 
