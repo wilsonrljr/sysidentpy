@@ -65,10 +65,8 @@ plt.plot(y_valid_)
 plt.plot(y_test3,'r--')
 plt.show()
 
-[rmse, mse] = model1.validation_index(y_valid_, y_test3)
-
 mean_forecast = model1.mean_forecast_error(y_valid_, y_test3)
-print('mean fore', mean_forecast)
+print('mean forecast', mean_forecast)
 
 msle = model1.mean_squared_log_error(y_valid_, y_test3)
 print('msle', msle)
@@ -97,7 +95,7 @@ print('med_ae', med_ae)
 r2 = model1.r2_score(y_valid_, y_test3)
 print('r2', r2)
 
-s_mape = model1.s_mape(y_valid_, y_test3)
+s_mape = model1.symmetric_mean_absolute_percentage_error(y_valid_, y_test3)
 print('s_mape', s_mape)
 
 print('fim')
