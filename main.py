@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 non_degree = 2
 ylag = 2
 ulag = 2
-model_length = 8 #Valor ignorado caso se utilize o critério de informação
+model_length = 4 #Valor ignorado caso se utilize o critério de informação
 
 # porcent=70
 # y_caminho='y1.txt'
@@ -45,8 +45,8 @@ plt.show()
 lilc = model1.information_criterion(y,u,3)
 plt.plot(reference, lilc, 'o--')
 plt.show()
-# model_length = input('Number of model elements:')
-# model_length = int(model_length)
+#model_length = input('Number of model elements:')
+#model_length = int(model_length)
 
 [model, errr, pivv, psi] = model1.ERR(y,w,model_length)
 theta = model1.last_squares(psi,y)

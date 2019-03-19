@@ -90,20 +90,20 @@ class sys_identfy:
         Raises:
             vec= A vector that contain the refer regressor
     """
-    def get_regresvec(self,reg_code_,i,j,y,u):
+    def get_regresvec(self, reg_code_, i, j, y, u):
         import numpy as np
-        max_lag=self.max_lag
-        aux_1=reg_code_-1000
-        aux_2=reg_code_-2000
-        if reg_code_[i,j] == 0:
-            vec = np.ones(len(y)-(self.max_lag))
-        if aux_1[i,j] > 0 and aux_1[i,j] < 100:
-            index_a=int(max_lag-aux_1[i,j])
-            index_b=int(len(y)-aux_1[i,j])
+        max_lag = self.max_lag
+        aux_1 = reg_code_-1000
+        aux_2 = reg_code_-2000
+        if reg_code_[i, j] == 0:
+            vec = np.ones(len(y) - (self.max_lag))
+        if aux_1[i, j] > 0 and aux_1[i, j] < 100:
+            index_a = int(max_lag - aux_1[i, j])
+            index_b = int(len(y) - aux_1[i, j])
             vec = y[index_a:index_b]
-        if aux_2[i,j] > 0 and aux_2[i,j] < 100:
-            index_a=int(max_lag-aux_2[i,j])
-            index_b=int(len(u)-aux_2[i,j])
+        if aux_2[i, j] > 0 and aux_2[i, j] < 100:
+            index_a = int(max_lag - aux_2[i, j])
+            index_b = int(len(u) - aux_2[i, j])
             vec = u[index_a:index_b]
         return vec
     #=============================================================================================================================================================
@@ -116,33 +116,33 @@ class sys_identfy:
         Raises:
             regress_matrix = Regressor matrix from the referencied model object
     """
-    def get_regressmatrx(self,y,u):
+    def get_regressmatrx(self, y, u):
         import numpy as np
-        reg_code=self.reg_code
+        reg_code = self.reg_code
         [row_number, col_number] = reg_code.shape
-        regress_matrix=get_regresvec(self,reg_code,0,0,y,u)
-        regress_matrix_aux=get_regresvec(self,reg_code,0,0,y,u)
+        regress_matrix = get_regresvec(self, reg_code, 0, 0, y, u)
+        regress_matrix_aux = get_regresvec(self, reg_code, 0, 0, y, u)
         for i in range(1, row_number):   #The first roll is read outside the loop, becouse that the range starts in 1.
             if col_number == 1:
-                regress_matrix_aux=get_regresvec(self,reg_code,i,0,y,u)
-                regress_matrix=np.vstack((regress_matrix,regress_matrix_aux))
+                regress_matrix_aux = get_regresvec(self, reg_code, i, 0, y, u)
+                regress_matrix = np.vstack((regress_matrix, regress_matrix_aux))
             else:
-                for j in range (0,col_number):
-                    if reg_code[i,j] != 0:
+                for j in range (0, col_number):
+                    if reg_code[i, j] != 0:
                         if j == 0:
-                            regress_matrix_aux=(get_regresvec(self,reg_code,i,j,y,u))*(get_regresvec(self,reg_code,i,j+1,y,u))
+                            regress_matrix_aux = (get_regresvec(self, reg_code, i, j, y, u))*(get_regresvec(self, reg_code, i, j+1, y, u))
                         else:
-                            if j == col_number-1:
-                                if reg_code[i,j-1] == 0:
-                                    regress_matrix_aux=get_regresvec(self,reg_code,i,j,y,u)
+                            if j == col_number - 1:
+                                if reg_code[i, j-1] == 0:
+                                    regress_matrix_aux = get_regresvec(self, reg_code, i, j, y, u)
                             else:
-                                if reg_code[i,j-1] == 0:
-                                    regress_matrix_aux=(get_regresvec(self,reg_code,i,j,y,u))*(get_regresvec(self,reg_code,i,j+1,y,u))
+                                if reg_code[i, j-1] == 0:
+                                    regress_matrix_aux = (get_regresvec(self, reg_code, i, j, y, u))*(get_regresvec(self, reg_code, i, j+1, y, u))
                                 else:
-                                    regress_matrix_aux=regress_matrix_aux*(get_regresvec(self,reg_code,i,j+1,y,u))
-                regress_matrix=np.vstack((regress_matrix,regress_matrix_aux))
-                regress_matrix_aux=get_regresvec(self,reg_code,0,0,y,u)
-        regress_matrix=regress_matrix.T
+                                    regress_matrix_aux = regress_matrix_aux*(get_regresvec(self, reg_code, i, j+1, y, u))
+                regress_matrix = np.vstack((regress_matrix, regress_matrix_aux))
+                regress_matrix_aux = get_regresvec(self, reg_code, 0, 0, y, u)
+        regress_matrix = regress_matrix.T
         return  regress_matrix
     #=============================================================================================================================================================
     """
@@ -150,15 +150,15 @@ class sys_identfy:
 
     """
 
-    def house(self,x):
+    def house(self, x):
         import numpy as np
-        n= len(x)
-        u=np.linalg.norm(x,2)
+        n = len(x)
+        u = np.linalg.norm(x, 2)
         v = np.array(x)
         aux_a = np.array([1])
         if u != 0:
             aux_b = x[0] + np.sign(x[0])*u
-            v = np.array(v[1:n]/aux_b)
+            v = np.array(v[1: n]/aux_b)
             v = np.concatenate((aux_a, v))
         return v
     #=============================================================================================================================================================
@@ -166,7 +166,7 @@ class sys_identfy:
     This function performes a rowhouse transformation
 
     """
-    def rowhouse(self,RA, v):
+    def rowhouse(self, RA, v):
         import numpy as np
         b = -2/(v.T@v)
         w = b*RA.T@v
@@ -174,7 +174,7 @@ class sys_identfy:
         w = w.reshape(1, m)
         m = v.size
         v = v.reshape(m, 1)
-        RA = RA+v*w
+        RA = RA + v*w
         B = RA
         return B
     #=============================================================================================================================================================
@@ -190,54 +190,54 @@ class sys_identfy:
             piv = A vec that contains the index to put the regressors in order
             psi_final = The Psi matrix
     """
-    def ERR(self,y,regress_matrix,process_term_number):
+    def ERR(self, y, regress_matrix, process_term_number):
         import numpy as np
-        squared_y = y[self.max_lag: -1].T@y[self.max_lag: -1]
-        aux_regress_matrix=np.array(regress_matrix)
-        y = np.array([y[self.max_lag:]]).T
-        aux_regress_matrix=np.concatenate((aux_regress_matrix,y), axis=1)
-        [row_number,col_number]=aux_regress_matrix.shape
-        piv=np.arange(col_number-1)
+        squared_y = y[self.max_lag: ].T@y[self.max_lag: ]
+        aux_regress_matrix = np.array(regress_matrix)
+        y = np.array([y[self.max_lag: ]]).T
+        y_aux = np.copy(y)
+        [row_number, col_number] = aux_regress_matrix.shape
+        piv = np.arange(col_number)
         # print('inicial')
         # print(piv)
-        err_aux = np.zeros(col_number-1)
-        err = np.zeros(col_number-1)
+        err_aux = np.zeros(col_number)
+        err = np.zeros(col_number)
         # print('iterações')
-        for i in np.arange(0,col_number-1):
-            for j in np.arange(i,col_number-1):
-                num = np.array(aux_regress_matrix[i:row_number, j].T@aux_regress_matrix[i:row_number, col_number-1])
-                num = np.power(num,2)
-                den = np.array( (aux_regress_matrix[i:row_number, j].T@aux_regress_matrix[i:row_number, j]) * squared_y)
+        for i in np.arange(0, col_number):
+            for j in np.arange(i, col_number):
+                num = np.array(aux_regress_matrix[i: row_number, j].T@y_aux[i: row_number])
+                num = np.power(num, 2)
+                den = np.array( (aux_regress_matrix[i:row_number, j].T@aux_regress_matrix[i: row_number, j]) * squared_y)
                 d = num/den
-                err_aux[j]=num/den
+                err_aux[j] = num/den
+
             err_aux = list(err_aux)
-            index = err_aux.index(max(err_aux[i:]))
+            print(err_aux)
+            index = err_aux.index(max(err_aux[i: ]))
             err[i] = err_aux[index]
-            temp = np.copy(aux_regress_matrix[:, i])
-            aux_regress_matrix[:, i] = np.copy(aux_regress_matrix[:, index])
-            aux_regress_matrix[:, index] = np.copy(temp)
-            temp2 = np.copy(piv[i])
-            piv[i] = np.copy(index)
-            piv[index] = np.copy(temp2)
+            aux_regress_matrix[:, [index, i]] = aux_regress_matrix[:, [i, index]]
+            piv[[index, i]] = piv[[i, index]]
             print('index', index , '\tvetor',piv , sep=':\t')
             x = aux_regress_matrix[i: row_number, i]
             v = self.house(x)
             aux_1 = aux_regress_matrix[i: row_number, i: col_number]
             row_result = self.rowhouse(aux_1, v)
+            y_aux[i: row_number] = self.rowhouse(y_aux[i: row_number], v)
             aux_regress_matrix[i: row_number, i: col_number] = np.copy(row_result)
             if i == process_term_number:
                 break
+
         Piv = piv[0: process_term_number]
         # print('final')
         # print(piv)
         psi_aux = np.array(regress_matrix)
         psi_final = np.copy(psi_aux[:, Piv])
-        reg_code_buffer=self.reg_code
-        model_code=np.copy(reg_code_buffer[Piv, :])
+        reg_code_buffer = self.reg_code
+        model_code = np.copy(reg_code_buffer[Piv, :])
 
         return model_code, err, piv, psi_final
     #=========================================================================================================================================================
-    
+
     """
     This function estimate the parameters from a model given a psi matrix and a output vec. It uses the Last Square Method and returns a vec that contains
     the estimated parameters.
@@ -247,9 +247,9 @@ class sys_identfy:
         Raises:
             theta = a vector that contains the estimated parameters
     """
-    def last_squares(self,psi,y):
+    def last_squares(self, psi, y):
         import numpy as np
-        theta= (np.linalg.pinv(psi.T@psi))@psi.T@y[self.max_lag:]
+        theta = (np.linalg.pinv(psi.T@psi))@psi.T@y[self.max_lag: ]
         return theta
     #=============================================================================================================================================================
 
@@ -266,16 +266,16 @@ class sys_identfy:
             u_valid = input validation data set
     """
 
-    def prepare_data(y_path,u_path,percent):
+    def prepare_data(y_path, u_path, percent):
         import numpy as np
         y = np.loadtxt(y_path)
         u = np.loadtxt(u_path)
-        y_size=y.size
-        size_ident=round((y_size*percent)/100)
-        y_ident=y[0:size_ident]
-        u_ident=u[0:size_ident]
-        y_valid=y[size_ident+1:y_size+1]
-        u_valid=y[size_ident+1:y_size+1]
+        y_size = y.size
+        size_ident = round((y_size*percent)/100)
+        y_ident = y[0: size_ident]
+        u_ident = u[0: size_ident]
+        y_valid = y[size_ident+1 : y_size+1]
+        u_valid = y[size_ident+1 : y_size+1]
         return y_ident, u_ident, y_valid, u_valid
     #============================================================================================================================================================
 
@@ -288,7 +288,7 @@ class sys_identfy:
             rmse = The RMSE index
             mse = The MSE index
     """
-    def validation_index(self,y, ysim):
+    def validation_index(self, y, ysim):
         import numpy as np
         mse = np.mean(np.square((y - ysim)))
         num2 = np.sum(np.square((ysim - y)))
@@ -306,7 +306,7 @@ class sys_identfy:
         import numpy as np
         result = np.correlate(x, x, mode='full')
         half_of_simmetry = int(np.floor(result.size/2))
-        return result[half_of_simmetry:]
+        return result[half_of_simmetry: ]
     #=========================================================================================================================================================
     """
     This function returns the values of predicted model
@@ -328,8 +328,8 @@ class sys_identfy:
         predicted_values[0:self.max_lag] = y_initial[0:self.max_lag]
         print(predicted_values[0:10])
         analised_elements_number = self.max_lag + 1
-        effective_pivot_vector = model_pivot[0:len(model_elements_count)]
-        for i in range(0,len(entrace_u)-self.max_lag):
+        effective_pivot_vector = model_pivot[0: len(model_elements_count)]
+        for i in range(0, len(entrace_u)-self.max_lag):
             # print(i)
             temporary_regressor_matrix = self.get_regressmatrx(predicted_values[i:i+analised_elements_number],entrace_u[i:i+analised_elements_number])
             # print('Unsorted:')
@@ -354,19 +354,19 @@ class sys_identfy:
         Rises:
             output_vector = Vector with values of akaike's information criterion for models with N terms (where N is the vector position + 1)
     """
-    def information_criterion(self,output_y,input_u,calculation_method):
+    def information_criterion(self, output_y, input_u, calculation_method):
         import numpy as np
         output_vector = np.zeros(len(self.reg_code))
         output_vector[:] = float('NaN')
-        base_regressor_matrix = self.get_regressmatrx(output_y,input_u)
+        base_regressor_matrix = self.get_regressmatrx(output_y, input_u)
         [null, null, null, regressor_matrix] = self.ERR(output_y, base_regressor_matrix, len(self.reg_code))
-        effective_output_elements_count = len(output_y)-self.max_lag
+        effective_output_elements_count = len(output_y) - self.max_lag
 
-        for i in range(0,len(self.reg_code)):
+        for i in range(0, len(self.reg_code)):
             model_elements = i + 1
-            temporary_estimated_paramters = self.last_squares(regressor_matrix[:,0:model_elements],output_y)
-            temporary_simulated_output = regressor_matrix[:,0:model_elements] @ temporary_estimated_paramters
-            temporary_residual = output_y[self.max_lag:] - temporary_simulated_output
+            temporary_estimated_paramters = self.last_squares(regressor_matrix[:, 0:model_elements], output_y)
+            temporary_simulated_output = regressor_matrix[:, 0:model_elements] @ temporary_estimated_paramters
+            temporary_residual = output_y[self.max_lag: ] - temporary_simulated_output
             residual_variance = np.var(temporary_residual)
 
             if calculation_method == 1:
