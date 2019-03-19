@@ -28,7 +28,7 @@ model1 = sys_identfy(non_degree,ylag,ulag)
 reg_code_ = model1.reg_code
 w = model1.get_regressmatrx(y,u)
 
-reference = np.arange(1,len(model1.reg_code)+1)
+# reference = np.arange(1,len(model1.reg_code)+1)
 # aic = model1.information_criterion(y,u,0)
 # plt.plot(reference, aic, 'o--')
 # plt.show()
@@ -41,11 +41,11 @@ reference = np.arange(1,len(model1.reg_code)+1)
 # plt.plot(reference, fpe, 'o--')
 # plt.show()
 
-lilc = model1.information_criterion(y,u,3)
-plt.plot(reference, lilc, 'o--')
-plt.show()
-model_length = input('Number of model elements:')
-model_length = int(model_length)
+# lilc = model1.information_criterion(y,u,3)
+# plt.plot(reference, lilc, 'o--')
+# plt.show()
+# model_length = input('Number of model elements:')
+# model_length = int(model_length)
 
 
 [model, errr, pivv, psi] = model1.ERR(y,w,model_length)

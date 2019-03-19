@@ -294,6 +294,10 @@ class sys_identfy:
             err[i] = err_aux[piv_index]
             aux_regress_matrix[:, [piv_index, i]] = aux_regress_matrix[:, [i, piv_index]]
             piv[[piv_index, i]] = piv[[i, piv_index]]
+            index = err_aux.index(max(err_aux[i: ]))
+            err[i] = err_aux[index]
+            aux_regress_matrix[:, [index, i]] = aux_regress_matrix[:, [i, index]]
+            piv[[index, i]] = piv[[i, index]]
             x = aux_regress_matrix[i: row_number, i]
             v = self.house(x)
             aux_1 = aux_regress_matrix[i: row_number, i: col_number]
@@ -304,6 +308,8 @@ class sys_identfy:
         Piv = piv[0: process_term_number]
         psi_aux = np.array(matrix_of_regressors)
         matrix_of_regressors_orthogonal = np.copy(psi_aux[:, Piv])
+        psi_aux = np.array(regress_matrix)
+        psi_final = np.copy(psi_aux[:, Piv])
         reg_code_buffer = self.reg_code
         model_code = np.copy(reg_code_buffer[Piv, :])
 
@@ -889,7 +895,6 @@ class sys_identfy:
         analised_elements_number = self.max_lag + 1
         effective_pivot_vector = model_pivot[0: len(model_elements)]
         for i in range(0, len(entrace_u)-self.max_lag):
-            # print(i)
             temporary_regressor_matrix = self.get_regressmatrx(predicted_values[i:i+analised_elements_number],entrace_u[i:i+analised_elements_number])
             temporary_regressor_matrix = np.copy(temporary_regressor_matrix[:, effective_pivot_vector])
             predicted_values[i+self.max_lag] = temporary_regressor_matrix @ estimated_paramters
@@ -927,13 +932,13 @@ class sys_identfy:
         output_vector = np.zeros(len(self.reg_code))
         output_vector[:] = float('NaN')
         base_regressor_matrix = self.get_regressmatrx(output_y, input_u)
-        [null, null, null, regressor_matrix] = self.ERR(output_y, base_regressor_matrix, len(self.reg_code))
         effective_output_elements_count = len(output_y) - self.max_lag
 
         for i in range(0, len(self.reg_code)):
             model_elements = i + 1
-            temporary_estimated_paramters = self.last_squares(regressor_matrix[:, 0:model_elements], output_y)
-            temporary_simulated_output = regressor_matrix[:, 0:model_elements] @ temporary_estimated_paramters
+            [null, null, null, regressor_matrix] = self.ERR(output_y, base_regressor_matrix, model_elements)
+            temporary_estimated_paramters = self.last_squares(regressor_matrix, output_y)
+            temporary_simulated_output = regressor_matrix @ temporary_estimated_paramters
             temporary_residual = output_y[self.max_lag: ] - temporary_simulated_output
             residual_variance = np.var(temporary_residual)
 
