@@ -206,12 +206,12 @@ class sys_identfy:
                 err_aux[j] = num/den
 
             err_aux = list(err_aux)
-            print(err_aux)
+            # print(err_aux)
             index = err_aux.index(max(err_aux[i: ]))
             err[i] = err_aux[index]
             aux_regress_matrix[:, [index, i]] = aux_regress_matrix[:, [i, index]]
             piv[[index, i]] = piv[[i, index]]
-            print('index', index , '\tvetor',piv , sep=':\t')
+            # print('index', index , '\tvetor',piv , sep=':\t')
             x = aux_regress_matrix[i: row_number, i]
             v = self.house(x)
             aux_1 = aux_regress_matrix[i: row_number, i: col_number]
@@ -318,7 +318,7 @@ class sys_identfy:
         predicted_values = np.zeros((len(entrace_u)))
         predicted_values[0:self.max_lag] = y_initial[0:self.max_lag] #Discard unnecessary initial values
         analised_elements_number = self.max_lag + 1
-        effective_pivot_vector = model_pivot[0: len(model_elements_count)]
+        effective_pivot_vector = model_pivot[0: len(model_elements)]
         for i in range(0, len(entrace_u)-self.max_lag):
             # print(i)
             temporary_regressor_matrix = self.get_regressmatrx(predicted_values[i:i+analised_elements_number],entrace_u[i:i+analised_elements_number])

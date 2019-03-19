@@ -30,9 +30,9 @@ reg_code_ = model1.reg_code
 w = model1.get_regressmatrx(y,u)
 
 reference = np.arange(1,len(model1.reg_code)+1)
-aic = model1.information_criterion(y,u,0)
-plt.plot(reference, aic, 'o--')
-plt.show()
+# aic = model1.information_criterion(y,u,0)
+# plt.plot(reference, aic, 'o--')
+# plt.show()
 
 # bic = model1.information_criterion(y,u,1)
 # plt.plot(reference, bic, 'o--')
@@ -45,8 +45,8 @@ plt.show()
 lilc = model1.information_criterion(y,u,3)
 plt.plot(reference, lilc, 'o--')
 plt.show()
-#model_length = input('Number of model elements:')
-#model_length = int(model_length)
+model_length = input('Number of model elements:')
+model_length = int(model_length)
 
 
 [model, errr, pivv, psi] = model1.ERR(y,w,model_length)
@@ -55,7 +55,7 @@ theta = model1.last_squares(psi,y)
 
 #print(theta)
 # print(pd.DataFrame(model))
-# print(errr)
+print(errr)
 # print(pivv)
 # print(theta)
 
@@ -70,23 +70,5 @@ plt.show()
 
 # print('rmse calculated: ', rmse)
 # print('mse calculated: ', mse)
-
-
-
-#================================================
-
-# y_livre = y[0:model1.max_lag]
-# for i in range((model1.max_lag),u.size):
-#     y_livre=np.append(y_livre,theta[0]*y_livre[i-1]+theta[1]*y_livre[i-2]+theta[2]*u[i-1]+theta[3]*y_livre[i-1]*u[i-1]+theta[4]*u[i-2]+theta[5]*y_livre[i-2]*u[i-1]+theta[6]*y_livre[i-1]*u[i-2]+theta[7]*y_livre[i-2]*u[i-2]+theta[8]*y_livre[i-1]*y_livre[i-1]+theta[9]*y_livre[i-2]*y_livre[i-2])
-# print(y_livre)
-# y_livre = np.zeros(u.size)
-# y_livre[0:model1.max_lag] = np.copy(y[0:model1.max_lag])
-
-# for i in range((model1.max_lag),u.size):
-#     y_livre[i]=theta[0]*y_livre[i-1]+theta[1]*y_livre[i-2]+theta[2]*u[i-1]+theta[3]*y_livre[i-1]*u[i-1]+theta[4]*u[i-2]+theta[5]*y_livre[i-2]*u[i-1]+theta[6]*y_livre[i-1]*u[i-2]+theta[7]*y_livre[i-2]*u[i-2]+theta[8]*y_livre[i-1]*y_livre[i-1]+theta[9]*y_livre[i-2]*y_livre[i-2]
-# print(y_livre)
-# plt.plot(y)
-# plt.plot(y_livre)
-# plt.show()
 
 print('fim')
