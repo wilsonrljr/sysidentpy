@@ -308,7 +308,7 @@ class sys_identfy:
         Piv = piv[0: process_term_number]
         psi_aux = np.array(matrix_of_regressors)
         matrix_of_regressors_orthogonal = np.copy(psi_aux[:, Piv])
-        psi_aux = np.array(regress_matrix)
+        psi_aux = np.array(matrix_of_regressors)
         psi_final = np.copy(psi_aux[:, Piv])
         reg_code_buffer = self.reg_code
         model_code = np.copy(reg_code_buffer[Piv, :])
