@@ -205,6 +205,8 @@ class sys_identfy:
                 d = num/den
                 err_aux[j] = num/den
 
+            if i == process_term_number:
+                break
             err_aux = list(err_aux)
             # print(err_aux)
             index = err_aux.index(max(err_aux[i: ]))
@@ -218,9 +220,7 @@ class sys_identfy:
             row_result = self.rowhouse(aux_1, v)
             y_aux[i: row_number] = self.rowhouse(y_aux[i: row_number], v)
             aux_regress_matrix[i: row_number, i: col_number] = np.copy(row_result)
-            if i == process_term_number:
-                break
-
+            
         Piv = piv[0: process_term_number]
         # print('final')
         # print(piv)
