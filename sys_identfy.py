@@ -912,10 +912,10 @@ class sys_identfy:
                   Input system values measured by the user
 
         calculation_method = int value to choose the respective information criteria
-                             0 - Akaike's Information Criterion with critical value 2 (AIC) (default)
-                             1 - Bayes Information Criterion (BIC)
-                             2 - Final Prediction Error (FPE)
-                             3 - Khundrin’s law ofiterated logarithm criterion (LILC)
+                             'Akaike'-  Akaike's Information Criterion with critical value 2 (AIC) (default)
+                             'Bayes' -  Bayes Information Criterion (BIC)
+                             'FPE'   -  Final Prediction Error (FPE)
+                             'LILC'  -  Khundrin’s law ofiterated logarithm criterion (LILC)
 
         Returns:
         --------
@@ -933,6 +933,9 @@ class sys_identfy:
         output_vector[:] = float('NaN')
         base_regressor_matrix = self.get_regressmatrx(output_y, input_u)
         effective_output_elements_count = len(output_y) - self.max_lag
+        choices={'Akaike':0,'Bayes':1,"FPE":2,"LILC":3}
+        result=choices.get(calculation_method)
+        calculation_method=result
 
         for i in range(0, len(self.reg_code)):
             model_elements = i + 1
@@ -941,6 +944,7 @@ class sys_identfy:
             temporary_simulated_output = regressor_matrix @ temporary_estimated_paramters
             temporary_residual = output_y[self.max_lag: ] - temporary_simulated_output
             residual_variance = np.var(temporary_residual)
+
 
             if calculation_method == 1: #BIC
                 model_factor = model_elements * np.log(effective_output_elements_count)
