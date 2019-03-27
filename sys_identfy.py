@@ -34,7 +34,7 @@ class sys_identfy:
         self.non_degree=non_degree_ # non_degree stores the nonlinearity degree
         self.ylag=ylag_             # ylag stores the maximum output lag
         self.ulag=ulag_             # ulag ylag stores the maximum input lag
-        [self.reg_code,self.max_lag]=genreg(non_degree_,ylag_,ulag_) # reg_code stores all possible combinations
+        [self.reg_code,self.max_lag] = genreg(non_degree_,ylag_,ulag_) # reg_code stores all possible combinations
     #=============================================================================================================================================================
 
     def genreg(non_degree, ylag, ulag):
@@ -80,100 +80,9 @@ class sys_identfy:
         reg_aux = np.concatenate([reg_aux, y_vec, u_vec])
         reg_code = list(combinations_with_replacement(reg_aux, non_degree))
         reg_code = np.array(reg_code)
+        reg_code = reg_code[:, reg_code.shape[1]::-1]
         max_lag = max(ylag, ulag)
         return reg_code, max_lag
-    #=============================================================================================================================================================
-
-    def get_regresvec(self, reg_code_, i, j, y, u):
-        """ This function extrac a givn regressor from a dataset
-
-        Parameters:
-        -----------
-
-        reg_code = ndarray of int
-                    A ndarray that contains the mappin of all possible regressors (it must be generate with genreg() func. )
-
-        i = int
-            Row from the map
-
-        j = int
-            Column from the map
-
-        y = array-like
-            target data used on training phase
-
-        u = array-like
-            input data used on training phase
-
-        Returns:
-        --------
-        vec = array-like
-              A vector that contain the refer regressor
-        """
-
-        import numpy as np
-        max_lag = self.max_lag
-        aux_1 = reg_code_-1000
-        aux_2 = reg_code_-2000
-        if reg_code_[i, j] == 0:
-            vec = np.ones(len(y) - (self.max_lag))
-        if aux_1[i, j] > 0 and aux_1[i, j] < 100:
-            index_a = int(max_lag - aux_1[i, j])
-            index_b = int(len(y) - aux_1[i, j])
-            vec = y[index_a:index_b]
-        if aux_2[i, j] > 0 and aux_2[i, j] < 100:
-            index_a = int(max_lag - aux_2[i, j])
-            index_b = int(len(u) - aux_2[i, j])
-            vec = u[index_a:index_b]
-        return vec
-    #=============================================================================================================================================================
-
-    def get_regressmatrx(self, y, u):
-        """ Build the information matrix based on model code.
-
-        Parameters:
-        -----------
-        y = array-like
-            target data used on training phase
-
-        u = array-like
-            input data used on training phase
-
-        Returns:
-        --------
-        matrix_of_regressors = ndarray of floats
-                                the information matrix of the model
-
-        """
-
-        import numpy as np
-        reg_code = self.reg_code
-        [row_number, col_number] = reg_code.shape
-        matrix_of_regressors = get_regresvec(self, reg_code, 0, 0, y, u)
-        regress_matrix_aux = get_regresvec(self, reg_code, 0, 0, y, u)
-        for i in range(1, row_number):   #The first roll is read outside the loop, becouse that the range starts in 1.
-            if col_number == 1:
-                regress_matrix_aux = get_regresvec(self, reg_code, i, 0, y, u)
-                matrix_of_regressors = np.vstack((regress_matrix, regress_matrix_aux))
-            else:
-                for j in range (0, col_number):
-                    if reg_code[i, j] != 0:
-                        if j == 0:
-                            regress_matrix_aux = (get_regresvec(self, reg_code, i, j, y, u))*(get_regresvec(self, reg_code, i, j+1, y, u))
-                        else:
-                            if j == col_number - 1:
-                                if reg_code[i, j-1] == 0:
-                                    regress_matrix_aux = get_regresvec(self, reg_code, i, j, y, u)
-                            else:
-                                if reg_code[i, j-1] == 0:
-                                    regress_matrix_aux = (get_regresvec(self, reg_code, i, j, y, u))*(get_regresvec(self, reg_code, i, j+1, y, u))
-                                else:
-                                    regress_matrix_aux = regress_matrix_aux*(get_regresvec(self, reg_code, i, j+1, y, u))
-                matrix_of_regressors = np.vstack((matrix_of_regressors, regress_matrix_aux))
-                regress_matrix_aux = get_regresvec(self, reg_code, 0, 0, y, u)
-        matrix_of_regressors = matrix_of_regressors.T
-        return  matrix_of_regressors
-    #=============================================================================================================================================================
 
     def house(self, x):
         """This function performes a Househoulder reflection of vector
@@ -274,7 +183,8 @@ class sys_identfy:
         import numpy as np
         squared_y = y[self.max_lag: ].T@y[self.max_lag: ]
         aux_regress_matrix = np.array(matrix_of_regressors)
-        y = np.array([y[self.max_lag: ]]).T
+        #y = np.array([y[self.max_lag: ]]).T
+        y = np.array([y[self.max_lag:, 0]]).T
         y_aux = np.copy(y)
         [row_number, col_number] = aux_regress_matrix.shape
         piv = np.arange(col_number)
@@ -286,6 +196,7 @@ class sys_identfy:
                 numerator = np.power(numerator, 2)
                 denominator = np.array( (aux_regress_matrix[i:row_number, j].T@aux_regress_matrix[i: row_number, j]) * squared_y)
                 err_aux[j] = numerator/denominator
+                #print(err_aux)
 
             if i == process_term_number:
                 break
@@ -294,10 +205,10 @@ class sys_identfy:
             err[i] = err_aux[piv_index]
             aux_regress_matrix[:, [piv_index, i]] = aux_regress_matrix[:, [i, piv_index]]
             piv[[piv_index, i]] = piv[[i, piv_index]]
-            index = err_aux.index(max(err_aux[i: ]))
-            err[i] = err_aux[index]
-            aux_regress_matrix[:, [index, i]] = aux_regress_matrix[:, [i, index]]
-            piv[[index, i]] = piv[[i, index]]
+            #index = err_aux.index(max(err_aux[i: ]))
+            #err[i] = err_aux[index]
+            #aux_regress_matrix[:, [index, i]] = aux_regress_matrix[:, [i, index]]
+            #piv[[index, i]] = piv[[i, index]]
             x = aux_regress_matrix[i: row_number, i]
             v = self.house(x)
             aux_1 = aux_regress_matrix[i: row_number, i: col_number]
@@ -333,7 +244,9 @@ class sys_identfy:
         """
 
         import numpy as np
-        theta = (np.linalg.pinv(matrix_of_regressors.T@matrix_of_regressors))@matrix_of_regressors.T@training_output[self.max_lag: ]
+        training_output = training_output[self.max_lag:, 0]
+        training_output = np.reshape(training_output, (len(training_output), 1))
+        theta = (np.linalg.pinv(matrix_of_regressors.T@matrix_of_regressors))@matrix_of_regressors.T@training_output
         return theta
 
 
@@ -844,7 +757,7 @@ class sys_identfy:
 
         Examples
         --------
-         >>> y = [3, -0.5, 2, 7]
+        >>> y = [3, -0.5, 2, 7]
         >>> autocorr(y)
         [62.25 11.5   2.5  21.  ]
 
@@ -854,7 +767,7 @@ class sys_identfy:
         result = np.correlate(signal, signal, mode='full')
         half_of_simmetry = int(np.floor(result.size/2))
         return result[half_of_simmetry: ]
-    #=========================================================================================================================================================
+
 
     def model_prediction(self, model_elements, model_pivot, y_initial, entrace_u, estimated_paramters):
 
@@ -890,14 +803,17 @@ class sys_identfy:
         import numpy as np
         if len(y_initial)<self.max_lag:
             raise Exception('Insufficient initial conditions elements!')
-        predicted_values = np.zeros((len(entrace_u)))
+        predicted_values = np.zeros((len(entrace_u), 1))
         predicted_values[0:self.max_lag] = y_initial[0:self.max_lag] #Discard unnecessary initial values
         analised_elements_number = self.max_lag + 1
         effective_pivot_vector = model_pivot[0: len(model_elements)]
         for i in range(0, len(entrace_u)-self.max_lag):
-            temporary_regressor_matrix = self.get_regressmatrx(predicted_values[i:i+analised_elements_number],entrace_u[i:i+analised_elements_number])
+            temporary_regressor_matrix = self.build_information_matrix(self.reg_code, entrace_u[i:i+analised_elements_number], predicted_values[i:i+analised_elements_number])
             temporary_regressor_matrix = np.copy(temporary_regressor_matrix[:, effective_pivot_vector])
-            predicted_values[i+self.max_lag] = temporary_regressor_matrix @ estimated_paramters
+            a = temporary_regressor_matrix @ estimated_paramters
+            #print(a)
+            predicted_values[i+self.max_lag] = a[:, 0]
+
         return predicted_values
 
     def information_criterion(self, output_y, input_u, calculation_method):
@@ -931,11 +847,15 @@ class sys_identfy:
         import numpy as np
         output_vector = np.zeros(len(self.reg_code))
         output_vector[:] = float('NaN')
-        base_regressor_matrix = self.get_regressmatrx(output_y, input_u)
+        base_regressor_matrix = self.build_information_matrix(self.reg_code, input_u, output_y)
         effective_output_elements_count = len(output_y) - self.max_lag
         choices={'Akaike':0,'Bayes':1,"FPE":2,"LILC":3}
         result=choices.get(calculation_method)
         calculation_method=result
+
+        choices = {'Akaike':0,'Bayes':1,"FPE":2,"LILC":3}
+        result = choices.get(calculation_method)
+        calculation_method = result
 
         for i in range(0, len(self.reg_code)):
             model_elements = i + 1
@@ -959,3 +879,193 @@ class sys_identfy:
             output_vector[i] = residual_factor + model_factor
 
         return output_vector
+
+
+    def model_information(self, model):
+        """ This function return crucial information about the current model evaluated
+
+        Parameters
+        ----------
+        model = ndarray of ints
+                The model code represetation
+
+        Returns:
+        --------
+        number_of_elements = int
+                             The number of terms of the model
+
+        nno = int
+              The number of noise terms
+
+        maximum_lag = int
+                      The maximum lag of any regressor of the model
+
+        number_of_output = int
+                           The number of outputs of the model
+
+        number_of_inputs = int
+                           The number of inputs of the model
+
+        model = ndarray of ints
+                The model code represetation
+
+
+        Examples
+        --------
+        Example 1:
+
+        >>> model = ([1001,1001]; [2001, 0]; [2002 1001])
+        >>> [n_e, nno, max_lag, n_out, n_in, model] = model_information(model)
+        n_e = 3
+        nno = 0
+        max_lag = 2
+        n_out = 1
+        n_in = 1
+        model = ([1001,1001]; [2001, 0]; [2002 1001])
+
+        """
+
+        import numpy as np
+        number_of_elements = model.shape[0]
+        number_of_noise = 0 #require future update for NARMAX model
+
+        # the auxiliary_model variable is an array with all terms of the model separated wihtout brackets
+        # example: if lag = 2, ylag = 2, ulag = 2, the auxiliary_model results in
+        #           [1001 1002 2001 2002 1001 1001 1002 1001 2001 1001 2002 1001 1002 1002
+        #           2001 1002 2002 1002 2001 2001 2002 2001 2002 2002]
+        auxiliary_model = model.reshape(model.shape[0]*model.shape[1], 1)
+        auxiliary_model = auxiliary_model[~np.all(auxiliary_model == 0, axis=1)]
+        auxiliary_model = np.array(auxiliary_model).ravel()
+        list_of_split_vector = []
+        lag = []
+        for k in np.arange(auxiliary_model.shape[0]):
+            remove_bracket = np.array(np.array2string(auxiliary_model[k], precision=1, separator=''))
+            # the split_vector transform each term in auxiliary_vector in separeted digits
+            # example: [1001] = [1 0 0 1]
+            split_vector = np.array([int(d) for d in str(remove_bracket)])
+            # the variable 's' is the join of the split_vector from index 1 onwards
+            # example: [1 0 0 1] = [001] = 1 and [1 0 1 2] = [012] = 12
+            s = int(''.join(str(i) for i in split_vector[1:]))
+            lag.append(s)
+            list_of_split_vector.append(split_vector)
+
+        list_of_split_vector = np.array(list_of_split_vector)
+        if len(model) != 0 and len(list_of_split_vector) != 0:
+            maximum_lag = np.max(lag)
+            min_term_code = np.min(list_of_split_vector[:, 0])
+            if min_term_code != 1:
+                number_of_output = 0
+            else:
+                number_of_output = 1
+
+            number_of_inputs = np.max(list_of_split_vector[:, 0]) - number_of_output
+
+        else:
+            maximum_lag = 0
+            number_of_output = 0
+            number_of_inputs = 0
+
+        _model = np.copy(model)
+
+        return number_of_elements, number_of_noise, maximum_lag, number_of_output, number_of_inputs, _model
+
+
+    def shift_column(self, col_to_shift, lag):
+        """ This function shift the values corresponding a regressor given its respective lag
+
+        Parameters
+        ----------
+        col_to_shift = array-like of shape = number_of_samples
+                       The samples of the input or output
+
+        lag = int
+              The respective lag of the regressor
+
+
+        Returns:
+        --------
+        col_aux = array-like of shape = number_of_samples
+                  The shifted array of the input or output
+
+        Examples
+        --------
+        Example 1:
+
+        >>> y = [1, 2, 3, 4, 5]
+        >>> shift_column(y, 1)
+        [0, 1, 2, 3, 4]
+        """
+
+        import numpy as np
+        number_of_samples = col_to_shift.shape[0]
+        col_aux = np.zeros((number_of_samples, 1))
+        aux = col_to_shift[0: number_of_samples - lag]
+        aux = np.reshape(aux, (len(aux),1))
+        col_aux[lag:, 0] = aux[:, 0]
+
+        return col_aux
+
+
+    def build_information_matrix(self, model, u, y):
+        """ Build the information matrix based on model code.
+
+        Parameters:
+        -----------
+        model = ndarray of int
+                the model code representation
+
+        y = array-like
+            target data used on training phase
+
+        u = array-like
+            input data used on training phase
+
+        Returns:
+        --------
+        matrix_of_regressors = ndarray of floats
+                                the information matrix of the model
+
+        """
+
+        import numpy as np
+
+        number_of_elements = self.model_information(model);
+        number_of_samples = u.shape[0]
+        auxiliary_model = np.copy(model)
+        matrix_of_regressors = np.ones((number_of_samples, number_of_elements[0]))
+        for k in np.arange(number_of_elements[0]):
+            current_regressor = auxiliary_model[k, :]
+            current_regressor = current_regressor.reshape(current_regressor.shape[0], 1)
+            current_regressor = current_regressor[~np.all(current_regressor == 0, axis=1)]
+            current_regressor = np.array(current_regressor).ravel()
+
+            if len(current_regressor) != 0:
+                list_of_split_vector = []
+                lag = []
+                for i in np.arange(current_regressor.shape[0]):
+                    remove_bracket = np.array(np.array2string(current_regressor[i], precision=1, separator=''))
+                    split_vector = np.array([int(d) for d in str(remove_bracket)])
+                    s = int(''.join(str(i) for i in split_vector[1:]))
+                    lag.append(s)
+                    list_of_split_vector.append(split_vector)
+
+                list_of_split_vector = np.array(list_of_split_vector)
+                lag = np.array(lag)
+                which_regressor = list_of_split_vector[:, 0];
+
+                for i in np.arange(which_regressor.shape[0]):
+                    if which_regressor[i] == 1:
+                        aux_col = self.shift_column(y, lag[i]).T
+                        element_wise_multiplication = np.multiply(aux_col, matrix_of_regressors[:, k]).T
+                        matrix_of_regressors[:, k] = element_wise_multiplication[:, 0]
+                    else:
+                        auxw = which_regressor[i]-2
+                        aux_col = self.shift_column(u[:, auxw], lag[i]).T
+                        element_wise_multiplication = np.multiply(aux_col, matrix_of_regressors[:, k]).T
+                        matrix_of_regressors[:, k] = element_wise_multiplication[:, 0]
+            else:
+                matrix_of_regressors[:, k] = np.ones((number_of_samples, 1))[:, 0]
+
+        matrix_of_regressors = matrix_of_regressors[number_of_elements[2]:, :]
+
+        return matrix_of_regressors
