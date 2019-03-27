@@ -53,7 +53,6 @@ model_length = input('Number of model elements:')
 model_length = int(model_length)
 
 
-
 [model, errr, pivv, psi] = model1.ERR(y,w,model_length)
 number_of_elements, nno, maximum_lag, number_of_output, nu, new_model = model1.model_information(model)
 theta = model1.last_squares(psi, y)
