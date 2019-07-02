@@ -144,7 +144,7 @@ class sys_identfy:
         return B
     #=============================================================================================================================================================
 
-    def ERR(self, y, matrix_of_regressors, process_term_number):
+    def ERR(self, y, X, process_term_number):
 
         """ Performs the Error Reduction Ration algorithm
 
@@ -153,7 +153,7 @@ class sys_identfy:
         y = array-like of shape = number_of_samples
             the target data used in the identification process
 
-        matrix_of_regressors = ndarray of floats
+        X = ndarray of floats
                                 the information matrix of the model
 
         process_term_number = int
@@ -167,7 +167,7 @@ class sys_identfy:
         piv = array-like of shape = number_of_model_elements
               Contains the index to put the regressors in the correct order based on err values
 
-        matrix_of_regressors_orthogonal = ndarray of floats
+        X_orthogonal = ndarray of floats
                                         The updated and orthogonal information matrix
 
         References:
@@ -182,19 +182,19 @@ class sys_identfy:
 
         import numpy as np
         squared_y = y[self.max_lag: ].T@y[self.max_lag: ]
-        aux_regress_matrix = np.array(matrix_of_regressors)
+        X_aux = np.array(X)
         #y = np.array([y[self.max_lag: ]]).T
         y = np.array([y[self.max_lag:, 0]]).T
         y_aux = np.copy(y)
-        [row_number, col_number] = aux_regress_matrix.shape
+        [row_number, col_number] = X_aux.shape
         piv = np.arange(col_number)
         err_aux = np.zeros(col_number)
         err = np.zeros(col_number)
         for i in np.arange(0, col_number):
             for j in np.arange(i, col_number):
-                numerator = np.array(aux_regress_matrix[i: row_number, j].T@y_aux[i: row_number])
+                numerator = np.array(X_aux[i: row_number, j].T@y_aux[i: row_number])
                 numerator = np.power(numerator, 2)
-                denominator = np.array( (aux_regress_matrix[i:row_number, j].T@aux_regress_matrix[i: row_number, j]) * squared_y)
+                denominator = np.array( (X_aux[i:row_number, j].T@X_aux[i: row_number, j]) * squared_y)
                 err_aux[j] = numerator/denominator
                 #print(err_aux)
 
@@ -203,38 +203,38 @@ class sys_identfy:
             err_aux = list(err_aux)
             piv_index = err_aux.index(max(err_aux[i: ]))
             err[i] = err_aux[piv_index]
-            aux_regress_matrix[:, [piv_index, i]] = aux_regress_matrix[:, [i, piv_index]]
+            X_aux[:, [piv_index, i]] = X_aux[:, [i, piv_index]]
             piv[[piv_index, i]] = piv[[i, piv_index]]
             #index = err_aux.index(max(err_aux[i: ]))
             #err[i] = err_aux[index]
             #aux_regress_matrix[:, [index, i]] = aux_regress_matrix[:, [i, index]]
             #piv[[index, i]] = piv[[i, index]]
-            x = aux_regress_matrix[i: row_number, i]
+            x = X_aux[i: row_number, i]
             v = self.house(x)
-            aux_1 = aux_regress_matrix[i: row_number, i: col_number]
+            aux_1 = X_aux[i: row_number, i: col_number]
             row_result = self.rowhouse(aux_1, v)
             y_aux[i: row_number] = self.rowhouse(y_aux[i: row_number], v)
-            aux_regress_matrix[i: row_number, i: col_number] = np.copy(row_result)
+            X_aux[i: row_number, i: col_number] = np.copy(row_result)
 
         Piv = piv[0: process_term_number]
-        psi_aux = np.array(matrix_of_regressors)
-        matrix_of_regressors_orthogonal = np.copy(psi_aux[:, Piv])
-        psi_aux = np.array(matrix_of_regressors)
+        psi_aux = np.array(X)
+        X_orthogonal = np.copy(psi_aux[:, Piv])
+        psi_aux = np.array(X)
         psi_final = np.copy(psi_aux[:, Piv])
         reg_code_buffer = self.reg_code
         model_code = np.copy(reg_code_buffer[Piv, :])
 
-        return model_code, err, piv, matrix_of_regressors_orthogonal
+        return model_code, err, piv, X_orthogonal
 
-    def last_squares(self, matrix_of_regressors, training_output):
+    def last_squares(self, X_train, y_train):
         """ Estimate the model parameters using Least Squares method
 
         Parameters:
         -----------
-        matrix_of_regressors = ndarray of floats
+        X_train = ndarray of floats
                                 the information matrix of the model
 
-        training_output = array-like of shape = y_training
+        y_train = array-like of shape = y_training
                           the data used to training the model
 
         Returns:
@@ -244,9 +244,9 @@ class sys_identfy:
         """
 
         import numpy as np
-        training_output = training_output[self.max_lag:, 0]
-        training_output = np.reshape(training_output, (len(training_output), 1))
-        theta = (np.linalg.pinv(matrix_of_regressors.T@matrix_of_regressors))@matrix_of_regressors.T@training_output
+        y_train = y_train[self.max_lag:, 0]
+        y_train = np.reshape(y_train, (len(y_train), 1))
+        theta = (np.linalg.pinv(X_train.T@X_train))@X_train.T@y_train
         return theta
 
 
@@ -290,7 +290,7 @@ class sys_identfy:
         u_validation = y[size_ident+1 : y_size+1]
         return y_training, u_training, y_validation, u_validation
 
-    def forecast_error(self, y, ysim):
+    def forecast_error(self, y, y_predicted):
         """ Calculate the forecast error (also known as identification residues)
             in a regression model
 
@@ -299,7 +299,7 @@ class sys_identfy:
         y : array-like of shape = number_of_outputs
             Represent the target values.
 
-        ysim : array-like of shape = number_of_outputs
+        y_predicted : array-like of shape = number_of_outputs
             Target values predicted by the model.
 
         Returns
@@ -316,16 +316,16 @@ class sys_identfy:
         Examples
         --------
         >>> y = [3, -0.5, 2, 7]
-        >>> ysim = [2.5, 0.0, 2, 8]
-        >>> forecast_error(y, ysim)
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> forecast_error(y, y_predicted)
         [0.5, -0.5, 0, -1]
 
         """
 
         import numpy as np
-        return y - ysim
+        return y - y_predicted
 
-    def mean_forecast_error(self, y, ysim):
+    def mean_forecast_error(self, y, y_predicted):
         """ Calculate the mean of forecast error of a regression model
 
         Parameters
@@ -333,7 +333,7 @@ class sys_identfy:
         y : array-like of shape = number_of_outputs
             Represent the target values.
 
-        ysim : array-like of shape = number_of_outputs
+        y_predicted : array-like of shape = number_of_outputs
             Target values predicted by the model.
 
         Returns
@@ -350,15 +350,15 @@ class sys_identfy:
         Examples
         --------
         >>> y = [3, -0.5, 2, 7]
-        >>> ysim = [2.5, 0.0, 2, 8]
-        >>> mean_forecast_error(y, ysim)
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> mean_forecast_error(y, y_predicted)
         -0.25
 
         """
         import numpy as np
-        return np.average(y - ysim)
+        return np.average(y - y_predicted)
 
-    def mean_squared_error(self, y, ysim):
+    def mean_squared_error(self, y, y_predicted):
         """ Calculate the Mean Squared Error in a regression model
 
 
@@ -367,7 +367,7 @@ class sys_identfy:
         y : array-like of shape = number_of_outputs
             Represent the target values.
 
-        ysim : array-like of shape = number_of_outputs
+        y_predicted : array-like of shape = number_of_outputs
             Target values predicted by the model.
 
         Returns
@@ -384,16 +384,16 @@ class sys_identfy:
         Examples
         --------
         >>> y = [3, -0.5, 2, 7]
-        >>> ysim = [2.5, 0.0, 2, 8]
-        >>> mean_squared_error(y, ysim)
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> mean_squared_error(y, y_predicted)
         0.375
 
         """
         import numpy as np
-        output_error = np.average((y - ysim) ** 2)
+        output_error = np.average((y - y_predicted) ** 2)
         return np.average(output_error)
 
-    def root_mean_squared_error(self, y, ysim):
+    def root_mean_squared_error(self, y, y_predicted):
         """ Calculate the Root Mean Squared Error in a regression model
 
 
@@ -402,7 +402,7 @@ class sys_identfy:
         y : array-like of shape = number_of_outputs
             Represent the target values.
 
-        ysim : array-like of shape = number_of_outputs
+        y_predicted : array-like of shape = number_of_outputs
             Target values predicted by the model.
 
         Returns
@@ -419,15 +419,15 @@ class sys_identfy:
         Examples
         --------
         >>> y = [3, -0.5, 2, 7]
-        >>> ysim = [2.5, 0.0, 2, 8]
-        >>> root_mean_squared_error(y, ysim)
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> root_mean_squared_error(y, y_predicted)
         0.612
 
         """
         import numpy as np
-        return np.sqrt(self.mean_squared_error(y, ysim))
+        return np.sqrt(self.mean_squared_error(y, y_predicted))
 
-    def normalized_root_mean_squared_error(self, y, ysim):
+    def normalized_root_mean_squared_error(self, y, y_predicted):
         """ Calculate the normalized Root Mean Squared Error in a regression model
 
 
@@ -436,7 +436,7 @@ class sys_identfy:
         y : array-like of shape = number_of_outputs
             Represent the target values.
 
-        ysim : array-like of shape = number_of_outputs
+        y_predicted : array-like of shape = number_of_outputs
             Target values predicted by the model.
 
         Returns
@@ -453,16 +453,16 @@ class sys_identfy:
         Examples
         --------
         >>> y = [3, -0.5, 2, 7]
-        >>> ysim = [2.5, 0.0, 2, 8]
-        >>> normalized_root_mean_squared_error(y, ysim)
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> normalized_root_mean_squared_error(y, y_predicted)
         0.081
 
         """
         import numpy as np
-        return self.root_mean_squared_error(y, ysim) / (y.max() - y.min())
+        return self.root_mean_squared_error(y, y_predicted) / (y.max() - y.min())
 
 
-    def root_relative_squared_error(self, y, ysim):
+    def root_relative_squared_error(self, y, y_predicted):
         """ Calculate the Root Relative Mean Squared Error in a regression model
 
 
@@ -471,7 +471,7 @@ class sys_identfy:
         y : array-like of shape = number_of_outputs
             Represent the target values.
 
-        ysim : array-like of shape = number_of_outputs
+        y_predicted : array-like of shape = number_of_outputs
             Target values predicted by the model.
 
         Returns
@@ -483,17 +483,17 @@ class sys_identfy:
         Examples
         --------
         >>> y = [3, -0.5, 2, 7]
-        >>> ysim = [2.5, 0.0, 2, 8]
-        >>> root_relative_mean_squared_error(y, ysim)
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> root_relative_mean_squared_error(y, y_predicted)
         0.226
 
         """
         import numpy as np
-        numerator = np.sum(np.square((ysim - y)))
-        denominator = np.sum(np.square((ysim - np.mean(y, axis=0))))
+        numerator = np.sum(np.square((y_predicted - y)))
+        denominator = np.sum(np.square((y_predicted - np.mean(y, axis=0))))
         return np.sqrt(np.divide(numerator, denominator))
 
-    def mean_absolute_error(self, y, ysim):
+    def mean_absolute_error(self, y, y_predicted):
         """ Calculate the Mean absolute error in a regression model
 
 
@@ -502,7 +502,7 @@ class sys_identfy:
         y : array-like of shape = number_of_outputs
             Represent the target values.
 
-        ysim : array-like of shape = number_of_outputs
+        y_predicted : array-like of shape = number_of_outputs
             Target values predicted by the model.
 
         Returns
@@ -519,17 +519,17 @@ class sys_identfy:
         Examples
         --------
         >>> y = [3, -0.5, 2, 7]
-        >>> ysim = [2.5, 0.0, 2, 8]
-        >>> mean_absolute_error(y, ysim)
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> mean_absolute_error(y, y_predicted)
         0.5
 
         """
 
         import numpy as np
-        output_errors = np.average(np.abs(y - ysim))
+        output_errors = np.average(np.abs(y - y_predicted))
         return np.average(output_errors)
 
-    def mean_squared_log_error(self, y, ysim):
+    def mean_squared_log_error(self, y, y_predicted):
         """ Calculate the Mean Squared Logarithmic Error in a regression model
 
 
@@ -538,7 +538,7 @@ class sys_identfy:
         y : array-like of shape = number_of_outputs
             Represent the target values.
 
-        ysim : array-like of shape = number_of_outputs
+        y_predicted : array-like of shape = number_of_outputs
             Target values predicted by the model.
 
         Returns
@@ -550,15 +550,15 @@ class sys_identfy:
         Examples
         --------
         >>> y = [3, 5, 2.5, 7]
-        >>> ysim = [2.5, 5, 4, 8]
-        >>> mean_squared_log_error(y, ysim)
+        >>> y_predicted = [2.5, 5, 4, 8]
+        >>> mean_squared_log_error(y, y_predicted)
         0.039
 
         """
         import numpy as np
-        return self.mean_squared_error(np.log1p(y), np.log1p(ysim))
+        return self.mean_squared_error(np.log1p(y), np.log1p(y_predicted))
 
-    def median_absolute_error(self, y, ysim):
+    def median_absolute_error(self, y, y_predicted):
         """ Calculate the Median Absolute Error in a regression model
 
 
@@ -567,7 +567,7 @@ class sys_identfy:
         y : array-like of shape = number_of_outputs
             Represent the target values.
 
-        ysim : array-like of shape = number_of_outputs
+        y_predicted : array-like of shape = number_of_outputs
             Target values predicted by the model.
 
         Returns
@@ -585,15 +585,15 @@ class sys_identfy:
         Examples
         --------
          >>> y = [3, -0.5, 2, 7]
-        >>> ysim = [2.5, 0.0, 2, 8]
-        >>> median_absolute_error(y, ysim)
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> median_absolute_error(y, y_predicted)
         0.5
 
         """
         import numpy as np
-        return np.median(np.abs(y - ysim))
+        return np.median(np.abs(y - y_predicted))
 
-    def explained_variance_score(self, y, ysim):
+    def explained_variance_score(self, y, y_predicted):
         """ Calculate the Explained Variance Score of a regression model
 
 
@@ -602,7 +602,7 @@ class sys_identfy:
         y : array-like of shape = number_of_outputs
             Represent the target values.
 
-        ysim : array-like of shape = number_of_outputs
+        y_predicted : array-like of shape = number_of_outputs
             Target values predicted by the model.
 
         Returns
@@ -621,15 +621,15 @@ class sys_identfy:
         Examples
         --------
          >>> y = [3, -0.5, 2, 7]
-        >>> ysim = [2.5, 0.0, 2, 8]
-        >>> explained_variance_score(y, ysim)
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> explained_variance_score(y, y_predicted)
         0.957
 
         """
 
         import numpy as np
-        y_diff_avg = np.average(y - ysim)
-        numerator = np.average((y - ysim - y_diff_avg) ** 2)
+        y_diff_avg = np.average(y - y_predicted)
+        numerator = np.average((y - y_predicted - y_diff_avg) ** 2)
         y_avg = np.average(y)
         denominator = np.average((y- y_avg) ** 2)
         nonzero_numerator = numerator != 0
@@ -641,7 +641,7 @@ class sys_identfy:
         output_scores[nonzero_numerator & ~nonzero_denominator] = 0.
         return np.average(output_scores)
 
-    def r2_score(self, y, ysim):
+    def r2_score(self, y, y_predicted):
         """ Calculate the R2 score of a regression model
 
 
@@ -650,7 +650,7 @@ class sys_identfy:
         y : array-like of shape = number_of_outputs
             Represent the target values.
 
-        ysim : array-like of shape = number_of_outputs
+        y_predicted : array-like of shape = number_of_outputs
             Target values predicted by the model.
 
         Returns
@@ -673,13 +673,13 @@ class sys_identfy:
         Examples
         --------
          >>> y = [3, -0.5, 2, 7]
-        >>> ysim = [2.5, 0.0, 2, 8]
-        >>> explained_variance_score(y, ysim)
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> explained_variance_score(y, y_predicted)
         0.948
 
         """
         import numpy as np
-        numerator = ((y - ysim) ** 2).sum(axis=0, dtype=np.float64)
+        numerator = ((y - y_predicted) ** 2).sum(axis=0, dtype=np.float64)
         denominator = ((y - np.average(y, axis=0)) ** 2).sum(axis=0, dtype=np.float64)
         nonzero_denominator = denominator != 0
         nonzero_numerator = numerator != 0
@@ -693,7 +693,7 @@ class sys_identfy:
 
         return np.average(output_scores)
 
-    def symmetric_mean_absolute_percentage_error(self, y, ysim):
+    def symmetric_mean_absolute_percentage_error(self, y, y_predicted):
         """ Calculate the SMAPE score of a regression model
 
 
@@ -702,7 +702,7 @@ class sys_identfy:
         y : array-like of shape = number_of_outputs
             Represent the target values.
 
-        ysim : array-like of shape = number_of_outputs
+        y_predicted : array-like of shape = number_of_outputs
             Target values predicted by the model.
 
         Returns
@@ -725,15 +725,15 @@ class sys_identfy:
         Examples
         --------
          >>> y = [3, -0.5, 2, 7]
-        >>> ysim = [2.5, 0.0, 2, 8]
-        >>> symmetric_mean_absolute_percentage_error(y, ysim)
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> symmetric_mean_absolute_percentage_error(y, y_predicted)
         57.87
 
         """
 
         import numpy as np
-        return 100/len(y) * np.sum(2*np.abs(ysim - y) / (np.abs(y) + np.abs(ysim)))
-        #return np.mean((np.abs(ysim - y) * 200/ (np.abs(ysim) + np.abs(y))))
+        return 100/len(y) * np.sum(2*np.abs(y_predicted - y) / (np.abs(y) + np.abs(y_predicted)))
+        #return np.mean((np.abs(y_predicted - y) * 200/ (np.abs(y_predicted) + np.abs(y))))
 
 
     def autocorr(self, signal):
@@ -769,7 +769,7 @@ class sys_identfy:
         return result[half_of_simmetry: ]
 
 
-    def model_prediction(self, model_elements, model_pivot, y_initial, entrace_u, estimated_paramters):
+    def model_prediction(self, model_elements, model_pivot, y_initial, entrace_u, theta):
 
         """ Performs the free run simulation (infinity steps-ahead simulation) of a model
 
@@ -789,7 +789,7 @@ class sys_identfy:
         entrace_u = ndarray of floats of shape = number_of_samples
                     Vector with entrace values to be used in model simulation
 
-        estimated_paramters = array-like of shape = number_of_model_elements
+        theta = array-like of shape = number_of_model_elements
                               Paramters estimated via Least Squares method
 
         Returns
@@ -808,9 +808,9 @@ class sys_identfy:
         analised_elements_number = self.max_lag + 1
         effective_pivot_vector = model_pivot[0: len(model_elements)]
         for i in range(0, len(entrace_u)-self.max_lag):
-            temporary_regressor_matrix = self.build_information_matrix(self.reg_code, entrace_u[i:i+analised_elements_number], predicted_values[i:i+analised_elements_number])
-            temporary_regressor_matrix = np.copy(temporary_regressor_matrix[:, effective_pivot_vector])
-            a = temporary_regressor_matrix @ estimated_paramters
+            X_temp = self.build_information_matrix(self.reg_code, entrace_u[i:i+analised_elements_number], predicted_values[i:i+analised_elements_number])
+            X_temp = np.copy(X_temp[:, effective_pivot_vector])
+            a = X_temp @ theta
             #print(a)
             predicted_values[i+self.max_lag] = a[:, 0]
 
@@ -847,7 +847,7 @@ class sys_identfy:
         import numpy as np
         output_vector = np.zeros(len(self.reg_code))
         output_vector[:] = float('NaN')
-        base_regressor_matrix = self.build_information_matrix(self.reg_code, input_u, output_y)
+        X_base = self.build_information_matrix(self.reg_code, input_u, output_y)
         effective_output_elements_count = len(output_y) - self.max_lag
         choices={'Akaike':0,'Bayes':1,"FPE":2,"LILC":3}
         result=choices.get(calculation_method)
@@ -859,9 +859,9 @@ class sys_identfy:
 
         for i in range(0, len(self.reg_code)):
             model_elements = i + 1
-            [null, null, null, regressor_matrix] = self.ERR(output_y, base_regressor_matrix, model_elements)
-            temporary_estimated_paramters = self.last_squares(regressor_matrix, output_y)
-            temporary_simulated_output = regressor_matrix @ temporary_estimated_paramters
+            [null, null, null, regressor_matrix] = self.ERR(output_y, X_base, model_elements)
+            temporary_theta = self.last_squares(regressor_matrix, output_y)
+            temporary_simulated_output = regressor_matrix @ temporary_theta
             temporary_residual = output_y[self.max_lag: ] - temporary_simulated_output
             residual_variance = np.var(temporary_residual)
 
@@ -1022,7 +1022,7 @@ class sys_identfy:
 
         Returns:
         --------
-        matrix_of_regressors = ndarray of floats
+        X = ndarray of floats
                                 the information matrix of the model
 
         """
@@ -1032,7 +1032,7 @@ class sys_identfy:
         number_of_elements = self.model_information(model);
         number_of_samples = u.shape[0]
         auxiliary_model = np.copy(model)
-        matrix_of_regressors = np.ones((number_of_samples, number_of_elements[0]))
+        X = np.ones((number_of_samples, number_of_elements[0]))
         for k in np.arange(number_of_elements[0]):
             current_regressor = auxiliary_model[k, :]
             current_regressor = current_regressor.reshape(current_regressor.shape[0], 1)
@@ -1056,16 +1056,16 @@ class sys_identfy:
                 for i in np.arange(which_regressor.shape[0]):
                     if which_regressor[i] == 1:
                         aux_col = self.shift_column(y, lag[i]).T
-                        element_wise_multiplication = np.multiply(aux_col, matrix_of_regressors[:, k]).T
-                        matrix_of_regressors[:, k] = element_wise_multiplication[:, 0]
+                        element_wise_multiplication = np.multiply(aux_col, X[:, k]).T
+                        X[:, k] = element_wise_multiplication[:, 0]
                     else:
                         auxw = which_regressor[i]-2
                         aux_col = self.shift_column(u[:, auxw], lag[i]).T
-                        element_wise_multiplication = np.multiply(aux_col, matrix_of_regressors[:, k]).T
-                        matrix_of_regressors[:, k] = element_wise_multiplication[:, 0]
+                        element_wise_multiplication = np.multiply(aux_col, X[:, k]).T
+                        X[:, k] = element_wise_multiplication[:, 0]
             else:
-                matrix_of_regressors[:, k] = np.ones((number_of_samples, 1))[:, 0]
+                X[:, k] = np.ones((number_of_samples, 1))[:, 0]
 
-        matrix_of_regressors = matrix_of_regressors[number_of_elements[2]:, :]
+        X = X[number_of_elements[2]:, :]
 
-        return matrix_of_regressors
+        return X

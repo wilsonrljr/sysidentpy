@@ -2,6 +2,9 @@ import numpy as np
 from sys_identfy import *
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set(style="whitegrid")
+
 
 non_degree = 2
 ylag = 2
@@ -60,7 +63,6 @@ theta = model1.last_squares(psi, y)
 print('taxa de redução de erro é', errr)
 
 print('o pivot é',pivv)
-
 #Testando o método de simulação livre
 y_test3 = model1.model_prediction(model,pivv,y_valid_,u_valid_,theta)
 
