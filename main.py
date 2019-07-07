@@ -21,7 +21,7 @@ u_valid_ = np.reshape(u_valid_, (len(u_valid_), 1))
 
 
 ## Exemplo 1 - Com valores padrão ####
-model = sys_identfy()
+model = sys_identfy(n_terms=4)
 regressores, _, _, _ = model.fit(u, y) #não precisa colocar nada, apenas model.fit(u, y). Só coloquei para printar o modelo
 y_test3 = model.predict(u_valid_, y_valid_)
 rrse = model.score(y_valid_, y_test3)

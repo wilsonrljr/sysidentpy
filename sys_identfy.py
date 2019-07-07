@@ -15,7 +15,7 @@ from itertools import combinations_with_replacement
 class sys_identfy:
 
 
-    def __init__(self, non_degree=2, ylag=2, xlag=2, info_criteria='aic', scoring='root_relative_squared_error'):
+    def __init__(self, non_degree=2, ylag=2, xlag=2, info_criteria='aic', scoring='root_relative_squared_error', n_terms=None):
         """
         This funcrion create a new object of the type sys_identfy. It is called automatically always that a new
         object is instantiated. It is responsible for create the variables from the object and call the function
@@ -33,6 +33,7 @@ class sys_identfy:
         [self.reg_code, self.max_lag] = self.genreg(non_degree,ylag,xlag) # reg_code stores all possible combinations
         self.info_criteria = info_criteria
         self.scoring = getattr(self, scoring)
+        self.n_terms = n_terms
 
     def score(self, y, y_predicted):
         return self.scoring(y, y_predicted)
@@ -40,8 +41,11 @@ class sys_identfy:
     def fit(self, X, y):
         reg_Matrix = self.build_information_matrix(self.reg_code, X, y)
         self.info_values = self.information_criterion(X, y)
-        model_length = np.where(self.info_values == np.amin(self.info_values))
-        model_length = int(model_length[0])
+        if self.n_terms is None:
+            model_length = np.where(self.info_values == np.amin(self.info_values))
+            model_length = int(model_length[0])
+        else:
+            model_length = self.n_terms
         [model, errr, self.pivv, psi] = self.ERR(y, reg_Matrix, model_length)
         number_of_elements, nno, maximum_lag, number_of_output, nu, self.new_model = self.model_information(model)
         self.theta =  self.last_squares(psi, y)
