@@ -1,2 +1,3 @@
 __pycache__/sys_identfy.cpython-36.pyc
 *.pyc
+.vscode/launch.json

@@ -8,18 +8,14 @@
 # License: BSD 3 clause
 
 """
+import numpy as np
+from itertools import combinations_with_replacement
 
 
 class sys_identfy:
-    import numpy as np
-    import pandas as pd
-    global get_regresvec
-    global genreg
-    global get_regresvec
-    global max_lag
 
 
-    def __init__(self,non_degree_,ylag_,ulag_):
+    def __init__(self, non_degree=2, ylag=2, xlag=2, info_criteria='aic', scoring='root_relative_squared_error'):
         """
         This funcrion create a new object of the type sys_identfy. It is called automatically always that a new
         object is instantiated. It is responsible for create the variables from the object and call the function
@@ -27,17 +23,35 @@ class sys_identfy:
         Args:
             non_degree = Nonlinearity degree
             ylag = Max lag of input
-            ulag = Max lag of output
+            xlag = Max lag of output
 
         """
 
-        self.non_degree=non_degree_ # non_degree stores the nonlinearity degree
-        self.ylag=ylag_             # ylag stores the maximum output lag
-        self.ulag=ulag_             # ulag ylag stores the maximum input lag
-        [self.reg_code,self.max_lag] = genreg(non_degree_,ylag_,ulag_) # reg_code stores all possible combinations
-    #=============================================================================================================================================================
+        self.non_degree = non_degree # non_degree stores the nonlinearity degree
+        self.ylag = ylag             # ylag stores the maximum output lag
+        self.xlag = xlag             # xlag ylag stores the maximum input lag
+        [self.reg_code, self.max_lag] = self.genreg(non_degree,ylag,xlag) # reg_code stores all possible combinations
+        self.info_criteria = info_criteria
+        self.scoring = getattr(self, scoring)
 
-    def genreg(non_degree, ylag, ulag):
+    def score(self, y, y_predicted):
+        return self.scoring(y, y_predicted)
+
+    def fit(self, X, y):
+        reg_Matrix = self.build_information_matrix(self.reg_code, X, y)
+        self.info_values = self.information_criterion(X, y)
+        model_length = np.where(self.info_values == np.amin(self.info_values))
+        model_length = int(model_length[0])
+        [model, errr, self.pivv, psi] = self.ERR(y, reg_Matrix, model_length)
+        number_of_elements, nno, maximum_lag, number_of_output, nu, self.new_model = self.model_information(model)
+        self.theta =  self.last_squares(psi, y)
+        return self.new_model, self.pivv, self.theta, self.info_values
+
+    def predict(self, X, y):
+        return self.model_prediction(self.new_model, self.pivv, X, y, self.theta)
+
+
+    def genreg(self, non_degree, ylag, xlag):
         """ This function generates a codification from all possibles regressors given the maximum lag of the
         input and output.
 
@@ -49,7 +63,7 @@ class sys_identfy:
         ylag = int
                 the maximum lag of output regressors
 
-        ulag =int
+        xlag =int
                 the maximum lag of input regressors
 
         Returns:
@@ -70,18 +84,16 @@ class sys_identfy:
 
         """
 
-        from itertools import combinations_with_replacement
-        import numpy as np
         ylagmax = 1001 + ylag
-        ulagmax = 2001 + ulag
+        xlagmax = 2001 + xlag
         y_vec = np.arange(1001, ylagmax)
-        u_vec = np.arange(2001, ulagmax)
+        u_vec = np.arange(2001, xlagmax)
         reg_aux = np.array([0])
         reg_aux = np.concatenate([reg_aux, y_vec, u_vec])
         reg_code = list(combinations_with_replacement(reg_aux, non_degree))
         reg_code = np.array(reg_code)
         reg_code = reg_code[:, reg_code.shape[1]::-1]
-        max_lag = max(ylag, ulag)
+        max_lag = max(ylag, xlag)
         return reg_code, max_lag
 
     def house(self, x):
@@ -103,7 +115,6 @@ class sys_identfy:
             <https://en.wikipedia.org/wiki/Householder_transformation>`_
         """
 
-        import numpy as np
         n = len(x)
         u = np.linalg.norm(x, 2)
         v = np.array(x)
@@ -132,7 +143,6 @@ class sys_identfy:
 
         """
 
-        import numpy as np
         b = -2/(v.T@v)
         w = b*RA.T@v
         m = w.size
@@ -180,7 +190,6 @@ class sys_identfy:
 
         """
 
-        import numpy as np
         squared_y = y[self.max_lag: ].T@y[self.max_lag: ]
         X_aux = np.array(X)
         #y = np.array([y[self.max_lag: ]]).T
@@ -243,498 +252,10 @@ class sys_identfy:
                 The estimated parameters of the model
         """
 
-        import numpy as np
         y_train = y_train[self.max_lag:, 0]
         y_train = np.reshape(y_train, (len(y_train), 1))
         theta = (np.linalg.pinv(X_train.T@X_train))@X_train.T@y_train
         return theta
-
-
-    def prepare_data(y_path, u_path, training_percent):
-        """ This function split the data in identificatioin and validation subsets.
-
-        Parameters:
-        -----------
-        y_path = str
-                 path from txt file that contains the outputs
-
-        u_path = str
-                 path from txt file that contains the inputs
-
-        training_percent = float
-                  percentage of the data set that is destinated as identification set
-
-        Returns:
-        --------
-        y_training = array-like
-                  target data used on training phase
-
-        u_training = array-like
-                  input data used on training phase
-
-        y_validation = array-like
-                  target data for model validation
-
-        u_validation = array-like
-                  input data for model validation
-        """
-
-        import numpy as np
-        y = np.loadtxt(y_path)
-        u = np.loadtxt(u_path)
-        y_size = y.size
-        size_ident = round((y_size*training_percent)/100)
-        y_training = y[0: size_ident]
-        u_training = u[0: size_ident]
-        y_validation = y[size_ident+1 : y_size+1]
-        u_validation = y[size_ident+1 : y_size+1]
-        return y_training, u_training, y_validation, u_validation
-
-    def forecast_error(self, y, y_predicted):
-        """ Calculate the forecast error (also known as identification residues)
-            in a regression model
-
-        Parameters
-        ----------
-        y : array-like of shape = number_of_outputs
-            Represent the target values.
-
-        y_predicted : array-like of shape = number_of_outputs
-            Target values predicted by the model.
-
-        Returns
-        -------
-        loss : ndarray of floats
-               The difference between the true target values and the predicted or forecast
-               value in regression or any other phenomenon.
-
-        References
-        ----------
-        [1] `Wikipedia entry on the Forecast error
-            <https://en.wikipedia.org/wiki/Forecast_error>`_
-
-        Examples
-        --------
-        >>> y = [3, -0.5, 2, 7]
-        >>> y_predicted = [2.5, 0.0, 2, 8]
-        >>> forecast_error(y, y_predicted)
-        [0.5, -0.5, 0, -1]
-
-        """
-
-        import numpy as np
-        return y - y_predicted
-
-    def mean_forecast_error(self, y, y_predicted):
-        """ Calculate the mean of forecast error of a regression model
-
-        Parameters
-        ----------
-        y : array-like of shape = number_of_outputs
-            Represent the target values.
-
-        y_predicted : array-like of shape = number_of_outputs
-            Target values predicted by the model.
-
-        Returns
-        -------
-        loss : float
-               The mean  value of the difference between the true target values and the predicted or forecast
-               value in regression or any other phenomenon.
-
-        References
-        ----------
-        [1] `Wikipedia entry on the Forecast error
-            <https://en.wikipedia.org/wiki/Forecast_error>`_
-
-        Examples
-        --------
-        >>> y = [3, -0.5, 2, 7]
-        >>> y_predicted = [2.5, 0.0, 2, 8]
-        >>> mean_forecast_error(y, y_predicted)
-        -0.25
-
-        """
-        import numpy as np
-        return np.average(y - y_predicted)
-
-    def mean_squared_error(self, y, y_predicted):
-        """ Calculate the Mean Squared Error in a regression model
-
-
-        Parameters
-        ----------
-        y : array-like of shape = number_of_outputs
-            Represent the target values.
-
-        y_predicted : array-like of shape = number_of_outputs
-            Target values predicted by the model.
-
-        Returns
-        -------
-        loss : float
-            MSE output is non-negative values. Becoming 0.0 means your
-            model outputs are exactly matched by true target values.
-
-        References
-        ----------
-        [1] `Wikipedia entry on the Mean Squared Error
-            <https://en.wikipedia.org/wiki/Mean_squared_error>`_
-
-        Examples
-        --------
-        >>> y = [3, -0.5, 2, 7]
-        >>> y_predicted = [2.5, 0.0, 2, 8]
-        >>> mean_squared_error(y, y_predicted)
-        0.375
-
-        """
-        import numpy as np
-        output_error = np.average((y - y_predicted) ** 2)
-        return np.average(output_error)
-
-    def root_mean_squared_error(self, y, y_predicted):
-        """ Calculate the Root Mean Squared Error in a regression model
-
-
-        Parameters
-        ----------
-        y : array-like of shape = number_of_outputs
-            Represent the target values.
-
-        y_predicted : array-like of shape = number_of_outputs
-            Target values predicted by the model.
-
-        Returns
-        -------
-        loss : float
-            RMSE output is non-negative values. Becoming 0.0 means your
-            model outputs are exactly matched by true target values.
-
-        References
-        ----------
-        [1] `Wikipedia entry on the Root Mean Squared Error
-            <https://en.wikipedia.org/wiki/Root-mean-square_deviation>`_
-
-        Examples
-        --------
-        >>> y = [3, -0.5, 2, 7]
-        >>> y_predicted = [2.5, 0.0, 2, 8]
-        >>> root_mean_squared_error(y, y_predicted)
-        0.612
-
-        """
-        import numpy as np
-        return np.sqrt(self.mean_squared_error(y, y_predicted))
-
-    def normalized_root_mean_squared_error(self, y, y_predicted):
-        """ Calculate the normalized Root Mean Squared Error in a regression model
-
-
-        Parameters
-        ----------
-        y : array-like of shape = number_of_outputs
-            Represent the target values.
-
-        y_predicted : array-like of shape = number_of_outputs
-            Target values predicted by the model.
-
-        Returns
-        -------
-        loss : float
-            nRMSE output is non-negative values. Becoming 0.0 means your
-            model outputs are exactly matched by true target values.
-
-        References
-        ----------
-        [1] `Wikipedia entry on the normalized Root Mean Squared Error
-            <https://en.wikipedia.org/wiki/Root-mean-square_deviation>`_
-
-        Examples
-        --------
-        >>> y = [3, -0.5, 2, 7]
-        >>> y_predicted = [2.5, 0.0, 2, 8]
-        >>> normalized_root_mean_squared_error(y, y_predicted)
-        0.081
-
-        """
-        import numpy as np
-        return self.root_mean_squared_error(y, y_predicted) / (y.max() - y.min())
-
-
-    def root_relative_squared_error(self, y, y_predicted):
-        """ Calculate the Root Relative Mean Squared Error in a regression model
-
-
-        Parameters
-        ----------
-        y : array-like of shape = number_of_outputs
-            Represent the target values.
-
-        y_predicted : array-like of shape = number_of_outputs
-            Target values predicted by the model.
-
-        Returns
-        -------
-        loss : float
-            RRSE output is non-negative values. Becoming 0.0 means your
-            model outputs are exactly matched by true target values.
-
-        Examples
-        --------
-        >>> y = [3, -0.5, 2, 7]
-        >>> y_predicted = [2.5, 0.0, 2, 8]
-        >>> root_relative_mean_squared_error(y, y_predicted)
-        0.226
-
-        """
-        import numpy as np
-        numerator = np.sum(np.square((y_predicted - y)))
-        denominator = np.sum(np.square((y_predicted - np.mean(y, axis=0))))
-        return np.sqrt(np.divide(numerator, denominator))
-
-    def mean_absolute_error(self, y, y_predicted):
-        """ Calculate the Mean absolute error in a regression model
-
-
-        Parameters
-        ----------
-        y : array-like of shape = number_of_outputs
-            Represent the target values.
-
-        y_predicted : array-like of shape = number_of_outputs
-            Target values predicted by the model.
-
-        Returns
-        -------
-        loss : float or ndarray of floats
-            MAE output is non-negative values. Becoming 0.0 means your
-            model outputs are exactly matched by true target values.
-
-        References
-        ----------
-        [1] `Wikipedia entry on the Mean absolute error
-            <https://en.wikipedia.org/wiki/Mean_absolute_error>`_
-
-        Examples
-        --------
-        >>> y = [3, -0.5, 2, 7]
-        >>> y_predicted = [2.5, 0.0, 2, 8]
-        >>> mean_absolute_error(y, y_predicted)
-        0.5
-
-        """
-
-        import numpy as np
-        output_errors = np.average(np.abs(y - y_predicted))
-        return np.average(output_errors)
-
-    def mean_squared_log_error(self, y, y_predicted):
-        """ Calculate the Mean Squared Logarithmic Error in a regression model
-
-
-        Parameters
-        ----------
-        y : array-like of shape = number_of_outputs
-            Represent the target values.
-
-        y_predicted : array-like of shape = number_of_outputs
-            Target values predicted by the model.
-
-        Returns
-        -------
-        loss : float
-            MSLE output is non-negative values. Becoming 0.0 means your
-            model outputs are exactly matched by true target values.
-
-        Examples
-        --------
-        >>> y = [3, 5, 2.5, 7]
-        >>> y_predicted = [2.5, 5, 4, 8]
-        >>> mean_squared_log_error(y, y_predicted)
-        0.039
-
-        """
-        import numpy as np
-        return self.mean_squared_error(np.log1p(y), np.log1p(y_predicted))
-
-    def median_absolute_error(self, y, y_predicted):
-        """ Calculate the Median Absolute Error in a regression model
-
-
-        Parameters
-        ----------
-        y : array-like of shape = number_of_outputs
-            Represent the target values.
-
-        y_predicted : array-like of shape = number_of_outputs
-            Target values predicted by the model.
-
-        Returns
-        -------
-        loss : float
-            MdAE output is non-negative values. Becoming 0.0 means your
-            model outputs are exactly matched by true target values.
-
-        References
-        ----------
-        [1] `Wikipedia entry on the Median absolute deviation
-            <https://en.wikipedia.org/wiki/Median_absolute_deviation>`_
-
-
-        Examples
-        --------
-         >>> y = [3, -0.5, 2, 7]
-        >>> y_predicted = [2.5, 0.0, 2, 8]
-        >>> median_absolute_error(y, y_predicted)
-        0.5
-
-        """
-        import numpy as np
-        return np.median(np.abs(y - y_predicted))
-
-    def explained_variance_score(self, y, y_predicted):
-        """ Calculate the Explained Variance Score of a regression model
-
-
-        Parameters
-        ----------
-        y : array-like of shape = number_of_outputs
-            Represent the target values.
-
-        y_predicted : array-like of shape = number_of_outputs
-            Target values predicted by the model.
-
-        Returns
-        -------
-        loss : float
-            EVS output is non-negative values. Becoming 1.0 means your
-            model outputs are exactly matched by true target values.
-            Lower values means worse results
-
-        References
-        ----------
-        [1] `Wikipedia entry on the Explained Variance
-            <https://en.wikipedia.org/wiki/Explained_variation>`_
-
-
-        Examples
-        --------
-         >>> y = [3, -0.5, 2, 7]
-        >>> y_predicted = [2.5, 0.0, 2, 8]
-        >>> explained_variance_score(y, y_predicted)
-        0.957
-
-        """
-
-        import numpy as np
-        y_diff_avg = np.average(y - y_predicted)
-        numerator = np.average((y - y_predicted - y_diff_avg) ** 2)
-        y_avg = np.average(y)
-        denominator = np.average((y- y_avg) ** 2)
-        nonzero_numerator = numerator != 0
-        nonzero_denominator = denominator != 0
-        valid_score = nonzero_numerator & nonzero_denominator
-        output_scores = np.ones(y.shape[0])
-        output_scores[valid_score] = 1 - (numerator[valid_score] /
-                                      denominator[valid_score])
-        output_scores[nonzero_numerator & ~nonzero_denominator] = 0.
-        return np.average(output_scores)
-
-    def r2_score(self, y, y_predicted):
-        """ Calculate the R2 score of a regression model
-
-
-        Parameters
-        ----------
-        y : array-like of shape = number_of_outputs
-            Represent the target values.
-
-        y_predicted : array-like of shape = number_of_outputs
-            Target values predicted by the model.
-
-        Returns
-        -------
-        loss : float
-            R2 output can be non-negative values or negative value. Becoming 1.0 means your
-            model outputs are exactly matched by true target values.
-            Lower values means worse results
-
-        Notes
-        -----
-        This is not a symmetric function
-
-        References
-        ----------
-        [1] `Wikipedia entry on the Coefficient of determination
-            <https://en.wikipedia.org/wiki/Coefficient_of_determination>`_
-
-
-        Examples
-        --------
-         >>> y = [3, -0.5, 2, 7]
-        >>> y_predicted = [2.5, 0.0, 2, 8]
-        >>> explained_variance_score(y, y_predicted)
-        0.948
-
-        """
-        import numpy as np
-        numerator = ((y - y_predicted) ** 2).sum(axis=0, dtype=np.float64)
-        denominator = ((y - np.average(y, axis=0)) ** 2).sum(axis=0, dtype=np.float64)
-        nonzero_denominator = denominator != 0
-        nonzero_numerator = numerator != 0
-        valid_score = nonzero_denominator & nonzero_numerator
-        output_scores = np.ones([y.shape[0]])
-        output_scores[valid_score] = 1 - (numerator[valid_score] /
-                                      denominator[valid_score])
-        # arbitrary set to zero to avoid -inf scores, having a constant
-        # y_true is not interesting for scoring a regression anyway
-        output_scores[nonzero_numerator & ~nonzero_denominator] = 0.
-
-        return np.average(output_scores)
-
-    def symmetric_mean_absolute_percentage_error(self, y, y_predicted):
-        """ Calculate the SMAPE score of a regression model
-
-
-        Parameters
-        ----------
-        y : array-like of shape = number_of_outputs
-            Represent the target values.
-
-        y_predicted : array-like of shape = number_of_outputs
-            Target values predicted by the model.
-
-        Returns
-        -------
-        loss : float
-            SMAPE output is a non-negative value.
-            The results are percentages values.
-
-        Notes
-        -----
-        One supposed problem with SMAPE is that it is not symmetric since over-forecasts
-        and under-forecasts are not treated equally.
-
-        References
-        ----------
-        [1] `Wikipedia entry on the Symmetric mean absolute percentage error
-            <https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error>`_
-
-
-        Examples
-        --------
-         >>> y = [3, -0.5, 2, 7]
-        >>> y_predicted = [2.5, 0.0, 2, 8]
-        >>> symmetric_mean_absolute_percentage_error(y, y_predicted)
-        57.87
-
-        """
-
-        import numpy as np
-        return 100/len(y) * np.sum(2*np.abs(y_predicted - y) / (np.abs(y) + np.abs(y_predicted)))
-        #return np.mean((np.abs(y_predicted - y) * 200/ (np.abs(y_predicted) + np.abs(y))))
-
 
     def autocorr(self, signal):
         """ Performs the autocorrelation of a signal to help the
@@ -763,13 +284,12 @@ class sys_identfy:
 
         """
 
-        import numpy as np
         result = np.correlate(signal, signal, mode='full')
         half_of_simmetry = int(np.floor(result.size/2))
         return result[half_of_simmetry: ]
 
 
-    def model_prediction(self, model_elements, model_pivot, y_initial, entrace_u, theta):
+    def model_prediction(self, model_elements, model_pivot, entrace_u, y_initial, theta):
 
         """ Performs the free run simulation (infinity steps-ahead simulation) of a model
 
@@ -800,7 +320,6 @@ class sys_identfy:
 
         """
 
-        import numpy as np
         if len(y_initial)<self.max_lag:
             raise Exception('Insufficient initial conditions elements!')
         predicted_values = np.zeros((len(entrace_u), 1))
@@ -816,7 +335,7 @@ class sys_identfy:
 
         return predicted_values
 
-    def information_criterion(self, output_y, input_u, calculation_method):
+    def information_criterion(self, input_u, output_y):
         """ This function performs a information criterion to determine the model size
 
         Parameters
@@ -844,18 +363,11 @@ class sys_identfy:
 
         """
 
-        import numpy as np
         output_vector = np.zeros(len(self.reg_code))
         output_vector[:] = float('NaN')
         X_base = self.build_information_matrix(self.reg_code, input_u, output_y)
         effective_output_elements_count = len(output_y) - self.max_lag
-        choices={'Akaike':0,'Bayes':1,"FPE":2,"LILC":3}
-        result=choices.get(calculation_method)
-        calculation_method=result
-
-        choices = {'Akaike':0,'Bayes':1,"FPE":2,"LILC":3}
-        result = choices.get(calculation_method)
-        calculation_method = result
+        calculation_method = self.info_criteria
 
         for i in range(0, len(self.reg_code)):
             model_elements = i + 1
@@ -866,11 +378,11 @@ class sys_identfy:
             residual_variance = np.var(temporary_residual)
 
 
-            if calculation_method == 1: #BIC
+            if calculation_method == 'bic': #BIC
                 model_factor = model_elements * np.log(effective_output_elements_count)
-            elif calculation_method == 2: #FPE
+            elif calculation_method == 'fpe': #FPE
                 model_factor = effective_output_elements_count * np.log((effective_output_elements_count + model_elements) / (effective_output_elements_count - model_elements))
-            elif calculation_method == 3: #LILC
+            elif calculation_method == 'lilc': #LILC
                 model_factor = 2 * model_elements * np.log(np.log(effective_output_elements_count))
             else: #AIC-2
                 model_factor =  + 2 * model_elements
@@ -925,12 +437,11 @@ class sys_identfy:
 
         """
 
-        import numpy as np
         number_of_elements = model.shape[0]
         number_of_noise = 0 #require future update for NARMAX model
 
         # the auxiliary_model variable is an array with all terms of the model separated wihtout brackets
-        # example: if lag = 2, ylag = 2, ulag = 2, the auxiliary_model results in
+        # example: if lag = 2, ylag = 2, xlag = 2, the auxiliary_model results in
         #           [1001 1002 2001 2002 1001 1001 1002 1001 2001 1001 2002 1001 1002 1002
         #           2001 1002 2002 1002 2001 2001 2002 2001 2002 2002]
         auxiliary_model = model.reshape(model.shape[0]*model.shape[1], 1)
@@ -996,7 +507,6 @@ class sys_identfy:
         [0, 1, 2, 3, 4]
         """
 
-        import numpy as np
         number_of_samples = col_to_shift.shape[0]
         col_aux = np.zeros((number_of_samples, 1))
         aux = col_to_shift[0: number_of_samples - lag]
@@ -1026,8 +536,6 @@ class sys_identfy:
                                 the information matrix of the model
 
         """
-
-        import numpy as np
 
         number_of_elements = self.model_information(model);
         number_of_samples = u.shape[0]
@@ -1069,3 +577,479 @@ class sys_identfy:
         X = X[number_of_elements[2]:, :]
 
         return X
+
+
+    def prepare_data(y_path, u_path, training_percent):
+        """ This function split the data in identificatioin and validation subsets.
+
+        Parameters:
+        -----------
+        y_path = str
+                 path from txt file that contains the outputs
+
+        u_path = str
+                 path from txt file that contains the inputs
+
+        training_percent = float
+                  percentage of the data set that is destinated as identification set
+
+        Returns:
+        --------
+        y_training = array-like
+                  target data used on training phase
+
+        u_training = array-like
+                  input data used on training phase
+
+        y_validation = array-like
+                  target data for model validation
+
+        u_validation = array-like
+                  input data for model validation
+        """
+
+        y = np.loadtxt(y_path)
+        u = np.loadtxt(u_path)
+        y_size = y.size
+        size_ident = round((y_size*training_percent)/100)
+        y_training = y[0: size_ident]
+        u_training = u[0: size_ident]
+        y_validation = y[size_ident+1 : y_size+1]
+        u_validation = y[size_ident+1 : y_size+1]
+        return y_training, u_training, y_validation, u_validation
+
+
+    def forecast_error(self, y, y_predicted):
+        """ Calculate the forecast error (also known as identification residues)
+            in a regression model
+
+        Parameters
+        ----------
+        y : array-like of shape = number_of_outputs
+            Represent the target values.
+
+        y_predicted : array-like of shape = number_of_outputs
+            Target values predicted by the model.
+
+        Returns
+        -------
+        loss : ndarray of floats
+               The difference between the true target values and the predicted or forecast
+               value in regression or any other phenomenon.
+
+        References
+        ----------
+        [1] `Wikipedia entry on the Forecast error
+            <https://en.wikipedia.org/wiki/Forecast_error>`_
+
+        Examples
+        --------
+        >>> y = [3, -0.5, 2, 7]
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> forecast_error(y, y_predicted)
+        [0.5, -0.5, 0, -1]
+
+        """
+
+        return y - y_predicted
+
+    def mean_forecast_error(self, y, y_predicted):
+        """ Calculate the mean of forecast error of a regression model
+
+        Parameters
+        ----------
+        y : array-like of shape = number_of_outputs
+            Represent the target values.
+
+        y_predicted : array-like of shape = number_of_outputs
+            Target values predicted by the model.
+
+        Returns
+        -------
+        loss : float
+               The mean  value of the difference between the true target values and the predicted or forecast
+               value in regression or any other phenomenon.
+
+        References
+        ----------
+        [1] `Wikipedia entry on the Forecast error
+            <https://en.wikipedia.org/wiki/Forecast_error>`_
+
+        Examples
+        --------
+        >>> y = [3, -0.5, 2, 7]
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> mean_forecast_error(y, y_predicted)
+        -0.25
+
+        """
+        return np.average(y - y_predicted)
+
+    def mean_squared_error(self, y, y_predicted):
+        """ Calculate the Mean Squared Error in a regression model
+
+
+        Parameters
+        ----------
+        y : array-like of shape = number_of_outputs
+            Represent the target values.
+
+        y_predicted : array-like of shape = number_of_outputs
+            Target values predicted by the model.
+
+        Returns
+        -------
+        loss : float
+            MSE output is non-negative values. Becoming 0.0 means your
+            model outputs are exactly matched by true target values.
+
+        References
+        ----------
+        [1] `Wikipedia entry on the Mean Squared Error
+            <https://en.wikipedia.org/wiki/Mean_squared_error>`_
+
+        Examples
+        --------
+        >>> y = [3, -0.5, 2, 7]
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> mean_squared_error(y, y_predicted)
+        0.375
+
+        """
+        output_error = np.average((y - y_predicted) ** 2)
+        return np.average(output_error)
+
+    def root_mean_squared_error(self, y, y_predicted):
+        """ Calculate the Root Mean Squared Error in a regression model
+
+
+        Parameters
+        ----------
+        y : array-like of shape = number_of_outputs
+            Represent the target values.
+
+        y_predicted : array-like of shape = number_of_outputs
+            Target values predicted by the model.
+
+        Returns
+        -------
+        loss : float
+            RMSE output is non-negative values. Becoming 0.0 means your
+            model outputs are exactly matched by true target values.
+
+        References
+        ----------
+        [1] `Wikipedia entry on the Root Mean Squared Error
+            <https://en.wikipedia.org/wiki/Root-mean-square_deviation>`_
+
+        Examples
+        --------
+        >>> y = [3, -0.5, 2, 7]
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> root_mean_squared_error(y, y_predicted)
+        0.612
+
+        """
+        return np.sqrt(self.mean_squared_error(y, y_predicted))
+
+    def normalized_root_mean_squared_error(self, y, y_predicted):
+        """ Calculate the normalized Root Mean Squared Error in a regression model
+
+
+        Parameters
+        ----------
+        y : array-like of shape = number_of_outputs
+            Represent the target values.
+
+        y_predicted : array-like of shape = number_of_outputs
+            Target values predicted by the model.
+
+        Returns
+        -------
+        loss : float
+            nRMSE output is non-negative values. Becoming 0.0 means your
+            model outputs are exactly matched by true target values.
+
+        References
+        ----------
+        [1] `Wikipedia entry on the normalized Root Mean Squared Error
+            <https://en.wikipedia.org/wiki/Root-mean-square_deviation>`_
+
+        Examples
+        --------
+        >>> y = [3, -0.5, 2, 7]
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> normalized_root_mean_squared_error(y, y_predicted)
+        0.081
+
+        """
+        return self.root_mean_squared_error(y, y_predicted) / (y.max() - y.min())
+
+
+    def root_relative_squared_error(self, y, y_predicted):
+        """ Calculate the Root Relative Mean Squared Error in a regression model
+
+
+        Parameters
+        ----------
+        y : array-like of shape = number_of_outputs
+            Represent the target values.
+
+        y_predicted : array-like of shape = number_of_outputs
+            Target values predicted by the model.
+
+        Returns
+        -------
+        loss : float
+            RRSE output is non-negative values. Becoming 0.0 means your
+            model outputs are exactly matched by true target values.
+
+        Examples
+        --------
+        >>> y = [3, -0.5, 2, 7]
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> root_relative_mean_squared_error(y, y_predicted)
+        0.226
+
+        """
+        numerator = np.sum(np.square((y_predicted - y)))
+        denominator = np.sum(np.square((y_predicted - np.mean(y, axis=0))))
+        return np.sqrt(np.divide(numerator, denominator))
+
+    def mean_absolute_error(self, y, y_predicted):
+        """ Calculate the Mean absolute error in a regression model
+
+
+        Parameters
+        ----------
+        y : array-like of shape = number_of_outputs
+            Represent the target values.
+
+        y_predicted : array-like of shape = number_of_outputs
+            Target values predicted by the model.
+
+        Returns
+        -------
+        loss : float or ndarray of floats
+            MAE output is non-negative values. Becoming 0.0 means your
+            model outputs are exactly matched by true target values.
+
+        References
+        ----------
+        [1] `Wikipedia entry on the Mean absolute error
+            <https://en.wikipedia.org/wiki/Mean_absolute_error>`_
+
+        Examples
+        --------
+        >>> y = [3, -0.5, 2, 7]
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> mean_absolute_error(y, y_predicted)
+        0.5
+
+        """
+
+        output_errors = np.average(np.abs(y - y_predicted))
+        return np.average(output_errors)
+
+    def mean_squared_log_error(self, y, y_predicted):
+        """ Calculate the Mean Squared Logarithmic Error in a regression model
+
+
+        Parameters
+        ----------
+        y : array-like of shape = number_of_outputs
+            Represent the target values.
+
+        y_predicted : array-like of shape = number_of_outputs
+            Target values predicted by the model.
+
+        Returns
+        -------
+        loss : float
+            MSLE output is non-negative values. Becoming 0.0 means your
+            model outputs are exactly matched by true target values.
+
+        Examples
+        --------
+        >>> y = [3, 5, 2.5, 7]
+        >>> y_predicted = [2.5, 5, 4, 8]
+        >>> mean_squared_log_error(y, y_predicted)
+        0.039
+
+        """
+        return self.mean_squared_error(np.log1p(y), np.log1p(y_predicted))
+
+    def median_absolute_error(self, y, y_predicted):
+        """ Calculate the Median Absolute Error in a regression model
+
+
+        Parameters
+        ----------
+        y : array-like of shape = number_of_outputs
+            Represent the target values.
+
+        y_predicted : array-like of shape = number_of_outputs
+            Target values predicted by the model.
+
+        Returns
+        -------
+        loss : float
+            MdAE output is non-negative values. Becoming 0.0 means your
+            model outputs are exactly matched by true target values.
+
+        References
+        ----------
+        [1] `Wikipedia entry on the Median absolute deviation
+            <https://en.wikipedia.org/wiki/Median_absolute_deviation>`_
+
+
+        Examples
+        --------
+         >>> y = [3, -0.5, 2, 7]
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> median_absolute_error(y, y_predicted)
+        0.5
+
+        """
+        return np.median(np.abs(y - y_predicted))
+
+    def explained_variance_score(self, y, y_predicted):
+        """ Calculate the Explained Variance Score of a regression model
+
+
+        Parameters
+        ----------
+        y : array-like of shape = number_of_outputs
+            Represent the target values.
+
+        y_predicted : array-like of shape = number_of_outputs
+            Target values predicted by the model.
+
+        Returns
+        -------
+        loss : float
+            EVS output is non-negative values. Becoming 1.0 means your
+            model outputs are exactly matched by true target values.
+            Lower values means worse results
+
+        References
+        ----------
+        [1] `Wikipedia entry on the Explained Variance
+            <https://en.wikipedia.org/wiki/Explained_variation>`_
+
+
+        Examples
+        --------
+         >>> y = [3, -0.5, 2, 7]
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> explained_variance_score(y, y_predicted)
+        0.957
+
+        """
+
+        y_diff_avg = np.average(y - y_predicted)
+        numerator = np.average((y - y_predicted - y_diff_avg) ** 2)
+        y_avg = np.average(y)
+        denominator = np.average((y- y_avg) ** 2)
+        nonzero_numerator = numerator != 0
+        nonzero_denominator = denominator != 0
+        valid_score = nonzero_numerator & nonzero_denominator
+        output_scores = np.ones(y.shape[0])
+        output_scores[valid_score] = 1 - (numerator[valid_score] /
+                                      denominator[valid_score])
+        output_scores[nonzero_numerator & ~nonzero_denominator] = 0.
+        return np.average(output_scores)
+
+    def r2_score(self, y, y_predicted):
+        """ Calculate the R2 score of a regression model
+
+
+        Parameters
+        ----------
+        y : array-like of shape = number_of_outputs
+            Represent the target values.
+
+        y_predicted : array-like of shape = number_of_outputs
+            Target values predicted by the model.
+
+        Returns
+        -------
+        loss : float
+            R2 output can be non-negative values or negative value. Becoming 1.0 means your
+            model outputs are exactly matched by true target values.
+            Lower values means worse results
+
+        Notes
+        -----
+        This is not a symmetric function
+
+        References
+        ----------
+        [1] `Wikipedia entry on the Coefficient of determination
+            <https://en.wikipedia.org/wiki/Coefficient_of_determination>`_
+
+
+        Examples
+        --------
+         >>> y = [3, -0.5, 2, 7]
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> explained_variance_score(y, y_predicted)
+        0.948
+
+        """
+        numerator = ((y - y_predicted) ** 2).sum(axis=0, dtype=np.float64)
+        denominator = ((y - np.average(y, axis=0)) ** 2).sum(axis=0, dtype=np.float64)
+        nonzero_denominator = denominator != 0
+        nonzero_numerator = numerator != 0
+        valid_score = nonzero_denominator & nonzero_numerator
+        output_scores = np.ones([y.shape[0]])
+        output_scores[valid_score] = 1 - (numerator[valid_score] /
+                                      denominator[valid_score])
+        # arbitrary set to zero to avoid -inf scores, having a constant
+        # y_true is not interesting for scoring a regression anyway
+        output_scores[nonzero_numerator & ~nonzero_denominator] = 0.
+
+        return np.average(output_scores)
+
+    def symmetric_mean_absolute_percentage_error(self, y, y_predicted):
+        """ Calculate the SMAPE score of a regression model
+
+
+        Parameters
+        ----------
+        y : array-like of shape = number_of_outputs
+            Represent the target values.
+
+        y_predicted : array-like of shape = number_of_outputs
+            Target values predicted by the model.
+
+        Returns
+        -------
+        loss : float
+            SMAPE output is a non-negative value.
+            The results are percentages values.
+
+        Notes
+        -----
+        One supposed problem with SMAPE is that it is not symmetric since over-forecasts
+        and under-forecasts are not treated equally.
+
+        References
+        ----------
+        [1] `Wikipedia entry on the Symmetric mean absolute percentage error
+            <https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error>`_
+
+
+        Examples
+        --------
+         >>> y = [3, -0.5, 2, 7]
+        >>> y_predicted = [2.5, 0.0, 2, 8]
+        >>> symmetric_mean_absolute_percentage_error(y, y_predicted)
+        57.87
+
+        """
+
+        return 100/len(y) * np.sum(2*np.abs(y_predicted - y) / (np.abs(y) + np.abs(y_predicted)))
+        #return np.mean((np.abs(y_predicted - y) * 200/ (np.abs(y_predicted) + np.abs(y))))
+
+
