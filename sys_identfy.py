@@ -14,12 +14,15 @@ from itertools import combinations_with_replacement
 
 class sys_identfy:
 
-
-    def __init__(self, non_degree=2, ylag=2, xlag=2, info_criteria='aic', scoring='root_relative_squared_error', n_terms=None):
+    def __init__(self, non_degree=2, ylag=2, xlag=2, info_criteria='aic',
+                 scoring='root_relative_squared_error', n_terms=None):
         """
-        This funcrion create a new object of the type sys_identfy. It is called automatically always that a new
-        object is instantiated. It is responsible for create the variables from the object and call the function
-        genreg that handle the hard job.
+        This funcrion create a new object of the type sys_identfy.
+        It is called automatically always that a new object is
+        instantiated. It is responsible for create the variables
+        from the object and call the function genreg that
+        handle the hard job.
+
         Args:
             non_degree = Nonlinearity degree
             ylag = Max lag of input
@@ -27,10 +30,10 @@ class sys_identfy:
 
         """
 
-        self.non_degree = non_degree # non_degree stores the nonlinearity degree
-        self.ylag = ylag             # ylag stores the maximum output lag
-        self.xlag = xlag             # xlag ylag stores the maximum input lag
-        [self.reg_code, self.max_lag] = self.genreg(non_degree,ylag,xlag) # reg_code stores all possible combinations
+        self.non_degree = non_degree
+        self.ylag = ylag
+        self.xlag = xlag
+        [self.reg_code, self.max_lag] = self.genreg(non_degree, ylag, xlag)
         self.info_criteria = info_criteria
         self.scoring = getattr(self, scoring)
         self.n_terms = n_terms
@@ -48,16 +51,17 @@ class sys_identfy:
             model_length = self.n_terms
         [model, errr, self.pivv, psi] = self.ERR(y, reg_Matrix, model_length)
         number_of_elements, nno, maximum_lag, number_of_output, nu, self.new_model = self.model_information(model)
-        self.theta =  self.last_squares(psi, y)
+        self.theta = self.last_squares(psi, y)
         return self.new_model, self.pivv, self.theta, self.info_values
 
     def predict(self, X, y):
-        return self.model_prediction(self.new_model, self.pivv, X, y, self.theta)
-
+        return self.model_prediction(self.new_model,
+                                     self.pivv, X, y,
+                                     self.theta)
 
     def genreg(self, non_degree, ylag, xlag):
-        """ This function generates a codification from all possibles regressors given the maximum lag of the
-        input and output.
+        """ This function generates a codification from all possibles
+            regressors given the maximum lag of the input and output.
 
         Parameters:
         -----------
@@ -106,7 +110,8 @@ class sys_identfy:
         Parameters:
         -----------
         x = array-like of shape = number_of_training_samples
-            The respective column of the matrix of regressors in each iteration of ERR function
+            The respective column of the matrix of regressors in each
+            iteration of ERR function
 
         Returns:
         --------
@@ -128,7 +133,6 @@ class sys_identfy:
             v = np.array(v[1: n]/aux_b)
             v = np.concatenate((aux_a, v))
         return v
-    #=============================================================================================================================================================
 
     def rowhouse(self, RA, v):
         """This function performes a row Househoulder transformation
@@ -136,7 +140,8 @@ class sys_identfy:
         Parameters:
         -----------
         RA = array-like of shape = number_of_training_samples
-            The respective column of the matrix of regressors in each iteration of ERR function
+            The respective column of the matrix of regressors in each
+            iteration of ERR function
 
         v = array-like of shape = number_of_training_samples
             the reflected vector obtained by using the householder reflection
@@ -156,7 +161,6 @@ class sys_identfy:
         RA = RA + v*w
         B = RA
         return B
-    #=============================================================================================================================================================
 
     def ERR(self, y, X, process_term_number):
 
@@ -179,24 +183,28 @@ class sys_identfy:
               The respective ERR calculated for each regressor
 
         piv = array-like of shape = number_of_model_elements
-              Contains the index to put the regressors in the correct order based on err values
+              Contains the index to put the regressors in the correct order
+              based on err values
 
         X_orthogonal = ndarray of floats
-                                        The updated and orthogonal information matrix
+                                        The updated and orthogonal
+                                        information matrix
 
         References:
         -----------
-        [1]`Manuscript: Orthogonal least squares methods and their application to non-linear system identification
+        [1]`Manuscript: Orthogonal least squares methods and their application
+            to non-linear system identification
             <https://eprints.soton.ac.uk/251147/1/778742007_content.pdf>`_
 
-        [2]`Manuscript (portuguese): Identificação de Sistemas não Lineares Utilizando Modelos NARMAX Polinomiais–Uma Revisão e Novos Resultados
+        [2]`Manuscript (portuguese): Identificação de Sistemas não Lineares
+            Utilizando Modelos NARMAX Polinomiais–Uma Revisão
+            e Novos Resultados
             <https://www.researchgate.net/profile/Giovani_Rodrigues/publication/228595821_Identificacao_de_Sistemas_nao_Lineares_Utilizando_Modelos_NARMAX_Polinomiais-Uma_Revisao_e_Novos_Resultados/links/00b4951b10ff8ab4d3000000.pdf>`_
 
         """
 
-        squared_y = y[self.max_lag: ].T@y[self.max_lag: ]
+        squared_y = y[self.max_lag:].T@y[self.max_lag:]
         X_aux = np.array(X)
-        #y = np.array([y[self.max_lag: ]]).T
         y = np.array([y[self.max_lag:, 0]]).T
         y_aux = np.copy(y)
         [row_number, col_number] = X_aux.shape
@@ -205,23 +213,22 @@ class sys_identfy:
         err = np.zeros(col_number)
         for i in np.arange(0, col_number):
             for j in np.arange(i, col_number):
-                numerator = np.array(X_aux[i: row_number, j].T@y_aux[i: row_number])
-                numerator = np.power(numerator, 2)
-                denominator = np.array( (X_aux[i:row_number, j].T@X_aux[i: row_number, j]) * squared_y)
-                err_aux[j] = numerator/denominator
-                #print(err_aux)
+                num = np.array(X_aux[i: row_number, j].T@y_aux[i: row_number])
+                num = np.power(num, 2)
+                den = np.array((X_aux[i:row_number, j].T@X_aux[i: row_number, j]) * squared_y)
+                err_aux[j] = num/den
 
             if i == process_term_number:
                 break
             err_aux = list(err_aux)
-            piv_index = err_aux.index(max(err_aux[i: ]))
+            piv_index = err_aux.index(max(err_aux[i:]))
             err[i] = err_aux[piv_index]
             X_aux[:, [piv_index, i]] = X_aux[:, [i, piv_index]]
             piv[[piv_index, i]] = piv[[i, piv_index]]
-            #index = err_aux.index(max(err_aux[i: ]))
-            #err[i] = err_aux[index]
-            #aux_regress_matrix[:, [index, i]] = aux_regress_matrix[:, [i, index]]
-            #piv[[index, i]] = piv[[i, index]]
+            # index = err_aux.index(max(err_aux[i: ]))
+            # err[i] = err_aux[index]
+            # aux_regress_matrix[:, [index, i]] = aux_regress_matrix[:, [i, index]]
+            # piv[[index, i]] = piv[[i, index]]
             x = X_aux[i: row_number, i]
             v = self.house(x)
             aux_1 = X_aux[i: row_number, i: col_number]
@@ -233,7 +240,6 @@ class sys_identfy:
         psi_aux = np.array(X)
         X_orthogonal = np.copy(psi_aux[:, Piv])
         psi_aux = np.array(X)
-        psi_final = np.copy(psi_aux[:, Piv])
         reg_code_buffer = self.reg_code
         model_code = np.copy(reg_code_buffer[Piv, :])
 
@@ -290,13 +296,13 @@ class sys_identfy:
 
         result = np.correlate(signal, signal, mode='full')
         half_of_simmetry = int(np.floor(result.size/2))
-        return result[half_of_simmetry: ]
+        return result[half_of_simmetry:]
 
+    def model_prediction(self, model_elements, model_pivot,
+                         entrace_u, y_initial, theta):
 
-    def model_prediction(self, model_elements, model_pivot, entrace_u, y_initial, theta):
-
-        """ Performs the free run simulation (infinity steps-ahead simulation) of a model
-
+        """ Performs the free run simulation (infinity steps-ahead simulation)
+            of a model
 
         Parameters
         ----------
@@ -307,7 +313,7 @@ class sys_identfy:
                       Vector with regressor order (from ERR)
 
         y_initial = array-like of shape = max_lag
-                    number of initial conditions values of output mensured 
+                    number of initial conditions values of output mensured
                     to start recursive process
 
         entrace_u = ndarray of floats of shape = number_of_samples
@@ -321,20 +327,21 @@ class sys_identfy:
         predicted_values = ndarray of floats
                            the predicted values of the model
 
-
         """
 
-        if len(y_initial)<self.max_lag:
+        if len(y_initial) < self.max_lag:
             raise Exception('Insufficient initial conditions elements!')
         predicted_values = np.zeros((len(entrace_u), 1))
-        predicted_values[0:self.max_lag] = y_initial[0:self.max_lag] #Discard unnecessary initial values
+        # Discard unnecessary initial values
+        predicted_values[0:self.max_lag] = y_initial[0:self.max_lag]
         analised_elements_number = self.max_lag + 1
         effective_pivot_vector = model_pivot[0: len(model_elements)]
         for i in range(0, len(entrace_u)-self.max_lag):
-            X_temp = self.build_information_matrix(self.reg_code, entrace_u[i:i+analised_elements_number], predicted_values[i:i+analised_elements_number])
+            X_temp = self.build_information_matrix(self.reg_code,
+                                                   entrace_u[i:i+analised_elements_number],
+                                                   predicted_values[i:i+analised_elements_number])
             X_temp = np.copy(X_temp[:, effective_pivot_vector])
             a = X_temp @ theta
-            #print(a)
             predicted_values[i+self.max_lag] = a[:, 0]
 
         return predicted_values
@@ -350,17 +357,22 @@ class sys_identfy:
         input_u = array-like of shape = number_of_samples
                   Input system values measured by the user
 
-        calculation_method = int value to choose the respective information criteria
-                             'Akaike'-  Akaike's Information Criterion with critical value 2 (AIC) (default)
+        calculation_method = int value to choose the respective
+                            information criteria
+
+                             'Akaike'-  Akaike's Information Criterion with
+                                        critical value 2 (AIC) (default)
                              'Bayes' -  Bayes Information Criterion (BIC)
                              'FPE'   -  Final Prediction Error (FPE)
-                             'LILC'  -  Khundrin’s law ofiterated logarithm criterion (LILC)
+                             'LILC'  -  Khundrin’s law ofiterated logarithm
+                                        criterion (LILC)
 
         Returns:
         --------
         output_vector = array-like of shape = number_of_elements
-                        Vector with values of akaike's information criterion for models
-                        with N terms (where N is the vector position + 1)
+                        Vector with values of akaike's information criterion
+                        for models with N terms (where N is the
+                        vector position + 1)
 
         References
         ----------
@@ -369,33 +381,38 @@ class sys_identfy:
 
         output_vector = np.zeros(len(self.reg_code))
         output_vector[:] = float('NaN')
-        X_base = self.build_information_matrix(self.reg_code, input_u, output_y)
+        X_base = self.build_information_matrix(self.reg_code,
+                                               input_u,
+                                               output_y)
         effective_output_elements_count = len(output_y) - self.max_lag
         calculation_method = self.info_criteria
 
         for i in range(0, len(self.reg_code)):
             model_elements = i + 1
-            [null, null, null, regressor_matrix] = self.ERR(output_y, X_base, model_elements)
+            [null, null, null, regressor_matrix] = self.ERR(output_y, X_base,
+                                                            model_elements)
             temporary_theta = self.last_squares(regressor_matrix, output_y)
             temporary_simulated_output = regressor_matrix @ temporary_theta
-            temporary_residual = output_y[self.max_lag: ] - temporary_simulated_output
+            temporary_residual = (output_y[self.max_lag:]
+                                  - temporary_simulated_output)
             residual_variance = np.var(temporary_residual)
 
-
-            if calculation_method == 'bic': #BIC
-                model_factor = model_elements * np.log(effective_output_elements_count)
-            elif calculation_method == 'fpe': #FPE
+            if calculation_method == 'bic':
+                model_factor = (model_elements
+                                * np.log(effective_output_elements_count))
+            elif calculation_method == 'fpe':
                 model_factor = effective_output_elements_count * np.log((effective_output_elements_count + model_elements) / (effective_output_elements_count - model_elements))
-            elif calculation_method == 'lilc': #LILC
-                model_factor = 2 * model_elements * np.log(np.log(effective_output_elements_count))
-            else: #AIC-2
-                model_factor =  + 2 * model_elements
+            elif calculation_method == 'lilc':
+                model_factor = (2 * model_elements
+                                * np.log(np.log(effective_output_elements_count)))
+            else:  # AIC
+                model_factor = + 2 * model_elements
 
-            residual_factor = (effective_output_elements_count)*np.log(residual_variance)
+            residual_factor = ((effective_output_elements_count)
+                               * np.log(residual_variance))
             output_vector[i] = residual_factor + model_factor
 
         return output_vector
-
 
     def model_information(self, model):
         """ This function return crucial information about the current model evaluated
@@ -442,23 +459,27 @@ class sys_identfy:
         """
 
         number_of_elements = model.shape[0]
-        number_of_noise = 0 #require future update for NARMAX model
+        number_of_noise = 0  # require future update for NARMAX model
 
-        # the auxiliary_model variable is an array with all terms of the model separated wihtout brackets
-        # example: if lag = 2, ylag = 2, xlag = 2, the auxiliary_model results in
-        #           [1001 1002 2001 2002 1001 1001 1002 1001 2001 1001 2002 1001 1002 1002
-        #           2001 1002 2002 1002 2001 2001 2002 2001 2002 2002]
-        auxiliary_model = model.reshape(model.shape[0]*model.shape[1], 1)
-        auxiliary_model = auxiliary_model[~np.all(auxiliary_model == 0, axis=1)]
-        auxiliary_model = np.array(auxiliary_model).ravel()
+        # the aux_model variable is an array with all terms
+        # of the model separated wihtout brackets
+        # example: if lag = 2, ylag = 2, xlag = 2, the aux_model
+        # results in
+        # [1001 1002 2001 2002 1001 1001 1002 1001 2001 1001 2002 1001 1002
+        #  1002 2001 1002 2002 1002 2001 2001 2002 2001 2002 2002]
+        aux_model = model.reshape(model.shape[0]*model.shape[1], 1)
+        aux_model = aux_model[~np.all(aux_model == 0, axis=1)]
+        aux_model = np.array(aux_model).ravel()
         list_of_split_vector = []
         lag = []
-        for k in np.arange(auxiliary_model.shape[0]):
-            remove_bracket = np.array(np.array2string(auxiliary_model[k], precision=1, separator=''))
-            # the split_vector transform each term in auxiliary_vector in separeted digits
+        for k in np.arange(aux_model.shape[0]):
+            remove_bracket = np.array(np.array2string(aux_model[k], precision=1, separator=''))
+            # the split_vector transform each term in auxiliary_vector
+            # in separeted digits
             # example: [1001] = [1 0 0 1]
             split_vector = np.array([int(d) for d in str(remove_bracket)])
-            # the variable 's' is the join of the split_vector from index 1 onwards
+            # the variable 's' is the join of the split_vector from index 1
+            # onwards
             # example: [1 0 0 1] = [001] = 1 and [1 0 1 2] = [012] = 12
             s = int(''.join(str(i) for i in split_vector[1:]))
             lag.append(s)
@@ -473,7 +494,8 @@ class sys_identfy:
             else:
                 number_of_output = 1
 
-            number_of_inputs = np.max(list_of_split_vector[:, 0]) - number_of_output
+            number_of_inputs = (np.max(list_of_split_vector[:, 0])
+                                - number_of_output)
 
         else:
             maximum_lag = 0
@@ -484,9 +506,9 @@ class sys_identfy:
 
         return number_of_elements, number_of_noise, maximum_lag, number_of_output, number_of_inputs, _model
 
-
     def shift_column(self, col_to_shift, lag):
-        """ This function shift the values corresponding a regressor given its respective lag
+        """ This function shift the values corresponding a regressor given
+            its respective lag
 
         Parameters
         ----------
@@ -495,7 +517,6 @@ class sys_identfy:
 
         lag = int
               The respective lag of the regressor
-
 
         Returns:
         --------
@@ -514,11 +535,10 @@ class sys_identfy:
         number_of_samples = col_to_shift.shape[0]
         col_aux = np.zeros((number_of_samples, 1))
         aux = col_to_shift[0: number_of_samples - lag]
-        aux = np.reshape(aux, (len(aux),1))
+        aux = np.reshape(aux, (len(aux), 1))
         col_aux[lag:, 0] = aux[:, 0]
 
         return col_aux
-
 
     def build_information_matrix(self, model, u, y):
         """ Build the information matrix based on model code.
@@ -541,7 +561,7 @@ class sys_identfy:
 
         """
 
-        number_of_elements = self.model_information(model);
+        number_of_elements = self.model_information(model)
         number_of_samples = u.shape[0]
         auxiliary_model = np.copy(model)
         X = np.ones((number_of_samples, number_of_elements[0]))
@@ -563,7 +583,7 @@ class sys_identfy:
 
                 list_of_split_vector = np.array(list_of_split_vector)
                 lag = np.array(lag)
-                which_regressor = list_of_split_vector[:, 0];
+                which_regressor = list_of_split_vector[:, 0]
 
                 for i in np.arange(which_regressor.shape[0]):
                     if which_regressor[i] == 1:
@@ -582,7 +602,6 @@ class sys_identfy:
 
         return X
 
-
     def prepare_data(y_path, u_path, training_percent):
         """ This function split the data in identificatioin and validation subsets.
 
@@ -595,10 +614,12 @@ class sys_identfy:
                  path from txt file that contains the inputs
 
         training_percent = float
-                  percentage of the data set that is destinated as identification set
+                  percentage of the data set that is destinated as
+                  identification set
 
         Returns:
-        --------
+        --------            #print(a)
+
         y_training = array-like
                   target data used on training phase
 
@@ -618,10 +639,9 @@ class sys_identfy:
         size_ident = round((y_size*training_percent)/100)
         y_training = y[0: size_ident]
         u_training = u[0: size_ident]
-        y_validation = y[size_ident+1 : y_size+1]
-        u_validation = y[size_ident+1 : y_size+1]
+        y_validation = y[size_ident+1:y_size+1]
+        u_validation = y[size_ident+1:y_size+1]
         return y_training, u_training, y_validation, u_validation
-
 
     def forecast_error(self, y, y_predicted):
         """ Calculate the forecast error (also known as identification residues)
@@ -638,8 +658,8 @@ class sys_identfy:
         Returns
         -------
         loss : ndarray of floats
-               The difference between the true target values and the predicted or forecast
-               value in regression or any other phenomenon.
+               The difference between the true target values and the predicted
+               or forecast value in regression or any other phenomenon.
 
         References
         ----------
@@ -671,8 +691,9 @@ class sys_identfy:
         Returns
         -------
         loss : float
-               The mean  value of the difference between the true target values and the predicted or forecast
-               value in regression or any other phenomenon.
+               The mean  value of the difference between the true target
+               values and the predicted or forecast value in regression
+               or any other phenomenon.
 
         References
         ----------
@@ -691,7 +712,6 @@ class sys_identfy:
 
     def mean_squared_error(self, y, y_predicted):
         """ Calculate the Mean Squared Error in a regression model
-
 
         Parameters
         ----------
@@ -726,7 +746,6 @@ class sys_identfy:
     def root_mean_squared_error(self, y, y_predicted):
         """ Calculate the Root Mean Squared Error in a regression model
 
-
         Parameters
         ----------
         y : array-like of shape = number_of_outputs
@@ -759,7 +778,6 @@ class sys_identfy:
     def normalized_root_mean_squared_error(self, y, y_predicted):
         """ Calculate the normalized Root Mean Squared Error in a regression model
 
-
         Parameters
         ----------
         y : array-like of shape = number_of_outputs
@@ -789,10 +807,8 @@ class sys_identfy:
         """
         return self.root_mean_squared_error(y, y_predicted) / (y.max() - y.min())
 
-
     def root_relative_squared_error(self, y, y_predicted):
         """ Calculate the Root Relative Mean Squared Error in a regression model
-
 
         Parameters
         ----------
@@ -822,7 +838,6 @@ class sys_identfy:
 
     def mean_absolute_error(self, y, y_predicted):
         """ Calculate the Mean absolute error in a regression model
-
 
         Parameters
         ----------
@@ -858,7 +873,6 @@ class sys_identfy:
     def mean_squared_log_error(self, y, y_predicted):
         """ Calculate the Mean Squared Logarithmic Error in a regression model
 
-
         Parameters
         ----------
         y : array-like of shape = number_of_outputs
@@ -885,7 +899,6 @@ class sys_identfy:
 
     def median_absolute_error(self, y, y_predicted):
         """ Calculate the Median Absolute Error in a regression model
-
 
         Parameters
         ----------
@@ -920,7 +933,6 @@ class sys_identfy:
     def explained_variance_score(self, y, y_predicted):
         """ Calculate the Explained Variance Score of a regression model
 
-
         Parameters
         ----------
         y : array-like of shape = number_of_outputs
@@ -954,19 +966,18 @@ class sys_identfy:
         y_diff_avg = np.average(y - y_predicted)
         numerator = np.average((y - y_predicted - y_diff_avg) ** 2)
         y_avg = np.average(y)
-        denominator = np.average((y- y_avg) ** 2)
+        denominator = np.average((y-y_avg)**2)
         nonzero_numerator = numerator != 0
         nonzero_denominator = denominator != 0
         valid_score = nonzero_numerator & nonzero_denominator
         output_scores = np.ones(y.shape[0])
-        output_scores[valid_score] = 1 - (numerator[valid_score] /
-                                      denominator[valid_score])
+        output_scores[valid_score] = (1 - (numerator[valid_score] /
+                                      denominator[valid_score]))
         output_scores[nonzero_numerator & ~nonzero_denominator] = 0.
         return np.average(output_scores)
 
     def r2_score(self, y, y_predicted):
         """ Calculate the R2 score of a regression model
-
 
         Parameters
         ----------
@@ -979,9 +990,9 @@ class sys_identfy:
         Returns
         -------
         loss : float
-            R2 output can be non-negative values or negative value. Becoming 1.0 means your
-            model outputs are exactly matched by true target values.
-            Lower values means worse results
+            R2 output can be non-negative values or negative value.
+            Becoming 1.0 means your model outputs are exactly
+            matched by true target values. Lower values means worse results
 
         Notes
         -----
@@ -1007,8 +1018,8 @@ class sys_identfy:
         nonzero_numerator = numerator != 0
         valid_score = nonzero_denominator & nonzero_numerator
         output_scores = np.ones([y.shape[0]])
-        output_scores[valid_score] = 1 - (numerator[valid_score] /
-                                      denominator[valid_score])
+        output_scores[valid_score] = (1 - (numerator[valid_score] /
+                                      denominator[valid_score]))
         # arbitrary set to zero to avoid -inf scores, having a constant
         # y_true is not interesting for scoring a regression anyway
         output_scores[nonzero_numerator & ~nonzero_denominator] = 0.
@@ -1017,7 +1028,6 @@ class sys_identfy:
 
     def symmetric_mean_absolute_percentage_error(self, y, y_predicted):
         """ Calculate the SMAPE score of a regression model
-
 
         Parameters
         ----------
@@ -1035,8 +1045,8 @@ class sys_identfy:
 
         Notes
         -----
-        One supposed problem with SMAPE is that it is not symmetric since over-forecasts
-        and under-forecasts are not treated equally.
+        One supposed problem with SMAPE is that it is not symmetric since
+        over-forecasts and under-forecasts are not treated equally.
 
         References
         ----------
@@ -1054,6 +1064,4 @@ class sys_identfy:
         """
 
         return 100/len(y) * np.sum(2*np.abs(y_predicted - y) / (np.abs(y) + np.abs(y_predicted)))
-        #return np.mean((np.abs(y_predicted - y) * 200/ (np.abs(y_predicted) + np.abs(y))))
-
-
+        # return np.mean((np.abs(y_predicted - y) * 200/ (np.abs(y_predicted) + np.abs(y))))
