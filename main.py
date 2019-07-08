@@ -1,5 +1,5 @@
 import numpy as np
-from sys_identfy import *
+from sys_identfy import sys_identfy
 import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set(style="whitegrid")
