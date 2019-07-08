@@ -18,6 +18,7 @@ except ImportError:
     print('itertools is required during installation')
     sys.exit(1)
 
+import sys_identfy
 
 setup(name='sys_identify',
       version='0.5',
