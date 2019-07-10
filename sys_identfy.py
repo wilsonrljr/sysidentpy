@@ -49,13 +49,13 @@ class sys_identfy:
             model_length = int(model_length[0])
         else:
             model_length = self.n_terms
-        [model, errr, self.pivv, psi] = self.ERR(y, reg_Matrix, model_length)
-        number_of_elements, nno, maximum_lag, number_of_output, nu, self.new_model = self.model_information(model)
+        [model, self.err, self.pivv, psi] = self.error_reduction_ration(y, reg_Matrix, model_length)
+        number_of_elements, nno, maximum_lag, number_of_output, nu, self.final_model = self.model_information(model)
         self.theta = self.last_squares(psi, y)
-        return self.new_model, self.pivv, self.theta, self.info_values
+        return self.final_model, self.pivv, self.theta, self.info_values, self.err
 
     def predict(self, X, y):
-        return self.model_prediction(self.new_model,
+        return self.model_prediction(self.final_model,
                                      self.pivv, X, y,
                                      self.theta)
 
@@ -162,7 +162,7 @@ class sys_identfy:
         B = RA
         return B
 
-    def ERR(self, y, X, process_term_number):
+    def error_reduction_ration(self, y, X, process_term_number):
 
         """ Performs the Error Reduction Ration algorithm
 
@@ -389,7 +389,7 @@ class sys_identfy:
 
         for i in range(0, len(self.reg_code)):
             model_elements = i + 1
-            [null, null, null, regressor_matrix] = self.ERR(output_y, X_base,
+            [null, null, null, regressor_matrix] = self.error_reduction_ration(output_y, X_base,
                                                             model_elements)
             temporary_theta = self.last_squares(regressor_matrix, output_y)
             temporary_simulated_output = regressor_matrix @ temporary_theta

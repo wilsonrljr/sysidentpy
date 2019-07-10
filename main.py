@@ -20,14 +20,15 @@ u_valid_ = np.reshape(u_valid_, (len(u_valid_), 1))
 
 
 # Exemplo 1 - Com valores padrão
-model = sys_identfy(scoring='mean_squared_root')
+model = sys_identfy(n_terms=4)
 # não precisa colocar nada, apenas model.fit(u, y).
 # Só coloquei para printar o modelo
-regressores, _, _, _ = model.fit(u, y)
+model.fit(u, y)
 y_test3 = model.predict(u_valid_, y_valid_)
 rrse = model.score(y_valid_, y_test3)
-print('o modelo é:', regressores)
+print('o modelo é:', model.final_model)
 print('O rrse é', rrse)
+print('o err é:', model.err)
 
 plt.plot(y_valid_)
 plt.plot(y_test3, 'r--')
@@ -35,10 +36,10 @@ plt.show()
 
 # Exemplo 2 - definindo alguns valores diferentes
 model1 = sys_identfy(info_criteria='fpe', scoring='root_mean_squared_error')
-regressores, _, _, _ = model1.fit(u, y)
+model1.fit(u, y)
 y_test = model1.predict(u_valid_, y_valid_)
 rmse = model1.score(y_valid_, y_test3)
-print('o modelo é: ', regressores)
+print('o modelo é: ', model.final_model)
 print('o rmse é:', rmse)
 
 plt.plot(y_valid_)
