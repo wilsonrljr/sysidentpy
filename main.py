@@ -20,7 +20,7 @@ u_valid_ = np.reshape(u_valid_, (len(u_valid_), 1))
 
 
 # Exemplo 1 - Com valores padrão
-model = sys_identfy(n_terms=4)
+model = sys_identfy(n_terms=8)
 # não precisa colocar nada, apenas model.fit(u, y).
 # Só coloquei para printar o modelo
 model.fit(u, y)

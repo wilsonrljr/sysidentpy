@@ -20,7 +20,7 @@ class sys_identfy:
         This funcrion create a new object of the type sys_identfy.
         It is called automatically always that a new object is
         instantiated. It is responsible for create the variables
-        from the object and call the function genreg that
+        from the object and call the function regressors_space that
         handle the hard job.
 
         Args:
@@ -33,7 +33,7 @@ class sys_identfy:
         self.non_degree = non_degree
         self.ylag = ylag
         self.xlag = xlag
-        [self.reg_code, self.max_lag] = self.genreg(non_degree, ylag, xlag)
+        [self.reg_code, self.max_lag] = self.regressors_space(non_degree, ylag, xlag)
         self.info_criteria = info_criteria
         self.scoring = getattr(self, scoring)
         self.n_terms = n_terms
@@ -59,7 +59,7 @@ class sys_identfy:
                                      self.pivv, X, y,
                                      self.theta)
 
-    def genreg(self, non_degree, ylag, xlag):
+    def regressors_space(self, non_degree, ylag, xlag):
         """ This function generates a codification from all possibles
             regressors given the maximum lag of the input and output.
 
