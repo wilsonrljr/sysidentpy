@@ -10,7 +10,7 @@
 """
 import numpy as np
 from itertools import combinations_with_replacement
-
+from collections import Counter
 
 class sys_identfy:
 
@@ -41,12 +41,44 @@ class sys_identfy:
     def score(self, y, y_predicted):
         return self.scoring(y, y_predicted)
 
+    def results(self, theta_precision=4, err_precision=8):
+        output_matrix = []
+        for i in range(0, self.n_terms):
+            if np.max(self.final_model[i]) < 1:
+                actual_regressor = str(1)
+            else:
+                regressor_dic = Counter(self.final_model[i])
+                regressor_string = []
+                for j in range(0, len(list(regressor_dic.keys()))):
+                    regressor_key = list(regressor_dic.keys())[j]
+                    if regressor_key < 1:
+                        translated_key = ''
+                        translated_exponent = ''
+                    else:
+                        delay_string = str(int(regressor_key - np.floor(regressor_key/1000)*1000))
+                        if int(regressor_key/1000) < 2:
+                            translated_key = 'y(k-' + delay_string + ')'
+                        else:
+                            translated_key = 'u' + str(int(regressor_key/1000)-1) + '(k-' + delay_string + ')'
+                        if regressor_dic[regressor_key] < 2:
+                            translated_exponent = ''
+                        else:
+                            translated_exponent = '^' + str(regressor_dic[regressor_key])
+                    regressor_string.append(translated_key + translated_exponent)
+                actual_regressor = ''.join(regressor_string)
+            actual_parameter = str(np.round(self.theta[i,0], theta_precision))
+            actual_err = str(np.round(self.err[i], err_precision))
+            actual_output = [actual_regressor, actual_parameter, actual_err]
+            output_matrix.append(actual_output)
+        return output_matrix
+
     def fit(self, X, y):
         reg_Matrix = self.build_information_matrix(self.reg_code, X, y)
         self.info_values = self.information_criterion(X, y)
         if self.n_terms is None:
             model_length = np.where(self.info_values == np.amin(self.info_values))
             model_length = int(model_length[0])
+            self.n_terms = model_length
         else:
             model_length = self.n_terms
         [model, self.err, self.pivv, psi] = self.error_reduction_ration(y, reg_Matrix, model_length)
@@ -602,7 +634,7 @@ class sys_identfy:
 
         return X
 
-    def prepare_data(y_path, u_path, training_percent):
+    def prepare_data(self, y_path, u_path, training_percent):
         """ This function split the data in identificatioin and validation subsets.
 
         Parameters:
