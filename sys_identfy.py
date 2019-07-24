@@ -8,7 +8,7 @@
 # License: BSD 3 clause
 
 """
-import numpy
+import numpy as np
 from itertools import combinations_with_replacement
 from collections import Counter
 
@@ -64,7 +64,7 @@ class sys_identfy:
 
         output_matrix = []
         for i in range(0, self.n_terms):
-            if numpy.max(self.final_model[i]) < 1:
+            if np.max(self.final_model[i]) < 1:
                 actual_regressor = str(1)
             else:
                 regressor_dic = Counter(self.final_model[i])
@@ -75,7 +75,7 @@ class sys_identfy:
                         translated_key = ''
                         translated_exponent = ''
                     else:
-                        delay_string = str(int(regressor_key - numpy.floor(regressor_key/1000)*1000))
+                        delay_string = str(int(regressor_key - np.floor(regressor_key/1000)*1000))
                         if int(regressor_key/1000) < 2:
                             translated_key = 'y(k-' + delay_string + ')'
                         else:
@@ -86,8 +86,8 @@ class sys_identfy:
                             translated_exponent = '^' + str(regressor_dic[regressor_key])
                     regressor_string.append(translated_key + translated_exponent)
                 actual_regressor = ''.join(regressor_string)
-            actual_parameter = str(numpy.round(self.theta[i,0], theta_precision))
-            actual_err = str(numpy.round(self.err[i], err_precision))
+            actual_parameter = str(np.round(self.theta[i,0], theta_precision))
+            actual_err = str(np.round(self.err[i], err_precision))
             actual_output = [actual_regressor, actual_parameter, actual_err]
             output_matrix.append(actual_output)
         return output_matrix
@@ -96,7 +96,7 @@ class sys_identfy:
         reg_Matrix = self.build_information_matrix(self.reg_code, X, y)
         self.info_values = self.information_criterion(X, y)
         if self.n_terms is None:
-            model_length = numpy.where(self.info_values == numpy.amin(self.info_values))
+            model_length = np.where(self.info_values == np.amin(self.info_values))
             model_length = int(model_length[0])
             self.n_terms = model_length
         else:
@@ -146,12 +146,12 @@ class sys_identfy:
 
         ylagmax = 1001 + ylag
         xlagmax = 2001 + xlag
-        y_vec = numpy.arange(1001, ylagmax)
-        u_vec = numpy.arange(2001, xlagmax)
-        reg_aux = numpy.array([0])
-        reg_aux = numpy.concatenate([reg_aux, y_vec, u_vec])
+        y_vec = np.arange(1001, ylagmax)
+        u_vec = np.arange(2001, xlagmax)
+        reg_aux = np.array([0])
+        reg_aux = np.concatenate([reg_aux, y_vec, u_vec])
         reg_code = list(combinations_with_replacement(reg_aux, non_degree))
-        reg_code = numpy.array(reg_code)
+        reg_code = np.array(reg_code)
         reg_code = reg_code[:, reg_code.shape[1]::-1]
         max_lag = max(ylag, xlag)
         return reg_code, max_lag
@@ -177,13 +177,13 @@ class sys_identfy:
         """
 
         n = len(x)
-        u = numpy.linalg.norm(x, 2)
-        v = numpy.array(x)
-        aux_a = numpy.array([1])
+        u = np.linalg.norm(x, 2)
+        v = np.array(x)
+        aux_a = np.array([1])
         if u != 0:
-            aux_b = x[0] + numpy.sign(x[0])*u
-            v = numpy.array(v[1: n]/aux_b)
-            v = numpy.concatenate((aux_a, v))
+            aux_b = x[0] + np.sign(x[0])*u
+            v = np.array(v[1: n]/aux_b)
+            v = np.concatenate((aux_a, v))
         return v
 
     def rowhouse(self, RA, v):
@@ -256,18 +256,18 @@ class sys_identfy:
         """
 
         squared_y = y[self.max_lag:].T@y[self.max_lag:]
-        X_aux = numpy.array(X)
-        y = numpy.array([y[self.max_lag:, 0]]).T
-        y_aux = numpy.copy(y)
+        X_aux = np.array(X)
+        y = np.array([y[self.max_lag:, 0]]).T
+        y_aux = np.copy(y)
         [row_number, col_number] = X_aux.shape
-        piv = numpy.arange(col_number)
-        err_aux = numpy.zeros(col_number)
-        err = numpy.zeros(col_number)
-        for i in numpy.arange(0, col_number):
-            for j in numpy.arange(i, col_number):
-                num = numpy.array(X_aux[i: row_number, j].T@y_aux[i: row_number])
-                num = numpy.power(num, 2)
-                den = numpy.array((X_aux[i:row_number, j].T@X_aux[i: row_number, j]) * squared_y)
+        piv = np.arange(col_number)
+        err_aux = np.zeros(col_number)
+        err = np.zeros(col_number)
+        for i in np.arange(0, col_number):
+            for j in np.arange(i, col_number):
+                num = np.array(X_aux[i: row_number, j].T@y_aux[i: row_number])
+                num = np.power(num, 2)
+                den = np.array((X_aux[i:row_number, j].T@X_aux[i: row_number, j]) * squared_y)
                 err_aux[j] = num/den
 
             if i == process_term_number:
@@ -286,14 +286,14 @@ class sys_identfy:
             aux_1 = X_aux[i: row_number, i: col_number]
             row_result = self.rowhouse(aux_1, v)
             y_aux[i: row_number] = self.rowhouse(y_aux[i: row_number], v)
-            X_aux[i: row_number, i: col_number] = numpy.copy(row_result)
+            X_aux[i: row_number, i: col_number] = np.copy(row_result)
 
         Piv = piv[0: process_term_number]
-        psi_aux = numpy.array(X)
-        X_orthogonal = numpy.copy(psi_aux[:, Piv])
-        psi_aux = numpy.array(X)
+        psi_aux = np.array(X)
+        X_orthogonal = np.copy(psi_aux[:, Piv])
+        psi_aux = np.array(X)
         reg_code_buffer = self.reg_code
-        model_code = numpy.copy(reg_code_buffer[Piv, :])
+        model_code = np.copy(reg_code_buffer[Piv, :])
 
         return model_code, err, piv, X_orthogonal
 
@@ -315,8 +315,8 @@ class sys_identfy:
         """
 
         y_train = y_train[self.max_lag:, 0]
-        y_train = numpy.reshape(y_train, (len(y_train), 1))
-        theta = (numpy.linalg.pinv(X_train.T@X_train))@X_train.T@y_train
+        y_train = np.reshape(y_train, (len(y_train), 1))
+        theta = (np.linalg.pinv(X_train.T@X_train))@X_train.T@y_train
         return theta
 
     def autocorr(self, signal):
@@ -346,8 +346,8 @@ class sys_identfy:
 
         """
 
-        result = numpy.correlate(signal, signal, mode='full')
-        half_of_simmetry = int(numpy.floor(result.size/2))
+        result = np.correlate(signal, signal, mode='full')
+        half_of_simmetry = int(np.floor(result.size/2))
         return result[half_of_simmetry:]
 
     def model_prediction(self, model_elements, model_pivot,
@@ -383,7 +383,7 @@ class sys_identfy:
 
         if len(y_initial) < self.max_lag:
             raise Exception('Insufficient initial conditions elements!')
-        predicted_values = numpy.zeros((len(entrace_u), 1))
+        predicted_values = np.zeros((len(entrace_u), 1))
         # Discard unnecessary initial values
         predicted_values[0:self.max_lag] = y_initial[0:self.max_lag]
         analised_elements_number = self.max_lag + 1
@@ -392,7 +392,7 @@ class sys_identfy:
             X_temp = self.build_information_matrix(self.reg_code,
                                                    entrace_u[i:i+analised_elements_number],
                                                    predicted_values[i:i+analised_elements_number])
-            X_temp = numpy.copy(X_temp[:, effective_pivot_vector])
+            X_temp = np.copy(X_temp[:, effective_pivot_vector])
             a = X_temp @ theta
             predicted_values[i+self.max_lag] = a[:, 0]
 
@@ -431,7 +431,7 @@ class sys_identfy:
 
         """
 
-        output_vector = numpy.zeros(len(self.reg_code))
+        output_vector = np.zeros(len(self.reg_code))
         output_vector[:] = float('NaN')
         X_base = self.build_information_matrix(self.reg_code,
                                                input_u,
@@ -447,21 +447,21 @@ class sys_identfy:
             temporary_simulated_output = regressor_matrix @ temporary_theta
             temporary_residual = (output_y[self.max_lag:]
                                   - temporary_simulated_output)
-            residual_variance = numpy.var(temporary_residual)
+            residual_variance = np.var(temporary_residual)
 
             if calculation_method == 'bic':
                 model_factor = (model_elements
-                                * numpy.log(effective_output_elements_count))
+                                * np.log(effective_output_elements_count))
             elif calculation_method == 'fpe':
-                model_factor = effective_output_elements_count * numpy.log((effective_output_elements_count + model_elements) / (effective_output_elements_count - model_elements))
+                model_factor = effective_output_elements_count * np.log((effective_output_elements_count + model_elements) / (effective_output_elements_count - model_elements))
             elif calculation_method == 'lilc':
                 model_factor = (2 * model_elements
-                                * numpy.log(numpy.log(effective_output_elements_count)))
+                                * np.log(np.log(effective_output_elements_count)))
             else:  # AIC
                 model_factor = + 2 * model_elements
 
             residual_factor = ((effective_output_elements_count)
-                               * numpy.log(residual_variance))
+                               * np.log(residual_variance))
             output_vector[i] = residual_factor + model_factor
 
         return output_vector
@@ -520,16 +520,16 @@ class sys_identfy:
         # [1001 1002 2001 2002 1001 1001 1002 1001 2001 1001 2002 1001 1002
         #  1002 2001 1002 2002 1002 2001 2001 2002 2001 2002 2002]
         aux_model = model.reshape(model.shape[0]*model.shape[1], 1)
-        aux_model = aux_model[~numpy.all(aux_model == 0, axis=1)]
-        aux_model = numpy.array(aux_model).ravel()
+        aux_model = aux_model[~np.all(aux_model == 0, axis=1)]
+        aux_model = np.array(aux_model).ravel()
         list_of_split_vector = []
         lag = []
-        for k in numpy.arange(aux_model.shape[0]):
-            remove_bracket = numpy.array(numpy.array2string(aux_model[k], precision=1, separator=''))
+        for k in np.arange(aux_model.shape[0]):
+            remove_bracket = np.array(np.array2string(aux_model[k], precision=1, separator=''))
             # the split_vector transform each term in auxiliary_vector
             # in separeted digits
             # example: [1001] = [1 0 0 1]
-            split_vector = numpy.array([int(d) for d in str(remove_bracket)])
+            split_vector = np.array([int(d) for d in str(remove_bracket)])
             # the variable 's' is the join of the split_vector from index 1
             # onwards
             # example: [1 0 0 1] = [001] = 1 and [1 0 1 2] = [012] = 12
@@ -537,16 +537,16 @@ class sys_identfy:
             lag.append(s)
             list_of_split_vector.append(split_vector)
 
-        list_of_split_vector = numpy.array(list_of_split_vector)
+        list_of_split_vector = np.array(list_of_split_vector)
         if len(model) != 0 and len(list_of_split_vector) != 0:
-            maximum_lag = numpy.max(lag)
-            min_term_code = numpy.min(list_of_split_vector[:, 0])
+            maximum_lag = np.max(lag)
+            min_term_code = np.min(list_of_split_vector[:, 0])
             if min_term_code != 1:
                 number_of_output = 0
             else:
                 number_of_output = 1
 
-            number_of_inputs = (numpy.max(list_of_split_vector[:, 0])
+            number_of_inputs = (np.max(list_of_split_vector[:, 0])
                                 - number_of_output)
 
         else:
@@ -554,7 +554,7 @@ class sys_identfy:
             number_of_output = 0
             number_of_inputs = 0
 
-        _model = numpy.copy(model)
+        _model = np.copy(model)
 
         return number_of_elements, number_of_noise, maximum_lag, number_of_output, number_of_inputs, _model
 
@@ -585,9 +585,9 @@ class sys_identfy:
         """
 
         number_of_samples = col_to_shift.shape[0]
-        col_aux = numpy.zeros((number_of_samples, 1))
+        col_aux = np.zeros((number_of_samples, 1))
         aux = col_to_shift[0: number_of_samples - lag]
-        aux = numpy.reshape(aux, (len(aux), 1))
+        aux = np.reshape(aux, (len(aux), 1))
         col_aux[lag:, 0] = aux[:, 0]
 
         return col_aux
@@ -615,40 +615,40 @@ class sys_identfy:
 
         number_of_elements = self.model_information(model)
         number_of_samples = u.shape[0]
-        auxiliary_model = numpy.copy(model)
-        X = numpy.ones((number_of_samples, number_of_elements[0]))
-        for k in numpy.arange(number_of_elements[0]):
+        auxiliary_model = np.copy(model)
+        X = np.ones((number_of_samples, number_of_elements[0]))
+        for k in np.arange(number_of_elements[0]):
             current_regressor = auxiliary_model[k, :]
             current_regressor = current_regressor.reshape(current_regressor.shape[0], 1)
-            current_regressor = current_regressor[~numpy.all(current_regressor == 0, axis=1)]
-            current_regressor = numpy.array(current_regressor).ravel()
+            current_regressor = current_regressor[~np.all(current_regressor == 0, axis=1)]
+            current_regressor = np.array(current_regressor).ravel()
 
             if len(current_regressor) != 0:
                 list_of_split_vector = []
                 lag = []
-                for i in numpy.arange(current_regressor.shape[0]):
-                    remove_bracket = numpy.array(numpy.array2string(current_regressor[i], precision=1, separator=''))
-                    split_vector = numpy.array([int(d) for d in str(remove_bracket)])
+                for i in np.arange(current_regressor.shape[0]):
+                    remove_bracket = np.array(np.array2string(current_regressor[i], precision=1, separator=''))
+                    split_vector = np.array([int(d) for d in str(remove_bracket)])
                     s = int(''.join(str(i) for i in split_vector[1:]))
                     lag.append(s)
                     list_of_split_vector.append(split_vector)
 
-                list_of_split_vector = numpy.array(list_of_split_vector)
-                lag = numpy.array(lag)
+                list_of_split_vector = np.array(list_of_split_vector)
+                lag = np.array(lag)
                 which_regressor = list_of_split_vector[:, 0]
 
-                for i in numpy.arange(which_regressor.shape[0]):
+                for i in np.arange(which_regressor.shape[0]):
                     if which_regressor[i] == 1:
                         aux_col = self.shift_column(y, lag[i]).T
-                        element_wise_multiplication = numpy.multiply(aux_col, X[:, k]).T
+                        element_wise_multiplication = np.multiply(aux_col, X[:, k]).T
                         X[:, k] = element_wise_multiplication[:, 0]
                     else:
                         auxw = which_regressor[i]-2
                         aux_col = self.shift_column(u[:, auxw], lag[i]).T
-                        element_wise_multiplication = numpy.multiply(aux_col, X[:, k]).T
+                        element_wise_multiplication = np.multiply(aux_col, X[:, k]).T
                         X[:, k] = element_wise_multiplication[:, 0]
             else:
-                X[:, k] = numpy.ones((number_of_samples, 1))[:, 0]
+                X[:, k] = np.ones((number_of_samples, 1))[:, 0]
 
         X = X[number_of_elements[2]:, :]
 
@@ -685,8 +685,8 @@ class sys_identfy:
                   input data for model validation
         """
 
-        y = numpy.loadtxt(y_path)
-        u = numpy.loadtxt(u_path)
+        y = np.loadtxt(y_path)
+        u = np.loadtxt(u_path)
         y_size = y.size
         size_ident = round((y_size*training_percent)/100)
         y_training = y[0: size_ident]
@@ -760,7 +760,7 @@ class sys_identfy:
         -0.25
 
         """
-        return numpy.average(y - y_predicted)
+        return np.average(y - y_predicted)
 
     def mean_squared_error(self, y, y_predicted):
         """ Calculate the Mean Squared Error in a regression model
@@ -792,8 +792,8 @@ class sys_identfy:
         0.375
 
         """
-        output_error = numpy.average((y - y_predicted) ** 2)
-        return numpy.average(output_error)
+        output_error = np.average((y - y_predicted) ** 2)
+        return np.average(output_error)
 
     def root_mean_squared_error(self, y, y_predicted):
         """ Calculate the Root Mean Squared Error in a regression model
@@ -825,7 +825,7 @@ class sys_identfy:
         0.612
 
         """
-        return numpy.sqrt(self.mean_squared_error(y, y_predicted))
+        return np.sqrt(self.mean_squared_error(y, y_predicted))
 
     def normalized_root_mean_squared_error(self, y, y_predicted):
         """ Calculate the normalized Root Mean Squared Error in a regression model
@@ -884,9 +884,9 @@ class sys_identfy:
         0.226
 
         """
-        numerator = numpy.sum(numpy.square((y_predicted - y)))
-        denominator = numpy.sum(numpy.square((y_predicted - numpy.mean(y, axis=0))))
-        return numpy.sqrt(numpy.divide(numerator, denominator))
+        numerator = np.sum(np.square((y_predicted - y)))
+        denominator = np.sum(np.square((y_predicted - np.mean(y, axis=0))))
+        return np.sqrt(np.divide(numerator, denominator))
 
     def mean_absolute_error(self, y, y_predicted):
         """ Calculate the Mean absolute error in a regression model
@@ -919,8 +919,8 @@ class sys_identfy:
 
         """
 
-        output_errors = numpy.average(numpy.abs(y - y_predicted))
-        return numpy.average(output_errors)
+        output_errors = np.average(np.abs(y - y_predicted))
+        return np.average(output_errors)
 
     def mean_squared_log_error(self, y, y_predicted):
         """ Calculate the Mean Squared Logarithmic Error in a regression model
@@ -947,7 +947,7 @@ class sys_identfy:
         0.039
 
         """
-        return self.mean_squared_error(numpy.log1p(y), numpy.log1p(y_predicted))
+        return self.mean_squared_error(np.log1p(y), np.log1p(y_predicted))
 
     def median_absolute_error(self, y, y_predicted):
         """ Calculate the Median Absolute Error in a regression model
@@ -980,7 +980,7 @@ class sys_identfy:
         0.5
 
         """
-        return numpy.median(numpy.abs(y - y_predicted))
+        return np.median(np.abs(y - y_predicted))
 
     def explained_variance_score(self, y, y_predicted):
         """ Calculate the Explained Variance Score of a regression model
@@ -1015,18 +1015,18 @@ class sys_identfy:
 
         """
 
-        y_diff_avg = numpy.average(y - y_predicted)
-        numerator = numpy.average((y - y_predicted - y_diff_avg) ** 2)
-        y_avg = numpy.average(y)
-        denominator = numpy.average((y-y_avg)**2)
+        y_diff_avg = np.average(y - y_predicted)
+        numerator = np.average((y - y_predicted - y_diff_avg) ** 2)
+        y_avg = np.average(y)
+        denominator = np.average((y-y_avg)**2)
         nonzero_numerator = numerator != 0
         nonzero_denominator = denominator != 0
         valid_score = nonzero_numerator & nonzero_denominator
-        output_scores = numpy.ones(y.shape[0])
+        output_scores = np.ones(y.shape[0])
         output_scores[valid_score] = (1 - (numerator[valid_score] /
                                       denominator[valid_score]))
         output_scores[nonzero_numerator & ~nonzero_denominator] = 0.
-        return numpy.average(output_scores)
+        return np.average(output_scores)
 
     def r2_score(self, y, y_predicted):
         """ Calculate the R2 score of a regression model
@@ -1064,19 +1064,19 @@ class sys_identfy:
         0.948
 
         """
-        numerator = ((y - y_predicted) ** 2).sum(axis=0, dtype=numpy.float64)
-        denominator = ((y - numpy.average(y, axis=0)) ** 2).sum(axis=0, dtype=numpy.float64)
+        numerator = ((y - y_predicted) ** 2).sum(axis=0, dtype=np.float64)
+        denominator = ((y - np.average(y, axis=0)) ** 2).sum(axis=0, dtype=np.float64)
         nonzero_denominator = denominator != 0
         nonzero_numerator = numerator != 0
         valid_score = nonzero_denominator & nonzero_numerator
-        output_scores = numpy.ones([y.shape[0]])
+        output_scores = np.ones([y.shape[0]])
         output_scores[valid_score] = (1 - (numerator[valid_score] /
                                       denominator[valid_score]))
         # arbitrary set to zero to avoid -inf scores, having a constant
         # y_true is not interesting for scoring a regression anyway
         output_scores[nonzero_numerator & ~nonzero_denominator] = 0.
 
-        return numpy.average(output_scores)
+        return np.average(output_scores)
 
     def symmetric_mean_absolute_percentage_error(self, y, y_predicted):
         """ Calculate the SMAPE score of a regression model
@@ -1115,5 +1115,5 @@ class sys_identfy:
 
         """
 
-        return 100/len(y) * numpy.sum(2*numpy.abs(y_predicted - y) / (numpy.abs(y) + numpy.abs(y_predicted)))
-        # return numpy.mean((numpy.abs(y_predicted - y) * 200/ (numpy.abs(y_predicted) + numpy.abs(y))))
+        return 100/len(y) * np.sum(2*np.abs(y_predicted - y) / (np.abs(y) + np.abs(y_predicted)))
+        # return np.mean((np.abs(y_predicted - y) * 200/ (np.abs(y_predicted) + np.abs(y))))
