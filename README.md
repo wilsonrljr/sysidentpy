@@ -8,7 +8,7 @@ machine learning using NARX models built on top of numpy and
 is distributed under the 3-Clause BSD license.
 
 The project was started in 2018 by Wilson R. L. Junior, Luan
-Pascoal and Samir A. M. Martins as a project for System Identification
+Pascoal C. Andrade and Samir A. M. Martins as a project for System Identification
 discipline. Samuel joined early in 2019 and since then have contributed.
 
 Website: http://sys-identpy.org
