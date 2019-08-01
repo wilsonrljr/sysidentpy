@@ -12,6 +12,7 @@ import numpy as np
 from itertools import combinations_with_replacement
 from collections import Counter
 
+
 class sys_identfy:
 
     def __init__(self, non_degree=2, ylag=2, xlag=2, info_criteria='aic',
@@ -39,6 +40,28 @@ class sys_identfy:
         self.n_terms = n_terms
 
     def score(self, y, y_predicted):
+        """ This function assess the performance of the identification proccess.
+            The default scoring function is 'root_relative_squared_error', but
+            the user can define another one in the model object creation.
+
+        Parameters
+        ----------
+        y : array-like of shape = number_of_outputs
+            Represent the target values.
+
+        y_predicted : array-like of shape = number_of_outputs
+            Target values predicted by the model.
+
+        Returns
+        -------
+        loss : float
+               The mean  value of the difference between the true target
+               values and the predicted or forecast value in regression
+               or any other phenomenon.
+
+
+        """
+
         return self.scoring(y, y_predicted)
 
     def results(self, theta_precision=4, err_precision=8):
@@ -59,7 +82,8 @@ class sys_identfy:
             Where:
                 first column represents each regressor element;
                 second column represents associated parameter;
-                third column represents the error reduction ratio associated to each regressor.
+                third column represents the error reduction ratio associated
+                to each regressor.
         """
 
         output_matrix = []
@@ -93,6 +117,41 @@ class sys_identfy:
         return output_matrix
 
     def fit(self, X, y):
+        """ This is an 'alpha' version of the 'fit' function which allows
+            a friendly usage by the user. Given two arguments, X and y, fit
+            training data.
+
+        Parameters:
+        -----------
+        X = ndarray of floats
+            the input data to be used in the training process
+
+        y = ndarray of floats
+            the output data to be used in the training process
+
+        Returns
+        -------
+        model = ndarray of ints
+                The model code represetation
+
+        piv = array-like of shape = number_of_model_elements
+              Contains the index to put the regressors in the correct order
+              based on err values
+
+        theta = array-like of shape = number_of_model_elements
+                The estimated parameters of the model
+
+        err = array-like of shape = number_of_model_elements
+              The respective ERR calculated for each regressor
+
+        info_values = array-like of shape = number_of_elements
+                        Vector with values of akaike's information criterion
+                        for models with N terms (where N is the
+                        vector position + 1)
+
+
+        """
+
         reg_Matrix = self.build_information_matrix(self.reg_code, X, y)
         self.info_values = self.information_criterion(X, y)
         if self.n_terms is None:
@@ -107,6 +166,28 @@ class sys_identfy:
         return self.final_model, self.pivv, self.theta, self.info_values, self.err
 
     def predict(self, X, y):
+        """ This is an 'alpha' version of the predict function which allows
+            a friendly usage by the user. Given a previously trained model,
+            predict values given a new set of data.
+
+            This method accept y values mainly for prediction n-steps ahead
+            (to be implemented in the future)
+
+        Parameters:
+        -----------
+        X = ndarray of floats
+            the input data to be used in the prediction process
+
+        y = ndarray of floats
+            the output data to be used in the prediction process
+
+        Returns
+        -------
+        predicted_values = ndarray of floats
+                           the predicted values of the model
+
+        """
+
         return self.model_prediction(self.final_model,
                                      self.pivv, X, y,
                                      self.theta)
