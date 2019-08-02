@@ -358,10 +358,6 @@ class sys_identfy:
             err[i] = err_aux[piv_index]
             X_aux[:, [piv_index, i]] = X_aux[:, [i, piv_index]]
             piv[[piv_index, i]] = piv[[i, piv_index]]
-            # index = err_aux.index(max(err_aux[i: ]))
-            # err[i] = err_aux[index]
-            # aux_regress_matrix[:, [index, i]] = aux_regress_matrix[:, [i, index]]
-            # piv[[index, i]] = piv[[i, index]]
             x = X_aux[i: row_number, i]
             v = self.house(x)
             aux_1 = X_aux[i: row_number, i: col_number]

@@ -36,8 +36,8 @@ plt.plot(y_valid_)
 plt.plot(y_test3, 'r--')
 plt.show()
 
-results1 = model.results()
-print(pd.DataFrame(results1))
+results1 = pd.DataFrame(model.results(), columns=['regressor', 'theta', 'ERR'])
+print(results1)
 
 print('Fim do exemplo 1')
 
@@ -54,8 +54,8 @@ plt.plot(y_valid_)
 plt.plot(y_test, 'r--')
 plt.show()
 
-results2 = model1.results(6, 10)
-print(pd.DataFrame(results2))
+results2 = pd.DataFrame(model1.results(6, 10), columns=['regressor', 'theta', 'ERR'])
+print(results2)
 
 print('Fim do exemplo 2')
 
