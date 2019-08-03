@@ -518,13 +518,13 @@ class sys_identfy:
 
         for i in range(0, len(self.reg_code)):
             model_elements = i + 1
-            [null, null, null, regressor_matrix] = self.error_reduction_ration(output_y, X_base,
-                                                            model_elements)
+            regressor_matrix = self.error_reduction_ration(output_y, X_base,
+                                                            model_elements)[3]
             temporary_theta = self.last_squares(regressor_matrix, output_y)
             temporary_simulated_output = regressor_matrix @ temporary_theta
             temporary_residual = (output_y[self.max_lag:]
                                   - temporary_simulated_output)
-            residual_variance = np.var(temporary_residual)
+            residual_variance = np.var(temporary_residual, ddof=1)
 
             if calculation_method == 'bic':
                 model_factor = (model_elements
