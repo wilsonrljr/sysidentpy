@@ -54,7 +54,7 @@ plt.plot(y_valid_)
 plt.plot(y_test, 'r--')
 plt.show()
 
-results2 = pd.DataFrame(model1.results(6, 10), columns=['regressor', 'theta', 'ERR'])
+results2 = pd.DataFrame(model1.results(3, 4, dtype='sci'), columns=['regressor', 'theta', 'ERR'])
 print(results2)
 
 print('Fim do exemplo 2')

@@ -64,7 +64,7 @@ class sys_identfy:
 
         return self.scoring(y, y_predicted)
 
-    def results(self, theta_precision=4, err_precision=8):
+    def results(self, theta_precision=4, err_precision=8, dtype='dec'):
         """ This function returns model regressors, associated parameter and
         respective ERR value on a string matrix.
 
@@ -75,6 +75,11 @@ class sys_identfy:
 
         err_precision = int (default: 8)
                         precision of shown ERR values
+
+        dtype = string (default: )
+                        Type of representation
+                        sci - Scientific notation
+                        dec - Decimal notation
 
         Returns:
         --------
@@ -87,6 +92,16 @@ class sys_identfy:
         """
 
         output_matrix = []
+
+        theta_output_format = '{:.' + str(theta_precision)
+        err_output_format = '{:.' + str(err_precision)
+        if dtype == 'dec':
+            theta_output_format = theta_output_format + 'f}'
+            err_output_format = err_output_format + 'f}'
+        else:
+            theta_output_format = theta_output_format + 'E}'
+            err_output_format = err_output_format + 'E}'
+    
         for i in range(0, self.n_terms):
             if np.max(self.final_model[i]) < 1:
                 actual_regressor = str(1)
@@ -110,8 +125,9 @@ class sys_identfy:
                             translated_exponent = '^' + str(regressor_dic[regressor_key])
                     regressor_string.append(translated_key + translated_exponent)
                 actual_regressor = ''.join(regressor_string)
-            actual_parameter = str(np.round(self.theta[i,0], theta_precision))
-            actual_err = str(np.round(self.err[i], err_precision))
+            
+            actual_parameter = theta_output_format.format(self.theta[i,0])
+            actual_err = err_output_format.format(self.err[i])
             actual_output = [actual_regressor, actual_parameter, actual_err]
             output_matrix.append(actual_output)
         return output_matrix
