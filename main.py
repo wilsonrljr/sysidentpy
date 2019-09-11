@@ -39,25 +39,36 @@ plt.show()
 results1 = pd.DataFrame(model.results(), columns=['regressor', 'theta', 'ERR'])
 print(results1)
 
-print('Fim do exemplo 1')
-
-# %%
-# Exemplo 2 - definindo alguns valores diferentes
-model1 = sys_identfy(info_criteria='fpe', scoring='root_mean_squared_error')
-model1.fit(u, y)
-y_test = model1.predict(u_valid_, y_valid_)
-rmse = model1.score(y_valid_, y_test)
-print('o modelo é: ', model1.final_model)
-print('o rmse é:', rmse)
-
-plt.plot(y_valid_)
-plt.plot(y_test, 'r--')
+residuos, cross = model.residuals()
+plt.plot(residuos[:,0],'b-')
+plt.plot(residuos[:,1],'k:')
+plt.plot(residuos[:,2],'k:')
 plt.show()
 
-results2 = pd.DataFrame(model1.results(3, 4, dtype='sci'), columns=['regressor', 'theta', 'ERR'])
-print(results2)
+plt.plot(cross[:,0],'b-')
+plt.plot(cross[:,1],'k:')
+plt.plot(cross[:,2],'k:')
+plt.show()
 
-print('Fim do exemplo 2')
+print('Fim do exemplo 1')
+
+# # %%
+# # Exemplo 2 - definindo alguns valores diferentes
+# model1 = sys_identfy(info_criteria='fpe', scoring='root_mean_squared_error')
+# model1.fit(u, y)
+# y_test = model1.predict(u_valid_, y_valid_)
+# rmse = model1.score(y_valid_, y_test)
+# print('o modelo é: ', model1.final_model)
+# print('o rmse é:', rmse)
+
+# plt.plot(y_valid_)
+# plt.plot(y_test, 'r--')
+# plt.show()
+
+# results2 = pd.DataFrame(model1.results(3, 4, dtype='sci'), columns=['regressor', 'theta', 'ERR'])
+# print(results2)
+
+# print('Fim do exemplo 2')
 
 
 #%%

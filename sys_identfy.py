@@ -203,10 +203,10 @@ class sys_identfy:
                            the predicted values of the model
 
         """
-
-        return self.model_prediction(self.final_model,
-                                     self.pivv, X, y,
-                                     self.theta)
+        self.prediction_sampled_output = y
+        self.prediction_sampled_input = X
+        self.predicted_output = self.model_prediction(self.final_model, self.pivv, X, y, self.theta)
+        return self.predicted_output
 
     def regressors_space(self, non_degree, ylag, xlag):
         """ This function generates a codification from all possibles
@@ -412,18 +412,18 @@ class sys_identfy:
         theta = (np.linalg.pinv(X_train.T@X_train))@X_train.T@y_train
         return theta
 
-    def autocorr(self, signal):
-        """ Performs the autocorrelation of a signal to help the
-        user to choose the most adequate decimation factor
-
-
-        Parameters
-        ----------
-        signal : array-like of shape = number_of_samples
+    def residuals(self):
+        """ Performs the residual analysis of output to validate model.
 
         Returns
         -------
-        autocorrelated_values : ndarray of floats
+        output_autocorr : ndarray of floats:
+                                        1st column - Residuals normalized autocorrelation
+                                        2nd/3rd columns - Superior and inferior limits of a 95% confidence interval 
+
+        output_crosscorr : ndarray of floats:
+                                        1st column - Correlation between residuals and input
+                                        2nd/3rd columns - Superior and inferior limits of a 95% confidence interval 
 
         References
         ----------
@@ -438,10 +438,39 @@ class sys_identfy:
         [62.25 11.5   2.5  21.  ]
 
         """
+        # Residuals autocorrelation (normalized)
+        residuals = (self.prediction_sampled_output - self.predicted_output).flatten()
+        result_autocorr = np.correlate(residuals, residuals, mode='full')
+        half_of_simmetry_autocorr = int(np.floor(result_autocorr.size/2))
+        output_autocorr = np.zeros((len(result_autocorr)-half_of_simmetry_autocorr,3),dtype=float)
+        output_autocorr[:,0] = result_autocorr[half_of_simmetry_autocorr:]/result_autocorr[half_of_simmetry_autocorr]
+        output_autocorr[:,1] = np.ones(len(output_autocorr[:,0])) * (1.96/np.sqrt(len(result_autocorr)))
+        output_autocorr[:,2] = output_autocorr[:,1] * (-1)
 
-        result = np.correlate(signal, signal, mode='full')
-        half_of_simmetry = int(np.floor(result.size/2))
-        return result[half_of_simmetry:]
+        # Input/residuals correlation
+        # input_res = (self.prediction_sampled_input - np.mean(self.prediction_sampled_input)).flatten()
+        result_crosscorr = self.normalized_correlation(self.prediction_sampled_input,residuals)
+        output_crosscorr = np.zeros((len(result_crosscorr),3),dtype=float)
+        output_crosscorr[:,0] = result_crosscorr[:]
+        output_crosscorr[:,1] = np.ones(len(output_crosscorr[:,0])) * (1.96/np.sqrt(len(result_crosscorr)))
+        output_crosscorr[:,2] = output_crosscorr[:,1] * (-1)
+        return output_autocorr, output_crosscorr
+
+    def normalized_correlation(self, signal1, signal2):
+        y = (signal1 - np.mean(signal1)).flatten()
+        u = (signal2 - np.mean(signal2)).flatten()
+        t = int(np.floor(len(self.prediction_sampled_output)/2))
+
+        ruy = np.array(np.zeros(t))
+        ruy[0] = np.sum(y*u) / (np.sqrt(np.sum(y**2)) * np.sqrt(np.sum(u**2)))
+        
+        for i in range(1, t):
+            y = (signal1 - np.mean(signal1[:i])).flatten()
+            u = (signal2 - np.mean(signal2[i:])).flatten()
+            ruy[i] = np.sum(y[:-i]*u[i:]) / (np.sqrt(np.sum(y[:-i]**2)) * np.sqrt(np.sum(u[i:]**2)))
+
+        return ruy
+
 
     def model_prediction(self, model_elements, model_pivot,
                          entrace_u, y_initial, theta):
