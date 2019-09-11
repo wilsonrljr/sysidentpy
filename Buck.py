@@ -47,7 +47,7 @@ ax.legend(fontsize=32)
 plt.xticks(fontsize=32)
 plt.yticks(fontsize=32)
 plt.xlabel('Samples', fontsize=32)
-plt.ylabel('y', fontsize=32)
+plt.ylabel('y [V]', fontsize=32)
 plt.show()
 
 # Correlação

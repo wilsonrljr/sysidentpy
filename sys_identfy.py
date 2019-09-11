@@ -134,7 +134,7 @@ class sys_identfy:
             actual_output = [actual_regressor, actual_parameter, actual_err]
             output_matrix.append(actual_output)
 
-            self.residuals()
+        self.residuals()
 
         #Plot
         if render_plots:
