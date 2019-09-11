@@ -9,6 +9,7 @@
 
 """
 import numpy as np
+import matplotlib.pyplot as plt
 from itertools import combinations_with_replacement
 from collections import Counter
 
@@ -64,19 +65,21 @@ class sys_identfy:
 
         return self.scoring(y, y_predicted)
 
-    def results(self, theta_precision=4, err_precision=8, dtype='dec'):
+    def results(self, theta_precision=4, err_precision=8, dtype='dec', render_plots=True):
         """ This function returns model regressors, associated parameter and
         respective ERR value on a string matrix.
 
         Parameters:
         -----------
+        render_plots = boolean (default: True)
+
         theta_precision = int (default: 4)
                           precision of shown parameters values
 
         err_precision = int (default: 8)
                         precision of shown ERR values
 
-        dtype = string (default: )
+        dtype = string (default: 'dec')
                         Type of representation
                         sci - Scientific notation
                         dec - Decimal notation
@@ -130,6 +133,40 @@ class sys_identfy:
             actual_err = err_output_format.format(self.err[i])
             actual_output = [actual_regressor, actual_parameter, actual_err]
             output_matrix.append(actual_output)
+
+            self.residuals()
+
+        #Plot
+        if render_plots:
+
+
+            fig0, ax = plt.subplots()
+            ax.plot(self.prediction_sampled_output, 'b-', label='Data')
+            ax.plot(self.predicted_output, 'r--', label='Model')
+            ax.legend()
+            plt.xlabel('Samples')
+            plt.ylabel('y')
+
+
+            fig1 = plt.figure()
+            plt.plot(self.output_autocorr[:,0], 'b-')
+            plt.plot(self.output_autocorr[:,1], 'k:')
+            plt.plot(self.output_autocorr[:,2], 'k:')
+            plt.xlabel('Lag')
+            plt.ylabel('Autocorrelation')
+            axes = plt.gca()
+            axes.set_ylim([-1,1])
+
+            fig2 = plt.figure()
+            plt.plot(self.output_crosscorr[:,0], 'b-')
+            plt.plot(self.output_crosscorr[:,1], 'k:')
+            plt.plot(self.output_crosscorr[:,2], 'k:')
+            plt.xlabel('Lag')
+            plt.ylabel('Autocorrelation')
+            axes = plt.gca()
+            axes.set_ylim([-1,1])
+            
+            plt.show()
         return output_matrix
 
     def fit(self, X, y):
@@ -442,19 +479,19 @@ class sys_identfy:
         residuals = (self.prediction_sampled_output - self.predicted_output).flatten()
         result_autocorr = np.correlate(residuals, residuals, mode='full')
         half_of_simmetry_autocorr = int(np.floor(result_autocorr.size/2))
-        output_autocorr = np.zeros((len(result_autocorr)-half_of_simmetry_autocorr,3),dtype=float)
-        output_autocorr[:,0] = result_autocorr[half_of_simmetry_autocorr:]/result_autocorr[half_of_simmetry_autocorr]
-        output_autocorr[:,1] = np.ones(len(output_autocorr[:,0])) * (1.96/np.sqrt(len(result_autocorr)))
-        output_autocorr[:,2] = output_autocorr[:,1] * (-1)
+        self.output_autocorr = np.zeros((len(result_autocorr)-half_of_simmetry_autocorr,3),dtype=float)
+        self.output_autocorr[:,0] = result_autocorr[half_of_simmetry_autocorr:]/result_autocorr[half_of_simmetry_autocorr]
+        self.output_autocorr[:,1] = np.ones(len(self.output_autocorr[:,0])) * (1.96/np.sqrt(len(result_autocorr)))
+        self.output_autocorr[:,2] = self.output_autocorr[:,1] * (-1)
 
         # Input/residuals correlation
-        # input_res = (self.prediction_sampled_input - np.mean(self.prediction_sampled_input)).flatten()
         result_crosscorr = self.normalized_correlation(self.prediction_sampled_input,residuals)
-        output_crosscorr = np.zeros((len(result_crosscorr),3),dtype=float)
-        output_crosscorr[:,0] = result_crosscorr[:]
-        output_crosscorr[:,1] = np.ones(len(output_crosscorr[:,0])) * (1.96/np.sqrt(len(result_crosscorr)))
-        output_crosscorr[:,2] = output_crosscorr[:,1] * (-1)
-        return output_autocorr, output_crosscorr
+        self.output_crosscorr = np.zeros((len(result_crosscorr),3),dtype=float)
+        self.output_crosscorr[:,0] = result_crosscorr[:]
+        self.output_crosscorr[:,1] = np.ones(len(self.output_crosscorr[:,0])) * (1.96/np.sqrt(len(result_autocorr)))
+        self.output_crosscorr[:,2] = self.output_crosscorr[:,1] * (-1)
+
+        return self.output_autocorr, self.output_crosscorr
 
     def normalized_correlation(self, signal1, signal2):
         y = (signal1 - np.mean(signal1)).flatten()

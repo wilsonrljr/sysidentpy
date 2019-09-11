@@ -31,7 +31,7 @@ y_test = model.predict(u_valid_, y_valid_)
 rrse = model.score(y_valid_, y_test)
 
 # Gera os resultados
-results = pd.DataFrame(model.results(), columns=['Regressors', 'Parameters', 'ERR'])
+results = pd.DataFrame(model.results(render_plots=False), columns=['Regressors', 'Parameters', 'ERR'])
 
 #Exibe os resultados
 print('RRSE:', rrse)
@@ -51,7 +51,6 @@ plt.ylabel('y', fontsize=32)
 plt.show()
 
 # Correlação
-residuals = (y_valid_ - y_test).flatten()[2:]
 r_residuals, ruy_residuals = model.residuals()
 
 plt.plot(r_residuals[:,0], 'b-', linewidth=5)
