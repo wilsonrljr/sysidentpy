@@ -1,4 +1,10 @@
-.. -*- mode: rst -*-
+.. sys-identpy documentation master file, created by
+   sphinx-quickstart on Sun Mar 15 08:37:08 2020.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to sysidentpy's documentation!
+=======================================
 
 SysIdentPy
 ============
@@ -95,3 +101,53 @@ Inspiration
 ~~~~~~~~~~~
 
 The documentation and structure (even this section) is openly inspired by sklearn, einsteinpy, and many others as we used (and keep using) them to learn.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+sysidentpy base
+===================
+.. automodule:: sysidentpy.base
+   :members:
+
+sysidentpy main
+=====================
+.. automodule:: sysidentpy.polynomial_basis.narx
+   :members:
+
+sysidentpy residues
+=================
+.. automodule:: sysidentpy.residues.residues_correlation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members: # if you want to document __x attributes
+   :special-members:
+
+sys-identpy metrics
+===================
+.. automodule:: sysidentpy.metrics._regression
+   :members:
+
+sys-identpy estimators
+===================
+.. automodule:: sysidentpy.parameter_estimation.estimators
+   :members:
+
+sys-identpy utils
+===================
+.. automodule:: sysidentpy.utils._check_arrays
+   :members:
+
+sys-identpy generate data
+===================
+.. automodule:: sysidentpy.utils.generate_data
+   :members:
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

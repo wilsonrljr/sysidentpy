@@ -1,27 +1,15 @@
 """SysIdentPy: System Identification Library for Python
 is open-source software for mathematics,
-science, and engineering regarding the use of NARX models
+science, and engineering regarding the use of NARMAX models
 built on top of numpy and is distributed under the 3-Clause BSD license.
-
 """
 
-import os
-import sys
-import subprocess
-import textwrap
-import warnings
-import sysconfig
-from distutils.version import LooseVersion
 from __future__ import print_function
 import sys
 from setuptools import setup, find_packages
-import builtins
-import platform
 
-
-
-if sys.version_info[:2] < (3, 5):
-    raise RuntimeError("Python version >= 3.5 required.")
+if sys.version_info[:2] < (3, 6):
+    raise RuntimeError("Python version >= 3.6 required.")
 
 with open('requirements.txt') as f:
     INSTALL_REQUIRES = [l.strip() for l in f.readlines() if l]
@@ -34,37 +22,34 @@ except ImportError:
     sys.exit(1)
 
 try:
-    import itertools
+    import matplotlib
 except ImportError:
-    print('itertools is required during installation')
+    print('matplotlib is required during installation')
     sys.exit(1)
 
-DISTNAME = 'sys-identpy'
-DESCRIPTION = 'Open source system identification library in Python'
-LONG_DESCRIPTION = 'Take a look into https://github.com/wilsonrljr'
+DISTNAME = 'sysidentpy'
+DESCRIPTION = 'Open source System Identification library in Python'
+LONG_DESCRIPTION = 'Take a look into https://github.com/wilsonrljr/sysidentpy'
 MAINTAINER = 'Wilson Rocha Lacerda Junior'
 MAINTAINER_EMAIL = 'wilsonrljr@outlook.com'
-URL = 'http://sys-identpy.org'
-DOWNLOAD_URL = 'https://pypi.org/project/sys-identpy/#files'
+URL = 'http://sysidentpy.org'
+DOWNLOAD_URL = 'https://pypi.org/project/sysidentpy/#files'
 LICENSE = 'new BSD'
 PROJECT_URLS = {
-    'Source Code': 'https://github.com/wilsonrljr/sys-identpy'
+    'Source Code': 'https://github.com/wilsonrljr/sysidentpy'
 }
 
-import sys_identfy
+import sysidentpy
 
-VERSION = sys_identfy.__version__
+VERSION = sysidentpy.__version__
 
-if platform.python_implementation() == 'PyPy':
-    ITERTOOLS_MIN_VERSION = '2.6'
-    NUMPY_MIN_VERSION = '1.14.0'
-else:
-    ITERTOOLS_MIN_VERSION = '2.6'
-    NUMPY_MIN_VERSION = '1.11.0'
+NUMPY_MIN_VERSION = '1.17.3'
+MATPLOTLIB_MIN_VERSION = '3.1.0'
 
 
 def setup_package():
-    metadata = dict(name=DISTNAME,
+    metadata = dict(packages=find_packages(),
+                    name=DISTNAME,
                     maintainer=MAINTAINER,
                     maintainer_email=MAINTAINER_EMAIL,
                     description=DESCRIPTION,
@@ -77,22 +62,20 @@ def setup_package():
                     classifiers=[
                             'Intended Audience :: Science/Research',
                             'Intended Audience :: Developers',
-                            'Programming Language :: Python :: 3.5',
                             'Programming Language :: Python :: 3.6',
                             'Programming Language :: Python :: 3.7',
-                            'Development Status :: 3 - Alpha',
+                            'Programming Language :: Python :: 3.8',
+                            'Development Status :: 0.0.1 - Alpha',
                             'Intended Audience :: Science/Research',
                             'Topic :: Scientific/Engineering',
                             'Topic :: Software Development'
                             'Operating System :: Microsoft :: Windows',
-                            'Operating System :: POSIX',
                             'Operating System :: Unix',
-                            'Operating System :: MacOS',
                             ],
-                    python_requires=">=3.5",
+                    python_requires=">=3.6",
                     install_requires=[
                                         'numpy>={}'.format(NUMPY_MIN_VERSION),
-                                        'itertools>={}'.format(ITERTOOLS_MIN_VERSION)
+                                        'matplotlib>={}'.format(MATPLOTLIB_MIN_VERSION)
                                     ],
                     )
 
