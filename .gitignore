@@ -2,3 +2,34 @@ __pycache__/sys_identfy.cpython-36.pyc
 *.pyc
 .vscode/launch.json
 *.json
+*.coverage
+
+# Sphinx
+docs/_build
+
+# Pycharm editor project files
+.idea
+
+# for virtual environment
+venv/
+
+# Packages/installer info
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+var
+sdist
+develop-eggs
+.installed.cfg
+distribute-*.tar.gz
+pip-wheel-metadata
+
+# VS Code
+.vscode
+
+# default pytest cache directory
+*/.pytest_cache
+.pytest_cache/
