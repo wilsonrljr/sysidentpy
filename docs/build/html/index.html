@@ -1,0 +1,369 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Welcome to sysidentpy’s documentation! &mdash; SysIdentPy</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/jquery.fancybox.min.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/glpi.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="SysIdentPy" href="#"/>
+        <link rel="next" title="Install Guide" href="installation.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> sysidentpy
+          
+
+          
+          </a>
+
+          
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction_to_narmax.html">A brief introduction to NARMAX models.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev_guide.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks.html">Jupyter notebooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Codes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.base">sysidentpy base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-main">sysidentpy main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.residues.residues_correlation">sysidentpy residues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.metrics._regression">sysidentpy metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.parameter_estimation.estimators">sysidentpy estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.utils._check_arrays">sysidentpy utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.utils.generate_data">sysidentpy generate data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">sysidentpy</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>Welcome to sysidentpy’s documentation!</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
+      
+        <a href="installation.html" class="btn btn-neutral float-right" title="Install Guide" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+  </div>
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="welcome-to-sysidentpy-s-documentation">
+<h1>Welcome to sysidentpy’s documentation!<a class="headerlink" href="#welcome-to-sysidentpy-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="sysidentpy">
+<h2>SysIdentPy<a class="headerlink" href="#sysidentpy" title="Permalink to this headline">¶</a></h2>
+<p>sysidentpy is a Python module for System Identification using NARMAX models built on top of numpy and
+is distributed under the 3-Clause BSD license.</p>
+<p>The project was started in by Wilson R. L. Junior, Luan
+Pascoal C. Andrade and Samir A. M. Martins as a project for System Identification
+discipline. Samuel joined early in 2019 and since then have contributed.</p>
+<p>Website (coming soon): <a class="reference external" href="http://sysidentpy.org">http://sysidentpy.org</a></p>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>The examples directory has several Jupyter notebooks presenting basic tutorials of how to use the package and some specific applications of sysidentpy. Try it out!</p>
+</div>
+<div class="section" id="changelog">
+<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
+<p>See the <a class="reference external" href="https://github.com/wilsonrljr/sysidentpy.whats_is_new.md">changelog</a>
+for a history of notable changes to sysidentpy.</p>
+</div>
+<div class="section" id="development">
+<h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
+<p>We welcome new contributors of all experience levels. The sysidentpy community goals are to be helpful, welcoming, and effective.</p>
+</div>
+<div class="section" id="important-links">
+<h2>Important links<a class="headerlink" href="#important-links" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Official source code repo: <a class="reference external" href="https://github.com/wilsonrljr/sysidentpy">https://github.com/wilsonrljr/sysidentpy</a></p></li>
+<li><p>Download releases: <a class="reference external" href="https://pypi.org/project/sysidentpy/">https://pypi.org/project/sysidentpy/</a></p></li>
+</ul>
+</div>
+<div class="section" id="source-code">
+<h2>Source code<a class="headerlink" href="#source-code" title="Permalink to this headline">¶</a></h2>
+<p>You can check the latest sources with the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">wilsonrljr</span><span class="o">/</span><span class="n">sysidentpy</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="project-history">
+<h2>Project History<a class="headerlink" href="#project-history" title="Permalink to this headline">¶</a></h2>
+<p>The project was started by Wilson R. L. Junior, Luan Pascoal and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019 and since then have contributed.</p>
+<p>The initial purpose was to learn the python language. Over time, the project has matured to the state it is in today.</p>
+<p>The project is currently maintained by its creators and looking for
+contributors.</p>
+<div class="section" id="communication">
+<h3>Communication<a class="headerlink" href="#communication" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Discord server: <a class="reference external" href="https://discord.gg/8eGE3PQ">https://discord.gg/8eGE3PQ</a></p></li>
+<li><p>Website(soon): <a class="reference external" href="http://sysidentpy.org">http://sysidentpy.org</a></p></li>
+</ul>
+</div>
+<div class="section" id="citation">
+<h3>Citation<a class="headerlink" href="#citation" title="Permalink to this headline">¶</a></h3>
+<p>More information coming soon.</p>
+</div>
+<div class="section" id="inspiration">
+<h3>Inspiration<a class="headerlink" href="#inspiration" title="Permalink to this headline">¶</a></h3>
+<p>The documentation and structure (even this section) is openly inspired by sklearn, einsteinpy, and many others as we used (and keep using) them to learn.</p>
+</div>
+</div>
+<div class="section" id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Install Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="introduction_to_narmax.html">A brief introduction to NARMAX models.</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction_to_narmax.html#so-what-is-a-narmax-model">So, what is a NARMAX model?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction_to_narmax.html#narmax-representation">NARMAX representation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction_to_narmax.html#polynomial-narmax">Polynomial NARMAX</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#presenting-main-functionality">Presenting main functionality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#generating-1-input-1-output-sample-data">Generating 1 input 1 output sample data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#important-note">Important Note:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dev_guide.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dev_guide.html#sugestions-and-bug-reporting">Sugestions and Bug reporting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dev_guide.html#documentation">Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dev_guide.html#development-environment">Development environment</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks.html">Jupyter notebooks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/basic_steps.html">Basic Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/multiple_inputs_example.html">Multiple Inputs usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/information_criteria_examples.html">Information Criteria - Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/extended_least_squares.html">Using Extended Least Squares Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/defining_lags.html">Setting specific lags</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Codes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.base">sysidentpy base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-main">sysidentpy main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.residues.residues_correlation">sysidentpy residues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.metrics._regression">sysidentpy metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.parameter_estimation.estimators">sysidentpy estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.utils._check_arrays">sysidentpy utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.utils.generate_data">sysidentpy generate data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="installation.html" class="btn btn-neutral float-right" title="Install Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="None"></script>
+      <script type="text/javascript" src="_static/jquery.fancybox.min.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+  
+  <script type="text/javascript">
+    $(function(){
+      $('.image-reference').fancybox();
+    })
+  </script>
+
+</body>
+</html>

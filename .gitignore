@@ -7,7 +7,6 @@ __pycache__/sys_identfy.cpython-36.pyc
 .ipynb_checkpoints
 
 # Sphinx
-docs/_build
 
 # Pycharm editor project files
 .idea
@@ -19,7 +18,6 @@ venv/
 *.egg
 *.egg-info
 dist
-build
 eggs
 parts
 var
