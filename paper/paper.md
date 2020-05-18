@@ -32,9 +32,9 @@ aas-journal: Astrophysical Journal <- The name of the AAS journal.
 
 # Summary
 
-The field of System Identification (SI) aims to build mathematical models for static and dynamic behavior from experimental data[` @Lju1987`]. In particular, nonlinear system identification has become a central issue in SI community and from the $1950$s onwards many methods has been proposed. In this respect, NARMAX (Nonlinear AutoRegressive Moving Average with eXogenous input) models are among the most well-documented and used model representation of dynamical systems[` @Bil2013`].
+The field of System Identification (SI) aims to build mathematical models for static and dynamic behavior from experimental data[@Lju1987]. In particular, nonlinear system identification has become a central issue in SI community and from the $1950$s onwards many methods has been proposed. In this respect, NARMAX (Nonlinear AutoRegressive Moving Average with eXogenous input) models are among the most well-documented and used model representation of dynamical systems[@Bil2013].
 
-The NARMAX model was proposed by [`@BL1981`; `@LB1985`; `@CB1989`] and can be described as
+The NARMAX model was proposed by [@BL1981; @LB1985; @CB1989] and can be described as
 
 \begin{equation}
 y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k,
@@ -42,7 +42,7 @@ y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} +
 
 where $n_y\in \mathbb{N}^*$, $n_x \in \mathbb{N}$, $n_e \in \mathbb{N}$ , are the maximum lags for the system output and input respectively; $x_k \in \mathbb{R}^{n_x}$ is the system input and $y_k \in \mathbb{R}^{n_y}$ is the system output at discrete time~$k \in \mathbb{N}^n$; $e_k \in \mathbb{R}^{n_e}$ represents uncertainties and possible noise at discrete time~$k$. In this case, $\mathcal{F}^\ell$ is some nonlinear function of the input and output regressors with nonlinearity degree $\ell \in \mathbb{N}$ and $d$ is a time delay typically set to $d=1$.
 
-Although there are many possible approximations of $\mathcal{F}(\cdot)$ (e.g., Neural Networks, Fuzzy, Wavelet, Radial Basis Function), the power-form Polynomial NARMAX model is the most commonly used[`@Bil2013`; `@MA2016`]:
+Although there are many possible approximations of $\mathcal{F}(\cdot)$ (e.g., Neural Networks, Fuzzy, Wavelet, Radial Basis Function), the power-form Polynomial NARMAX model is the most commonly used[@Bil2013; @MA2016]:
 
 \begin{align}
 \label{eq5:narx}
@@ -54,11 +54,11 @@ y_k =& \sum_{0} + \sum_{i=1}^{p}\Theta_{y}^{i}y_{k-i} + \sum_{j=1}^{q}\Theta_{e}
 & + \sum_{m_1=1}^{r} \dotsc \sum_{m_l=m_{l-1}}^{r} \Theta_{x^l}^{m_1, \dotsc, m_2} x_{k-m_1} x_{k-m_l},
 \end{align}
 
-Polynomial NARMAX models have many interesting atrributes[`@Bil2013`; `@Agu2004`]:
+Polynomial NARMAX models have many interesting atrributes[@Bil2013; @Agu2004]:
 
 - All polynomial functions are smooth in $\mathbb{R}$;
-- The Weierstrass theorem \cite{Wei1885} states that any given continuous real-valued function defined on a closed and bounded space $[a,b]$ can be uniformly approximated using a polynomial on that interval;
-- Can describe several nonlinear dynamical systems, which include industrial processes, control systems, structural systems, economic and financial systems, biology, medicine, social systems, and much more[`@WMNL2019`; `@FWHM2003`; `@GGBW2016`; `@KGHK2003`; `@BBWL2018`; `@CER2001`; `@Bil2013`; `@Agu2004`];
+- The Weierstrass theorem [@Wei1885] states that any given continuous real-valued function defined on a closed and bounded space $[a,b]$ can be uniformly approximated using a polynomial on that interval;
+- Can describe several nonlinear dynamical systems, which include industrial processes, control systems, structural systems, economic and financial systems, biology, medicine, social systems, and much more[@WMNL2019; @FWHM2003; @GGBW2016; @KGHK2003; @BBWL2018; CER2001; @Bil2013; @Agu2004];
 - Polynomial NARMAX models can be used both for prediction and inference.
 
 # SysIdentPy
