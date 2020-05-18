@@ -4,10 +4,10 @@
    contain the root `toctree` directive.
 
 Welcome to sysidentpy's documentation!
-=======================================
+======================================
 
 SysIdentPy
-============
+----------
 
 sysidentpy is a Python module for System Identification using NARMAX models built on top of numpy and
 is distributed under the 3-Clause BSD license.
@@ -21,35 +21,6 @@ Website (coming soon): http://sysidentpy.org
 Examples
 --------
 The examples directory has several Jupyter notebooks presenting basic tutorials of how to use the package and some specific applications of sysidentpy. Try it out!
-
-Requirements
-------------
-
-sysidentpy requires:
-
-- Python (>= 3.6)
-- NumPy (>= 1.5.0) for all numerical algorithms
-- Matplotlib >= 1.5.2 for static plotiing and visualizations
-
-==============   ===================
-Platform         Status
-==============   ===================
-Linux            OK
-Windows x64      OK
-==============   ===================
-
-**SysIdentPy do not to support Python 2.7.**
-
-A few examples require pandas >= 0.18.0. However, it is not required to use sysidentpy.
-
-Installation
-------------
-
-The easiest way to get sysidentpy running is to install it using ``pip``   ::
-
-    pip install sysidentpy
-
-We will made it available at conda repository as soon as possible.
 
 Changelog
 ---------
@@ -102,52 +73,14 @@ Inspiration
 
 The documentation and structure (even this section) is openly inspired by sklearn, einsteinpy, and many others as we used (and keep using) them to learn.
 
+Contents
+--------
+
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
 
-sysidentpy base
-===================
-.. automodule:: sysidentpy.base
-   :members:
-
-sysidentpy main
-=====================
-.. automodule:: sysidentpy.polynomial_basis.narx
-   :members:
-
-sysidentpy residues
-=================
-.. automodule:: sysidentpy.residues.residues_correlation
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :private-members: # if you want to document __x attributes
-   :special-members:
-
-sys-identpy metrics
-===================
-.. automodule:: sysidentpy.metrics._regression
-   :members:
-
-sys-identpy estimators
-===================
-.. automodule:: sysidentpy.parameter_estimation.estimators
-   :members:
-
-sys-identpy utils
-===================
-.. automodule:: sysidentpy.utils._check_arrays
-   :members:
-
-sys-identpy generate data
-===================
-.. automodule:: sysidentpy.utils.generate_data
-   :members:
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+    installation
+    user_guide
+    dev_guide
+    notebooks
+    code

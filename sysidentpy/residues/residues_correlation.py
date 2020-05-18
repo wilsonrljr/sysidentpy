@@ -18,11 +18,11 @@ class ResiduesAnalysis:
 
         Parameters
         ----------
-        y = array-like of shape = n_samples
+        y : array-like of shape = n_samples
             The target data used in the identification process.
-        yhat = array-like of shape = n_samples
+        yhat : array-like of shape = n_samples
             The prediction values of the identification process.
-        X = ndarray of floats
+        X : ndarray of floats
             The input data.
 
         Returns
@@ -107,8 +107,8 @@ class ResiduesAnalysis:
 
         Parameters
         ----------
-        signal1 = array-like of shape = n_samples.
-        signal2 = array-like of shape = n_samples.
+        signal1 : array-like of shape = n_samples.
+        signal2 : array-like of shape = n_samples.
 
         Returns
         -------
@@ -137,9 +137,9 @@ class ResiduesAnalysis:
 
         Parameters
         ----------
-        y = array-like of shape = n_samples
+        y : array-like of shape = n_samples
             The target data used in the identification process.
-        yhat = array-like of shape = n_samples
+        yhat : array-like of shape = n_samples
             The prediction values of the identification process.
         e_acf : ndarray of floats:
             1st column - Residuals normalized autocorrelation.

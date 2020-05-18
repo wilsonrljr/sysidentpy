@@ -13,9 +13,9 @@ def check_infinity(X, y):
 
     Parameters
     ----------
-    X = ndarray of floats
+    X : ndarray of floats
         The input data.
-    y = ndarray of floats
+    y : ndarray of floats
         The output data.
 
     """
@@ -37,9 +37,9 @@ def check_nan(X, y):
 
     Parameters
     ----------
-    X = ndarray of floats
+    X : ndarray of floats
         The input data.
-    y = ndarray of floats
+    y : ndarray of floats
         The output data.
 
     """
@@ -61,9 +61,9 @@ def check_length(X, y):
 
     Parameters
     ----------
-    X = ndarray of floats
+    X : ndarray of floats
         The input data.
-    y = ndarray of floats
+    y : ndarray of floats
         The output data.
 
     """
@@ -81,9 +81,9 @@ def check_dimension(X, y):
 
     Parameters
     ----------
-    X = ndarray of floats
+    X : ndarray of floats
         The input data.
-    y = ndarray of floats
+    y : ndarray of floats
         The output data.
 
     """
@@ -109,9 +109,9 @@ def check_X_y(X, y):
 
     Parameters
     ----------
-    X = ndarray of floats
+    X : ndarray of floats
         The input data.
-    y = ndarray of floats
+    y : ndarray of floats
         The output data.
 
     """

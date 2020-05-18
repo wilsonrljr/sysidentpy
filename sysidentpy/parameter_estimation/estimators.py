@@ -65,14 +65,14 @@ class Estimators:
 
         Parameters
         ----------
-        psi = ndarray of floats
+        psi : ndarray of floats
             The information matrix of the model.
-        y_train = array-like of shape = y_training
+        y_train : array-like of shape = y_training
             The data used to training the model.
 
         Returns
         -------
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             The estimated parameters of the model.
 
         References
@@ -103,14 +103,14 @@ class Estimators:
 
         Parameters
         ----------
-        psi = ndarray of floats
+        psi : ndarray of floats
             The information matrix of the model.
-        y_train = array-like of shape = y_training
+        y_train : array-like of shape = y_training
             The data used to training the model.
 
         Returns
         -------
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             The estimated parameters of the model.
 
         References
@@ -148,14 +148,14 @@ class Estimators:
         The implementation consider the forgeting factor.
         Parameters
         ----------
-        psi = ndarray of floats
+        psi : ndarray of floats
             The information matrix of the model.
-        y_train = array-like of shape = y_training
+        y_train : array-like of shape = y_training
             The data used to training the model.
 
         Returns
         -------
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             The estimated parameters of the model.
 
         Notes
@@ -201,14 +201,14 @@ class Estimators:
 
         Parameters
         ----------
-        psi = ndarray of floats
+        psi : ndarray of floats
             The information matrix of the model.
-        y_train = array-like of shape = y_training
+        y_train : array-like of shape = y_training
             The data used to training the model.
 
         Returns
         -------
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             The estimated parameters of the model.
 
         Notes
@@ -241,14 +241,14 @@ class Estimators:
 
         Parameters
         ----------
-        psi = ndarray of floats
+        psi : ndarray of floats
             The information matrix of the model.
-        y_train = array-like of shape = y_training
+        y_train : array-like of shape = y_training
             The data used to training the model.
 
         Returns
         -------
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             The estimated parameters of the model.
 
         Notes
@@ -290,14 +290,14 @@ class Estimators:
 
         Parameters
         ----------
-        psi = ndarray of floats
+        psi : ndarray of floats
             The information matrix of the model.
-        y_train = array-like of shape = y_training
+        y_train : array-like of shape = y_training
             The data used to training the model.
 
         Returns
         -------
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             The estimated parameters of the model.
 
         Notes
@@ -338,14 +338,14 @@ class Estimators:
 
         Parameters
         ----------
-        psi = ndarray of floats
+        psi : ndarray of floats
             The information matrix of the model.
-        y_train = array-like of shape = y_training
+        y_train : array-like of shape = y_training
             The data used to training the model.
 
         Returns
         -------
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             The estimated parameters of the model.
 
         Notes
@@ -387,14 +387,14 @@ class Estimators:
 
         Parameters
         ----------
-        psi = ndarray of floats
+        psi : ndarray of floats
             The information matrix of the model.
-        y_train = array-like of shape = y_training
+        y_train : array-like of shape = y_training
             The data used to training the model.
 
         Returns
         -------
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             The estimated parameters of the model.
 
         Notes
@@ -435,14 +435,14 @@ class Estimators:
 
         Parameters
         ----------
-        psi = ndarray of floats
+        psi : ndarray of floats
             The information matrix of the model.
-        y_train = array-like of shape = y_training
+        y_train : array-like of shape = y_training
             The data used to training the model.
 
         Returns
         -------
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             The estimated parameters of the model.
 
         Notes
@@ -484,14 +484,14 @@ class Estimators:
 
         Parameters
         ----------
-        psi = ndarray of floats
+        psi : ndarray of floats
             The information matrix of the model.
-        y_train = array-like of shape = y_training
+        y_train : array-like of shape = y_training
             The data used to training the model.
 
         Returns
         -------
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             The estimated parameters of the model.
 
         Notes
@@ -533,14 +533,14 @@ class Estimators:
 
         Parameters
         ----------
-        psi = ndarray of floats
+        psi : ndarray of floats
             The information matrix of the model.
-        y_train = array-like of shape = y_training
+        y_train : array-like of shape = y_training
             The data used to training the model.
 
         Returns
         -------
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             The estimated parameters of the model.
 
         Notes
@@ -583,14 +583,14 @@ class Estimators:
 
         Parameters
         ----------
-        psi = ndarray of floats
+        psi : ndarray of floats
             The information matrix of the model.
-        y_train = array-like of shape = y_training
+        y_train : array-like of shape = y_training
             The data used to training the model.
 
         Returns
         -------
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             The estimated parameters of the model.
 
         Notes
@@ -632,14 +632,14 @@ class Estimators:
 
         Parameters
         ----------
-        psi = ndarray of floats
+        psi : ndarray of floats
             The information matrix of the model.
-        y_train = array-like of shape = y_training
+        y_train : array-like of shape = y_training
             The data used to training the model.
 
         Returns
         -------
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             The estimated parameters of the model.
 
         Notes
@@ -680,14 +680,14 @@ class Estimators:
 
         Parameters
         ----------
-        psi = ndarray of floats
+        psi : ndarray of floats
             The information matrix of the model.
-        y_train = array-like of shape = y_training
+        y_train : array-like of shape = y_training
             The data used to training the model.
 
         Returns
         -------
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             The estimated parameters of the model.
 
         Notes
@@ -728,14 +728,14 @@ class Estimators:
 
         Parameters
         ----------
-        psi = ndarray of floats
+        psi : ndarray of floats
             The information matrix of the model.
-        y_train = array-like of shape = y_training
+        y_train : array-like of shape = y_training
             The data used to training the model.
 
         Returns
         -------
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             The estimated parameters of the model.
 
         Notes
@@ -785,14 +785,14 @@ class Estimators:
 
         Parameters
         ----------
-        psi = ndarray of floats
+        psi : ndarray of floats
             The information matrix of the model.
-        y_train = array-like of shape = y_training
+        y_train : array-like of shape = y_training
             The data used to training the model.
 
         Returns
         -------
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             The estimated parameters of the model.
 
         Notes

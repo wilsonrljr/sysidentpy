@@ -10,6 +10,8 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+
+import sphinx_glpi_theme
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../../'))
@@ -32,36 +34,60 @@ release = '0.0.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 
+autodoc_member_order = "bysource"
+
+html_theme_options = {
+    "description": "System Identification in Python",
+    "body_text_align": "left",
+    "github_user": "wilsonrljr",
+    "github_repo": "sysidentpy",
+    "show_relbars": True,
+    "page_width": "80%",
+    "github_button": True,
+}
+
+add_function_parentheses = True
+
+add_module_names = True
+
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.viewcode',
-              # 'sphinx.ext.napoleon',
+              'sphinx.ext.napoleon',
               # 'sphinx_autodoc_typehints',
+              "sphinx.ext.todo",
               'numpydoc',
-              'sphinx.ext.githubpages'
-]
+              "nbsphinx",
+              "sphinx.ext.intersphinx",
+              "IPython.sphinxext.ipython_console_highlighting",
+              'sphinx.ext.githubpages',
+              ]
+
+source_suffix = ".rst"
+
+master_doc = "index"
 
 # Napoleon settings
-napoleon_google_docstring = False
-napoleon_numpy_docstring = True
-napoleon_include_init_with_doc = False
-napoleon_include_private_with_doc = False
-napoleon_include_special_with_doc = False
-napoleon_use_admonition_for_examples = False
-napoleon_use_admonition_for_notes = False
-napoleon_use_admonition_for_references = False
-napoleon_use_ivar = False
-napoleon_use_param = True
-napoleon_use_rtype = True
+# napoleon_google_docstring = False
+# napoleon_numpy_docstring = True
+# napoleon_include_init_with_doc = False
+# napoleon_include_private_with_doc = False
+# napoleon_include_special_with_doc = False
+# napoleon_use_admonition_for_examples = False
+# napoleon_use_admonition_for_notes = False
+# napoleon_use_admonition_for_references = False
+# napoleon_use_ivar = False
+# napoleon_use_param = True
+# napoleon_use_rtype = True
 
 
 latex_elements = {
-# The paper size ('letterpaper' or 'a4paper').
+    # The paper size ('letterpaper' or 'a4paper').
     'papersize': 'letterpaper',
 
-# The font size ('10pt', '11pt' or '12pt').
+    # The font size ('10pt', '11pt' or '12pt').
     'pointsize': '11pt',
 
-# Additional stuff for the LaTeX preamble.
+    # Additional stuff for the LaTeX preamble.
     'preamble': r'''
         \usepackage{charter}
         % \usepackage[defaultsans]{lato}
@@ -83,9 +109,12 @@ exclude_patterns = []
 # a list of builtin themes.
 #
 
-import sphinx_glpi_theme
-
 html_theme = "glpi"
+
+html_title = "SysIdentPy"
+
+htmlhelp_basename = "sysidentpydoc"
+
 
 html_theme_path = sphinx_glpi_theme.get_html_themes_path()
 
