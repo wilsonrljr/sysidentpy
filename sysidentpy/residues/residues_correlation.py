@@ -160,7 +160,7 @@ class ResiduesAnalysis:
         for ax, feature in zip(axes.flatten()[2:], [e_acf, xe_ccf]):
             ax.plot(feature)
             ax.set_xlabel('Lag', fontsize=12)
-            ax.set_ylabel('Cross Correlation', fontsize=12)
+            ax.set_ylabel('Cross Correlation: ee, ex', fontsize=12)
             # ax = plt.gca()
             ax.set_ylim([-1, 1])
             ax.grid(color='grey', linestyle='-.', alpha=0.2)
