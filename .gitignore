@@ -3,6 +3,7 @@ __pycache__/sys_identfy.cpython-36.pyc
 .vscode/launch.json
 *.json
 *.coverage
+.ipynb_checkpoints
 
 # Sphinx
 docs/_build
