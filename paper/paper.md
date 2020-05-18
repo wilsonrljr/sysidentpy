@@ -67,7 +67,7 @@ SysIdentPy is an open source python package for system identification using poly
 
 SysIdentpy is designed designed to be easily expanded and user friendly. Moreover, the package aims to provid useful tools for researchers and students not only in SI field, but also in correlated areas such as Machine Learning, Statistical Learning and Data Science.
 
-The table below and \autoref{fig:example} serves as an example of one of the outputs of the package.
+The table below and Figure 1 serves as an example of one of the outputs of the package.
 
 | Regressors     | Parameters | ERR        |
 |----------------|------------|------------|
@@ -77,9 +77,10 @@ The table below and \autoref{fig:example} serves as an example of one of the out
 | x1(k-1)y(k-1)  | 0.1000     | 0.00033239 |
 
 
-![Caption for example figure.\label{fig:example}](output_16_0.png)
+![\label{fig:example}](output_16_0.png)
+_Figure 1. Results from modeling a simulated system. Free run simulation, autocorrelation of the residues and cross correlation between residues and the input._
 
-# Future
+# Future work
 
 Future releases will include new methods for MSS of polynomial NARMAX models, multiobjective MSS and parameter estimation algorithms, new adaptative filters, frequency domain analysis, and algorithms for using NARMAX models for classification problems.
 
