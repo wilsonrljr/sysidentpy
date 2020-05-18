@@ -15,7 +15,7 @@ Jupyter notebooks
    
 .. toctree::
    :maxdepth: 1
-   :caption: Information Criteria comparison
+   :caption: Information Criteria - Examples
    
    /examples/information_criteria_examples.ipynb
 
