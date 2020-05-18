@@ -39,7 +39,7 @@ class Estimators:
                       'gama': self._gama,
                       'weight': self._weight}
         for attribute, value in attributes.items():
-            if not isinstance(value, (np.int64, int, float)):
+            if not isinstance(value, (np.integer, int, float)):
                 raise ValueError(
                     (f"{attribute} must be int or float (positive)."
                      f"Got {type(attribute)}"))
