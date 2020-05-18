@@ -62,15 +62,15 @@ def setup_package():
                     classifiers=[
                             'Intended Audience :: Science/Research',
                             'Intended Audience :: Developers',
+                            'Intended Audience :: Education',
                             'Programming Language :: Python :: 3.6',
                             'Programming Language :: Python :: 3.7',
                             'Programming Language :: Python :: 3.8',
-                            'Development Status :: 0.0.1 - Alpha',
+                            'Development Status :: 5 - Production/Stable',
                             'Intended Audience :: Science/Research',
                             'Topic :: Scientific/Engineering',
-                            'Topic :: Software Development'
-                            'Operating System :: Microsoft :: Windows',
-                            'Operating System :: Unix',
+                            'Topic :: Software Development',
+                            'Operating System :: OS Independent'
                             ],
                     python_requires=">=3.6",
                     install_requires=[
