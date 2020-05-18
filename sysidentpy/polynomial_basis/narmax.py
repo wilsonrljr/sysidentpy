@@ -105,21 +105,21 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
 
         Parameters
         ----------
-        y = array-like of shape = n_samples
+        y : array-like of shape = n_samples
             The target data used in the identification process.
-        psi = ndarray of floats
+        psi : ndarray of floats
             The information matrix of the model.
-        process_term_number = int
+        process_term_number : int
             Number of Process Terms defined by the user.
 
         Returns
         -------
-        err = array-like of shape = number_of_model_elements
+        err : array-like of shape = number_of_model_elements
             The respective ERR calculated for each regressor.
-        piv = array-like of shape = number_of_model_elements
+        piv : array-like of shape = number_of_model_elements
             Contains the index to put the regressors in the correct order
             based on err values.
-        psi_orthogonal = ndarray of floats
+        psi_orthogonal : ndarray of floats
             The updated and orthogonal information matrix.
 
         References
@@ -192,23 +192,23 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
 
         Parameters
         ----------
-        X = ndarray of floats
+        X : ndarray of floats
             The input data to be used in the training process.
-        y = ndarray of floats
+        y : ndarray of floats
             The output data to be used in the training process.
 
         Returns
         -------
-        model = ndarray of ints
+        model : ndarray of ints
             The model code represetation.
-        piv = array-like of shape = number_of_model_elements
+        piv : array-like of shape = number_of_model_elements
             Contains the index to put the regressors in the correct order
             based on err values.
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             The estimated parameters of the model.
-        err = array-like of shape = number_of_model_elements
+        err : array-like of shape = number_of_model_elements
             The respective ERR calculated for each regressor.
-        info_values = array-like of shape = n_regressor
+        info_values : array-like of shape = n_regressor
             Vector with values of akaike's information criterion
             for models with N terms (where N is the
             vector position + 1).
@@ -266,18 +266,18 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
 
         Parameters
         ----------
-        psi = ndarray of floats
+        psi : ndarray of floats
             The information matrix of the model.
-        X = ndarray of floats
+        X : ndarray of floats
             The input data to be used in the training process.
-        y_train = array-like of shape = y_training
+        y_train : array-like of shape = y_training
             The data used to training the model.
-        biased_theta = array-like of shape = number_of_model_elements
+        biased_theta : array-like of shape = number_of_model_elements
             The estimated biased parameters of the model.
 
         Returns
         -------
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             The estimated unbiased parameters of the model.
 
         References
@@ -328,14 +328,14 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
 
         Parameters
         ----------
-        X = ndarray of floats
+        X : ndarray of floats
             The input data to be used in the prediction process.
-        y = ndarray of floats
+        y : ndarray of floats
             The output data to be used in the prediction process.
 
         Returns
         -------
-        yhat = ndarray of floats
+        yhat : ndarray of floats
             The predicted values of the model.
 
         """
@@ -351,21 +351,21 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
 
         Parameters
         ----------
-        model_elements = ndarray of ints
+        model_elements : ndarray of ints
             Matrix with regressor codes.
-        model_pivot = array-like of shape = number_of_model_elements
+        model_pivot : array-like of shape = number_of_model_elements
             Vector with regressor order (from ERR).
-        y_initial = array-like of shape = max_lag
+        y_initial : array-like of shape = max_lag
             Number of initial conditions values of output mensured
             to start recursive process.
-        X = ndarray of floats of shape = n_samples
+        X : ndarray of floats of shape = n_samples
             Vector with entrace values to be used in model simulation.
-        theta = array-like of shape = number_of_model_elements
+        theta : array-like of shape = number_of_model_elements
             Paramters estimated via Least Squares method.
 
         Returns
         -------
-        yhat = ndarray of floats
+        yhat : ndarray of floats
                The predicted values of the model.
 
         """
@@ -403,14 +403,14 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
 
         Parameters
         ----------
-        y = array-like of shape = n_samples
+        y : array-like of shape = n_samples
             Target values of the system.
-        X = array-like of shape = n_samples
+        X : array-like of shape = n_samples
             Input system values measured by the user.
 
         Returns
         -------
-        output_vector = array-like of shape = n_regressor
+        output_vector : array-like of shape = n_regressor
             Vector with values of akaike's information criterion
             for models with N terms (where N is the
             vector position + 1).
@@ -487,18 +487,18 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
 
         Parameters
         ----------
-        theta_precision = int (default: 4)
+        theta_precision : int (default: 4)
             Precision of shown parameters values.
-        err_precision = int (default: 8)
+        err_precision : int (default: 8)
             Precision of shown ERR values.
-        dtype = string (default: 'dec')
+        dtype : string (default: 'dec')
             Type of representation:
             sci - Scientific notation;
             dec - Decimal notation.
 
         Returns
         -------
-        output_matrix = string
+        output_matrix : string
             Where:
                 First column represents each regressor element;
                 Second column represents associated parameter;

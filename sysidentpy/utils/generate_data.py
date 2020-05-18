@@ -12,22 +12,22 @@ def get_siso_data(n=5000, colored_noise=False,
 
         Parameters
         ----------
-        n = int
+        n : int
             The number of samples.
-        colored_noise = bool
+        colored_noise : bool
             Select white noise or colored noise (autoregressive noise).
-        sigma = float
+        sigma : float
             The standard deviation of the random distribution to generate
             the noise.
-        train_percentage = int
+        train_percentage : int
             The percentage of the data to be used as train data.
 
         Returns
         -------
-        x_train, x_valid = array-like
+        x_train, x_valid : array-like
             The input data to be used in identification and validation,
             respectively.
-        y_train, y_valid = array-like
+        y_train, y_valid : array-like
             The output data to be used in identification and validation,
             respectively.
 
@@ -68,22 +68,22 @@ def get_miso_data(n=5000, colored_noise=False,
 
         Parameters
         ----------
-        n = int
+        n : int
             The number of samples.
-        colored_noise = bool
+        colored_noise : bool
             Select white noise or colored noise (autoregressive noise).
-        sigma = float
+        sigma : float
             The standard deviation of the random distribution to generate
             the noise.
-        train_percentage = int
+        train_percentage : int
             The percentage of the data to be used as train data.
 
         Returns
         -------
-        x_train, x_valid = array-like
+        x_train, x_valid : array-like
             The input data to be used in identification and validation,
             respectively.
-        y_train, y_valid = array-like
+        y_train, y_valid : array-like
             The output data to be used in identification and validation,
             respectively.
 

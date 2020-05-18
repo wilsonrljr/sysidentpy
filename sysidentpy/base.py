@@ -27,18 +27,18 @@ class GenerateRegressors:
 
         Parameters
         ----------
-        non_degree = int
+        non_degree : int
             The desired maximum nonlinearity degree.
-        ylag = int
+        ylag : int
             The maximum lag of output regressors.
-        xlag =int
+        xlag : int
             The maximum lag of input regressors.
 
         Returns
         -------
-        max_lag = int
+        max_lag : int
             This value can be used by another functions.
-        regressor_code = ndarray of int
+        regressor_code : ndarray of int
             Matrix codification of all possible regressors.
 
         Examples
@@ -134,13 +134,13 @@ class HouseHolder:
 
         Parameters
         ----------
-        x = array-like of shape = number_of_training_samples
+        x : array-like of shape = number_of_training_samples
             The respective column of the matrix of regressors in each
             iteration of ERR function.
 
         Returns
         -------
-        v = array-like of shape = number_of_training_samples
+        v : array-like of shape = number_of_training_samples
             The reflection of the array x.
 
         References
@@ -169,15 +169,15 @@ class HouseHolder:
 
         Parameters
         ----------
-        RA = array-like of shape = number_of_training_samples
+        RA : array-like of shape = number_of_training_samples
             The respective column of the matrix of regressors in each
             iteration of ERR function.
-        v = array-like of shape = number_of_training_samples
+        v : array-like of shape = number_of_training_samples
             The reflected vector obtained by using the householder reflection.
 
         Returns
         -------
-        B = array-like of shape = number_of_training_samples
+        B : array-like of shape = number_of_training_samples
 
         References
         ----------
@@ -207,20 +207,18 @@ class InformationMatrix:
 
         Parameters
         ----------
-        col_to_shift = array-like of shape = n_samples
+        col_to_shift : array-like of shape = n_samples
             The samples of the input or output.
-        lag = int
+        lag : int
             The respective lag of the regressor.
 
         Returns
         -------
-        tmp_column = array-like of shape = n_samples
+        tmp_column : array-like of shape = n_samples
             The shifted array of the input or output.
 
         Examples
         --------
-        Example 1:
-
         >>> y = [1, 2, 3, 4, 5]
         >>> shift_column(y, 1)
         [0, 1, 2, 3, 4]
@@ -238,15 +236,15 @@ class InformationMatrix:
 
         Parameters
         ----------
-        X = array-like
+        X : array-like
             Input data used on training phase.
-        xlag = int
+        xlag : int
             The maximum lag of input regressors.
 
         Returns
         -------
-        x_lag = ndarray of int
-              The range of lags according to user definition.
+        x_lag : ndarray of int
+            The range of lags according to user definition.
 
         """
         n_inputs = X.shape[1]
@@ -265,13 +263,13 @@ class InformationMatrix:
 
         Parameters
         ----------
-        ylag = int, list
+        ylag : int, list
             The maximum lag of input regressors.
 
         Returns
         -------
-        y_lag = ndarray of int
-              The range of lags according to user definition.
+        y_lag : ndarray of int
+            The range of lags according to user definition.
 
         """
         if isinstance(ylag, int):
@@ -284,18 +282,18 @@ class InformationMatrix:
 
         Parameters
         ----------
-        X = array-like
+        X : array-like
             Input data used on training phase.
-        xlag = int
+        xlag : int
             The maximum lag of input regressors.
-        n_inputs = int
+        n_inputs : int
             Number of input variables.
 
         Returns
         -------
-        x_lagged = ndarray of floats
-              A lagged input matrix formed by the input regressors
-              without combinations.
+        x_lagged : ndarray of floats
+            A lagged input matrix formed by the input regressors
+            without combinations.
 
         """
         if n_inputs == 1:
@@ -321,16 +319,16 @@ class InformationMatrix:
 
         Parameters
         ----------
-        y = array-like
+        y : array-like
             Output data used on training phase.
-        ylag = int
+        ylag : int
             The maximum lag of output regressors.
 
         Returns
         -------
-        y_lagged = ndarray of floats
-              A lagged input matrix formed by the output regressors
-              without combinations.
+        y_lagged : ndarray of floats
+            A lagged input matrix formed by the output regressors
+            without combinations.
 
         """
         y_lagged = np.column_stack(
@@ -342,21 +340,21 @@ class InformationMatrix:
 
         Parameters
         ----------
-        model = ndarray of int
-                The model code representation.
-        y = array-like
+        model : ndarray of int
+            The model code representation.
+        y : array-like
             Target data used on training phase.
-        X = array-like
+        X : array-like
             Input data used on training phase.
-        ylag = int
+        ylag : int
             The maximum lag of output regressors.
-        xlag =int
+        xlag : int
             The maximum lag of input regressors.
 
         Returns
         -------
-        lagged_data = ndarray of floats
-              The lagged matrix built in respect with each lag and column.
+        lagged_data : ndarray of floats
+            The lagged matrix built in respect with each lag and column.
 
         Examples
         --------
@@ -385,23 +383,23 @@ class InformationMatrix:
 
         Parameters
         ----------
-        model = ndarray of int
-                The model code representation.
-        y = array-like
+        model : ndarray of int
+            The model code representation.
+        y : array-like
             Target data used on training phase.
-        X = array-like
+        X : array-like
             Input data used on training phase.
-        ylag = int
+        ylag : int
             The maximum lag of output regressors.
-        xlag =int
+        xlag : int
             The maximum lag of input regressors.
-        non_degree = int
+        non_degree : int
             The desired maximum nonlinearity degree.
 
         Returns
         -------
         lagged_data = ndarray of floats
-              The lagged matrix built in respect with each lag and column.
+            The lagged matrix built in respect with each lag and column.
 
         """
         max_lag = np.max(np.maximum(ylag, xlag))
