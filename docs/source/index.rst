@@ -60,7 +60,7 @@ contributors.
 Communication
 ~~~~~~~~~~~~~
 
-- IRC channel: ``@sysidentpy`` at ``web.telegram.org`` (https://t.me/joinchat/FEhuRxZGN_VUNu8lSGI2XQ)
+- Discord server: https://discord.gg/8eGE3PQ
 - Website(soon): http://sysidentpy.org
 
 Citation
@@ -80,6 +80,7 @@ Contents
     :maxdepth: 2
 
     installation
+    introduction_to_narmax
     user_guide
     dev_guide
     notebooks
