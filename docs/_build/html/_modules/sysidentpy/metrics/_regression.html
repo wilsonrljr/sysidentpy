@@ -1,0 +1,684 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sysidentpy.metrics._regression &mdash; SysIdentPy</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/jquery.fancybox.min.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../../_static/glpi.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="SysIdentPy" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> sysidentpy
+          
+
+          
+          </a>
+
+          
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction_to_narmax.html">A brief introduction to NARMAX models.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev_guide.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Jupyter notebooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Codes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code.html#module-sysidentpy.base">sysidentpy base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code.html#sysidentpy-main">sysidentpy main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code.html#module-sysidentpy.residues.residues_correlation">sysidentpy residues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code.html#module-sysidentpy.metrics._regression">sysidentpy metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code.html#module-sysidentpy.parameter_estimation.estimators">sysidentpy estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code.html#module-sysidentpy.utils._check_arrays">sysidentpy utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code.html#module-sysidentpy.utils.generate_data">sysidentpy generate data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">sysidentpy</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>sysidentpy.metrics._regression</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for sysidentpy.metrics._regression</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Common metrics to assess performance on NARX models.&quot;&quot;&quot;</span>
+
+<span class="c1"># Authors:</span>
+<span class="c1">#           Wilson Rocha Lacerda Junior &lt;wilsonrljr@outlook.com&gt;</span>
+<span class="c1">#           Luan Pascoal da Costa Andrade &lt;luan_pascoal13@hotmail.com&gt;</span>
+<span class="c1">#           Samuel Carlos Pessoa Oliveira &lt;samuelcpoliveira@gmail.com&gt;</span>
+<span class="c1">#           Samir Angelo Milani Martins &lt;martins@ufsj.edu.br&gt;</span>
+<span class="c1"># License: BSD 3 clause</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<span class="n">__ALL__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;forecast_error&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mean_forecast_error&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mean_squared_error&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;root_mean_squared_error&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;normalized_root_mean_squared_error&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;root_relative_squared_error&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mean_absolute_error&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mean_squared_log_error&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;median_absolute_error&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;explained_variance_score&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;r2_score&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;symmetric_mean_absolute_percentage_error&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="forecast_error"><a class="viewcode-back" href="../../../code.html#sysidentpy.metrics._regression.forecast_error">[docs]</a><span class="k">def</span> <span class="nf">forecast_error</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_predicted</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the forecast error in a regression model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : array-like of shape = number_of_outputs</span>
+<span class="sd">        Represent the target values.</span>
+<span class="sd">    y_predicted : array-like of shape = number_of_outputs</span>
+<span class="sd">        Target values predicted by the model.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    loss : ndarray of floats</span>
+<span class="sd">        The difference between the true target values and the predicted</span>
+<span class="sd">        or forecast value in regression or any other phenomenon.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    [1] `Wikipedia entry on the Forecast error</span>
+<span class="sd">        &lt;https://en.wikipedia.org/wiki/Forecast_error&gt;`_</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; y = [3, -0.5, 2, 7]</span>
+<span class="sd">    &gt;&gt;&gt; y_predicted = [2.5, 0.0, 2, 8]</span>
+<span class="sd">    &gt;&gt;&gt; forecast_error(y, y_predicted)</span>
+<span class="sd">    [0.5, -0.5, 0, -1]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">y</span> <span class="o">-</span> <span class="n">y_predicted</span></div>
+
+
+<div class="viewcode-block" id="mean_forecast_error"><a class="viewcode-back" href="../../../code.html#sysidentpy.metrics._regression.mean_forecast_error">[docs]</a><span class="k">def</span> <span class="nf">mean_forecast_error</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_predicted</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the mean of forecast error of a regression model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : array-like of shape = number_of_outputs</span>
+<span class="sd">        Represent the target values.</span>
+<span class="sd">    y_predicted : array-like of shape = number_of_outputs</span>
+<span class="sd">        Target values predicted by the model.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    loss : float</span>
+<span class="sd">        The mean  value of the difference between the true target</span>
+<span class="sd">        values and the predicted or forecast value in regression</span>
+<span class="sd">        or any other phenomenon.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    [1] `Wikipedia entry on the Forecast error</span>
+<span class="sd">        &lt;https://en.wikipedia.org/wiki/Forecast_error&gt;`_</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; y = [3, -0.5, 2, 7]</span>
+<span class="sd">    &gt;&gt;&gt; y_predicted = [2.5, 0.0, 2, 8]</span>
+<span class="sd">    &gt;&gt;&gt; mean_forecast_error(y, y_predicted)</span>
+<span class="sd">    -0.25</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_predicted</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mean_squared_error"><a class="viewcode-back" href="../../../code.html#sysidentpy.metrics._regression.mean_squared_error">[docs]</a><span class="k">def</span> <span class="nf">mean_squared_error</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_predicted</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the Mean Squared Error.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : array-like of shape = number_of_outputs</span>
+<span class="sd">        Represent the target values.</span>
+<span class="sd">    y_predicted : array-like of shape = number_of_outputs</span>
+<span class="sd">        Target values predicted by the model.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    loss : float</span>
+<span class="sd">        MSE output is non-negative values. Becoming 0.0 means your</span>
+<span class="sd">        model outputs are exactly matched by true target values.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    [1] `Wikipedia entry on the Mean Squared Error</span>
+<span class="sd">        &lt;https://en.wikipedia.org/wiki/Mean_squared_error&gt;`_</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; y = [3, -0.5, 2, 7]</span>
+<span class="sd">    &gt;&gt;&gt; y_predicted = [2.5, 0.0, 2, 8]</span>
+<span class="sd">    &gt;&gt;&gt; mean_squared_error(y, y_predicted)</span>
+<span class="sd">    0.375</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">output_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_predicted</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">output_error</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="root_mean_squared_error"><a class="viewcode-back" href="../../../code.html#sysidentpy.metrics._regression.root_mean_squared_error">[docs]</a><span class="k">def</span> <span class="nf">root_mean_squared_error</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_predicted</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the Root Mean Squared Error.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : array-like of shape = number_of_outputs</span>
+<span class="sd">        Represent the target values.</span>
+<span class="sd">    y_predicted : array-like of shape = number_of_outputs</span>
+<span class="sd">        Target values predicted by the model.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    loss : float</span>
+<span class="sd">        RMSE output is non-negative values. Becoming 0.0 means your</span>
+<span class="sd">        model outputs are exactly matched by true target values.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    [1] `Wikipedia entry on the Root Mean Squared Error</span>
+<span class="sd">        &lt;https://en.wikipedia.org/wiki/Root-mean-square_deviation&gt;`_</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; y = [3, -0.5, 2, 7]</span>
+<span class="sd">    &gt;&gt;&gt; y_predicted = [2.5, 0.0, 2, 8]</span>
+<span class="sd">    &gt;&gt;&gt; root_mean_squared_error(y, y_predicted)</span>
+<span class="sd">    0.612</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_predicted</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="normalized_root_mean_squared_error"><a class="viewcode-back" href="../../../code.html#sysidentpy.metrics._regression.normalized_root_mean_squared_error">[docs]</a><span class="k">def</span> <span class="nf">normalized_root_mean_squared_error</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_predicted</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the normalized Root Mean Squared Error.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : array-like of shape = number_of_outputs</span>
+<span class="sd">        Represent the target values.</span>
+<span class="sd">    y_predicted : array-like of shape = number_of_outputs</span>
+<span class="sd">        Target values predicted by the model.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    loss : float</span>
+<span class="sd">        nRMSE output is non-negative values. Becoming 0.0 means your</span>
+<span class="sd">        model outputs are exactly matched by true target values.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    [1] `Wikipedia entry on the normalized Root Mean Squared Error</span>
+<span class="sd">        &lt;https://en.wikipedia.org/wiki/Root-mean-square_deviation&gt;`_</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; y = [3, -0.5, 2, 7]</span>
+<span class="sd">    &gt;&gt;&gt; y_predicted = [2.5, 0.0, 2, 8]</span>
+<span class="sd">    &gt;&gt;&gt; normalized_root_mean_squared_error(y, y_predicted)</span>
+<span class="sd">    0.081</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">root_mean_squared_error</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_predicted</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="root_relative_squared_error"><a class="viewcode-back" href="../../../code.html#sysidentpy.metrics._regression.root_relative_squared_error">[docs]</a><span class="k">def</span> <span class="nf">root_relative_squared_error</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_predicted</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the Root Relative Mean Squared Error.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : array-like of shape = number_of_outputs</span>
+<span class="sd">        Represent the target values.</span>
+<span class="sd">    y_predicted : array-like of shape = number_of_outputs</span>
+<span class="sd">        Target values predicted by the model.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    loss : float</span>
+<span class="sd">        RRSE output is non-negative values. Becoming 0.0 means your</span>
+<span class="sd">        model outputs are exactly matched by true target values.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; y = [3, -0.5, 2, 7]</span>
+<span class="sd">    &gt;&gt;&gt; y_predicted = [2.5, 0.0, 2, 8]</span>
+<span class="sd">    &gt;&gt;&gt; root_relative_mean_squared_error(y, y_predicted)</span>
+<span class="sd">    0.206</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">numerator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">((</span><span class="n">y_predicted</span> <span class="o">-</span> <span class="n">y</span><span class="p">)))</span>
+    <span class="n">denominator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">((</span><span class="n">y_predicted</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">numerator</span><span class="p">,</span> <span class="n">denominator</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="mean_absolute_error"><a class="viewcode-back" href="../../../code.html#sysidentpy.metrics._regression.mean_absolute_error">[docs]</a><span class="k">def</span> <span class="nf">mean_absolute_error</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_predicted</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the Mean absolute error.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : array-like of shape = number_of_outputs</span>
+<span class="sd">        Represent the target values.</span>
+<span class="sd">    y_predicted : array-like of shape = number_of_outputs</span>
+<span class="sd">        Target values predicted by the model.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    loss : float or ndarray of floats</span>
+<span class="sd">        MAE output is non-negative values. Becoming 0.0 means your</span>
+<span class="sd">        model outputs are exactly matched by true target values.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    [1] `Wikipedia entry on the Mean absolute error</span>
+<span class="sd">        &lt;https://en.wikipedia.org/wiki/Mean_absolute_error&gt;`_</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; y = [3, -0.5, 2, 7]</span>
+<span class="sd">    &gt;&gt;&gt; y_predicted = [2.5, 0.0, 2, 8]</span>
+<span class="sd">    &gt;&gt;&gt; mean_absolute_error(y, y_predicted)</span>
+<span class="sd">    0.5</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">output_errors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_predicted</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">output_errors</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mean_squared_log_error"><a class="viewcode-back" href="../../../code.html#sysidentpy.metrics._regression.mean_squared_log_error">[docs]</a><span class="k">def</span> <span class="nf">mean_squared_log_error</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_predicted</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the Mean Squared Logarithmic Error.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : array-like of shape = number_of_outputs</span>
+<span class="sd">        Represent the target values.</span>
+<span class="sd">    y_predicted : array-like of shape = number_of_outputs</span>
+<span class="sd">        Target values predicted by the model.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    loss : float</span>
+<span class="sd">        MSLE output is non-negative values. Becoming 0.0 means your</span>
+<span class="sd">        model outputs are exactly matched by true target values.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; y = [3, 5, 2.5, 7]</span>
+<span class="sd">    &gt;&gt;&gt; y_predicted = [2.5, 5, 4, 8]</span>
+<span class="sd">    &gt;&gt;&gt; mean_squared_log_error(y, y_predicted)</span>
+<span class="sd">    0.039</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">y_predicted</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="median_absolute_error"><a class="viewcode-back" href="../../../code.html#sysidentpy.metrics._regression.median_absolute_error">[docs]</a><span class="k">def</span> <span class="nf">median_absolute_error</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_predicted</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the Median Absolute Error.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : array-like of shape = number_of_outputs</span>
+<span class="sd">        Represent the target values.</span>
+<span class="sd">    y_predicted : array-like of shape = number_of_outputs</span>
+<span class="sd">        Target values predicted by the model.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    loss : float</span>
+<span class="sd">        MdAE output is non-negative values. Becoming 0.0 means your</span>
+<span class="sd">        model outputs are exactly matched by true target values.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    [1] `Wikipedia entry on the Median absolute deviation</span>
+<span class="sd">        &lt;https://en.wikipedia.org/wiki/Median_absolute_deviation&gt;`_</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; y = [3, -0.5, 2, 7]</span>
+<span class="sd">    &gt;&gt;&gt; y_predicted = [2.5, 0.0, 2, 8]</span>
+<span class="sd">    &gt;&gt;&gt; median_absolute_error(y, y_predicted)</span>
+<span class="sd">    0.5</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_predicted</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="explained_variance_score"><a class="viewcode-back" href="../../../code.html#sysidentpy.metrics._regression.explained_variance_score">[docs]</a><span class="k">def</span> <span class="nf">explained_variance_score</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_predicted</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the Explained Variance Score.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : array-like of shape = number_of_outputs</span>
+<span class="sd">        Represent the target values.</span>
+<span class="sd">    y_predicted : array-like of shape = number_of_outputs</span>
+<span class="sd">        Target values predicted by the model.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    loss : float</span>
+<span class="sd">        EVS output is non-negative values. Becoming 1.0 means your</span>
+<span class="sd">        model outputs are exactly matched by true target values.</span>
+<span class="sd">        Lower values means worse results.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    [1] `Wikipedia entry on the Explained Variance</span>
+<span class="sd">        &lt;https://en.wikipedia.org/wiki/Explained_variation&gt;`_</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; y = [3, -0.5, 2, 7]</span>
+<span class="sd">    &gt;&gt;&gt; y_predicted = [2.5, 0.0, 2, 8]</span>
+<span class="sd">    &gt;&gt;&gt; explained_variance_score(y, y_predicted)</span>
+<span class="sd">    0.957</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">y_diff_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_predicted</span><span class="p">)</span>
+    <span class="n">numerator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_predicted</span> <span class="o">-</span> <span class="n">y_diff_avg</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">y_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">denominator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">((</span><span class="n">y</span><span class="o">-</span><span class="n">y_avg</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">nonzero_numerator</span> <span class="o">=</span> <span class="n">numerator</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">nonzero_denominator</span> <span class="o">=</span> <span class="n">denominator</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">valid_score</span> <span class="o">=</span> <span class="n">nonzero_numerator</span> <span class="o">&amp;</span> <span class="n">nonzero_denominator</span>
+    <span class="n">output_scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">output_scores</span><span class="p">[</span><span class="n">valid_score</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">numerator</span><span class="p">[</span><span class="n">valid_score</span><span class="p">]</span> <span class="o">/</span>
+                                       <span class="n">denominator</span><span class="p">[</span><span class="n">valid_score</span><span class="p">]))</span>
+    <span class="n">output_scores</span><span class="p">[</span><span class="n">nonzero_numerator</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">nonzero_denominator</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">output_scores</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="r2_score"><a class="viewcode-back" href="../../../code.html#sysidentpy.metrics._regression.r2_score">[docs]</a><span class="k">def</span> <span class="nf">r2_score</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_predicted</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the R2 score.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : array-like of shape = number_of_outputs</span>
+<span class="sd">        Represent the target values.</span>
+<span class="sd">    y_predicted : array-like of shape = number_of_outputs</span>
+<span class="sd">        Target values predicted by the model.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    loss : float</span>
+<span class="sd">        R2 output can be non-negative values or negative value.</span>
+<span class="sd">        Becoming 1.0 means your model outputs are exactly</span>
+<span class="sd">        matched by true target values. Lower values means worse results.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This is not a symmetric function.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    [1] `Wikipedia entry on the Coefficient of determination</span>
+<span class="sd">        &lt;https://en.wikipedia.org/wiki/Coefficient_of_determination&gt;`_</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; y = [3, -0.5, 2, 7]</span>
+<span class="sd">    &gt;&gt;&gt; y_predicted = [2.5, 0.0, 2, 8]</span>
+<span class="sd">    &gt;&gt;&gt; explained_variance_score(y, y_predicted)</span>
+<span class="sd">    0.948</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">numerator</span> <span class="o">=</span> <span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_predicted</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">denominator</span> <span class="o">=</span> <span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span> <span class="o">**</span>
+                   <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">nonzero_denominator</span> <span class="o">=</span> <span class="n">denominator</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">nonzero_numerator</span> <span class="o">=</span> <span class="n">numerator</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">valid_score</span> <span class="o">=</span> <span class="n">nonzero_denominator</span> <span class="o">&amp;</span> <span class="n">nonzero_numerator</span>
+    <span class="n">output_scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="n">output_scores</span><span class="p">[</span><span class="n">valid_score</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">numerator</span><span class="p">[</span><span class="n">valid_score</span><span class="p">]</span> <span class="o">/</span>
+                                       <span class="n">denominator</span><span class="p">[</span><span class="n">valid_score</span><span class="p">]))</span>
+    <span class="c1"># arbitrary set to zero to avoid -inf scores, having a constant</span>
+    <span class="c1"># y_true is not interesting for scoring a regression anyway</span>
+    <span class="n">output_scores</span><span class="p">[</span><span class="n">nonzero_numerator</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">nonzero_denominator</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">output_scores</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="symmetric_mean_absolute_percentage_error"><a class="viewcode-back" href="../../../code.html#sysidentpy.metrics._regression.symmetric_mean_absolute_percentage_error">[docs]</a><span class="k">def</span> <span class="nf">symmetric_mean_absolute_percentage_error</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_predicted</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the SMAPE score.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : array-like of shape = number_of_outputs</span>
+<span class="sd">        Represent the target values.</span>
+<span class="sd">    y_predicted : array-like of shape = number_of_outputs</span>
+<span class="sd">        Target values predicted by the model.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    loss : float</span>
+<span class="sd">        SMAPE output is a non-negative value.</span>
+<span class="sd">        The results are percentages values.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    One supposed problem with SMAPE is that it is not symmetric since</span>
+<span class="sd">    over-forecasts and under-forecasts are not treated equally.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    [1] `Wikipedia entry on the Symmetric mean absolute percentage error</span>
+<span class="sd">        &lt;https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error&gt;`_</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; y = [3, -0.5, 2, 7]</span>
+<span class="sd">    &gt;&gt;&gt; y_predicted = [2.5, 0.0, 2, 8]</span>
+<span class="sd">    &gt;&gt;&gt; symmetric_mean_absolute_percentage_error(y, y_predicted)</span>
+<span class="sd">    57.87</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mi">100</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y_predicted</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span>
+                               <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y_predicted</span><span class="p">)))</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../../_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="../../../None"></script>
+      <script type="text/javascript" src="../../../_static/jquery.fancybox.min.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+  
+  <script type="text/javascript">
+    $(function(){
+      $('.image-reference').fancybox();
+    })
+  </script>
+
+</body>
+</html>
