@@ -11,10 +11,6 @@ from setuptools import setup, find_packages
 if sys.version_info[:2] < (3, 6):
     raise RuntimeError("Python version >= 3.6 required.")
 
-with open('requirements.txt') as f:
-    INSTALL_REQUIRES = [l.strip() for l in f.readlines() if l]
-
-
 try:
     import numpy
 except ImportError:
