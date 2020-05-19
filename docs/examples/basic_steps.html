@@ -1,0 +1,821 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Basic Steps &mdash; SysIdentPy</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../_static/jquery.fancybox.min.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../_static/glpi.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="SysIdentPy" href="../index.html"/>
+        <link rel="up" title="Jupyter notebooks" href="../notebooks.html"/>
+        <link rel="next" title="Multiple Inputs usage" href="multiple_inputs_example.html"/>
+        <link rel="prev" title="Jupyter notebooks" href="../notebooks.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> sysidentpy
+          
+
+          
+          </a>
+
+          
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction_to_narmax.html">A brief introduction to NARMAX models.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_guide.html">Contributing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../notebooks.html">Jupyter notebooks</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Basic Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple_inputs_example.html">Multiple Inputs usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="information_criteria_examples.html">Information Criteria - Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extended_least_squares.html">Using Extended Least Squares Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="defining_lags.html">Setting specific lags</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html">Codes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.base">sysidentpy base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html#sysidentpy-main">sysidentpy main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.residues.residues_correlation">sysidentpy residues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.metrics._regression">sysidentpy metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.parameter_estimation.estimators">sysidentpy estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.utils._check_arrays">sysidentpy utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.utils.generate_data">sysidentpy generate data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">sysidentpy</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../notebooks.html">Jupyter notebooks</a> &raquo;</li>
+        
+      <li>Basic Steps</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/examples/basic_steps.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
+      
+        <a href="multiple_inputs_example.html" class="btn btn-neutral float-right" title="Multiple Inputs usage" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../notebooks.html" class="btn btn-neutral" title="Jupyter notebooks" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+  </div>
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Basic-Steps">
+<h1>Basic Steps<a class="headerlink" href="#Basic-Steps" title="Permalink to this headline">¶</a></h1>
+<p>Presenting main functionality</p>
+<p>Here we import the NARMAX model, the metric for model evaluation and the methods to generate sample data for tests. Also, we import pandas for specific usage.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.polynomial_basis</span> <span class="kn">import</span> <span class="n">PolynomialNarmax</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.metrics</span> <span class="kn">import</span> <span class="n">root_relative_squared_error</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.utils.generate_data</span> <span class="kn">import</span> <span class="n">get_miso_data</span><span class="p">,</span> <span class="n">get_siso_data</span>
+
+</pre></div>
+</div>
+</div>
+<div class="line-block">
+<div class="line">Generating 1 input 1 output sample data</div>
+<div class="line">The data is generated by simulating the following model: <span class="math notranslate nohighlight">\(y_k = 0.2y_{k-1} + 0.1y_{k-1}x_{k-1} + 0.9x_{k-1} + e_{k}\)</span></div>
+</div>
+<p>If <em>colored_noise</em> is set to True:</p>
+<p><span class="math notranslate nohighlight">\(e_{k} = 0.8\nu_{k-1} + \nu_{k}\)</span></p>
+<p>where <span class="math notranslate nohighlight">\(x\)</span> is a uniformly distributed random variable and <span class="math notranslate nohighlight">\(\nu\)</span> is a gaussian distributed variable with <span class="math notranslate nohighlight">\(\mu=0\)</span> and <span class="math notranslate nohighlight">\(\sigma=0.1\)</span></p>
+<p>In the next example we will generate a data with 3000 samples with white noise and selecting 90% of the data to train the model.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">x_train</span><span class="p">,</span> <span class="n">x_valid</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="n">get_siso_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                                                   <span class="n">colored_noise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                   <span class="n">sigma</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+                                                   <span class="n">train_percentage</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>To obtain a NARMAX model we have to choose some values, <em>e.g</em>, the nonlinearity degree (<em>non_degree</em>), the maximum lag for the inputs and output (<em>xlag</em> and <em>ylag</em>).</p>
+<p>In addition, you can select the information criteria to be used with the Error Reduction Ratio to select the model order and the method to estimate the model paramaters:</p>
+<ul class="simple">
+<li><p>Information Criteria: aic, bic, lilc, fpe</p></li>
+<li><p>Parameter Estimation: least_squares, total_least_squares, recursive_least_squares, least_mean_squres and many other (see the docs)</p></li>
+</ul>
+<p>The <em>n_terms</em> values is optional. It refer to the number of terms to inclued in the final model. You can set this value based on the information criteria (see below) or based on priori information about the model struture. The default value is <em>n_terms=None</em>, so the algorithm will choose the minimum value reached by the information criteria.</p>
+<p>To use information criteria you have to set <em>order_selection=True</em>. You can also select <em>n_info_values</em> (default = 15).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">model</span> <span class="o">=</span> <span class="n">PolynomialNarmax</span><span class="p">(</span><span class="n">non_degree</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                         <span class="n">order_selection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                         <span class="n">n_info_values</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                         <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="n">ylag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                         <span class="n">info_criteria</span><span class="o">=</span><span class="s1">&#39;aic&#39;</span><span class="p">,</span>
+                         <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;least_squares&#39;</span><span class="p">,</span>
+                         <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The <em>fit</em> method executes the Error Reduction Ratio algorithm using Househoulder reflection to select the model structure.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;sysidentpy.polynomial_basis.narmax.PolynomialNarmax at 0x7f332d0cc490&gt;
+</pre></div></div>
+</div>
+<p>The <em>predict</em> method is use to generate the predictions. For now we only support <em>free run simulation</em> (also known as <em>infinity steps ahead</em>). Soon will let the user define a <em>one-step ahead</em> or <em>k-step ahead</em> prediction.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">yhat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>In this example we use the <em>root_relative_squared_error</em> metric because it is often used in System Idenfication. More metrics and information about it can be found on documentation.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">rrse</span> <span class="o">=</span> <span class="n">root_relative_squared_error</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rrse</span><span class="p">)</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.0018758031321337446
+</pre></div></div>
+</div>
+<p><em>model_object.results</em> return the selected model regressors, the estimated parameters and the ERR values. As shown below, the algorithm detect the exact model that was used for simulate the data.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="n">err_precision</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                                     <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;dec&#39;</span><span class="p">),</span>
+                       <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Regressors&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;ERR&#39;</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Regressors Parameters         ERR
+0        u1(k-2)     0.9001  0.95750813
+1         y(k-1)     0.2000  0.03916822
+2  u1(k-1)y(k-1)     0.1003  0.00332022
+</pre></div></div>
+</div>
+<p>In addition, you can access the <em>residuals</em> and <em>plot_result</em> methods to take a look at the prediction and two residual analysis. The <em>extras</em> and <em>lam</em> values below contain another residues analysis so you can plot it mannualy. This method will be improved soon.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ee</span><span class="p">,</span> <span class="n">ex</span><span class="p">,</span> <span class="n">extras</span><span class="p">,</span> <span class="n">lam</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">residuals</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">plot_result</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">ee</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_basic_steps_17_0.svg" src="../_images/examples_basic_steps_17_0.svg" /></div>
+</div>
+<p>In the example above we let the number of terms to compose the final model to be defined as the minimum value of the information criteria. Once you ran the algorithm and choose the best number of parameters, you can turn <em>order_selection</em> to <em>False</em> and set the <em>n_terms</em> value (3 in this example). Here we have a small dataset, but in bigger data this can be critical because running information criteria algorithm is more computational expensive. Since we already know the best number of regressor,
+we set <em>n_terms</em> and we get the same result.</p>
+<p>However, this is not only critical because computational eficiency. In many situation, the minimum value of the information criteria can lead to overfiting. In some cases, the diference between choosing a model with 30 regressors or 10 is minimal, so you can take the model with 10 terms without loosing accuracy.</p>
+<p>In the following we use <em>info_values</em> to plot the information criteria values. As you can see, the minimum value relies where <span class="math notranslate nohighlight">\(xaxis = 5\)</span></p>
+<p>xaxis = np.arange(1, model.n_info_values + 1) plt.plot(xaxis, model.info_values) plt.xlabel(‘n_terms’) plt.ylabel(‘Information Criteria’)</p>
+<p>Important Note:</p>
+<p>Here we are creating random samples with white noise and letting the algorithm choose the number of terms based on the minimum value of information criteria. This is not the best approach in System Identification, but serves as a simple example. The information criteria must be used as an <strong>auxiliary tool</strong> to select <em>n_terms</em>. Plot the information values to help you on that!</p>
+<p>If you run the example above several times you might find some cases where the algorithm choose only the first two regressors, or four (depending on the information criteria method selected). This is because the minimum value of information criteria depends on residual variance (affected by noise) and have some limitations in nonlinear scenarios. However, if you check the ERR values (robust to noise) you will see that the ERR is ordering the regressors in the correct way!</p>
+<p>We have some examples on <em>information_criteria</em> notebook!</p>
+<p>The <em>n_info_values</em> limits the number of regressors to apply the information criteria. We choose <span class="math notranslate nohighlight">\(n_y = n_x = \ell = 2\)</span>, so the candidate regressor is a list of 15 regressors. We can set <em>n_info_values = 15</em> and see the information values for all regressors. This option can save some amount of computational resources when dealing with multiples inputs and large datasets.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">model</span> <span class="o">=</span> <span class="n">PolynomialNarmax</span><span class="p">(</span><span class="n">non_degree</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                         <span class="n">order_selection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                         <span class="n">n_info_values</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+                         <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="n">ylag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                         <span class="n">info_criteria</span><span class="o">=</span><span class="s1">&#39;aic&#39;</span><span class="p">,</span>
+                         <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;least_squares&#39;</span><span class="p">,</span>
+                         <span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="n">xaxis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">n_info_values</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xaxis</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">info_values</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;n_terms&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Information Criteria&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Text(0, 0.5, &#39;Information Criteria&#39;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_basic_steps_22_1.svg" src="../_images/examples_basic_steps_22_1.svg" /></div>
+</div>
+<p>Now running without executing information criteria methods (setting the <em>n_terms</em>) because we already know the optimal number of regressors</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">model</span> <span class="o">=</span> <span class="n">PolynomialNarmax</span><span class="p">(</span><span class="n">non_degree</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                         <span class="c1"># order_selection=True,</span>
+                         <span class="n">n_terms</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+                         <span class="c1"># n_info_values=15,</span>
+                         <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="n">ylag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                         <span class="n">info_criteria</span><span class="o">=</span><span class="s1">&#39;aic&#39;</span><span class="p">,</span>
+                         <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;least_squares&#39;</span><span class="p">,</span>
+                         <span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">yhat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
+<span class="n">rrse</span> <span class="o">=</span> <span class="n">root_relative_squared_error</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;rrse: &#39;</span><span class="p">,</span> <span class="n">rrse</span><span class="p">)</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="n">err_precision</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                                     <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;dec&#39;</span><span class="p">),</span>
+                       <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Regressors&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;ERR&#39;</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+rrse:  0.0018758031321337446
+
+       Regressors Parameters         ERR
+0        u1(k-2)     0.9001  0.95750813
+1         y(k-1)     0.2000  0.03916822
+2  u1(k-1)y(k-1)     0.1003  0.00332022
+</pre></div></div>
+</div>
+<p>You can acess some extra information like the list of all candidate regressors</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># for now the list is returned as a codification. Here, $0$ is the constant term, $[1001]=y{k-1}, [100n]=y_{k-n}, [200n] = x1_{k-n}, [300n]=x2_{k-n}$ and so on</span>
+<span class="n">model</span><span class="o">.</span><span class="n">regressor_code</span>  <span class="c1"># list of all possible regressors given non_degree, n_y and n_x values</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([[   0,    0],
+       [1001,    0],
+       [1002,    0],
+       [2001,    0],
+       [2002,    0],
+       [1001, 1001],
+       [1002, 1001],
+       [2001, 1001],
+       [2002, 1001],
+       [1002, 1002],
+       [2001, 1002],
+       [2002, 1002],
+       [2001, 2001],
+       [2002, 2001],
+       [2002, 2002]])
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">err</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># err values for the selected terms</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span>  <span class="c1"># estimated parameters for the final model structure</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[0.95750813 0.03916822 0.00332022 0.         0.         0.
+ 0.         0.         0.         0.         0.         0.
+ 0.         0.         0.        ]
+
+
+[[0.90008672]
+ [0.19998879]
+ [0.10026928]]
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="multiple_inputs_example.html" class="btn btn-neutral float-right" title="Multiple Inputs usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../notebooks.html" class="btn btn-neutral" title="Jupyter notebooks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="../None"></script>
+      <script type="text/javascript" src="../_static/jquery.fancybox.min.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+  
+  <script type="text/javascript">
+    $(function(){
+      $('.image-reference').fancybox();
+    })
+  </script>
+
+</body>
+</html>
