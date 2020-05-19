@@ -84,6 +84,7 @@ Communication
 ~~~~~~~~~~~~~
 
 - Discord server: https://discord.gg/8eGE3PQ
+- Website: https://wilsonrljr.github.io/sysidentpy/
 - Website(soon): http://sysidentpy.org
 
 Citation
