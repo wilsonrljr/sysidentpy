@@ -10,7 +10,10 @@ The project was started in by Wilson R. L. Junior, Luan
 Pascoal C. Andrade and Samir A. M. Martins as a project for System Identification
 discipline. Samuel joined early in 2019 and since then have contributed.
 
-Website (coming soon): http://sysidentpy.org
+Documentation
+=============
+
+- Website: https://wilsonrljr.github.io/sysidentpy/
 
 Examples
 --------
@@ -84,7 +87,6 @@ Communication
 ~~~~~~~~~~~~~
 
 - Discord server: https://discord.gg/8eGE3PQ
-- Website: https://wilsonrljr.github.io/sysidentpy/
 - Website(soon): http://sysidentpy.org
 
 Citation
