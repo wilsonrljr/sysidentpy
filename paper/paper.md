@@ -70,6 +70,9 @@ SysIdentpy is designed designed to be easily expanded and user friendly. Moreove
 A typical example of model identification and validation is as follows:
 
 ```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 from sysidentpy.polynomial_basis import PolynomialNarmax
 from sysidentpy.metrics import root_relative_squared_error
 from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
