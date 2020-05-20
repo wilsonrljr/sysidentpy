@@ -9,11 +9,11 @@ tags:
 authors:
   - name: Wilson Rocha Lacerda Junior
     orcid: 0000-0002-3263-1152
-    affiliation: "1, 2" # (Multiple affiliations must be quoted)
+    affiliation: "1" # (Multiple affiliations must be quoted)
   - name: Luan Pascoal da Costa Andrade
-    affiliation: 2
+    affiliation: 1
   - name: Samuel Carlos Pessoa Oliveira
-    affiliation: 2
+    affiliation: 1
   - name: Samir Angelo Milani Martins
     affiliation: "1, 2"
 affiliations:
@@ -26,15 +26,13 @@ bibliography: paper.bib
 
 # Optional fields if submitting to a AAS journal too, see this blog post:
 # https://blog.joss.theoj.org/2018/12/a-new-collaboration-with-aas-publishing
-aas-doi: 10.3847/xxxxx <- update this with the DOI from AAS once you know it.
-aas-journal: Astrophysical Journal <- The name of the AAS journal.
 ---
 
 # Summary
 
-The field of System Identification (SI) aims to build mathematical models for static and dynamic behavior from experimental data[@Lju1987]. In particular, nonlinear system identification has become a central issue in SI community and from the $1950$s onwards many methods has been proposed. In this respect, NARMAX (Nonlinear AutoRegressive Moving Average with eXogenous input) models are among the most well-documented and used model representation of dynamical systems[@Bil2013].
+The field of System Identification (SI) aims to build mathematical models for static and dynamic behavior from experimental data[@Lju1987]. In particular, nonlinear system identification has become a central issue in SI community and from the $1950$s onwards many methods have been proposed. In this respect, NARMAX (Nonlinear AutoRegressive Moving Average with eXogenous input) models are among the most well-documented and used model representation of dynamical systems[@Bil2013].
 
-The NARMAX model was proposed by [@BL1981; @LB1985; @CB1989] and can be described as
+The polynomial NARMAX model was proposed by [@BL1981; @LB1985; @CB1989] and can be described as
 
 \begin{equation}
 y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k,
@@ -67,7 +65,40 @@ SysIdentPy is an open source python package for system identification using poly
 
 SysIdentpy is designed designed to be easily expanded and user friendly. Moreover, the package aims to provid useful tools for researchers and students not only in SI field, but also in correlated areas such as Machine Learning, Statistical Learning and Data Science.
 
-The table below and Figure 1 serves as an example of one of the outputs of the package.
+# Example
+
+A typical example of model identification and validation is as follows:
+
+```python
+from sysidentpy.polynomial_basis import PolynomialNarmax
+from sysidentpy.metrics import root_relative_squared_error
+from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
+x_train, x_valid, y_train, y_valid = get_siso_data(n=1000,
+                                                   colored_noise=False,
+                                                   sigma=0.001,
+                                                   train_percentage=90)
+model = PolynomialNarmax(non_degree=2,
+                         order_selection=True,
+                         n_info_values=10,
+                         extended_least_squares=False,
+                         ylag=2, xlag=2,
+                         info_criteria='aic',
+                         estimator='least_squares',
+                         )
+model.fit(x_train, y_train)
+yhat = model.predict(x_valid, y_valid)
+rrse = root_relative_squared_error(y_valid, yhat)
+print(rrse)
+results = pd.DataFrame(model.results(err_precision=8,
+                                     dtype='dec'),
+                       columns=['Regressors', 'Parameters', 'ERR'])
+
+print(results)
+ee, ex, extras, lam = model.residuals(x_valid, y_valid, yhat)
+model.plot_result(y_valid, yhat, ee, ex)
+```
+
+The table below and Figure 1 are the ouput of the aforementioned example.
 
 | Regressors     | Parameters | ERR        |
 |----------------|------------|------------|
@@ -78,7 +109,7 @@ The table below and Figure 1 serves as an example of one of the outputs of the p
 
 
 ![\label{fig:example}](output_16_0.png)
-_Figure 1. Results from modeling a simulated system. Free run simulation, autocorrelation of the residues and cross correlation between residues and the input._
+_Figure 1. Results from modeling a simulated system available with the SysIdentPy package. Free run simulation (validation data vs. model prediction), autocorrelation of the residues and cross correlation between residues and the input._
 
 # Future work
 
