@@ -30,3 +30,10 @@ Jupyter notebooks
    :caption: Setting specific lags
 
    /examples/defining_lags.ipynb
+   
+.. toctree::
+   :maxdepth: 1
+   :caption: Parameter estimation methods
+
+   /examples/parameter_estimation.ipynb
+   
