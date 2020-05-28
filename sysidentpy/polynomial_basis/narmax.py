@@ -434,7 +434,7 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
             build_information_matrix(X, y, self.xlag,
                                      self.ylag, self.non_degree)
 
-        count_elements = len(y) - self.max_lag
+        n_samples = len(y) - self.max_lag
 
         parameter_estimation = Estimators(
             aux_lag=self.max_lag,
@@ -447,35 +447,22 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
             weight=self._weight)
 
         for i in range(0, self.n_info_values):
-            model_elements = i + 1
+            n_theta = i + 1
             regressor_matrix = self.error_reduction_ratio(X_base, y,
-                                                          model_elements)[3]
+                                                          n_theta)[3]
 
             tmp_theta = getattr(parameter_estimation,
                                 self.estimator)(regressor_matrix, y)
 
             tmp_yhat = regressor_matrix @ tmp_theta
             tmp_residual = (y[self.max_lag:] - tmp_yhat)
-            residual_variance = np.var(tmp_residual, ddof=1)
+            e_var = np.var(tmp_residual, ddof=1)
 
-            if self.info_criteria == 'bic':
-                model_factor = (model_elements
-                                * np.log(count_elements))
-            elif self.info_criteria == 'fpe':
-                model_factor = count_elements * \
-                    np.log((count_elements
-                            + model_elements)
-                           / (count_elements
-                              - model_elements))
-            elif self.info_criteria == 'lilc':
-                model_factor = (2 * model_elements
-                                * np.log(np.log(count_elements)))
-            else:  # AIC
-                model_factor = + 2 * model_elements
+            output_vector[i] = self.compute_info_value(n_theta,
+                                                       n_samples,
+                                                       e_var)
 
-            residual_factor = ((count_elements)
-                               * np.log(residual_variance))
-            output_vector[i] = residual_factor + model_factor
+            # output_vector[i] = e_factor + model_factor
 
         return output_vector
 
@@ -566,3 +553,41 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
             output_matrix.append(current_output)
 
         return output_matrix
+
+    def compute_info_value(self, n_theta, n_samples, e_var):
+        """Compute the information criteria value.
+
+        This function returns the information criteria concerning each
+        number of regressor. The informotion criteria can be AIC, BIC,
+        LILC and FPE.
+
+        Parameters
+        ----------
+        n_theta : int
+            Number of parameters of the model.
+        n_samples : int
+            Number of samples given the maximum lag.
+        e_var : float
+            Variance of the residues
+
+        Returns
+        -------
+        info_criteria_value : float
+            The computed value given the information criteria selected by the
+            user.
+
+        """
+        if self.info_criteria == 'bic':
+            model_factor = n_theta * np.log(n_samples)
+        elif self.info_criteria == 'fpe':
+            model_factor = n_samples * np.log((n_samples + n_theta)
+                                              / (n_samples - n_theta))
+        elif self.info_criteria == 'lilc':
+            model_factor = 2 * n_theta * np.log(np.log(n_samples))
+        else:  # AIC
+            model_factor = + 2 * n_theta
+
+        e_factor = n_samples * np.log(e_var)
+        info_criteria_value = e_factor + model_factor
+
+        return info_criteria_value
