@@ -1,5 +1,5 @@
 ---
-title: 'SysIdentPy: A Python package for System Identification'
+title: 'SysIdentPy: A Python package for System Identification using NARMAX models'
 tags:
   - Python
   - System Identification
