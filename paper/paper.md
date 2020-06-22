@@ -44,7 +44,6 @@ Although there are many possible approximations of $\mathcal{F}(\cdot)$ (e.g., N
 
 \begin{align}
              y_k&=& \sum_{i=1}^{p}\Theta_i \times \prod_{j=0}^{n_x}u_{k-j}^{b_i, j}\prod_{l=1}^{n_e}e_{k-l}^{d_i, \ell}\prod_{m=1}^{n_y}y_{k-m}^{a_i, m}
-\label{eq:narxekxt}
 \label{eq5:narx}
 \end{align}
 where $p$ is the number of regressors, $Theta_i$ are the model parameters, $a_i, m$, $b_i, j$ and $d_i, \ell \in \mathbb{N}$ are the exponents of output, input and noise terms, respectively.
@@ -72,12 +71,12 @@ Estimating the parameters of NARMAX models is a simple task if the model structu
 
 SysIdentPy is an open source python package for system identification using polynomial NARMAX models. The package can handle SISO (Single-Input Single-Output) and MISO (Multiple-Inputs Single-Output) NARMAX models identification and its variants such as NARX, NAR, ARMAX, ARX, and AR models. It provides various tools for both Model Structure Selection and Parameter Estimation including classical algorithms, e.g., Forward Regression Orthogonal Least Squares and Extended Least Squares Orthogonal Foward Regression; parameter estimation using ordinary Least Squares, recursive algorithms and adaptative filters; Akaike Information Criterion (AIC), Bayesian Information Criterion (BIC), Khinchin's law of iterated logarithm criterion (LILC), and Final Prediction Error (FPE) methods for model order selection[@HK1999]; regression metrics; residual analysis  and so on. The reader is referred to the package documentation for further details.
 
-SysIdentpy is designed designed to be easily expanded and user friendly. Moreover, the package aims to provide useful tools for researchers and students not only in SI field, but also in correlated areas such as Machine Learning, Statistical Learning and Data Science.
+SysIdentpy is designed to be easily expanded and user friendly. Moreover, the package aims to provide useful tools for researchers and students not only in SI field, but also in correlated areas such as Machine Learning, Statistical Learning and Data Science.
 
 # Example
 
-The follwing is an example of how to use SysIdentPy for build NARMAX model from data. For simplicity, the example uses a simulated data with $1000$ samples generated using the method :code:`get_siso_data`. Assuming that there is no information regarding what equation generated the data, a dictionary of candidate terms must be created by defining the nonlinearity degree of the polynomial function and the maximum lag of the input and output terms. These parameters are, respectively :code:`non_degree, ylag, xlag`. The Akaike Information Criterion is chosen for model order selection and the Least Squares method is used for parameter estimation. Finally, :code:`fit` is used the obtain the model and :code:`predict` to validate the model using a new data.
-The metric to evaluation is the Relative Root Squared Error. The :code:`model.results` and :code:`model.residuals` return the model polynomial model obtained and plot the results for qualitative analysis.
+The follwing is an example of how to use SysIdentPy for build NARMAX model from data. For simplicity, the example uses a simulated data with $1000$ samples generated using the method :code:`get_siso_data`. Assuming that there is no information regarding what system generated the data, a dictionary of candidate terms must be created by defining the nonlinearity degree of the polynomial function and the maximum lag of the input and output terms. These parameters are, respectively :code:`non_degree, ylag, xlag`. The Akaike Information Criterion is chosen for model order selection and the Least Squares method is used for parameter estimation. Finally, :code:`fit` is used the obtain the model and :code:`predict` to validate the model using new data.
+The metric to evaluation is the Relative Root Squared Error. The :code:`model.results` and :code:`model.residuals` return the polynomial model obtained and plot the results for qualitative analysis.
 
 ```python
 import numpy as np
