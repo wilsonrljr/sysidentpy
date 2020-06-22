@@ -43,10 +43,10 @@ where $n_y\in \mathbb{N}^*$, $n_x \in \mathbb{N}$, $n_e \in \mathbb{N}$ , are th
 Although there are many possible approximations of $\mathcal{F}(\cdot)$ (e.g., Neural Networks, Fuzzy, Wavelet, Radial Basis Function), the power-form Polynomial NARMAX model is the most commonly used[@Bil2013; @KST2020]:
 
 \begin{align}
-             y_k&=& \sum_{i=1}^{p}\Theta_i \times \prod_{j=0}^{n_x}u_{k-j}^{b_i, j}\prod_{l=1}^{n_e}e_{k-l}^{d_i, \ell}\prod_{m=1}^{n_y}y_{k-m}^{a_i, m}
+             y_k&=& \sum_{i=1}^{p}\Theta_i \times \prod_{j=0}^{n_x}u_{k-j}^{b_i, j}\prod_{l=1}^{n_e}e_{k-l}^{d_i, l}\prod_{m=1}^{n_y}y_{k-m}^{a_i, m}
 \label{eq5:narx}
 \end{align}
-where $p$ is the number of regressors, $\Theta_i$ are the model parameters, $a_i, m$, $b_i, j$ and $d_i, \ell \in \mathbb{N}$ are the exponents of output, input and noise terms, respectively.
+where $p$ is the number of regressors, $\Theta_i$ are the model parameters, $a_i, m$, $b_i, j$ and $d_i, l \in \mathbb{N}$ are the exponents of output, input and noise terms, respectively.
 
 The following is a polynomial NARMAX model where the nolinearity degree is equal $2$, identified from experimental data of a DC motor/generator with no prior knowledge of the model form taken from[@LJAM2017].
 	\begin{align}
