@@ -61,7 +61,7 @@ Polynomial basis function is one of the most used representation of NARMAX model
 
 - All polynomial functions are smooth in $\mathbb{R}$.
 - The Weierstrass theorem [@Wei1885] states that any given continuous real-valued function defined on a closed and bounded space $[a,b]$ can be uniformly approximated using a polynomial on that interval.
-- Can describe several nonlinear dynamical systems [@Bil2013], which include industrial processes, control systems, structural systems, economic and financial systems, biology, medicine, social systems, and much more[@WMNL2019; @FWHM2003; @GGBW2016; @KGHK2003; @BBWL2018; @CER2001; @Bil2013; @Agu2004; @MA2016].
+- Can describe several nonlinear dynamical systems [@Bil2013], which include industrial processes, control systems, structural systems, economic and financial systems, biology, medicine, social systems, and much more [@WMNL2019; @FWHM2003; @GGBW2016; @KGHK2003; @BBWL2018; @CER2001; @Bil2013; @Agu2004; @MA2016].
 - Several algorithms have been developed for both structure selection and parameter estimation of polynomial NARMAX models.
 - Polynomial NARMAX models can be used both for prediction and inference. The structure of polynomial NARMAX models are easy to interpret and can be related to the underlying system, which is not a trivial task when using, for example, neural or wavelet functions.
 
