@@ -36,7 +36,7 @@ where :math:`x` is a uniformly distributed random variable and
 :math:`\nu` is a gaussian distributed variable with :math:`\mu=0` and
 :math:`\sigma=0.1`
 
-In the next example we will generate a data with 3000 samples with white
+In the next example we will generate a data with 1000 samples with white
 noise and selecting 90% of the data to train the model.
 
 .. code:: ipython3
