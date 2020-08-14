@@ -1,0 +1,956 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Example: F-16 Ground Vibration Test benchmark &mdash; SysIdentPy</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../_static/jquery.fancybox.min.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../_static/glpi.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="SysIdentPy" href="../index.html"/>
+        <link rel="up" title="Jupyter notebooks" href="../notebooks.html"/>
+        <link rel="next" title="Codes" href="../code.html"/>
+        <link rel="prev" title="Parameter Estimation" href="parameter_estimation.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> sysidentpy
+          
+
+          
+          </a>
+
+          
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction_to_narmax.html">A brief introduction to NARMAX models.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_guide.html">Contributing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../notebooks.html">Jupyter notebooks</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basic_steps.html">Presenting main functionality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple_inputs_example.html">Multiple Inputs usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="information_criteria_examples.html">Information Criteria - Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extended_least_squares.html">Important notes and examples of how to use Extended Least Squares</a></li>
+<li class="toctree-l2"><a class="reference internal" href="defining_lags.html">Setting specific lags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parameter_estimation.html">Parameter Estimation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Example: F-16 Ground Vibration Test benchmark</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html">Codes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.base">sysidentpy base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html#sysidentpy-main">sysidentpy main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.residues.residues_correlation">sysidentpy residues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.metrics._regression">sysidentpy metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.parameter_estimation.estimators">sysidentpy estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.utils._check_arrays">sysidentpy utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.utils.generate_data">sysidentpy generate data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">sysidentpy</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../notebooks.html">Jupyter notebooks</a> &raquo;</li>
+        
+      <li>Example: F-16 Ground Vibration Test benchmark</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/examples/f_16_benchmark.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
+      
+        <a href="../code.html" class="btn btn-neutral float-right" title="Codes" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="parameter_estimation.html" class="btn btn-neutral" title="Parameter Estimation" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+  </div>
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Example:-F-16-Ground-Vibration-Test-benchmark">
+<h1>Example: F-16 Ground Vibration Test benchmark<a class="headerlink" href="#Example:-F-16-Ground-Vibration-Test-benchmark" title="Permalink to this headline">¶</a></h1>
+<p><strong>Note</strong>: The following examples do not try to replicate the results of the cited manuscripts. Even the model parameters such as ylag and xlag and size of identification and validation data are not the same of the cited papers. Moreover, sampling rate adjustment and other different data preparation are not handled here.</p>
+<p><strong>The following text was taken from the link http://www.nonlinearbenchmark.org/#F16</strong>.</p>
+<p><strong>Note</strong>: The reader is reffered to the mentioned website for a complete reference concerning the experiment. For now, this notebook is just a simple example of the performance of SysIdentPy on a real world dataset. A more detailed study of this system will be published in the future.</p>
+<blockquote>
+<div><p>The F-16 Ground Vibration Test benchmark features a high order system with clearance and friction nonlinearities at the mounting interface of the payloads.</p>
+</div></blockquote>
+<blockquote>
+<div><p>The experimental data made available to the Workshop participants were acquired on a full-scale F-16 aircraft on the occasion of the Siemens LMS Ground Vibration Testing Master Class, held in September 2014 at the Saffraanberg military basis, Sint-Truiden, Belgium.</p>
+<p>During the test campaign, two dummy payloads were mounted at the wing tips to simulate the mass and inertia properties of real devices typically equipping an F-16 in ﬂight. The aircraft structure was instrumented with accelerometers. One shaker was attached underneath the right wing to apply input signals. The dominant source of nonlinearity in the structural dynamics was expected to originate from the mounting interfaces of the two payloads. These interfaces consist of T-shaped connecting
+elements on the payload side, slid through a rail attached to the wing side. A preliminary investigation showed that the back connection of the right-wing-to-payload interface was the predominant source of nonlinear distortions in the aircraft dynamics, and is therefore the focus of this benchmark study.</p>
+</div></blockquote>
+<blockquote>
+<div><p>A detailed formulation of the identification problem can be found here. All the provided files and information on the F-16 aircraft benchmark system are available for download here. This zip-file contains a detailed system description, the estimation and test data sets, and some pictures of the setup. The data is available in the .csv and .mat file format.</p>
+<p>Please refer to the F16 benchmark as:</p>
+</div></blockquote>
+<blockquote>
+<div><p>J.P. Noël and M. Schoukens, F-16 aircraft benchmark based on ground vibration test data, 2017 Workshop on Nonlinear System Identification Benchmarks, pp. 19-23, Brussels, Belgium, April 24-26, 2017.</p>
+</div></blockquote>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.polynomial_basis</span> <span class="kn">import</span> <span class="n">PolynomialNarmax</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.metrics</span> <span class="kn">import</span> <span class="n">root_relative_squared_error</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_columns&#39;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">f_16</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;datasets/f-16.txt&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">,</span> <span class="s1">&#39;x2&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">f_16</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(32768, 3)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">f_16</span><span class="p">[[</span><span class="s1">&#39;x1&#39;</span><span class="p">,</span> <span class="s1">&#39;x2&#39;</span><span class="p">]][</span><span class="mi">0</span><span class="p">:</span><span class="mi">500</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fe6b0443210&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_f_16_benchmark_5_1.png" src="../_images/examples_f_16_benchmark_5_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">f_16</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">2000</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fe697898650&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_f_16_benchmark_6_1.png" src="../_images/examples_f_16_benchmark_6_1.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">x1_id</span><span class="p">,</span> <span class="n">x1_val</span> <span class="o">=</span> <span class="n">f_16</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">16384</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">f_16</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">][</span><span class="mi">16384</span><span class="p">::]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">x2_id</span><span class="p">,</span> <span class="n">x2_val</span> <span class="o">=</span> <span class="n">f_16</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">16384</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">f_16</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">][</span><span class="mi">16384</span><span class="p">::]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">x_id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">x1_id</span><span class="p">,</span> <span class="n">x2_id</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">x_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">x1_val</span><span class="p">,</span> <span class="n">x2_val</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">y_id</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span> <span class="n">f_16</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">16384</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">f_16</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">][</span><span class="mi">16384</span><span class="p">::]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">x1lag</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">x2lag</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">x2lag</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[1, 2, 3, 4, 5, 6, 7, 8, 9]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">model</span> <span class="o">=</span> <span class="n">PolynomialNarmax</span><span class="p">(</span><span class="c1"># n_terms=8,</span>
+                         <span class="n">non_degree</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">order_selection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                         <span class="n">ylag</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="p">[</span><span class="n">x1lag</span><span class="p">,</span> <span class="n">x2lag</span><span class="p">],</span>
+                         <span class="n">n_inputs</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+                         <span class="n">n_info_values</span><span class="o">=</span><span class="mi">39</span><span class="p">,</span>
+                         <span class="n">info_criteria</span><span class="o">=</span><span class="s1">&#39;bic&#39;</span><span class="p">,</span>
+                         <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;least_squares&#39;</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_id</span><span class="p">,</span> <span class="n">y_id</span><span class="p">)</span>
+<span class="n">y_hat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="n">y_val</span><span class="p">)</span>
+<span class="n">rrse</span> <span class="o">=</span> <span class="n">root_relative_squared_error</span><span class="p">(</span><span class="n">y_val</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rrse</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="n">err_precision</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;sci&#39;</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Regressors&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;ERR&#39;</span><span class="p">])</span>
+<span class="n">results</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.3090560911603647
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Regressors</th>
+      <th>Parameters</th>
+      <th>ERR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>y(k-1)</td>
+      <td>1.8387E+00</td>
+      <td>9.43378253E-01</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>y(k-2)</td>
+      <td>-1.8938E+00</td>
+      <td>1.95167599E-02</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>y(k-3)</td>
+      <td>1.3337E+00</td>
+      <td>1.02432261E-02</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>y(k-6)</td>
+      <td>-1.6038E+00</td>
+      <td>8.03485985E-03</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>y(k-9)</td>
+      <td>2.6776E-01</td>
+      <td>9.27874557E-04</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>x2(k-7)</td>
+      <td>-2.2384E+01</td>
+      <td>3.76837313E-04</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>x1(k-1)</td>
+      <td>8.2709E+00</td>
+      <td>6.81508210E-04</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>x2(k-3)</td>
+      <td>1.0587E+02</td>
+      <td>1.57459800E-03</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>x1(k-8)</td>
+      <td>-3.7975E+00</td>
+      <td>7.35086279E-04</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>x2(k-1)</td>
+      <td>8.5726E+01</td>
+      <td>4.85358786E-04</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>y(k-7)</td>
+      <td>1.3955E+00</td>
+      <td>2.77245281E-04</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>y(k-5)</td>
+      <td>1.3219E+00</td>
+      <td>8.64120037E-04</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>y(k-10)</td>
+      <td>-2.9306E-01</td>
+      <td>8.51717688E-04</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>y(k-4)</td>
+      <td>-9.5479E-01</td>
+      <td>7.23623116E-04</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>y(k-8)</td>
+      <td>-7.1309E-01</td>
+      <td>4.44988077E-04</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>y(k-12)</td>
+      <td>-3.0437E-01</td>
+      <td>1.49743148E-04</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>y(k-11)</td>
+      <td>4.8602E-01</td>
+      <td>3.34613282E-04</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>y(k-13)</td>
+      <td>-8.2442E-02</td>
+      <td>1.43738964E-04</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>y(k-15)</td>
+      <td>-1.6762E-01</td>
+      <td>1.25546584E-04</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>x1(k-2)</td>
+      <td>-8.9698E+00</td>
+      <td>9.76699739E-05</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>y(k-17)</td>
+      <td>2.2036E-02</td>
+      <td>4.55983807E-05</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>y(k-14)</td>
+      <td>2.4900E-01</td>
+      <td>1.10314107E-04</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>y(k-19)</td>
+      <td>-6.8239E-03</td>
+      <td>1.99734771E-05</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>x2(k-9)</td>
+      <td>-9.6265E+01</td>
+      <td>2.98523208E-05</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>x2(k-8)</td>
+      <td>2.2620E+02</td>
+      <td>2.34402543E-04</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>x2(k-2)</td>
+      <td>-2.3609E+02</td>
+      <td>1.04172323E-04</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>y(k-20)</td>
+      <td>-5.4663E-02</td>
+      <td>5.37895336E-05</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>x2(k-6)</td>
+      <td>-2.3651E+02</td>
+      <td>2.11392628E-05</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>x2(k-4)</td>
+      <td>1.7378E+02</td>
+      <td>2.18396315E-05</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>x1(k-7)</td>
+      <td>4.9862E+00</td>
+      <td>2.03811842E-05</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">residuals</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="n">y_val</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">plot_result</span><span class="p">(</span><span class="n">y_val</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_f_16_benchmark_10_0.png" src="../_images/examples_f_16_benchmark_10_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">xaxis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">n_info_values</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xaxis</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">info_values</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;n_terms&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Information Criteria&#39;</span><span class="p">)</span>
+
+<span class="c1"># You can use the plot below to choose the &quot;n_terms&quot; and run the model again with the most adequate value of terms.</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Text(0, 0.5, &#39;Information Criteria&#39;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_f_16_benchmark_11_1.png" src="../_images/examples_f_16_benchmark_11_1.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../code.html" class="btn btn-neutral float-right" title="Codes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="parameter_estimation.html" class="btn btn-neutral" title="Parameter Estimation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="../None"></script>
+      <script type="text/javascript" src="../_static/jquery.fancybox.min.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+  
+  <script type="text/javascript">
+    $(function(){
+      $('.image-reference').fancybox();
+    })
+  </script>
+
+</body>
+</html>
