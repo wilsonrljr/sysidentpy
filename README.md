@@ -26,12 +26,12 @@ sysidentpy requires:
 - NumPy (>= 1.5.0) for all numerical algorithms
 - Matplotlib >= 1.5.2 for static plotiing and visualizations
 
-==============   ===================
-Platform         Status
-==============   ===================
-Linux            OK
-Windows x64      OK
-==============   ===================
+| Platform  | Status |
+| --------- | -----:|
+| Linux     | ok    |
+| Windows   | ok    |
+| macOS     | ok    |
+
 
 **SysIdentPy do not to support Python 2.7.**
 
