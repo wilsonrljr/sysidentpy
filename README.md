@@ -40,7 +40,7 @@ Windows x64      OK
 A few examples require pandas >= 0.18.0. However, it is not required to use sysidentpy.
 
 Installation
-------------
+============
 
 The easiest way to get sysidentpy running is to install it using ``pip``   ::
 
@@ -49,18 +49,24 @@ The easiest way to get sysidentpy running is to install it using ``pip``   ::
 We will made it available at conda repository as soon as possible.
 
 Changelog
----------
+=========
 
 See the `changelog <https://github.com/wilsonrljr/sysidentpy.whats_is_new.md>`__
 for a history of notable changes to sysidentpy.
 
 Development
------------
+===========
 
 We welcome new contributors of all experience levels. The sysidentpy community goals are to be helpful, welcoming, and effective.
 
+Note: we use the pytest package for testing. The test functions are located in tests subdirectories at each folder inside sysidentpy, which check the validity of the algorithms.
+
+Run the pytest in the respective folder to perform all the tests of the corresponding sub-packages.
+
+Currently, we have around 85% of code coverage.
+
 Important links
----------------
+===============
 
 - Official source code repo: https://github.com/wilsonrljr/sysidentpy
 - Download releases: https://pypi.org/project/sysidentpy/
@@ -74,7 +80,7 @@ You can check the latest sources with the command::
     git clone https://github.com/wilsonrljr/sysidentpy.git
 
 Project History
----------------
+===============
 
 The project was started by Wilson R. L. Junior, Luan Pascoal and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019 and since then have contributed.
 
