@@ -1,7 +1,7 @@
 .. -*- mode: rst -*-
 
 SysIdentPy
-============
+==========
 
 sysidentpy is a Python module for System Identification using NARMAX models built on top of numpy and
 is distributed under the 3-Clause BSD license.
