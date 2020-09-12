@@ -48,7 +48,7 @@ See the [changelog]( <https://github.com/wilsonrljr/sysidentpy.whats_is_new.md>)
 
 We welcome new contributors of all experience levels. The sysidentpy community goals are to be helpful, welcoming, and effective.
 
-*Note*: we use the `pytest` package for testing. The test functions are located in tests sub directories at each folder inside **SysIdentPy**, which check the validity of the algorithms.
+*Note*: we use the `pytest` package for testing. The test functions are located in tests subdirectories at each folder inside **SysIdentPy**, which check the validity of the algorithms.
 
 Run the `pytest` in the respective folder to perform all the tests of the corresponding sub-packages.
 
@@ -61,7 +61,7 @@ pip install -U pytest
 
 ### Example of how to run the tests:
 
-Open a terminal emulator of your choice and go to a sub directory, e.g,
+Open a terminal emulator of your choice and go to a subdirectory, e.g,
 ~~~~~~~~~~~~~~~~~~~~
 \sysidentpy\metrics\
 ~~~~~~~~~~~~~~~~~~~~
