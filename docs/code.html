@@ -41,7 +41,7 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="SysIdentPy" href="index.html"/>
-        <link rel="prev" title="Example: F-16 Ground Vibration Test benchmark" href="examples/f_16_benchmark.html"/> 
+        <link rel="prev" title="Parameter Estimation" href="examples/parameter_estimation.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -167,7 +167,7 @@
   <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
       
       
-        <a href="examples/f_16_benchmark.html" class="btn btn-neutral" title="Example: F-16 Ground Vibration Test benchmark" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="examples/parameter_estimation.html" class="btn btn-neutral" title="Parameter Estimation" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
   </div>
   
@@ -195,14 +195,14 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.base.GenerateRegressors.regressor_space" title="sysidentpy.base.GenerateRegressors.regressor_space"><code class="xref py py-obj docutils literal notranslate"><span class="pre">regressor_space</span></code></a>(self, non_degree, xlag, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.base.GenerateRegressors.regressor_space" title="sysidentpy.base.GenerateRegressors.regressor_space"><code class="xref py py-obj docutils literal notranslate"><span class="pre">regressor_space</span></code></a>(non_degree, xlag, ylag, n_inputs)</p></td>
 <td><p>Create the code representation of the regressors.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
 <dt id="sysidentpy.base.GenerateRegressors.regressor_space">
-<code class="sig-name descname">regressor_space</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">non_degree</span></em>, <em class="sig-param"><span class="n">xlag</span></em>, <em class="sig-param"><span class="n">ylag</span></em>, <em class="sig-param"><span class="n">n_inputs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/base.html#GenerateRegressors.regressor_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.base.GenerateRegressors.regressor_space" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">regressor_space</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">non_degree</span></em>, <em class="sig-param"><span class="n">xlag</span></em>, <em class="sig-param"><span class="n">ylag</span></em>, <em class="sig-param"><span class="n">n_inputs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/base.html#GenerateRegressors.regressor_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.base.GenerateRegressors.regressor_space" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the code representation of the regressors.</p>
 <p>This function generates a codification from all possibles
 regressors given the maximum lag of the input and output.
@@ -264,20 +264,20 @@ reference below.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.base.InformationMatrix.build_information_matrix" title="sysidentpy.base.InformationMatrix.build_information_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_information_matrix</span></code></a>(self, X, y, xlag, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.base.InformationMatrix.build_information_matrix" title="sysidentpy.base.InformationMatrix.build_information_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_information_matrix</span></code></a>(X, y, xlag, ylag, …)</p></td>
 <td><p>Build the information matrix.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.base.InformationMatrix.initial_lagged_matrix" title="sysidentpy.base.InformationMatrix.initial_lagged_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial_lagged_matrix</span></code></a>(self, X, y, xlag, ylag)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.base.InformationMatrix.initial_lagged_matrix" title="sysidentpy.base.InformationMatrix.initial_lagged_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial_lagged_matrix</span></code></a>(X, y, xlag, ylag)</p></td>
 <td><p>Build a lagged matrix concerning each lag for each column.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.base.InformationMatrix.shift_column" title="sysidentpy.base.InformationMatrix.shift_column"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shift_column</span></code></a>(self, col_to_shift, lag)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.base.InformationMatrix.shift_column" title="sysidentpy.base.InformationMatrix.shift_column"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shift_column</span></code></a>(col_to_shift, lag)</p></td>
 <td><p>Shift values based on a lag.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
 <dt id="sysidentpy.base.InformationMatrix.shift_column">
-<code class="sig-name descname">shift_column</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">col_to_shift</span></em>, <em class="sig-param"><span class="n">lag</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/base.html#InformationMatrix.shift_column"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.base.InformationMatrix.shift_column" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">shift_column</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col_to_shift</span></em>, <em class="sig-param"><span class="n">lag</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/base.html#InformationMatrix.shift_column"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.base.InformationMatrix.shift_column" title="Permalink to this definition">¶</a></dt>
 <dd><p>Shift values based on a lag.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -303,7 +303,7 @@ reference below.</p>
 
 <dl class="py method">
 <dt id="sysidentpy.base.InformationMatrix.initial_lagged_matrix">
-<code class="sig-name descname">initial_lagged_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">xlag</span></em>, <em class="sig-param"><span class="n">ylag</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/base.html#InformationMatrix.initial_lagged_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.base.InformationMatrix.initial_lagged_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">initial_lagged_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">xlag</span></em>, <em class="sig-param"><span class="n">ylag</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/base.html#InformationMatrix.initial_lagged_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.base.InformationMatrix.initial_lagged_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build a lagged matrix concerning each lag for each column.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -331,7 +331,7 @@ X[k-1], and X[k-2].</p>
 
 <dl class="py method">
 <dt id="sysidentpy.base.InformationMatrix.build_information_matrix">
-<code class="sig-name descname">build_information_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">xlag</span></em>, <em class="sig-param"><span class="n">ylag</span></em>, <em class="sig-param"><span class="n">non_degree</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/base.html#InformationMatrix.build_information_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.base.InformationMatrix.build_information_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">build_information_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">xlag</span></em>, <em class="sig-param"><span class="n">ylag</span></em>, <em class="sig-param"><span class="n">non_degree</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/base.html#InformationMatrix.build_information_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.base.InformationMatrix.build_information_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build the information matrix.</p>
 <p>Each columns of the information matrix represents a candidate
 regressor. The set of candidate regressors are based on xlag,
@@ -376,17 +376,17 @@ ylag, and non_degree entered by the user.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.residues.residues_correlation.ResiduesAnalysis.plot_result" title="sysidentpy.residues.residues_correlation.ResiduesAnalysis.plot_result"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_result</span></code></a>(self, y, yhat, e_acf, xe_ccf[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.residues.residues_correlation.ResiduesAnalysis.plot_result" title="sysidentpy.residues.residues_correlation.ResiduesAnalysis.plot_result"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_result</span></code></a>(y, yhat, e_acf, xe_ccf[, figsize, n])</p></td>
 <td><p>Plot the free run simulation and residues analysis.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.residues.residues_correlation.ResiduesAnalysis.residuals" title="sysidentpy.residues.residues_correlation.ResiduesAnalysis.residuals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">residuals</span></code></a>(self, X, y, yhat)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.residues.residues_correlation.ResiduesAnalysis.residuals" title="sysidentpy.residues.residues_correlation.ResiduesAnalysis.residuals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">residuals</span></code></a>(X, y, yhat)</p></td>
 <td><p>Performs the residual analysis of output to validate model.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
 <dt id="sysidentpy.residues.residues_correlation.ResiduesAnalysis.residuals">
-<code class="sig-name descname">residuals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">yhat</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/residues/residues_correlation.html#ResiduesAnalysis.residuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.residues.residues_correlation.ResiduesAnalysis.residuals" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">residuals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">yhat</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/residues/residues_correlation.html#ResiduesAnalysis.residuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.residues.residues_correlation.ResiduesAnalysis.residuals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs the residual analysis of output to validate model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -422,38 +422,8 @@ ylag, and non_degree entered by the user.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="sysidentpy.residues.residues_correlation.ResiduesAnalysis._input_ccf">
-<code class="sig-name descname">_input_ccf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">e</span></em>, <em class="sig-param"><span class="n">len_confidence</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/residues/residues_correlation.html#ResiduesAnalysis._input_ccf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.residues.residues_correlation.ResiduesAnalysis._input_ccf" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="sysidentpy.residues.residues_correlation.ResiduesAnalysis._residuals_acf">
-<code class="sig-name descname">_residuals_acf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">yhat</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/residues/residues_correlation.html#ResiduesAnalysis._residuals_acf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.residues.residues_correlation.ResiduesAnalysis._residuals_acf" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="sysidentpy.residues.residues_correlation.ResiduesAnalysis._normalized_correlation">
-<code class="sig-name descname">_normalized_correlation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">signal1</span></em>, <em class="sig-param"><span class="n">signal2</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/residues/residues_correlation.html#ResiduesAnalysis._normalized_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.residues.residues_correlation.ResiduesAnalysis._normalized_correlation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the normalized correlation between two signals.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>signal1</strong> (<em>array-like of shape = n_samples.</em>) – </p></li>
-<li><p><strong>signal2</strong> (<em>array-like of shape = n_samples.</em>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>ruy</strong> – The normalized cross correlation between the two signals.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>ndarray of floats:</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt id="sysidentpy.residues.residues_correlation.ResiduesAnalysis.plot_result">
-<code class="sig-name descname">plot_result</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">yhat</span></em>, <em class="sig-param"><span class="n">e_acf</span></em>, <em class="sig-param"><span class="n">xe_ccf</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="o">=</span><span class="default_value">10, 8</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">100</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/residues/residues_correlation.html#ResiduesAnalysis.plot_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.residues.residues_correlation.ResiduesAnalysis.plot_result" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plot_result</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">yhat</span></em>, <em class="sig-param"><span class="n">e_acf</span></em>, <em class="sig-param"><span class="n">xe_ccf</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="o">=</span><span class="default_value">10, 8</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">100</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/residues/residues_correlation.html#ResiduesAnalysis.plot_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.residues.residues_correlation.ResiduesAnalysis.plot_result" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the free run simulation and residues analysis.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -902,59 +872,59 @@ over-forecasts and under-forecasts are not treated equally.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.affine_least_mean_squares" title="sysidentpy.parameter_estimation.estimators.Estimators.affine_least_mean_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">affine_least_mean_squares</span></code></a>(self, psi, y)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.affine_least_mean_squares" title="sysidentpy.parameter_estimation.estimators.Estimators.affine_least_mean_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">affine_least_mean_squares</span></code></a>(psi, y)</p></td>
 <td><p>Estimate the model parameters using the Affine Least Mean Squares.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares</span></code></a>(self, psi, y)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares</span></code></a>(psi, y)</p></td>
 <td><p>Estimate the model parameters using the Least Mean Squares filter.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_fourth" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_fourth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_fourth</span></code></a>(self, psi, y)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_fourth" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_fourth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_fourth</span></code></a>(psi, y)</p></td>
 <td><p>Parameter estimation using the  LMS Fourth filter.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_leaky" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_leaky"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_leaky</span></code></a>(self, psi, y)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_leaky" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_leaky"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_leaky</span></code></a>(psi, y)</p></td>
 <td><p>Parameter estimation using the  Leaky LMS filter.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_mixed_norm" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_mixed_norm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_mixed_norm</span></code></a>(self, psi, y)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_mixed_norm" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_mixed_norm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_mixed_norm</span></code></a>(psi, y)</p></td>
 <td><p>Parameter estimation using the Mixed-norm LMS filter.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_leaky" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_leaky"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_normalized_leaky</span></code></a>(self, psi, y)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_leaky" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_leaky"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_normalized_leaky</span></code></a>(psi, y)</p></td>
 <td><p>Parameter estimation using the  Normalized Leaky LMS filter.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_error" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_normalized_sign_error</span></code></a>(…)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_error" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_normalized_sign_error</span></code></a>(psi, y)</p></td>
 <td><p>Parameter estimation using the Normalized Sign-Error LMS filter.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_regressor" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_regressor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_normalized_sign_regressor</span></code></a>(…)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_regressor" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_regressor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_normalized_sign_regressor</span></code></a>(psi, y)</p></td>
 <td><p>Parameter estimation using the Normalized Sign-Regressor LMS filter.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_sign" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_sign"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_normalized_sign_sign</span></code></a>(…)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_sign" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_sign"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_normalized_sign_sign</span></code></a>(psi, y)</p></td>
 <td><p>Parameter estimation using the Normalized Sign-Sign LMS filter.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_error" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_sign_error</span></code></a>(self, psi, y)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_error" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_sign_error</span></code></a>(psi, y)</p></td>
 <td><p>Parameter estimation using the Sign-Error  Least Mean Squares filter.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_regressor" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_regressor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_sign_regressor</span></code></a>(self, psi, y)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_regressor" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_regressor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_sign_regressor</span></code></a>(psi, y)</p></td>
 <td><p>Parameter estimation using the  Sign-Regressor LMS filter.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_sign" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_sign"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_sign_sign</span></code></a>(self, psi, y)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_sign" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_sign"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_sign_sign</span></code></a>(psi, y)</p></td>
 <td><p>Parameter estimation using the  Sign-Sign LMS filter.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_squares" title="sysidentpy.parameter_estimation.estimators.Estimators.least_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_squares</span></code></a>(self, psi, y)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_squares" title="sysidentpy.parameter_estimation.estimators.Estimators.least_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_squares</span></code></a>(psi, y)</p></td>
 <td><p>Estimate the model parameters using Least Squares method.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.normalized_least_mean_squares" title="sysidentpy.parameter_estimation.estimators.Estimators.normalized_least_mean_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalized_least_mean_squares</span></code></a>(self, psi, y)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.normalized_least_mean_squares" title="sysidentpy.parameter_estimation.estimators.Estimators.normalized_least_mean_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalized_least_mean_squares</span></code></a>(psi, y)</p></td>
 <td><p>Parameter estimation using the Normalized Least Mean Squares filter.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.recursive_least_squares" title="sysidentpy.parameter_estimation.estimators.Estimators.recursive_least_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">recursive_least_squares</span></code></a>(self, psi, y)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.recursive_least_squares" title="sysidentpy.parameter_estimation.estimators.Estimators.recursive_least_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">recursive_least_squares</span></code></a>(psi, y)</p></td>
 <td><p>Estimate the model parameters using the Recursive Least Squares method.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.total_least_squares" title="sysidentpy.parameter_estimation.estimators.Estimators.total_least_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">total_least_squares</span></code></a>(self, psi, y)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.total_least_squares" title="sysidentpy.parameter_estimation.estimators.Estimators.total_least_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">total_least_squares</span></code></a>(psi, y)</p></td>
 <td><p>Estimate the model parameters using Total Least Squares method.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
 <dt id="sysidentpy.parameter_estimation.estimators.Estimators.least_squares">
-<code class="sig-name descname">least_squares</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_squares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_squares" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">least_squares</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_squares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_squares" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate the model parameters using Least Squares method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -990,7 +960,7 @@ Signal processing, 87(10), 2283-2302.
 
 <dl class="py method">
 <dt id="sysidentpy.parameter_estimation.estimators.Estimators.total_least_squares">
-<code class="sig-name descname">total_least_squares</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.total_least_squares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.total_least_squares" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">total_least_squares</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.total_least_squares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.total_least_squares" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate the model parameters using Total Least Squares method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1023,7 +993,7 @@ Signal processing, 87(10), 2283-2302.
 
 <dl class="py method">
 <dt id="sysidentpy.parameter_estimation.estimators.Estimators.recursive_least_squares">
-<code class="sig-name descname">recursive_least_squares</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.recursive_least_squares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.recursive_least_squares" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">recursive_least_squares</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.recursive_least_squares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.recursive_least_squares" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate the model parameters using the Recursive Least Squares method.</p>
 <p>The implementation consider the forgeting factor.
 :param psi: The information matrix of the model.
@@ -1053,7 +1023,7 @@ reais. Editora da UFMG. 3a ediçao.
 
 <dl class="py method">
 <dt id="sysidentpy.parameter_estimation.estimators.Estimators.affine_least_mean_squares">
-<code class="sig-name descname">affine_least_mean_squares</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.affine_least_mean_squares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.affine_least_mean_squares" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">affine_least_mean_squares</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.affine_least_mean_squares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.affine_least_mean_squares" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate the model parameters using the Affine Least Mean Squares.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1083,7 +1053,7 @@ references.</p>
 
 <dl class="py method">
 <dt id="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares">
-<code class="sig-name descname">least_mean_squares</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">least_mean_squares</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate the model parameters using the Least Mean Squares filter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1119,7 +1089,7 @@ variável.
 
 <dl class="py method">
 <dt id="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_error">
-<code class="sig-name descname">least_mean_squares_sign_error</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_sign_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_error" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">least_mean_squares_sign_error</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_sign_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_error" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter estimation using the Sign-Error  Least Mean Squares filter.</p>
 <p>The sign-error LMS algorithm uses the sign of the error vector
 to change the filter coefficients.</p>
@@ -1156,7 +1126,7 @@ variável.
 
 <dl class="py method">
 <dt id="sysidentpy.parameter_estimation.estimators.Estimators.normalized_least_mean_squares">
-<code class="sig-name descname">normalized_least_mean_squares</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.normalized_least_mean_squares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.normalized_least_mean_squares" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">normalized_least_mean_squares</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.normalized_least_mean_squares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.normalized_least_mean_squares" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter estimation using the Normalized Least Mean Squares filter.</p>
 <p>The normalization is used to avoid numerical instability when updating
 the estimated parameters.</p>
@@ -1193,7 +1163,7 @@ variável.
 
 <dl class="py method">
 <dt id="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_error">
-<code class="sig-name descname">least_mean_squares_normalized_sign_error</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_normalized_sign_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_error" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">least_mean_squares_normalized_sign_error</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_normalized_sign_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_error" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter estimation using the Normalized Sign-Error LMS filter.</p>
 <p>The normalization is used to avoid numerical instability when updating
 the estimated parameters and the sign of the error vector is used to
@@ -1231,7 +1201,7 @@ variável.
 
 <dl class="py method">
 <dt id="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_regressor">
-<code class="sig-name descname">least_mean_squares_sign_regressor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_sign_regressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_regressor" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">least_mean_squares_sign_regressor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_sign_regressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_regressor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter estimation using the  Sign-Regressor LMS filter.</p>
 <p>The sign-regressor LMS algorithm uses the sign of the matrix
 information to change the filter coefficients.</p>
@@ -1268,7 +1238,7 @@ variável.
 
 <dl class="py method">
 <dt id="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_regressor">
-<code class="sig-name descname">least_mean_squares_normalized_sign_regressor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_normalized_sign_regressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_regressor" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">least_mean_squares_normalized_sign_regressor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_normalized_sign_regressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_regressor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter estimation using the Normalized Sign-Regressor LMS filter.</p>
 <p>The normalization is used to avoid numerical instability when updating
 the estimated parameters and the sign of the information matrix is
@@ -1306,7 +1276,7 @@ variável.
 
 <dl class="py method">
 <dt id="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_sign">
-<code class="sig-name descname">least_mean_squares_sign_sign</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_sign_sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_sign" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">least_mean_squares_sign_sign</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_sign_sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_sign" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter estimation using the  Sign-Sign LMS filter.</p>
 <p>The sign-regressor LMS algorithm uses both the sign of the matrix
 information and the sign of the error vector to change the filter
@@ -1344,7 +1314,7 @@ variável.
 
 <dl class="py method">
 <dt id="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_sign">
-<code class="sig-name descname">least_mean_squares_normalized_sign_sign</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_normalized_sign_sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_sign" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">least_mean_squares_normalized_sign_sign</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_normalized_sign_sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_sign" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter estimation using the Normalized Sign-Sign LMS filter.</p>
 <p>The normalization is used to avoid numerical instability when updating
 the estimated parameters and both the sign of the information matrix
@@ -1383,7 +1353,7 @@ variável.
 
 <dl class="py method">
 <dt id="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_leaky">
-<code class="sig-name descname">least_mean_squares_normalized_leaky</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_normalized_leaky"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_leaky" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">least_mean_squares_normalized_leaky</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_normalized_leaky"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_leaky" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter estimation using the  Normalized Leaky LMS filter.</p>
 <p>When the leakage factor, gama, is set to 0 then there is no
 leakage in the estimation process.</p>
@@ -1420,7 +1390,7 @@ variável.
 
 <dl class="py method">
 <dt id="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_leaky">
-<code class="sig-name descname">least_mean_squares_leaky</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_leaky"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_leaky" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">least_mean_squares_leaky</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_leaky"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_leaky" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter estimation using the  Leaky LMS filter.</p>
 <p>When the leakage factor, gama, is set to 0 then there is no
 leakage in the estimation process.</p>
@@ -1457,7 +1427,7 @@ variável.
 
 <dl class="py method">
 <dt id="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_fourth">
-<code class="sig-name descname">least_mean_squares_fourth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_fourth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_fourth" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">least_mean_squares_fourth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_fourth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_fourth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter estimation using the  LMS Fourth filter.</p>
 <p>When the leakage factor, gama, is set to 0 then there is no
 leakage in the estimation process.</p>
@@ -1504,7 +1474,7 @@ Acoustics, Speech, and Signal Processing, 2005.
 
 <dl class="py method">
 <dt id="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_mixed_norm">
-<code class="sig-name descname">least_mean_squares_mixed_norm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_mixed_norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_mixed_norm" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">least_mean_squares_mixed_norm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_mean_squares_mixed_norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_mixed_norm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter estimation using the Mixed-norm LMS filter.</p>
 <p>The weight factor controls the proportions of the error norms
 and offers an extra degree of freedom within the adaptation.</p>
@@ -1698,7 +1668,7 @@ respectively.</p></li>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
       
-        <a href="examples/f_16_benchmark.html" class="btn btn-neutral" title="Example: F-16 Ground Vibration Test benchmark" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="examples/parameter_estimation.html" class="btn btn-neutral" title="Parameter Estimation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -1742,7 +1712,7 @@ respectively.</p></li>
       <script type="text/javascript" src="_static/doctools.js"></script>
       <script type="text/javascript" src="_static/language_data.js"></script>
       <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
       <script type="text/javascript" src="None"></script>
       <script type="text/javascript" src="_static/jquery.fancybox.min.js"></script>
 

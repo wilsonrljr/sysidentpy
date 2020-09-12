@@ -241,7 +241,7 @@
                 <span class="p">[</span><span class="n">yeline_x2line</span><span class="p">,</span> <span class="n">yeline_eeline</span><span class="p">,</span> <span class="n">e_ex</span><span class="p">,</span> <span class="n">x2line_e</span><span class="p">,</span> <span class="n">x2line_ee</span><span class="p">],</span>
                 <span class="n">lam</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ResiduesAnalysis._input_ccf"><a class="viewcode-back" href="../../../code.html#sysidentpy.residues.residues_correlation.ResiduesAnalysis._input_ccf">[docs]</a>    <span class="k">def</span> <span class="nf">_input_ccf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">len_confidence</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_input_ccf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">len_confidence</span><span class="p">):</span>
         <span class="n">xe_ccf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)),</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
 
         <span class="n">xe_ccf</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalized_correlation</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
@@ -250,9 +250,9 @@
             <span class="nb">len</span><span class="p">(</span><span class="n">xe_ccf</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]))</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.96</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">len_confidence</span><span class="p">))</span>
 
         <span class="n">xe_ccf</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">xe_ccf</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">xe_ccf</span></div>
+        <span class="k">return</span> <span class="n">xe_ccf</span>
 
-<div class="viewcode-block" id="ResiduesAnalysis._residuals_acf"><a class="viewcode-back" href="../../../code.html#sysidentpy.residues.residues_correlation.ResiduesAnalysis._residuals_acf">[docs]</a>    <span class="k">def</span> <span class="nf">_residuals_acf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_residuals_acf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">):</span>
         <span class="n">e</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">yhat</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
         <span class="n">unnormalized_e_acf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">correlate</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;full&#39;</span><span class="p">)</span>
         <span class="n">half_of_simmetry_autocorr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">unnormalized_e_acf</span><span class="o">.</span><span class="n">size</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
@@ -268,9 +268,9 @@
             <span class="nb">len</span><span class="p">(</span><span class="n">e_acf</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]))</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.96</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">unnormalized_e_acf</span><span class="p">)))</span>
 
         <span class="n">e_acf</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">e_acf</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">e</span><span class="p">,</span> <span class="n">e_acf</span><span class="p">,</span> <span class="n">unnormalized_e_acf</span></div>
+        <span class="k">return</span> <span class="n">e</span><span class="p">,</span> <span class="n">e_acf</span><span class="p">,</span> <span class="n">unnormalized_e_acf</span>
 
-<div class="viewcode-block" id="ResiduesAnalysis._normalized_correlation"><a class="viewcode-back" href="../../../code.html#sysidentpy.residues.residues_correlation.ResiduesAnalysis._normalized_correlation">[docs]</a>    <span class="k">def</span> <span class="nf">_normalized_correlation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal1</span><span class="p">,</span> <span class="n">signal2</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_normalized_correlation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal1</span><span class="p">,</span> <span class="n">signal2</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute the normalized correlation between two signals.</span>
 
 <span class="sd">        Parameters</span>
@@ -297,7 +297,7 @@
                 <span class="n">y</span><span class="p">[:</span><span class="o">-</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">:])</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span><span class="p">[:</span><span class="o">-</span><span class="n">i</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
                                  <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">:]</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span>
 
-        <span class="k">return</span> <span class="n">ruy</span></div>
+        <span class="k">return</span> <span class="n">ruy</span>
 
 <div class="viewcode-block" id="ResiduesAnalysis.plot_result"><a class="viewcode-back" href="../../../code.html#sysidentpy.residues.residues_correlation.ResiduesAnalysis.plot_result">[docs]</a>    <span class="k">def</span> <span class="nf">plot_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">e_acf</span><span class="p">,</span> <span class="n">xe_ccf</span><span class="p">,</span>
                     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">n</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
@@ -404,7 +404,7 @@
       <script type="text/javascript" src="../../../_static/doctools.js"></script>
       <script type="text/javascript" src="../../../_static/language_data.js"></script>
       <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
       <script type="text/javascript" src="../../../None"></script>
       <script type="text/javascript" src="../../../_static/jquery.fancybox.min.js"></script>
 

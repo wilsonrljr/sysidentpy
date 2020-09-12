@@ -37,9 +37,3 @@ Jupyter notebooks
 
    /examples/parameter_estimation.ipynb
    
-.. toctree::
-   :maxdepth: 1
-   :caption: F-16 Ground Vibration Test benchmark
-
-   /examples/f_16_benchmark.ipynb
-   
