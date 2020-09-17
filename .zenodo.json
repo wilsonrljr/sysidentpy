@@ -1,0 +1,35 @@
+{
+    "description": "<p>This release adds the required modifications and updates from the JOSS review process.</p>",
+    "license": "other-open",
+    "title": "wilsonrljr/sysidentpy: SysIdentPy v0.1.2",
+    "version": "v0.1.2",
+    "upload_type": "software",
+    "publication_date": "2020-09-12",
+    "creators": [
+        {
+            "name": "Wilson Rocha Lacerda Junior"
+        },
+        {
+            "name": "Luan Pascoal da Costa Andrade"
+        },
+        {
+            "name": "Samuel Carlos Pessoa Oliveira"
+        },
+        {
+            "name": "Samir Angelo Milani Martins"
+        }
+    ],
+    "access_right": "open",
+    "related_identifiers": [
+        {
+            "scheme": "url",
+            "identifier": "https://github.com/wilsonrljr/sysidentpy/tree/v0.1.2",
+            "relation": "isSupplementTo"
+        },
+        {
+            "scheme": "doi",
+            "identifier": "10.5281/zenodo.4026515",
+            "relation": "isVersionOf"
+        }
+    ]
+}
