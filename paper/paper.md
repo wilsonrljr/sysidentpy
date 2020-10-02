@@ -17,9 +17,9 @@ authors:
   - name: Samir Angelo Milani Martins
     affiliation: "1, 2"
 affiliations:
- - name: GCoM - Modeling and Control Group at Federal University of São João del-Rei
+ - name: GCoM - Modeling and Control Group at Federal University of São João del-Rei, Brazil
    index: 1
- - name: Department of Electrical Engineering at Federal University of São João del-Rei
+ - name: Department of Electrical Engineering at Federal University of São João del-Rei, Brazil
    index: 2
 date: 18 May 2020
 bibliography: paper.bib
@@ -142,7 +142,7 @@ The table below and Figure 1 are the ouput of the aforementioned example. Table 
 | y(k-1)^2       | 0.3999     | 0.04410386 |
 | x1(k-1)y(k-1)  | 0.1000     | 0.00033239 |
 
-![\label{fig:example}](output_16_0.png)
+![\label{fig:example}](example1.png)
 _Figure 1. Results from modeling a simulated system available with the `SysIdentPy` package. Free run simulation (validation data vs. model prediction), autocorrelation of the residues and cross correlation between residues and the input._
 
 For more information and examples of how to build NARMAX models and its variants using different methods for parameters estimation, model order selection and many more, see the package documentation.
