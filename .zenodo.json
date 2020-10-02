@@ -1,7 +1,7 @@
 {
     "description": "<p>This release adds the required modifications and updates from the JOSS review process.</p>",
     "license": "other-open",
-    "title": "wilsonrljr/sysidentpy: SysIdentPy v0.1.2",
+    "title": "SysIdentPy: A Python package for System Identification using NARMAX models",
     "version": "v0.1.2",
     "upload_type": "software",
     "publication_date": "2020-09-12",
