@@ -356,7 +356,7 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
         regressors = np.array(list(set(code)))
         regressors_count = Counter(code)
 
-        if not(np.any(regressors)):
+        if np.all(regressors == 0):
             return np.zeros(self.max_lag * (1 + self._n_inputs))
 
         else:
@@ -366,13 +366,15 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
 
             for j in range(1, self._n_inputs + 2):
                 base_exponents = np.zeros(self.max_lag, dtype=float)
-                if (np.sum(elements == j) == 0):
-                    exponents = np.append(exponents, base_exponents)
-                else:
+                if (j in elements):
                     for i in range(1, self.max_lag + 1):
                         regressor_code = int(j*1000 + i)
                         base_exponents[-i] = regressors_count[regressor_code]
                     exponents = np.append(exponents, base_exponents)
+
+                else:
+                    exponents = np.append(exponents, base_exponents)
+                    
             return exponents
 
     def _model_prediction(self, model_elements,
@@ -397,6 +399,7 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
                The predicted values of the model.
 
         """
+        X = X.reshape(-1, self._n_inputs)
         y_output = np.zeros(X.shape[0], dtype=float)
         y_output.fill(np.nan)
         y_output[:self.max_lag] = y_initial[:self.max_lag, 0]
