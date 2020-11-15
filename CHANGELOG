@@ -1,0 +1,27 @@
+--------------------------------------------------------------------------------------------------------------
+File for tracking changes in SysIdentPy
+--------------------------------------------------------------------------------------------------------------
+
+0.1.3
+-----
+CONTRIBUTORS
+- wilsonrljr
+- renard162
+
+CHANGES
+- Fixed a bug concerning the xlag and ylag in multiple input scenarios.
+- Refactored predict function. Improved performance up to 43%.
+- You can set lags with different size for each input.
+- Added a new function to get the max value of xlag and ylag. Work with int, list, nested lists.
+- Fixed tests for information criteria.
+
+
+0.1.4
+-----
+CONTRIBUTORS
+CHANGES
+
+0.1.5
+-----
+CONTRIBUTORS
+CHANGES

@@ -10,6 +10,26 @@
 
 import numpy as np
 from itertools import combinations_with_replacement
+from itertools import chain
+
+
+def _get_max_lag(ylag, xlag):
+    """Get the max lag defined by the user.
+    Parameters
+    ----------
+    ylag : int
+        The maximum lag of output regressors.
+    xlag : int
+        The maximum lag of input regressors.
+    Returns
+    -------
+    max_lag = int
+        The max lag value defined by the user.
+    """
+    # ny = np.max(ylag)
+    ny = np.max(list(chain.from_iterable([[ylag]])))
+    nx = np.max(list(chain.from_iterable([[xlag]])))
+    return np.max([ny, np.max(nx)])
 
 
 class GenerateRegressors:
@@ -64,12 +84,13 @@ class GenerateRegressors:
                 % non_degree)
 
         if (not isinstance(ylag, (int, list))
-           or np.min(np.minimum(ylag, 1)) < 1):
+                or np.min(np.minimum(ylag, 1)) < 1):
             raise ValueError(
                 "ylag must be integer or list and > zero. Got %f" % ylag)
 
         if (not isinstance(xlag, (int, list))
-           or np.min(np.minimum(xlag, 1)) < 1):
+                # or np.min(np.minimum(xlag, 1)) < 1):
+                or np.min(np.min(list(chain.from_iterable([[xlag]])))) < 1):
             raise ValueError(
                 "xlag must be integer or list and > zero. Got %f" % xlag)
 
@@ -110,7 +131,7 @@ class GenerateRegressors:
         if n_inputs > 1:
             # if x_vec is a nested list, ensure all elements are arrays
             all_arrays = ([np.array([i]) if isinstance(i, int) else i
-                          for i in x_vec_tmp])
+                           for i in x_vec_tmp])
             x_vec = np.concatenate([i for i in all_arrays])
         else:
             x_vec = x_vec_tmp
@@ -122,7 +143,7 @@ class GenerateRegressors:
 
         regressor_code = np.array(regressor_code)
         regressor_code = regressor_code[:, regressor_code.shape[1]::-1]
-        max_lag = np.max(np.maximum(ylag, xlag))
+        max_lag = _get_max_lag(ylag, xlag)
         return regressor_code, max_lag
 
 
@@ -402,7 +423,7 @@ class InformationMatrix:
             The lagged matrix built in respect with each lag and column.
 
         """
-        max_lag = np.max(np.maximum(ylag, xlag))
+        max_lag = _get_max_lag(ylag, xlag)
 
         # Generate a lagged data which each column is a input or output
         # related to its respective lags. With this approach we can create

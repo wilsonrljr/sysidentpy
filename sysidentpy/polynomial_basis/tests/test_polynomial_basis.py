@@ -13,7 +13,7 @@ def create_test_data(n=1000):
     lag = 2
     for k in range(lag, len(x)):
         y[k] = theta[4]*y[k-1]**2 + theta[2]*y[k-1]*x[k-1] + theta[0]*x[k-2] \
-               + theta[3]*y[k-2]*x[k-2] + theta[1]*y[k-2]
+            + theta[3]*y[k-2]*x[k-2] + theta[1]*y[k-2]
 
     y = np.reshape(y, (len(y), 1))
     x = np.reshape(x, (len(x), 1))
@@ -22,22 +22,22 @@ def create_test_data(n=1000):
 
 
 def test_error_reduction_ration():
-    piv = np.array([4, 2, 7, 11, 5, 0, 3, 6, 12, 8, 14, 1, 10, 13, 9])
+    piv = np.array([4, 2, 7, 11, 5, 6, 12, 8, 3, 9, 13, 14, 10, 1, 0])
     model_code = np.array([[2002,    0],
                            [1002,    0],
                            [2001, 1001],
                            [2002, 1002],
                            [1001, 1001],
-                           [0,       0],
-                           [2001,    0],
                            [1002, 1001],
                            [2001, 2001],
                            [2002, 1001],
-                           [2002, 2002],
-                           [1001,    0],
-                           [2001, 1002],
+                           [2001,    0],
+                           [1002, 1002],
                            [2002, 2001],
-                           [1002, 1002]])
+                           [2002, 2002],
+                           [2001, 1002],
+                           [1001,    0],
+                           [0,    0]])
     x, y, theta = create_test_data()
     model = PolynomialNarmax(non_degree=2,
                              n_terms=15,
@@ -50,6 +50,7 @@ def test_error_reduction_ration():
                              )
     model.fit(x, y)
     assert_array_equal(model.pivv, piv)
+    print(model.final_model)
     assert_array_equal(model.final_model, model_code)
 
 
@@ -228,7 +229,7 @@ def test_model_prediction():
     assert_raises(Exception, model.predict, X_test, y_test[:1])
 
 
-def test_information_criteria():
+def test_information_criteria_aic():
     x, y, theta = create_test_data()
 
     model = PolynomialNarmax(non_degree=2,
@@ -241,9 +242,9 @@ def test_information_criteria():
                              estimator='least_squares',
                              )
     model.fit(x, y)
-    info_values = np.array([-1769.7907939, -2329.9129067, -2991.1078461,
-                            -4481.5306496, -71792.6413])
-    assert_almost_equal(model.info_values, info_values)
+    info_values = np.array([-1769.7907932,  -2329.9129013,  -2991.1078281,
+                            -4481.5306067, -72870.296884])
+    assert_almost_equal(model.info_values, info_values, decimal=3)
 
 
 def test_information_criteria_bic():
@@ -259,9 +260,9 @@ def test_information_criteria_bic():
                              estimator='least_squares',
                              )
     model.fit(x, y)
-    info_values = np.array([-1764.8850406, -2320.1014001, -2976.3905863,
-                            -4461.9076365, -71768.1125336])
-    assert_almost_equal(model.info_values, info_values)
+    info_values = np.array([-1764.885,  -2320.101,  -2976.391,
+                            -4461.908, -72845.768])
+    assert_almost_equal(model.info_values, info_values, decimal=3)
 
 
 def test_information_criteria_fpe():
@@ -277,9 +278,9 @@ def test_information_criteria_fpe():
                              estimator='least_squares',
                              )
     model.fit(x, y)
-    info_values = np.array([-1769.7907932, -2329.9129013, -2991.1078281,
-                            -4481.5306067, -71792.6412163])
-    assert_almost_equal(model.info_values, info_values)
+    info_values = np.array([-1769.7907932,  -2329.9129013,  -2991.1078281,
+                            -4481.5306067, -72870.296884])
+    assert_almost_equal(model.info_values, info_values, decimal=3)
 
 
 def test_information_criteria_lilc():
@@ -295,9 +296,9 @@ def test_information_criteria_lilc():
                              estimator='least_squares',
                              )
     model.fit(x, y)
-    info_values = np.array([-1767.9260841, -2326.1834872, -2985.5137169,
-                            -4474.0718106, -71783.3177513])
-    assert_almost_equal(model.info_values, info_values)
+    info_values = np.array([-1767.926,  -2326.183,  -2985.514,
+                            -4474.072, -72860.973])
+    assert_almost_equal(model.info_values, info_values, decimal=3)
 
 
 def test_results():
