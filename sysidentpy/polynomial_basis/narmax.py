@@ -375,7 +375,7 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
                 else:
                     exponents = np.append(exponents, base_exponents)
 
-        return exponents
+            return exponents
 
     def _model_prediction(self, model_elements,
                           X, y_initial, theta):
