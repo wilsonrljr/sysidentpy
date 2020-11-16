@@ -399,6 +399,9 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
                The predicted values of the model.
 
         """
+        if len(y_initial) < self.max_lag:
+            raise Exception('Insufficient initial conditions elements!')
+
         X = X.reshape(-1, self._n_inputs)
         y_output = np.zeros(X.shape[0], dtype=float)
         y_output.fill(np.nan)
