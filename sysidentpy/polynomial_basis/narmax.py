@@ -150,7 +150,7 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
                 num = np.power(num, 2)
                 den = np.array(
                     (tmp_psi[i:n, j].T
-                     @tmp_psi[i: n, j])
+                     @ tmp_psi[i: n, j])
                     * squared_y)
                 tmp_err[j] = num/den
 
@@ -306,7 +306,7 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
                 .build_information_matrix(ee, y, elag, 1, 2)
 
             psi_extended = psi_extended[:, [2, 3, 7, 8, 11,
-                                        12, 13, 14, 15, 16, 17]]
+                                            12, 13, 14, 15, 16, 17]]
 
             psi_e = np.concatenate([psi, psi_extended], axis=1)
             unbiased_theta = getattr(parameter_estimation,
@@ -344,7 +344,7 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
             X, y, self.theta)
         return yhat
 
-    def _code2exponents(self,code):
+    def _code2exponents(self, code):
         """
         Convert regressor code to exponents array.
 
@@ -361,8 +361,8 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
 
         else:
             exponents = np.array([], dtype=float)
-            elements = np.round(np.divide(regressors, 1000), \
-                                0)[(regressors>0)].astype(int)
+            elements = np.round(np.divide(regressors, 1000),
+                                0)[(regressors > 0)].astype(int)
 
             for j in range(1, self._n_inputs + 2):
                 base_exponents = np.zeros(self.max_lag, dtype=float)
@@ -374,8 +374,8 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
 
                 else:
                     exponents = np.append(exponents, base_exponents)
-                    
-            return exponents
+
+        return exponents
 
     def _model_prediction(self, model_elements,
                           X, y_initial, theta):
@@ -404,7 +404,8 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
         y_output.fill(np.nan)
         y_output[:self.max_lag] = y_initial[:self.max_lag, 0]
 
-        model_exponents = [self._code2exponents(model) for model in model_elements]
+        model_exponents = [self._code2exponents(
+            model) for model in model_elements]
         raw_regressor = np.zeros(len(model_exponents[0]), dtype=float)
 
         for i in range(self.max_lag, X.shape[0]):
@@ -419,11 +420,11 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
 
             regressor_value = np.zeros(len(model_exponents))
             for j in range(len(model_exponents)):
-                regressor_value[j] = np.prod(np.power(raw_regressor, \
-                                                    model_exponents[j]))
+                regressor_value[j] = np.prod(np.power(raw_regressor,
+                                                      model_exponents[j]))
 
             y_output[i] = np.dot(regressor_value, theta.flatten())
-        return y_output.reshape(-1,1)
+        return y_output.reshape(-1, 1)
 
     def information_criterion(self, X, y):
         """Determine the model order.
