@@ -26,7 +26,6 @@ def _get_max_lag(ylag, xlag):
     max_lag = int
         The max lag value defined by the user.
     """
-    # ny = np.max(ylag)
     ny = np.max(list(chain.from_iterable([[ylag]])))
     nx = np.max(list(chain.from_iterable([[xlag]])))
     return np.max([ny, np.max(nx)])
@@ -80,17 +79,18 @@ class GenerateRegressors:
         """
         if not isinstance(non_degree, int) or non_degree < 1:
             raise ValueError(
-                "non_degree must be integer and > zero. Got %f"
-                % non_degree)
+                "non_degree must be integer and > zero. Got %f" % non_degree
+            )
 
-        if (not isinstance(ylag, (int, list))
-                or np.min(np.minimum(ylag, 1)) < 1):
+        if not isinstance(ylag, (int, list)) or np.min(np.minimum(ylag, 1)) < 1:
             raise ValueError(
                 "ylag must be integer or list and > zero. Got %f" % ylag)
 
-        if (not isinstance(xlag, (int, list))
-                # or np.min(np.minimum(xlag, 1)) < 1):
-                or np.min(np.min(list(chain.from_iterable([[xlag]])))) < 1):
+        if (
+            not isinstance(xlag, (int, list))
+            # or np.min(np.minimum(xlag, 1)) < 1):
+            or np.min(np.min(list(chain.from_iterable([[xlag]])))) < 1
+        ):
             raise ValueError(
                 "xlag must be integer or list and > zero. Got %f" % xlag)
 
@@ -101,7 +101,7 @@ class GenerateRegressors:
         if isinstance(ylag, list):
             # create only the lags passed from list
             y_vec = []
-            y_vec.extend([lag+1000 for lag in ylag])
+            y_vec.extend([lag + 1000 for lag in ylag])
             y_vec = np.array(y_vec)
         else:
             # create a range of lags if passed a int value
@@ -110,7 +110,7 @@ class GenerateRegressors:
         if isinstance(xlag, list) and n_inputs == 1:
             # create only the lags passed from list
             x_vec_tmp = []
-            x_vec_tmp.extend([lag+2000 for lag in xlag])
+            x_vec_tmp.extend([lag + 2000 for lag in xlag])
             x_vec_tmp = np.array(x_vec_tmp)
         elif isinstance(xlag, int) and n_inputs == 1:
             # create a range of lags if passed a int value
@@ -122,16 +122,18 @@ class GenerateRegressors:
             for i in range(n_inputs):
                 if isinstance(xlag[i], list) and n_inputs > 1:
                     # create 200n, 300n,..., 400n to describe each input
-                    x_vec_tmp.extend([lag+2000+i*1000 for lag in xlag[i]])
+                    x_vec_tmp.extend(
+                        [lag + 2000 + i * 1000 for lag in xlag[i]])
                 elif isinstance(xlag[i], int) and n_inputs > 1:
                     x_vec_tmp.extend(
-                        [np.arange(2001+i*1000, 2001+i*1000 + xlag[i])])
+                        [np.arange(2001 + i * 1000, 2001 + i * 1000 + xlag[i])]
+                    )
 
         reg_aux = np.array([0])
         if n_inputs > 1:
             # if x_vec is a nested list, ensure all elements are arrays
-            all_arrays = ([np.array([i]) if isinstance(i, int) else i
-                           for i in x_vec_tmp])
+            all_arrays = [np.array([i]) if isinstance(
+                i, int) else i for i in x_vec_tmp]
             x_vec = np.concatenate([i for i in all_arrays])
         else:
             x_vec = x_vec_tmp
@@ -142,7 +144,7 @@ class GenerateRegressors:
             combinations_with_replacement(reg_aux, non_degree))
 
         regressor_code = np.array(regressor_code)
-        regressor_code = regressor_code[:, regressor_code.shape[1]::-1]
+        regressor_code = regressor_code[:, regressor_code.shape[1]:: -1]
         max_lag = _get_max_lag(ylag, xlag)
         return regressor_code, max_lag
 
@@ -180,8 +182,8 @@ class HouseHolder:
         v = np.array(x)
         aux_a = np.array([1])
         if u != 0:
-            aux_b = x[0] + np.sign(x[0])*u
-            v = np.array(v[1: n]/aux_b)
+            aux_b = x[0] + np.sign(x[0]) * u
+            v = np.array(v[1:n] / aux_b)
             v = np.concatenate((aux_a, v))
         return v
 
@@ -211,11 +213,11 @@ class HouseHolder:
             <https://en.wikipedia.org/wiki/Householder_transformation>`_
 
         """
-        b = -2/(v.T@v)
-        w = b*RA.T@v
+        b = -2 / (v.T @ v)
+        w = b * RA.T @ v
         w = w.reshape(1, -1)
         v = v.reshape(-1, 1)
-        RA = RA + v*w
+        RA = RA + v * w
         B = RA
         return B
 
@@ -271,11 +273,11 @@ class InformationMatrix:
         n_inputs = X.shape[1]
         if isinstance(xlag, int) and n_inputs > 1:
             raise ValueError(
-                "If n_inputs > 1, xlag must be a nested list. Got %f"
-                % xlag)
+                "If n_inputs > 1, xlag must be a nested list. Got %f" % xlag
+            )
 
         if isinstance(xlag, int):
-            xlag = range(1, xlag+1)
+            xlag = range(1, xlag + 1)
 
         return n_inputs, xlag
 
@@ -294,7 +296,7 @@ class InformationMatrix:
 
         """
         if isinstance(ylag, int):
-            ylag = range(1, ylag+1)
+            ylag = range(1, ylag + 1)
 
         return ylag
 
@@ -319,16 +321,18 @@ class InformationMatrix:
         """
         if n_inputs == 1:
             x_lagged = np.column_stack(
-                [self.shift_column(X[:, 0], lag) for lag in xlag])
+                [self.shift_column(X[:, 0], lag) for lag in xlag]
+            )
         else:
-            x_lagged = np.zeros([len(X), 1])  # only for stack other columns
+            x_lagged = np.zeros([len(X), 1])  # just to stack other columns
             # if user input a nested list like [[1, 2], 4], the following
             # line convert it to [[1, 2], [4]].
             # Remember, for multiple inputs all lags must be entered explicity
             xlag = [[i] if isinstance(i, int) else i for i in xlag]
             for col in range(n_inputs):
                 x_lagged_col = np.column_stack(
-                    [self.shift_column(X[:, col], lag) for lag in xlag[col]])
+                    [self.shift_column(X[:, col], lag) for lag in xlag[col]]
+                )
                 x_lagged = np.column_stack([x_lagged, x_lagged_col])
 
             x_lagged = x_lagged[:, 1:]  # remove the column of 0 created above
@@ -436,11 +440,14 @@ class InformationMatrix:
 
         # Create combinations of all columns based on its index
         iterable_list = range(data.shape[1])
-        combinations = list(combinations_with_replacement(iterable_list,
-                                                          non_degree))
+        combinations = list(combinations_with_replacement(
+            iterable_list, non_degree))
 
         psi = np.column_stack(
-            [np.prod(data[:, combinations[i]], axis=1)
-                for i in range(len(combinations))])
+            [
+                np.prod(data[:, combinations[i]], axis=1)
+                for i in range(len(combinations))
+            ]
+        )
         psi = psi[max_lag:, :]
         return psi

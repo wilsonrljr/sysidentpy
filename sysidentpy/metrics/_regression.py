@@ -342,14 +342,13 @@ def explained_variance_score(y, y_predicted):
     y_diff_avg = np.average(y - y_predicted)
     numerator = np.average((y - y_predicted - y_diff_avg) ** 2)
     y_avg = np.average(y)
-    denominator = np.average((y-y_avg)**2)
+    denominator = np.average((y - y_avg) ** 2)
     nonzero_numerator = numerator != 0
     nonzero_denominator = denominator != 0
     valid_score = nonzero_numerator & nonzero_denominator
     output_scores = np.ones(y.shape[0])
-    output_scores[valid_score] = (1 - (numerator[valid_score] /
-                                       denominator[valid_score]))
-    output_scores[nonzero_numerator & ~nonzero_denominator] = 0.
+    output_scores[valid_score] = 1 - (numerator[valid_score] / denominator[valid_score])
+    output_scores[nonzero_numerator & ~nonzero_denominator] = 0.0
     return np.average(output_scores)
 
 
@@ -388,17 +387,15 @@ def r2_score(y, y_predicted):
 
     """
     numerator = ((y - y_predicted) ** 2).sum(axis=0, dtype=np.float64)
-    denominator = ((y - np.average(y, axis=0)) **
-                   2).sum(axis=0, dtype=np.float64)
+    denominator = ((y - np.average(y, axis=0)) ** 2).sum(axis=0, dtype=np.float64)
     nonzero_denominator = denominator != 0
     nonzero_numerator = numerator != 0
     valid_score = nonzero_denominator & nonzero_numerator
     output_scores = np.ones([y.shape[0]])
-    output_scores[valid_score] = (1 - (numerator[valid_score] /
-                                       denominator[valid_score]))
+    output_scores[valid_score] = 1 - (numerator[valid_score] / denominator[valid_score])
     # arbitrary set to zero to avoid -inf scores, having a constant
     # y_true is not interesting for scoring a regression anyway
-    output_scores[nonzero_numerator & ~nonzero_denominator] = 0.
+    output_scores[nonzero_numerator & ~nonzero_denominator] = 0.0
     return np.average(output_scores)
 
 
@@ -436,5 +433,8 @@ def symmetric_mean_absolute_percentage_error(y, y_predicted):
     57.87
 
     """
-    return 100/len(y) * np.sum(2*np.abs(y_predicted - y)
-                               / (np.abs(y) + np.abs(y_predicted)))
+    return (
+        100
+        / len(y)
+        * np.sum(2 * np.abs(y_predicted - y) / (np.abs(y) + np.abs(y_predicted)))
+    )

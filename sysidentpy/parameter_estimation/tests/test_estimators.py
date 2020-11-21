@@ -11,8 +11,13 @@ def create_test_data(n=1000):
     theta = np.array([[0.6], [-0.5], [0.7], [-0.7], [0.2]])
     lag = 2
     for k in range(lag, len(x)):
-        y[k] = theta[4]*y[k-1]**2 + theta[2]*y[k-1]*x[k-1] + theta[0]*x[k-2] \
-               + theta[3]*y[k-2]*x[k-2] + theta[1]*y[k-2]
+        y[k] = (
+            theta[4] * y[k - 1] ** 2
+            + theta[2] * y[k - 1] * x[k - 1]
+            + theta[0] * x[k - 2]
+            + theta[3] * y[k - 2] * x[k - 2]
+            + theta[1] * y[k - 2]
+        )
 
     y = np.reshape(y, (len(y), 1))
     x = np.reshape(x, (len(x), 1))
@@ -22,24 +27,28 @@ def create_test_data(n=1000):
 
 def test_least_squares():
     x, y, theta = create_test_data()
-    model = PolynomialNarmax(non_degree=2,
-                             n_terms=5,
-                             extended_least_squares=False,
-                             ylag=[1, 2], xlag=2,
-                             estimator='least_squares',
-                             )
+    model = PolynomialNarmax(
+        non_degree=2,
+        n_terms=5,
+        extended_least_squares=False,
+        ylag=[1, 2],
+        xlag=2,
+        estimator="least_squares",
+    )
     model.fit(x, y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_total_least_squares():
     x, y, theta = create_test_data()
-    model = PolynomialNarmax(non_degree=2,
-                             n_terms=5,
-                             extended_least_squares=False,
-                             ylag=[1, 2], xlag=2,
-                             estimator='total_least_squares',
-                             )
+    model = PolynomialNarmax(
+        non_degree=2,
+        n_terms=5,
+        extended_least_squares=False,
+        ylag=[1, 2],
+        xlag=2,
+        estimator="total_least_squares",
+    )
     model.fit(x, y)
     print(model.theta)
     assert_almost_equal(model.theta, theta, decimal=2)
@@ -47,67 +56,77 @@ def test_total_least_squares():
 
 def test_recursive_least_squares():
     x, y, theta = create_test_data()
-    model = PolynomialNarmax(non_degree=2,
-                             n_terms=5,
-                             delta=0.00001,
-                             lam=0.99,
-                             extended_least_squares=False,
-                             ylag=[1, 2], xlag=2,
-                             estimator='recursive_least_squares',
-                             )
+    model = PolynomialNarmax(
+        non_degree=2,
+        n_terms=5,
+        delta=0.00001,
+        lam=0.99,
+        extended_least_squares=False,
+        ylag=[1, 2],
+        xlag=2,
+        estimator="recursive_least_squares",
+    )
     model.fit(x, y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_affine_least_mean_squares():
     x, y, theta = create_test_data()
-    model = PolynomialNarmax(non_degree=2,
-                             n_terms=5,
-                             mu=0.01,
-                             offset_covariance=0.2,
-                             extended_least_squares=False,
-                             ylag=[1, 2], xlag=2,
-                             estimator='affine_least_mean_squares',
-                             )
+    model = PolynomialNarmax(
+        non_degree=2,
+        n_terms=5,
+        mu=0.01,
+        offset_covariance=0.2,
+        extended_least_squares=False,
+        ylag=[1, 2],
+        xlag=2,
+        estimator="affine_least_mean_squares",
+    )
     model.fit(x, y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_least_mean_squares():
     x, y, theta = create_test_data()
-    model = PolynomialNarmax(non_degree=2,
-                             n_terms=5,
-                             mu=0.1,
-                             extended_least_squares=False,
-                             ylag=[1, 2], xlag=2,
-                             estimator='least_mean_squares',
-                             )
+    model = PolynomialNarmax(
+        non_degree=2,
+        n_terms=5,
+        mu=0.1,
+        extended_least_squares=False,
+        ylag=[1, 2],
+        xlag=2,
+        estimator="least_mean_squares",
+    )
     model.fit(x, y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_least_mean_squares_sign_error():
     x, y, theta = create_test_data(n=5000)
-    model = PolynomialNarmax(non_degree=2,
-                             n_terms=5,
-                             mu=0.01,
-                             extended_least_squares=False,
-                             ylag=[1, 2], xlag=2,
-                             estimator='least_mean_squares_sign_error',
-                             )
+    model = PolynomialNarmax(
+        non_degree=2,
+        n_terms=5,
+        mu=0.01,
+        extended_least_squares=False,
+        ylag=[1, 2],
+        xlag=2,
+        estimator="least_mean_squares_sign_error",
+    )
     model.fit(x, y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_normalized_least_mean_squares():
     x, y, theta = create_test_data()
-    model = PolynomialNarmax(non_degree=2,
-                             n_terms=5,
-                             mu=0.1,
-                             extended_least_squares=False,
-                             ylag=[1, 2], xlag=2,
-                             estimator='normalized_least_mean_squares',
-                             )
+    model = PolynomialNarmax(
+        non_degree=2,
+        n_terms=5,
+        mu=0.1,
+        extended_least_squares=False,
+        ylag=[1, 2],
+        xlag=2,
+        estimator="normalized_least_mean_squares",
+    )
     model.fit(x, y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
@@ -119,24 +138,27 @@ def test_least_mean_squares_normalized_sign_error():
         n_terms=5,
         n_info_values=6,
         extended_least_squares=False,
-        ylag=[1, 2], xlag=2,
-        info_criteria='aic',
-        estimator='least_mean_squares_normalized_sign_error',
+        ylag=[1, 2],
+        xlag=2,
+        info_criteria="aic",
+        estimator="least_mean_squares_normalized_sign_error",
         mu=0.005,
-        )
+    )
     model.fit(x, y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_least_mean_squares_sign_regressor():
     x, y, theta = create_test_data()
-    model = PolynomialNarmax(non_degree=2,
-                             n_terms=5,
-                             mu=0.1,
-                             extended_least_squares=False,
-                             ylag=[1, 2], xlag=2,
-                             estimator='least_mean_squares_sign_regressor',
-                             )
+    model = PolynomialNarmax(
+        non_degree=2,
+        n_terms=5,
+        mu=0.1,
+        extended_least_squares=False,
+        ylag=[1, 2],
+        xlag=2,
+        estimator="least_mean_squares_sign_regressor",
+    )
     model.fit(x, y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
@@ -148,9 +170,10 @@ def test_least_mean_squares_normalized_sign_regressor():
         n_terms=5,
         mu=0.1,
         extended_least_squares=False,
-        ylag=[1, 2], xlag=2,
-        estimator='least_mean_squares_normalized_sign_regressor',
-        )
+        ylag=[1, 2],
+        xlag=2,
+        estimator="least_mean_squares_normalized_sign_regressor",
+    )
     model.fit(x, y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
@@ -162,9 +185,10 @@ def test_least_mean_squares_sign_sign():
         n_terms=5,
         mu=0.001,
         extended_least_squares=False,
-        ylag=[1, 2], xlag=2,
-        estimator='least_mean_squares_sign_sign',
-        )
+        ylag=[1, 2],
+        xlag=2,
+        estimator="least_mean_squares_sign_sign",
+    )
     model.fit(x, y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
@@ -177,9 +201,10 @@ def test_least_mean_squares_normalized_sign_sign():
         mu=0.0001,
         # eps=0.05,
         extended_least_squares=False,
-        ylag=[1, 2], xlag=2,
-        estimator='least_mean_squares_normalized_sign_sign',
-        )
+        ylag=[1, 2],
+        xlag=2,
+        estimator="least_mean_squares_normalized_sign_sign",
+    )
     model.fit(x, y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
@@ -191,8 +216,9 @@ def test_least_mean_squares_mixed_norm():
         n_terms=5,
         mu=0.05,
         extended_least_squares=False,
-        ylag=[1, 2], xlag=2,
-        estimator='least_mean_squares_mixed_norm',
-        )
+        ylag=[1, 2],
+        xlag=2,
+        estimator="least_mean_squares_mixed_norm",
+    )
     model.fit(x, y)
     assert_almost_equal(model.theta, theta, decimal=2)

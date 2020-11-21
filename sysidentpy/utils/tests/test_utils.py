@@ -1,8 +1,10 @@
-from sysidentpy.utils._check_arrays import (check_length,
-                                            check_dimension,
-                                            check_infinity,
-                                            check_nan,
-                                            check_X_y)
+from sysidentpy.utils._check_arrays import (
+    check_length,
+    check_dimension,
+    check_infinity,
+    check_nan,
+    check_X_y,
+)
 
 import numpy as np
 from numpy.testing import assert_raises

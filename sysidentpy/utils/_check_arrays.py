@@ -20,13 +20,17 @@ def check_infinity(X, y):
 
     """
     if np.isinf(X).any():
-        msg_error = (f"Input contains invalid values (e.g. NaN, Inf) on "
-                     f"index {np.argwhere(np.isinf(X))}")
+        msg_error = (
+            f"Input contains invalid values (e.g. NaN, Inf) on "
+            f"index {np.argwhere(np.isinf(X))}"
+        )
         raise ValueError(msg_error)
 
     if np.isinf(y).any():
-        msg_error = (f"Output contains invalid values (e.g Inf) on "
-                     f"index {np.argwhere(np.isinf(y))}")
+        msg_error = (
+            f"Output contains invalid values (e.g Inf) on "
+            f"index {np.argwhere(np.isinf(y))}"
+        )
         raise ValueError(msg_error)
 
 
@@ -44,13 +48,17 @@ def check_nan(X, y):
 
     """
     if np.isnan(X).any():
-        msg_error = (f"Input contains invalid values (e.g. NaN, Inf) on "
-                     f"index {np.argwhere(np.isnan(X))}")
+        msg_error = (
+            f"Input contains invalid values (e.g. NaN, Inf) on "
+            f"index {np.argwhere(np.isnan(X))}"
+        )
         raise ValueError(msg_error)
 
     if not ~np.isnan(y).any():
-        msg_error = (f"Output contains invalid values (e.g. NaN, Inf) on "
-                     f"index {np.argwhere(np.isnan(y))}")
+        msg_error = (
+            f"Output contains invalid values (e.g. NaN, Inf) on "
+            f"index {np.argwhere(np.isnan(y))}"
+        )
         raise ValueError(msg_error)
 
 
@@ -68,9 +76,11 @@ def check_length(X, y):
 
     """
     if X.shape[0] != y.shape[0]:
-        msg_error = (f"Input and output data must have the same number of "
-                     f"samples. X has dimension {X.shape} and "
-                     f"y has dimension {y.shape}")
+        msg_error = (
+            f"Input and output data must have the same number of "
+            f"samples. X has dimension {X.shape} and "
+            f"y has dimension {y.shape}"
+        )
         raise ValueError(msg_error)
 
 
@@ -88,20 +98,36 @@ def check_dimension(X, y):
 
     """
     if X.ndim == 0:
-        raise ValueError((f"Input must be a 2d array, got scalar instead.\n"
-                          f"Reshape your data using array.reshape(-1, 1)"))
+        raise ValueError(
+            (
+                f"Input must be a 2d array, got scalar instead.\n"
+                f"Reshape your data using array.reshape(-1, 1)"
+            )
+        )
 
     if X.ndim == 1:
-        raise ValueError((f"Input must be a 2d array, got 1d array instead.\n"
-                          f"Reshape your data using array.reshape(-1, 1)"))
+        raise ValueError(
+            (
+                f"Input must be a 2d array, got 1d array instead.\n"
+                f"Reshape your data using array.reshape(-1, 1)"
+            )
+        )
 
     if y.ndim == 0:
-        raise ValueError((f"Output must be a 2d array, got scalar instead.\n"
-                          f"Reshape your data using array.reshape(-1, 1)"))
+        raise ValueError(
+            (
+                f"Output must be a 2d array, got scalar instead.\n"
+                f"Reshape your data using array.reshape(-1, 1)"
+            )
+        )
 
     if y.ndim == 1:
-        raise ValueError((f"Output must be a 2d array, got 1d array instead.\n"
-                          f"Reshape your data using array.reshape(-1, 1)"))
+        raise ValueError(
+            (
+                f"Output must be a 2d array, got 1d array instead.\n"
+                f"Reshape your data using array.reshape(-1, 1)"
+            )
+        )
 
 
 def check_X_y(X, y):
