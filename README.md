@@ -131,11 +131,15 @@ The project is currently maintained by its creators and looking for contributors
 
 # Communication
 
-- Discord server: https://discord.gg/8eGE3PQ
+- Discord server: https://discord.gg/8eGE3PQ 
+
+  [![discord](https://img.shields.io/discord/711610087700955176?color=%23FF7800&label=discord)](https://discord.gg/7afBSzU4)
+
 
 - Website(soon): http://sysidentpy.org
 
 # Citation
+[![DOI](https://img.shields.io/badge/DOI-10.21105%2Fjoss.02384-%23FF7800)](https://joss.theoj.org/papers/10.21105/joss.02384)
 
 If you use SysIdentPy on your project, please [drop me a line](mailto:wilsonrljr@outlook.com).
 
@@ -157,8 +161,6 @@ If you use SysIdentPy on your scientific publication, we would appreciate citati
   journal = {Journal of Open Source Software}
 }
 ```
-[![DOI](https://img.shields.io/badge/DOI-10.21105%2Fjoss.02384-%23FF7800)](https://joss.theoj.org/papers/10.21105/joss.02384)
-
 
 # Inspiration
 
