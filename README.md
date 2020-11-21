@@ -1,4 +1,6 @@
-<img src="images/sysidentpy-logo.svg" width="1280" height="640" />
+<p align="center">
+<img src="images/sysidentpy-logo.svg" width="640" height="320" />
+</p>
 
 [![DOI](https://img.shields.io/badge/DOI-10.21105%2Fjoss.02384-%23FF7800)](https://joss.theoj.org/papers/10.21105/joss.02384)
 [![PyPI version](https://img.shields.io/pypi/v/sysidentpy?color=%23ff7800)](https://pypi.org/project/sysidentpy/)
