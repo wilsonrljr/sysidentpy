@@ -19,30 +19,41 @@ from ..residues.residues_correlation import ResiduesAnalysis
 from ..utils._check_arrays import check_X_y
 
 
-class PolynomialNarmax(GenerateRegressors, HouseHolder,
-                       InformationMatrix, ResiduesAnalysis,
-                       Estimators):
+class PolynomialNarmax(
+    GenerateRegressors, HouseHolder, InformationMatrix, ResiduesAnalysis, Estimators
+):
     """ Polynomial NARXMAX model"""
 
-    def __init__(self, non_degree=2, ylag=2, xlag=2,
-                 order_selection=False,
-                 info_criteria='aic', n_terms=None,
-                 n_inputs=1,
-                 n_info_values=10,
-                 estimator='least_squares',
-                 extended_least_squares=True,
-                 aux_lag=1, lam=0.98, delta=0.01,
-                 offset_covariance=0.2, mu=0.01,
-                 eps=np.finfo(np.float).eps,
-                 gama=0.2, weight=0.02):
+    def __init__(
+        self,
+        non_degree=2,
+        ylag=2,
+        xlag=2,
+        order_selection=False,
+        info_criteria="aic",
+        n_terms=None,
+        n_inputs=1,
+        n_info_values=10,
+        estimator="least_squares",
+        extended_least_squares=True,
+        aux_lag=1,
+        lam=0.98,
+        delta=0.01,
+        offset_covariance=0.2,
+        mu=0.01,
+        eps=np.finfo(np.float).eps,
+        gama=0.2,
+        weight=0.02,
+    ):
 
         self.non_degree = non_degree
         self._order_selection = order_selection
         self._n_inputs = n_inputs
         self.ylag = ylag
         self.xlag = xlag
-        [self.regressor_code, self.max_lag] = GenerateRegressors().\
-            regressor_space(non_degree, xlag, ylag, n_inputs)
+        [self.regressor_code, self.max_lag] = GenerateRegressors().regressor_space(
+            non_degree, xlag, ylag, n_inputs
+        )
 
         self.info_criteria = info_criteria
         self.n_info_values = n_info_values
@@ -63,42 +74,50 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
         """Validate input params."""
         if not isinstance(self.n_info_values, int) or self.n_info_values < 1:
             raise ValueError(
-                "n_info_values must be integer and > zero. Got %f"
-                % self.n_info_values)
+                "n_info_values must be integer and > zero. Got %f" % self.n_info_values
+            )
 
         if not isinstance(self._n_inputs, int) or self._n_inputs < 1:
             raise ValueError(
-                "n_inputs must be integer and > zero. Got %f"
-                % self._n_inputs)
+                "n_inputs must be integer and > zero. Got %f" % self._n_inputs
+            )
 
         if not isinstance(self._order_selection, bool):
             raise TypeError(
-                "order_selection must be False or True. Got %f"
-                % self._order_selection)
+                "order_selection must be False or True. Got %f" % self._order_selection
+            )
 
         if not isinstance(self._extended_least_squares, bool):
             raise TypeError(
                 "extended_least_squares must be False or True. Got %f"
-                % self._extended_least_squares)
+                % self._extended_least_squares
+            )
 
-        if self.info_criteria not in ['aic', 'bic', 'fpe', 'lilc']:
+        if self.info_criteria not in ["aic", "bic", "fpe", "lilc"]:
             raise ValueError(
-                'info_criteria must be aic, bic, fpe or lilc. Got %s'
-                % self.info_criteria)
+                "info_criteria must be aic, bic, fpe or lilc. Got %s"
+                % self.info_criteria
+            )
 
-        if (not isinstance(self.n_terms, int) or self.n_terms < 1) \
-                and self.n_terms is not None:
+        if (
+            not isinstance(self.n_terms, int) or self.n_terms < 1
+        ) and self.n_terms is not None:
             raise ValueError(
-                "n_terms must be integer and > zero. Got %f" % self.n_terms)
+                "n_terms must be integer and > zero. Got %f" % self.n_terms
+            )
 
-        if (self.n_terms is not None
-                and self.n_terms > self.regressor_code.shape[0]):
+        if self.n_terms is not None and self.n_terms > self.regressor_code.shape[0]:
             self.n_terms = self.regressor_code.shape[0]
-            warnings.warn(("n_terms is greater than the maximum number of "
-                           "all regressors space considering the chosen y_lag,"
-                           "u_lag, and non_degree. We set as "
-                           "%d ") % self.regressor_code.shape[0],
-                          stacklevel=2)
+            warnings.warn(
+                (
+                    "n_terms is greater than the maximum number of "
+                    "all regressors space considering the chosen y_lag,"
+                    "u_lag, and non_degree. We set as "
+                    "%d "
+                )
+                % self.regressor_code.shape[0],
+                stacklevel=2,
+            )
 
     def error_reduction_ratio(self, psi, y, process_term_number):
         """Perform the Error Reduction Ration algorithm.
@@ -134,9 +153,9 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
             <https://www.researchgate.net/profile/Giovani_Rodrigues/publication/228595821_Identificacao_de_Sistemas_nao_Lineares_Utilizando_Modelos_NARMAX_Polinomiais-Uma_Revisao_e_Novos_Resultados/links/00b4951b10ff8ab4d3000000.pdf>`_
 
         """
-        squared_y = y[self.max_lag:].T@y[self.max_lag:]
+        squared_y = y[self.max_lag :].T @ y[self.max_lag :]
         tmp_psi = np.array(psi)
-        y = np.array([y[self.max_lag:, 0]]).T
+        y = np.array([y[self.max_lag :, 0]]).T
         tmp_y = np.copy(y)
         [n, dimension] = tmp_psi.shape
         piv = np.arange(dimension)
@@ -145,14 +164,10 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
 
         for i in np.arange(0, dimension):
             for j in np.arange(i, dimension):
-                num = np.array(
-                    tmp_psi[i: n, j].T@tmp_y[i: n])
+                num = np.array(tmp_psi[i:n, j].T @ tmp_y[i:n])
                 num = np.power(num, 2)
-                den = np.array(
-                    (tmp_psi[i:n, j].T
-                     @ tmp_psi[i: n, j])
-                    * squared_y)
-                tmp_err[j] = num/den
+                den = np.array((tmp_psi[i:n, j].T @ tmp_psi[i:n, j]) * squared_y)
+                tmp_err[j] = num / den
 
             if i == process_term_number:
                 break
@@ -162,20 +177,19 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
             err[i] = tmp_err[piv_index]
             tmp_psi[:, [piv_index, i]] = tmp_psi[:, [i, piv_index]]
             piv[[piv_index, i]] = piv[[i, piv_index]]
-            x = tmp_psi[i: n, i]
+            x = tmp_psi[i:n, i]
 
             v = HouseHolder()._house(x)
 
-            aux_1 = tmp_psi[i: n, i: dimension]
+            aux_1 = tmp_psi[i:n, i:dimension]
 
             row_result = HouseHolder()._rowhouse(aux_1, v)
 
-            tmp_y[i: n] = HouseHolder()._rowhouse(
-                tmp_y[i: n], v)
+            tmp_y[i:n] = HouseHolder()._rowhouse(tmp_y[i:n], v)
 
-            tmp_psi[i: n, i: dimension] = np.copy(row_result)
+            tmp_psi[i:n, i:dimension] = np.copy(row_result)
 
-        tmp_piv = piv[0: process_term_number]
+        tmp_piv = piv[0:process_term_number]
         tmp_psi = np.array(psi)
         psi_orthogonal = np.copy(tmp_psi[:, tmp_piv])
         tmp_psi = np.array(psi)
@@ -219,28 +233,27 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
 
         check_X_y(X, y)
 
-        reg_Matrix = InformationMatrix().\
-            build_information_matrix(X, y, self.xlag,
-                                     self.ylag, self.non_degree)
+        reg_Matrix = InformationMatrix().build_information_matrix(
+            X, y, self.xlag, self.ylag, self.non_degree
+        )
 
         if self._order_selection is True:
             self.info_values = self.information_criterion(X, y)
 
         if self.n_terms is None and self._order_selection is True:
-            model_length = np.where(
-                self.info_values == np.amin(self.info_values))
+            model_length = np.where(self.info_values == np.amin(self.info_values))
             model_length = int(model_length[0] + 1)
             self.n_terms = model_length
         elif self.n_terms is None and self._order_selection is not True:
             raise ValueError(
-                'If order_selection is False, you must define n_terms value.')
+                "If order_selection is False, you must define n_terms value."
+            )
         else:
             model_length = self.n_terms
 
-        (self.final_model,
-         self.err,
-         self.pivv,
-         psi) = self.error_reduction_ratio(reg_Matrix, y, model_length)
+        (self.final_model, self.err, self.pivv, psi) = self.error_reduction_ratio(
+            reg_Matrix, y, model_length
+        )
 
         # I know... the 'method' below needs attention
         parameter_estimation = Estimators(
@@ -251,17 +264,19 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
             mu=self._mu,
             eps=self._eps,
             gama=self._gama,
-            weight=self._weight)
+            weight=self._weight,
+        )
         self.theta = getattr(parameter_estimation, self.estimator)(psi, y)
 
         if self._extended_least_squares is True:
-            self.theta = self._unbiased_estimator(psi, X, y, self.theta,
-                                                  self.max_lag,
-                                                  parameter_estimation)
+            self.theta = self._unbiased_estimator(
+                psi, X, y, self.theta, self.max_lag, parameter_estimation
+            )
         return self
 
-    def _unbiased_estimator(self, psi, X, y, biased_theta,
-                            aux_lag, parameter_estimation):
+    def _unbiased_estimator(
+        self, psi, X, y, biased_theta, aux_lag, parameter_estimation
+    ):
         """Estimate the model parameters using Extended Least Squares method.
 
         Parameters
@@ -301,20 +316,18 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
         for i in range(30):
             e = np.concatenate([np.zeros([aux_lag, 1]), e], axis=0)
             ee = np.concatenate([e, X], axis=1)
-            elag = [[1, aux_lag]]*ee.shape[1]
-            psi_extended = InformationMatrix()\
-                .build_information_matrix(ee, y, elag, 1, 2)
+            elag = [[1, aux_lag]] * ee.shape[1]
+            psi_extended = InformationMatrix().build_information_matrix(
+                ee, y, elag, 1, 2
+            )
 
-            psi_extended = psi_extended[:, [2, 3, 7, 8, 11,
-                                            12, 13, 14, 15, 16, 17]]
+            psi_extended = psi_extended[:, [2, 3, 7, 8, 11, 12, 13, 14, 15, 16, 17]]
 
             psi_e = np.concatenate([psi, psi_extended], axis=1)
-            unbiased_theta = getattr(parameter_estimation,
-                                     self.estimator)(psi_e, y)
-            e = y[aux_lag:, 0].reshape(-1, 1) \
-                - psi_e @ unbiased_theta.reshape(-1, 1)
+            unbiased_theta = getattr(parameter_estimation, self.estimator)(psi_e, y)
+            e = y[aux_lag:, 0].reshape(-1, 1) - psi_e @ unbiased_theta.reshape(-1, 1)
 
-        return unbiased_theta[0:len(self.final_model), 0].reshape(-1, 1)
+        return unbiased_theta[0 : len(self.final_model), 0].reshape(-1, 1)
 
     def predict(self, X, y):
         """Return the predicted values given an input.
@@ -339,9 +352,7 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
             The predicted values of the model.
 
         """
-        yhat = self._model_prediction(
-            self.final_model,
-            X, y, self.theta)
+        yhat = self._model_prediction(self.final_model, X, y, self.theta)
         return yhat
 
     def _code2exponents(self, code):
@@ -361,14 +372,15 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
 
         else:
             exponents = np.array([], dtype=float)
-            elements = np.round(np.divide(regressors, 1000),
-                                0)[(regressors > 0)].astype(int)
+            elements = np.round(np.divide(regressors, 1000), 0)[
+                (regressors > 0)
+            ].astype(int)
 
             for j in range(1, self._n_inputs + 2):
                 base_exponents = np.zeros(self.max_lag, dtype=float)
-                if (j in elements):
+                if j in elements:
                     for i in range(1, self.max_lag + 1):
-                        regressor_code = int(j*1000 + i)
+                        regressor_code = int(j * 1000 + i)
                         base_exponents[-i] = regressors_count[regressor_code]
                     exponents = np.append(exponents, base_exponents)
 
@@ -377,8 +389,7 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
 
             return exponents
 
-    def _model_prediction(self, model_elements,
-                          X, y_initial, theta):
+    def _model_prediction(self, model_elements, X, y_initial, theta):
         """Perform the infinity steps-ahead simulation of a model.
 
         Parameters
@@ -400,15 +411,14 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
 
         """
         if len(y_initial) < self.max_lag:
-            raise Exception('Insufficient initial conditions elements!')
+            raise Exception("Insufficient initial conditions elements!")
 
         X = X.reshape(-1, self._n_inputs)
         y_output = np.zeros(X.shape[0], dtype=float)
         y_output.fill(np.nan)
-        y_output[:self.max_lag] = y_initial[:self.max_lag, 0]
+        y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
 
-        model_exponents = [self._code2exponents(
-            model) for model in model_elements]
+        model_exponents = [self._code2exponents(model) for model in model_elements]
         raw_regressor = np.zeros(len(model_exponents[0]), dtype=float)
 
         for i in range(self.max_lag, X.shape[0]):
@@ -423,8 +433,9 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
 
             regressor_value = np.zeros(len(model_exponents))
             for j in range(len(model_exponents)):
-                regressor_value[j] = np.prod(np.power(raw_regressor,
-                                                      model_exponents[j]))
+                regressor_value[j] = np.prod(
+                    np.power(raw_regressor, model_exponents[j])
+                )
 
             y_output[i] = np.dot(regressor_value, theta.flatten())
         return y_output.reshape(-1, 1)
@@ -457,20 +468,27 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
         ----------
 
         """
-        if (self.n_info_values is not None
-                and self.n_info_values > self.regressor_code.shape[0]):
+        if (
+            self.n_info_values is not None
+            and self.n_info_values > self.regressor_code.shape[0]
+        ):
             self.n_info_values = self.regressor_code.shape[0]
-            warnings.warn(("n_info_values is greater than the maximum number "
-                           "of all regressors space considering the chosen "
-                           "y_lag, u_lag, and non_degree. We set as "
-                           "%d ") % self.regressor_code.shape[0],
-                          stacklevel=2)
+            warnings.warn(
+                (
+                    "n_info_values is greater than the maximum number "
+                    "of all regressors space considering the chosen "
+                    "y_lag, u_lag, and non_degree. We set as "
+                    "%d "
+                )
+                % self.regressor_code.shape[0],
+                stacklevel=2,
+            )
 
         output_vector = np.zeros(self.n_info_values)
         output_vector[:] = np.nan
-        X_base = InformationMatrix().\
-            build_information_matrix(X, y, self.xlag,
-                                     self.ylag, self.non_degree)
+        X_base = InformationMatrix().build_information_matrix(
+            X, y, self.xlag, self.ylag, self.non_degree
+        )
 
         n_samples = len(y) - self.max_lag
 
@@ -482,29 +500,28 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
             mu=self._mu,
             eps=self._eps,
             gama=self._gama,
-            weight=self._weight)
+            weight=self._weight,
+        )
 
         for i in range(0, self.n_info_values):
             n_theta = i + 1
-            regressor_matrix = self.error_reduction_ratio(X_base, y,
-                                                          n_theta)[3]
+            regressor_matrix = self.error_reduction_ratio(X_base, y, n_theta)[3]
 
-            tmp_theta = getattr(parameter_estimation,
-                                self.estimator)(regressor_matrix, y)
+            tmp_theta = getattr(parameter_estimation, self.estimator)(
+                regressor_matrix, y
+            )
 
             tmp_yhat = regressor_matrix @ tmp_theta
-            tmp_residual = (y[self.max_lag:] - tmp_yhat)
+            tmp_residual = y[self.max_lag :] - tmp_yhat
             e_var = np.var(tmp_residual, ddof=1)
 
-            output_vector[i] = self.compute_info_value(n_theta,
-                                                       n_samples,
-                                                       e_var)
+            output_vector[i] = self.compute_info_value(n_theta, n_samples, e_var)
 
             # output_vector[i] = e_factor + model_factor
 
         return output_vector
 
-    def results(self, theta_precision=4, err_precision=8, dtype='dec'):
+    def results(self, theta_precision=4, err_precision=8, dtype="dec"):
         """Write the model regressors, parameters and ERR values.
 
         This function returns the model regressors, its respectives parameter
@@ -533,27 +550,27 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
         """
         if not isinstance(theta_precision, int) or theta_precision < 1:
             raise ValueError(
-                "theta_precision must be integer and > zero. Got %f"
-                % theta_precision)
+                "theta_precision must be integer and > zero. Got %f" % theta_precision
+            )
 
         if not isinstance(err_precision, int) or err_precision < 1:
             raise ValueError(
-                "err_precision must be integer and > zero. Got %f"
-                % err_precision)
+                "err_precision must be integer and > zero. Got %f" % err_precision
+            )
 
-        if dtype not in ('dec', 'sci'):
+        if dtype not in ("dec", "sci"):
             raise ValueError("dtype must be dec or sci. Got %s" % dtype)
 
         output_matrix = []
-        theta_output_format = '{:.' + str(theta_precision)
-        err_output_format = '{:.' + str(err_precision)
+        theta_output_format = "{:." + str(theta_precision)
+        err_output_format = "{:." + str(err_precision)
 
-        if dtype == 'dec':
-            theta_output_format = theta_output_format + 'f}'
-            err_output_format = err_output_format + 'f}'
+        if dtype == "dec":
+            theta_output_format = theta_output_format + "f}"
+            err_output_format = err_output_format + "f}"
         else:
-            theta_output_format = theta_output_format + 'E}'
-            err_output_format = err_output_format + 'E}'
+            theta_output_format = theta_output_format + "E}"
+            err_output_format = err_output_format + "E}"
 
         for i in range(0, self.n_terms):
             if np.max(self.final_model[i]) < 1:
@@ -564,26 +581,30 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
                 for j in range(0, len(list(regressor_dic.keys()))):
                     regressor_key = list(regressor_dic.keys())[j]
                     if regressor_key < 1:
-                        translated_key = ''
-                        translated_exponent = ''
+                        translated_key = ""
+                        translated_exponent = ""
                     else:
                         delay_string = str(
-                            int(regressor_key
-                                - np.floor(regressor_key/1000)*1000))
-                        if int(regressor_key/1000) < 2:
-                            translated_key = 'y(k-' + delay_string + ')'
+                            int(regressor_key - np.floor(regressor_key / 1000) * 1000)
+                        )
+                        if int(regressor_key / 1000) < 2:
+                            translated_key = "y(k-" + delay_string + ")"
                         else:
-                            translated_key = 'x' + \
-                                str(int(regressor_key/1000)-1) + \
-                                '(k-' + delay_string + ')'
+                            translated_key = (
+                                "x"
+                                + str(int(regressor_key / 1000) - 1)
+                                + "(k-"
+                                + delay_string
+                                + ")"
+                            )
                         if regressor_dic[regressor_key] < 2:
-                            translated_exponent = ''
+                            translated_exponent = ""
                         else:
-                            translated_exponent = '^' + \
-                                str(regressor_dic[regressor_key])
-                    regressor_string.append(
-                        translated_key + translated_exponent)
-                tmp_regressor = ''.join(regressor_string)
+                            translated_exponent = "^" + str(
+                                regressor_dic[regressor_key]
+                            )
+                    regressor_string.append(translated_key + translated_exponent)
+                tmp_regressor = "".join(regressor_string)
 
             current_parameter = theta_output_format.format(self.theta[i, 0])
             current_err = err_output_format.format(self.err[i])
@@ -615,15 +636,16 @@ class PolynomialNarmax(GenerateRegressors, HouseHolder,
             user.
 
         """
-        if self.info_criteria == 'bic':
+        if self.info_criteria == "bic":
             model_factor = n_theta * np.log(n_samples)
-        elif self.info_criteria == 'fpe':
-            model_factor = n_samples * np.log((n_samples + n_theta)
-                                              / (n_samples - n_theta))
-        elif self.info_criteria == 'lilc':
+        elif self.info_criteria == "fpe":
+            model_factor = n_samples * np.log(
+                (n_samples + n_theta) / (n_samples - n_theta)
+            )
+        elif self.info_criteria == "lilc":
             model_factor = 2 * n_theta * np.log(np.log(n_samples))
         else:  # AIC
-            model_factor = + 2 * n_theta
+            model_factor = +2 * n_theta
 
         e_factor = n_samples * np.log(e_var)
         info_criteria_value = e_factor + model_factor
