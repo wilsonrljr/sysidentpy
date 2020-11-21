@@ -7,58 +7,6 @@ from numpy.testing import assert_almost_equal, assert_array_equal
 from numpy.testing import assert_raises
 
 
-def create_test_data2(n=1000):
-    np.random.seed(42)
-    x = np.random.uniform(-1, 1, n).T
-    y = np.zeros((n, 1))
-    theta = np.array([[0.2], [0.1], [0.9]])
-    lag = 2
-    for k in range(lag, len(x)):
-        y[k] = theta[0]*y[k-1] + theta[1]*y[k-1]*x[k-1]\
-            + theta[2]*x[k-2]
-
-    y = np.reshape(y, (len(y), 1))
-    x = np.reshape(x, (len(x), 1))
-
-    return x, y, theta
-
-
-def test_new_err():
-    model_code = np.array([[2002,    0],
-                           [1001,    0],
-                           [2001, 1001]])
-
-    x, y, theta = create_test_data2()
-    model = PolynomialNarmax(non_degree=2,
-                             n_terms=3,
-                             order_selection=True,
-                             n_info_values=3,
-                             info_criteria='aic',
-                             extended_least_squares=False,
-                             ylag=[1, 2], xlag=2,
-                             estimator='least_squares',
-                             )
-    model.fit(x, y)
-    assert_array_equal(model.final_model, model_code)
-
-
-def test_new_information_criteria_aic():
-    x, y, theta = create_test_data2()
-
-    model = PolynomialNarmax(non_degree=2,
-                             n_terms=3,
-                             extended_least_squares=False,
-                             order_selection=True,
-                             info_criteria='aic',
-                             n_info_values=3,
-                             ylag=[1, 2], xlag=2,
-                             estimator='least_squares',
-                             )
-    model.fit(x, y)
-    info_values = np.array([-4391.716,  -6945.509, -75140.556])
-    assert_almost_equal(model.info_values, info_values, decimal=3)
-
-
 def create_test_data(n=1000):
     np.random.seed(42)
     x = np.random.uniform(-1, 1, n).T
