@@ -1,3 +1,4 @@
+from numpy.testing._private.utils import assert_allclose
 from sysidentpy.polynomial_basis import PolynomialNarmax
 from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
 
@@ -221,24 +222,6 @@ def test_model_prediction():
                              )
     model.fit(X_train, y_train)
     assert_raises(Exception, model.predict, X_test, y_test[:1])
-
-
-def test_information_criteria_aic():
-    x, y, theta = create_test_data()
-
-    model = PolynomialNarmax(non_degree=2,
-                             n_terms=5,
-                             extended_least_squares=False,
-                             order_selection=True,
-                             info_criteria='aic',
-                             n_info_values=5,
-                             ylag=[1, 2], xlag=2,
-                             estimator='least_squares',
-                             )
-    model.fit(x, y)
-    info_values = np.array([-1769.7907932,  -2329.9129013,  -2991.1078281,
-                            -4481.5306067, -72761.177])
-    assert_almost_equal(model.info_values, info_values, decimal=3)
 
 
 def test_information_criteria_bic():
