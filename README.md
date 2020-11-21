@@ -1,5 +1,19 @@
 
 # SysIdentPy
+[![DOI](https://img.shields.io/badge/DOI-10.21105%2Fjoss.02384-%23FF7800)](https://joss.theoj.org/papers/10.21105/joss.02384)
+[![PyPI version](https://img.shields.io/pypi/v/sysidentpy?color=%23ff7800)](https://pypi.org/project/sysidentpy/)
+[![License](https://img.shields.io/pypi/l/sysidentpy?color=%23FF7800)](https://opensource.org/licenses/BSD-3-Clause)
+[![openissues](https://img.shields.io/github/issues/wilsonrljr/sysidentpy?color=%23FF7800)](https://github.com/wilsonrljr/sysidentpy/issues)
+[![issuesclosed](https://img.shields.io/github/issues-closed-raw/wilsonrljr/sysidentpy?color=%23FF7800)](https://github.com/wilsonrljr/sysidentpy/issues)
+[![downloads](https://img.shields.io/pypi/dm/sysidentpy?color=%23FF7800)](https://pypi.org/project/sysidentpy/)
+[![python](https://img.shields.io/pypi/pyversions/sysidentpy?color=%23FF7800)](https://pypi.org/project/sysidentpy/)
+[![status](https://img.shields.io/pypi/status/sysidentpy?color=%23FF7800)](https://pypi.org/project/sysidentpy/)
+[![discord](https://img.shields.io/discord/711610087700955176?color=%23FF7800&label=discord)](https://discord.gg/7afBSzU4)
+[![contributors](https://img.shields.io/github/contributors/wilsonrljr/sysidentpy?color=%23FF7800)](https://github.com/wilsonrljr/sysidentpy/graphs/contributors)
+[![forks](https://img.shields.io/github/forks/wilsonrljr/sysidentpy?style=social)](https://github.com/wilsonrljr/sysidentpy/network/members)
+[![stars](https://img.shields.io/github/stars/wilsonrljr/sysidentpy?style=social)](https://github.com/wilsonrljr/sysidentpy/stargazers)
+
+
 
 SysIdentPy is a Python module for System Identification using **NARMAX** models built on top of **numpy** and is distributed under the 3-Clause BSD license.
 
@@ -121,7 +135,28 @@ The project is currently maintained by its creators and looking for contributors
 
 # Citation
 
-More information coming soon.
+If you use SysIdentPy on your project, please [drop me a line](mailto:wilsonrljr@outlook.com).
+
+If you use SysIdentPy on your scientific publication, we would appreciate citations to the following paper:
+
+- Lacerda et al., (2020). SysIdentPy: A Python package for System Identification using NARMAX models. Journal of Open Source Software, 5(54), 2384, https://doi.org/10.21105/joss.02384
+
+```
+@article{Lacerda2020,
+  doi = {10.21105/joss.02384},
+  url = {https://doi.org/10.21105/joss.02384},
+  year = {2020},
+  publisher = {The Open Journal},
+  volume = {5},
+  number = {54},
+  pages = {2384},
+  author = {Wilson Rocha Lacerda and Luan Pascoal Costa da Andrade and Samuel Carlos Pessoa Oliveira and Samir Angelo Milani Martins},
+  title = {SysIdentPy: A Python package for System Identification using NARMAX models},
+  journal = {Journal of Open Source Software}
+}
+```
+[![DOI](https://zenodo.org/badge/175484103.svg)](https://zenodo.org/badge/latestdoi/175484103)
+
 
 # Inspiration
 
