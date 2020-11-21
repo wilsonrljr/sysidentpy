@@ -155,7 +155,7 @@ If you use SysIdentPy on your scientific publication, we would appreciate citati
   journal = {Journal of Open Source Software}
 }
 ```
-[![DOI](https://zenodo.org/badge/175484103.svg)](https://zenodo.org/badge/latestdoi/175484103)
+[![DOI](https://img.shields.io/badge/DOI-10.21105%2Fjoss.02384-%23FF7800)](https://joss.theoj.org/papers/10.21105/joss.02384)
 
 
 # Inspiration
