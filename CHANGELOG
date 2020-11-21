@@ -10,10 +10,16 @@ CONTRIBUTORS
 
 CHANGES
 - Fixed a bug concerning the xlag and ylag in multiple input scenarios.
-- Refactored predict function. Improved performance up to 43%.
+- Refactored predict function. Improved performance up to 87% depending on the number of regressors.
 - You can set lags with different size for each input.
 - Added a new function to get the max value of xlag and ylag. Work with int, list, nested lists.
 - Fixed tests for information criteria.
+- Added SysIdentPy logo.
+- Refactored code of all classes following PEP 8 guidelines to improve readability.
+- Added Citation information on Readme.
+- Changes on information Criteria tests.
+- Added workflow to run the tests when merge branch into master.
+
 
 
 0.1.4
