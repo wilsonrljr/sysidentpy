@@ -58,7 +58,7 @@ We will made it available at conda repository as soon as possible.
 
 # Changelog
 
-See the [changelog]( <https://sysidentpy.org/changelog/>) for a history of notable changes to SysIdentPy.
+See the [changelog]( <http://sysidentpy.org/changelog/v0.1.3.html>) for a history of notable changes to SysIdentPy.
 
 # Development
 
