@@ -8,6 +8,7 @@ __pycache__/sys_identfy.cpython-36.pyc
 
 # Sphinx
 docs/_build
+docs/build
 # Pycharm editor project files
 .idea
 
@@ -17,7 +18,7 @@ venv/
 # Packages/installer info
 *.egg
 *.egg-info
-dist
+dist/
 build
 eggs
 parts

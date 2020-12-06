@@ -5,6 +5,7 @@ built on top of numpy and is distributed under the 3-Clause BSD license.
 """
 
 from __future__ import print_function
+import sysidentpy
 import sys
 from setuptools import setup, find_packages
 
@@ -23,9 +24,12 @@ except ImportError:
     print('matplotlib is required during installation')
     sys.exit(1)
 
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
 DISTNAME = 'sysidentpy'
 DESCRIPTION = 'Open source System Identification library in Python'
-LONG_DESCRIPTION = 'Take a look into https://github.com/wilsonrljr/sysidentpy'
+LONG_DESCRIPTION = long_description
 MAINTAINER = 'Wilson Rocha Lacerda Junior'
 MAINTAINER_EMAIL = 'wilsonrljr@outlook.com'
 URL = 'http://sysidentpy.org'
@@ -35,7 +39,6 @@ PROJECT_URLS = {
     'Source Code': 'https://github.com/wilsonrljr/sysidentpy'
 }
 
-import sysidentpy
 
 VERSION = sysidentpy.__version__
 
@@ -55,25 +58,27 @@ def setup_package():
                     project_urls=PROJECT_URLS,
                     version=VERSION,
                     long_description=LONG_DESCRIPTION,
+                    long_description_content_type="text/markdown",
                     classifiers=[
-                            'Intended Audience :: Science/Research',
-                            'Intended Audience :: Developers',
-                            'Intended Audience :: Education',
-                            'Programming Language :: Python :: 3.6',
-                            'Programming Language :: Python :: 3.7',
-                            'Programming Language :: Python :: 3.8',
-                            'Development Status :: 5 - Production/Stable',
-                            'Intended Audience :: Science/Research',
-                            'Topic :: Scientific/Engineering',
-                            'Topic :: Software Development',
-                            'Operating System :: OS Independent'
-                            ],
-                    python_requires=">=3.6",
-                    install_requires=[
-                                        'numpy>={}'.format(NUMPY_MIN_VERSION),
-                                        'matplotlib>={}'.format(MATPLOTLIB_MIN_VERSION)
-                                    ],
-                    )
+        'Intended Audience :: Science/Research',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Education',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Science/Research',
+        'Topic :: Scientific/Engineering',
+        'Topic :: Software Development',
+        'Operating System :: OS Independent'
+    ],
+        python_requires=">=3.6",
+        install_requires=[
+        'numpy>={}'.format(NUMPY_MIN_VERSION),
+        'matplotlib>={}'.format(
+            MATPLOTLIB_MIN_VERSION)
+    ],
+    )
 
     setup(**metadata)
 
