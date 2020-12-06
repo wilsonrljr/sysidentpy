@@ -37,3 +37,9 @@ Jupyter notebooks
 
    /examples/parameter_estimation.ipynb
    
+.. toctree::
+   :maxdepth: 1
+   :caption: F-16 aircraft
+
+   /examples/f_16_benchmark.ipynb
+   

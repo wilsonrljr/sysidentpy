@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Overview: module code &mdash; SysIdentPy</title>
+  <title>Changes in SysIdentPy &mdash; SysIdentPy</title>
   
 
   
@@ -40,7 +40,9 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="SysIdentPy" href="../index.html"/> 
+    <link rel="top" title="SysIdentPy" href="../index.html"/>
+        <link rel="next" title="Codes" href="../code.html"/>
+        <link rel="prev" title="Example: F-16 Ground Vibration Test benchmark" href="../examples/f_16_benchmark.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -88,13 +90,22 @@
               
             
             
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../introduction_to_narmax.html">A brief introduction to NARMAX models.</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_guide.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Jupyter notebooks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changelog/v0.1.3.html">Changes in SysIdentPy</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changes in SysIdentPy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#v0-1-3">v0.1.3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#contributors">CONTRIBUTORS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changes">CHANGES</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-1-4">v0.1.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-1-5">v0.1.5</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../code.html">Codes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.base">sysidentpy base</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../code.html#sysidentpy-narmax">sysidentpy narmax</a></li>
@@ -148,30 +159,75 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>Overview: module code</li>
+      <li>Changes in SysIdentPy</li>
     
     
       <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/changelog/v0.1.3.rst.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
     
   </ul>
 
   
+  <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
+      
+        <a href="../code.html" class="btn btn-neutral float-right" title="Codes" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../examples/f_16_benchmark.html" class="btn btn-neutral" title="Example: F-16 Ground Vibration Test benchmark" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+  </div>
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>All modules for which code is available</h1>
-<ul><li><a href="sysidentpy/base.html">sysidentpy.base</a></li>
-<li><a href="sysidentpy/metrics/_regression.html">sysidentpy.metrics._regression</a></li>
-<li><a href="sysidentpy/parameter_estimation/estimators.html">sysidentpy.parameter_estimation.estimators</a></li>
-<li><a href="sysidentpy/polynomial_basis/narmax.html">sysidentpy.polynomial_basis.narmax</a></li>
-<li><a href="sysidentpy/residues/residues_correlation.html">sysidentpy.residues.residues_correlation</a></li>
-<li><a href="sysidentpy/utils/_check_arrays.html">sysidentpy.utils._check_arrays</a></li>
-<li><a href="sysidentpy/utils/generate_data.html">sysidentpy.utils.generate_data</a></li>
+  <div class="section" id="changes-in-sysidentpy">
+<h1>Changes in SysIdentPy<a class="headerlink" href="#changes-in-sysidentpy" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="v0-1-3">
+<h2>v0.1.3<a class="headerlink" href="#v0-1-3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="contributors">
+<h3>CONTRIBUTORS<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>wilsonrljr</p></li>
+<li><p>renard162</p></li>
 </ul>
+</div>
+<div class="section" id="changes">
+<h3>CHANGES<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed a bug concerning the xlag and ylag in multiple input scenarios.</p></li>
+<li><p>Refactored predict function. Improved performance up to 87% depending on the number of regressors.</p></li>
+<li><p>You can set lags with different size for each input.</p></li>
+<li><p>Added a new function to get the max value of xlag and ylag. Work with int, list, nested lists.</p></li>
+<li><p>Fixed tests for information criteria.</p></li>
+<li><p>Added SysIdentPy logo.</p></li>
+<li><p>Refactored code of all classes following PEP 8 guidelines to improve readability.</p></li>
+<li><p>Added Citation information on Readme.</p></li>
+<li><p>Changes on information Criteria tests.</p></li>
+<li><p>Added workflow to run the tests when merge branch into master.</p></li>
+<li><p>Added new site domain.</p></li>
+<li><p>Updated docs.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="v0-1-4">
+<h2>v0.1.4<a class="headerlink" href="#v0-1-4" title="Permalink to this headline">¶</a></h2>
+<p>CONTRIBUTORS
+CHANGES</p>
+</div>
+<div class="section" id="v0-1-5">
+<h2>v0.1.5<a class="headerlink" href="#v0-1-5" title="Permalink to this headline">¶</a></h2>
+<p>CONTRIBUTORS
+CHANGES</p>
+</div>
+</div>
+
 
            </div>
            <div class="articleComments">
@@ -179,6 +235,15 @@
            </div>
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../code.html" class="btn btn-neutral float-right" title="Codes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../examples/f_16_benchmark.html" class="btn btn-neutral" title="Example: F-16 Ground Vibration Test benchmark" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

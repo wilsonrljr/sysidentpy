@@ -32,7 +32,11 @@ def _get_max_lag(ylag, xlag):
 
 
 class GenerateRegressors:
-    """Polynomial NARMAX model"""
+    """Polynomial NARMAX model
+
+    Provides the main functions to generate the regressor dictionary
+    and regressor codes for polynomial basis.
+    """
 
     def regressor_space(self, non_degree, xlag, ylag, n_inputs):
         """Create the code representation of the regressors.

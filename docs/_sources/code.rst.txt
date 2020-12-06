@@ -10,9 +10,9 @@ sysidentpy base
 .. automodule:: sysidentpy.base
    :members:
 
-sysidentpy main
+sysidentpy narmax
 ===============
-.. automodule:: sysidentpy.polynomial_basis.narx
+.. automodule:: sysidentpy.polynomial_basis.narmax
    :members:
 
 sysidentpy residues

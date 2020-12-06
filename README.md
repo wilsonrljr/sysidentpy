@@ -23,7 +23,7 @@ The project was started in by Wilson R. L. Junior, Luan Pascoal C. Andrade and S
 
 # Documentation
 
-- Website: https://wilsonrljr.github.io/sysidentpy/
+- Website: https://sysidentpy.org
 
 # Examples
 
@@ -50,15 +50,15 @@ A few examples require pandas >= 0.18.0. However, it is not required to use sysi
 # Installation
 
 The easiest way to get sysidentpy running is to install it using ``pip``
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 pip install sysidentpy
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 We will made it available at conda repository as soon as possible.
 
 # Changelog
 
-See the [changelog]( <https://github.com/wilsonrljr/sysidentpy.whats_is_new.md>) for a history of notable changes to SysIdentPy.
+See the [changelog]( <https://sysidentpy.org/changelog/>) for a history of notable changes to SysIdentPy.
 
 # Development
 
@@ -131,12 +131,12 @@ The project is currently maintained by its creators and looking for contributors
 
 # Communication
 
-- Discord server: https://discord.gg/8eGE3PQ 
+- Discord server: https://discord.gg/8eGE3PQ
 
   [![discord](https://img.shields.io/discord/711610087700955176?color=%23FF7800&label=discord)](https://discord.gg/7afBSzU4)
 
 
-- Website(soon): http://sysidentpy.org
+- Website: http://sysidentpy.org
 
 # Citation
 [![DOI](https://img.shields.io/badge/DOI-10.21105%2Fjoss.02384-%23FF7800)](https://joss.theoj.org/papers/10.21105/joss.02384)
@@ -156,7 +156,7 @@ If you use SysIdentPy on your scientific publication, we would appreciate citati
   volume = {5},
   number = {54},
   pages = {2384},
-  author = {Wilson Rocha Lacerda and Luan Pascoal Costa da Andrade and Samuel Carlos Pessoa Oliveira and Samir Angelo Milani Martins},
+  author = {Wilson Rocha Lacerda Junior and Luan Pascoal Costa da Andrade and Samuel Carlos Pessoa Oliveira and Samir Angelo Milani Martins},
   title = {SysIdentPy: A Python package for System Identification using NARMAX models},
   journal = {Journal of Open Source Software}
 }

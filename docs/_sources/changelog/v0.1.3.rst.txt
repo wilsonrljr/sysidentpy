@@ -1,14 +1,18 @@
---------------------------------------------------------------------------------------------------------------
-File for tracking changes in SysIdentPy
---------------------------------------------------------------------------------------------------------------
+Changes in SysIdentPy
+=====================
 
-0.1.3
------
+v0.1.3
+------
+
 CONTRIBUTORS
+~~~~~~~~~~~~
+
 - wilsonrljr
 - renard162
 
 CHANGES
+~~~~~~~
+
 - Fixed a bug concerning the xlag and ylag in multiple input scenarios.
 - Refactored predict function. Improved performance up to 87% depending on the number of regressors.
 - You can set lags with different size for each input.
@@ -22,13 +26,12 @@ CHANGES
 - Added new site domain.
 - Updated docs.
 
-
-0.1.4
------
+v0.1.4
+------
 CONTRIBUTORS
 CHANGES
 
-0.1.5
------
+v0.1.5
+------
 CONTRIBUTORS
 CHANGES

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to sysidentpy’s documentation! &mdash; SysIdentPy</title>
+  <title>Welcome to SysIdentPy’s documentation! &mdash; SysIdentPy</title>
   
 
   
@@ -95,9 +95,10 @@
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dev_guide.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks.html">Jupyter notebooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog/v0.1.3.html">Changes in SysIdentPy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Codes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.base">sysidentpy base</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-main">sysidentpy main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-narmax">sysidentpy narmax</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.residues.residues_correlation">sysidentpy residues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.metrics._regression">sysidentpy metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.parameter_estimation.estimators">sysidentpy estimators</a></li>
@@ -148,7 +149,7 @@
     
       <li><a href="#">Docs</a> &raquo;</li>
         
-      <li>Welcome to sysidentpy’s documentation!</li>
+      <li>Welcome to SysIdentPy’s documentation!</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -175,28 +176,63 @@
            <div itemprop="articleBody">
             
   <div class="section" id="welcome-to-sysidentpy-s-documentation">
-<h1>Welcome to sysidentpy’s documentation!<a class="headerlink" href="#welcome-to-sysidentpy-s-documentation" title="Permalink to this headline">¶</a></h1>
+<h1>Welcome to SysIdentPy’s documentation!<a class="headerlink" href="#welcome-to-sysidentpy-s-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="sysidentpy">
 <h2>SysIdentPy<a class="headerlink" href="#sysidentpy" title="Permalink to this headline">¶</a></h2>
-<p>sysidentpy is a Python module for System Identification using NARMAX models built on top of numpy and
-is distributed under the 3-Clause BSD license.</p>
-<p>The project was started in by Wilson R. L. Junior, Luan
-Pascoal C. Andrade and Samir A. M. Martins as a project for System Identification
-discipline. Samuel joined early in 2019 and since then have contributed.</p>
-<p>Website (coming soon): <a class="reference external" href="http://sysidentpy.org">http://sysidentpy.org</a></p>
+<p><strong>SysIdentPy</strong> is a Python module for System Identification using <strong>NARMAX</strong> models built on top of <strong>numpy</strong> and is distributed under the 3-Clause BSD license.</p>
+<p>The project was started in by Wilson R. L. Junior, Luan Pascoal C. Andrade and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019 and since then have contributed.</p>
+<p>Website: <a class="reference external" href="http://sysidentpy.org">http://sysidentpy.org</a></p>
 </div>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
-<p>The examples directory has several Jupyter notebooks presenting basic tutorials of how to use the package and some specific applications of sysidentpy. Try it out!</p>
+<p>The examples directory has several Jupyter notebooks presenting basic tutorials of how to use the package and some specific applications of <strong>SysIdentPy</strong>. Try it out!</p>
 </div>
 <div class="section" id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
 <p>See the <a class="reference external" href="https://github.com/wilsonrljr/sysidentpy.whats_is_new.md">changelog</a>
-for a history of notable changes to sysidentpy.</p>
+for a history of notable changes to <strong>SysIdentPy</strong>.</p>
 </div>
 <div class="section" id="development">
 <h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
-<p>We welcome new contributors of all experience levels. The sysidentpy community goals are to be helpful, welcoming, and effective.</p>
+<p>We welcome new contributors of all experience levels. The <strong>SysIdentPy</strong> community goals are to be helpful, welcoming, and effective.</p>
+<p><em>Note</em>: we use the <cite>pytest</cite> package for testing. The test functions are located in tests subdirectories at each folder inside <strong>SysIdentPy</strong>, which check the validity of the algorithms.</p>
+<p>Run the <cite>pytest</cite> in the respective folder to perform all the tests of the corresponding sub-packages.</p>
+<p>Currently, we have around 81% of code coverage.</p>
+<p>You can install pytest using</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">U</span> <span class="n">pytest</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-of-how-to-run-the-tests">
+<h2>Example of how to run the tests:<a class="headerlink" href="#example-of-how-to-run-the-tests" title="Permalink to this headline">¶</a></h2>
+<p>Open a terminal emulator of your choice and go to a subdirectory, e.g,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>\<span class="n">sysidentpy</span>\<span class="n">metrics</span>\
+</pre></div>
+</div>
+<p>Just type <code class="code docutils literal notranslate"><span class="pre">pytest</span></code> and you get a result like</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">==========</span> <span class="n">test</span> <span class="n">session</span> <span class="n">starts</span> <span class="o">==========</span>
+
+<span class="n">platform</span> <span class="n">linux</span> <span class="o">--</span> <span class="n">Python</span> <span class="mf">3.7</span><span class="o">.</span><span class="mi">6</span><span class="p">,</span> <span class="n">pytest</span><span class="o">-</span><span class="mf">5.4</span><span class="o">.</span><span class="mi">2</span><span class="p">,</span> <span class="n">py</span><span class="o">-</span><span class="mf">1.8</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="n">pluggy</span><span class="o">-</span><span class="mf">0.13</span><span class="o">.</span><span class="mi">1</span>
+
+<span class="n">rootdir</span><span class="p">:</span> <span class="o">~/</span><span class="n">sysidentpy</span>
+
+<span class="n">plugins</span><span class="p">:</span> <span class="n">cov</span><span class="o">-</span><span class="mf">2.8</span><span class="o">.</span><span class="mi">1</span>
+
+<span class="n">collected</span> <span class="mi">12</span> <span class="n">items</span>
+
+<span class="n">tests</span><span class="o">/</span><span class="n">test_regression</span><span class="o">.</span><span class="n">py</span> <span class="o">............</span> <span class="p">[</span><span class="mi">100</span><span class="o">%</span><span class="p">]</span>
+
+<span class="o">==========</span> <span class="mi">12</span> <span class="n">passed</span> <span class="ow">in</span> <span class="mf">2.45</span><span class="n">s</span> <span class="o">==================</span>
+</pre></div>
+</div>
+<p>You can also see the code coverage using the <code class="code docutils literal notranslate"><span class="pre">pytest-cov</span></code> package. First, install <code class="code docutils literal notranslate"><span class="pre">pytest-cov</span></code> using</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pytest</span><span class="o">-</span><span class="n">cov</span>
+</pre></div>
+</div>
+<p>Run the command below in the <strong>SysIdentPy</strong> root directory, to generate the report.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="o">--</span><span class="n">cov</span><span class="o">=.</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="important-links">
 <h2>Important links<a class="headerlink" href="#important-links" title="Permalink to this headline">¶</a></h2>
@@ -227,12 +263,31 @@ contributors.</p>
 </div>
 <div class="section" id="citation">
 <h3>Citation<a class="headerlink" href="#citation" title="Permalink to this headline">¶</a></h3>
-<p>More information coming soon.</p>
+<p>If you use <strong>SysIdentPy</strong> on your project, please <a class="reference external" href="mailto:wilsonrljr&#37;&#52;&#48;outlook&#46;com">drop me a line</a>.</p>
+<p>If you use <strong>SysIdentPy</strong> on your scientific publication, we would appreciate citations to the following paper:</p>
+<ul>
+<li><p>Lacerda et al., (2020). SysIdentPy: A Python package for System Identification using NARMAX models. Journal of Open Source Software, 5(54), 2384, <a class="reference external" href="https://doi.org/10.21105/joss.02384">https://doi.org/10.21105/joss.02384</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@article</span><span class="p">{</span><span class="n">Lacerda2020</span><span class="p">,</span>
+  <span class="n">doi</span> <span class="o">=</span> <span class="p">{</span><span class="mf">10.21105</span><span class="o">/</span><span class="n">joss</span><span class="o">.</span><span class="mi">02384</span><span class="p">},</span>
+  <span class="n">url</span> <span class="o">=</span> <span class="p">{</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">doi</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="mf">10.21105</span><span class="o">/</span><span class="n">joss</span><span class="o">.</span><span class="mi">02384</span><span class="p">},</span>
+  <span class="n">year</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2020</span><span class="p">},</span>
+  <span class="n">publisher</span> <span class="o">=</span> <span class="p">{</span><span class="n">The</span> <span class="n">Open</span> <span class="n">Journal</span><span class="p">},</span>
+  <span class="n">volume</span> <span class="o">=</span> <span class="p">{</span><span class="mi">5</span><span class="p">},</span>
+  <span class="n">number</span> <span class="o">=</span> <span class="p">{</span><span class="mi">54</span><span class="p">},</span>
+  <span class="n">pages</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2384</span><span class="p">},</span>
+  <span class="n">author</span> <span class="o">=</span> <span class="p">{</span><span class="n">Wilson</span> <span class="n">Rocha</span> <span class="n">Lacerda</span> <span class="n">Junior</span> <span class="ow">and</span> <span class="n">Luan</span> <span class="n">Pascoal</span> <span class="n">Costa</span> <span class="n">da</span> <span class="n">Andrade</span> <span class="ow">and</span> <span class="n">Samuel</span> <span class="n">Carlos</span> <span class="n">Pessoa</span> <span class="n">Oliveira</span> <span class="ow">and</span> <span class="n">Samir</span> <span class="n">Angelo</span> <span class="n">Milani</span> <span class="n">Martins</span><span class="p">},</span>
+  <span class="n">title</span> <span class="o">=</span> <span class="p">{</span><span class="n">SysIdentPy</span><span class="p">:</span> <span class="n">A</span> <span class="n">Python</span> <span class="n">package</span> <span class="k">for</span> <span class="n">System</span> <span class="n">Identification</span> <span class="n">using</span> <span class="n">NARMAX</span> <span class="n">models</span><span class="p">},</span>
+  <span class="n">journal</span> <span class="o">=</span> <span class="p">{</span><span class="n">Journal</span> <span class="n">of</span> <span class="n">Open</span> <span class="n">Source</span> <span class="n">Software</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
 </div>
 <div class="section" id="inspiration">
-<h3>Inspiration<a class="headerlink" href="#inspiration" title="Permalink to this headline">¶</a></h3>
+<h2>Inspiration<a class="headerlink" href="#inspiration" title="Permalink to this headline">¶</a></h2>
 <p>The documentation and structure (even this section) is openly inspired by sklearn, einsteinpy, and many others as we used (and keep using) them to learn.</p>
-</div>
 </div>
 <div class="section" id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
@@ -268,13 +323,20 @@ contributors.</p>
 <li class="toctree-l2"><a class="reference internal" href="examples/extended_least_squares.html">Important notes and examples of how to use Extended Least Squares</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/defining_lags.html">Setting specific lags</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/parameter_estimation.html">Parameter Estimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/f_16_benchmark.html">Example: F-16 Ground Vibration Test benchmark</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog/v0.1.3.html">Changes in SysIdentPy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changelog/v0.1.3.html#v0-1-3">v0.1.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog/v0.1.3.html#v0-1-4">v0.1.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog/v0.1.3.html#v0-1-5">v0.1.5</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Codes</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.base">sysidentpy base</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-main">sysidentpy main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-narmax">sysidentpy narmax</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.residues.residues_correlation">sysidentpy residues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.metrics._regression">sysidentpy metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.parameter_estimation.estimators">sysidentpy estimators</a></li>
@@ -328,7 +390,7 @@ contributors.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.0.1',
+            VERSION:'0.1.3',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

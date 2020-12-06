@@ -41,7 +41,7 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="SysIdentPy" href="index.html"/>
-        <link rel="prev" title="Parameter Estimation" href="examples/parameter_estimation.html"/> 
+        <link rel="prev" title="Changes in SysIdentPy" href="changelog/v0.1.3.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -95,11 +95,12 @@
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dev_guide.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks.html">Jupyter notebooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog/v0.1.3.html">Changes in SysIdentPy</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Codes</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#module-sysidentpy.base">sysidentpy base</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#sysidentpy-main">sysidentpy main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#sysidentpy-narmax">sysidentpy narmax</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#module-sysidentpy.residues.residues_correlation">sysidentpy residues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#module-sysidentpy.metrics._regression">sysidentpy metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#module-sysidentpy.parameter_estimation.estimators">sysidentpy estimators</a></li>
@@ -167,7 +168,7 @@
   <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
       
       
-        <a href="examples/parameter_estimation.html" class="btn btn-neutral" title="Parameter Estimation" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="changelog/v0.1.3.html" class="btn btn-neutral" title="Changes in SysIdentPy" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
   </div>
   
@@ -188,18 +189,8 @@
 <dt id="sysidentpy.base.GenerateRegressors">
 <em class="property">class </em><code class="sig-prename descclassname">sysidentpy.base.</code><code class="sig-name descname">GenerateRegressors</code><a class="reference internal" href="_modules/sysidentpy/base.html#GenerateRegressors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.base.GenerateRegressors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Polynomial NARMAX model</p>
-<p class="rubric">Methods</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.base.GenerateRegressors.regressor_space" title="sysidentpy.base.GenerateRegressors.regressor_space"><code class="xref py py-obj docutils literal notranslate"><span class="pre">regressor_space</span></code></a>(non_degree, xlag, ylag, n_inputs)</p></td>
-<td><p>Create the code representation of the regressors.</p></td>
-</tr>
-</tbody>
-</table>
+<p>Provides the main functions to generate the regressor dictionary
+and regressor codes for polynomial basis.</p>
 <dl class="py method">
 <dt id="sysidentpy.base.GenerateRegressors.regressor_space">
 <code class="sig-name descname">regressor_space</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">non_degree</span></em>, <em class="sig-param"><span class="n">xlag</span></em>, <em class="sig-param"><span class="n">ylag</span></em>, <em class="sig-param"><span class="n">n_inputs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/base.html#GenerateRegressors.regressor_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.base.GenerateRegressors.regressor_space" title="Permalink to this definition">¶</a></dt>
@@ -257,24 +248,6 @@ reference below.</p>
 <dt id="sysidentpy.base.InformationMatrix">
 <em class="property">class </em><code class="sig-prename descclassname">sysidentpy.base.</code><code class="sig-name descname">InformationMatrix</code><a class="reference internal" href="_modules/sysidentpy/base.html#InformationMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.base.InformationMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for methods regarding preprocessing of columns</p>
-<p class="rubric">Methods</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.base.InformationMatrix.build_information_matrix" title="sysidentpy.base.InformationMatrix.build_information_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_information_matrix</span></code></a>(X, y, xlag, ylag, …)</p></td>
-<td><p>Build the information matrix.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.base.InformationMatrix.initial_lagged_matrix" title="sysidentpy.base.InformationMatrix.initial_lagged_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial_lagged_matrix</span></code></a>(X, y, xlag, ylag)</p></td>
-<td><p>Build a lagged matrix concerning each lag for each column.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.base.InformationMatrix.shift_column" title="sysidentpy.base.InformationMatrix.shift_column"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shift_column</span></code></a>(col_to_shift, lag)</p></td>
-<td><p>Shift values based on a lag.</p></td>
-</tr>
-</tbody>
-</table>
 <dl class="py method">
 <dt id="sysidentpy.base.InformationMatrix.shift_column">
 <code class="sig-name descname">shift_column</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col_to_shift</span></em>, <em class="sig-param"><span class="n">lag</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/base.html#InformationMatrix.shift_column"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.base.InformationMatrix.shift_column" title="Permalink to this definition">¶</a></dt>
@@ -359,8 +332,270 @@ ylag, and non_degree entered by the user.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="sysidentpy-main">
-<h1>sysidentpy main<a class="headerlink" href="#sysidentpy-main" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="sysidentpy-narmax">
+<h1>sysidentpy narmax<a class="headerlink" href="#sysidentpy-narmax" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-sysidentpy.polynomial_basis.narmax"></span><p>Build Polynomial NARMAX Models</p>
+<dl class="py class">
+<dt id="sysidentpy.polynomial_basis.narmax.PolynomialNarmax">
+<em class="property">class </em><code class="sig-prename descclassname">sysidentpy.polynomial_basis.narmax.</code><code class="sig-name descname">PolynomialNarmax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">non_degree</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">ylag</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">xlag</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">order_selection</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">info_criteria</span><span class="o">=</span><span class="default_value">'aic'</span></em>, <em class="sig-param"><span class="n">n_terms</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_inputs</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">n_info_values</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">estimator</span><span class="o">=</span><span class="default_value">'least_squares'</span></em>, <em class="sig-param"><span class="n">extended_least_squares</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">aux_lag</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">lam</span><span class="o">=</span><span class="default_value">0.98</span></em>, <em class="sig-param"><span class="n">delta</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">offset_covariance</span><span class="o">=</span><span class="default_value">0.2</span></em>, <em class="sig-param"><span class="n">mu</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">eps</span><span class="o">=</span><span class="default_value">2.220446049250313e-16</span></em>, <em class="sig-param"><span class="n">gama</span><span class="o">=</span><span class="default_value">0.2</span></em>, <em class="sig-param"><span class="n">weight</span><span class="o">=</span><span class="default_value">0.02</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/polynomial_basis/narmax.html#PolynomialNarmax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.polynomial_basis.narmax.PolynomialNarmax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Polynomial NARXMAX model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>non_degree</strong> (<em>int</em><em>, </em><em>default=2</em>) – The nonlinearity degree of the polynomial function.</p></li>
+<li><p><strong>ylag</strong> (<em>int</em><em>, </em><em>default=2</em>) – The maximum lag of the output.</p></li>
+<li><p><strong>xlag</strong> (<em>int</em><em>, </em><em>default=2</em>) – The maximum lag of the input.</p></li>
+<li><p><strong>order_selection</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to use information criteria for order selection.</p></li>
+<li><p><strong>info_criteria</strong> (<em>str</em><em>, </em><em>default=&quot;aic&quot;</em>) – The information criteria method to be used.</p></li>
+<li><p><strong>n_terms</strong> (<em>int</em><em>, </em><em>default=None</em>) – The number of the model terms to be selected.
+Note that n_terms overwrite the information criteria
+values.</p></li>
+<li><p><strong>n_inputs</strong> (<em>int</em><em>, </em><em>default=1</em>) – The number of inputs of the system.</p></li>
+<li><p><strong>n_info_values</strong> (<em>int</em><em>, </em><em>default=10</em>) – The number of iterations of the information
+criteria method.</p></li>
+<li><p><strong>estimator</strong> (<em>str</em><em>, </em><em>default=&quot;least_squares&quot;</em>) – The parameter estimation method.</p></li>
+<li><p><strong>extended_least_squres</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to use extended least squres method
+for parameter estimation.
+Note that we define a specific set of noise regressors.</p></li>
+<li><p><strong>aux_lag</strong> (<em>int</em><em>, </em><em>default=1</em>) – Temporary lag value used only for parameter estimation.
+This value is overwriten by the max_lag value and will
+be removed in v0.1.4.</p></li>
+<li><p><strong>lam</strong> (<em>float</em><em>, </em><em>default=0.98</em>) – Forgetting factor of the Recursive Least Squares method.</p></li>
+<li><p><strong>delta</strong> (<em>float</em><em>, </em><em>default=0.01</em>) – Normalization factor of the P matrix.</p></li>
+<li><p><strong>offset_covariance</strong> (<em>float</em><em>, </em><em>default=0.2</em>) – The offset covariance factor of the affine least mean squares
+filter.</p></li>
+<li><p><strong>mu</strong> (<em>float</em><em>, </em><em>defaul=0.01</em>) – The convergence coefficient (learning rate) of the filter.</p></li>
+<li><p><strong>eps</strong> (<em>float</em>) – Normalization factor of the normalized filters.</p></li>
+<li><p><strong>gama</strong> (<em>float</em><em>, </em><em>default=0.2</em>) – The leakage factor of the Leaky LMS method.</p></li>
+<li><p><strong>weight</strong> (<em>float</em><em>, </em><em>default=0.02</em>) – Weight factor to control the proportions of the error norms
+and offers an extra degree of freedom within the adaptation
+of the LMS mixed norm method.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sysidentpy.polynomial_basis</span> <span class="kn">import</span> <span class="n">PolynomialNarmax</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sysidentpy.metrics</span> <span class="kn">import</span> <span class="n">root_relative_squared_error</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sysidentpy.utils.generate_data</span> <span class="kn">import</span> <span class="n">get_miso_data</span><span class="p">,</span> <span class="n">get_siso_data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x_train</span><span class="p">,</span> <span class="n">x_valid</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="n">get_siso_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+<span class="gp">... </span>                                                   <span class="n">colored_noise</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>                                                   <span class="n">sigma</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+<span class="gp">... </span>                                                   <span class="n">train_percentage</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">PolynomialNarmax</span><span class="p">(</span><span class="n">non_degree</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="n">order_selection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="n">n_info_values</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="n">ylag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="n">info_criteria</span><span class="o">=</span><span class="s1">&#39;aic&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;least_squares&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">yhat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rrse</span> <span class="o">=</span> <span class="n">root_relative_squared_error</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">rrse</span><span class="p">)</span>
+<span class="go">0.001993603325328823</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="n">err_precision</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+<span class="gp">... </span>                                     <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;dec&#39;</span><span class="p">),</span>
+<span class="gp">... </span>                       <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Regressors&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;ERR&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+<span class="go">    Regressors Parameters         ERR</span>
+<span class="go">0        x1(k-2)     0.9000  0.95556574</span>
+<span class="go">1         y(k-1)     0.1999  0.04107943</span>
+<span class="go">2  x1(k-1)y(k-1)     0.1000  0.00335113</span>
+</pre></div>
+</div>
+<p class="rubric">References</p>
+<dl class="simple">
+<dt>[1]`Manuscript: Orthogonal least squares methods and their application</dt><dd><p>to non-linear system identification
+&lt;<a class="reference external" href="https://eprints.soton.ac.uk/251147/1/778742007_content.pdf">https://eprints.soton.ac.uk/251147/1/778742007_content.pdf</a>&gt;`_</p>
+</dd>
+<dt>[2]`Manuscript (portuguese): Identificação de Sistemas não Lineares</dt><dd><p>Utilizando Modelos NARMAX Polinomiais–Uma Revisão
+e Novos Resultados
+&lt;<a class="reference external" href="https://www.researchgate.net/profile/Giovani_Rodrigues/publication/228595821_Identificacao_de_Sistemas_nao_Lineares_Utilizando_Modelos_NARMAX_Polinomiais-Uma_Revisao_e_Novos_Resultados/links/00b4951b10ff8ab4d3000000.pdf">https://www.researchgate.net/profile/Giovani_Rodrigues/publication/228595821_Identificacao_de_Sistemas_nao_Lineares_Utilizando_Modelos_NARMAX_Polinomiais-Uma_Revisao_e_Novos_Resultados/links/00b4951b10ff8ab4d3000000.pdf</a>&gt;`_</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sysidentpy.polynomial_basis.narmax.PolynomialNarmax.error_reduction_ratio">
+<code class="sig-name descname">error_reduction_ratio</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">process_term_number</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/polynomial_basis/narmax.html#PolynomialNarmax.error_reduction_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.polynomial_basis.narmax.PolynomialNarmax.error_reduction_ratio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform the Error Reduction Ration algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>array-like of shape = n_samples</em>) – The target data used in the identification process.</p></li>
+<li><p><strong>psi</strong> (<em>ndarray of floats</em>) – The information matrix of the model.</p></li>
+<li><p><strong>process_term_number</strong> (<em>int</em>) – Number of Process Terms defined by the user.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>err</strong> (<em>array-like of shape = number_of_model_elements</em>) – The respective ERR calculated for each regressor.</p></li>
+<li><p><strong>piv</strong> (<em>array-like of shape = number_of_model_elements</em>) – Contains the index to put the regressors in the correct order
+based on err values.</p></li>
+<li><p><strong>psi_orthogonal</strong> (<em>ndarray of floats</em>) – The updated and orthogonal information matrix.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="simple">
+<dt>[1]`Manuscript: Orthogonal least squares methods and their application</dt><dd><p>to non-linear system identification
+&lt;<a class="reference external" href="https://eprints.soton.ac.uk/251147/1/778742007_content.pdf">https://eprints.soton.ac.uk/251147/1/778742007_content.pdf</a>&gt;`_</p>
+</dd>
+<dt>[2]`Manuscript (portuguese): Identificação de Sistemas não Lineares</dt><dd><p>Utilizando Modelos NARMAX Polinomiais–Uma Revisão
+e Novos Resultados
+&lt;<a class="reference external" href="https://www.researchgate.net/profile/Giovani_Rodrigues/publication/228595821_Identificacao_de_Sistemas_nao_Lineares_Utilizando_Modelos_NARMAX_Polinomiais-Uma_Revisao_e_Novos_Resultados/links/00b4951b10ff8ab4d3000000.pdf">https://www.researchgate.net/profile/Giovani_Rodrigues/publication/228595821_Identificacao_de_Sistemas_nao_Lineares_Utilizando_Modelos_NARMAX_Polinomiais-Uma_Revisao_e_Novos_Resultados/links/00b4951b10ff8ab4d3000000.pdf</a>&gt;`_</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sysidentpy.polynomial_basis.narmax.PolynomialNarmax.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/polynomial_basis/narmax.html#PolynomialNarmax.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.polynomial_basis.narmax.PolynomialNarmax.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit polynomial NARMAX model.</p>
+<p>This is an ‘alpha’ version of the ‘fit’ function which allows
+a friendly usage by the user. Given two arguments, X and y, fit
+training data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>ndarray of floats</em>) – The input data to be used in the training process.</p></li>
+<li><p><strong>y</strong> (<em>ndarray of floats</em>) – The output data to be used in the training process.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>model</strong> (<em>ndarray of ints</em>) – The model code represetation.</p></li>
+<li><p><strong>piv</strong> (<em>array-like of shape = number_of_model_elements</em>) – Contains the index to put the regressors in the correct order
+based on err values.</p></li>
+<li><p><strong>theta</strong> (<em>array-like of shape = number_of_model_elements</em>) – The estimated parameters of the model.</p></li>
+<li><p><strong>err</strong> (<em>array-like of shape = number_of_model_elements</em>) – The respective ERR calculated for each regressor.</p></li>
+<li><p><strong>info_values</strong> (<em>array-like of shape = n_regressor</em>) – Vector with values of akaike’s information criterion
+for models with N terms (where N is the
+vector position + 1).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sysidentpy.polynomial_basis.narmax.PolynomialNarmax.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/polynomial_basis/narmax.html#PolynomialNarmax.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.polynomial_basis.narmax.PolynomialNarmax.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the predicted values given an input.</p>
+<p>This is an ‘alpha’ version of the predict function which allows
+a friendly usage by the user. Given a previously trained model,
+predict values given a new set of data.</p>
+<p>This method accept y values mainly for prediction n-steps ahead
+(to be implemented in the future)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>ndarray of floats</em>) – The input data to be used in the prediction process.</p></li>
+<li><p><strong>y</strong> (<em>ndarray of floats</em>) – The output data to be used in the prediction process.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>yhat</strong> – The predicted values of the model.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sysidentpy.polynomial_basis.narmax.PolynomialNarmax.information_criterion">
+<code class="sig-name descname">information_criterion</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/polynomial_basis/narmax.html#PolynomialNarmax.information_criterion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.polynomial_basis.narmax.PolynomialNarmax.information_criterion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the model order.</p>
+<p>This function uses a information criterion to determine the model size.
+‘Akaike’-  Akaike’s Information Criterion with</p>
+<blockquote>
+<div><p>critical value 2 (AIC) (default).</p>
+</div></blockquote>
+<p>‘Bayes’ -  Bayes Information Criterion (BIC).
+‘FPE’   -  Final Prediction Error (FPE).
+‘LILC’  -  Khundrin’s law ofiterated logarithm criterion (LILC).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>array-like of shape = n_samples</em>) – Target values of the system.</p></li>
+<li><p><strong>X</strong> (<em>array-like of shape = n_samples</em>) – Input system values measured by the user.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>output_vector</strong> – Vector with values of akaike’s information criterion
+for models with N terms (where N is the
+vector position + 1).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array-like of shape = n_regressor</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sysidentpy.polynomial_basis.narmax.PolynomialNarmax.results">
+<code class="sig-name descname">results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">theta_precision</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">err_precision</span><span class="o">=</span><span class="default_value">8</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">'dec'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/polynomial_basis/narmax.html#PolynomialNarmax.results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.polynomial_basis.narmax.PolynomialNarmax.results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the model regressors, parameters and ERR values.</p>
+<p>This function returns the model regressors, its respectives parameter
+and ERR value on a string matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>theta_precision</strong> (<em>int</em><em> (</em><em>default: 4</em><em>)</em>) – Precision of shown parameters values.</p></li>
+<li><p><strong>err_precision</strong> (<em>int</em><em> (</em><em>default: 8</em><em>)</em>) – Precision of shown ERR values.</p></li>
+<li><p><strong>dtype</strong> (<em>string</em><em> (</em><em>default: 'dec'</em><em>)</em>) – Type of representation:
+sci - Scientific notation;
+dec - Decimal notation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>output_matrix</strong> –</p>
+<dl class="simple">
+<dt>Where:</dt><dd><p>First column represents each regressor element;
+Second column represents associated parameter;
+Third column represents the error reduction ratio associated
+to each regressor.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sysidentpy.polynomial_basis.narmax.PolynomialNarmax.compute_info_value">
+<code class="sig-name descname">compute_info_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_theta</span></em>, <em class="sig-param"><span class="n">n_samples</span></em>, <em class="sig-param"><span class="n">e_var</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/polynomial_basis/narmax.html#PolynomialNarmax.compute_info_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.polynomial_basis.narmax.PolynomialNarmax.compute_info_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the information criteria value.</p>
+<p>This function returns the information criteria concerning each
+number of regressor. The informotion criteria can be AIC, BIC,
+LILC and FPE.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_theta</strong> (<em>int</em>) – Number of parameters of the model.</p></li>
+<li><p><strong>n_samples</strong> (<em>int</em>) – Number of samples given the maximum lag.</p></li>
+<li><p><strong>e_var</strong> (<em>float</em>) – Variance of the residues</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>info_criteria_value</strong> – The computed value given the information criteria selected by the
+user.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-sysidentpy.residues.residues_correlation">
 <span id="sysidentpy-residues"></span><h1>sysidentpy residues<a class="headerlink" href="#module-sysidentpy.residues.residues_correlation" title="Permalink to this headline">¶</a></h1>
@@ -369,21 +604,6 @@ ylag, and non_degree entered by the user.</p>
 <em class="property">class </em><code class="sig-prename descclassname">sysidentpy.residues.residues_correlation.</code><code class="sig-name descname">ResiduesAnalysis</code><a class="reference internal" href="_modules/sysidentpy/residues/residues_correlation.html#ResiduesAnalysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.residues.residues_correlation.ResiduesAnalysis" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Residues analysis for Polynomial NARX model.</p>
-<p class="rubric">Methods</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.residues.residues_correlation.ResiduesAnalysis.plot_result" title="sysidentpy.residues.residues_correlation.ResiduesAnalysis.plot_result"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_result</span></code></a>(y, yhat, e_acf, xe_ccf[, figsize, n])</p></td>
-<td><p>Plot the free run simulation and residues analysis.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.residues.residues_correlation.ResiduesAnalysis.residuals" title="sysidentpy.residues.residues_correlation.ResiduesAnalysis.residuals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">residuals</span></code></a>(X, y, yhat)</p></td>
-<td><p>Performs the residual analysis of output to validate model.</p></td>
-</tr>
-</tbody>
-</table>
 <dl class="py method">
 <dt id="sysidentpy.residues.residues_correlation.ResiduesAnalysis.residuals">
 <code class="sig-name descname">residuals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">yhat</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/residues/residues_correlation.html#ResiduesAnalysis.residuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.residues.residues_correlation.ResiduesAnalysis.residuals" title="Permalink to this definition">¶</a></dt>
@@ -423,7 +643,7 @@ ylag, and non_degree entered by the user.</p>
 
 <dl class="py method">
 <dt id="sysidentpy.residues.residues_correlation.ResiduesAnalysis.plot_result">
-<code class="sig-name descname">plot_result</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">yhat</span></em>, <em class="sig-param"><span class="n">e_acf</span></em>, <em class="sig-param"><span class="n">xe_ccf</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="o">=</span><span class="default_value">10, 8</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">100</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/residues/residues_correlation.html#ResiduesAnalysis.plot_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.residues.residues_correlation.ResiduesAnalysis.plot_result" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plot_result</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">yhat</span></em>, <em class="sig-param"><span class="n">e_acf</span></em>, <em class="sig-param"><span class="n">xe_ccf</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="o">=</span><span class="default_value">(10, 8)</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">100</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/residues/residues_correlation.html#ResiduesAnalysis.plot_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.residues.residues_correlation.ResiduesAnalysis.plot_result" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the free run simulation and residues analysis.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -865,63 +1085,6 @@ over-forecasts and under-forecasts are not treated equally.</p>
 <dt id="sysidentpy.parameter_estimation.estimators.Estimators">
 <em class="property">class </em><code class="sig-prename descclassname">sysidentpy.parameter_estimation.estimators.</code><code class="sig-name descname">Estimators</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">aux_lag</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">lam</span><span class="o">=</span><span class="default_value">0.98</span></em>, <em class="sig-param"><span class="n">delta</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">offset_covariance</span><span class="o">=</span><span class="default_value">0.2</span></em>, <em class="sig-param"><span class="n">mu</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">eps</span><span class="o">=</span><span class="default_value">2.220446049250313e-16</span></em>, <em class="sig-param"><span class="n">gama</span><span class="o">=</span><span class="default_value">0.2</span></em>, <em class="sig-param"><span class="n">weight</span><span class="o">=</span><span class="default_value">0.02</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators" title="Permalink to this definition">¶</a></dt>
 <dd><p>Oridanry Least squares for linear parameter estimation</p>
-<p class="rubric">Methods</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.affine_least_mean_squares" title="sysidentpy.parameter_estimation.estimators.Estimators.affine_least_mean_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">affine_least_mean_squares</span></code></a>(psi, y)</p></td>
-<td><p>Estimate the model parameters using the Affine Least Mean Squares.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares</span></code></a>(psi, y)</p></td>
-<td><p>Estimate the model parameters using the Least Mean Squares filter.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_fourth" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_fourth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_fourth</span></code></a>(psi, y)</p></td>
-<td><p>Parameter estimation using the  LMS Fourth filter.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_leaky" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_leaky"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_leaky</span></code></a>(psi, y)</p></td>
-<td><p>Parameter estimation using the  Leaky LMS filter.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_mixed_norm" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_mixed_norm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_mixed_norm</span></code></a>(psi, y)</p></td>
-<td><p>Parameter estimation using the Mixed-norm LMS filter.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_leaky" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_leaky"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_normalized_leaky</span></code></a>(psi, y)</p></td>
-<td><p>Parameter estimation using the  Normalized Leaky LMS filter.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_error" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_normalized_sign_error</span></code></a>(psi, y)</p></td>
-<td><p>Parameter estimation using the Normalized Sign-Error LMS filter.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_regressor" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_regressor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_normalized_sign_regressor</span></code></a>(psi, y)</p></td>
-<td><p>Parameter estimation using the Normalized Sign-Regressor LMS filter.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_sign" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_normalized_sign_sign"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_normalized_sign_sign</span></code></a>(psi, y)</p></td>
-<td><p>Parameter estimation using the Normalized Sign-Sign LMS filter.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_error" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_sign_error</span></code></a>(psi, y)</p></td>
-<td><p>Parameter estimation using the Sign-Error  Least Mean Squares filter.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_regressor" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_regressor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_sign_regressor</span></code></a>(psi, y)</p></td>
-<td><p>Parameter estimation using the  Sign-Regressor LMS filter.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_sign" title="sysidentpy.parameter_estimation.estimators.Estimators.least_mean_squares_sign_sign"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_mean_squares_sign_sign</span></code></a>(psi, y)</p></td>
-<td><p>Parameter estimation using the  Sign-Sign LMS filter.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_squares" title="sysidentpy.parameter_estimation.estimators.Estimators.least_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_squares</span></code></a>(psi, y)</p></td>
-<td><p>Estimate the model parameters using Least Squares method.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.normalized_least_mean_squares" title="sysidentpy.parameter_estimation.estimators.Estimators.normalized_least_mean_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalized_least_mean_squares</span></code></a>(psi, y)</p></td>
-<td><p>Parameter estimation using the Normalized Least Mean Squares filter.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.recursive_least_squares" title="sysidentpy.parameter_estimation.estimators.Estimators.recursive_least_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">recursive_least_squares</span></code></a>(psi, y)</p></td>
-<td><p>Estimate the model parameters using the Recursive Least Squares method.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sysidentpy.parameter_estimation.estimators.Estimators.total_least_squares" title="sysidentpy.parameter_estimation.estimators.Estimators.total_least_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">total_least_squares</span></code></a>(psi, y)</p></td>
-<td><p>Estimate the model parameters using Total Least Squares method.</p></td>
-</tr>
-</tbody>
-</table>
 <dl class="py method">
 <dt id="sysidentpy.parameter_estimation.estimators.Estimators.least_squares">
 <code class="sig-name descname">least_squares</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/parameter_estimation/estimators.html#Estimators.least_squares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.parameter_estimation.estimators.Estimators.least_squares" title="Permalink to this definition">¶</a></dt>
@@ -1668,7 +1831,7 @@ respectively.</p></li>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
       
-        <a href="examples/parameter_estimation.html" class="btn btn-neutral" title="Parameter Estimation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="changelog/v0.1.3.html" class="btn btn-neutral" title="Changes in SysIdentPy" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -1699,7 +1862,7 @@ respectively.</p></li>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.0.1',
+            VERSION:'0.1.3',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

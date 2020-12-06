@@ -22,7 +22,100 @@ from ..utils._check_arrays import check_X_y
 class PolynomialNarmax(
     GenerateRegressors, HouseHolder, InformationMatrix, ResiduesAnalysis, Estimators
 ):
-    """ Polynomial NARXMAX model"""
+    """ Polynomial NARXMAX model
+
+    Parameters
+    ----------
+    non_degree : int, default=2
+        The nonlinearity degree of the polynomial function.
+    ylag : int, default=2
+        The maximum lag of the output.
+    xlag : int, default=2
+        The maximum lag of the input.
+    order_selection: bool, default=False
+        Whether to use information criteria for order selection.
+    info_criteria : str, default="aic"
+        The information criteria method to be used.
+    n_terms : int, default=None
+        The number of the model terms to be selected.
+        Note that n_terms overwrite the information criteria
+        values.
+    n_inputs : int, default=1
+        The number of inputs of the system.
+    n_info_values : int, default=10
+        The number of iterations of the information
+        criteria method.
+    estimator : str, default="least_squares"
+        The parameter estimation method.
+    extended_least_squres : bool, default=False
+        Whether to use extended least squres method
+        for parameter estimation.
+        Note that we define a specific set of noise regressors.
+    aux_lag : int, default=1
+        Temporary lag value used only for parameter estimation.
+        This value is overwriten by the max_lag value and will
+        be removed in v0.1.4.
+    lam : float, default=0.98
+        Forgetting factor of the Recursive Least Squares method.
+    delta : float, default=0.01
+        Normalization factor of the P matrix.
+    offset_covariance : float, default=0.2
+        The offset covariance factor of the affine least mean squares
+        filter.
+    mu : float, defaul=0.01
+        The convergence coefficient (learning rate) of the filter.
+    eps : float
+        Normalization factor of the normalized filters.
+    gama : float, default=0.2
+        The leakage factor of the Leaky LMS method.
+    weight : float, default=0.02
+        Weight factor to control the proportions of the error norms
+        and offers an extra degree of freedom within the adaptation
+        of the LMS mixed norm method.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import matplotlib.pyplot as plt
+    >>> from sysidentpy.polynomial_basis import PolynomialNarmax
+    >>> from sysidentpy.metrics import root_relative_squared_error
+    >>> from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
+    >>> x_train, x_valid, y_train, y_valid = get_siso_data(n=1000,
+    ...                                                    colored_noise=True,
+    ...                                                    sigma=0.2,
+    ...                                                    train_percentage=90)
+    >>> model = PolynomialNarmax(non_degree=2,
+    ...                          order_selection=True,
+    ...                          n_info_values=10,
+    ...                          extended_least_squares=False,
+    ...                          ylag=2, xlag=2,
+    ...                          info_criteria='aic',
+    ...                          estimator='least_squares',
+    ...                          )
+    >>> model.fit(x_train, y_train)
+    >>> yhat = model.predict(x_valid, y_valid)
+    >>> rrse = root_relative_squared_error(y_valid, yhat)
+    >>> print(rrse)
+    0.001993603325328823
+    >>> results = pd.DataFrame(model.results(err_precision=8,
+    ...                                      dtype='dec'),
+    ...                        columns=['Regressors', 'Parameters', 'ERR'])
+    >>> print(results)
+        Regressors Parameters         ERR
+    0        x1(k-2)     0.9000  0.95556574
+    1         y(k-1)     0.1999  0.04107943
+    2  x1(k-1)y(k-1)     0.1000  0.00335113
+
+    References
+    ----------
+    [1]`Manuscript: Orthogonal least squares methods and their application
+        to non-linear system identification
+        <https://eprints.soton.ac.uk/251147/1/778742007_content.pdf>`_
+    [2]`Manuscript (portuguese): Identificação de Sistemas não Lineares
+        Utilizando Modelos NARMAX Polinomiais–Uma Revisão
+        e Novos Resultados
+        <https://www.researchgate.net/profile/Giovani_Rodrigues/publication/228595821_Identificacao_de_Sistemas_nao_Lineares_Utilizando_Modelos_NARMAX_Polinomiais-Uma_Revisao_e_Novos_Resultados/links/00b4951b10ff8ab4d3000000.pdf>`_
+    """
 
     def __init__(
         self,
@@ -153,9 +246,9 @@ class PolynomialNarmax(
             <https://www.researchgate.net/profile/Giovani_Rodrigues/publication/228595821_Identificacao_de_Sistemas_nao_Lineares_Utilizando_Modelos_NARMAX_Polinomiais-Uma_Revisao_e_Novos_Resultados/links/00b4951b10ff8ab4d3000000.pdf>`_
 
         """
-        squared_y = y[self.max_lag :].T @ y[self.max_lag :]
+        squared_y = y[self.max_lag:].T @ y[self.max_lag:]
         tmp_psi = np.array(psi)
-        y = np.array([y[self.max_lag :, 0]]).T
+        y = np.array([y[self.max_lag:, 0]]).T
         tmp_y = np.copy(y)
         [n, dimension] = tmp_psi.shape
         piv = np.arange(dimension)
@@ -166,7 +259,8 @@ class PolynomialNarmax(
             for j in np.arange(i, dimension):
                 num = np.array(tmp_psi[i:n, j].T @ tmp_y[i:n])
                 num = np.power(num, 2)
-                den = np.array((tmp_psi[i:n, j].T @ tmp_psi[i:n, j]) * squared_y)
+                den = np.array(
+                    (tmp_psi[i:n, j].T @ tmp_psi[i:n, j]) * squared_y)
                 tmp_err[j] = num / den
 
             if i == process_term_number:
@@ -241,7 +335,8 @@ class PolynomialNarmax(
             self.info_values = self.information_criterion(X, y)
 
         if self.n_terms is None and self._order_selection is True:
-            model_length = np.where(self.info_values == np.amin(self.info_values))
+            model_length = np.where(
+                self.info_values == np.amin(self.info_values))
             model_length = int(model_length[0] + 1)
             self.n_terms = model_length
         elif self.n_terms is None and self._order_selection is not True:
@@ -321,13 +416,16 @@ class PolynomialNarmax(
                 ee, y, elag, 1, 2
             )
 
-            psi_extended = psi_extended[:, [2, 3, 7, 8, 11, 12, 13, 14, 15, 16, 17]]
+            psi_extended = psi_extended[:, [
+                2, 3, 7, 8, 11, 12, 13, 14, 15, 16, 17]]
 
             psi_e = np.concatenate([psi, psi_extended], axis=1)
-            unbiased_theta = getattr(parameter_estimation, self.estimator)(psi_e, y)
-            e = y[aux_lag:, 0].reshape(-1, 1) - psi_e @ unbiased_theta.reshape(-1, 1)
+            unbiased_theta = getattr(
+                parameter_estimation, self.estimator)(psi_e, y)
+            e = y[aux_lag:, 0].reshape(-1, 1) - \
+                psi_e @ unbiased_theta.reshape(-1, 1)
 
-        return unbiased_theta[0 : len(self.final_model), 0].reshape(-1, 1)
+        return unbiased_theta[0: len(self.final_model), 0].reshape(-1, 1)
 
     def predict(self, X, y):
         """Return the predicted values given an input.
@@ -418,7 +516,8 @@ class PolynomialNarmax(
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
 
-        model_exponents = [self._code2exponents(model) for model in model_elements]
+        model_exponents = [self._code2exponents(
+            model) for model in model_elements]
         raw_regressor = np.zeros(len(model_exponents[0]), dtype=float)
 
         for i in range(self.max_lag, X.shape[0]):
@@ -505,17 +604,19 @@ class PolynomialNarmax(
 
         for i in range(0, self.n_info_values):
             n_theta = i + 1
-            regressor_matrix = self.error_reduction_ratio(X_base, y, n_theta)[3]
+            regressor_matrix = self.error_reduction_ratio(X_base, y, n_theta)[
+                3]
 
             tmp_theta = getattr(parameter_estimation, self.estimator)(
                 regressor_matrix, y
             )
 
             tmp_yhat = regressor_matrix @ tmp_theta
-            tmp_residual = y[self.max_lag :] - tmp_yhat
+            tmp_residual = y[self.max_lag:] - tmp_yhat
             e_var = np.var(tmp_residual, ddof=1)
 
-            output_vector[i] = self.compute_info_value(n_theta, n_samples, e_var)
+            output_vector[i] = self.compute_info_value(
+                n_theta, n_samples, e_var)
 
             # output_vector[i] = e_factor + model_factor
 
@@ -585,7 +686,8 @@ class PolynomialNarmax(
                         translated_exponent = ""
                     else:
                         delay_string = str(
-                            int(regressor_key - np.floor(regressor_key / 1000) * 1000)
+                            int(regressor_key -
+                                np.floor(regressor_key / 1000) * 1000)
                         )
                         if int(regressor_key / 1000) < 2:
                             translated_key = "y(k-" + delay_string + ")"
@@ -603,7 +705,8 @@ class PolynomialNarmax(
                             translated_exponent = "^" + str(
                                 regressor_dic[regressor_key]
                             )
-                    regressor_string.append(translated_key + translated_exponent)
+                    regressor_string.append(
+                        translated_key + translated_exponent)
                 tmp_regressor = "".join(regressor_string)
 
             current_parameter = theta_output_format.format(self.theta[i, 0])

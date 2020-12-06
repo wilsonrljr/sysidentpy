@@ -4,7 +4,7 @@ Install Guide
 Requirements
 ------------
 
-sysidentpy requires:
+SysIdentPy requires:
 
 - Python (>= 3.6)
 - NumPy (>= 1.5.0) for all numerical algorithms
@@ -15,11 +15,12 @@ Platform         Status
 ==============   ===================
 Linux            OK
 Windows x64      OK
+MacOS			 OK
 ==============   ===================
 
 **SysIdentPy do not to support Python 2.7.**
 
-A few examples require pandas >= 0.18.0 and seaborn. However, they are not required to use sysidentpy.
+A few examples require pandas >= 0.18.0. However, it is not required to use sysidentpy.
 
 Installation
 ------------

@@ -25,7 +25,7 @@ copyright = '2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins'
 author = 'Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = '0.1.3'
 
 
 # -- General configuration ---------------------------------------------------
@@ -56,7 +56,7 @@ extensions = ['sphinx.ext.autodoc',
               # 'sphinx_autodoc_typehints',
               "sphinx.ext.todo",
               'sphinx.ext.mathjax',
-              'numpydoc',
+              # 'numpydoc',
               "nbsphinx",
               "sphinx.ext.intersphinx",
               "IPython.sphinxext.ipython_console_highlighting",

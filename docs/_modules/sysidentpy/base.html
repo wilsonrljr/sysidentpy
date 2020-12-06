@@ -95,9 +95,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../dev_guide.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks.html">Jupyter notebooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog/v0.1.3.html">Changes in SysIdentPy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../code.html">Codes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../code.html#module-sysidentpy.base">sysidentpy base</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../code.html#sysidentpy-main">sysidentpy main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../code.html#sysidentpy-narmax">sysidentpy narmax</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../code.html#module-sysidentpy.residues.residues_correlation">sysidentpy residues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../code.html#module-sysidentpy.metrics._regression">sysidentpy metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../code.html#module-sysidentpy.parameter_estimation.estimators">sysidentpy estimators</a></li>
@@ -178,10 +179,33 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations_with_replacement</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+
+
+<span class="k">def</span> <span class="nf">_get_max_lag</span><span class="p">(</span><span class="n">ylag</span><span class="p">,</span> <span class="n">xlag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the max lag defined by the user.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ylag : int</span>
+<span class="sd">        The maximum lag of output regressors.</span>
+<span class="sd">    xlag : int</span>
+<span class="sd">        The maximum lag of input regressors.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    max_lag = int</span>
+<span class="sd">        The max lag value defined by the user.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ny</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">([[</span><span class="n">ylag</span><span class="p">]])))</span>
+    <span class="n">nx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">([[</span><span class="n">xlag</span><span class="p">]])))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">ny</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">nx</span><span class="p">)])</span>
 
 
 <div class="viewcode-block" id="GenerateRegressors"><a class="viewcode-back" href="../../code.html#sysidentpy.base.GenerateRegressors">[docs]</a><span class="k">class</span> <span class="nc">GenerateRegressors</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Polynomial NARMAX model&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Polynomial NARMAX model</span>
+
+<span class="sd">    Provides the main functions to generate the regressor dictionary</span>
+<span class="sd">    and regressor codes for polynomial basis.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="GenerateRegressors.regressor_space"><a class="viewcode-back" href="../../code.html#sysidentpy.base.GenerateRegressors.regressor_space">[docs]</a>    <span class="k">def</span> <span class="nf">regressor_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">non_degree</span><span class="p">,</span> <span class="n">xlag</span><span class="p">,</span> <span class="n">ylag</span><span class="p">,</span> <span class="n">n_inputs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create the code representation of the regressors.</span>
@@ -228,16 +252,18 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">non_degree</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">non_degree</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;non_degree must be integer and &gt; zero. Got </span><span class="si">%f</span><span class="s2">&quot;</span>
-                <span class="o">%</span> <span class="n">non_degree</span><span class="p">)</span>
+                <span class="s2">&quot;non_degree must be integer and &gt; zero. Got </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">non_degree</span>
+            <span class="p">)</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ylag</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
-           <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">ylag</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ylag</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">ylag</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;ylag must be integer or list and &gt; zero. Got </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">ylag</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xlag</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
-           <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">xlag</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xlag</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
+            <span class="c1"># or np.min(np.minimum(xlag, 1)) &lt; 1):</span>
+            <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">([[</span><span class="n">xlag</span><span class="p">]]))))</span> <span class="o">&lt;</span> <span class="mi">1</span>
+        <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;xlag must be integer or list and &gt; zero. Got </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">xlag</span><span class="p">)</span>
 
@@ -248,7 +274,7 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ylag</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="c1"># create only the lags passed from list</span>
             <span class="n">y_vec</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">y_vec</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">lag</span><span class="o">+</span><span class="mi">1000</span> <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="n">ylag</span><span class="p">])</span>
+            <span class="n">y_vec</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">lag</span> <span class="o">+</span> <span class="mi">1000</span> <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="n">ylag</span><span class="p">])</span>
             <span class="n">y_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_vec</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># create a range of lags if passed a int value</span>
@@ -257,7 +283,7 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xlag</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">n_inputs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1"># create only the lags passed from list</span>
             <span class="n">x_vec_tmp</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">x_vec_tmp</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">lag</span><span class="o">+</span><span class="mi">2000</span> <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="n">xlag</span><span class="p">])</span>
+            <span class="n">x_vec_tmp</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">lag</span> <span class="o">+</span> <span class="mi">2000</span> <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="n">xlag</span><span class="p">])</span>
             <span class="n">x_vec_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_vec_tmp</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xlag</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">n_inputs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1"># create a range of lags if passed a int value</span>
@@ -269,16 +295,18 @@
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_inputs</span><span class="p">):</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xlag</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">n_inputs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="c1"># create 200n, 300n,..., 400n to describe each input</span>
-                    <span class="n">x_vec_tmp</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">lag</span><span class="o">+</span><span class="mi">2000</span><span class="o">+</span><span class="n">i</span><span class="o">*</span><span class="mi">1000</span> <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="n">xlag</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+                    <span class="n">x_vec_tmp</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">lag</span> <span class="o">+</span> <span class="mi">2000</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">1000</span> <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="n">xlag</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
                 <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xlag</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">n_inputs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">x_vec_tmp</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-                        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2001</span><span class="o">+</span><span class="n">i</span><span class="o">*</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2001</span><span class="o">+</span><span class="n">i</span><span class="o">*</span><span class="mi">1000</span> <span class="o">+</span> <span class="n">xlag</span><span class="p">[</span><span class="n">i</span><span class="p">])])</span>
+                        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2001</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">2001</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">1000</span> <span class="o">+</span> <span class="n">xlag</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span>
+                    <span class="p">)</span>
 
         <span class="n">reg_aux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">n_inputs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1"># if x_vec is a nested list, ensure all elements are arrays</span>
-            <span class="n">all_arrays</span> <span class="o">=</span> <span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span><span class="p">])</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="n">i</span>
-                          <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x_vec_tmp</span><span class="p">])</span>
+            <span class="n">all_arrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span><span class="p">])</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">i</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x_vec_tmp</span><span class="p">]</span>
             <span class="n">x_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">all_arrays</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">x_vec</span> <span class="o">=</span> <span class="n">x_vec_tmp</span>
@@ -289,8 +317,8 @@
             <span class="n">combinations_with_replacement</span><span class="p">(</span><span class="n">reg_aux</span><span class="p">,</span> <span class="n">non_degree</span><span class="p">))</span>
 
         <span class="n">regressor_code</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">regressor_code</span><span class="p">)</span>
-        <span class="n">regressor_code</span> <span class="o">=</span> <span class="n">regressor_code</span><span class="p">[:,</span> <span class="n">regressor_code</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">max_lag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">ylag</span><span class="p">,</span> <span class="n">xlag</span><span class="p">))</span>
+        <span class="n">regressor_code</span> <span class="o">=</span> <span class="n">regressor_code</span><span class="p">[:,</span> <span class="n">regressor_code</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]::</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">max_lag</span> <span class="o">=</span> <span class="n">_get_max_lag</span><span class="p">(</span><span class="n">ylag</span><span class="p">,</span> <span class="n">xlag</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">regressor_code</span><span class="p">,</span> <span class="n">max_lag</span></div></div>
 
 
@@ -327,8 +355,8 @@
         <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">aux_a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">u</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">aux_b</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">u</span>
-            <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span> <span class="n">n</span><span class="p">]</span><span class="o">/</span><span class="n">aux_b</span><span class="p">)</span>
+            <span class="n">aux_b</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">u</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">]</span> <span class="o">/</span> <span class="n">aux_b</span><span class="p">)</span>
             <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">aux_a</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">v</span>
 
@@ -358,11 +386,11 @@
 <span class="sd">            &lt;https://en.wikipedia.org/wiki/Householder_transformation&gt;`_</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">T</span><span class="nd">@v</span><span class="p">)</span>
-        <span class="n">w</span> <span class="o">=</span> <span class="n">b</span><span class="o">*</span><span class="n">RA</span><span class="o">.</span><span class="n">T</span><span class="nd">@v</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">v</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">b</span> <span class="o">*</span> <span class="n">RA</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">v</span>
         <span class="n">w</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">RA</span> <span class="o">=</span> <span class="n">RA</span> <span class="o">+</span> <span class="n">v</span><span class="o">*</span><span class="n">w</span>
+        <span class="n">RA</span> <span class="o">=</span> <span class="n">RA</span> <span class="o">+</span> <span class="n">v</span> <span class="o">*</span> <span class="n">w</span>
         <span class="n">B</span> <span class="o">=</span> <span class="n">RA</span>
         <span class="k">return</span> <span class="n">B</span></div>
 
@@ -418,11 +446,11 @@
         <span class="n">n_inputs</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xlag</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">n_inputs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;If n_inputs &gt; 1, xlag must be a nested list. Got </span><span class="si">%f</span><span class="s2">&quot;</span>
-                <span class="o">%</span> <span class="n">xlag</span><span class="p">)</span>
+                <span class="s2">&quot;If n_inputs &gt; 1, xlag must be a nested list. Got </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">xlag</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xlag</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="n">xlag</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">xlag</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">xlag</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">xlag</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">n_inputs</span><span class="p">,</span> <span class="n">xlag</span>
 
@@ -441,7 +469,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ylag</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="n">ylag</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ylag</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">ylag</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ylag</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">ylag</span>
 
@@ -466,16 +494,18 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">n_inputs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">x_lagged</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
-                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">shift_column</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">lag</span><span class="p">)</span> <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="n">xlag</span><span class="p">])</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">shift_column</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">lag</span><span class="p">)</span> <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="n">xlag</span><span class="p">]</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">x_lagged</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="mi">1</span><span class="p">])</span>  <span class="c1"># only for stack other columns</span>
+            <span class="n">x_lagged</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="mi">1</span><span class="p">])</span>  <span class="c1"># just to stack other columns</span>
             <span class="c1"># if user input a nested list like [[1, 2], 4], the following</span>
             <span class="c1"># line convert it to [[1, 2], [4]].</span>
             <span class="c1"># Remember, for multiple inputs all lags must be entered explicity</span>
             <span class="n">xlag</span> <span class="o">=</span> <span class="p">[[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xlag</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_inputs</span><span class="p">):</span>
                 <span class="n">x_lagged_col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
-                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">shift_column</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="n">col</span><span class="p">],</span> <span class="n">lag</span><span class="p">)</span> <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="n">xlag</span><span class="p">[</span><span class="n">col</span><span class="p">]])</span>
+                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">shift_column</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="n">col</span><span class="p">],</span> <span class="n">lag</span><span class="p">)</span> <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="n">xlag</span><span class="p">[</span><span class="n">col</span><span class="p">]]</span>
+                <span class="p">)</span>
                 <span class="n">x_lagged</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">x_lagged</span><span class="p">,</span> <span class="n">x_lagged_col</span><span class="p">])</span>
 
             <span class="n">x_lagged</span> <span class="o">=</span> <span class="n">x_lagged</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>  <span class="c1"># remove the column of 0 created above</span>
@@ -570,7 +600,7 @@
 <span class="sd">            The lagged matrix built in respect with each lag and column.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">max_lag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">ylag</span><span class="p">,</span> <span class="n">xlag</span><span class="p">))</span>
+        <span class="n">max_lag</span> <span class="o">=</span> <span class="n">_get_max_lag</span><span class="p">(</span><span class="n">ylag</span><span class="p">,</span> <span class="n">xlag</span><span class="p">)</span>
 
         <span class="c1"># Generate a lagged data which each column is a input or output</span>
         <span class="c1"># related to its respective lags. With this approach we can create</span>
@@ -583,12 +613,15 @@
 
         <span class="c1"># Create combinations of all columns based on its index</span>
         <span class="n">iterable_list</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">combinations</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">combinations_with_replacement</span><span class="p">(</span><span class="n">iterable_list</span><span class="p">,</span>
-                                                          <span class="n">non_degree</span><span class="p">))</span>
+        <span class="n">combinations</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">combinations_with_replacement</span><span class="p">(</span>
+            <span class="n">iterable_list</span><span class="p">,</span> <span class="n">non_degree</span><span class="p">))</span>
 
         <span class="n">psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="n">combinations</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">combinations</span><span class="p">))])</span>
+            <span class="p">[</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="n">combinations</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">combinations</span><span class="p">))</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
         <span class="n">psi</span> <span class="o">=</span> <span class="n">psi</span><span class="p">[</span><span class="n">max_lag</span><span class="p">:,</span> <span class="p">:]</span>
         <span class="k">return</span> <span class="n">psi</span></div></div>
 </pre></div>
@@ -627,7 +660,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.0.1',
+            VERSION:'0.1.3',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
