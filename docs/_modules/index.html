@@ -1,168 +1,281 @@
 
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Overview: module code &mdash; SysIdentPy</title>
-  
 
-  
-  
-  
-  
-
-  
-
-  
-  
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Overview: module code &#8212; NARMAX models</title>
     
-
-  
-
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../_static/jquery.fancybox.min.css" type="text/css" />
-  
-    <link rel="stylesheet" href="../_static/glpi.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="SysIdentPy" href="../index.html"/> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
-</head>
-
-<body class="wy-body-for-nav" role="document">
-
-   
-  <div class="wy-grid-for-nav">
+  <link rel="stylesheet" href="../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
 
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-          
-            <a href="../index.html" class="icon icon-home"> sysidentpy
-          
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
 
-          
-          </a>
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.40e2e510f6b7d1648584402491bb10fe.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.3da636dd464baa7582d2.js">
 
-          
-            
-          
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.d31b09fe5c1d09cb49b26a786de4a05d.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <link rel="canonical" href="http://sysidentpy.org/_modules/index.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
 
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
 
-          
-        </div>
 
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+<!-- Opengraph tags -->
+<meta property="og:url"         content="http://sysidentpy.org/_modules/index.html" />
+<meta property="og:type"        content="article" />
+<meta property="og:title"       content="NARMAX models" />
+<meta property="og:description" content="" />
+<meta property="og:image"       content="http://sysidentpy.org/_static/sysidentpy-logo.png" />
+
+<meta name="twitter:card" content="summary" />
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
           
-            
-            
-              
-            
-            
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Install Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../introduction_to_narmax.html">A brief introduction to NARMAX models.</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_guide.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Jupyter notebooks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changelog/v0.1.3.html">Changes in SysIdentPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../code.html">Codes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.base">sysidentpy base</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../code.html#sysidentpy-narmax">sysidentpy narmax</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.residues.residues_correlation">sysidentpy residues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.metrics._regression">sysidentpy metrics</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.parameter_estimation.estimators">sysidentpy estimators</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.utils._check_arrays">sysidentpy utils</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../code.html#module-sysidentpy.utils.generate_data">sysidentpy generate data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../code.html#indices-and-tables">Indices and tables</a></li>
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../index.html">
+  
+  <img src="../_static/sysidentpy-logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">NARMAX models</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../installation.html">
+   Install Guide
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../introduction_to_narmax.html">
+   A brief introduction to NARMAX models.
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../user_guide.html">
+   User Guide
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../dev_guide.html">
+   Contributing
+  </a>
+ </li>
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="../notebooks.html">
+   Jupyter notebooks
+  </a>
+  <ul class="collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/basic_steps.html">
+     Presenting main functionality
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/multiple_inputs_example.html">
+     Multiple Inputs usage
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/information_criteria_examples.html">
+     Information Criteria - Examples
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/extended_least_squares.html">
+     Important notes and examples of how to use Extended Least Squares
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/defining_lags.html">
+     Setting specific lags
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/parameter_estimation.html">
+     Parameter Estimation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/f_16_benchmark.html">
+     Example: F-16 Ground Vibration Test benchmark
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../changelog/v0.1.3.html">
+   Changes in SysIdentPy
+  </a>
+ </li>
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="../code.html">
+   Codes
+  </a>
+  <ul class="simple collapse-ul">
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../code.html#module-sysidentpy.base">
+   sysidentpy base
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../code.html#sysidentpy-narmax">
+   sysidentpy narmax
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../code.html#module-sysidentpy.residues.residues_correlation">
+   sysidentpy residues
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../code.html#module-sysidentpy.metrics._regression">
+   sysidentpy metrics
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../code.html#module-sysidentpy.parameter_estimation.estimators">
+   sysidentpy estimators
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../code.html#module-sysidentpy.utils._check_arrays">
+   sysidentpy utils
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../code.html#module-sysidentpy.utils.generate_data">
+   sysidentpy generate data
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../code.html#indices-and-tables">
+   Indices and tables
+  </a>
+ </li>
 </ul>
 
-            
-          
-        </div>
-      </div>
-    </nav>
+</nav> <!-- To handle the deprecated key -->
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">sysidentpy</a>
-        
-      </nav>
-
-
-      
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html">Docs</a> &raquo;</li>
-        
-      <li>Overview: module code</li>
-    
-    
-      <li class="wy-breadcrumbs-aside">
-        
-      </li>
-    
-  </ul>
-
-  
-  <hr/>
+<div class="navbar_extra_footer">
+  Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="row topbar fixed-top container-xl">
+    <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show">
+    </div>
+    <div class="col pl-2 topbar-main">
+        
+        <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+            data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+            aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+            title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+            <i class="fas fa-bars"></i>
+            <i class="fas fa-arrow-left"></i>
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        
+        
+        <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/wilsonrljr/sysidentpy/tree/master/docs"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/wilsonrljr/sysidentpy/tree/master/docs/issues/new?title=Issue%20on%20page%20%2F_modules/index.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
+
+
+        <!-- Full screen (wrap in <a> to have style consistency -->
+        <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                title="Fullscreen mode"><i
+                    class="fas fa-expand"></i></button></a>
+
+        <!-- Launch buttons -->
+
+    </div>
+
+    <!-- Table of contents -->
+    <div class="d-none d-md-block col-md-2 bd-toc show">
+        
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
   <h1>All modules for which code is available</h1>
 <ul><li><a href="sysidentpy/base.html">sysidentpy.base</a></li>
 <li><a href="sysidentpy/metrics/_regression.html">sysidentpy.metrics._regression</a></li>
@@ -173,77 +286,36 @@
 <li><a href="sysidentpy/utils/generate_data.html">sysidentpy.utils.generate_data</a></li>
 </ul>
 
-           </div>
-           <div class="articleComments">
-            
-           </div>
-          </div>
-          <footer>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.
-
-    </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
-
+              </div>
+              
         </div>
+    </div>
+    
+    
+    <div class='prev-next-bottom'>
+        
+
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins<br/>
+        
+            &copy; Copyright 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
       </div>
+    </div>
 
-    </section>
-
-  </div>
-  
+    
+  <script src="../_static/js/index.3da636dd464baa7582d2.js"></script>
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.1.3',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/language_data.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-      <script type="text/javascript" src="../None"></script>
-      <script type="text/javascript" src="../_static/jquery.fancybox.min.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
-
-  
-  
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
-      });
-  </script>
-  
-  <script type="text/javascript">
-    $(function(){
-      $('.image-reference').fancybox();
-    })
-  </script>
-
-</body>
+    
+  </body>
 </html>

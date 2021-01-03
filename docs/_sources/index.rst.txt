@@ -6,18 +6,13 @@
 Welcome to SysIdentPy's documentation!
 ======================================
 
-SysIdentPy
-----------
-
 **SysIdentPy** is a Python module for System Identification using **NARMAX** models built on top of **numpy** and is distributed under the 3-Clause BSD license.
 
 The project was started in by Wilson R. L. Junior, Luan Pascoal C. Andrade and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019 and since then have contributed.
 
-Website: http://sysidentpy.org
+.. seealso::
+	The examples directory has several Jupyter notebooks presenting basic tutorials of how to use the package and some specific applications of **SysIdentPy**. `Try it out! <http://sysidentpy.org/notebooks.html>`__
 
-Examples
---------
-The examples directory has several Jupyter notebooks presenting basic tutorials of how to use the package and some specific applications of **SysIdentPy**. Try it out!
 
 Changelog
 ---------
@@ -25,12 +20,14 @@ Changelog
 See the `changelog <https://github.com/wilsonrljr/sysidentpy.whats_is_new.md>`__
 for a history of notable changes to **SysIdentPy**.
 
+
 Development
 -----------
 
 We welcome new contributors of all experience levels. The **SysIdentPy** community goals are to be helpful, welcoming, and effective.
 
-*Note*: we use the `pytest` package for testing. The test functions are located in tests subdirectories at each folder inside **SysIdentPy**, which check the validity of the algorithms.
+.. note::
+	We use the `pytest` package for testing. The test functions are located in tests subdirectories at each folder inside **SysIdentPy**, which check the validity of the algorithms.
 
 Run the `pytest` in the respective folder to perform all the tests of the corresponding sub-packages.
 
@@ -73,13 +70,6 @@ Run the command below in the **SysIdentPy** root directory, to generate the repo
 	pytest --cov=.
 
 
-Important links
----------------
-
-- Official source code repo: https://github.com/wilsonrljr/sysidentpy
-- Download releases: https://pypi.org/project/sysidentpy/
-
-
 Source code
 -----------
 
@@ -98,13 +88,13 @@ The project is currently maintained by its creators and looking for
 contributors.
 
 Communication
-~~~~~~~~~~~~~
+-------------
 
 - Discord server: https://discord.gg/8eGE3PQ
 - Website(soon): http://sysidentpy.org
 
 Citation
-~~~~~~~~
+--------
 
 If you use **SysIdentPy** on your project, please `drop me a line <wilsonrljr@outlook.com>`__.
 
@@ -130,12 +120,11 @@ Inspiration
 
 The documentation and structure (even this section) is openly inspired by sklearn, einsteinpy, and many others as we used (and keep using) them to learn.
 
-
 Contents
 --------
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     installation
     introduction_to_narmax
