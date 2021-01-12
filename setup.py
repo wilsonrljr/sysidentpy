@@ -36,7 +36,8 @@ URL = 'http://sysidentpy.org'
 DOWNLOAD_URL = 'https://pypi.org/project/sysidentpy/#files'
 LICENSE = 'new BSD'
 PROJECT_URLS = {
-    'Source Code': 'https://github.com/wilsonrljr/sysidentpy'
+    'Source Code': 'https://github.com/wilsonrljr/sysidentpy',
+    'Documentation': 'http://sysidentpy.org/'
 }
 
 
@@ -44,6 +45,7 @@ VERSION = sysidentpy.__version__
 
 NUMPY_MIN_VERSION = '1.17.3'
 MATPLOTLIB_MIN_VERSION = '3.1.0'
+PYTORCH_MIN_VERSION = '1.7.1'
 
 
 def setup_package():
@@ -76,7 +78,8 @@ def setup_package():
         install_requires=[
         'numpy>={}'.format(NUMPY_MIN_VERSION),
         'matplotlib>={}'.format(
-            MATPLOTLIB_MIN_VERSION)
+            MATPLOTLIB_MIN_VERSION),
+        'pytorch>={}'.format(PYTORCH_MIN_VERSION)
     ],
     )
 

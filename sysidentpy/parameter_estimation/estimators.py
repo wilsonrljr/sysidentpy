@@ -98,24 +98,23 @@ class Estimators:
 
         References
         ----------
-        [1]`Manuscript: Sorenson, H. W. (1970). Least-squares estimation:
+        [1] Manuscript: Sorenson, H. W. (1970). Least-squares estimation:
             from Gauss to Kalman. IEEE spectrum, 7(7), 63-68.
-            <http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf>`_
-        [2]`Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificaçao
+            http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf
+        [2] Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificaçao
             de sistemas: técnicas lineares enao-lineares aplicadas a sistemas
             reais. Editora da UFMG. 3a ediçao.
-            <https://books.google.com.br/books?hl=pt-BR&lr=&id=f9IwE7Ph0fYC&oi=fnd&pg=PA2&dq=Introdu%C3%A7%C3%A3o+%C3%A0+identifica%C3%A7%C3%A3o+de+sistemas+-+T%C3%A9cnicas+lineares+e+n%C3%A3o-lineares+aplicadas+a+sistemas+reais&ots=Qiyc4VsMdt&sig=6gumj1AEWh_b0tUGR4quI5oETUA#v=onepage&q=Introdu%C3%A7%C3%A3o%20%C3%A0%20identifica%C3%A7%C3%A3o%20de%20sistemas%20-%20T%C3%A9cnicas%20lineares%20e%20n%C3%A3o-lineares%20aplicadas%20a%20sistemas%20reais&f=false>`_
-        [3]`Manuscript: Markovsky, I., & Van Huffel, S. (2007).
+        [3] Manuscript: Markovsky, I., & Van Huffel, S. (2007).
             Overview of total least-squares methods.
             Signal processing, 87(10), 2283-2302.
-            <https://eprints.soton.ac.uk/263855/1/tls_overview.pdf>`_
-        [4]`Wikipedia entry on Least Squares
-            <https://en.wikipedia.org/wiki/Least_squares>`_
+            https://eprints.soton.ac.uk/263855/1/tls_overview.pdf
+        [4] Wikipedia entry on Least Squares
+            https://en.wikipedia.org/wiki/Least_squares
 
         """
         self._check_linear_dependence_rows(psi)
 
-        y = y[self._aux_lag :, 0].reshape(-1, 1)
+        y = y[self._aux_lag:, 0].reshape(-1, 1)
         theta = (np.linalg.pinv(psi.T @ psi)) @ psi.T @ y
         return theta
 
@@ -136,19 +135,18 @@ class Estimators:
 
         References
         ----------
-        [1]`Manuscript: Golub, G. H., & Van Loan, C. F. (1980).
+        [1] Manuscript: Golub, G. H., & Van Loan, C. F. (1980).
             An analysis of the total least squares problem.
             SIAM journal on numerical analysis, 17(6), 883-893.
-            <https://epubs.siam.org/doi/pdf/10.1137/0717073?casa_token=218O16LygKkAAAAA:GyssnBnNEWzVg2Wvbmu5K1pj-XwkzpTSknUsddVTZfEJafpKANUstMuRDyJjIdcTgO-tFuQYb4Y>`_
-        [2]`Manuscript: Markovsky, I., & Van Huffel, S. (2007).
+        [2] Manuscript: Markovsky, I., & Van Huffel, S. (2007).
             Overview of total least-squares methods.
             Signal processing, 87(10), 2283-2302.
-            <https://eprints.soton.ac.uk/263855/1/tls_overview.pdf>`_
-        [3]`Wikipedia entry on Total Least Squares
-            <https://en.wikipedia.org/wiki/Total_least_squares>`_
+            https://eprints.soton.ac.uk/263855/1/tls_overview.pdf
+        [3] Wikipedia entry on Total Least Squares
+            https://en.wikipedia.org/wiki/Total_least_squares
 
         """
-        y = y[self._aux_lag :, 0].reshape(-1, 1)
+        y = y[self._aux_lag:, 0].reshape(-1, 1)
         full = np.hstack((psi, y))
         n = psi.shape[1]
         u, s, v = np.linalg.svd(full, full_matrices=True)
@@ -156,7 +154,7 @@ class Estimators:
         return theta.reshape(-1, 1)
 
     def _initial_values(self, y, psi):
-        y = y[self._aux_lag :, 0].reshape(-1, 1)
+        y = y[self._aux_lag:, 0].reshape(-1, 1)
         n_theta = psi.shape[1]
         n = len(psi)
         theta = np.zeros([n_theta, n])
@@ -187,10 +185,9 @@ class Estimators:
 
         References
         ----------
-        [1]`Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificaçao
+        [1] Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificaçao
             de sistemas: técnicas lineares enao-lineares aplicadas a sistemas
             reais. Editora da UFMG. 3a ediçao.
-            <https://books.google.com.br/books?hl=pt-BR&lr=&id=f9IwE7Ph0fYC&oi=fnd&pg=PA2&dq=Introdu%C3%A7%C3%A3o+%C3%A0+identifica%C3%A7%C3%A3o+de+sistemas+-+T%C3%A9cnicas+lineares+e+n%C3%A3o-lineares+aplicadas+a+sistemas+reais&ots=Qiyc4VsMdt&sig=6gumj1AEWh_b0tUGR4quI5oETUA#v=onepage&q=Introdu%C3%A7%C3%A3o%20%C3%A0%20identifica%C3%A7%C3%A3o%20de%20sistemas%20-%20T%C3%A9cnicas%20lineares%20e%20n%C3%A3o-lineares%20aplicadas%20a%20sistemas%20reais&f=false>`_
 
         """
         y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
@@ -200,12 +197,15 @@ class Estimators:
         for i in range(2, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
             k_numerator = self._lam ** (-1) * p.dot(psi_tmp)
-            k_denominator = 1 + self._lam ** (-1) * psi_tmp.T.dot(p).dot(psi_tmp)
+            k_denominator = 1 + \
+                self._lam ** (-1) * psi_tmp.T.dot(p).dot(psi_tmp)
             k = np.divide(k_numerator, k_denominator)
             self.xi[i, 0] = y[i, 0] - psi_tmp.T @ theta[:, i - 1]
-            theta[:, i] = list(theta[:, i - 1].reshape(-1, 1) + k.dot(self.xi[i, 0]))
+            theta[:, i] = list(
+                theta[:, i - 1].reshape(-1, 1) + k.dot(self.xi[i, 0]))
 
-            p1 = p.dot(psi[i, :].reshape(-1, 1)).dot(psi[i, :].reshape(-1, 1).T).dot(p)
+            p1 = p.dot(psi[i, :].reshape(-1, 1)
+                       ).dot(psi[i, :].reshape(-1, 1).T).dot(p)
             p2 = (
                 psi[i, :].reshape(-1, 1).T.dot(p).dot(psi[i, :].reshape(-1, 1))
                 + self._lam
@@ -240,9 +240,8 @@ class Estimators:
 
         References
         ----------
-        [1]`Book: Poularikas, A. D. (2017). Adaptive filtering: Fundamentals
+        [1] Book: Poularikas, A. D. (2017). Adaptive filtering: Fundamentals
             of least mean squares with MATLAB®. CRC Press.
-            <https://books.google.com.br/books?hl=pt-BR&lr=&id=OJPSBQAAQBAJ&oi=fnd&pg=PP1&dq=adaptive+filtering+fundamentals+of+least+mean+squares+with+matlab&ots=dMNzB_2erC&sig=7l0VvIm9-GwUDgj0xuy1m0c0Gdo#v=onepage&q=adaptive%20filtering%20fundamentals%20of%20least%20mean%20squares%20with%20matlab&f=false>`_
 
         """
         y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
@@ -256,7 +255,8 @@ class Estimators:
                     psi.T @ psi + self._offset_covariance * np.eye(n_theta)
                 )
             )
-            theta[:, i] = list(theta[:, i - 1].reshape(-1, 1) + aux.T.dot(self.xi))
+            theta[:, i] = list(
+                theta[:, i - 1].reshape(-1, 1) + aux.T.dot(self.xi))
 
         return theta[:, -1].reshape(-1, 1)
 
@@ -283,15 +283,13 @@ class Estimators:
 
         References
         ----------
-        [1]`Book: Haykin, S., & Widrow, B. (Eds.). (2003). Least-mean-square
+        [1] Book: Haykin, S., & Widrow, B. (Eds.). (2003). Least-mean-square
             adaptive filters (Vol. 31). John Wiley & Sons.
-            <https://books.google.com.br/books?hl=pt-BR&lr=&id=U8X3mJtawUkC&oi=fnd&pg=PR9&dq=%22least+mean+square%22&ots=Bzp42ZklVe&sig=ZilhP9bYuuagpi30hrJk53sWj_8&redir_esc=y#v=onepage&q=%22least%20mean%20square%22&f=false>`_
-        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
+        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
             análise estatística e novas estratégias de algoritmos LMS de passo
             variável.
-            <https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1>`_
-        [3]`Wikipedia entry on Least Mean Squares
-            <https://en.wikipedia.org/wiki/Least_mean_squares_filter>`_
+        [3] Wikipedia entry on Least Mean Squares
+            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
         y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
@@ -300,7 +298,8 @@ class Estimators:
             psi_tmp = psi[i, :].reshape(-1, 1)
             self.xi[i, 0] = y[i, 0] - psi_tmp.T @ theta[:, i - 1]
             theta[:, i] = list(
-                theta[:, i - 1].reshape(-1, 1) + 2 * self._mu * self.xi[i, 0] * psi_tmp
+                theta[:, i - 1].reshape(-1, 1) + 2 *
+                self._mu * self.xi[i, 0] * psi_tmp
             )
 
         return theta[:, -1].reshape(-1, 1)
@@ -336,9 +335,8 @@ class Estimators:
         [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
             análise estatística e novas estratégias de algoritmos LMS de passo
             variável.
-            <https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1>`_
-        [3]`Wikipedia entry on Least Mean Squares
-            <https://en.wikipedia.org/wiki/Least_mean_squares_filter>`_
+        [3] Wikipedia entry on Least Mean Squares
+            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
         y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
@@ -381,12 +379,11 @@ class Estimators:
         ----------
         [1]`Book: Hayes, M. H. (2009). Statistical digital signal processing
             and modeling. John Wiley & Sons.
-        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
+        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
             análise estatística e novas estratégias de algoritmos LMS de passo
             variável.
-            <https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1>`_
-        [3]`Wikipedia entry on Least Mean Squares
-            <https://en.wikipedia.org/wiki/Least_mean_squares_filter>`_
+        [3] Wikipedia entry on Least Mean Squares
+            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
         y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
@@ -431,14 +428,13 @@ class Estimators:
 
         References
         ----------
-        [1]`Book: Hayes, M. H. (2009). Statistical digital signal processing
+        [1] Book: Hayes, M. H. (2009). Statistical digital signal processing
             and modeling. John Wiley & Sons.
-        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
+        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
             análise estatística e novas estratégias de algoritmos LMS de passo
             variável.
-            <https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1>`_
-        [3]`Wikipedia entry on Least Mean Squares
-            <https://en.wikipedia.org/wiki/Least_mean_squares_filter>`_
+        [3] Wikipedia entry on Least Mean Squares
+            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
         y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
@@ -482,14 +478,13 @@ class Estimators:
 
         References
         ----------
-        [1]`Book: Hayes, M. H. (2009). Statistical digital signal processing
+        [1] Book: Hayes, M. H. (2009). Statistical digital signal processing
             and modeling. John Wiley & Sons.
-        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
+        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
             análise estatística e novas estratégias de algoritmos LMS de passo
             variável.
-            <https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1>`_
-        [3]`Wikipedia entry on Least Mean Squares
-            <https://en.wikipedia.org/wiki/Least_mean_squares_filter>`_
+        [3] Wikipedia entry on Least Mean Squares
+            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
         y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
@@ -531,14 +526,13 @@ class Estimators:
 
         References
         ----------
-        [1]`Book: Hayes, M. H. (2009). Statistical digital signal processing
+        [1] Book: Hayes, M. H. (2009). Statistical digital signal processing
             and modeling. John Wiley & Sons.
-        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
+        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
             análise estatística e novas estratégias de algoritmos LMS de passo
             variável.
-            <https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1>`_
-        [3]`Wikipedia entry on Least Mean Squares
-            <https://en.wikipedia.org/wiki/Least_mean_squares_filter>`_
+        [3] Wikipedia entry on Least Mean Squares
+            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
         y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
@@ -582,14 +576,13 @@ class Estimators:
 
         References
         ----------
-        [1]`Book: Hayes, M. H. (2009). Statistical digital signal processing
+        [1] Book: Hayes, M. H. (2009). Statistical digital signal processing
             and modeling. John Wiley & Sons.
-        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
+        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
             análise estatística e novas estratégias de algoritmos LMS de passo
             variável.
-            <https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1>`_
-        [3]`Wikipedia entry on Least Mean Squares
-            <https://en.wikipedia.org/wiki/Least_mean_squares_filter>`_
+        [3] Wikipedia entry on Least Mean Squares
+            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
         y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
@@ -632,14 +625,13 @@ class Estimators:
 
         References
         ----------
-        [1]`Book: Hayes, M. H. (2009). Statistical digital signal processing
+        [1] Book: Hayes, M. H. (2009). Statistical digital signal processing
             and modeling. John Wiley & Sons.
-        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
+        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
             análise estatística e novas estratégias de algoritmos LMS de passo
             variável.
-            <https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1>`_
-        [3]`Wikipedia entry on Least Mean Squares
-            <https://en.wikipedia.org/wiki/Least_mean_squares_filter>`_
+        [3] Wikipedia entry on Least Mean Squares
+            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
         y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
@@ -683,14 +675,13 @@ class Estimators:
 
         References
         ----------
-        [1]`Book: Hayes, M. H. (2009). Statistical digital signal processing
+        [1] Book: Hayes, M. H. (2009). Statistical digital signal processing
             and modeling. John Wiley & Sons.
-        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
+        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
             análise estatística e novas estratégias de algoritmos LMS de passo
             variável.
-            <https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1>`_
-        [3]`Wikipedia entry on Least Mean Squares
-            <https://en.wikipedia.org/wiki/Least_mean_squares_filter>`_
+        [3] Wikipedia entry on Least Mean Squares
+            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
         y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
@@ -700,7 +691,8 @@ class Estimators:
             self.xi[i, 0] = y[i, 0] - psi_tmp.T @ theta[:, i - 1]
             theta[:, i] = list(
                 theta[:, i - 1].reshape(-1, 1) * (1 - self._mu * self._gama)
-                + self._mu * self.xi[i, 0] * psi_tmp / (self._eps + psi_tmp.T @ psi_tmp)
+                + self._mu * self.xi[i, 0] * psi_tmp /
+                (self._eps + psi_tmp.T @ psi_tmp)
             )
 
         return theta[:, -1].reshape(-1, 1)
@@ -731,14 +723,13 @@ class Estimators:
 
         References
         ----------
-        [1]`Book: Hayes, M. H. (2009). Statistical digital signal processing
+        [1] Book: Hayes, M. H. (2009). Statistical digital signal processing
             and modeling. John Wiley & Sons.
-        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
+        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
             análise estatística e novas estratégias de algoritmos LMS de passo
             variável.
-            <https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1>`_
-        [3]`Wikipedia entry on Least Mean Squares
-            <https://en.wikipedia.org/wiki/Least_mean_squares_filter>`_
+        [3] Wikipedia entry on Least Mean Squares
+            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
         y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
@@ -779,24 +770,23 @@ class Estimators:
 
         References
         ----------
-        [1]`Book: Hayes, M. H. (2009). Statistical digital signal processing
+        [1] Book: Hayes, M. H. (2009). Statistical digital signal processing
             and modeling. John Wiley & Sons.
-        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
+        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
             análise estatística e novas estratégias de algoritmos LMS de passo
             variável.
-            <https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1>`_
-        [3]`Manuscript:Gui, G., Mehbodniya, A., & Adachi, F. (2013).
+        [3] Manuscript:Gui, G., Mehbodniya, A., & Adachi, F. (2013).
             Least mean square/fourth algorithm with application to sparse
             channel estimation. arXiv preprint arXiv:1304.3911.
-            <https://arxiv.org/pdf/1304.3911.pdf>`_
-        [4]`Manuscript: Nascimento, V. H., & Bermudez, J. C. M. (2005, March).
+            https://arxiv.org/pdf/1304.3911.pdf
+        [4] Manuscript: Nascimento, V. H., & Bermudez, J. C. M. (2005, March).
             When is the least-mean fourth algorithm mean-square stable?
             In Proceedings.(ICASSP'05). IEEE International Conference on
             Acoustics, Speech, and Signal Processing, 2005.
             (Vol. 4, pp. iv-341). IEEE.
-            <http://www.lps.usp.br/vitor/artigos/icassp05.pdf>`_
-        [5]`Wikipedia entry on Least Mean Squares
-            <https://en.wikipedia.org/wiki/Least_mean_squares_filter>`_
+            http://www.lps.usp.br/vitor/artigos/icassp05.pdf
+        [5] Wikipedia entry on Least Mean Squares
+            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
         y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
@@ -805,7 +795,8 @@ class Estimators:
             psi_tmp = psi[i, :].reshape(-1, 1)
             self.xi[i, 0] = y[i, 0] - psi_tmp.T @ theta[:, i - 1]
             theta[:, i] = list(
-                theta[:, i - 1].reshape(-1, 1) + self._mu * psi_tmp * self.xi[i, 0] ** 3
+                theta[:, i - 1].reshape(-1, 1) +
+                self._mu * psi_tmp * self.xi[i, 0] ** 3
             )
 
         return theta[:, -1].reshape(-1, 1)
@@ -836,16 +827,15 @@ class Estimators:
 
         References
         ----------
-        [1]`Chambers, J. A., Tanrikulu, O., & Constantinides, A. G. (1994).
+        [1] Chambers, J. A., Tanrikulu, O., & Constantinides, A. G. (1994).
             Least mean mixed-norm adaptive filtering.
             Electronics letters, 30(19), 1574-1575.
-            <https://ieeexplore.ieee.org/document/326382>`_
-        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
+            https://ieeexplore.ieee.org/document/326382
+        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
             análise estatística e novas estratégias de algoritmos LMS de passo
             variável.
-            <https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1>`_
-        [3]`Wikipedia entry on Least Mean Squares
-            <https://en.wikipedia.org/wiki/Least_mean_squares_filter>`_
+        [3] Wikipedia entry on Least Mean Squares
+            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
         y, n_theta, n, theta, self.xi = self._initial_values(y, psi)

@@ -44,8 +44,8 @@ def forecast_error(y, y_predicted):
 
     References
     ----------
-    [1] `Wikipedia entry on the Forecast error
-        <https://en.wikipedia.org/wiki/Forecast_error>`_
+    [1] Wikipedia entry on the Forecast error
+        https://en.wikipedia.org/wiki/Forecast_error
 
     Examples
     --------
@@ -77,8 +77,8 @@ def mean_forecast_error(y, y_predicted):
 
     References
     ----------
-    [1] `Wikipedia entry on the Forecast error
-        <https://en.wikipedia.org/wiki/Forecast_error>`_
+    [1] Wikipedia entry on the Forecast error
+        https://en.wikipedia.org/wiki/Forecast_error
 
     Examples
     --------
@@ -109,8 +109,8 @@ def mean_squared_error(y, y_predicted):
 
     References
     ----------
-    [1] `Wikipedia entry on the Mean Squared Error
-        <https://en.wikipedia.org/wiki/Mean_squared_error>`_
+    [1] Wikipedia entry on the Mean Squared Error
+        https://en.wikipedia.org/wiki/Mean_squared_error
 
     Examples
     --------
@@ -142,8 +142,8 @@ def root_mean_squared_error(y, y_predicted):
 
     References
     ----------
-    [1] `Wikipedia entry on the Root Mean Squared Error
-        <https://en.wikipedia.org/wiki/Root-mean-square_deviation>`_
+    [1] Wikipedia entry on the Root Mean Squared Error
+        https://en.wikipedia.org/wiki/Root-mean-square_deviation
 
     Examples
     --------
@@ -174,8 +174,8 @@ def normalized_root_mean_squared_error(y, y_predicted):
 
     References
     ----------
-    [1] `Wikipedia entry on the normalized Root Mean Squared Error
-        <https://en.wikipedia.org/wiki/Root-mean-square_deviation>`_
+    [1] Wikipedia entry on the normalized Root Mean Squared Error
+        https://en.wikipedia.org/wiki/Root-mean-square_deviation
 
     Examples
     --------
@@ -235,8 +235,8 @@ def mean_absolute_error(y, y_predicted):
 
     References
     ----------
-    [1] `Wikipedia entry on the Mean absolute error
-        <https://en.wikipedia.org/wiki/Mean_absolute_error>`_
+    [1] Wikipedia entry on the Mean absolute error
+        https://en.wikipedia.org/wiki/Mean_absolute_error
 
     Examples
     --------
@@ -295,8 +295,8 @@ def median_absolute_error(y, y_predicted):
 
     References
     ----------
-    [1] `Wikipedia entry on the Median absolute deviation
-        <https://en.wikipedia.org/wiki/Median_absolute_deviation>`_
+    [1] Wikipedia entry on the Median absolute deviation
+        https://en.wikipedia.org/wiki/Median_absolute_deviation
 
     Examples
     --------
@@ -328,8 +328,8 @@ def explained_variance_score(y, y_predicted):
 
     References
     ----------
-    [1] `Wikipedia entry on the Explained Variance
-        <https://en.wikipedia.org/wiki/Explained_variation>`_
+    [1] Wikipedia entry on the Explained Variance
+        https://en.wikipedia.org/wiki/Explained_variation
 
     Examples
     --------
@@ -347,7 +347,8 @@ def explained_variance_score(y, y_predicted):
     nonzero_denominator = denominator != 0
     valid_score = nonzero_numerator & nonzero_denominator
     output_scores = np.ones(y.shape[0])
-    output_scores[valid_score] = 1 - (numerator[valid_score] / denominator[valid_score])
+    output_scores[valid_score] = 1 - \
+        (numerator[valid_score] / denominator[valid_score])
     output_scores[nonzero_numerator & ~nonzero_denominator] = 0.0
     return np.average(output_scores)
 
@@ -375,8 +376,8 @@ def r2_score(y, y_predicted):
 
     References
     ----------
-    [1] `Wikipedia entry on the Coefficient of determination
-        <https://en.wikipedia.org/wiki/Coefficient_of_determination>`_
+    [1] Wikipedia entry on the Coefficient of determination
+        https://en.wikipedia.org/wiki/Coefficient_of_determination
 
     Examples
     --------
@@ -387,12 +388,14 @@ def r2_score(y, y_predicted):
 
     """
     numerator = ((y - y_predicted) ** 2).sum(axis=0, dtype=np.float64)
-    denominator = ((y - np.average(y, axis=0)) ** 2).sum(axis=0, dtype=np.float64)
+    denominator = ((y - np.average(y, axis=0)) **
+                   2).sum(axis=0, dtype=np.float64)
     nonzero_denominator = denominator != 0
     nonzero_numerator = numerator != 0
     valid_score = nonzero_denominator & nonzero_numerator
     output_scores = np.ones([y.shape[0]])
-    output_scores[valid_score] = 1 - (numerator[valid_score] / denominator[valid_score])
+    output_scores[valid_score] = 1 - \
+        (numerator[valid_score] / denominator[valid_score])
     # arbitrary set to zero to avoid -inf scores, having a constant
     # y_true is not interesting for scoring a regression anyway
     output_scores[nonzero_numerator & ~nonzero_denominator] = 0.0
@@ -422,8 +425,8 @@ def symmetric_mean_absolute_percentage_error(y, y_predicted):
 
     References
     ----------
-    [1] `Wikipedia entry on the Symmetric mean absolute percentage error
-        <https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error>`_
+    [1] Wikipedia entry on the Symmetric mean absolute percentage error
+        https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error
 
     Examples
     --------

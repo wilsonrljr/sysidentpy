@@ -15,6 +15,16 @@ sysidentpy narmax
 .. automodule:: sysidentpy.polynomial_basis.narmax
    :members:
 
+sysidentpy narx_neural_network
+===============
+.. automodule:: sysidentpy.narx_neural_network.narx_nn
+   :members:
+
+sysidentpy general_estimators
+===============
+.. automodule:: sysidentpy.general_estimators.narx
+   :members:
+
 sysidentpy residues
 ===================
 .. automodule:: sysidentpy.residues.residues_correlation
