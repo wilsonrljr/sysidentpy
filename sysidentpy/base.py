@@ -15,12 +15,14 @@ from itertools import chain
 
 def _get_max_lag(ylag, xlag):
     """Get the max lag defined by the user.
+
     Parameters
     ----------
     ylag : int
         The maximum lag of output regressors.
     xlag : int
         The maximum lag of input regressors.
+
     Returns
     -------
     max_lag = int
@@ -75,10 +77,9 @@ class GenerateRegressors:
 
         References
         ----------
-        [1]`Master Thesis: Barbosa, Alípio Monteiro.
-        "Técnicas de otimizaçao bi-objetivo para a determinaçao
-         da estrutura de modelos NARX." (2010).
-            <https://repositorio.ufmg.br/bitstream/1843/BUOS-8EXJV3/1/7m.pdf>`_
+        [1] Master Thesis: Barbosa, Alípio Monteiro.
+            Técnicas de otimizaçao bi-objetivo para a determinaçao
+            da estrutura de modelos NARX (2010).
 
         """
         if not isinstance(non_degree, int) or non_degree < 1:
@@ -172,13 +173,8 @@ class HouseHolder:
 
         References
         ----------
-        [1]`Manuscript: Chen, S., Billings, S. A., & Luo, W. (1989).
-            Orthogonal least squares methods and their application to
-            non-linear system identification. International Journal of
-            control, 50(5), 1873-1896.
-            <https://eprints.soton.ac.uk/251147/1/778742007_content.pdf>`_
-        [2]`Wikipedia entry on Householder transformation
-            <https://en.wikipedia.org/wiki/Householder_transformation>`_
+        [1] Manuscript: Chen, S., Billings, S. A., & Luo, W. (1989).
+            Orthogonal least squares methods and their application to non-linear system identification.
 
         """
         n = len(x)
@@ -208,13 +204,10 @@ class HouseHolder:
 
         References
         ----------
-        [1]`Manuscript: Chen, S., Billings, S. A., & Luo, W. (1989).
+        [1] Manuscript: Chen, S., Billings, S. A., & Luo, W. (1989).
             Orthogonal least squares methods and their application to
             non-linear system identification. International Journal of
             control, 50(5), 1873-1896.
-            <https://eprints.soton.ac.uk/251147/1/778742007_content.pdf>`_
-        [2]`Wikipedia entry on Householder transformation
-            <https://en.wikipedia.org/wiki/Householder_transformation>`_
 
         """
         b = -2 / (v.T @ v)

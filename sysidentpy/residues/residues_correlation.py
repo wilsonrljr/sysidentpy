@@ -36,12 +36,6 @@ class ResiduesAnalysis:
             2nd/3rd columns - Superior and inferior limits of a
             95% confidence interval.
 
-        References
-        ----------
-        [1] `Wikipedia entry on the Autocorrelation
-            <https://en.wikipedia.org/wiki/Autocorrelation>`_
-
-
         Examples
         --------
         >>> y = [3, -0.5, 2, 7]
@@ -62,9 +56,11 @@ class ResiduesAnalysis:
         ye = y * e.reshape(-1, 1)
         yeline = (y * e.reshape(-1, 1)) - (y * e.reshape(-1, 1)).mean()
 
-        yeline_x2line = self._input_ccf(yeline, x2line, len(unnormalized_e_acf))
+        yeline_x2line = self._input_ccf(
+            yeline, x2line, len(unnormalized_e_acf))
         lam = np.sqrt(sum((ee - ee.mean()) ** 2) / sum((ye - ye.mean()) ** 2))
-        yeline_eeline = self._input_ccf(yeline, eeline, len(unnormalized_e_acf))
+        yeline_eeline = self._input_ccf(
+            yeline, eeline, len(unnormalized_e_acf))
         return (
             e_acf,
             xe_ccf,
@@ -77,7 +73,8 @@ class ResiduesAnalysis:
 
         xe_ccf[:, 0] = self._normalized_correlation(X, e)
 
-        xe_ccf[:, 1] = np.ones(len(xe_ccf[:, 0])) * (1.96 / np.sqrt(len_confidence))
+        xe_ccf[:, 1] = np.ones(len(xe_ccf[:, 0])) * \
+            (1.96 / np.sqrt(len_confidence))
 
         xe_ccf[:, 2] = xe_ccf[:, 1] * (-1)
         return xe_ccf
@@ -121,7 +118,8 @@ class ResiduesAnalysis:
         u = (signal2 - np.mean(signal2)).flatten()
         t = int(np.floor(len(signal1) / 2))
         ruy = np.array(np.zeros(t))
-        ruy[0] = np.sum(y * u) / (np.sqrt(np.sum(y ** 2)) * np.sqrt(np.sum(u ** 2)))
+        ruy[0] = np.sum(y * u) / (np.sqrt(np.sum(y ** 2))
+                                  * np.sqrt(np.sum(u ** 2)))
 
         for i in range(1, t):
             y = (signal1 - np.mean(signal1[:i])).flatten()
@@ -151,18 +149,21 @@ class ResiduesAnalysis:
             95% confidence interval.
 
         """
-        plt.style.use("seaborn-whitegrid")
+        plt.style.use("seaborn-white")
         plt.rcParams["axes.facecolor"] = "white"
 
-        fig, axes = plt.subplots(nrows=2, ncols=2, figsize=figsize, facecolor="white")
+        fig, axes = plt.subplots(
+            nrows=2, ncols=2, figsize=figsize, facecolor="white")
         fig.subplots_adjust(hspace=0.7)
         for ax, feature in zip(axes.flatten()[2:], [e_acf, xe_ccf]):
-            ax.plot(feature)
+            ax.plot(feature[:, 0], color='#1f77b4')
+            ax.axhspan(feature[0, 1], feature[0, 2],
+                       color='#ccd9ff', alpha=0.5, lw=0)
             ax.set_xlabel("Lag", fontsize=12)
             ax.set_ylabel("Cross Correlation: ee, ex", fontsize=12)
             # ax = plt.gca()
             ax.set_ylim([-1, 1])
-            ax.grid(color="grey", linestyle="-.", alpha=0.2)
+            # ax.grid(color="grey", linestyle="-.", alpha=0.1)
             ax.spines["right"].set_visible(False)
             ax.spines["top"].set_visible(False)
             ax.xaxis.set_ticks_position("bottom")
@@ -171,26 +172,27 @@ class ResiduesAnalysis:
 
         ax = plt.subplot(211)
         ax.plot(
-            y[self.max_lag : n],
-            c="#101820FF",
-            alpha=0.2,
+            y[self.max_lag: n],
+            c="#1f77b4",
+            alpha=1,
             marker="o",
             label="Data",
-            linewidth=5,
+            linewidth=1.5,
         )
         ax.plot(
-            yhat[self.max_lag : n],
-            c="#006B38FF",
+            yhat[self.max_lag: n],
+            c="#ff7f0e",
             marker="*",
+            # linestyle='dashed',
             label="Model",
-            linewidth=1.0,
+            linewidth=1.5,
         )
         ax.set_title("Free run simulation", fontsize=18)
         ax.legend()
         ax.tick_params(labelsize=14)
         ax.set_xlabel("Samples", fontsize=14)
         ax.set_ylabel("y, yhat", fontsize=14)
-        ax.grid(color="grey", linestyle="-.", alpha=0.2)
+        # ax.grid(color="grey", linestyle="-.", alpha=0.1)
         ax.spines["right"].set_visible(False)
         ax.spines["top"].set_visible(False)
         ax.xaxis.set_ticks_position("bottom")

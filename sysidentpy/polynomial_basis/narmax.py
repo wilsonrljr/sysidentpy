@@ -108,13 +108,12 @@ class PolynomialNarmax(
 
     References
     ----------
-    [1]`Manuscript: Orthogonal least squares methods and their application
+    [1] Manuscript: Orthogonal least squares methods and their application
         to non-linear system identification
-        <https://eprints.soton.ac.uk/251147/1/778742007_content.pdf>`_
-    [2]`Manuscript (portuguese): Identificação de Sistemas não Lineares
+        https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
+    [2] Manuscript (portuguese): Identificação de Sistemas não Lineares
         Utilizando Modelos NARMAX Polinomiais–Uma Revisão
         e Novos Resultados
-        <https://www.researchgate.net/profile/Giovani_Rodrigues/publication/228595821_Identificacao_de_Sistemas_nao_Lineares_Utilizando_Modelos_NARMAX_Polinomiais-Uma_Revisao_e_Novos_Resultados/links/00b4951b10ff8ab4d3000000.pdf>`_
     """
 
     def __init__(
@@ -236,14 +235,13 @@ class PolynomialNarmax(
 
         References
         ----------
-        [1]`Manuscript: Orthogonal least squares methods and their application
+        [1] Manuscript: Orthogonal least squares methods and their application
             to non-linear system identification
-            <https://eprints.soton.ac.uk/251147/1/778742007_content.pdf>`_
+            https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
 
-        [2]`Manuscript (portuguese): Identificação de Sistemas não Lineares
+        [2] Manuscript (portuguese): Identificação de Sistemas não Lineares
             Utilizando Modelos NARMAX Polinomiais–Uma Revisão
             e Novos Resultados
-            <https://www.researchgate.net/profile/Giovani_Rodrigues/publication/228595821_Identificacao_de_Sistemas_nao_Lineares_Utilizando_Modelos_NARMAX_Polinomiais-Uma_Revisao_e_Novos_Resultados/links/00b4951b10ff8ab4d3000000.pdf>`_
 
         """
         squared_y = y[self.max_lag:].T @ y[self.max_lag:]
@@ -392,19 +390,18 @@ class PolynomialNarmax(
 
         References
         ----------
-        [1]`Manuscript: Sorenson, H. W. (1970). Least-squares estimation:
+        [1] Manuscript: Sorenson, H. W. (1970). Least-squares estimation:
             from Gauss to Kalman. IEEE spectrum, 7(7), 63-68.
-            <http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf>`_
-        [2]`Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificaçao
+            http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf
+        [2] Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificaçao
             de sistemas: técnicas lineares enao-lineares aplicadas a sistemas
             reais. Editora da UFMG. 3a ediçao.
-            <https://books.google.com.br/books?hl=pt-BR&lr=&id=f9IwE7Ph0fYC&oi=fnd&pg=PA2&dq=Introdu%C3%A7%C3%A3o+%C3%A0+identifica%C3%A7%C3%A3o+de+sistemas+-+T%C3%A9cnicas+lineares+e+n%C3%A3o-lineares+aplicadas+a+sistemas+reais&ots=Qiyc4VsMdt&sig=6gumj1AEWh_b0tUGR4quI5oETUA#v=onepage&q=Introdu%C3%A7%C3%A3o%20%C3%A0%20identifica%C3%A7%C3%A3o%20de%20sistemas%20-%20T%C3%A9cnicas%20lineares%20e%20n%C3%A3o-lineares%20aplicadas%20a%20sistemas%20reais&f=false>`_
-        [3]`Manuscript: Markovsky, I., & Van Huffel, S. (2007).
+        [3] Manuscript: Markovsky, I., & Van Huffel, S. (2007).
             Overview of total least-squares methods.
             Signal processing, 87(10), 2283-2302.
-            <https://eprints.soton.ac.uk/263855/1/tls_overview.pdf>`_
-        [4]`Wikipedia entry on Least Squares
-            <https://en.wikipedia.org/wiki/Least_squares>`_
+            https://eprints.soton.ac.uk/263855/1/tls_overview.pdf
+        [4] Wikipedia entry on Least Squares
+            https://en.wikipedia.org/wiki/Least_squares
 
         """
         e = y[aux_lag:, 0].reshape(-1, 1) - psi @ biased_theta
@@ -430,9 +427,9 @@ class PolynomialNarmax(
     def predict(self, X, y):
         """Return the predicted values given an input.
 
-        This is an 'alpha' version of the predict function which allows
-        a friendly usage by the user. Given a previously trained model,
-        predict values given a new set of data.
+        The predict function allows a friendly usage by the user.
+        Given a previously trained model, predict values given
+        a new set of data.
 
         This method accept y values mainly for prediction n-steps ahead
         (to be implemented in the future)
