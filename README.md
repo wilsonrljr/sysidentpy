@@ -136,11 +136,13 @@ catboost_narx.plot_result(y_valid, yhat, ee, ex)
 ```
 ![catboost](/examples/figures/catboost_narx.png)
 
-Catboost without NARX configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Catboost without NARX configuration
 
 The following is the Catboost performance without the NARX configuration.
+
+
 ```python
+
 def plot_results(yvalid, yhat):
     _, ax = plt.subplots(figsize=(14, 8))
     ax.plot(y_valid[:200], label='Data', marker='o')
@@ -152,9 +154,8 @@ def plot_results(yvalid, yhat):
     plt.show()
 
 catboost = CatBoostRegressor(iterations=300,
-                             learning_rate=0.1,
-                             depth=6)
-
+                            learning_rate=0.1,
+                            depth=6)
 catboost.fit(x_train, y_train, verbose=False)
 plot_results(y_valid, catboost.predict(x_valid))
 ```
