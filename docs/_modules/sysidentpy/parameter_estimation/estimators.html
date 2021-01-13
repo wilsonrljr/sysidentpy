@@ -147,12 +147,22 @@
      Example: F-16 Ground Vibration Test benchmark
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/narx_neural_network.html">
+     Building NARX Neural Network using Sysidentpy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/general_estimators.html">
+     Building NARX models using general estimators
+    </a>
+   </li>
   </ul>
   <i class="fas fa-chevron-down">
   </i>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="../../../changelog/v0.1.3.html">
+  <a class="reference internal" href="../../../changelog/v0.1.4.html">
    Changes in SysIdentPy
   </a>
  </li>
@@ -173,6 +183,16 @@
  <li class="toctree-l1">
   <a class="reference internal" href="../../../code.html#sysidentpy-narmax">
    sysidentpy narmax
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../code.html#sysidentpy-narx-neural-network">
+   sysidentpy narx_neural_network
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../code.html#sysidentpy-general-estimators">
+   sysidentpy general_estimators
   </a>
  </li>
  <li class="toctree-l1">
@@ -244,11 +264,11 @@
         aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
     <div class="dropdown-buttons sourcebuttons">
         <a class="repository-button"
-            href="https://github.com/wilsonrljr/sysidentpy/tree/master/docs"><button type="button" class="btn btn-secondary topbarbtn"
+            href="https://github.com/wilsonrljr/sysidentpy/tree/master/"><button type="button" class="btn btn-secondary topbarbtn"
                 data-toggle="tooltip" data-placement="left" title="Source repository"><i
                     class="fab fa-github"></i>repository</button></a>
         <a class="issues-button"
-            href="https://github.com/wilsonrljr/sysidentpy/tree/master/docs/issues/new?title=Issue%20on%20page%20%2F_modules/sysidentpy/parameter_estimation/estimators.html&body=Your%20issue%20content%20here."><button
+            href="https://github.com/wilsonrljr/sysidentpy/tree/master//issues/new?title=Issue%20on%20page%20%2F_modules/sysidentpy/parameter_estimation/estimators.html&body=Your%20issue%20content%20here."><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
                 title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
         
@@ -377,24 +397,23 @@
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
-<span class="sd">        [1]`Manuscript: Sorenson, H. W. (1970). Least-squares estimation:</span>
+<span class="sd">        [1] Manuscript: Sorenson, H. W. (1970). Least-squares estimation:</span>
 <span class="sd">            from Gauss to Kalman. IEEE spectrum, 7(7), 63-68.</span>
-<span class="sd">            &lt;http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf&gt;`_</span>
-<span class="sd">        [2]`Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificaçao</span>
+<span class="sd">            http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf</span>
+<span class="sd">        [2] Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificaçao</span>
 <span class="sd">            de sistemas: técnicas lineares enao-lineares aplicadas a sistemas</span>
 <span class="sd">            reais. Editora da UFMG. 3a ediçao.</span>
-<span class="sd">            &lt;https://books.google.com.br/books?hl=pt-BR&amp;lr=&amp;id=f9IwE7Ph0fYC&amp;oi=fnd&amp;pg=PA2&amp;dq=Introdu%C3%A7%C3%A3o+%C3%A0+identifica%C3%A7%C3%A3o+de+sistemas+-+T%C3%A9cnicas+lineares+e+n%C3%A3o-lineares+aplicadas+a+sistemas+reais&amp;ots=Qiyc4VsMdt&amp;sig=6gumj1AEWh_b0tUGR4quI5oETUA#v=onepage&amp;q=Introdu%C3%A7%C3%A3o%20%C3%A0%20identifica%C3%A7%C3%A3o%20de%20sistemas%20-%20T%C3%A9cnicas%20lineares%20e%20n%C3%A3o-lineares%20aplicadas%20a%20sistemas%20reais&amp;f=false&gt;`_</span>
-<span class="sd">        [3]`Manuscript: Markovsky, I., &amp; Van Huffel, S. (2007).</span>
+<span class="sd">        [3] Manuscript: Markovsky, I., &amp; Van Huffel, S. (2007).</span>
 <span class="sd">            Overview of total least-squares methods.</span>
 <span class="sd">            Signal processing, 87(10), 2283-2302.</span>
-<span class="sd">            &lt;https://eprints.soton.ac.uk/263855/1/tls_overview.pdf&gt;`_</span>
-<span class="sd">        [4]`Wikipedia entry on Least Squares</span>
-<span class="sd">            &lt;https://en.wikipedia.org/wiki/Least_squares&gt;`_</span>
+<span class="sd">            https://eprints.soton.ac.uk/263855/1/tls_overview.pdf</span>
+<span class="sd">        [4] Wikipedia entry on Least Squares</span>
+<span class="sd">            https://en.wikipedia.org/wiki/Least_squares</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_linear_dependence_rows</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span>
 
-        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_aux_lag</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_aux_lag</span><span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">theta</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">psi</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">psi</span><span class="p">))</span> <span class="o">@</span> <span class="n">psi</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y</span>
         <span class="k">return</span> <span class="n">theta</span></div>
 
@@ -415,19 +434,18 @@
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
-<span class="sd">        [1]`Manuscript: Golub, G. H., &amp; Van Loan, C. F. (1980).</span>
+<span class="sd">        [1] Manuscript: Golub, G. H., &amp; Van Loan, C. F. (1980).</span>
 <span class="sd">            An analysis of the total least squares problem.</span>
 <span class="sd">            SIAM journal on numerical analysis, 17(6), 883-893.</span>
-<span class="sd">            &lt;https://epubs.siam.org/doi/pdf/10.1137/0717073?casa_token=218O16LygKkAAAAA:GyssnBnNEWzVg2Wvbmu5K1pj-XwkzpTSknUsddVTZfEJafpKANUstMuRDyJjIdcTgO-tFuQYb4Y&gt;`_</span>
-<span class="sd">        [2]`Manuscript: Markovsky, I., &amp; Van Huffel, S. (2007).</span>
+<span class="sd">        [2] Manuscript: Markovsky, I., &amp; Van Huffel, S. (2007).</span>
 <span class="sd">            Overview of total least-squares methods.</span>
 <span class="sd">            Signal processing, 87(10), 2283-2302.</span>
-<span class="sd">            &lt;https://eprints.soton.ac.uk/263855/1/tls_overview.pdf&gt;`_</span>
-<span class="sd">        [3]`Wikipedia entry on Total Least Squares</span>
-<span class="sd">            &lt;https://en.wikipedia.org/wiki/Total_least_squares&gt;`_</span>
+<span class="sd">            https://eprints.soton.ac.uk/263855/1/tls_overview.pdf</span>
+<span class="sd">        [3] Wikipedia entry on Total Least Squares</span>
+<span class="sd">            https://en.wikipedia.org/wiki/Total_least_squares</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_aux_lag</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_aux_lag</span><span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">full</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">psi</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">psi</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">full</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -435,7 +453,7 @@
         <span class="k">return</span> <span class="n">theta</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_initial_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_aux_lag</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_aux_lag</span><span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">n_theta</span> <span class="o">=</span> <span class="n">psi</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span>
         <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_theta</span><span class="p">,</span> <span class="n">n</span><span class="p">])</span>
@@ -466,10 +484,9 @@
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
-<span class="sd">        [1]`Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificaçao</span>
+<span class="sd">        [1] Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificaçao</span>
 <span class="sd">            de sistemas: técnicas lineares enao-lineares aplicadas a sistemas</span>
 <span class="sd">            reais. Editora da UFMG. 3a ediçao.</span>
-<span class="sd">            &lt;https://books.google.com.br/books?hl=pt-BR&amp;lr=&amp;id=f9IwE7Ph0fYC&amp;oi=fnd&amp;pg=PA2&amp;dq=Introdu%C3%A7%C3%A3o+%C3%A0+identifica%C3%A7%C3%A3o+de+sistemas+-+T%C3%A9cnicas+lineares+e+n%C3%A3o-lineares+aplicadas+a+sistemas+reais&amp;ots=Qiyc4VsMdt&amp;sig=6gumj1AEWh_b0tUGR4quI5oETUA#v=onepage&amp;q=Introdu%C3%A7%C3%A3o%20%C3%A0%20identifica%C3%A7%C3%A3o%20de%20sistemas%20-%20T%C3%A9cnicas%20lineares%20e%20n%C3%A3o-lineares%20aplicadas%20a%20sistemas%20reais&amp;f=false&gt;`_</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">n_theta</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_values</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
@@ -479,12 +496,15 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
             <span class="n">psi_tmp</span> <span class="o">=</span> <span class="n">psi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">k_numerator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lam</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">p</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">psi_tmp</span><span class="p">)</span>
-            <span class="n">k_denominator</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lam</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">psi_tmp</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">psi_tmp</span><span class="p">)</span>
+            <span class="n">k_denominator</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">_lam</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">psi_tmp</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">psi_tmp</span><span class="p">)</span>
             <span class="n">k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">k_numerator</span><span class="p">,</span> <span class="n">k_denominator</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">psi_tmp</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
-            <span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">k</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+            <span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">k</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
 
-            <span class="n">p1</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">psi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">psi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="n">p1</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">psi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                       <span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">psi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
             <span class="n">p2</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">psi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">psi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
                 <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lam</span>
@@ -519,9 +539,8 @@
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
-<span class="sd">        [1]`Book: Poularikas, A. D. (2017). Adaptive filtering: Fundamentals</span>
+<span class="sd">        [1] Book: Poularikas, A. D. (2017). Adaptive filtering: Fundamentals</span>
 <span class="sd">            of least mean squares with MATLAB®. CRC Press.</span>
-<span class="sd">            &lt;https://books.google.com.br/books?hl=pt-BR&amp;lr=&amp;id=OJPSBQAAQBAJ&amp;oi=fnd&amp;pg=PP1&amp;dq=adaptive+filtering+fundamentals+of+least+mean+squares+with+matlab&amp;ots=dMNzB_2erC&amp;sig=7l0VvIm9-GwUDgj0xuy1m0c0Gdo#v=onepage&amp;q=adaptive%20filtering%20fundamentals%20of%20least%20mean%20squares%20with%20matlab&amp;f=false&gt;`_</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">n_theta</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_values</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
@@ -535,7 +554,8 @@
                     <span class="n">psi</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">psi</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset_covariance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n_theta</span><span class="p">)</span>
                 <span class="p">)</span>
             <span class="p">)</span>
-            <span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">aux</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">))</span>
+            <span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">aux</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">theta</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
 
@@ -562,15 +582,13 @@
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
-<span class="sd">        [1]`Book: Haykin, S., &amp; Widrow, B. (Eds.). (2003). Least-mean-square</span>
+<span class="sd">        [1] Book: Haykin, S., &amp; Widrow, B. (Eds.). (2003). Least-mean-square</span>
 <span class="sd">            adaptive filters (Vol. 31). John Wiley &amp; Sons.</span>
-<span class="sd">            &lt;https://books.google.com.br/books?hl=pt-BR&amp;lr=&amp;id=U8X3mJtawUkC&amp;oi=fnd&amp;pg=PR9&amp;dq=%22least+mean+square%22&amp;ots=Bzp42ZklVe&amp;sig=ZilhP9bYuuagpi30hrJk53sWj_8&amp;redir_esc=y#v=onepage&amp;q=%22least%20mean%20square%22&amp;f=false&gt;`_</span>
-<span class="sd">        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
+<span class="sd">        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
 <span class="sd">            análise estatística e novas estratégias de algoritmos LMS de passo</span>
 <span class="sd">            variável.</span>
-<span class="sd">            &lt;https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1&gt;`_</span>
-<span class="sd">        [3]`Wikipedia entry on Least Mean Squares</span>
-<span class="sd">            &lt;https://en.wikipedia.org/wiki/Least_mean_squares_filter&gt;`_</span>
+<span class="sd">        [3] Wikipedia entry on Least Mean Squares</span>
+<span class="sd">            https://en.wikipedia.org/wiki/Least_mean_squares_filter</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">n_theta</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_values</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
@@ -579,7 +597,8 @@
             <span class="n">psi_tmp</span> <span class="o">=</span> <span class="n">psi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">psi_tmp</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
             <span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
-                <span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">psi_tmp</span>
+                <span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">psi_tmp</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">theta</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
@@ -615,9 +634,8 @@
 <span class="sd">        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
 <span class="sd">            análise estatística e novas estratégias de algoritmos LMS de passo</span>
 <span class="sd">            variável.</span>
-<span class="sd">            &lt;https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1&gt;`_</span>
-<span class="sd">        [3]`Wikipedia entry on Least Mean Squares</span>
-<span class="sd">            &lt;https://en.wikipedia.org/wiki/Least_mean_squares_filter&gt;`_</span>
+<span class="sd">        [3] Wikipedia entry on Least Mean Squares</span>
+<span class="sd">            https://en.wikipedia.org/wiki/Least_mean_squares_filter</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">n_theta</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_values</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
@@ -660,12 +678,11 @@
 <span class="sd">        ----------</span>
 <span class="sd">        [1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</span>
 <span class="sd">            and modeling. John Wiley &amp; Sons.</span>
-<span class="sd">        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
+<span class="sd">        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
 <span class="sd">            análise estatística e novas estratégias de algoritmos LMS de passo</span>
 <span class="sd">            variável.</span>
-<span class="sd">            &lt;https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1&gt;`_</span>
-<span class="sd">        [3]`Wikipedia entry on Least Mean Squares</span>
-<span class="sd">            &lt;https://en.wikipedia.org/wiki/Least_mean_squares_filter&gt;`_</span>
+<span class="sd">        [3] Wikipedia entry on Least Mean Squares</span>
+<span class="sd">            https://en.wikipedia.org/wiki/Least_mean_squares_filter</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">n_theta</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_values</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
@@ -710,14 +727,13 @@
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
-<span class="sd">        [1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</span>
+<span class="sd">        [1] Book: Hayes, M. H. (2009). Statistical digital signal processing</span>
 <span class="sd">            and modeling. John Wiley &amp; Sons.</span>
-<span class="sd">        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
+<span class="sd">        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
 <span class="sd">            análise estatística e novas estratégias de algoritmos LMS de passo</span>
 <span class="sd">            variável.</span>
-<span class="sd">            &lt;https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1&gt;`_</span>
-<span class="sd">        [3]`Wikipedia entry on Least Mean Squares</span>
-<span class="sd">            &lt;https://en.wikipedia.org/wiki/Least_mean_squares_filter&gt;`_</span>
+<span class="sd">        [3] Wikipedia entry on Least Mean Squares</span>
+<span class="sd">            https://en.wikipedia.org/wiki/Least_mean_squares_filter</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">n_theta</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_values</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
@@ -761,14 +777,13 @@
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
-<span class="sd">        [1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</span>
+<span class="sd">        [1] Book: Hayes, M. H. (2009). Statistical digital signal processing</span>
 <span class="sd">            and modeling. John Wiley &amp; Sons.</span>
-<span class="sd">        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
+<span class="sd">        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
 <span class="sd">            análise estatística e novas estratégias de algoritmos LMS de passo</span>
 <span class="sd">            variável.</span>
-<span class="sd">            &lt;https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1&gt;`_</span>
-<span class="sd">        [3]`Wikipedia entry on Least Mean Squares</span>
-<span class="sd">            &lt;https://en.wikipedia.org/wiki/Least_mean_squares_filter&gt;`_</span>
+<span class="sd">        [3] Wikipedia entry on Least Mean Squares</span>
+<span class="sd">            https://en.wikipedia.org/wiki/Least_mean_squares_filter</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">n_theta</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_values</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
@@ -810,14 +825,13 @@
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
-<span class="sd">        [1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</span>
+<span class="sd">        [1] Book: Hayes, M. H. (2009). Statistical digital signal processing</span>
 <span class="sd">            and modeling. John Wiley &amp; Sons.</span>
-<span class="sd">        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
+<span class="sd">        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
 <span class="sd">            análise estatística e novas estratégias de algoritmos LMS de passo</span>
 <span class="sd">            variável.</span>
-<span class="sd">            &lt;https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1&gt;`_</span>
-<span class="sd">        [3]`Wikipedia entry on Least Mean Squares</span>
-<span class="sd">            &lt;https://en.wikipedia.org/wiki/Least_mean_squares_filter&gt;`_</span>
+<span class="sd">        [3] Wikipedia entry on Least Mean Squares</span>
+<span class="sd">            https://en.wikipedia.org/wiki/Least_mean_squares_filter</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">n_theta</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_values</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
@@ -861,14 +875,13 @@
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
-<span class="sd">        [1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</span>
+<span class="sd">        [1] Book: Hayes, M. H. (2009). Statistical digital signal processing</span>
 <span class="sd">            and modeling. John Wiley &amp; Sons.</span>
-<span class="sd">        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
+<span class="sd">        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
 <span class="sd">            análise estatística e novas estratégias de algoritmos LMS de passo</span>
 <span class="sd">            variável.</span>
-<span class="sd">            &lt;https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1&gt;`_</span>
-<span class="sd">        [3]`Wikipedia entry on Least Mean Squares</span>
-<span class="sd">            &lt;https://en.wikipedia.org/wiki/Least_mean_squares_filter&gt;`_</span>
+<span class="sd">        [3] Wikipedia entry on Least Mean Squares</span>
+<span class="sd">            https://en.wikipedia.org/wiki/Least_mean_squares_filter</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">n_theta</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_values</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
@@ -911,14 +924,13 @@
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
-<span class="sd">        [1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</span>
+<span class="sd">        [1] Book: Hayes, M. H. (2009). Statistical digital signal processing</span>
 <span class="sd">            and modeling. John Wiley &amp; Sons.</span>
-<span class="sd">        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
+<span class="sd">        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
 <span class="sd">            análise estatística e novas estratégias de algoritmos LMS de passo</span>
 <span class="sd">            variável.</span>
-<span class="sd">            &lt;https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1&gt;`_</span>
-<span class="sd">        [3]`Wikipedia entry on Least Mean Squares</span>
-<span class="sd">            &lt;https://en.wikipedia.org/wiki/Least_mean_squares_filter&gt;`_</span>
+<span class="sd">        [3] Wikipedia entry on Least Mean Squares</span>
+<span class="sd">            https://en.wikipedia.org/wiki/Least_mean_squares_filter</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">n_theta</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_values</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
@@ -962,14 +974,13 @@
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
-<span class="sd">        [1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</span>
+<span class="sd">        [1] Book: Hayes, M. H. (2009). Statistical digital signal processing</span>
 <span class="sd">            and modeling. John Wiley &amp; Sons.</span>
-<span class="sd">        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
+<span class="sd">        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
 <span class="sd">            análise estatística e novas estratégias de algoritmos LMS de passo</span>
 <span class="sd">            variável.</span>
-<span class="sd">            &lt;https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1&gt;`_</span>
-<span class="sd">        [3]`Wikipedia entry on Least Mean Squares</span>
-<span class="sd">            &lt;https://en.wikipedia.org/wiki/Least_mean_squares_filter&gt;`_</span>
+<span class="sd">        [3] Wikipedia entry on Least Mean Squares</span>
+<span class="sd">            https://en.wikipedia.org/wiki/Least_mean_squares_filter</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">n_theta</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_values</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
@@ -979,7 +990,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">psi_tmp</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
             <span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
                 <span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gama</span><span class="p">)</span>
-                <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">psi_tmp</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eps</span> <span class="o">+</span> <span class="n">psi_tmp</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">psi_tmp</span><span class="p">)</span>
+                <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">psi_tmp</span> <span class="o">/</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eps</span> <span class="o">+</span> <span class="n">psi_tmp</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">psi_tmp</span><span class="p">)</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">theta</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
@@ -1010,14 +1022,13 @@
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
-<span class="sd">        [1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</span>
+<span class="sd">        [1] Book: Hayes, M. H. (2009). Statistical digital signal processing</span>
 <span class="sd">            and modeling. John Wiley &amp; Sons.</span>
-<span class="sd">        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
+<span class="sd">        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
 <span class="sd">            análise estatística e novas estratégias de algoritmos LMS de passo</span>
 <span class="sd">            variável.</span>
-<span class="sd">            &lt;https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1&gt;`_</span>
-<span class="sd">        [3]`Wikipedia entry on Least Mean Squares</span>
-<span class="sd">            &lt;https://en.wikipedia.org/wiki/Least_mean_squares_filter&gt;`_</span>
+<span class="sd">        [3] Wikipedia entry on Least Mean Squares</span>
+<span class="sd">            https://en.wikipedia.org/wiki/Least_mean_squares_filter</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">n_theta</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_values</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
@@ -1058,24 +1069,23 @@
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
-<span class="sd">        [1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</span>
+<span class="sd">        [1] Book: Hayes, M. H. (2009). Statistical digital signal processing</span>
 <span class="sd">            and modeling. John Wiley &amp; Sons.</span>
-<span class="sd">        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
+<span class="sd">        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
 <span class="sd">            análise estatística e novas estratégias de algoritmos LMS de passo</span>
 <span class="sd">            variável.</span>
-<span class="sd">            &lt;https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1&gt;`_</span>
-<span class="sd">        [3]`Manuscript:Gui, G., Mehbodniya, A., &amp; Adachi, F. (2013).</span>
+<span class="sd">        [3] Manuscript:Gui, G., Mehbodniya, A., &amp; Adachi, F. (2013).</span>
 <span class="sd">            Least mean square/fourth algorithm with application to sparse</span>
 <span class="sd">            channel estimation. arXiv preprint arXiv:1304.3911.</span>
-<span class="sd">            &lt;https://arxiv.org/pdf/1304.3911.pdf&gt;`_</span>
-<span class="sd">        [4]`Manuscript: Nascimento, V. H., &amp; Bermudez, J. C. M. (2005, March).</span>
+<span class="sd">            https://arxiv.org/pdf/1304.3911.pdf</span>
+<span class="sd">        [4] Manuscript: Nascimento, V. H., &amp; Bermudez, J. C. M. (2005, March).</span>
 <span class="sd">            When is the least-mean fourth algorithm mean-square stable?</span>
 <span class="sd">            In Proceedings.(ICASSP&#39;05). IEEE International Conference on</span>
 <span class="sd">            Acoustics, Speech, and Signal Processing, 2005.</span>
 <span class="sd">            (Vol. 4, pp. iv-341). IEEE.</span>
-<span class="sd">            &lt;http://www.lps.usp.br/vitor/artigos/icassp05.pdf&gt;`_</span>
-<span class="sd">        [5]`Wikipedia entry on Least Mean Squares</span>
-<span class="sd">            &lt;https://en.wikipedia.org/wiki/Least_mean_squares_filter&gt;`_</span>
+<span class="sd">            http://www.lps.usp.br/vitor/artigos/icassp05.pdf</span>
+<span class="sd">        [5] Wikipedia entry on Least Mean Squares</span>
+<span class="sd">            https://en.wikipedia.org/wiki/Least_mean_squares_filter</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">n_theta</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_values</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
@@ -1084,7 +1094,8 @@
             <span class="n">psi_tmp</span> <span class="o">=</span> <span class="n">psi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">psi_tmp</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
             <span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
-                <span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">*</span> <span class="n">psi_tmp</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">3</span>
+                <span class="n">theta</span><span class="p">[:,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">*</span> <span class="n">psi_tmp</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">3</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">theta</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
@@ -1115,16 +1126,15 @@
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
-<span class="sd">        [1]`Chambers, J. A., Tanrikulu, O., &amp; Constantinides, A. G. (1994).</span>
+<span class="sd">        [1] Chambers, J. A., Tanrikulu, O., &amp; Constantinides, A. G. (1994).</span>
 <span class="sd">            Least mean mixed-norm adaptive filtering.</span>
 <span class="sd">            Electronics letters, 30(19), 1574-1575.</span>
-<span class="sd">            &lt;https://ieeexplore.ieee.org/document/326382&gt;`_</span>
-<span class="sd">        [2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
+<span class="sd">            https://ieeexplore.ieee.org/document/326382</span>
+<span class="sd">        [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</span>
 <span class="sd">            análise estatística e novas estratégias de algoritmos LMS de passo</span>
 <span class="sd">            variável.</span>
-<span class="sd">            &lt;https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1&gt;`_</span>
-<span class="sd">        [3]`Wikipedia entry on Least Mean Squares</span>
-<span class="sd">            &lt;https://en.wikipedia.org/wiki/Least_mean_squares_filter&gt;`_</span>
+<span class="sd">        [3] Wikipedia entry on Least Mean Squares</span>
+<span class="sd">            https://en.wikipedia.org/wiki/Least_mean_squares_filter</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">n_theta</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_values</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>

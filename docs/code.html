@@ -48,7 +48,7 @@
     <link rel="canonical" href="http://sysidentpy.org/code.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Changes in SysIdentPy" href="changelog/v0.1.3.html" />
+    <link rel="prev" title="Changes in SysIdentPy" href="changelog/v0.1.4.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -148,12 +148,22 @@
      Example: F-16 Ground Vibration Test benchmark
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/narx_neural_network.html">
+     Building NARX Neural Network using Sysidentpy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/general_estimators.html">
+     Building NARX models using general estimators
+    </a>
+   </li>
   </ul>
   <i class="fas fa-chevron-down">
   </i>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="changelog/v0.1.3.html">
+  <a class="reference internal" href="changelog/v0.1.4.html">
    Changes in SysIdentPy
   </a>
  </li>
@@ -174,6 +184,16 @@
  <li class="toctree-l1">
   <a class="reference internal" href="#sysidentpy-narmax">
    sysidentpy narmax
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="#sysidentpy-narx-neural-network">
+   sysidentpy narx_neural_network
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="#sysidentpy-general-estimators">
+   sysidentpy general_estimators
   </a>
  </li>
  <li class="toctree-l1">
@@ -262,11 +282,11 @@
         aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
     <div class="dropdown-buttons sourcebuttons">
         <a class="repository-button"
-            href="https://github.com/wilsonrljr/sysidentpy/tree/master/docs"><button type="button" class="btn btn-secondary topbarbtn"
+            href="https://github.com/wilsonrljr/sysidentpy/tree/master/"><button type="button" class="btn btn-secondary topbarbtn"
                 data-toggle="tooltip" data-placement="left" title="Source repository"><i
                     class="fab fa-github"></i>repository</button></a>
         <a class="issues-button"
-            href="https://github.com/wilsonrljr/sysidentpy/tree/master/docs/issues/new?title=Issue%20on%20page%20%2Fcode.html&body=Your%20issue%20content%20here."><button
+            href="https://github.com/wilsonrljr/sysidentpy/tree/master//issues/new?title=Issue%20on%20page%20%2Fcode.html&body=Your%20issue%20content%20here."><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
                 title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
         
@@ -305,6 +325,16 @@
  <li class="toc-h1 nav-item toc-entry">
   <a class="reference internal nav-link" href="#sysidentpy-narmax">
    sysidentpy narmax
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#sysidentpy-narx-neural-network">
+   sysidentpy narx_neural_network
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#sysidentpy-general-estimators">
+   sysidentpy general_estimators
   </a>
  </li>
  <li class="toc-h1 nav-item toc-entry">
@@ -397,14 +427,11 @@ reference below.</p>
 </pre></div>
 </div>
 <p class="rubric">References</p>
-<p>[1]`Master Thesis: Barbosa, Alípio Monteiro.
-“Técnicas de otimizaçao bi-objetivo para a determinaçao</p>
-<blockquote>
-<div><dl class="simple">
-<dt>da estrutura de modelos NARX.” (2010).</dt><dd><p>&lt;<a class="reference external" href="https://repositorio.ufmg.br/bitstream/1843/BUOS-8EXJV3/1/7m.pdf">https://repositorio.ufmg.br/bitstream/1843/BUOS-8EXJV3/1/7m.pdf</a>&gt;`_</p>
+<dl class="simple">
+<dt>[1] Master Thesis: Barbosa, Alípio Monteiro.</dt><dd><p>Técnicas de otimizaçao bi-objetivo para a determinaçao
+da estrutura de modelos NARX (2010).</p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 </dd></dl>
@@ -579,12 +606,11 @@ of the LMS mixed norm method.</p></li>
 </div>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1]`Manuscript: Orthogonal least squares methods and their application</dt><dd><p>to non-linear system identification
-&lt;<a class="reference external" href="https://eprints.soton.ac.uk/251147/1/778742007_content.pdf">https://eprints.soton.ac.uk/251147/1/778742007_content.pdf</a>&gt;`_</p>
+<dt>[1] Manuscript: Orthogonal least squares methods and their application</dt><dd><p>to non-linear system identification
+<a class="reference external" href="https://eprints.soton.ac.uk/251147/1/778742007_content.pdf">https://eprints.soton.ac.uk/251147/1/778742007_content.pdf</a></p>
 </dd>
-<dt>[2]`Manuscript (portuguese): Identificação de Sistemas não Lineares</dt><dd><p>Utilizando Modelos NARMAX Polinomiais–Uma Revisão
-e Novos Resultados
-&lt;<a class="reference external" href="https://www.researchgate.net/profile/Giovani_Rodrigues/publication/228595821_Identificacao_de_Sistemas_nao_Lineares_Utilizando_Modelos_NARMAX_Polinomiais-Uma_Revisao_e_Novos_Resultados/links/00b4951b10ff8ab4d3000000.pdf">https://www.researchgate.net/profile/Giovani_Rodrigues/publication/228595821_Identificacao_de_Sistemas_nao_Lineares_Utilizando_Modelos_NARMAX_Polinomiais-Uma_Revisao_e_Novos_Resultados/links/00b4951b10ff8ab4d3000000.pdf</a>&gt;`_</p>
+<dt>[2] Manuscript (portuguese): Identificação de Sistemas não Lineares</dt><dd><p>Utilizando Modelos NARMAX Polinomiais–Uma Revisão
+e Novos Resultados</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -611,12 +637,11 @@ based on err values.</p></li>
 </dl>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1]`Manuscript: Orthogonal least squares methods and their application</dt><dd><p>to non-linear system identification
-&lt;<a class="reference external" href="https://eprints.soton.ac.uk/251147/1/778742007_content.pdf">https://eprints.soton.ac.uk/251147/1/778742007_content.pdf</a>&gt;`_</p>
+<dt>[1] Manuscript: Orthogonal least squares methods and their application</dt><dd><p>to non-linear system identification
+<a class="reference external" href="https://eprints.soton.ac.uk/251147/1/778742007_content.pdf">https://eprints.soton.ac.uk/251147/1/778742007_content.pdf</a></p>
 </dd>
-<dt>[2]`Manuscript (portuguese): Identificação de Sistemas não Lineares</dt><dd><p>Utilizando Modelos NARMAX Polinomiais–Uma Revisão
-e Novos Resultados
-&lt;<a class="reference external" href="https://www.researchgate.net/profile/Giovani_Rodrigues/publication/228595821_Identificacao_de_Sistemas_nao_Lineares_Utilizando_Modelos_NARMAX_Polinomiais-Uma_Revisao_e_Novos_Resultados/links/00b4951b10ff8ab4d3000000.pdf">https://www.researchgate.net/profile/Giovani_Rodrigues/publication/228595821_Identificacao_de_Sistemas_nao_Lineares_Utilizando_Modelos_NARMAX_Polinomiais-Uma_Revisao_e_Novos_Resultados/links/00b4951b10ff8ab4d3000000.pdf</a>&gt;`_</p>
+<dt>[2] Manuscript (portuguese): Identificação de Sistemas não Lineares</dt><dd><p>Utilizando Modelos NARMAX Polinomiais–Uma Revisão
+e Novos Resultados</p>
 </dd>
 </dl>
 </dd></dl>
@@ -655,9 +680,9 @@ vector position + 1).</p></li>
 <dt id="sysidentpy.polynomial_basis.narmax.PolynomialNarmax.predict">
 <code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/polynomial_basis/narmax.html#PolynomialNarmax.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.polynomial_basis.narmax.PolynomialNarmax.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the predicted values given an input.</p>
-<p>This is an ‘alpha’ version of the predict function which allows
-a friendly usage by the user. Given a previously trained model,
-predict values given a new set of data.</p>
+<p>The predict function allows a friendly usage by the user.
+Given a previously trained model, predict values given
+a new set of data.</p>
 <p>This method accept y values mainly for prediction n-steps ahead
 (to be implemented in the future)</p>
 <dl class="field-list simple">
@@ -768,6 +793,131 @@ user.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="sysidentpy-narx-neural-network">
+<h1>sysidentpy narx_neural_network<a class="headerlink" href="#sysidentpy-narx-neural-network" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="sysidentpy-general-estimators">
+<h1>sysidentpy general_estimators<a class="headerlink" href="#sysidentpy-general-estimators" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-sysidentpy.general_estimators.narx"></span><p>Build NARX Models Using general estimators</p>
+<dl class="py class">
+<dt id="sysidentpy.general_estimators.narx.NARX">
+<em class="property">class </em><code class="sig-prename descclassname">sysidentpy.general_estimators.narx.</code><code class="sig-name descname">NARX</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">non_degree</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">ylag</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">xlag</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">n_inputs</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">base_estimator</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fit_params</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/general_estimators/narx.html#NARX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.general_estimators.narx.NARX" title="Permalink to this definition">¶</a></dt>
+<dd><p>NARX model build on top of general estimators</p>
+<p>Currently is possible to use any estimator that have a fit/predict
+as an Autoregressive Model. We use our GenerateRegressors and
+InformationMatrix classes to handle the creation of the lagged
+features and we are able to use a simple fit and prediction function
+to run infinity-steps-ahead prediction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>non_degree</strong> (<em>int</em><em>, </em><em>default=1</em>) – The nonlinearity degree of the polynomial function.</p></li>
+<li><p><strong>ylag</strong> (<em>int</em><em>, </em><em>default=2</em>) – The maximum lag of the output.</p></li>
+<li><p><strong>xlag</strong> (<em>int</em><em>, </em><em>default=2</em>) – The maximum lag of the input.</p></li>
+<li><p><strong>n_inputs</strong> (<em>int</em><em>, </em><em>default=1</em>) – The number of inputs of the system.</p></li>
+<li><p><strong>fit_params</strong> (<em>dict</em><em>, </em><em>default=None</em>) – Optional parameters of the fit function of the baseline estimator</p></li>
+<li><p><strong>base_estimator</strong> (<em>default=None</em>) – The defined base estimator of the sklearn</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Print messages</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sysidentpy.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sysidentpy.utils.generate_data</span> <span class="kn">import</span> <span class="n">get_siso_data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sysidentpy.general_estimators</span> <span class="kn">import</span> <span class="n">NARX</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">BayesianRidge</span> <span class="c1"># to use as base estimator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x_train</span><span class="p">,</span> <span class="n">x_valid</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="n">get_siso_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>                                                   <span class="n">colored_noise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>                                                   <span class="n">sigma</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>                                                   <span class="n">train_percentage</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">BayesianRidge_narx</span> <span class="o">=</span> <span class="n">NARX</span><span class="p">(</span><span class="n">base_estimator</span><span class="o">=</span><span class="n">BayesianRidge</span><span class="p">(),</span>
+<span class="gp">... </span>                          <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>                          <span class="n">ylag</span><span class="o">=</span><span class="mi">2</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">BayesianRidge_narx</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">yhat</span> <span class="o">=</span> <span class="n">BayesianRidge_narx</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">))</span>
+<span class="go">0.000131</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="sysidentpy.general_estimators.narx.NARX.data_preparation">
+<code class="sig-name descname">data_preparation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/general_estimators/narx.html#NARX.data_preparation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.general_estimators.narx.NARX.data_preparation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the lagged matrix and the y values given the maximum lags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>ndarray of floats</em>) – The input data.</p></li>
+<li><p><strong>y</strong> (<em>ndarray of floats</em>) – The output data.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>y</strong> (<em>ndarray of floats</em>) – The y values considering the lags.</p></li>
+<li><p><strong>reg_matrix</strong> (<em>ndarray of floats</em>) – The information matrix of the model.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sysidentpy.general_estimators.narx.NARX.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/general_estimators/narx.html#NARX.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.general_estimators.narx.NARX.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train a NARX Neural Network model.</p>
+<p>This is an training pipeline that allows a friendly usage
+by the user. All the lagged features are built using the
+SysIdentPy classes and we use the fit method of the base
+estimator of the sklearn to fit the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>ndarrays of floats</em>) – The input data to be used in the training process.</p></li>
+<li><p><strong>y</strong> (<em>ndarrays of floats</em>) – The output data to be used in the training process.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>base_estimator</strong> – The model fitted.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>sklearn estimator</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sysidentpy.general_estimators.narx.NARX.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y_initial</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/general_estimators/narx.html#NARX.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysidentpy.general_estimators.narx.NARX.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the predicted given an input and initial values.</p>
+<p>The predict function allows a friendly usage by the user.
+Given a trained model, predict values given
+a new set of data.</p>
+<p>This method accept y values mainly for prediction n-steps ahead
+(to be implemented in the future).</p>
+<p>Currently we only support infinity-steps-ahead prediction,
+but run 1-step-ahead prediction manually is straightforward.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>ndarray of floats</em>) – The input data to be used in the prediction process.</p></li>
+<li><p><strong>y</strong> (<em>ndarray of floats</em>) – The output data to be used in the prediction process.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>yhat</strong> – The predicted values of the model.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-sysidentpy.residues.residues_correlation">
 <span id="sysidentpy-residues"></span><h1>sysidentpy residues<a class="headerlink" href="#module-sysidentpy.residues.residues_correlation" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
@@ -797,11 +947,6 @@ user.</p>
 95% confidence interval.</p></li>
 </ul>
 </p>
-</dd>
-</dl>
-<p class="rubric">References</p>
-<dl class="simple">
-<dt>[1] <a href="#id1"><span class="problematic" id="id2">`</span></a>Wikipedia entry on the Autocorrelation</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Autocorrelation">https://en.wikipedia.org/wiki/Autocorrelation</a>&gt;`_</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -875,7 +1020,7 @@ or forecast value in regression or any other phenomenon.</p>
 </dl>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1] <a href="#id3"><span class="problematic" id="id4">`</span></a>Wikipedia entry on the Forecast error</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Forecast_error">https://en.wikipedia.org/wiki/Forecast_error</a>&gt;`_</p>
+<dt>[1] Wikipedia entry on the Forecast error</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Forecast_error">https://en.wikipedia.org/wiki/Forecast_error</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -909,7 +1054,7 @@ or any other phenomenon.</p>
 </dl>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1] <a href="#id5"><span class="problematic" id="id6">`</span></a>Wikipedia entry on the Forecast error</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Forecast_error">https://en.wikipedia.org/wiki/Forecast_error</a>&gt;`_</p>
+<dt>[1] Wikipedia entry on the Forecast error</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Forecast_error">https://en.wikipedia.org/wiki/Forecast_error</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -942,7 +1087,7 @@ model outputs are exactly matched by true target values.</p>
 </dl>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1] <a href="#id7"><span class="problematic" id="id8">`</span></a>Wikipedia entry on the Mean Squared Error</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Mean_squared_error">https://en.wikipedia.org/wiki/Mean_squared_error</a>&gt;`_</p>
+<dt>[1] Wikipedia entry on the Mean Squared Error</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Mean_squared_error">https://en.wikipedia.org/wiki/Mean_squared_error</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -975,7 +1120,7 @@ model outputs are exactly matched by true target values.</p>
 </dl>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1] <a href="#id9"><span class="problematic" id="id10">`</span></a>Wikipedia entry on the Root Mean Squared Error</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Root-mean-square_deviation">https://en.wikipedia.org/wiki/Root-mean-square_deviation</a>&gt;`_</p>
+<dt>[1] Wikipedia entry on the Root Mean Squared Error</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Root-mean-square_deviation">https://en.wikipedia.org/wiki/Root-mean-square_deviation</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -1008,7 +1153,7 @@ model outputs are exactly matched by true target values.</p>
 </dl>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1] <a href="#id11"><span class="problematic" id="id12">`</span></a>Wikipedia entry on the normalized Root Mean Squared Error</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Root-mean-square_deviation">https://en.wikipedia.org/wiki/Root-mean-square_deviation</a>&gt;`_</p>
+<dt>[1] Wikipedia entry on the normalized Root Mean Squared Error</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Root-mean-square_deviation">https://en.wikipedia.org/wiki/Root-mean-square_deviation</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -1069,7 +1214,7 @@ model outputs are exactly matched by true target values.</p>
 </dl>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1] <a href="#id13"><span class="problematic" id="id14">`</span></a>Wikipedia entry on the Mean absolute error</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Mean_absolute_error">https://en.wikipedia.org/wiki/Mean_absolute_error</a>&gt;`_</p>
+<dt>[1] Wikipedia entry on the Mean absolute error</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Mean_absolute_error">https://en.wikipedia.org/wiki/Mean_absolute_error</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -1130,7 +1275,7 @@ model outputs are exactly matched by true target values.</p>
 </dl>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1] <a href="#id15"><span class="problematic" id="id16">`</span></a>Wikipedia entry on the Median absolute deviation</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Median_absolute_deviation">https://en.wikipedia.org/wiki/Median_absolute_deviation</a>&gt;`_</p>
+<dt>[1] Wikipedia entry on the Median absolute deviation</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Median_absolute_deviation">https://en.wikipedia.org/wiki/Median_absolute_deviation</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -1164,7 +1309,7 @@ Lower values means worse results.</p>
 </dl>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1] <a href="#id17"><span class="problematic" id="id18">`</span></a>Wikipedia entry on the Explained Variance</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Explained_variation">https://en.wikipedia.org/wiki/Explained_variation</a>&gt;`_</p>
+<dt>[1] Wikipedia entry on the Explained Variance</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Explained_variation">https://en.wikipedia.org/wiki/Explained_variation</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -1200,7 +1345,7 @@ matched by true target values. Lower values means worse results.</p>
 <p>This is not a symmetric function.</p>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1] <a href="#id19"><span class="problematic" id="id20">`</span></a>Wikipedia entry on the Coefficient of determination</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Coefficient_of_determination">https://en.wikipedia.org/wiki/Coefficient_of_determination</a>&gt;`_</p>
+<dt>[1] Wikipedia entry on the Coefficient of determination</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Coefficient_of_determination">https://en.wikipedia.org/wiki/Coefficient_of_determination</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -1236,7 +1381,7 @@ The results are percentages values.</p>
 over-forecasts and under-forecasts are not treated equally.</p>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1] <a href="#id21"><span class="problematic" id="id22">`</span></a>Wikipedia entry on the Symmetric mean absolute percentage error</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error">https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error</a>&gt;`_</p>
+<dt>[1] Wikipedia entry on the Symmetric mean absolute percentage error</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error">https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -1276,18 +1421,17 @@ over-forecasts and under-forecasts are not treated equally.</p>
 </dl>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1]`Manuscript: Sorenson, H. W. (1970). Least-squares estimation:</dt><dd><p>from Gauss to Kalman. IEEE spectrum, 7(7), 63-68.
-&lt;<a class="reference external" href="http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf">http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf</a>&gt;`_</p>
+<dt>[1] Manuscript: Sorenson, H. W. (1970). Least-squares estimation:</dt><dd><p>from Gauss to Kalman. IEEE spectrum, 7(7), 63-68.
+<a class="reference external" href="http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf">http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf</a></p>
 </dd>
-<dt>[2]`Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificaçao</dt><dd><p>de sistemas: técnicas lineares enao-lineares aplicadas a sistemas
-reais. Editora da UFMG. 3a ediçao.
-&lt;<a class="reference external" href="https://books.google.com.br/books?hl=pt-BR&amp;lr=&amp;id=f9IwE7Ph0fYC&amp;oi=fnd&amp;pg=PA2&amp;dq=Introdu%C3%A7%C3%A3o+%C3%A0+identifica%C3%A7%C3%A3o+de+sistemas+-+T%C3%A9cnicas+lineares+e+n%C3%A3o-lineares+aplicadas+a+sistemas+reais&amp;ots=Qiyc4VsMdt&amp;sig=6gumj1AEWh_b0tUGR4quI5oETUA#v=onepage&amp;q=Introdu%C3%A7%C3%A3o%20%C3%A0%20identifica%C3%A7%C3%A3o%20de%20sistemas%20-%20T%C3%A9cnicas%20lineares%20e%20n%C3%A3o-lineares%20aplicadas%20a%20sistemas%20reais&amp;f=false">https://books.google.com.br/books?hl=pt-BR&amp;lr=&amp;id=f9IwE7Ph0fYC&amp;oi=fnd&amp;pg=PA2&amp;dq=Introdu%C3%A7%C3%A3o+%C3%A0+identifica%C3%A7%C3%A3o+de+sistemas+-+T%C3%A9cnicas+lineares+e+n%C3%A3o-lineares+aplicadas+a+sistemas+reais&amp;ots=Qiyc4VsMdt&amp;sig=6gumj1AEWh_b0tUGR4quI5oETUA#v=onepage&amp;q=Introdu%C3%A7%C3%A3o%20%C3%A0%20identifica%C3%A7%C3%A3o%20de%20sistemas%20-%20T%C3%A9cnicas%20lineares%20e%20n%C3%A3o-lineares%20aplicadas%20a%20sistemas%20reais&amp;f=false</a>&gt;`_</p>
+<dt>[2] Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificaçao</dt><dd><p>de sistemas: técnicas lineares enao-lineares aplicadas a sistemas
+reais. Editora da UFMG. 3a ediçao.</p>
 </dd>
-<dt>[3]`Manuscript: Markovsky, I., &amp; Van Huffel, S. (2007).</dt><dd><p>Overview of total least-squares methods.
+<dt>[3] Manuscript: Markovsky, I., &amp; Van Huffel, S. (2007).</dt><dd><p>Overview of total least-squares methods.
 Signal processing, 87(10), 2283-2302.
-&lt;<a class="reference external" href="https://eprints.soton.ac.uk/263855/1/tls_overview.pdf">https://eprints.soton.ac.uk/263855/1/tls_overview.pdf</a>&gt;`_</p>
+<a class="reference external" href="https://eprints.soton.ac.uk/263855/1/tls_overview.pdf">https://eprints.soton.ac.uk/263855/1/tls_overview.pdf</a></p>
 </dd>
-<dt>[4]`Wikipedia entry on Least Squares</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Least_squares">https://en.wikipedia.org/wiki/Least_squares</a>&gt;`_</p>
+<dt>[4] Wikipedia entry on Least Squares</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Least_squares">https://en.wikipedia.org/wiki/Least_squares</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1312,15 +1456,14 @@ Signal processing, 87(10), 2283-2302.
 </dl>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1]`Manuscript: Golub, G. H., &amp; Van Loan, C. F. (1980).</dt><dd><p>An analysis of the total least squares problem.
-SIAM journal on numerical analysis, 17(6), 883-893.
-&lt;<a class="reference external" href="https://epubs.siam.org/doi/pdf/10.1137/0717073?casa_token=218O16LygKkAAAAA:GyssnBnNEWzVg2Wvbmu5K1pj-XwkzpTSknUsddVTZfEJafpKANUstMuRDyJjIdcTgO-tFuQYb4Y">https://epubs.siam.org/doi/pdf/10.1137/0717073?casa_token=218O16LygKkAAAAA:GyssnBnNEWzVg2Wvbmu5K1pj-XwkzpTSknUsddVTZfEJafpKANUstMuRDyJjIdcTgO-tFuQYb4Y</a>&gt;`_</p>
+<dt>[1] Manuscript: Golub, G. H., &amp; Van Loan, C. F. (1980).</dt><dd><p>An analysis of the total least squares problem.
+SIAM journal on numerical analysis, 17(6), 883-893.</p>
 </dd>
-<dt>[2]`Manuscript: Markovsky, I., &amp; Van Huffel, S. (2007).</dt><dd><p>Overview of total least-squares methods.
+<dt>[2] Manuscript: Markovsky, I., &amp; Van Huffel, S. (2007).</dt><dd><p>Overview of total least-squares methods.
 Signal processing, 87(10), 2283-2302.
-&lt;<a class="reference external" href="https://eprints.soton.ac.uk/263855/1/tls_overview.pdf">https://eprints.soton.ac.uk/263855/1/tls_overview.pdf</a>&gt;`_</p>
+<a class="reference external" href="https://eprints.soton.ac.uk/263855/1/tls_overview.pdf">https://eprints.soton.ac.uk/263855/1/tls_overview.pdf</a></p>
 </dd>
-<dt>[3]`Wikipedia entry on Total Least Squares</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Total_least_squares">https://en.wikipedia.org/wiki/Total_least_squares</a>&gt;`_</p>
+<dt>[3] Wikipedia entry on Total Least Squares</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Total_least_squares">https://en.wikipedia.org/wiki/Total_least_squares</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1348,9 +1491,8 @@ will be available soon. For now, please refer to the mentioned
 references.</p>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1]`Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificaçao</dt><dd><p>de sistemas: técnicas lineares enao-lineares aplicadas a sistemas
-reais. Editora da UFMG. 3a ediçao.
-&lt;<a class="reference external" href="https://books.google.com.br/books?hl=pt-BR&amp;lr=&amp;id=f9IwE7Ph0fYC&amp;oi=fnd&amp;pg=PA2&amp;dq=Introdu%C3%A7%C3%A3o+%C3%A0+identifica%C3%A7%C3%A3o+de+sistemas+-+T%C3%A9cnicas+lineares+e+n%C3%A3o-lineares+aplicadas+a+sistemas+reais&amp;ots=Qiyc4VsMdt&amp;sig=6gumj1AEWh_b0tUGR4quI5oETUA#v=onepage&amp;q=Introdu%C3%A7%C3%A3o%20%C3%A0%20identifica%C3%A7%C3%A3o%20de%20sistemas%20-%20T%C3%A9cnicas%20lineares%20e%20n%C3%A3o-lineares%20aplicadas%20a%20sistemas%20reais&amp;f=false">https://books.google.com.br/books?hl=pt-BR&amp;lr=&amp;id=f9IwE7Ph0fYC&amp;oi=fnd&amp;pg=PA2&amp;dq=Introdu%C3%A7%C3%A3o+%C3%A0+identifica%C3%A7%C3%A3o+de+sistemas+-+T%C3%A9cnicas+lineares+e+n%C3%A3o-lineares+aplicadas+a+sistemas+reais&amp;ots=Qiyc4VsMdt&amp;sig=6gumj1AEWh_b0tUGR4quI5oETUA#v=onepage&amp;q=Introdu%C3%A7%C3%A3o%20%C3%A0%20identifica%C3%A7%C3%A3o%20de%20sistemas%20-%20T%C3%A9cnicas%20lineares%20e%20n%C3%A3o-lineares%20aplicadas%20a%20sistemas%20reais&amp;f=false</a>&gt;`_</p>
+<dt>[1] Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificaçao</dt><dd><p>de sistemas: técnicas lineares enao-lineares aplicadas a sistemas
+reais. Editora da UFMG. 3a ediçao.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1379,8 +1521,7 @@ will be available soon. For now, please refer to the mentioned
 references.</p>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1]`Book: Poularikas, A. D. (2017). Adaptive filtering: Fundamentals</dt><dd><p>of least mean squares with MATLAB®. CRC Press.
-&lt;<a class="reference external" href="https://books.google.com.br/books?hl=pt-BR&amp;lr=&amp;id=OJPSBQAAQBAJ&amp;oi=fnd&amp;pg=PP1&amp;dq=adaptive+filtering+fundamentals+of+least+mean+squares+with+matlab&amp;ots=dMNzB_2erC&amp;sig=7l0VvIm9-GwUDgj0xuy1m0c0Gdo#v=onepage&amp;q=adaptive%20filtering%20fundamentals%20of%20least%20mean%20squares%20with%20matlab&amp;f=false">https://books.google.com.br/books?hl=pt-BR&amp;lr=&amp;id=OJPSBQAAQBAJ&amp;oi=fnd&amp;pg=PP1&amp;dq=adaptive+filtering+fundamentals+of+least+mean+squares+with+matlab&amp;ots=dMNzB_2erC&amp;sig=7l0VvIm9-GwUDgj0xuy1m0c0Gdo#v=onepage&amp;q=adaptive%20filtering%20fundamentals%20of%20least%20mean%20squares%20with%20matlab&amp;f=false</a>&gt;`_</p>
+<dt>[1] Book: Poularikas, A. D. (2017). Adaptive filtering: Fundamentals</dt><dd><p>of least mean squares with MATLAB®. CRC Press.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1409,14 +1550,12 @@ will be available soon. For now, please refer to the mentioned
 references.</p>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1]`Book: Haykin, S., &amp; Widrow, B. (Eds.). (2003). Least-mean-square</dt><dd><p>adaptive filters (Vol. 31). John Wiley &amp; Sons.
-&lt;<a class="reference external" href="https://books.google.com.br/books?hl=pt-BR&amp;lr=&amp;id=U8X3mJtawUkC&amp;oi=fnd&amp;pg=PR9&amp;dq=%22least+mean+square%22&amp;ots=Bzp42ZklVe&amp;sig=ZilhP9bYuuagpi30hrJk53sWj_8&amp;redir_esc=y#v=onepage&amp;q=%22least%20mean%20square%22&amp;f=false">https://books.google.com.br/books?hl=pt-BR&amp;lr=&amp;id=U8X3mJtawUkC&amp;oi=fnd&amp;pg=PR9&amp;dq=%22least+mean+square%22&amp;ots=Bzp42ZklVe&amp;sig=ZilhP9bYuuagpi30hrJk53sWj_8&amp;redir_esc=y#v=onepage&amp;q=%22least%20mean%20square%22&amp;f=false</a>&gt;`_</p>
+<dt>[1] Book: Haykin, S., &amp; Widrow, B. (Eds.). (2003). Least-mean-square</dt><dd><p>adaptive filters (Vol. 31). John Wiley &amp; Sons.</p>
 </dd>
-<dt>[2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
-variável.
-&lt;<a class="reference external" href="https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1">https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1</a>&gt;`_</p>
+<dt>[2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
+variável.</p>
 </dd>
-<dt>[3]`Wikipedia entry on Least Mean Squares</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a>&gt;`_</p>
+<dt>[3] Wikipedia entry on Least Mean Squares</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1450,10 +1589,9 @@ references.</p>
 <dt>[1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</dt><dd><p>and modeling. John Wiley &amp; Sons.</p>
 </dd>
 <dt>[2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
-variável.
-&lt;<a class="reference external" href="https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1">https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1</a>&gt;`_</p>
+variável.</p>
 </dd>
-<dt>[3]`Wikipedia entry on Least Mean Squares</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a>&gt;`_</p>
+<dt>[3] Wikipedia entry on Least Mean Squares</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1486,11 +1624,10 @@ references.</p>
 <dl class="simple">
 <dt>[1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</dt><dd><p>and modeling. John Wiley &amp; Sons.</p>
 </dd>
-<dt>[2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
-variável.
-&lt;<a class="reference external" href="https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1">https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1</a>&gt;`_</p>
+<dt>[2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
+variável.</p>
 </dd>
-<dt>[3]`Wikipedia entry on Least Mean Squares</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a>&gt;`_</p>
+<dt>[3] Wikipedia entry on Least Mean Squares</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1522,13 +1659,12 @@ will be available soon. For now, please refer to the mentioned
 references.</p>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</dt><dd><p>and modeling. John Wiley &amp; Sons.</p>
+<dt>[1] Book: Hayes, M. H. (2009). Statistical digital signal processing</dt><dd><p>and modeling. John Wiley &amp; Sons.</p>
 </dd>
-<dt>[2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
-variável.
-&lt;<a class="reference external" href="https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1">https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1</a>&gt;`_</p>
+<dt>[2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
+variável.</p>
 </dd>
-<dt>[3]`Wikipedia entry on Least Mean Squares</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a>&gt;`_</p>
+<dt>[3] Wikipedia entry on Least Mean Squares</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1559,13 +1695,12 @@ will be available soon. For now, please refer to the mentioned
 references.</p>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</dt><dd><p>and modeling. John Wiley &amp; Sons.</p>
+<dt>[1] Book: Hayes, M. H. (2009). Statistical digital signal processing</dt><dd><p>and modeling. John Wiley &amp; Sons.</p>
 </dd>
-<dt>[2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
-variável.
-&lt;<a class="reference external" href="https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1">https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1</a>&gt;`_</p>
+<dt>[2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
+variável.</p>
 </dd>
-<dt>[3]`Wikipedia entry on Least Mean Squares</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a>&gt;`_</p>
+<dt>[3] Wikipedia entry on Least Mean Squares</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1597,13 +1732,12 @@ will be available soon. For now, please refer to the mentioned
 references.</p>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</dt><dd><p>and modeling. John Wiley &amp; Sons.</p>
+<dt>[1] Book: Hayes, M. H. (2009). Statistical digital signal processing</dt><dd><p>and modeling. John Wiley &amp; Sons.</p>
 </dd>
-<dt>[2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
-variável.
-&lt;<a class="reference external" href="https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1">https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1</a>&gt;`_</p>
+<dt>[2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
+variável.</p>
 </dd>
-<dt>[3]`Wikipedia entry on Least Mean Squares</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a>&gt;`_</p>
+<dt>[3] Wikipedia entry on Least Mean Squares</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1635,13 +1769,12 @@ will be available soon. For now, please refer to the mentioned
 references.</p>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</dt><dd><p>and modeling. John Wiley &amp; Sons.</p>
+<dt>[1] Book: Hayes, M. H. (2009). Statistical digital signal processing</dt><dd><p>and modeling. John Wiley &amp; Sons.</p>
 </dd>
-<dt>[2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
-variável.
-&lt;<a class="reference external" href="https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1">https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1</a>&gt;`_</p>
+<dt>[2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
+variável.</p>
 </dd>
-<dt>[3]`Wikipedia entry on Least Mean Squares</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a>&gt;`_</p>
+<dt>[3] Wikipedia entry on Least Mean Squares</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1674,13 +1807,12 @@ will be available soon. For now, please refer to the mentioned
 references.</p>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</dt><dd><p>and modeling. John Wiley &amp; Sons.</p>
+<dt>[1] Book: Hayes, M. H. (2009). Statistical digital signal processing</dt><dd><p>and modeling. John Wiley &amp; Sons.</p>
 </dd>
-<dt>[2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
-variável.
-&lt;<a class="reference external" href="https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1">https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1</a>&gt;`_</p>
+<dt>[2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
+variável.</p>
 </dd>
-<dt>[3]`Wikipedia entry on Least Mean Squares</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a>&gt;`_</p>
+<dt>[3] Wikipedia entry on Least Mean Squares</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1711,13 +1843,12 @@ will be available soon. For now, please refer to the mentioned
 references.</p>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</dt><dd><p>and modeling. John Wiley &amp; Sons.</p>
+<dt>[1] Book: Hayes, M. H. (2009). Statistical digital signal processing</dt><dd><p>and modeling. John Wiley &amp; Sons.</p>
 </dd>
-<dt>[2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
-variável.
-&lt;<a class="reference external" href="https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1">https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1</a>&gt;`_</p>
+<dt>[2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
+variável.</p>
 </dd>
-<dt>[3]`Wikipedia entry on Least Mean Squares</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a>&gt;`_</p>
+<dt>[3] Wikipedia entry on Least Mean Squares</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1748,13 +1879,12 @@ will be available soon. For now, please refer to the mentioned
 references.</p>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</dt><dd><p>and modeling. John Wiley &amp; Sons.</p>
+<dt>[1] Book: Hayes, M. H. (2009). Statistical digital signal processing</dt><dd><p>and modeling. John Wiley &amp; Sons.</p>
 </dd>
-<dt>[2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
-variável.
-&lt;<a class="reference external" href="https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1">https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1</a>&gt;`_</p>
+<dt>[2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
+variável.</p>
 </dd>
-<dt>[3]`Wikipedia entry on Least Mean Squares</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a>&gt;`_</p>
+<dt>[3] Wikipedia entry on Least Mean Squares</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1785,23 +1915,22 @@ will be available soon. For now, please refer to the mentioned
 references.</p>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1]`Book: Hayes, M. H. (2009). Statistical digital signal processing</dt><dd><p>and modeling. John Wiley &amp; Sons.</p>
+<dt>[1] Book: Hayes, M. H. (2009). Statistical digital signal processing</dt><dd><p>and modeling. John Wiley &amp; Sons.</p>
 </dd>
-<dt>[2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
-variável.
-&lt;<a class="reference external" href="https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1">https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1</a>&gt;`_</p>
+<dt>[2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
+variável.</p>
 </dd>
-<dt>[3]`Manuscript:Gui, G., Mehbodniya, A., &amp; Adachi, F. (2013).</dt><dd><p>Least mean square/fourth algorithm with application to sparse
+<dt>[3] Manuscript:Gui, G., Mehbodniya, A., &amp; Adachi, F. (2013).</dt><dd><p>Least mean square/fourth algorithm with application to sparse
 channel estimation. arXiv preprint arXiv:1304.3911.
-&lt;https://arxiv.org/pdf/1304.3911.pdf&gt;`_</p>
+https://arxiv.org/pdf/1304.3911.pdf</p>
 </dd>
-<dt>[4]`Manuscript: Nascimento, V. H., &amp; Bermudez, J. C. M. (2005, March).</dt><dd><p>When is the least-mean fourth algorithm mean-square stable?
+<dt>[4] Manuscript: Nascimento, V. H., &amp; Bermudez, J. C. M. (2005, March).</dt><dd><p>When is the least-mean fourth algorithm mean-square stable?
 In Proceedings.(ICASSP’05). IEEE International Conference on
 Acoustics, Speech, and Signal Processing, 2005.
 (Vol. 4, pp. iv-341). IEEE.
-&lt;<a class="reference external" href="http://www.lps.usp.br/vitor/artigos/icassp05.pdf">http://www.lps.usp.br/vitor/artigos/icassp05.pdf</a>&gt;`_</p>
+<a class="reference external" href="http://www.lps.usp.br/vitor/artigos/icassp05.pdf">http://www.lps.usp.br/vitor/artigos/icassp05.pdf</a></p>
 </dd>
-<dt>[5]`Wikipedia entry on Least Mean Squares</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a>&gt;`_</p>
+<dt>[5] Wikipedia entry on Least Mean Squares</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1832,15 +1961,14 @@ will be available soon. For now, please refer to the mentioned
 references.</p>
 <p class="rubric">References</p>
 <dl class="simple">
-<dt>[1]`Chambers, J. A., Tanrikulu, O., &amp; Constantinides, A. G. (1994).</dt><dd><p>Least mean mixed-norm adaptive filtering.
+<dt>[1] Chambers, J. A., Tanrikulu, O., &amp; Constantinides, A. G. (1994).</dt><dd><p>Least mean mixed-norm adaptive filtering.
 Electronics letters, 30(19), 1574-1575.
-&lt;<a class="reference external" href="https://ieeexplore.ieee.org/document/326382">https://ieeexplore.ieee.org/document/326382</a>&gt;`_</p>
+<a class="reference external" href="https://ieeexplore.ieee.org/document/326382">https://ieeexplore.ieee.org/document/326382</a></p>
 </dd>
-<dt>[2]`Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
-variável.
-&lt;<a class="reference external" href="https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1">https://repositorio.ufsc.br/bitstream/handle/123456789/94953/296734.pdf?sequence=1</a>&gt;`_</p>
+<dt>[2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,</dt><dd><p>análise estatística e novas estratégias de algoritmos LMS de passo
+variável.</p>
 </dd>
-<dt>[3]`Wikipedia entry on Least Mean Squares</dt><dd><p>&lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a>&gt;`_</p>
+<dt>[3] Wikipedia entry on Least Mean Squares</dt><dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Least_mean_squares_filter">https://en.wikipedia.org/wiki/Least_mean_squares_filter</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2000,7 +2128,7 @@ respectively.</p></li>
     
     <div class='prev-next-bottom'>
         
-    <a class='left-prev' id="prev-link" href="changelog/v0.1.3.html" title="previous page">Changes in SysIdentPy</a>
+    <a class='left-prev' id="prev-link" href="changelog/v0.1.4.html" title="previous page">Changes in SysIdentPy</a>
 
     </div>
     <footer class="footer mt-5 mt-md-0">

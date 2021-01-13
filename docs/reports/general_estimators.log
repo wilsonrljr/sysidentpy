@@ -1,0 +1,40 @@
+Traceback (most recent call last):
+  File "c:\users\wilso\miniconda3\envs\sysidentpy_tests\lib\site-packages\jupyter_cache\executors\utils.py", line 56, in single_nb_execution
+    record_timing=False,
+  File "c:\users\wilso\miniconda3\envs\sysidentpy_tests\lib\site-packages\nbclient\client.py", line 1087, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+  File "c:\users\wilso\miniconda3\envs\sysidentpy_tests\lib\site-packages\nbclient\util.py", line 74, in wrapped
+    return just_run(coro(*args, **kwargs))
+  File "c:\users\wilso\miniconda3\envs\sysidentpy_tests\lib\site-packages\nbclient\util.py", line 53, in just_run
+    return loop.run_until_complete(coro)
+  File "c:\users\wilso\miniconda3\envs\sysidentpy_tests\lib\asyncio\base_events.py", line 587, in run_until_complete
+    return future.result()
+  File "c:\users\wilso\miniconda3\envs\sysidentpy_tests\lib\site-packages\nbclient\client.py", line 541, in async_execute
+    cell, index, execution_count=self.code_cells_executed + 1
+  File "c:\users\wilso\miniconda3\envs\sysidentpy_tests\lib\site-packages\nbclient\client.py", line 832, in async_execute_cell
+    self._check_raise_for_error(cell, exec_reply)
+  File "c:\users\wilso\miniconda3\envs\sysidentpy_tests\lib\site-packages\nbclient\client.py", line 740, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply['content'])
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+import matplotlib.pyplot as plt
+from sysidentpy.metrics import mean_squared_error
+from sysidentpy.utils.generate_data import get_siso_data
+from sysidentpy.general_estimators import NARX
+from sklearn.linear_model import BayesianRidge, ARDRegression
+from sklearn.ensemble import GradientBoostingRegressor
+from catboost import CatBoostRegressor
+------------------
+
+[1;31m---------------------------------------------------------------------------[0m
+[1;31mModuleNotFoundError[0m                       Traceback (most recent call last)
+[1;32m<ipython-input-1-679175ba9ef3>[0m in [0;36m<module>[1;34m[0m
+[0;32m      2[0m [1;32mfrom[0m [0msysidentpy[0m[1;33m.[0m[0mmetrics[0m [1;32mimport[0m [0mmean_squared_error[0m[1;33m[0m[1;33m[0m[0m
+[0;32m      3[0m [1;32mfrom[0m [0msysidentpy[0m[1;33m.[0m[0mutils[0m[1;33m.[0m[0mgenerate_data[0m [1;32mimport[0m [0mget_siso_data[0m[1;33m[0m[1;33m[0m[0m
+[1;32m----> 4[1;33m [1;32mfrom[0m [0msysidentpy[0m[1;33m.[0m[0mgeneral_estimators[0m [1;32mimport[0m [0mNARX[0m[1;33m[0m[1;33m[0m[0m
+[0m[0;32m      5[0m [1;32mfrom[0m [0msklearn[0m[1;33m.[0m[0mlinear_model[0m [1;32mimport[0m [0mBayesianRidge[0m[1;33m,[0m [0mARDRegression[0m[1;33m[0m[1;33m[0m[0m
+[0;32m      6[0m [1;32mfrom[0m [0msklearn[0m[1;33m.[0m[0mensemble[0m [1;32mimport[0m [0mGradientBoostingRegressor[0m[1;33m[0m[1;33m[0m[0m
+
+[1;31mModuleNotFoundError[0m: No module named 'sysidentpy.general_estimators'
+ModuleNotFoundError: No module named 'sysidentpy.general_estimators'
+

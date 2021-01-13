@@ -42,3 +42,15 @@ Jupyter notebooks
    :caption: F-16 aircraft
 
    /examples/f_16_benchmark.ipynb
+
+.. toctree::
+   :maxdepth: 1
+   :caption: NARX Neural Network
+
+   /examples/narx_neural_network.ipynb
+
+.. toctree::
+   :maxdepth: 1
+   :caption: General Estimators
+
+   /examples/general_estimators.ipynb

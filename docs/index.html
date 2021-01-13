@@ -148,12 +148,22 @@
      Example: F-16 Ground Vibration Test benchmark
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/narx_neural_network.html">
+     Building NARX Neural Network using Sysidentpy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/general_estimators.html">
+     Building NARX models using general estimators
+    </a>
+   </li>
   </ul>
   <i class="fas fa-chevron-down">
   </i>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="changelog/v0.1.3.html">
+  <a class="reference internal" href="changelog/v0.1.4.html">
    Changes in SysIdentPy
   </a>
  </li>
@@ -174,6 +184,16 @@
  <li class="toctree-l1">
   <a class="reference internal" href="code.html#sysidentpy-narmax">
    sysidentpy narmax
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="code.html#sysidentpy-narx-neural-network">
+   sysidentpy narx_neural_network
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="code.html#sysidentpy-general-estimators">
+   sysidentpy general_estimators
   </a>
  </li>
  <li class="toctree-l1">
@@ -262,11 +282,11 @@
         aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
     <div class="dropdown-buttons sourcebuttons">
         <a class="repository-button"
-            href="https://github.com/wilsonrljr/sysidentpy/tree/master/docs"><button type="button" class="btn btn-secondary topbarbtn"
+            href="https://github.com/wilsonrljr/sysidentpy/tree/master/"><button type="button" class="btn btn-secondary topbarbtn"
                 data-toggle="tooltip" data-placement="left" title="Source repository"><i
                     class="fab fa-github"></i>repository</button></a>
         <a class="issues-button"
-            href="https://github.com/wilsonrljr/sysidentpy/tree/master/docs/issues/new?title=Issue%20on%20page%20%2Findex.html&body=Your%20issue%20content%20here."><button
+            href="https://github.com/wilsonrljr/sysidentpy/tree/master//issues/new?title=Issue%20on%20page%20%2Findex.html&body=Your%20issue%20content%20here."><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
                 title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
         
@@ -293,49 +313,71 @@
         <nav id="bd-toc-nav">
             <ul class="nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#changelog">
-   Changelog
+  <a class="reference internal nav-link" href="#polynomial-narx">
+   Polynomial NARX
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#development">
-   Development
+  <a class="reference internal nav-link" href="#narx-neural-network">
+   NARX Neural Network
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#example-of-how-to-run-the-tests">
-   Example of how to run the tests:
+  <a class="reference internal nav-link" href="#catboost-narx">
+   Catboost-narx
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#source-code">
-   Source code
+  <a class="reference internal nav-link" href="#catboost-without-narx-configuration">
+   Catboost without NARX configuration
   </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#project-history">
-   Project History
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#communication">
-   Communication
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#citation">
-   Citation
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#inspiration">
-   Inspiration
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#contents">
-   Contents
-  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#changelog">
+     Changelog
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#development">
+     Development
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#example-of-how-to-run-the-tests">
+     Example of how to run the tests:
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#source-code">
+     Source code
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#project-history">
+     Project History
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#communication">
+     Communication
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#citation">
+     Citation
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#inspiration">
+     Inspiration
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#contents">
+     Contents
+    </a>
+   </li>
+  </ul>
  </li>
 </ul>
 
@@ -356,13 +398,155 @@
 <p class="admonition-title">See also</p>
 <p>The examples directory has several Jupyter notebooks presenting basic tutorials of how to use the package and some specific applications of <strong>SysIdentPy</strong>. <a class="reference external" href="http://sysidentpy.org/notebooks.html">Try it out!</a></p>
 </div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>SysIdentPy now support NARX Neural Network and General estimators, e.g., sklearn estimators and Catboost. Check it out!</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.utils.generate_data</span> <span class="kn">import</span> <span class="n">get_siso_data</span>
+
+
+<span class="c1"># Generate a dataset of a simulated dynamical system</span>
+<span class="n">x_train</span><span class="p">,</span> <span class="n">x_valid</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="n">get_siso_data</span><span class="p">(</span>
+        <span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+        <span class="n">colored_noise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="n">sigma</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+<span class="n">train_percentage</span><span class="o">=</span><span class="mi">80</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="polynomial-narx">
+<h2>Polynomial NARX<a class="headerlink" href="#polynomial-narx" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sysidentpy.polynomial_basis</span> <span class="kn">import</span> <span class="n">PolynomialNarmax</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">PolynomialNarmax</span><span class="p">(</span>
+        <span class="n">non_degree</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">order_selection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">n_info_values</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">ylag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">info_criteria</span><span class="o">=</span><span class="s1">&#39;aic&#39;</span><span class="p">,</span>
+        <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;least_squares&#39;</span>
+<span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">yhat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="n">err_precision</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                                                                        <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;dec&#39;</span><span class="p">),</span>
+                                        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Regressors&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;ERR&#39;</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+<span class="n">Regressors</span>     <span class="n">Parameters</span>        <span class="n">ERR</span>
+<span class="mi">0</span>        <span class="n">x1</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>     <span class="mf">0.9000</span>  <span class="mf">0.95556574</span>
+<span class="mi">1</span>         <span class="n">y</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>     <span class="mf">0.1999</span>  <span class="mf">0.04107943</span>
+<span class="mi">2</span>  <span class="n">x1</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="n">y</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>     <span class="mf">0.1000</span>  <span class="mf">0.00335113</span>
+
+<span class="n">ee</span><span class="p">,</span> <span class="n">ex</span><span class="p">,</span> <span class="n">extras</span><span class="p">,</span> <span class="n">lam</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">residuals</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">plot_result</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">ee</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/polynomial_narmax.png" src="_images/polynomial_narmax.png" />
+</div>
+<div class="section" id="narx-neural-network">
+<h2>NARX Neural Network<a class="headerlink" href="#narx-neural-network" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.neural_network</span> <span class="kn">import</span> <span class="n">NARXNN</span>
+
+<span class="k">class</span> <span class="nc">NARX</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lin</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lin2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lin3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tanh</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Tanh</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xb</span><span class="p">):</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin</span><span class="p">(</span><span class="n">xb</span><span class="p">)</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin2</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin3</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">z</span>
+
+<span class="n">narx_net</span> <span class="o">=</span> <span class="n">NARXNN</span><span class="p">(</span>
+        <span class="n">net</span><span class="o">=</span><span class="n">NARX</span><span class="p">(),</span>
+        <span class="n">ylag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">loss_func</span><span class="o">=</span><span class="s1">&#39;mse_loss&#39;</span><span class="p">,</span>
+        <span class="n">optimizer</span><span class="o">=</span><span class="s1">&#39;Adam&#39;</span><span class="p">,</span>
+        <span class="n">epochs</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">optim_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;betas&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.999</span><span class="p">),</span> <span class="s1">&#39;eps&#39;</span><span class="p">:</span> <span class="mf">1e-05</span><span class="p">}</span> <span class="c1"># optional parameters of the optimizer</span>
+<span class="p">)</span>
+
+<span class="n">train_dl</span> <span class="o">=</span> <span class="n">narx_net</span><span class="o">.</span><span class="n">data_transform</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">valid_dl</span> <span class="o">=</span> <span class="n">narx_net</span><span class="o">.</span><span class="n">data_transform</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
+<span class="n">narx_net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_dl</span><span class="p">,</span> <span class="n">valid_dl</span><span class="p">)</span>
+<span class="n">yhat</span> <span class="o">=</span> <span class="n">narx_net</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
+<span class="n">ee</span><span class="p">,</span> <span class="n">ex</span><span class="p">,</span> <span class="n">extras</span><span class="p">,</span> <span class="n">lam</span> <span class="o">=</span> <span class="n">narx_net</span><span class="o">.</span><span class="n">residuals</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+<span class="n">narx_net</span><span class="o">.</span><span class="n">plot_result</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">ee</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/narx_network.png" src="_images/narx_network.png" />
+</div>
+<div class="section" id="catboost-narx">
+<h2>Catboost-narx<a class="headerlink" href="#catboost-narx" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sysidentpy.general_estimators</span> <span class="kn">import</span> <span class="n">NARX</span>
+<span class="kn">from</span> <span class="nn">catboost</span> <span class="kn">import</span> <span class="n">CatBoostRegressor</span>
+
+<span class="n">catboost_narx</span> <span class="o">=</span> <span class="n">NARX</span><span class="p">(</span>
+        <span class="n">base_estimator</span><span class="o">=</span><span class="n">CatBoostRegressor</span><span class="p">(</span>
+                <span class="n">iterations</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+                <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                <span class="n">depth</span><span class="o">=</span><span class="mi">6</span><span class="p">),</span>
+        <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">ylag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">fit_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;verbose&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="p">)</span>
+
+<span class="n">catboost_narx</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">yhat</span> <span class="o">=</span> <span class="n">catboost_narx</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
+<span class="n">ee</span><span class="p">,</span> <span class="n">ex</span><span class="p">,</span> <span class="n">extras</span><span class="p">,</span> <span class="n">lam</span> <span class="o">=</span> <span class="n">catboost_narx</span><span class="o">.</span><span class="n">residuals</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+<span class="n">catboost_narx</span><span class="o">.</span><span class="n">plot_result</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">ee</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/catboost_narx.png" src="_images/catboost_narx.png" />
+</div>
+<div class="section" id="catboost-without-narx-configuration">
+<h2>Catboost without NARX configuration<a class="headerlink" href="#catboost-without-narx-configuration" title="Permalink to this headline">¶</a></h2>
+<p>The following is the Catboost performance <em>without</em> the NARX configuration.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_results</span><span class="p">(</span><span class="n">yvalid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">):</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y_valid</span><span class="p">[:</span><span class="mi">200</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Data&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">yhat</span><span class="p">[:</span><span class="mi">200</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Prediction&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;$n$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;$y[n]$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">catboost</span> <span class="o">=</span> <span class="n">CatBoostRegressor</span><span class="p">(</span>
+        <span class="n">iterations</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+        <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">depth</span><span class="o">=</span><span class="mi">6</span>
+<span class="p">)</span>
+
+<span class="n">catboost</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">plot_results</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">catboost</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_valid</span><span class="p">))</span>
+</pre></div>
+</div>
+<img alt="_images/catboost.png" src="_images/catboost.png" />
 <div class="section" id="changelog">
-<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
+<h3>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h3>
 <p>See the <a class="reference external" href="https://github.com/wilsonrljr/sysidentpy.whats_is_new.md">changelog</a>
 for a history of notable changes to <strong>SysIdentPy</strong>.</p>
 </div>
 <div class="section" id="development">
-<h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
+<h3>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h3>
 <p>We welcome new contributors of all experience levels. The <strong>SysIdentPy</strong> community goals are to be helpful, welcoming, and effective.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -376,7 +560,7 @@ for a history of notable changes to <strong>SysIdentPy</strong>.</p>
 </div>
 </div>
 <div class="section" id="example-of-how-to-run-the-tests">
-<h2>Example of how to run the tests:<a class="headerlink" href="#example-of-how-to-run-the-tests" title="Permalink to this headline">¶</a></h2>
+<h3>Example of how to run the tests:<a class="headerlink" href="#example-of-how-to-run-the-tests" title="Permalink to this headline">¶</a></h3>
 <p>Open a terminal emulator of your choice and go to a subdirectory, e.g,</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>\<span class="n">sysidentpy</span>\<span class="n">metrics</span>\
 </pre></div>
@@ -407,28 +591,28 @@ for a history of notable changes to <strong>SysIdentPy</strong>.</p>
 </div>
 </div>
 <div class="section" id="source-code">
-<h2>Source code<a class="headerlink" href="#source-code" title="Permalink to this headline">¶</a></h2>
+<h3>Source code<a class="headerlink" href="#source-code" title="Permalink to this headline">¶</a></h3>
 <p>You can check the latest sources with the command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">wilsonrljr</span><span class="o">/</span><span class="n">sysidentpy</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="project-history">
-<h2>Project History<a class="headerlink" href="#project-history" title="Permalink to this headline">¶</a></h2>
+<h3>Project History<a class="headerlink" href="#project-history" title="Permalink to this headline">¶</a></h3>
 <p>The project was started by Wilson R. L. Junior, Luan Pascoal and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019 and since then have contributed.</p>
 <p>The initial purpose was to learn the python language. Over time, the project has matured to the state it is in today.</p>
 <p>The project is currently maintained by its creators and looking for
 contributors.</p>
 </div>
 <div class="section" id="communication">
-<h2>Communication<a class="headerlink" href="#communication" title="Permalink to this headline">¶</a></h2>
+<h3>Communication<a class="headerlink" href="#communication" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Discord server: <a class="reference external" href="https://discord.gg/8eGE3PQ">https://discord.gg/8eGE3PQ</a></p></li>
 <li><p>Website(soon): <a class="reference external" href="http://sysidentpy.org">http://sysidentpy.org</a></p></li>
 </ul>
 </div>
 <div class="section" id="citation">
-<h2>Citation<a class="headerlink" href="#citation" title="Permalink to this headline">¶</a></h2>
+<h3>Citation<a class="headerlink" href="#citation" title="Permalink to this headline">¶</a></h3>
 <p>If you use <strong>SysIdentPy</strong> on your project, please <a class="reference external" href="mailto:wilsonrljr&#37;&#52;&#48;outlook&#46;com">drop me a line</a>.</p>
 <p>If you use <strong>SysIdentPy</strong> on your scientific publication, we would appreciate citations to the following paper:</p>
 <ul>
@@ -451,11 +635,11 @@ contributors.</p>
 </ul>
 </div>
 <div class="section" id="inspiration">
-<h2>Inspiration<a class="headerlink" href="#inspiration" title="Permalink to this headline">¶</a></h2>
+<h3>Inspiration<a class="headerlink" href="#inspiration" title="Permalink to this headline">¶</a></h3>
 <p>The documentation and structure (even this section) is openly inspired by sklearn, einsteinpy, and many others as we used (and keep using) them to learn.</p>
 </div>
 <div class="section" id="contents">
-<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<h3>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Install Guide</a></li>
@@ -463,10 +647,12 @@ contributors.</p>
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dev_guide.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks.html">Jupyter notebooks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog/v0.1.3.html">Changes in SysIdentPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog/v0.1.4.html">Changes in SysIdentPy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Codes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.base">sysidentpy base</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-narmax">sysidentpy narmax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-narx-neural-network">sysidentpy narx_neural_network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-general-estimators">sysidentpy general_estimators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.residues.residues_correlation">sysidentpy residues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.metrics._regression">sysidentpy metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.parameter_estimation.estimators">sysidentpy estimators</a></li>
@@ -474,6 +660,7 @@ contributors.</p>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.utils.generate_data">sysidentpy generate data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#indices-and-tables">Indices and tables</a></li>
 </ul>
+</div>
 </div>
 </div>
 </div>

@@ -147,12 +147,22 @@
      Example: F-16 Ground Vibration Test benchmark
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/narx_neural_network.html">
+     Building NARX Neural Network using Sysidentpy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/general_estimators.html">
+     Building NARX models using general estimators
+    </a>
+   </li>
   </ul>
   <i class="fas fa-chevron-down">
   </i>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="../../../changelog/v0.1.3.html">
+  <a class="reference internal" href="../../../changelog/v0.1.4.html">
    Changes in SysIdentPy
   </a>
  </li>
@@ -173,6 +183,16 @@
  <li class="toctree-l1">
   <a class="reference internal" href="../../../code.html#sysidentpy-narmax">
    sysidentpy narmax
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../code.html#sysidentpy-narx-neural-network">
+   sysidentpy narx_neural_network
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../code.html#sysidentpy-general-estimators">
+   sysidentpy general_estimators
   </a>
  </li>
  <li class="toctree-l1">
@@ -244,11 +264,11 @@
         aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
     <div class="dropdown-buttons sourcebuttons">
         <a class="repository-button"
-            href="https://github.com/wilsonrljr/sysidentpy/tree/master/docs"><button type="button" class="btn btn-secondary topbarbtn"
+            href="https://github.com/wilsonrljr/sysidentpy/tree/master/"><button type="button" class="btn btn-secondary topbarbtn"
                 data-toggle="tooltip" data-placement="left" title="Source repository"><i
                     class="fab fa-github"></i>repository</button></a>
         <a class="issues-button"
-            href="https://github.com/wilsonrljr/sysidentpy/tree/master/docs/issues/new?title=Issue%20on%20page%20%2F_modules/sysidentpy/polynomial_basis/narmax.html&body=Your%20issue%20content%20here."><button
+            href="https://github.com/wilsonrljr/sysidentpy/tree/master//issues/new?title=Issue%20on%20page%20%2F_modules/sysidentpy/polynomial_basis/narmax.html&body=Your%20issue%20content%20here."><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
                 title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
         
@@ -387,13 +407,12 @@
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    [1]`Manuscript: Orthogonal least squares methods and their application</span>
+<span class="sd">    [1] Manuscript: Orthogonal least squares methods and their application</span>
 <span class="sd">        to non-linear system identification</span>
-<span class="sd">        &lt;https://eprints.soton.ac.uk/251147/1/778742007_content.pdf&gt;`_</span>
-<span class="sd">    [2]`Manuscript (portuguese): Identificação de Sistemas não Lineares</span>
+<span class="sd">        https://eprints.soton.ac.uk/251147/1/778742007_content.pdf</span>
+<span class="sd">    [2] Manuscript (portuguese): Identificação de Sistemas não Lineares</span>
 <span class="sd">        Utilizando Modelos NARMAX Polinomiais–Uma Revisão</span>
 <span class="sd">        e Novos Resultados</span>
-<span class="sd">        &lt;https://www.researchgate.net/profile/Giovani_Rodrigues/publication/228595821_Identificacao_de_Sistemas_nao_Lineares_Utilizando_Modelos_NARMAX_Polinomiais-Uma_Revisao_e_Novos_Resultados/links/00b4951b10ff8ab4d3000000.pdf&gt;`_</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -515,14 +534,13 @@
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
-<span class="sd">        [1]`Manuscript: Orthogonal least squares methods and their application</span>
+<span class="sd">        [1] Manuscript: Orthogonal least squares methods and their application</span>
 <span class="sd">            to non-linear system identification</span>
-<span class="sd">            &lt;https://eprints.soton.ac.uk/251147/1/778742007_content.pdf&gt;`_</span>
+<span class="sd">            https://eprints.soton.ac.uk/251147/1/778742007_content.pdf</span>
 
-<span class="sd">        [2]`Manuscript (portuguese): Identificação de Sistemas não Lineares</span>
+<span class="sd">        [2] Manuscript (portuguese): Identificação de Sistemas não Lineares</span>
 <span class="sd">            Utilizando Modelos NARMAX Polinomiais–Uma Revisão</span>
 <span class="sd">            e Novos Resultados</span>
-<span class="sd">            &lt;https://www.researchgate.net/profile/Giovani_Rodrigues/publication/228595821_Identificacao_de_Sistemas_nao_Lineares_Utilizando_Modelos_NARMAX_Polinomiais-Uma_Revisao_e_Novos_Resultados/links/00b4951b10ff8ab4d3000000.pdf&gt;`_</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">squared_y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:]</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:]</span>
@@ -671,19 +689,18 @@
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
-<span class="sd">        [1]`Manuscript: Sorenson, H. W. (1970). Least-squares estimation:</span>
+<span class="sd">        [1] Manuscript: Sorenson, H. W. (1970). Least-squares estimation:</span>
 <span class="sd">            from Gauss to Kalman. IEEE spectrum, 7(7), 63-68.</span>
-<span class="sd">            &lt;http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf&gt;`_</span>
-<span class="sd">        [2]`Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificaçao</span>
+<span class="sd">            http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf</span>
+<span class="sd">        [2] Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificaçao</span>
 <span class="sd">            de sistemas: técnicas lineares enao-lineares aplicadas a sistemas</span>
 <span class="sd">            reais. Editora da UFMG. 3a ediçao.</span>
-<span class="sd">            &lt;https://books.google.com.br/books?hl=pt-BR&amp;lr=&amp;id=f9IwE7Ph0fYC&amp;oi=fnd&amp;pg=PA2&amp;dq=Introdu%C3%A7%C3%A3o+%C3%A0+identifica%C3%A7%C3%A3o+de+sistemas+-+T%C3%A9cnicas+lineares+e+n%C3%A3o-lineares+aplicadas+a+sistemas+reais&amp;ots=Qiyc4VsMdt&amp;sig=6gumj1AEWh_b0tUGR4quI5oETUA#v=onepage&amp;q=Introdu%C3%A7%C3%A3o%20%C3%A0%20identifica%C3%A7%C3%A3o%20de%20sistemas%20-%20T%C3%A9cnicas%20lineares%20e%20n%C3%A3o-lineares%20aplicadas%20a%20sistemas%20reais&amp;f=false&gt;`_</span>
-<span class="sd">        [3]`Manuscript: Markovsky, I., &amp; Van Huffel, S. (2007).</span>
+<span class="sd">        [3] Manuscript: Markovsky, I., &amp; Van Huffel, S. (2007).</span>
 <span class="sd">            Overview of total least-squares methods.</span>
 <span class="sd">            Signal processing, 87(10), 2283-2302.</span>
-<span class="sd">            &lt;https://eprints.soton.ac.uk/263855/1/tls_overview.pdf&gt;`_</span>
-<span class="sd">        [4]`Wikipedia entry on Least Squares</span>
-<span class="sd">            &lt;https://en.wikipedia.org/wiki/Least_squares&gt;`_</span>
+<span class="sd">            https://eprints.soton.ac.uk/263855/1/tls_overview.pdf</span>
+<span class="sd">        [4] Wikipedia entry on Least Squares</span>
+<span class="sd">            https://en.wikipedia.org/wiki/Least_squares</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">e</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">aux_lag</span><span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">psi</span> <span class="o">@</span> <span class="n">biased_theta</span>
@@ -709,9 +726,9 @@
 <div class="viewcode-block" id="PolynomialNarmax.predict"><a class="viewcode-back" href="../../../code.html#sysidentpy.polynomial_basis.narmax.PolynomialNarmax.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the predicted values given an input.</span>
 
-<span class="sd">        This is an &#39;alpha&#39; version of the predict function which allows</span>
-<span class="sd">        a friendly usage by the user. Given a previously trained model,</span>
-<span class="sd">        predict values given a new set of data.</span>
+<span class="sd">        The predict function allows a friendly usage by the user.</span>
+<span class="sd">        Given a previously trained model, predict values given</span>
+<span class="sd">        a new set of data.</span>
 
 <span class="sd">        This method accept y values mainly for prediction n-steps ahead</span>
 <span class="sd">        (to be implemented in the future)</span>
