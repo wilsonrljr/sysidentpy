@@ -27,7 +27,7 @@ The project was started in by Wilson R. L. Junior, Luan Pascoal C. Andrade and S
 
 # Examples
 
-## SysIdentPy now support NARX Neural Network and General estimators, e.g., all sklearn estimators and Catboost.
+## SysIdentPy now support NARX Neural Network and General estimators, e.g., sklearn estimators and Catboost.
 
 ### Exemples
 ```python
