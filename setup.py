@@ -79,7 +79,7 @@ def setup_package():
         'numpy>={}'.format(NUMPY_MIN_VERSION),
         'matplotlib>={}'.format(
             MATPLOTLIB_MIN_VERSION),
-        'pytorch>={}'.format(PYTORCH_MIN_VERSION)
+        'torch>={}'.format(PYTORCH_MIN_VERSION)
     ],
     )
 
