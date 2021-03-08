@@ -424,7 +424,7 @@ class PolynomialNarmax(
 
         return unbiased_theta[0: len(self.final_model), 0].reshape(-1, 1)
 
-    def predict(self, X, y):
+    def predict(self, X, y, steps_ahead=None):
         """Return the predicted values given an input.
 
         The predict function allows a friendly usage by the user.
@@ -447,8 +447,12 @@ class PolynomialNarmax(
             The predicted values of the model.
 
         """
-        yhat = self._model_prediction(self.final_model, X, y, self.theta)
-        return yhat
+        if steps_ahead is None:
+            return self._model_prediction(self.final_model, X, y, self.theta)
+        elif steps_ahead == 1:
+            return self.one_step_ahead_prediction(X, y)
+        else:
+            return self.n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
 
     def _code2exponents(self, code):
         """
@@ -483,6 +487,41 @@ class PolynomialNarmax(
                     exponents = np.append(exponents, base_exponents)
 
             return exponents
+
+    def one_step_ahead_prediction(self, X, y):
+        X_base = InformationMatrix().build_information_matrix(
+            X, y, self.xlag, self.ylag, self.non_degree
+        )
+        piv_final_model = self.pivv[:len(self.final_model)]
+        X_base = X_base[:, piv_final_model]
+        yhat = np.dot(X_base, self.theta.flatten())
+        yhat = np.concatenate([y[:self.max_lag].flatten(), yhat])
+        return yhat.reshape(-1, 1)
+
+    def n_step_ahead_prediction(self, X, y, steps_ahead):
+        if len(y) < self.max_lag:
+            raise Exception("Insufficient initial conditions elements!")
+
+        yhat = np.zeros(X.shape[0], dtype=float)
+        yhat.fill(np.nan)
+        yhat[: self.max_lag] = y[: self.max_lag, 0]
+        i = self.max_lag
+        X = X.reshape(-1, self._n_inputs)
+        while i < len(y):
+            k = int(i - self.max_lag)
+            if i + steps_ahead > len(y):
+                steps_ahead = len(y) - i
+
+            yhat[i:i+steps_ahead] = self._model_prediction(
+                self.final_model,
+                X[k:i+steps_ahead],
+                y[k:i+steps_ahead],
+                self.theta)[-steps_ahead:].ravel()
+
+            i += steps_ahead
+
+        yhat = yhat.ravel()
+        return yhat.reshape(-1, 1)
 
     def _model_prediction(self, model_elements, X, y_initial, theta):
         """Perform the infinity steps-ahead simulation of a model.
