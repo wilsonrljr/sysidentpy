@@ -2,6 +2,6 @@ theme: jekyll-theme-cayman
 repository:
   url                       : https://github.com/wilsonrljr/sysidentpy  # Online location of your book
   path_to_book              : /docs  # Optional path to your book, relative to the repository root
-  branch                    : step_ahead  # Which branch of the repository should be used when creating links (optional)
+  branch                    : master  # Which branch of the repository should be used when creating links (optional)
 launch_buttons:
   colab_url: "https://colab.research.google.com"

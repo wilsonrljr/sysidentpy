@@ -14,6 +14,7 @@ CHANGES
 
 - MAJOR: n-steps-ahead prediction.
     - Now you can define the numbers of steps ahead in the predict function.
+	- only for Polynomial models for now. Next update will bring this functionality to Neural NARX and General Estimators.
 
 - Added 4 new notebooks in the example section.
 

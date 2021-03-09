@@ -552,10 +552,8 @@ class PolynomialNarmax(
                 steps_ahead = len(y) - i  # predicts the remaining values
 
             yhat[i:i+steps_ahead] = self._model_prediction(
-                self.final_model,
                 X[k:i+steps_ahead],
-                y[k:i+steps_ahead],
-                self.theta)[-steps_ahead:].ravel()
+                y[k:i+steps_ahead])[-steps_ahead:].ravel()
 
             i += steps_ahead
 

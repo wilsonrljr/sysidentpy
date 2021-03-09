@@ -72,3 +72,9 @@ Jupyter notebooks
    :caption: Identification of an electromechanical system
 
    /examples/identification_of_an_electromechanical_system.ipynb
+   
+.. toctree::
+   :maxdepth: 1
+   :caption: N-steps-ahead simulation
+
+   /examples/n_steps_ahead_prediction.ipynb
