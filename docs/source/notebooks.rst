@@ -54,3 +54,21 @@ Jupyter notebooks
    :caption: General Estimators
 
    /examples/general_estimators.ipynb
+   
+.. toctree::
+   :maxdepth: 1
+   :caption: Simulate a predefined model
+
+   /examples/simulating_a_predefined_model.ipynb
+   
+.. toctree::
+   :maxdepth: 1
+   :caption: System Identification Using Adaptative Filters
+
+   /examples/system_identification_using_adaptative_filters.ipynb
+   
+.. toctree::
+   :maxdepth: 1
+   :caption: Identification of an electromechanical system
+
+   /examples/identification_of_an_electromechanical_system.ipynb
