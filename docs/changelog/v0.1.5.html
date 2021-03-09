@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Setting specific lags &#8212; NARMAX models</title>
+    <title>Changes in SysIdentPy &#8212; NARMAX models</title>
     
   <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -42,23 +42,21 @@
     <script src="../_static/copybutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
-    <link rel="canonical" href="http://sysidentpy.org/examples/defining_lags.html" />
+    <link rel="canonical" href="http://sysidentpy.org/changelog/v0.1.5.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Parameter Estimation" href="parameter_estimation.html" />
-    <link rel="prev" title="Important notes and examples of how to use Extended Least Squares" href="extended_least_squares.html" />
+    <link rel="next" title="Codes" href="../code.html" />
+    <link rel="prev" title="Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark" href="../examples/n_steps_ahead_prediction.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
 
 
 <!-- Opengraph tags -->
-<meta property="og:url"         content="http://sysidentpy.org/examples/defining_lags.html" />
+<meta property="og:url"         content="http://sysidentpy.org/changelog/v0.1.5.html" />
 <meta property="og:type"        content="article" />
-<meta property="og:title"       content="Setting specific lags" />
-<meta property="og:description" content="Setting specific lags  Example created by Wilson Rocha Lacerda Junior  Different ways to set the maximum lag for input and output  import numpy as np import pan" />
+<meta property="og:title"       content="Changes in SysIdentPy" />
+<meta property="og:description" content="Changes in SysIdentPy  v0.1.5  CONTRIBUTORS  wilsonrljr  CHANGES  MAJOR: n-steps-ahead prediction.  Now you can define the numbers of steps ahead in the predict" />
 <meta property="og:image"       content="http://sysidentpy.org/_static/sysidentpy-logo.png" />
 
 <meta name="twitter:card" content="summary" />
@@ -108,73 +106,73 @@
    Contributing
   </a>
  </li>
- <li class="toctree-l1 current active collapsible-parent">
+ <li class="toctree-l1 collapsible-parent">
   <a class="reference internal" href="../notebooks.html">
    Jupyter notebooks
   </a>
-  <ul class="current collapse-ul">
+  <ul class="collapse-ul">
    <li class="toctree-l2">
-    <a class="reference internal" href="basic_steps.html">
+    <a class="reference internal" href="../examples/basic_steps.html">
      Presenting main functionality
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="multiple_inputs_example.html">
+    <a class="reference internal" href="../examples/multiple_inputs_example.html">
      Multiple Inputs usage
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="information_criteria_examples.html">
+    <a class="reference internal" href="../examples/information_criteria_examples.html">
      Information Criteria - Examples
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="extended_least_squares.html">
+    <a class="reference internal" href="../examples/extended_least_squares.html">
      Important notes and examples of how to use Extended Least Squares
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/defining_lags.html">
      Setting specific lags
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="parameter_estimation.html">
+    <a class="reference internal" href="../examples/parameter_estimation.html">
      Parameter Estimation
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="f_16_benchmark.html">
+    <a class="reference internal" href="../examples/f_16_benchmark.html">
      Example: F-16 Ground Vibration Test benchmark
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="narx_neural_network.html">
+    <a class="reference internal" href="../examples/narx_neural_network.html">
      Building NARX Neural Network using Sysidentpy
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="general_estimators.html">
+    <a class="reference internal" href="../examples/general_estimators.html">
      Building NARX models using general estimators
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="simulating_a_predefined_model.html">
+    <a class="reference internal" href="../examples/simulating_a_predefined_model.html">
      Simulate a Predefined Model
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="system_identification_using_adaptative_filters.html">
+    <a class="reference internal" href="../examples/system_identification_using_adaptative_filters.html">
      System Identification Using Adaptative Filters
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="identification_of_an_electromechanical_system.html">
+    <a class="reference internal" href="../examples/identification_of_an_electromechanical_system.html">
      Identification of an electromechanical system
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="n_steps_ahead_prediction.html">
+    <a class="reference internal" href="../examples/n_steps_ahead_prediction.html">
      Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark
     </a>
    </li>
@@ -182,8 +180,8 @@
   <i class="fas fa-chevron-down">
   </i>
  </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../changelog/v0.1.5.html">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
    Changes in SysIdentPy
   </a>
  </li>
@@ -286,9 +284,9 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../_sources/examples/defining_lags.ipynb.txt"><button type="button"
+        <a class="dropdown-buttons" href="../_sources/changelog/v0.1.5.rst.txt"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
-                data-placement="left">.ipynb</button></a>
+                data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
             onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
@@ -306,7 +304,7 @@
                 data-toggle="tooltip" data-placement="left" title="Source repository"><i
                     class="fab fa-github"></i>repository</button></a>
         <a class="issues-button"
-            href="https://github.com/wilsonrljr/sysidentpy/tree/master//issues/new?title=Issue%20on%20page%20%2Fexamples/defining_lags.html&body=Your%20issue%20content%20here."><button
+            href="https://github.com/wilsonrljr/sysidentpy/tree/master//issues/new?title=Issue%20on%20page%20%2Fchangelog/v0.1.5.html&body=Your%20issue%20content%20here."><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
                 title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
         
@@ -333,13 +331,59 @@
         <nav id="bd-toc-nav">
             <ul class="nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#setting-lags-using-a-range-of-values">
-   Setting lags using a range of values
+  <a class="reference internal nav-link" href="#v0-1-5">
+   v0.1.5
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#contributors">
+     CONTRIBUTORS
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#changes">
+     CHANGES
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#setting-specific-lags-using-lists">
-   Setting specific lags using lists
+  <a class="reference internal nav-link" href="#v0-1-4">
+   v0.1.4
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id1">
+     CONTRIBUTORS
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id2">
+     CHANGES
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#v0-1-3">
+   v0.1.3
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id3">
+     CONTRIBUTORS
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id4">
+     CHANGES
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id5">
+   v0.1.5
   </a>
  </li>
 </ul>
@@ -354,82 +398,111 @@
         
               <div>
                 
-  <div class="section" id="setting-specific-lags">
-<h1>Setting specific lags<a class="headerlink" href="#setting-specific-lags" title="Permalink to this headline">¶</a></h1>
-<p>Example created by Wilson Rocha Lacerda Junior</p>
-<p>Different ways to set the maximum lag for input and output</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">sysidentpy.polynomial_basis</span> <span class="kn">import</span> <span class="n">PolynomialNarmax</span>
-</pre></div>
+  <div class="section" id="changes-in-sysidentpy">
+<h1>Changes in SysIdentPy<a class="headerlink" href="#changes-in-sysidentpy" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="v0-1-5">
+<h2>v0.1.5<a class="headerlink" href="#v0-1-5" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="contributors">
+<h3>CONTRIBUTORS<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>wilsonrljr</p></li>
+</ul>
+</div>
+<div class="section" id="changes">
+<h3>CHANGES<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><dl class="simple">
+<dt>MAJOR: n-steps-ahead prediction.</dt><dd><ul>
+<li><dl class="simple">
+<dt>Now you can define the numbers of steps ahead in the predict function.</dt><dd><ul>
+<li><p>only for Polynomial models for now. Next update will bring this functionality to Neural NARX and General Estimators.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Added 4 new notebooks in the example section.</p></li>
+<li><p>Added iterative notebooks.</p></li>
+<li><p>Fix issues related to html on Jupyter notebooks examples on documentation.</p></li>
+<li><p>Updated Readme with examples of how to use.</p></li>
+</ul>
 </div>
 </div>
+<div class="section" id="v0-1-4">
+<h2>v0.1.4<a class="headerlink" href="#v0-1-4" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>CONTRIBUTORS<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>wilsonrljr</p></li>
+</ul>
 </div>
-<div class="section" id="setting-lags-using-a-range-of-values">
-<h2>Setting lags using a range of values<a class="headerlink" href="#setting-lags-using-a-range-of-values" title="Permalink to this headline">¶</a></h2>
-<p>If you pass int values for <em>ylag</em> and <em>xlag</em>, the lags are defined as a range from 1-<em>ylag</em> and 1-<em>xlag</em>.</p>
-<p>For example: if <em>ylag=4</em> then the candidate regressors are <span class="math notranslate nohighlight">\(y_{k-1}, y_{k-2}, y_{k-3}, y_{k-4}\)</span></p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">PolynomialNarmax</span><span class="p">(</span><span class="n">non_degree</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                         <span class="n">order_selection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                         <span class="n">n_info_values</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                         <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                         <span class="n">ylag</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-                         <span class="n">info_criteria</span><span class="o">=</span><span class="s1">&#39;aic&#39;</span><span class="p">,</span>
-                         <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;least_squares&#39;</span><span class="p">,</span>
-                         <span class="p">)</span>
-
-<span class="n">model</span><span class="o">.</span><span class="n">regressor_code</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[   0],
-       [1001],
-       [1002],
-       [1003],
-       [1004],
-       [2001],
-       [2002],
-       [2003],
-       [2004]])
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="section" id="setting-specific-lags-using-lists">
-<h2>Setting specific lags using lists<a class="headerlink" href="#setting-specific-lags-using-lists" title="Permalink to this headline">¶</a></h2>
-<p>If you pass the <em>ylag</em> and <em>xlag</em> as a list, only the lags related to values in the list will be created.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">PolynomialNarmax</span><span class="p">(</span><span class="n">non_degree</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                         <span class="n">order_selection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                         <span class="n">n_info_values</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                         <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                         <span class="n">ylag</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="n">xlag</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
-                         <span class="n">info_criteria</span><span class="o">=</span><span class="s1">&#39;aic&#39;</span><span class="p">,</span>
-                         <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;least_squares&#39;</span><span class="p">,</span>
-                         <span class="p">)</span>
-
-<span class="n">model</span><span class="o">.</span><span class="n">regressor_code</span>
-</pre></div>
+<div class="section" id="id2">
+<h3>CHANGES<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><dl class="simple">
+<dt>MAJOR: Introducing NARX Neural Network in SysIdentPy.</dt><dd><ul>
+<li><p>Now you can build NARX Neural Network on SysIdentPy.</p></li>
+<li><p>This feature is built on top of Pytorch. See the docs for more details and examples of how to use.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>MAJOR: Introducing general estimators in SysIdentPy.</dt><dd><ul>
+<li><p>Now you are able to use any estimator that have Fit/Predict methods (estimators from Sklearn and Catboost, for example) and build NARX models based on those estimators.</p></li>
+<li><p>We use the core functions of SysIdentPy and keep the Fit/Predict approach from those estimators to keep the process easy to use.</p></li>
+<li><p>More estimators are coming soon like XGboost.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Added notebooks to show how to build NARX neural Network.</p></li>
+<li><p>Added notebooks to show how to build NARX models using general estimators.</p></li>
+<li><p>Changed the default parameters of the plot_results function.</p></li>
+<li><p>NOTE: We will keeping improving the Polynomial NARX models (new model structure selection algorithms and multiobjective identification</p></li>
+</ul>
+<p>is on our roadmap). These recent modifications will allow us to introduce new NARX models like PWARX models very soon.</p>
+<ul class="simple">
+<li><p>New template for the documentation site.</p></li>
+<li><p>Fix issues related to html on Jupyter notebooks examples on documentation.</p></li>
+<li><p>Updated Readme with examples of how to use.</p></li>
+</ul>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[   0],
-       [1001],
-       [1004],
-       [2001],
-       [2004]])
-</pre></div>
+<div class="section" id="v0-1-3">
+<h2>v0.1.3<a class="headerlink" href="#v0-1-3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id3">
+<h3>CONTRIBUTORS<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>wilsonrljr</p></li>
+<li><p>renard162</p></li>
+</ul>
+</div>
+<div class="section" id="id4">
+<h3>CHANGES<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed a bug concerning the xlag and ylag in multiple input scenarios.</p></li>
+<li><p>Refactored predict function. Improved performance up to 87% depending on the number of regressors.</p></li>
+<li><p>You can set lags with different size for each input.</p></li>
+<li><p>Added a new function to get the max value of xlag and ylag. Work with int, list, nested lists.</p></li>
+<li><p>Fixed tests for information criteria.</p></li>
+<li><p>Added SysIdentPy logo.</p></li>
+<li><p>Refactored code of all classes following PEP 8 guidelines to improve readability.</p></li>
+<li><p>Added Citation information on Readme.</p></li>
+<li><p>Changes on information Criteria tests.</p></li>
+<li><p>Added workflow to run the tests when merge branch into master.</p></li>
+<li><p>Added new site domain.</p></li>
+<li><p>Updated docs.</p></li>
+</ul>
 </div>
 </div>
-</div>
+<div class="section" id="id5">
+<h2>v0.1.5<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<p>CONTRIBUTORS
+CHANGES</p>
 </div>
 </div>
 
@@ -439,8 +512,8 @@
         
         <div class='prev-next-bottom'>
             
-    <a class='left-prev' id="prev-link" href="extended_least_squares.html" title="previous page">Important notes and examples of how to use Extended Least Squares</a>
-    <a class='right-next' id="next-link" href="parameter_estimation.html" title="next page">Parameter Estimation</a>
+    <a class='left-prev' id="prev-link" href="../examples/n_steps_ahead_prediction.html" title="previous page">Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark</a>
+    <a class='right-next' id="next-link" href="../code.html" title="next page">Codes</a>
 
         </div>
         

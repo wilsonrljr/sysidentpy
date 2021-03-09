@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Example: F-16 Ground Vibration Test benchmark &#8212; NARMAX models</title>
+    <title>Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark &#8212; NARMAX models</title>
     
   <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -42,21 +42,21 @@
     <script src="../_static/copybutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
-    <link rel="canonical" href="http://sysidentpy.org/examples/f_16_benchmark.html" />
+    <link rel="canonical" href="http://sysidentpy.org/examples/n_steps_ahead_prediction.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Building NARX Neural Network using Sysidentpy" href="narx_neural_network.html" />
-    <link rel="prev" title="Parameter Estimation" href="parameter_estimation.html" />
+    <link rel="next" title="Changes in SysIdentPy" href="../changelog/v0.1.5.html" />
+    <link rel="prev" title="Identification of an electromechanical system" href="identification_of_an_electromechanical_system.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
 
 
 <!-- Opengraph tags -->
-<meta property="og:url"         content="http://sysidentpy.org/examples/f_16_benchmark.html" />
+<meta property="og:url"         content="http://sysidentpy.org/examples/n_steps_ahead_prediction.html" />
 <meta property="og:type"        content="article" />
-<meta property="og:title"       content="Example: F-16 Ground Vibration Test benchmark" />
-<meta property="og:description" content="Example: F-16 Ground Vibration Test benchmark  Example created by Wilson Rocha Lacerda Junior  Note: The following examples do not try to replicate the results " />
+<meta property="og:title"       content="Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark" />
+<meta property="og:description" content="Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark  Note: The following examples do not try to replicate the results of the cited manuscri" />
 <meta property="og:image"       content="http://sysidentpy.org/_static/sysidentpy-logo.png" />
 
 <meta name="twitter:card" content="summary" />
@@ -141,8 +141,8 @@
      Parameter Estimation
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="f_16_benchmark.html">
      Example: F-16 Ground Vibration Test benchmark
     </a>
    </li>
@@ -171,8 +171,8 @@
      Identification of an electromechanical system
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="n_steps_ahead_prediction.html">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
      Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark
     </a>
    </li>
@@ -284,7 +284,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../_sources/examples/f_16_benchmark.ipynb.txt"><button type="button"
+        <a class="dropdown-buttons" href="../_sources/examples/n_steps_ahead_prediction.ipynb.txt"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
@@ -304,7 +304,7 @@
                 data-toggle="tooltip" data-placement="left" title="Source repository"><i
                     class="fab fa-github"></i>repository</button></a>
         <a class="issues-button"
-            href="https://github.com/wilsonrljr/sysidentpy/tree/master//issues/new?title=Issue%20on%20page%20%2Fexamples/f_16_benchmark.html&body=Your%20issue%20content%20here."><button
+            href="https://github.com/wilsonrljr/sysidentpy/tree/master//issues/new?title=Issue%20on%20page%20%2Fexamples/n_steps_ahead_prediction.html&body=Your%20issue%20content%20here."><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
                 title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
         
@@ -331,33 +331,18 @@
         <nav id="bd-toc-nav">
             <ul class="nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#reference">
-   Reference
+  <a class="reference internal nav-link" href="#preparing-the-data">
+   Preparing the data
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#visualizating-the-data">
-   Visualizating the data
+  <a class="reference internal nav-link" href="#building-the-model">
+   Building the model
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#spliting-the-data">
-   Spliting the data
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#setting-the-lags-the-inputs">
-   Setting the lags the inputs
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#model-training-and-evalutation">
-   Model training and evalutation
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#information-criteria-plot">
-   Information Criteria plot
+  <a class="reference internal nav-link" href="#defining-the-forecasting-horizon">
+   Defining the forecasting horizon
   </a>
  </li>
 </ul>
@@ -372,12 +357,9 @@
         
               <div>
                 
-  <div class="section" id="example-f-16-ground-vibration-test-benchmark">
-<h1>Example: F-16 Ground Vibration Test benchmark<a class="headerlink" href="#example-f-16-ground-vibration-test-benchmark" title="Permalink to this headline">¶</a></h1>
-<p>Example created by Wilson Rocha Lacerda Junior</p>
+  <div class="section" id="example-n-steps-ahead-prediction-f-16-ground-vibration-test-benchmark">
+<h1>Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark<a class="headerlink" href="#example-n-steps-ahead-prediction-f-16-ground-vibration-test-benchmark" title="Permalink to this headline">¶</a></h1>
 <p><strong>Note</strong>: The following examples do not try to replicate the results of the cited manuscripts. Even the model parameters such as ylag and xlag and size of identification and validation data are not the same of the cited papers. Moreover, sampling rate adjustment and other different data preparation are not handled here.</p>
-<div class="section" id="reference">
-<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
 <p><strong>The following text was taken from the link http://www.nonlinearbenchmark.org/#F16</strong>.</p>
 <p><strong>Note</strong>: The reader is reffered to the mentioned website for a complete reference concerning the experiment. For now, this notebook is just a simple example of the performance of SysIdentPy on a real world dataset. A more detailed study of this system will be published in the future.</p>
 <blockquote>
@@ -411,9 +393,11 @@
 </div>
 </div>
 </div>
+<div class="section" id="preparing-the-data">
+<h2>Preparing the data<a class="headerlink" href="#preparing-the-data" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f_16</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;../../../examples/datasets/f-16.txt&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">,</span> <span class="s1">&#39;x2&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f_16</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;examples/datasets/f-16.txt&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">,</span> <span class="s1">&#39;x2&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -430,9 +414,6 @@
 </div>
 </div>
 </div>
-</div>
-<div class="section" id="visualizating-the-data">
-<h2>Visualizating the data<a class="headerlink" href="#visualizating-the-data" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f_16</span><span class="p">[[</span><span class="s1">&#39;x1&#39;</span><span class="p">,</span> <span class="s1">&#39;x2&#39;</span><span class="p">]][</span><span class="mi">0</span><span class="p">:</span><span class="mi">500</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
@@ -443,7 +424,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
 </pre></div>
 </div>
-<img alt="../_images/f_16_benchmark_6_1.svg" src="../_images/f_16_benchmark_6_1.svg" /></div>
+<img alt="../_images/n_steps_ahead_prediction_6_1.svg" src="../_images/n_steps_ahead_prediction_6_1.svg" /></div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -455,11 +436,8 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
 </pre></div>
 </div>
-<img alt="../_images/f_16_benchmark_7_1.svg" src="../_images/f_16_benchmark_7_1.svg" /></div>
+<img alt="../_images/n_steps_ahead_prediction_7_1.svg" src="../_images/n_steps_ahead_prediction_7_1.svg" /></div>
 </div>
-</div>
-<div class="section" id="spliting-the-data">
-<h2>Spliting the data<a class="headerlink" href="#spliting-the-data" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x1_id</span><span class="p">,</span> <span class="n">x1_val</span> <span class="o">=</span> <span class="n">f_16</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">16384</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">f_16</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">][</span><span class="mi">16384</span><span class="p">::]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -472,9 +450,6 @@
 </div>
 </div>
 </div>
-</div>
-<div class="section" id="setting-the-lags-the-inputs">
-<h2>Setting the lags the inputs<a class="headerlink" href="#setting-the-lags-the-inputs" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x1lag</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
@@ -490,8 +465,8 @@
 </div>
 </div>
 </div>
-<div class="section" id="model-training-and-evalutation">
-<h2>Model training and evalutation<a class="headerlink" href="#model-training-and-evalutation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="building-the-model">
+<h2>Building the model<a class="headerlink" href="#building-the-model" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">PolynomialNarmax</span><span class="p">(</span><span class="c1"># n_terms=8,</span>
@@ -504,7 +479,23 @@
                          <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                          <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;least_squares&#39;</span><span class="p">)</span>
 <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_id</span><span class="p">,</span> <span class="n">y_id</span><span class="p">)</span>
-<span class="n">y_hat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="n">y_val</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;sysidentpy.polynomial_basis.narmax.PolynomialNarmax at 0x2523e7e4850&gt;
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="defining-the-forecasting-horizon">
+<h2>Defining the forecasting horizon<a class="headerlink" href="#defining-the-forecasting-horizon" title="Permalink to this headline">¶</a></h2>
+<p>To perform a n-steps-ahead prediction you just need to set the “steps_ahead” argument.</p>
+<p><strong>Note</strong> The default value for steps_ahead is None and it performs a infinity-steps-ahead prediction</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_hat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="n">y_val</span><span class="p">,</span> <span class="n">steps_ahead</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">rrse</span> <span class="o">=</span> <span class="n">root_relative_squared_error</span><span class="p">(</span><span class="n">y_val</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">rrse</span><span class="p">)</span>
 <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="n">err_precision</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;sci&#39;</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Regressors&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;ERR&#39;</span><span class="p">])</span>
@@ -513,7 +504,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.3090559299602927
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.09660139833917882
 </pre></div>
 </div>
 <div class="output text_html"><div>
@@ -732,27 +723,43 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/f_16_benchmark_14_0.svg" src="../_images/f_16_benchmark_14_0.svg" /></div>
+<img alt="../_images/n_steps_ahead_prediction_14_0.svg" src="../_images/n_steps_ahead_prediction_14_0.svg" /></div>
 </div>
-</div>
-<div class="section" id="information-criteria-plot">
-<h2>Information Criteria plot<a class="headerlink" href="#information-criteria-plot" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">xaxis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">n_info_values</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xaxis</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">info_values</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;n_terms&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Information Criteria&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_hat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="n">y_val</span><span class="p">,</span> <span class="n">steps_ahead</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">rrse</span> <span class="o">=</span> <span class="n">root_relative_squared_error</span><span class="p">(</span><span class="n">y_val</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rrse</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="n">err_precision</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;sci&#39;</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Regressors&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;ERR&#39;</span><span class="p">])</span>
 
-<span class="c1"># You can use the plot below to choose the &quot;n_terms&quot; and run the model again with the most adequate value of terms.</span>
+<span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">residuals</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="n">y_val</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">plot_result</span><span class="p">(</span><span class="n">y_val</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;Information Criteria&#39;)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.22158488532181117
 </pre></div>
 </div>
-<img alt="../_images/f_16_benchmark_16_1.svg" src="../_images/f_16_benchmark_16_1.svg" /></div>
+<img alt="../_images/n_steps_ahead_prediction_15_1.svg" src="../_images/n_steps_ahead_prediction_15_1.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_hat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="n">y_val</span><span class="p">)</span> <span class="c1"># inifity-steps-ahead prediction</span>
+<span class="n">rrse</span> <span class="o">=</span> <span class="n">root_relative_squared_error</span><span class="p">(</span><span class="n">y_val</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rrse</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="n">err_precision</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;sci&#39;</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Regressors&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;ERR&#39;</span><span class="p">])</span>
+
+<span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">residuals</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="n">y_val</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">plot_result</span><span class="p">(</span><span class="n">y_val</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.3090559299602927
+</pre></div>
+</div>
+<img alt="../_images/n_steps_ahead_prediction_16_1.svg" src="../_images/n_steps_ahead_prediction_16_1.svg" /></div>
 </div>
 </div>
 </div>
@@ -763,8 +770,8 @@
         
         <div class='prev-next-bottom'>
             
-    <a class='left-prev' id="prev-link" href="parameter_estimation.html" title="previous page">Parameter Estimation</a>
-    <a class='right-next' id="next-link" href="narx_neural_network.html" title="next page">Building NARX Neural Network using Sysidentpy</a>
+    <a class='left-prev' id="prev-link" href="identification_of_an_electromechanical_system.html" title="previous page">Identification of an electromechanical system</a>
+    <a class='right-next' id="next-link" href="../changelog/v0.1.5.html" title="next page">Changes in SysIdentPy</a>
 
         </div>
         
