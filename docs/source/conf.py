@@ -25,7 +25,7 @@ copyright = '2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins'
 author = 'Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.4'
+release = '0.1.5'
 
 autodoc_member_order = "bysource"
 add_function_parentheses = True
@@ -102,8 +102,15 @@ htmlhelp_basename = "sysidentpydoc"
 # html_static_path = ['_static']
 
 html_theme_options = {
-    "repository_url": "https://github.com/wilsonrljr/sysidentpy/tree/master/",
+    "repository_url": "https://github.com/wilsonrljr/sysidentpy/",
     "use_repository_button": True,
     "use_issues_button": True,
-    "use_download_button": True
+    "use_download_button": True,
+    "use_edit_page_button": True,
+    "repository_branch": "master",
+    "path_to_docs": "docs",
+    "launch_buttons": {
+        "colab_url": "https://colab.research.google.com",
+        "notebook_interface": "jupyterlab"
+    },
 }
