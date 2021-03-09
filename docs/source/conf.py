@@ -53,8 +53,8 @@ source_suffix = {
 }
 
 master_doc = "index"
-myst_admonition_enable = True
-myst_deflist_enable = True
+# myst_admonition_enable = True
+# myst_deflist_enable = True
 myst_url_schemes = ("http", "https", "mailto")
 jupyter_execute_notebooks = "cache"
 
