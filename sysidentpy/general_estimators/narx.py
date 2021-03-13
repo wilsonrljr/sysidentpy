@@ -13,14 +13,17 @@ from ..residues.residues_correlation import ResiduesAnalysis
 from ..utils._check_arrays import check_X_y
 
 import sys
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
-                    datefmt='%m-%d %H:%M:%S',
-                    level=logging.INFO,
-                    stream=sys.stdout)
+
+logging.basicConfig(
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%m-%d %H:%M:%S",
+    level=logging.INFO,
+    stream=sys.stdout,
+)
 
 
 class NARX(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
-    """ NARX model build on top of general estimators
+    """NARX model build on top of general estimators
 
     Currently is possible to use any estimator that have a fit/predict
     as an Autoregressive Model. We use our GenerateRegressors and
@@ -75,7 +78,7 @@ class NARX(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
         xlag=2,
         n_inputs=1,
         base_estimator=None,
-        fit_params={}
+        fit_params={},
     ):
         self.non_degree = non_degree
         self.ylag = ylag
@@ -115,13 +118,15 @@ class NARX(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
             The information matrix of the model.
         """
         logging.info("Creating the regressor matrix")
-        reg_matrix = InformationMatrix().build_information_matrix(X, y, self.xlag,
-                                                                  self.ylag, self.non_degree)
-        logging.info("The regressor matrix have " +
-                     str(reg_matrix.shape[1]) + " features")
+        reg_matrix = InformationMatrix().build_information_matrix(
+            X, y, self.xlag, self.ylag, self.non_degree
+        )
+        logging.info(
+            "The regressor matrix have " + str(reg_matrix.shape[1]) + " features"
+        )
         reg_matrix = reg_matrix
 
-        y = y[self.max_lag:]
+        y = y[self.max_lag :]
         return reg_matrix, y
 
     def fit(self, X, y):
@@ -149,10 +154,10 @@ class NARX(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
 
         check_X_y(X, y)
 
-        logging.info('Training the model')
+        logging.info("Training the model")
         X, y = self.data_preparation(X, y)
         self.base_estimator.fit(X, y, **self.fit_params)
-        logging.info('Done! Model is built!')
+        logging.info("Done! Model is built!")
         return self
 
     def predict(self, X, y_initial):
@@ -184,17 +189,18 @@ class NARX(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
         yhat = np.zeros((len(X), 1))
 
         # Discard unnecessary initial values
-        yhat[0:self.max_lag] = y_initial[0:self.max_lag]
+        yhat[0 : self.max_lag] = y_initial[0 : self.max_lag]
         analised_elements_number = self.max_lag + 1
 
         for i in range(0, len(X) - self.max_lag):
-            reg_matrix = InformationMatrix().\
-                build_information_matrix(X[i:i+analised_elements_number],
-                                         yhat[i:i+analised_elements_number],
-                                         self.xlag,
-                                         self.ylag,
-                                         self.non_degree)
+            reg_matrix = InformationMatrix().build_information_matrix(
+                X[i : i + analised_elements_number],
+                yhat[i : i + analised_elements_number],
+                self.xlag,
+                self.ylag,
+                self.non_degree,
+            )
 
             a = self.base_estimator.predict(reg_matrix)
-            yhat[i+self.max_lag] = a[0]
+            yhat[i + self.max_lag] = a[0]
         return yhat
