@@ -17,14 +17,17 @@ from torch import optim
 import torch.nn.functional as F
 import torch
 import sys
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
-                    datefmt='%m-%d %H:%M:%S',
-                    level=logging.INFO,
-                    stream=sys.stdout)
+
+logging.basicConfig(
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%m-%d %H:%M:%S",
+    level=logging.INFO,
+    stream=sys.stdout,
+)
 
 
 class NARXNN(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
-    """ NARX Neural Network model build on top of Pytorch
+    """NARX Neural Network model build on top of Pytorch
 
     Currently we support a Series-Parallel (open-loop) Feedforward Network training
     process, which make the training process easier, and we convert the
@@ -119,8 +122,8 @@ class NARXNN(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
         batch_size=100,  # batch size
         learning_rate=0.01,  # learning rate
         epochs=200,  # how many epochs to train for
-        loss_func='mse_loss',
-        optimizer='Adam',
+        loss_func="mse_loss",
+        optimizer="Adam",
         net=None,
         train_percentage=80,
         verbose=False,
@@ -160,9 +163,7 @@ class NARXNN(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
             )
 
         if not isinstance(self.epochs, int) or self.epochs < 1:
-            raise ValueError(
-                "epochs must be integer and > zero. Got %f" % self.epochs
-            )
+            raise ValueError("epochs must be integer and > zero. Got %f" % self.epochs)
 
         if not isinstance(self.train_percentage, int) or self.train_percentage < 0:
             raise ValueError(
@@ -170,9 +171,7 @@ class NARXNN(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
             )
 
         if not isinstance(self.verbose, bool):
-            raise TypeError(
-                "verbose must be False or True. Got %f" % self.verbose
-            )
+            raise TypeError("verbose must be False or True. Got %f" % self.verbose)
 
     def define_opt(self):
         opt = getattr(optim, self.optimizer)
@@ -220,12 +219,13 @@ class NARXNN(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
             The information matrix of the model.
         """
         # [:, 1] removes the column of the constant
-        reg_matrix = InformationMatrix().build_information_matrix(X, y, self.xlag,
-                                                                  self.ylag, self.non_degree)[:, 1:]
+        reg_matrix = InformationMatrix().build_information_matrix(
+            X, y, self.xlag, self.ylag, self.non_degree
+        )[:, 1:]
 
         reg_matrix = np.atleast_1d(reg_matrix).astype(np.float32)
 
-        y = np.atleast_1d(y[self.max_lag:]).astype(np.float32)
+        y = np.atleast_1d(y[self.max_lag :]).astype(np.float32)
         return reg_matrix, y
 
     def convert_to_tensor(self, reg_matrix, y):
@@ -327,18 +327,20 @@ class NARXNN(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
                     *[self.loss_batch(X, y) for X, y in train_dl]
                 )
                 self.train_loss.append(
-                    np.sum(np.multiply(train_losses, train_nums)) / np.sum(train_nums))
+                    np.sum(np.multiply(train_losses, train_nums)) / np.sum(train_nums)
+                )
 
                 self.net.eval()
                 with torch.no_grad():
-                    losses, nums = zip(
-                        *[self.loss_batch(X, y) for X, y in valid_dl]
-                    )
-                self.val_loss.append(
-                    np.sum(np.multiply(losses, nums)) / np.sum(nums))
+                    losses, nums = zip(*[self.loss_batch(X, y) for X, y in valid_dl])
+                self.val_loss.append(np.sum(np.multiply(losses, nums)) / np.sum(nums))
 
-                logging.info("Train metrics: " + str(
-                    self.train_loss[epoch]) + " | Validation metrics: " + str(self.val_loss[epoch]))
+                logging.info(
+                    "Train metrics: "
+                    + str(self.train_loss[epoch])
+                    + " | Validation metrics: "
+                    + str(self.val_loss[epoch])
+                )
         return self
 
     def one_step_ahead_prediction(self, valid_dl):
@@ -372,20 +374,21 @@ class NARXNN(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
         yhat = np.zeros((len(X), 1))
 
         # Discard unnecessary initial values
-        yhat[0:self.max_lag] = y_initial[0:self.max_lag]
+        yhat[0 : self.max_lag] = y_initial[0 : self.max_lag]
         analised_elements_number = self.max_lag + 1
 
-        for i in range(0, len(X)-self.max_lag):
-            reg_matrix = InformationMatrix().\
-                build_information_matrix(X[i:i+analised_elements_number],
-                                         yhat[i:i+analised_elements_number],
-                                         self.xlag,
-                                         self.ylag,
-                                         self.non_degree)[:, 1:]
+        for i in range(0, len(X) - self.max_lag):
+            reg_matrix = InformationMatrix().build_information_matrix(
+                X[i : i + analised_elements_number],
+                yhat[i : i + analised_elements_number],
+                self.xlag,
+                self.ylag,
+                self.non_degree,
+            )[:, 1:]
 
             reg_matrix = np.atleast_1d(reg_matrix).astype(np.float32)
             yhat = yhat.astype(np.float32)
             x_valid, y_valid = map(torch.tensor, (reg_matrix, yhat))
             a = self.net(x_valid)
-            yhat[i+self.max_lag] = a[:, 0].detach().numpy()
+            yhat[i + self.max_lag] = a[:, 0].detach().numpy()
         return yhat
