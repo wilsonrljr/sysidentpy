@@ -22,7 +22,7 @@ from ..utils._check_arrays import check_X_y
 class PolynomialNarmax(
     GenerateRegressors, HouseHolder, InformationMatrix, ResiduesAnalysis, Estimators
 ):
-    """ Polynomial NARXMAX model
+    """Polynomial NARXMAX model
 
     Parameters
     ----------
@@ -244,9 +244,9 @@ class PolynomialNarmax(
             e Novos Resultados
 
         """
-        squared_y = y[self.max_lag:].T @ y[self.max_lag:]
+        squared_y = y[self.max_lag :].T @ y[self.max_lag :]
         tmp_psi = np.array(psi)
-        y = np.array([y[self.max_lag:, 0]]).T
+        y = np.array([y[self.max_lag :, 0]]).T
         tmp_y = np.copy(y)
         [n, dimension] = tmp_psi.shape
         piv = np.arange(dimension)
@@ -257,8 +257,7 @@ class PolynomialNarmax(
             for j in np.arange(i, dimension):
                 num = np.array(tmp_psi[i:n, j].T @ tmp_y[i:n])
                 num = np.power(num, 2)
-                den = np.array(
-                    (tmp_psi[i:n, j].T @ tmp_psi[i:n, j]) * squared_y)
+                den = np.array((tmp_psi[i:n, j].T @ tmp_psi[i:n, j]) * squared_y)
                 tmp_err[j] = num / den
 
             if i == process_term_number:
@@ -333,8 +332,7 @@ class PolynomialNarmax(
             self.info_values = self.information_criterion(X, y)
 
         if self.n_terms is None and self._order_selection is True:
-            model_length = np.where(
-                self.info_values == np.amin(self.info_values))
+            model_length = np.where(self.info_values == np.amin(self.info_values))
             model_length = int(model_length[0] + 1)
             self.n_terms = model_length
         elif self.n_terms is None and self._order_selection is not True:
@@ -413,16 +411,13 @@ class PolynomialNarmax(
                 ee, y, elag, 1, 2
             )
 
-            psi_extended = psi_extended[:, [
-                2, 3, 7, 8, 11, 12, 13, 14, 15, 16, 17]]
+            psi_extended = psi_extended[:, [2, 3, 7, 8, 11, 12, 13, 14, 15, 16, 17]]
 
             psi_e = np.concatenate([psi, psi_extended], axis=1)
-            unbiased_theta = getattr(
-                parameter_estimation, self.estimator)(psi_e, y)
-            e = y[aux_lag:, 0].reshape(-1, 1) - \
-                psi_e @ unbiased_theta.reshape(-1, 1)
+            unbiased_theta = getattr(parameter_estimation, self.estimator)(psi_e, y)
+            e = y[aux_lag:, 0].reshape(-1, 1) - psi_e @ unbiased_theta.reshape(-1, 1)
 
-        return unbiased_theta[0: len(self.final_model), 0].reshape(-1, 1)
+        return unbiased_theta[0 : len(self.final_model), 0].reshape(-1, 1)
 
     def predict(self, X, y, steps_ahead=None):
         """Return the predicted values given an input.
@@ -452,7 +447,7 @@ class PolynomialNarmax(
         elif steps_ahead == 1:
             return self._one_step_ahead_prediction(X, y)
         else:
-            self._check_positive_int(steps_ahead, 'steps_ahead')
+            self._check_positive_int(steps_ahead, "steps_ahead")
             return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
 
     def _code2exponents(self, code):
@@ -491,9 +486,7 @@ class PolynomialNarmax(
 
     def _check_positive_int(self, value, name):
         if not isinstance(value, int) or value < 1:
-            raise ValueError(
-                f"{name} must be integer and > zero. Got {value}"
-            )
+            raise ValueError(f"{name} must be integer and > zero. Got {value}")
 
     def _one_step_ahead_prediction(self, X, y):
         """Perform the 1-step-ahead prediction of a model.
@@ -515,10 +508,10 @@ class PolynomialNarmax(
         X_base = InformationMatrix().build_information_matrix(
             X, y, self.xlag, self.ylag, self.non_degree
         )
-        piv_final_model = self.pivv[:len(self.final_model)]
+        piv_final_model = self.pivv[: len(self.final_model)]
         X_base = X_base[:, piv_final_model]
         yhat = np.dot(X_base, self.theta.flatten())
-        yhat = np.concatenate([y[:self.max_lag].flatten(), yhat])
+        yhat = np.concatenate([y[: self.max_lag].flatten(), yhat])
         return yhat.reshape(-1, 1)
 
     def _n_step_ahead_prediction(self, X, y, steps_ahead):
@@ -551,9 +544,9 @@ class PolynomialNarmax(
             if i + steps_ahead > len(y):
                 steps_ahead = len(y) - i  # predicts the remaining values
 
-            yhat[i:i+steps_ahead] = self._model_prediction(
-                X[k:i+steps_ahead],
-                y[k:i+steps_ahead])[-steps_ahead:].ravel()
+            yhat[i : i + steps_ahead] = self._model_prediction(
+                X[k : i + steps_ahead], y[k : i + steps_ahead]
+            )[-steps_ahead:].ravel()
 
             i += steps_ahead
 
@@ -585,8 +578,7 @@ class PolynomialNarmax(
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
 
-        model_exponents = [self._code2exponents(
-            model) for model in self.final_model]
+        model_exponents = [self._code2exponents(model) for model in self.final_model]
         raw_regressor = np.zeros(len(model_exponents[0]), dtype=float)
 
         for i in range(self.max_lag, X.shape[0]):
@@ -673,19 +665,17 @@ class PolynomialNarmax(
 
         for i in range(0, self.n_info_values):
             n_theta = i + 1
-            regressor_matrix = self.error_reduction_ratio(X_base, y, n_theta)[
-                3]
+            regressor_matrix = self.error_reduction_ratio(X_base, y, n_theta)[3]
 
             tmp_theta = getattr(parameter_estimation, self.estimator)(
                 regressor_matrix, y
             )
 
             tmp_yhat = regressor_matrix @ tmp_theta
-            tmp_residual = y[self.max_lag:] - tmp_yhat
+            tmp_residual = y[self.max_lag :] - tmp_yhat
             e_var = np.var(tmp_residual, ddof=1)
 
-            output_vector[i] = self.compute_info_value(
-                n_theta, n_samples, e_var)
+            output_vector[i] = self.compute_info_value(n_theta, n_samples, e_var)
 
             # output_vector[i] = e_factor + model_factor
 
@@ -755,8 +745,7 @@ class PolynomialNarmax(
                         translated_exponent = ""
                     else:
                         delay_string = str(
-                            int(regressor_key -
-                                np.floor(regressor_key / 1000) * 1000)
+                            int(regressor_key - np.floor(regressor_key / 1000) * 1000)
                         )
                         if int(regressor_key / 1000) < 2:
                             translated_key = "y(k-" + delay_string + ")"
@@ -774,8 +763,7 @@ class PolynomialNarmax(
                             translated_exponent = "^" + str(
                                 regressor_dic[regressor_key]
                             )
-                    regressor_string.append(
-                        translated_key + translated_exponent)
+                    regressor_string.append(translated_key + translated_exponent)
                 tmp_regressor = "".join(regressor_string)
 
             current_parameter = theta_output_format.format(self.theta[i, 0])
