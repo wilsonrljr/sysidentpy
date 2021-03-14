@@ -20,21 +20,23 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
         eps=np.finfo(np.float).eps,
         gama=0.2,
         weight=0.02,
-        estimate_parameter=False
+        estimate_parameter=False,
     ):
 
-        super().__init__(n_inputs,
-                         estimator=estimator,
-                         extended_least_squares=extended_least_squares,
-                         lam=lam,
-                         delta=delta,
-                         offset_covariance=offset_covariance,
-                         mu=mu,
-                         eps=eps,
-                         gama=gama,
-                         weight=weight)
+        super().__init__(  # n_inputs=n_inputs,
+            estimator=estimator,
+            extended_least_squares=extended_least_squares,
+            lam=lam,
+            delta=delta,
+            offset_covariance=offset_covariance,
+            mu=mu,
+            eps=eps,
+            gama=gama,
+            weight=weight,
+        )
 
         self.estimate_parameter = estimate_parameter
+        self._n_inputs = n_inputs
 
     def _validate_simulate_params(self):
         if not isinstance(self.estimate_parameter, bool):
@@ -60,9 +62,13 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
             Index of model code in the regressor space.
 
         """
-        dims = regressor_code.max(0)+1
-        model_index = np.where(np.in1d(np.ravel_multi_index(regressor_code.T, dims),
-                                       np.ravel_multi_index(model_code.T, dims)))[0]
+        dims = regressor_code.max(0) + 1
+        model_index = np.where(
+            np.in1d(
+                np.ravel_multi_index(regressor_code.T, dims),
+                np.ravel_multi_index(model_code.T, dims),
+            )
+        )[0]
         return model_index
 
     def _list_output_regressor_code(self, model_code):
@@ -79,8 +85,9 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
             Flattened list of output regressors.
 
         """
-        regressor_code = [code for code in model_code.ravel() if (
-            code != 0) and (str(code)[0] == '1')]
+        regressor_code = [
+            code for code in model_code.ravel() if (code != 0) and (str(code)[0] == "1")
+        ]
 
         return np.asarray(regressor_code)
 
@@ -98,8 +105,9 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
             Flattened list of output regressors.
 
         """
-        regressor_code = [code for code in model_code.ravel() if (
-            code != 0) and (str(code)[0] != '1')]
+        regressor_code = [
+            code for code in model_code.ravel() if (code != 0) and (str(code)[0] != "1")
+        ]
         return np.asarray(regressor_code)
 
     def _get_lag_from_regressor_code(self, regressors):
@@ -116,19 +124,22 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
             Maximum lag of list of regressors.
 
         """
-        lag_list = [int(i) for i in regressors.astype('str')
-                    for i in [np.sum(int(i[2:]))]]
+        lag_list = [
+            int(i) for i in regressors.astype("str") for i in [np.sum(int(i[2:]))]
+        ]
         return max(lag_list)
 
-    def simulate(self,
-                 X_train=None,
-                 y_train=None,
-                 X_test=None,
-                 y_test=None,
-                 model_code=None,
-                 steps_ahead=None,
-                 theta=None,
-                 plot=True):
+    def simulate(
+        self,
+        X_train=None,
+        y_train=None,
+        X_test=None,
+        y_test=None,
+        model_code=None,
+        steps_ahead=None,
+        theta=None,
+        plot=True,
+    ):
         """Simulate a model defined by the user.
 
         Parameters
@@ -165,18 +176,14 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
             raise ValueError("y_test cannot be None")
 
         if not isinstance(model_code, np.ndarray):
-            raise TypeError(
-                f"model_code must be an np.np.ndarray. Got {model_code}"
-            )
+            raise TypeError(f"model_code must be an np.np.ndarray. Got {model_code}")
 
         if not isinstance(steps_ahead, (int, type(None))):
             raise ValueError(
                 f"steps_ahead must be None or integer > zero. Got {steps_ahead}"
             )
         if not isinstance(plot, bool):
-            raise TypeError(
-                f"plot must be True or False. Got {plot}"
-            )
+            raise TypeError(f"plot must be True or False. Got {plot}")
         if not isinstance(theta, np.ndarray) and not self.estimate_parameter:
             raise TypeError(
                 f"If estimate_parameter is False, theta must be an np.np.ndarray. Got {theta}"
@@ -197,15 +204,14 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
         self.xlag = self._get_lag_from_regressor_code(xlag_code)
         self.ylag = self._get_lag_from_regressor_code(ylag_code)
         if self._n_inputs != 1:
-            self.xlag = self._n_inputs * [[self.xlag]]
+            self.xlag = self._n_inputs * [list(range(1, self.max_lag + 1))]
 
         self.non_degree = model_code.shape[1]
         [regressor_code, _] = self.regressor_space(
             self.non_degree, self.xlag, self.ylag, self._n_inputs
         )
 
-        self.pivv = self._get_index_from_regressor_code(
-            regressor_code, model_code)
+        self.pivv = self._get_index_from_regressor_code(regressor_code, model_code)
         self.final_model = regressor_code[self.pivv]
         # self.pivv = model_index
 
@@ -213,11 +219,12 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
         self.n_terms = self.final_model.shape[0]
         if not self.estimate_parameter:
             self.theta = theta
-            self.err = self.n_terms*[0]
+            self.err = self.n_terms * [0]
             # self.pivv = list(range(1, self.n_terms+1))
         else:
             psi = self.build_information_matrix(
-                X_train, y_train, self.xlag, self.ylag, self.non_degree)
+                X_train, y_train, self.xlag, self.ylag, self.non_degree
+            )
             psi = psi[:, self.pivv]
 
             parameter_estimation = Estimators(
@@ -230,13 +237,13 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
                 gama=self._gama,
                 weight=self._weight,
             )
-            _, self.err, self.pivv, _ = self.error_reduction_ratio(psi,
-                                                                   y_train, self.n_terms)
-            self.theta = getattr(parameter_estimation, self.estimator)(
-                psi,  y_train)
+            _, self.err, self.pivv, _ = self.error_reduction_ratio(
+                psi, y_train, self.n_terms
+            )
+            self.theta = getattr(parameter_estimation, self.estimator)(psi, y_train)
 
         yhat = self.predict(X_test, y_test, steps_ahead)
-        results = self.results(err_precision=8, dtype='dec')
+        results = self.results(err_precision=8, dtype="dec")
 
         if plot:
             ee, ex, _, _ = self.residuals(X_test, y_test, yhat)

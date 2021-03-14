@@ -44,13 +44,12 @@ def test_check_X_y():
     X = np.ones([10, 2])
     y = np.ones([8, 1])
     assert_raises(ValueError, check_X_y, X, y)
-    
+
+
 def test_get_miso_data():
     x_train, x_valid, y_train, y_valid = get_siso_data(
-        n=1000,
-        colored_noise=False,
-        sigma=0.001,
-        train_percentage=90)
+        n=1000, colored_noise=False, sigma=0.001, train_percentage=90
+    )
     assert len(x_train) == 900
     assert len(x_valid) == 100
     assert len(y_train) == 900
@@ -58,12 +57,11 @@ def test_get_miso_data():
     assert x_train.shape[1] == 1
     assert y_train.shape[1] == 1
 
+
 def test_get_miso_data():
     x_train, x_valid, y_train, y_valid = get_miso_data(
-        n=1000,
-        colored_noise=False,
-        sigma=0.001,
-        train_percentage=90)
+        n=1000, colored_noise=False, sigma=0.001, train_percentage=90
+    )
     assert len(x_train) == 900
     assert len(x_valid) == 100
     assert len(y_train) == 900
