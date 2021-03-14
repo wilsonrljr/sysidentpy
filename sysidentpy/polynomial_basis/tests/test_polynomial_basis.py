@@ -82,14 +82,14 @@ def test_default_values():
         "n_terms": None,
         "n_inputs": 1,
         "n_info_values": 10,
-        "estimator": "least_squares",
+        "estimator": "recursive_least_squares",
         "extended_least_squares": True,
         "aux_lag": 1,
         "lam": 0.98,
         "delta": 0.01,
         "offset_covariance": 0.2,
         "mu": 0.01,
-        "eps": np.finfo(np.float).eps,
+        "eps": np.finfo(np.float64).eps,
         "gama": 0.2,
         "weight": 0.02,
     }
@@ -262,7 +262,8 @@ def test_information_criteria_bic():
         estimator="least_squares",
     )
     model.fit(x, y)
-    info_values = np.array([-1764.885, -2320.101, -2976.391, -4461.908, -72845.768])
+    info_values = np.array(
+        [-1764.885, -2320.101, -2976.391, -4461.908, -72845.768])
     assert_almost_equal(model.info_values[:4], info_values[:4], decimal=3)
 
 
@@ -302,7 +303,8 @@ def test_information_criteria_lilc():
         estimator="least_squares",
     )
     model.fit(x, y)
-    info_values = np.array([-1767.926, -2326.183, -2985.514, -4474.072, -72860.973])
+    info_values = np.array(
+        [-1767.926, -2326.183, -2985.514, -4474.072, -72860.973])
     assert_almost_equal(model.info_values[:4], info_values[:4], decimal=3)
 
 
