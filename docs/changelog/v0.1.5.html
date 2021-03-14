@@ -205,6 +205,11 @@
   </a>
  </li>
  <li class="toctree-l1">
+  <a class="reference internal" href="../code.html#sysidentpy-simulation">
+   sysidentpy simulation
+  </a>
+ </li>
+ <li class="toctree-l1">
   <a class="reference internal" href="../code.html#sysidentpy-narx-neural-network">
    sysidentpy narx_neural_network
   </a>
@@ -417,17 +422,28 @@
 <dt>MAJOR: n-steps-ahead prediction.</dt><dd><ul>
 <li><dl class="simple">
 <dt>Now you can define the numbers of steps ahead in the predict function.</dt><dd><ul>
-<li><p>only for Polynomial models for now. Next update will bring this functionality to Neural NARX and General Estimators.</p></li>
+<li><p>Only for Polynomial models for now. Next update will bring this functionality to Neural NARX and General Estimators.</p></li>
 </ul>
 </dd>
 </dl>
 </li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>MAJOR: Simulating predefined models.</dt><dd><ul>
+<li><p>Added the new class SimulatePolynomialNarmax to handle the simulation of known model structures.</p></li>
+<li><p>Now you can simulate predefined models by just passing the model structure codification. Check the notebook examples.</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 <li><p>Added 4 new notebooks in the example section.</p></li>
-<li><p>Added iterative notebooks.</p></li>
+<li><p>Added iterative notebooks. Now you can run the notebooks in Jupyter notebook section of the documentation in Colab.</p></li>
+<li><p>Fix code format issues.</p></li>
+<li><p>Added new tests for SimulatePolynomialNarmax and generate_data.</p></li>
+<li><p>Started changes related to numpy 1.19.4 update. There are still some Deprecation warnings that will be fixed in next update.</p></li>
 <li><p>Fix issues related to html on Jupyter notebooks examples on documentation.</p></li>
 <li><p>Updated Readme with examples of how to use.</p></li>
 </ul>

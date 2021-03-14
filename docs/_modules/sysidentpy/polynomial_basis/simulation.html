@@ -1,0 +1,601 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sysidentpy.polynomial_basis.simulation &#8212; NARMAX models</title>
+    
+  <link rel="stylesheet" href="../../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/sphinx-book-theme.37f24b989f4638ff9c27c22dc7559d4f.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/togglebutton.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <link rel="canonical" href="http://sysidentpy.org/_modules/sysidentpy/polynomial_basis/simulation.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+<!-- Opengraph tags -->
+<meta property="og:url"         content="http://sysidentpy.org/_modules/sysidentpy/polynomial_basis/simulation.html" />
+<meta property="og:type"        content="article" />
+<meta property="og:title"       content="NARMAX models" />
+<meta property="og:description" content="" />
+<meta property="og:image"       content="http://sysidentpy.org/_static/sysidentpy-logo.png" />
+
+<meta name="twitter:card" content="summary" />
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../../../index.html">
+  
+  <img src="../../../_static/sysidentpy-logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">NARMAX models</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../installation.html">
+   Install Guide
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../introduction_to_narmax.html">
+   A brief introduction to NARMAX models.
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../user_guide.html">
+   User Guide
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../dev_guide.html">
+   Contributing
+  </a>
+ </li>
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="../../../notebooks.html">
+   Jupyter notebooks
+  </a>
+  <ul class="collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/basic_steps.html">
+     Presenting main functionality
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/multiple_inputs_example.html">
+     Multiple Inputs usage
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/information_criteria_examples.html">
+     Information Criteria - Examples
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/extended_least_squares.html">
+     Important notes and examples of how to use Extended Least Squares
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/defining_lags.html">
+     Setting specific lags
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/parameter_estimation.html">
+     Parameter Estimation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/f_16_benchmark.html">
+     Example: F-16 Ground Vibration Test benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/narx_neural_network.html">
+     Building NARX Neural Network using Sysidentpy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/general_estimators.html">
+     Building NARX models using general estimators
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/simulating_a_predefined_model.html">
+     Simulate a Predefined Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/system_identification_using_adaptative_filters.html">
+     System Identification Using Adaptative Filters
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/identification_of_an_electromechanical_system.html">
+     Identification of an electromechanical system
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/n_steps_ahead_prediction.html">
+     Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../changelog/v0.1.5.html">
+   Changes in SysIdentPy
+  </a>
+ </li>
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="../../../code.html">
+   Codes
+  </a>
+  <ul class="simple collapse-ul">
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../code.html#module-sysidentpy.base">
+   sysidentpy base
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../code.html#sysidentpy-narmax">
+   sysidentpy narmax
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../code.html#sysidentpy-simulation">
+   sysidentpy simulation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../code.html#sysidentpy-narx-neural-network">
+   sysidentpy narx_neural_network
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../code.html#sysidentpy-general-estimators">
+   sysidentpy general_estimators
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../code.html#module-sysidentpy.residues.residues_correlation">
+   sysidentpy residues
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../code.html#module-sysidentpy.metrics._regression">
+   sysidentpy metrics
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../code.html#module-sysidentpy.parameter_estimation.estimators">
+   sysidentpy estimators
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../code.html#module-sysidentpy.utils._check_arrays">
+   sysidentpy utils
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../code.html#module-sysidentpy.utils.generate_data">
+   sysidentpy generate data
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../code.html#indices-and-tables">
+   Indices and tables
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+            <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/wilsonrljr/sysidentpy/"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/wilsonrljr/sysidentpy//issues/new?title=Issue%20on%20page%20%2F_modules/sysidentpy/polynomial_basis/simulation.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <h1>Source code for sysidentpy.polynomial_basis.simulation</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">sysidentpy.parameter_estimation.estimators</span> <span class="kn">import</span> <span class="n">Estimators</span>
+<span class="kn">from</span> <span class="nn">..base</span> <span class="kn">import</span> <span class="n">GenerateRegressors</span>
+<span class="kn">from</span> <span class="nn">..base</span> <span class="kn">import</span> <span class="n">InformationMatrix</span>
+<span class="kn">from</span> <span class="nn">.narmax</span> <span class="kn">import</span> <span class="n">PolynomialNarmax</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">..residues.residues_correlation</span> <span class="kn">import</span> <span class="n">ResiduesAnalysis</span>
+<span class="kn">from</span> <span class="nn">..utils._check_arrays</span> <span class="kn">import</span> <span class="n">check_X_y</span>
+
+
+<div class="viewcode-block" id="SimulatePolynomialNarmax"><a class="viewcode-back" href="../../../code.html#sysidentpy.polynomial_basis.simulation.SimulatePolynomialNarmax">[docs]</a><span class="k">class</span> <span class="nc">SimulatePolynomialNarmax</span><span class="p">(</span><span class="n">PolynomialNarmax</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">n_inputs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">estimator</span><span class="o">=</span><span class="s2">&quot;recursive_least_squares&quot;</span><span class="p">,</span>
+        <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">lam</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span>
+        <span class="n">delta</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">offset_covariance</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">mu</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">eps</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span>
+        <span class="n">gama</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">weight</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span>
+        <span class="n">estimate_parameter</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">n_inputs</span><span class="p">,</span>
+                         <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
+                         <span class="n">extended_least_squares</span><span class="o">=</span><span class="n">extended_least_squares</span><span class="p">,</span>
+                         <span class="n">lam</span><span class="o">=</span><span class="n">lam</span><span class="p">,</span>
+                         <span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">,</span>
+                         <span class="n">offset_covariance</span><span class="o">=</span><span class="n">offset_covariance</span><span class="p">,</span>
+                         <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span>
+                         <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">,</span>
+                         <span class="n">gama</span><span class="o">=</span><span class="n">gama</span><span class="p">,</span>
+                         <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimate_parameter</span> <span class="o">=</span> <span class="n">estimate_parameter</span>
+
+    <span class="k">def</span> <span class="nf">_validate_simulate_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimate_parameter</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;estimate_parameter must be False or True. Got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">estimate_parameter</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_index_from_regressor_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regressor_code</span><span class="p">,</span> <span class="n">model_code</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the index of user regressor in regressor space.</span>
+
+<span class="sd">        Took from: https://stackoverflow.com/questions/38674027/find-the-row-indexes-of-several-values-in-a-numpy-array/38674038#38674038</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        regressor_code : ndarray of int</span>
+<span class="sd">            Matrix codification of all possible regressors.</span>
+<span class="sd">        model_code : ndarray of int</span>
+<span class="sd">            Model defined by the user to simulate.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        model_index : ndarray of int</span>
+<span class="sd">            Index of model code in the regressor space.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="n">regressor_code</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+        <span class="n">model_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ravel_multi_index</span><span class="p">(</span><span class="n">regressor_code</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">dims</span><span class="p">),</span>
+                                       <span class="n">np</span><span class="o">.</span><span class="n">ravel_multi_index</span><span class="p">(</span><span class="n">model_code</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">dims</span><span class="p">)))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">model_index</span>
+
+    <span class="k">def</span> <span class="nf">_list_output_regressor_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_code</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a flattened array of input or output regressors.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model_code : ndarray of int</span>
+<span class="sd">            Model defined by the user to simulate.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        model_code : ndarray of int</span>
+<span class="sd">            Flattened list of output regressors.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">regressor_code</span> <span class="o">=</span> <span class="p">[</span><span class="n">code</span> <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">model_code</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">if</span> <span class="p">(</span>
+            <span class="n">code</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">code</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">)]</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">regressor_code</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_list_input_regressor_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_code</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a flattened array of input or output regressors.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model_code : ndarray of int</span>
+<span class="sd">            Model defined by the user to simulate.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        model_code : ndarray of int</span>
+<span class="sd">            Flattened list of output regressors.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">regressor_code</span> <span class="o">=</span> <span class="p">[</span><span class="n">code</span> <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">model_code</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">if</span> <span class="p">(</span>
+            <span class="n">code</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">code</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;1&#39;</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">regressor_code</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_lag_from_regressor_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regressors</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the maximum lag from array of regressors.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        regressors : ndarray of int</span>
+<span class="sd">            Flattened list of input or output regressors.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        max_lag : int</span>
+<span class="sd">            Maximum lag of list of regressors.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lag_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">regressors</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;str&#39;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">:]))]]</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">lag_list</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SimulatePolynomialNarmax.simulate"><a class="viewcode-back" href="../../../code.html#sysidentpy.polynomial_basis.simulation.SimulatePolynomialNarmax.simulate">[docs]</a>    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">X_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">y_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">model_code</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">steps_ahead</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">theta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Simulate a model defined by the user.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X_train : ndarray of floats</span>
+<span class="sd">            The input data to be used in the training process.</span>
+<span class="sd">        y_train : ndarray of floats</span>
+<span class="sd">            The output data to be used in the training process.</span>
+<span class="sd">        X_test : ndarray of floats</span>
+<span class="sd">            The input data to be used in the prediction process.</span>
+<span class="sd">        y_test : ndarray of floats</span>
+<span class="sd">            The output data (initial conditions) to be used in the prediction process.</span>
+<span class="sd">        model_code : ndarray of int</span>
+<span class="sd">            Flattened list of input or output regressors.</span>
+<span class="sd">        steps_ahead = int, default = None</span>
+<span class="sd">            The forecast horizon.</span>
+<span class="sd">        theta : array-like of shape = number_of_model_elements</span>
+<span class="sd">            The parameters of the model.</span>
+<span class="sd">        plot : bool, default=True</span>
+<span class="sd">            Indicate if the user wants to plot or not.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        yhat : ndarray of floats</span>
+<span class="sd">            The predicted values of the model.</span>
+<span class="sd">        results : string</span>
+<span class="sd">            Where:</span>
+<span class="sd">                First column represents each regressor element;</span>
+<span class="sd">                Second column represents associated parameter;</span>
+<span class="sd">                Third column represents the error reduction ratio associated</span>
+<span class="sd">                to each regressor.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">y_test</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;y_test cannot be None&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_code</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;model_code must be an np.np.ndarray. Got </span><span class="si">{</span><span class="n">model_code</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">steps_ahead</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">))):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;steps_ahead must be None or integer &gt; zero. Got </span><span class="si">{</span><span class="n">steps_ahead</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;plot must be True or False. Got </span><span class="si">{</span><span class="n">plot</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_parameter</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;If estimate_parameter is False, theta must be an np.np.ndarray. Got </span><span class="si">{</span><span class="n">theta</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">check_X_y</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_parameter</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">]):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;If estimate_parameter is True, X_train and y_train must be an np.ndarray. Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">X_train</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="n">check_X_y</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">y_train</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;y_train cannot be None&quot;</span><span class="p">)</span>
+
+        <span class="n">xlag_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_input_regressor_code</span><span class="p">(</span><span class="n">model_code</span><span class="p">)</span>
+        <span class="n">ylag_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_output_regressor_code</span><span class="p">(</span><span class="n">model_code</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_lag_from_regressor_code</span><span class="p">(</span><span class="n">xlag_code</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_lag_from_regressor_code</span><span class="p">(</span><span class="n">ylag_code</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_inputs</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_inputs</span> <span class="o">*</span> <span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">]]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">non_degree</span> <span class="o">=</span> <span class="n">model_code</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">[</span><span class="n">regressor_code</span><span class="p">,</span> <span class="n">_</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regressor_space</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">non_degree</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_inputs</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pivv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_index_from_regressor_code</span><span class="p">(</span>
+            <span class="n">regressor_code</span><span class="p">,</span> <span class="n">model_code</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_model</span> <span class="o">=</span> <span class="n">regressor_code</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pivv</span><span class="p">]</span>
+        <span class="c1"># self.pivv = model_index</span>
+
+        <span class="c1"># to use in the predict function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_terms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_model</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_parameter</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">err</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_terms</span><span class="o">*</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># self.pivv = list(range(1, self.n_terms+1))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">psi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_information_matrix</span><span class="p">(</span>
+                <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_degree</span><span class="p">)</span>
+            <span class="n">psi</span> <span class="o">=</span> <span class="n">psi</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pivv</span><span class="p">]</span>
+
+            <span class="n">parameter_estimation</span> <span class="o">=</span> <span class="n">Estimators</span><span class="p">(</span>
+                <span class="n">aux_lag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">,</span>
+                <span class="n">lam</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lam</span><span class="p">,</span>
+                <span class="n">delta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_delta</span><span class="p">,</span>
+                <span class="n">offset_covariance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_offset_covariance</span><span class="p">,</span>
+                <span class="n">mu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span>
+                <span class="n">eps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_eps</span><span class="p">,</span>
+                <span class="n">gama</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_gama</span><span class="p">,</span>
+                <span class="n">weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">err</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pivv</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_reduction_ratio</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span>
+                                                                   <span class="n">y_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_terms</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">parameter_estimation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">)(</span>
+                <span class="n">psi</span><span class="p">,</span>  <span class="n">y_train</span><span class="p">)</span>
+
+        <span class="n">yhat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">steps_ahead</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="n">err_precision</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;dec&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+            <span class="n">ee</span><span class="p">,</span> <span class="n">ex</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plot_result</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">ee</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">results</span></div></div>
+</pre></div>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins<br/>
+        
+            &copy; Copyright 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../../../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

@@ -203,6 +203,11 @@
   </a>
  </li>
  <li class="toctree-l1">
+  <a class="reference internal" href="../../../code.html#sysidentpy-simulation">
+   sysidentpy simulation
+  </a>
+ </li>
+ <li class="toctree-l1">
   <a class="reference internal" href="../../../code.html#sysidentpy-narx-neural-network">
    sysidentpy narx_neural_network
   </a>
@@ -330,14 +335,17 @@
 <span class="kn">from</span> <span class="nn">..utils._check_arrays</span> <span class="kn">import</span> <span class="n">check_X_y</span>
 
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
-                    <span class="n">datefmt</span><span class="o">=</span><span class="s1">&#39;%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">,</span>
-                    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
-                    <span class="n">stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(levelname)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">datefmt</span><span class="o">=</span><span class="s2">&quot;%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">,</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+    <span class="n">stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="NARX"><a class="viewcode-back" href="../../../code.html#sysidentpy.general_estimators.narx.NARX">[docs]</a><span class="k">class</span> <span class="nc">NARX</span><span class="p">(</span><span class="n">GenerateRegressors</span><span class="p">,</span> <span class="n">InformationMatrix</span><span class="p">,</span> <span class="n">ResiduesAnalysis</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; NARX model build on top of general estimators</span>
+    <span class="sd">&quot;&quot;&quot;NARX model build on top of general estimators</span>
 
 <span class="sd">    Currently is possible to use any estimator that have a fit/predict</span>
 <span class="sd">    as an Autoregressive Model. We use our GenerateRegressors and</span>
@@ -392,13 +400,14 @@
         <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="n">n_inputs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">base_estimator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">fit_params</span><span class="o">=</span><span class="p">{}</span>
+        <span class="n">fit_params</span><span class="o">=</span><span class="p">{},</span>
     <span class="p">):</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">non_degree</span> <span class="o">=</span> <span class="n">non_degree</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span> <span class="o">=</span> <span class="n">ylag</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span> <span class="o">=</span> <span class="n">xlag</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_n_inputs</span> <span class="o">=</span> <span class="n">n_inputs</span>
-        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">regressor_code</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">]</span> <span class="o">=</span> <span class="n">GenerateRegressors</span><span class="p">()</span><span class="o">.</span><span class="n">regressor_space</span><span class="p">(</span>
+        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">regressor_code</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regressor_space</span><span class="p">(</span>
             <span class="n">non_degree</span><span class="p">,</span> <span class="n">xlag</span><span class="p">,</span> <span class="n">ylag</span><span class="p">,</span> <span class="n">n_inputs</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">regressor_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regressor_code</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
@@ -432,13 +441,15 @@
 <span class="sd">            The information matrix of the model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Creating the regressor matrix&quot;</span><span class="p">)</span>
-        <span class="n">reg_matrix</span> <span class="o">=</span> <span class="n">InformationMatrix</span><span class="p">()</span><span class="o">.</span><span class="n">build_information_matrix</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">,</span>
-                                                                  <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_degree</span><span class="p">)</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;The regressor matrix have &quot;</span> <span class="o">+</span>
-                     <span class="nb">str</span><span class="p">(</span><span class="n">reg_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot; features&quot;</span><span class="p">)</span>
+        <span class="n">reg_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_information_matrix</span><span class="p">(</span>
+            <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_degree</span>
+        <span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;The regressor matrix have &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">reg_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot; features&quot;</span>
+        <span class="p">)</span>
         <span class="n">reg_matrix</span> <span class="o">=</span> <span class="n">reg_matrix</span>
 
-        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span> <span class="p">:]</span>
         <span class="k">return</span> <span class="n">reg_matrix</span><span class="p">,</span> <span class="n">y</span></div>
 
 <div class="viewcode-block" id="NARX.fit"><a class="viewcode-back" href="../../../code.html#sysidentpy.general_estimators.narx.NARX.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
@@ -466,10 +477,10 @@
 
         <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Training the model&#39;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Training the model&quot;</span><span class="p">)</span>
         <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_preparation</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">base_estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_params</span><span class="p">)</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Done! Model is built!&#39;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Done! Model is built!&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="NARX.predict"><a class="viewcode-back" href="../../../code.html#sysidentpy.general_estimators.narx.NARX.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y_initial</span><span class="p">):</span>
@@ -501,19 +512,20 @@
         <span class="n">yhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
 
         <span class="c1"># Discard unnecessary initial values</span>
-        <span class="n">yhat</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_initial</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">]</span>
+        <span class="n">yhat</span><span class="p">[</span><span class="mi">0</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_initial</span><span class="p">[</span><span class="mi">0</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">]</span>
         <span class="n">analised_elements_number</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span> <span class="o">+</span> <span class="mi">1</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">):</span>
-            <span class="n">reg_matrix</span> <span class="o">=</span> <span class="n">InformationMatrix</span><span class="p">()</span><span class="o">.</span>\
-                <span class="n">build_information_matrix</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">analised_elements_number</span><span class="p">],</span>
-                                         <span class="n">yhat</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">analised_elements_number</span><span class="p">],</span>
-                                         <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">,</span>
-                                         <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">,</span>
-                                         <span class="bp">self</span><span class="o">.</span><span class="n">non_degree</span><span class="p">)</span>
+            <span class="n">reg_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_information_matrix</span><span class="p">(</span>
+                <span class="n">X</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">analised_elements_number</span><span class="p">],</span>
+                <span class="n">yhat</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">analised_elements_number</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">non_degree</span><span class="p">,</span>
+            <span class="p">)</span>
 
             <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_estimator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">reg_matrix</span><span class="p">)</span>
-            <span class="n">yhat</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">yhat</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">yhat</span></div></div>
 </pre></div>
 

@@ -204,6 +204,11 @@
   </a>
  </li>
  <li class="toctree-l1">
+  <a class="reference internal" href="#sysidentpy-simulation">
+   sysidentpy simulation
+  </a>
+ </li>
+ <li class="toctree-l1">
   <a class="reference internal" href="#sysidentpy-narx-neural-network">
    sysidentpy narx_neural_network
   </a>
@@ -344,6 +349,11 @@
  <li class="toc-h1 nav-item toc-entry">
   <a class="reference internal nav-link" href="#sysidentpy-narmax">
    sysidentpy narmax
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#sysidentpy-simulation">
+   sysidentpy simulation
   </a>
  </li>
  <li class="toc-h1 nav-item toc-entry">
@@ -555,7 +565,7 @@ ylag, and non_degree entered by the user.</p>
 <span class="target" id="module-sysidentpy.polynomial_basis.narmax"></span><p>Build Polynomial NARMAX Models</p>
 <dl class="py class">
 <dt id="sysidentpy.polynomial_basis.narmax.PolynomialNarmax">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">sysidentpy.polynomial_basis.narmax.</span></code><code class="sig-name descname"><span class="pre">PolynomialNarmax</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">non_degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info_criteria</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_terms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_info_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'least_squares'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extended_least_squares</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_lag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.98</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.220446049250313e-16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gama</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/polynomial_basis/narmax.html#PolynomialNarmax"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sysidentpy.polynomial_basis.narmax.PolynomialNarmax" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">sysidentpy.polynomial_basis.narmax.</span></code><code class="sig-name descname"><span class="pre">PolynomialNarmax</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">non_degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info_criteria</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_terms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_info_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'recursive_least_squares'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extended_least_squares</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_lag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.98</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.220446049250313e-16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gama</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/polynomial_basis/narmax.html#PolynomialNarmax"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sysidentpy.polynomial_basis.narmax.PolynomialNarmax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Polynomial NARXMAX model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -710,6 +720,7 @@ a new set of data.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>X</strong> (<em>ndarray of floats</em>) – The input data to be used in the prediction process.</p></li>
 <li><p><strong>y</strong> (<em>ndarray of floats</em>) – The output data to be used in the prediction process.</p></li>
+<li><p><strong>= int</strong><strong> (</strong><strong>default = None</strong><strong>)</strong> (<em>steps_ahead</em>) – The forecast horizon.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -806,6 +817,50 @@ user.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="sysidentpy-simulation">
+<h1>sysidentpy simulation<a class="headerlink" href="#sysidentpy-simulation" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-sysidentpy.polynomial_basis.simulation"></span><dl class="py class">
+<dt id="sysidentpy.polynomial_basis.simulation.SimulatePolynomialNarmax">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">sysidentpy.polynomial_basis.simulation.</span></code><code class="sig-name descname"><span class="pre">SimulatePolynomialNarmax</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'recursive_least_squares'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extended_least_squares</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.98</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.220446049250313e-16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gama</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimate_parameter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/polynomial_basis/simulation.html#SimulatePolynomialNarmax"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sysidentpy.polynomial_basis.simulation.SimulatePolynomialNarmax" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="sysidentpy.polynomial_basis.simulation.SimulatePolynomialNarmax.simulate">
+<code class="sig-name descname"><span class="pre">simulate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_ahead</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/polynomial_basis/simulation.html#SimulatePolynomialNarmax.simulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sysidentpy.polynomial_basis.simulation.SimulatePolynomialNarmax.simulate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simulate a model defined by the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_train</strong> (<em>ndarray of floats</em>) – The input data to be used in the training process.</p></li>
+<li><p><strong>y_train</strong> (<em>ndarray of floats</em>) – The output data to be used in the training process.</p></li>
+<li><p><strong>X_test</strong> (<em>ndarray of floats</em>) – The input data to be used in the prediction process.</p></li>
+<li><p><strong>y_test</strong> (<em>ndarray of floats</em>) – The output data (initial conditions) to be used in the prediction process.</p></li>
+<li><p><strong>model_code</strong> (<em>ndarray of int</em>) – Flattened list of input or output regressors.</p></li>
+<li><p><strong>= int</strong> (<em>steps_ahead</em>) – The forecast horizon.</p></li>
+<li><p><strong>= None</strong> (<em>default</em>) – The forecast horizon.</p></li>
+<li><p><strong>theta</strong> (<em>array-like of shape = number_of_model_elements</em>) – The parameters of the model.</p></li>
+<li><p><strong>plot</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Indicate if the user wants to plot or not.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul>
+<li><p><strong>yhat</strong> (<em>ndarray of floats</em>) – The predicted values of the model.</p></li>
+<li><p><strong>results</strong> (<em>string</em>) –</p>
+<dl class="simple">
+<dt>Where:</dt><dd><p>First column represents each regressor element;
+Second column represents associated parameter;
+Third column represents the error reduction ratio associated
+to each regressor.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p>
 </dd>
 </dl>
 </dd></dl>

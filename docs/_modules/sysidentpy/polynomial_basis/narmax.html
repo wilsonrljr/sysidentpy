@@ -203,6 +203,11 @@
   </a>
  </li>
  <li class="toctree-l1">
+  <a class="reference internal" href="../../../code.html#sysidentpy-simulation">
+   sysidentpy simulation
+  </a>
+ </li>
+ <li class="toctree-l1">
   <a class="reference internal" href="../../../code.html#sysidentpy-narx-neural-network">
    sysidentpy narx_neural_network
   </a>
@@ -339,7 +344,7 @@
 <div class="viewcode-block" id="PolynomialNarmax"><a class="viewcode-back" href="../../../code.html#sysidentpy.polynomial_basis.narmax.PolynomialNarmax">[docs]</a><span class="k">class</span> <span class="nc">PolynomialNarmax</span><span class="p">(</span>
     <span class="n">GenerateRegressors</span><span class="p">,</span> <span class="n">HouseHolder</span><span class="p">,</span> <span class="n">InformationMatrix</span><span class="p">,</span> <span class="n">ResiduesAnalysis</span><span class="p">,</span> <span class="n">Estimators</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Polynomial NARXMAX model</span>
+    <span class="sd">&quot;&quot;&quot;Polynomial NARXMAX model</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -443,14 +448,14 @@
         <span class="n">n_terms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">n_inputs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">n_info_values</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-        <span class="n">estimator</span><span class="o">=</span><span class="s2">&quot;least_squares&quot;</span><span class="p">,</span>
+        <span class="n">estimator</span><span class="o">=</span><span class="s2">&quot;recursive_least_squares&quot;</span><span class="p">,</span>
         <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">aux_lag</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">lam</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span>
         <span class="n">delta</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
         <span class="n">offset_covariance</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
         <span class="n">mu</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
-        <span class="n">eps</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span>
+        <span class="n">eps</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span>
         <span class="n">gama</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
         <span class="n">weight</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span>
     <span class="p">):</span>
@@ -476,7 +481,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_lam</span> <span class="o">=</span> <span class="n">lam</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span> <span class="o">=</span> <span class="n">delta</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_gama</span> <span class="o">=</span> <span class="n">gama</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span> <span class="o">=</span> <span class="n">weight</span>  <span class="c1"># &lt;0  e &lt;1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span> <span class="o">=</span> <span class="n">weight</span>  <span class="c1"># 0 &lt; weight &lt;1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_params</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_validate_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -757,6 +762,8 @@
 <span class="sd">            The input data to be used in the prediction process.</span>
 <span class="sd">        y : ndarray of floats</span>
 <span class="sd">            The output data to be used in the prediction process.</span>
+<span class="sd">        steps_ahead = int (default = None)</span>
+<span class="sd">            The forecast horizon.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -769,7 +776,7 @@
         <span class="k">elif</span> <span class="n">steps_ahead</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_one_step_ahead_prediction</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_check_positive_int</span><span class="p">(</span><span class="n">steps_ahead</span><span class="p">,</span> <span class="s1">&#39;steps_ahead&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_positive_int</span><span class="p">(</span><span class="n">steps_ahead</span><span class="p">,</span> <span class="s2">&quot;steps_ahead&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_step_ahead_prediction</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">steps_ahead</span><span class="o">=</span><span class="n">steps_ahead</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_code2exponents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
@@ -808,9 +815,7 @@
 
     <span class="k">def</span> <span class="nf">_check_positive_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be integer and &gt; zero. Got </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be integer and &gt; zero. Got </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_one_step_ahead_prediction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Perform the 1-step-ahead prediction of a model.</span>
@@ -832,10 +837,10 @@
         <span class="n">X_base</span> <span class="o">=</span> <span class="n">InformationMatrix</span><span class="p">()</span><span class="o">.</span><span class="n">build_information_matrix</span><span class="p">(</span>
             <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_degree</span>
         <span class="p">)</span>
-        <span class="n">piv_final_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pivv</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_model</span><span class="p">)]</span>
+        <span class="n">piv_final_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pivv</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_model</span><span class="p">)]</span>
         <span class="n">X_base</span> <span class="o">=</span> <span class="n">X_base</span><span class="p">[:,</span> <span class="n">piv_final_model</span><span class="p">]</span>
         <span class="n">yhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X_base</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
-        <span class="n">yhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">y</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">yhat</span><span class="p">])</span>
+        <span class="n">yhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">y</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">yhat</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">yhat</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_n_step_ahead_prediction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">steps_ahead</span><span class="p">):</span>
@@ -868,9 +873,9 @@
             <span class="k">if</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
                 <span class="n">steps_ahead</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">-</span> <span class="n">i</span>  <span class="c1"># predicts the remaining values</span>
 
-            <span class="n">yhat</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">steps_ahead</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_prediction</span><span class="p">(</span>
-                <span class="n">X</span><span class="p">[</span><span class="n">k</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">steps_ahead</span><span class="p">],</span>
-                <span class="n">y</span><span class="p">[</span><span class="n">k</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">steps_ahead</span><span class="p">])[</span><span class="o">-</span><span class="n">steps_ahead</span><span class="p">:]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="n">yhat</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_prediction</span><span class="p">(</span>
+                <span class="n">X</span><span class="p">[</span><span class="n">k</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">k</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">]</span>
+            <span class="p">)[</span><span class="o">-</span><span class="n">steps_ahead</span><span class="p">:]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
 
             <span class="n">i</span> <span class="o">+=</span> <span class="n">steps_ahead</span>
 
