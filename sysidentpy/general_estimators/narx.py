@@ -80,11 +80,12 @@ class NARX(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
         base_estimator=None,
         fit_params={},
     ):
+
         self.non_degree = non_degree
         self.ylag = ylag
         self.xlag = xlag
         self._n_inputs = n_inputs
-        [self.regressor_code, self.max_lag] = GenerateRegressors().regressor_space(
+        [self.regressor_code, self.max_lag] = self.regressor_space(
             non_degree, xlag, ylag, n_inputs
         )
         self.regressor_code = self.regressor_code[1:]
@@ -118,7 +119,7 @@ class NARX(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
             The information matrix of the model.
         """
         logging.info("Creating the regressor matrix")
-        reg_matrix = InformationMatrix().build_information_matrix(
+        reg_matrix = self.build_information_matrix(
             X, y, self.xlag, self.ylag, self.non_degree
         )
         logging.info(
@@ -193,7 +194,7 @@ class NARX(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
         analised_elements_number = self.max_lag + 1
 
         for i in range(0, len(X) - self.max_lag):
-            reg_matrix = InformationMatrix().build_information_matrix(
+            reg_matrix = self.build_information_matrix(
                 X[i : i + analised_elements_number],
                 yhat[i : i + analised_elements_number],
                 self.xlag,
