@@ -9,8 +9,8 @@ import sysidentpy
 import sys
 from setuptools import setup, find_packages
 
-if sys.version_info[:2] < (3, 6):
-    raise RuntimeError("Python version >= 3.6 required.")
+if sys.version_info[:2] < (3, 7):
+    raise RuntimeError("Python version >= 3.7 required.")
 
 try:
     import numpy
@@ -43,8 +43,8 @@ PROJECT_URLS = {
 
 VERSION = sysidentpy.__version__
 
-NUMPY_MIN_VERSION = '1.17.3'
-MATPLOTLIB_MIN_VERSION = '3.1.0'
+NUMPY_MIN_VERSION = '1.19.2'
+MATPLOTLIB_MIN_VERSION = '3.3.2'
 PYTORCH_MIN_VERSION = '1.7.1'
 
 
@@ -65,7 +65,8 @@ def setup_package():
         'Intended Audience :: Science/Research',
         'Intended Audience :: Developers',
         'Intended Audience :: Education',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Development Status :: 5 - Production/Stable',
@@ -74,12 +75,12 @@ def setup_package():
         'Topic :: Software Development',
         'Operating System :: OS Independent'
     ],
-        python_requires=">=3.6",
+        python_requires=">=3.7",
         install_requires=[
         'numpy>={}'.format(NUMPY_MIN_VERSION),
         'matplotlib>={}'.format(
             MATPLOTLIB_MIN_VERSION),
-        'torch>={}'.format(PYTORCH_MIN_VERSION)
+        'torch=={}'.format(PYTORCH_MIN_VERSION)
     ],
     )
 

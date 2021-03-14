@@ -1,3 +1,3 @@
 matplotlib
 numpy
-torch
+torch==1.7.1
