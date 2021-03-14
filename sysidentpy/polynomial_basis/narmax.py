@@ -22,7 +22,7 @@ from ..utils._check_arrays import check_X_y
 class PolynomialNarmax(
     GenerateRegressors, HouseHolder, InformationMatrix, ResiduesAnalysis, Estimators
 ):
-    """ Polynomial NARXMAX model
+    """Polynomial NARXMAX model
 
     Parameters
     ----------
@@ -126,14 +126,14 @@ class PolynomialNarmax(
         n_terms=None,
         n_inputs=1,
         n_info_values=10,
-        estimator="least_squares",
+        estimator="recursive_least_squares",
         extended_least_squares=True,
         aux_lag=1,
         lam=0.98,
         delta=0.01,
         offset_covariance=0.2,
         mu=0.01,
-        eps=np.finfo(np.float).eps,
+        eps=np.finfo(np.float64).eps,
         gama=0.2,
         weight=0.02,
     ):
@@ -159,7 +159,7 @@ class PolynomialNarmax(
         self._lam = lam
         self._delta = delta
         self._gama = gama
-        self._weight = weight  # <0  e <1
+        self._weight = weight  # 0 < weight <1
         self._validate_params()
 
     def _validate_params(self):
@@ -424,7 +424,7 @@ class PolynomialNarmax(
 
         return unbiased_theta[0: len(self.final_model), 0].reshape(-1, 1)
 
-    def predict(self, X, y):
+    def predict(self, X, y, steps_ahead=None):
         """Return the predicted values given an input.
 
         The predict function allows a friendly usage by the user.
@@ -440,6 +440,8 @@ class PolynomialNarmax(
             The input data to be used in the prediction process.
         y : ndarray of floats
             The output data to be used in the prediction process.
+        steps_ahead = int (default = None)
+            The forecast horizon.
 
         Returns
         -------
@@ -447,8 +449,13 @@ class PolynomialNarmax(
             The predicted values of the model.
 
         """
-        yhat = self._model_prediction(self.final_model, X, y, self.theta)
-        return yhat
+        if steps_ahead is None:
+            return self._model_prediction(X, y)
+        elif steps_ahead == 1:
+            return self._one_step_ahead_prediction(X, y)
+        else:
+            self._check_positive_int(steps_ahead, "steps_ahead")
+            return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
 
     def _code2exponents(self, code):
         """
@@ -484,20 +491,85 @@ class PolynomialNarmax(
 
             return exponents
 
-    def _model_prediction(self, model_elements, X, y_initial, theta):
+    def _check_positive_int(self, value, name):
+        if not isinstance(value, int) or value < 1:
+            raise ValueError(f"{name} must be integer and > zero. Got {value}")
+
+    def _one_step_ahead_prediction(self, X, y):
+        """Perform the 1-step-ahead prediction of a model.
+
+        Parameters
+        ----------
+        y : array-like of shape = max_lag
+            Initial conditions values of the model
+            to start recursive process.
+        X : ndarray of floats of shape = n_samples
+            Vector with entrace values to be used in model simulation.
+
+        Returns
+        -------
+        yhat : ndarray of floats
+               The 1-step-ahead predicted values of the model.
+
+        """
+        X_base = InformationMatrix().build_information_matrix(
+            X, y, self.xlag, self.ylag, self.non_degree
+        )
+        piv_final_model = self.pivv[: len(self.final_model)]
+        X_base = X_base[:, piv_final_model]
+        yhat = np.dot(X_base, self.theta.flatten())
+        yhat = np.concatenate([y[: self.max_lag].flatten(), yhat])
+        return yhat.reshape(-1, 1)
+
+    def _n_step_ahead_prediction(self, X, y, steps_ahead):
+        """Perform the n-steps-ahead prediction of a model.
+
+        Parameters
+        ----------
+        y : array-like of shape = max_lag
+            Initial conditions values of the model
+            to start recursive process.
+        X : ndarray of floats of shape = n_samples
+            Vector with entrace values to be used in model simulation.
+
+        Returns
+        -------
+        yhat : ndarray of floats
+               The n-steps-ahead predicted values of the model.
+
+        """
+        if len(y) < self.max_lag:
+            raise Exception("Insufficient initial conditions elements!")
+
+        yhat = np.zeros(X.shape[0], dtype=float)
+        yhat.fill(np.nan)
+        yhat[: self.max_lag] = y[: self.max_lag, 0]
+        i = self.max_lag
+        X = X.reshape(-1, self._n_inputs)
+        while i < len(y):
+            k = int(i - self.max_lag)
+            if i + steps_ahead > len(y):
+                steps_ahead = len(y) - i  # predicts the remaining values
+
+            yhat[i: i + steps_ahead] = self._model_prediction(
+                X[k: i + steps_ahead], y[k: i + steps_ahead]
+            )[-steps_ahead:].ravel()
+
+            i += steps_ahead
+
+        yhat = yhat.ravel()
+        return yhat.reshape(-1, 1)
+
+    def _model_prediction(self, X, y_initial):
         """Perform the infinity steps-ahead simulation of a model.
 
         Parameters
         ----------
-        model_elements : ndarray of ints
-            Matrix with regressor codes.
         y_initial : array-like of shape = max_lag
             Number of initial conditions values of output mensured
             to start recursive process.
         X : ndarray of floats of shape = n_samples
             Vector with entrace values to be used in model simulation.
-        theta : array-like of shape = number_of_model_elements
-            Paramters estimated via Least Squares method.
 
         Returns
         -------
@@ -514,7 +586,7 @@ class PolynomialNarmax(
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
 
         model_exponents = [self._code2exponents(
-            model) for model in model_elements]
+            model) for model in self.final_model]
         raw_regressor = np.zeros(len(model_exponents[0]), dtype=float)
 
         for i in range(self.max_lag, X.shape[0]):
@@ -533,7 +605,7 @@ class PolynomialNarmax(
                     np.power(raw_regressor, model_exponents[j])
                 )
 
-            y_output[i] = np.dot(regressor_value, theta.flatten())
+            y_output[i] = np.dot(regressor_value, self.theta.flatten())
         return y_output.reshape(-1, 1)
 
     def information_criterion(self, X, y):

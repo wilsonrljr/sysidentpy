@@ -88,20 +88,17 @@ class GenerateRegressors:
             )
 
         if not isinstance(ylag, (int, list)) or np.min(np.minimum(ylag, 1)) < 1:
-            raise ValueError(
-                "ylag must be integer or list and > zero. Got %f" % ylag)
+            raise ValueError("ylag must be integer or list and > zero. Got %f" % ylag)
 
         if (
             not isinstance(xlag, (int, list))
             # or np.min(np.minimum(xlag, 1)) < 1):
             or np.min(np.min(list(chain.from_iterable([[xlag]])))) < 1
         ):
-            raise ValueError(
-                "xlag must be integer or list and > zero. Got %f" % xlag)
+            raise ValueError("xlag must be integer or list and > zero. Got %f" % xlag)
 
         if not isinstance(n_inputs, int) or n_inputs < 1:
-            raise ValueError(
-                "n_inputs must be integer and > zero. Got %f" % n_inputs)
+            raise ValueError("n_inputs must be integer and > zero. Got %f" % n_inputs)
 
         if isinstance(ylag, list):
             # create only the lags passed from list
@@ -127,8 +124,7 @@ class GenerateRegressors:
             for i in range(n_inputs):
                 if isinstance(xlag[i], list) and n_inputs > 1:
                     # create 200n, 300n,..., 400n to describe each input
-                    x_vec_tmp.extend(
-                        [lag + 2000 + i * 1000 for lag in xlag[i]])
+                    x_vec_tmp.extend([lag + 2000 + i * 1000 for lag in xlag[i]])
                 elif isinstance(xlag[i], int) and n_inputs > 1:
                     x_vec_tmp.extend(
                         [np.arange(2001 + i * 1000, 2001 + i * 1000 + xlag[i])]
@@ -137,19 +133,17 @@ class GenerateRegressors:
         reg_aux = np.array([0])
         if n_inputs > 1:
             # if x_vec is a nested list, ensure all elements are arrays
-            all_arrays = [np.array([i]) if isinstance(
-                i, int) else i for i in x_vec_tmp]
+            all_arrays = [np.array([i]) if isinstance(i, int) else i for i in x_vec_tmp]
             x_vec = np.concatenate([i for i in all_arrays])
         else:
             x_vec = x_vec_tmp
 
         reg_aux = np.concatenate([reg_aux, y_vec, x_vec])
 
-        regressor_code = list(
-            combinations_with_replacement(reg_aux, non_degree))
+        regressor_code = list(combinations_with_replacement(reg_aux, non_degree))
 
         regressor_code = np.array(regressor_code)
-        regressor_code = regressor_code[:, regressor_code.shape[1]:: -1]
+        regressor_code = regressor_code[:, regressor_code.shape[1] :: -1]
         max_lag = _get_max_lag(ylag, xlag)
         return regressor_code, max_lag
 
@@ -246,7 +240,7 @@ class InformationMatrix:
         """
         n_samples = col_to_shift.shape[0]
         tmp_column = np.zeros((n_samples, 1))
-        aux = col_to_shift[0: n_samples - lag]
+        aux = col_to_shift[0 : n_samples - lag]
         aux = np.reshape(aux, (len(aux), 1))
         tmp_column[lag:, 0] = aux[:, 0]
         return tmp_column
@@ -353,8 +347,7 @@ class InformationMatrix:
             without combinations.
 
         """
-        y_lagged = np.column_stack(
-            [self.shift_column(y[:, 0], lag) for lag in ylag])
+        y_lagged = np.column_stack([self.shift_column(y[:, 0], lag) for lag in ylag])
         return y_lagged
 
     def initial_lagged_matrix(self, X, y, xlag, ylag):
@@ -437,8 +430,7 @@ class InformationMatrix:
 
         # Create combinations of all columns based on its index
         iterable_list = range(data.shape[1])
-        combinations = list(combinations_with_replacement(
-            iterable_list, non_degree))
+        combinations = list(combinations_with_replacement(iterable_list, non_degree))
 
         psi = np.column_stack(
             [

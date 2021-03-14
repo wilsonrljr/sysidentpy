@@ -114,7 +114,7 @@ class Estimators:
         """
         self._check_linear_dependence_rows(psi)
 
-        y = y[self._aux_lag:, 0].reshape(-1, 1)
+        y = y[self._aux_lag :, 0].reshape(-1, 1)
         theta = (np.linalg.pinv(psi.T @ psi)) @ psi.T @ y
         return theta
 
@@ -146,7 +146,7 @@ class Estimators:
             https://en.wikipedia.org/wiki/Total_least_squares
 
         """
-        y = y[self._aux_lag:, 0].reshape(-1, 1)
+        y = y[self._aux_lag :, 0].reshape(-1, 1)
         full = np.hstack((psi, y))
         n = psi.shape[1]
         u, s, v = np.linalg.svd(full, full_matrices=True)
@@ -154,7 +154,7 @@ class Estimators:
         return theta.reshape(-1, 1)
 
     def _initial_values(self, y, psi):
-        y = y[self._aux_lag:, 0].reshape(-1, 1)
+        y = y[self._aux_lag :, 0].reshape(-1, 1)
         n_theta = psi.shape[1]
         n = len(psi)
         theta = np.zeros([n_theta, n])
@@ -197,15 +197,12 @@ class Estimators:
         for i in range(2, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
             k_numerator = self._lam ** (-1) * p.dot(psi_tmp)
-            k_denominator = 1 + \
-                self._lam ** (-1) * psi_tmp.T.dot(p).dot(psi_tmp)
+            k_denominator = 1 + self._lam ** (-1) * psi_tmp.T.dot(p).dot(psi_tmp)
             k = np.divide(k_numerator, k_denominator)
             self.xi[i, 0] = y[i, 0] - psi_tmp.T @ theta[:, i - 1]
-            theta[:, i] = list(
-                theta[:, i - 1].reshape(-1, 1) + k.dot(self.xi[i, 0]))
+            theta[:, i] = list(theta[:, i - 1].reshape(-1, 1) + k.dot(self.xi[i, 0]))
 
-            p1 = p.dot(psi[i, :].reshape(-1, 1)
-                       ).dot(psi[i, :].reshape(-1, 1).T).dot(p)
+            p1 = p.dot(psi[i, :].reshape(-1, 1)).dot(psi[i, :].reshape(-1, 1).T).dot(p)
             p2 = (
                 psi[i, :].reshape(-1, 1).T.dot(p).dot(psi[i, :].reshape(-1, 1))
                 + self._lam
@@ -255,8 +252,7 @@ class Estimators:
                     psi.T @ psi + self._offset_covariance * np.eye(n_theta)
                 )
             )
-            theta[:, i] = list(
-                theta[:, i - 1].reshape(-1, 1) + aux.T.dot(self.xi))
+            theta[:, i] = list(theta[:, i - 1].reshape(-1, 1) + aux.T.dot(self.xi))
 
         return theta[:, -1].reshape(-1, 1)
 
@@ -298,8 +294,7 @@ class Estimators:
             psi_tmp = psi[i, :].reshape(-1, 1)
             self.xi[i, 0] = y[i, 0] - psi_tmp.T @ theta[:, i - 1]
             theta[:, i] = list(
-                theta[:, i - 1].reshape(-1, 1) + 2 *
-                self._mu * self.xi[i, 0] * psi_tmp
+                theta[:, i - 1].reshape(-1, 1) + 2 * self._mu * self.xi[i, 0] * psi_tmp
             )
 
         return theta[:, -1].reshape(-1, 1)
@@ -691,8 +686,7 @@ class Estimators:
             self.xi[i, 0] = y[i, 0] - psi_tmp.T @ theta[:, i - 1]
             theta[:, i] = list(
                 theta[:, i - 1].reshape(-1, 1) * (1 - self._mu * self._gama)
-                + self._mu * self.xi[i, 0] * psi_tmp /
-                (self._eps + psi_tmp.T @ psi_tmp)
+                + self._mu * self.xi[i, 0] * psi_tmp / (self._eps + psi_tmp.T @ psi_tmp)
             )
 
         return theta[:, -1].reshape(-1, 1)
@@ -795,8 +789,7 @@ class Estimators:
             psi_tmp = psi[i, :].reshape(-1, 1)
             self.xi[i, 0] = y[i, 0] - psi_tmp.T @ theta[:, i - 1]
             theta[:, i] = list(
-                theta[:, i - 1].reshape(-1, 1) +
-                self._mu * psi_tmp * self.xi[i, 0] ** 3
+                theta[:, i - 1].reshape(-1, 1) + self._mu * psi_tmp * self.xi[i, 0] ** 3
             )
 
         return theta[:, -1].reshape(-1, 1)

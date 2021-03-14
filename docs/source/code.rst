@@ -15,6 +15,11 @@ sysidentpy narmax
 .. automodule:: sysidentpy.polynomial_basis.narmax
    :members:
 
+sysidentpy simulation
+===============
+.. automodule:: sysidentpy.polynomial_basis.simulation
+   :members:
+
 sysidentpy narx_neural_network
 ===============
 .. automodule:: sysidentpy.narx_neural_network.narx_nn

@@ -2,6 +2,40 @@
 File for tracking changes in SysIdentPy
 --------------------------------------------------------------------------------------------------------------
 
+v0.1.5
+------
+
+CONTRIBUTORS
+~~~~~~~~~~~~
+
+- wilsonrljr
+
+CHANGES
+~~~~~~~
+
+- MAJOR: n-steps-ahead prediction.
+    - Now you can define the numbers of steps ahead in the predict function.
+	- Only for Polynomial models for now. Next update will bring this functionality to Neural NARX and General Estimators.
+
+- MAJOR: Simulating predefined models.
+    - Added the new class SimulatePolynomialNarmax to handle the simulation of known model structures.
+    - Now you can simulate predefined models by just passing the model structure codification. Check the notebook examples.
+
+- Added 4 new notebooks in the example section.
+
+- Added iterative notebooks. Now you can run the notebooks in Jupyter notebook section of the documentation in Colab.
+
+- Fix code format issues.
+
+- Added new tests for SimulatePolynomialNarmax and generate_data.
+
+- Started changes related to numpy 1.19.4 update. There are still some Deprecation warnings that will be fixed in next update.
+
+- Fix issues related to html on Jupyter notebooks examples on documentation.
+
+- Updated Readme with examples of how to use.
+
+
 v0.1.4
 ------
 

@@ -288,5 +288,5 @@ Contents
     user_guide
     dev_guide
     notebooks
-    changelog/v0.1.4
+    changelog/v0.1.5
     code
