@@ -227,20 +227,10 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
             )
             psi = psi[:, self.pivv]
 
-            parameter_estimation = Estimators(
-                aux_lag=self.max_lag,
-                lam=self._lam,
-                delta=self._delta,
-                offset_covariance=self._offset_covariance,
-                mu=self._mu,
-                eps=self._eps,
-                gama=self._gama,
-                weight=self._weight,
-            )
             _, self.err, self.pivv, _ = self.error_reduction_ratio(
                 psi, y_train, self.n_terms
             )
-            self.theta = getattr(parameter_estimation, self.estimator)(psi, y_train)
+            self.theta = getattr(self, self.estimator)(psi, y_train)
 
         yhat = self.predict(X_test, y_test, steps_ahead)
         results = self.results(err_precision=8, dtype="dec")

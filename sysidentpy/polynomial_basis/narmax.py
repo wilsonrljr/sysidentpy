@@ -20,7 +20,7 @@ from ..utils._check_arrays import check_X_y
 
 
 class PolynomialNarmax(
-    GenerateRegressors, HouseHolder, InformationMatrix, ResiduesAnalysis, Estimators
+    Estimators, GenerateRegressors, HouseHolder, InformationMatrix, ResiduesAnalysis
 ):
     """Polynomial NARXMAX model
 
@@ -128,7 +128,6 @@ class PolynomialNarmax(
         n_info_values=10,
         estimator="recursive_least_squares",
         extended_least_squares=True,
-        aux_lag=1,
         lam=0.98,
         delta=0.01,
         offset_covariance=0.2,
@@ -137,6 +136,7 @@ class PolynomialNarmax(
         gama=0.2,
         weight=0.02,
     ):
+
         self.non_degree = non_degree
         self._order_selection = order_selection
         self._n_inputs = n_inputs
@@ -154,7 +154,6 @@ class PolynomialNarmax(
         self._eps = eps
         self._mu = mu
         self._offset_covariance = offset_covariance
-        self._aux_lag = aux_lag
         self._lam = lam
         self._delta = delta
         self._gama = gama
@@ -339,27 +338,14 @@ class PolynomialNarmax(
         )
 
         # I know... the 'method' below needs attention
-        parameter_estimation = Estimators(
-            aux_lag=self.max_lag,
-            lam=self._lam,
-            delta=self._delta,
-            offset_covariance=self._offset_covariance,
-            mu=self._mu,
-            eps=self._eps,
-            gama=self._gama,
-            weight=self._weight,
-        )
-        self.theta = getattr(parameter_estimation, self.estimator)(psi, y)
+
+        self.theta = getattr(self, self.estimator)(psi, y)
 
         if self._extended_least_squares is True:
-            self.theta = self._unbiased_estimator(
-                psi, X, y, self.theta, self.max_lag, parameter_estimation
-            )
+            self.theta = self._unbiased_estimator(psi, X, y)
         return self
 
-    def _unbiased_estimator(
-        self, psi, X, y, biased_theta, aux_lag, parameter_estimation
-    ):
+    def _unbiased_estimator(self, psi, X, y):
         """Estimate the model parameters using Extended Least Squares method.
 
         Parameters
@@ -394,20 +380,20 @@ class PolynomialNarmax(
             https://en.wikipedia.org/wiki/Least_squares
 
         """
-        e = y[aux_lag:, 0].reshape(-1, 1) - psi @ biased_theta
+        e = y[self.max_lag :, 0].reshape(-1, 1) - psi @ self.theta
         for i in range(30):
-            e = np.concatenate([np.zeros([aux_lag, 1]), e], axis=0)
+            e = np.concatenate([np.zeros([self.max_lag, 1]), e], axis=0)
             ee = np.concatenate([e, X], axis=1)
-            elag = [[1, aux_lag]] * ee.shape[1]
-            psi_extended = InformationMatrix().build_information_matrix(
-                ee, y, elag, 1, 2
-            )
+            elag = [[1, self.max_lag]] * ee.shape[1]
+            psi_extended = self.build_information_matrix(ee, y, elag, 1, 2)
 
             psi_extended = psi_extended[:, [2, 3, 7, 8, 11, 12, 13, 14, 15, 16, 17]]
 
             psi_e = np.concatenate([psi, psi_extended], axis=1)
-            unbiased_theta = getattr(parameter_estimation, self.estimator)(psi_e, y)
-            e = y[aux_lag:, 0].reshape(-1, 1) - psi_e @ unbiased_theta.reshape(-1, 1)
+            unbiased_theta = getattr(self, self.estimator)(psi_e, y)
+            e = y[self.max_lag :, 0].reshape(-1, 1) - psi_e @ unbiased_theta.reshape(
+                -1, 1
+            )
 
         return unbiased_theta[0 : len(self.final_model), 0].reshape(-1, 1)
 
@@ -646,22 +632,11 @@ class PolynomialNarmax(
 
         n_samples = len(y) - self.max_lag
 
-        parameter_estimation = Estimators(
-            aux_lag=self.max_lag,
-            lam=self._lam,
-            delta=self._delta,
-            offset_covariance=self._offset_covariance,
-            mu=self._mu,
-            eps=self._eps,
-            gama=self._gama,
-            weight=self._weight,
-        )
-
         for i in range(0, self.n_info_values):
             n_theta = i + 1
             regressor_matrix = self.error_reduction_ratio(X_base, y, n_theta)[3]
 
-            tmp_theta = getattr(parameter_estimation, self.estimator)(
+            tmp_theta = getattr(self, self.estimator)(
                 regressor_matrix, y
             )
 

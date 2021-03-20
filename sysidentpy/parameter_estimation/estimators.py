@@ -16,7 +16,7 @@ class Estimators:
 
     def __init__(
         self,
-        aux_lag=1,
+        max_lag=1,
         lam=0.98,
         delta=0.01,
         offset_covariance=0.2,
@@ -29,7 +29,7 @@ class Estimators:
         self._eps = eps
         self._mu = mu
         self._offset_covariance = offset_covariance
-        self._aux_lag = aux_lag
+        self.max_lag = max_lag
         self._lam = lam
         self._delta = delta
         self._gama = gama
@@ -39,7 +39,7 @@ class Estimators:
     def _validate_params(self):
         """Validate input params."""
         attributes = {
-            "aux_lag": self._aux_lag,
+            "max_lag": self.max_lag,
             "lam": self._lam,
             "delta": self._delta,
             "offset_covariance": self._offset_covariance,
@@ -114,7 +114,7 @@ class Estimators:
         """
         self._check_linear_dependence_rows(psi)
 
-        y = y[self._aux_lag :, 0].reshape(-1, 1)
+        y = y[self.max_lag :, 0].reshape(-1, 1)
         theta = (np.linalg.pinv(psi.T @ psi)) @ psi.T @ y
         return theta
 
@@ -146,7 +146,7 @@ class Estimators:
             https://en.wikipedia.org/wiki/Total_least_squares
 
         """
-        y = y[self._aux_lag :, 0].reshape(-1, 1)
+        y = y[self.max_lag :, 0].reshape(-1, 1)
         full = np.hstack((psi, y))
         n = psi.shape[1]
         u, s, v = np.linalg.svd(full, full_matrices=True)
@@ -154,7 +154,7 @@ class Estimators:
         return theta.reshape(-1, 1)
 
     def _initial_values(self, y, psi):
-        y = y[self._aux_lag :, 0].reshape(-1, 1)
+        y = y[self.max_lag :, 0].reshape(-1, 1)
         n_theta = psi.shape[1]
         n = len(psi)
         theta = np.zeros([n_theta, n])
