@@ -253,10 +253,11 @@ class PolynomialNarmax(
 
         for i in np.arange(0, dimension):
             for j in np.arange(i, dimension):
-                num = np.dot(tmp_psi[i:, j].T, tmp_y[i:])
-                num = num ** 2
-                den = np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) * squared_y
-                tmp_err[j] = num / den
+                # Add `eps` in the denominator to omit division by zero if
+                # denominator is zero
+                tmp_err[j] = (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2) / (
+                    np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) * squared_y + self._eps
+                )
 
             if i == process_term_number:
                 break
@@ -337,8 +338,6 @@ class PolynomialNarmax(
             reg_Matrix, y, model_length
         )
 
-        # I know... the 'method' below needs attention
-
         self.theta = getattr(self, self.estimator)(psi, y)
 
         if self._extended_least_squares is True:
@@ -380,7 +379,7 @@ class PolynomialNarmax(
             https://en.wikipedia.org/wiki/Least_squares
 
         """
-        e = y[self.max_lag :, 0].reshape(-1, 1) - psi @ self.theta
+        e = y[self.max_lag :, 0].reshape(-1, 1) - np.dot(psi, self.theta)
         for i in range(30):
             e = np.concatenate([np.zeros([self.max_lag, 1]), e], axis=0)
             ee = np.concatenate([e, X], axis=1)
@@ -391,8 +390,8 @@ class PolynomialNarmax(
 
             psi_e = np.concatenate([psi, psi_extended], axis=1)
             unbiased_theta = getattr(self, self.estimator)(psi_e, y)
-            e = y[self.max_lag :, 0].reshape(-1, 1) - psi_e @ unbiased_theta.reshape(
-                -1, 1
+            e = y[self.max_lag :, 0].reshape(-1, 1) - np.dot(
+                psi_e, unbiased_theta.reshape(-1, 1)
             )
 
         return unbiased_theta[0 : len(self.final_model), 0].reshape(-1, 1)
@@ -636,9 +635,7 @@ class PolynomialNarmax(
             n_theta = i + 1
             regressor_matrix = self.error_reduction_ratio(X_base, y, n_theta)[3]
 
-            tmp_theta = getattr(self, self.estimator)(
-                regressor_matrix, y
-            )
+            tmp_theta = getattr(self, self.estimator)(regressor_matrix, y)
 
             tmp_yhat = np.dot(regressor_matrix, tmp_theta)
             tmp_residual = y[self.max_lag :] - tmp_yhat

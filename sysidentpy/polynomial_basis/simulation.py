@@ -1,3 +1,9 @@
+""" Simulation methods for Polynomial NARMAX models """
+
+# Authors:
+#           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
+# License: BSD 3 clause
+
 from sysidentpy.parameter_estimation.estimators import Estimators
 from ..base import GenerateRegressors
 from ..base import InformationMatrix
