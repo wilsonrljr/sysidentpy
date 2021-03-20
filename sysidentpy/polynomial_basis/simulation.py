@@ -219,14 +219,12 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
 
         self.pivv = self._get_index_from_regressor_code(regressor_code, model_code)
         self.final_model = regressor_code[self.pivv]
-        # self.pivv = model_index
 
         # to use in the predict function
         self.n_terms = self.final_model.shape[0]
         if not self.estimate_parameter:
             self.theta = theta
             self.err = self.n_terms * [0]
-            # self.pivv = list(range(1, self.n_terms+1))
         else:
             psi = self.build_information_matrix(
                 X_train, y_train, self.xlag, self.ylag, self.non_degree
