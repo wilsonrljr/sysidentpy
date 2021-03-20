@@ -21,7 +21,7 @@ class Estimators:
         delta=0.01,
         offset_covariance=0.2,
         mu=0.01,
-        eps=np.finfo(np.float).eps,
+        eps=np.finfo(np.float64).eps,
         gama=0.2,
         weight=0.02,
     ):

@@ -137,13 +137,12 @@ class PolynomialNarmax(
         gama=0.2,
         weight=0.02,
     ):
-
         self.non_degree = non_degree
         self._order_selection = order_selection
         self._n_inputs = n_inputs
         self.ylag = ylag
         self.xlag = xlag
-        [self.regressor_code, self.max_lag] = GenerateRegressors().regressor_space(
+        [self.regressor_code, self.max_lag] = self.regressor_space(
             non_degree, xlag, ylag, n_inputs
         )
 
@@ -244,48 +243,41 @@ class PolynomialNarmax(
             e Novos Resultados
 
         """
-        squared_y = y[self.max_lag :].T @ y[self.max_lag :]
-        tmp_psi = np.array(psi)
-        y = np.array([y[self.max_lag :, 0]]).T
-        tmp_y = np.copy(y)
-        [n, dimension] = tmp_psi.shape
+        squared_y = np.dot(y[self.max_lag :].T, y[self.max_lag :])
+        tmp_psi = psi.copy()
+        y = y[self.max_lag :, 0].reshape(-1, 1)
+        tmp_y = y.copy()
+        dimension = tmp_psi.shape[1]
         piv = np.arange(dimension)
         tmp_err = np.zeros(dimension)
         err = np.zeros(dimension)
 
         for i in np.arange(0, dimension):
             for j in np.arange(i, dimension):
-                num = np.array(tmp_psi[i:n, j].T @ tmp_y[i:n])
-                num = np.power(num, 2)
-                den = np.array((tmp_psi[i:n, j].T @ tmp_psi[i:n, j]) * squared_y)
+                num = np.dot(tmp_psi[i:, j].T, tmp_y[i:])
+                num = num ** 2
+                den = np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) * squared_y
                 tmp_err[j] = num / den
 
             if i == process_term_number:
                 break
 
-            tmp_err = list(tmp_err)
-            piv_index = tmp_err.index(max(tmp_err[i:]))
+            piv_index = np.argmax(tmp_err[i:]) + i
             err[i] = tmp_err[piv_index]
             tmp_psi[:, [piv_index, i]] = tmp_psi[:, [i, piv_index]]
             piv[[piv_index, i]] = piv[[i, piv_index]]
-            x = tmp_psi[i:n, i]
 
-            v = HouseHolder()._house(x)
+            v = self._house(tmp_psi[i:, i])
 
-            aux_1 = tmp_psi[i:n, i:dimension]
+            row_result = self._rowhouse(tmp_psi[i:, i:], v)
 
-            row_result = HouseHolder()._rowhouse(aux_1, v)
+            tmp_y[i:] = self._rowhouse(tmp_y[i:], v)
 
-            tmp_y[i:n] = HouseHolder()._rowhouse(tmp_y[i:n], v)
-
-            tmp_psi[i:n, i:dimension] = np.copy(row_result)
+            tmp_psi[i:, i:] = np.copy(row_result)
 
         tmp_piv = piv[0:process_term_number]
-        tmp_psi = np.array(psi)
-        psi_orthogonal = np.copy(tmp_psi[:, tmp_piv])
-        tmp_psi = np.array(psi)
-        regressor_code_buffer = self.regressor_code
-        model_code = np.copy(regressor_code_buffer[tmp_piv, :])
+        psi_orthogonal = psi[:, tmp_piv]
+        model_code = self.regressor_code[tmp_piv, :].copy()
         return model_code, err, piv, psi_orthogonal
 
     def fit(self, X, y):
@@ -324,7 +316,7 @@ class PolynomialNarmax(
 
         check_X_y(X, y)
 
-        reg_Matrix = InformationMatrix().build_information_matrix(
+        reg_Matrix = self.build_information_matrix(
             X, y, self.xlag, self.ylag, self.non_degree
         )
 
@@ -648,7 +640,7 @@ class PolynomialNarmax(
 
         output_vector = np.zeros(self.n_info_values)
         output_vector[:] = np.nan
-        X_base = InformationMatrix().build_information_matrix(
+        X_base = self.build_information_matrix(
             X, y, self.xlag, self.ylag, self.non_degree
         )
 
@@ -673,13 +665,11 @@ class PolynomialNarmax(
                 regressor_matrix, y
             )
 
-            tmp_yhat = regressor_matrix @ tmp_theta
+            tmp_yhat = np.dot(regressor_matrix, tmp_theta)
             tmp_residual = y[self.max_lag :] - tmp_yhat
             e_var = np.var(tmp_residual, ddof=1)
 
             output_vector[i] = self.compute_info_value(n_theta, n_samples, e_var)
-
-            # output_vector[i] = e_factor + model_factor
 
         return output_vector
 
