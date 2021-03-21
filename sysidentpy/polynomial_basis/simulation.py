@@ -1,3 +1,9 @@
+""" Simulation methods for Polynomial NARMAX models """
+
+# Authors:
+#           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
+# License: BSD 3 clause
+
 from sysidentpy.parameter_estimation.estimators import Estimators
 from ..base import GenerateRegressors
 from ..base import InformationMatrix
@@ -213,34 +219,22 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
 
         self.pivv = self._get_index_from_regressor_code(regressor_code, model_code)
         self.final_model = regressor_code[self.pivv]
-        # self.pivv = model_index
 
         # to use in the predict function
         self.n_terms = self.final_model.shape[0]
         if not self.estimate_parameter:
             self.theta = theta
             self.err = self.n_terms * [0]
-            # self.pivv = list(range(1, self.n_terms+1))
         else:
             psi = self.build_information_matrix(
                 X_train, y_train, self.xlag, self.ylag, self.non_degree
             )
             psi = psi[:, self.pivv]
 
-            parameter_estimation = Estimators(
-                aux_lag=self.max_lag,
-                lam=self._lam,
-                delta=self._delta,
-                offset_covariance=self._offset_covariance,
-                mu=self._mu,
-                eps=self._eps,
-                gama=self._gama,
-                weight=self._weight,
-            )
             _, self.err, self.pivv, _ = self.error_reduction_ratio(
                 psi, y_train, self.n_terms
             )
-            self.theta = getattr(parameter_estimation, self.estimator)(psi, y_train)
+            self.theta = getattr(self, self.estimator)(psi, y_train)
 
         yhat = self.predict(X_test, y_test, steps_ahead)
         results = self.results(err_precision=8, dtype="dec")

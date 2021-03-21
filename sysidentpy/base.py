@@ -171,15 +171,12 @@ class HouseHolder:
             Orthogonal least squares methods and their application to non-linear system identification.
 
         """
-        n = len(x)
         u = np.linalg.norm(x, 2)
-        v = np.array(x)
-        aux_a = np.array([1])
         if u != 0:
             aux_b = x[0] + np.sign(x[0]) * u
-            v = np.array(v[1:n] / aux_b)
-            v = np.concatenate((aux_a, v))
-        return v
+            x = x[1:] / aux_b
+            x = np.concatenate((np.array([1]), x))
+        return x
 
     def _rowhouse(self, RA, v):
         """Perform a row Househoulder transformation.
@@ -204,8 +201,8 @@ class HouseHolder:
             control, 50(5), 1873-1896.
 
         """
-        b = -2 / (v.T @ v)
-        w = b * RA.T @ v
+        b = -2 / np.dot(v.T, v)
+        w = b * np.dot(RA.T, v)
         w = w.reshape(1, -1)
         v = v.reshape(-1, 1)
         RA = RA + v * w
