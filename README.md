@@ -25,6 +25,12 @@ The project was started in by Wilson R. L. Junior, Luan Pascoal C. Andrade and S
 
 - Website: https://sysidentpy.org
 
+# New Update!
+
+The update v0.1.6 added new methods for structure selection of NARMAX models: MetaMSS and AOLS. The MetaMSS algorithm is based on metaheuristics (check the paper [Meta-Model Structure Selection: Building Polynomial NARX Model for Regression and Classification](https://arxiv.org/abs/2109.09917) ) and the AOLS is based on the [Accelerated Orthogonal Least-Squares for Large-Scale Sparse Reconstruction](https://users.ece.utexas.edu/~hvikalo/pubs/DSPpaper2018.pdf).
+
+Check the examples of how to use it in the documentation page: http://sysidentpy.org/notebooks.html
+
 # Examples
 
 ## SysIdentPy now support NARX Neural Network and General estimators, e.g., sklearn estimators and Catboost.
@@ -189,11 +195,11 @@ The easiest way to get sysidentpy running is to install it using ``pip``
 pip install sysidentpy
 ~~~~~~~~~~~~~~~~~~~~~~
 
-We will made it available at conda repository as soon as possible.
+We will make it available at conda repository as soon as possible.
 
 # Changelog
 
-See the [changelog]( <http://sysidentpy.org/changelog/v0.1.3.html>) for a history of notable changes to SysIdentPy.
+See the [changelog]( <http://sysidentpy.org/changelog/v0.1.6.html>) for a history of notable changes to SysIdentPy.
 
 # Development
 

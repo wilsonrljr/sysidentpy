@@ -10,6 +10,14 @@ Welcome to SysIdentPy's documentation!
 
 The project was started in by Wilson R. L. Junior, Luan Pascoal C. Andrade and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019 and since then have contributed.
 
+.. tip::
+	The update **v0.1.6** added new methods for structure selection of NARMAX models: **MetaMSS** and **AOLS**.
+	
+	The **MetaMSS** algorithm is based on metaheuristics (check the following paper `Meta-Model Structure Selection: Building Polynomial NARX Model for Regression and Classification <https://arxiv.org/abs/2109.09917>`__ ) and the **AOLS** is based on the `Accelerated Orthogonal Least-Squares for Large-Scale Sparse Reconstruction <https://users.ece.utexas.edu/~hvikalo/pubs/DSPpaper2018.pdf>`__.
+	
+	Check the examples of how to use it in the `documentation page <http://sysidentpy.org/notebooks.html>`__
+
+
 .. seealso::
 	The examples directory has several Jupyter notebooks presenting basic tutorials of how to use the package and some specific applications of **SysIdentPy**. `Try it out! <http://sysidentpy.org/notebooks.html>`__
 
@@ -174,7 +182,7 @@ The following is the Catboost performance *without* the NARX configuration.
 Changelog
 ---------
 
-See the `changelog <https://github.com/wilsonrljr/sysidentpy.whats_is_new.md>`__
+See the `changelog <http://sysidentpy.org/changelog/v0.1.6.html>`__
 for a history of notable changes to **SysIdentPy**.
 
 
@@ -288,5 +296,5 @@ Contents
     user_guide
     dev_guide
     notebooks
-    changelog/v0.1.5
+    changelog/v0.1.6
     code

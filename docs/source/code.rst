@@ -15,6 +15,11 @@ sysidentpy narmax
 .. automodule:: sysidentpy.polynomial_basis.narmax
    :members:
 
+sysidentpy metamss
+===============
+.. automodule:: sysidentpy.polynomial_basis.metamss
+   :members:
+
 sysidentpy simulation
 ===============
 .. automodule:: sysidentpy.polynomial_basis.simulation
@@ -28,6 +33,11 @@ sysidentpy narx_neural_network
 sysidentpy general_estimators
 ===============
 .. automodule:: sysidentpy.general_estimators.narx
+   :members:
+
+sysidentpy bpsogsa
+===============
+.. automodule:: sysidentpy.metaheuristics.bpsogsa
    :members:
 
 sysidentpy residues

@@ -11,6 +11,8 @@
 import numpy as np
 from itertools import combinations_with_replacement
 from itertools import chain
+from collections import Counter
+
 
 
 def _get_max_lag(ylag, xlag):
@@ -386,7 +388,7 @@ class InformationMatrix:
         lagged_data = np.concatenate([y_lagged, x_lagged], axis=1)
         return lagged_data
 
-    def build_information_matrix(self, X, y, xlag, ylag, non_degree):
+    def build_information_matrix(self, X, y, xlag, ylag, non_degree, predefined_regressors=None):
         """Build the information matrix.
 
         Each columns of the information matrix represents a candidate
@@ -428,6 +430,8 @@ class InformationMatrix:
         # Create combinations of all columns based on its index
         iterable_list = range(data.shape[1])
         combinations = list(combinations_with_replacement(iterable_list, non_degree))
+        if predefined_regressors is not None:
+            combinations = [combinations[index] for index in predefined_regressors]
 
         psi = np.column_stack(
             [
@@ -437,3 +441,72 @@ class InformationMatrix:
         )
         psi = psi[max_lag:, :]
         return psi
+
+class ModelInformation:
+    def _list_output_regressor_code(self, model_code):
+        """Create a flattened array of input or output regressors.
+
+        Parameters
+        ----------
+        model_code : ndarray of int
+            Model defined by the user to simulate.
+
+        Returns
+        -------
+        model_code : ndarray of int
+            Flattened list of output regressors.
+
+        """
+        regressor_code = [
+            code for code in model_code.ravel() if (code != 0) and (str(code)[0] == "1")
+        ]
+
+        return np.asarray(regressor_code)
+
+    def _list_input_regressor_code(self, model_code):
+        """Create a flattened array of input or output regressors.
+
+        Parameters
+        ----------
+        model_code : ndarray of int
+            Model defined by the user to simulate.
+
+        Returns
+        -------
+        model_code : ndarray of int
+            Flattened list of output regressors.
+
+        """
+        regressor_code = [
+            code for code in model_code.ravel() if (code != 0) and (str(code)[0] != "1")
+        ]
+        return np.asarray(regressor_code)
+
+    def _get_lag_from_regressor_code(self, regressors):
+        """Get the maximum lag from array of regressors.
+
+        Parameters
+        ----------
+        regressors : ndarray of int
+            Flattened list of input or output regressors.
+
+        Returns
+        -------
+        max_lag : int
+            Maximum lag of list of regressors.
+
+        """
+        lag_list = [
+            int(i) for i in regressors.astype("str") for i in [np.sum(int(i[2:]))]
+        ]
+        if len(lag_list) != 0:
+            return max(lag_list)
+        else:
+            return 1
+        
+    def _get_max_lag_from_model_code(self, model_code):
+        xlag_code = self._list_input_regressor_code(model_code)
+        ylag_code = self._list_output_regressor_code(model_code)
+        xlag = self._get_lag_from_regressor_code(xlag_code)
+        ylag = self._get_lag_from_regressor_code(ylag_code)
+        return max(xlag, ylag)
