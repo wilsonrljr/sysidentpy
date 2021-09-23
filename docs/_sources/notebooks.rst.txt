@@ -39,6 +39,18 @@ Jupyter notebooks
 
 .. toctree::
    :maxdepth: 1
+   :caption: MetaMSS Algorithm
+
+   /examples/metamss.ipynb
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Accelerated Orthogonal Least-Squares algorithm
+
+   /examples/aols.ipynb
+
+.. toctree::
+   :maxdepth: 1
    :caption: F-16 aircraft
 
    /examples/f_16_benchmark.ipynb

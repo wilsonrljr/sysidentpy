@@ -1,3 +1,4 @@
 matplotlib
 numpy
+scipy
 torch==1.7.1

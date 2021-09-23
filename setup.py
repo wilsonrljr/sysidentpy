@@ -12,18 +12,6 @@ from setuptools import setup, find_packages
 if sys.version_info[:2] < (3, 7):
     raise RuntimeError("Python version >= 3.7 required.")
 
-try:
-    import numpy
-except ImportError:
-    print('numpy is required during installation')
-    sys.exit(1)
-
-try:
-    import matplotlib
-except ImportError:
-    print('matplotlib is required during installation')
-    sys.exit(1)
-
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
@@ -45,6 +33,7 @@ VERSION = sysidentpy.__version__
 
 NUMPY_MIN_VERSION = '1.19.2'
 MATPLOTLIB_MIN_VERSION = '3.3.2'
+SCIPY_MIN_VERSION = '1.7.0'
 PYTORCH_MIN_VERSION = '1.7.1'
 
 
@@ -69,6 +58,7 @@ def setup_package():
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering',
@@ -78,10 +68,13 @@ def setup_package():
         python_requires=">=3.7",
         install_requires=[
         'numpy>={}'.format(NUMPY_MIN_VERSION),
+        'scipy>={}'.format(SCIPY_MIN_VERSION),
         'matplotlib>={}'.format(
-            MATPLOTLIB_MIN_VERSION),
-        'torch=={}'.format(PYTORCH_MIN_VERSION)
+            MATPLOTLIB_MIN_VERSION)
     ],
+        extras_require = {
+        'full': ['torch>={}'.format(PYTORCH_MIN_VERSION)]
+        }
     )
 
     setup(**metadata)

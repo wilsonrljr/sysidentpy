@@ -14,6 +14,79 @@ from ..utils._check_arrays import check_X_y
 
 
 class SimulatePolynomialNarmax(PolynomialNarmax):
+    """Simulation of Polynomial NARXMAX model
+
+    Parameters
+    ----------
+    n_inputs : int, default=1
+        The number of inputs of the system.
+    estimator : str, default="least_squares"
+        The parameter estimation method.
+    extended_least_squres : bool, default=False
+        Whether to use extended least squres method
+        for parameter estimation.
+        Note that we define a specific set of noise regressors.
+    estimate_parameter : bool, default=False
+        Whether to use a method for parameter estimation.
+        Must be True if the user do not enter the pre-estimated parameters.
+        Note that we define a specific set of noise regressors.
+    calculate_err : bool, default=False
+        Whether to use a ERR algorithm to the pre-defined regressors.
+    lam : float, default=0.98
+        Forgetting factor of the Recursive Least Squares method.
+    delta : float, default=0.01
+        Normalization factor of the P matrix.
+    offset_covariance : float, default=0.2
+        The offset covariance factor of the affine least mean squares
+        filter.
+    mu : float, defaul=0.01
+        The convergence coefficient (learning rate) of the filter.
+    eps : float
+        Normalization factor of the normalized filters.
+    gama : float, default=0.2
+        The leakage factor of the Leaky LMS method.
+    weight : float, default=0.02
+        Weight factor to control the proportions of the error norms
+        and offers an extra degree of freedom within the adaptation
+        of the LMS mixed norm method.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import matplotlib.pyplot as plt
+    >>> from sysidentpy.polynomial_basis.simulation import SimulatePolynomialNarmax
+    >>> from sysidentpy.metrics import root_relative_squared_error
+    >>> from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
+    >>> x_train, x_valid, y_train, y_valid = get_siso_data(n=1000,
+    ...                                                    colored_noise=True,
+    ...                                                    sigma=0.2,
+    ...                                                    train_percentage=90)
+    >>> s = SimulatePolynomialNarmax()
+    >>> model = np.array(
+    ...     [
+    ...     [1001,    0], # y(k-1)
+    ...     [2001, 1001], # x1(k-1)y(k-1)
+    ...     [2002,    0], # x1(k-2)
+    ...     ]
+    ...                 )
+    >>> # theta must be a numpy array of shape (n, 1) where n is the number of regressors
+    >>> theta = np.array([[0.2, 0.9, 0.1]]).T
+    >>> yhat, results = s.simulate(
+    ...     X_test=x_test,
+    ...     y_test=y_test,
+    ...     model_code=model,
+    ...     theta=theta,
+    ...     plot=True)
+    >>> results = pd.DataFrame(model.results(err_precision=8,
+    ...                                      dtype='dec'),
+    ...                        columns=['Regressors', 'Parameters', 'ERR'])
+    >>> print(results)
+        Regressors Parameters         ERR
+    0        x1(k-2)     0.9000  0.95556574
+    1         y(k-1)     0.1999  0.04107943
+    2  x1(k-1)y(k-1)     0.1000  0.00335113
+
+    """
     def __init__(
         self,
         n_inputs=1,
@@ -23,10 +96,11 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
         delta=0.01,
         offset_covariance=0.2,
         mu=0.01,
-        eps=np.finfo(np.float).eps,
+        eps=np.finfo(np.float64).eps,
         gama=0.2,
         weight=0.02,
         estimate_parameter=False,
+        calculate_err=False,
     ):
 
         super().__init__(  # n_inputs=n_inputs,
@@ -42,6 +116,7 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
         )
 
         self.estimate_parameter = estimate_parameter
+        self.calculate_err = calculate_err
         self._n_inputs = n_inputs
 
     def _validate_simulate_params(self):
@@ -133,7 +208,10 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
         lag_list = [
             int(i) for i in regressors.astype("str") for i in [np.sum(int(i[2:]))]
         ]
-        return max(lag_list)
+        if len(lag_list) != 0:
+            return max(lag_list)
+        else:
+            return 1
 
     def simulate(
         self,
@@ -209,6 +287,7 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
         ylag_code = self._list_output_regressor_code(model_code)
         self.xlag = self._get_lag_from_regressor_code(xlag_code)
         self.ylag = self._get_lag_from_regressor_code(ylag_code)
+        self.max_lag = max(self.xlag, self.ylag)
         if self._n_inputs != 1:
             self.xlag = self._n_inputs * [list(range(1, self.max_lag + 1))]
 
@@ -225,11 +304,18 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
         if not self.estimate_parameter:
             self.theta = theta
             self.err = self.n_terms * [0]
+        elif self.estimate_parameter and not self.calculate_err:
+            psi = self.build_information_matrix(
+                X_train, y_train, self.xlag, self.ylag, self.non_degree, self.pivv
+            )
+            # psi = psi[:, self.pivv]
+            self.theta = getattr(self, self.estimator)(psi, y_train)
+            self.err = self.n_terms * [0]
         else:
             psi = self.build_information_matrix(
-                X_train, y_train, self.xlag, self.ylag, self.non_degree
+                X_train, y_train, self.xlag, self.ylag, self.non_degree,self.pivv
             )
-            psi = psi[:, self.pivv]
+            # psi = psi[:, self.pivv]
 
             _, self.err, self.pivv, _ = self.error_reduction_ratio(
                 psi, y_train, self.n_terms

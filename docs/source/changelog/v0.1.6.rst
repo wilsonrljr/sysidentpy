@@ -1,0 +1,159 @@
+Changes in SysIdentPy
+=====================
+
+v0.1.6
+------
+
+CONTRIBUTORS
+~~~~~~~~~~~~
+
+- wilsonrljr
+
+CHANGES
+~~~~~~~
+
+- MAJOR: Meta-Model Structure Selection Algorithm (Meta-MSS).
+    - A new method for build NARMAX models based on metaheuristics. The algorithm uses a Binary hybrid Particle Swarm Optimization and Gravitational Search Algorithm with a new cost function to build parsimonious models.
+    
+    - New class for the BPSOGSA algorithm. New algorithms can be adapted in the Meta-MSS framework.
+	
+    - Future updates will add NARX models for classification and multiobjective model structure selection.
+
+- MAJOR: Accelerated Orthogonal Least-Squares algorithm.
+    - Added the new class AOLS to build NARX models using the Accelerated Orthogonal Least-Squares algorithm.
+    
+    - At the best of my knowledge, this is the first time this algorithm is used in the NARMAX framework. The tests I've made are promising, but use it with caution until the results are formalized into a research paper.
+
+- Added notebook with a simple example of how to use MetaMSS and a simple model comparison of the Electromechanical system.
+
+- Added notebook with a simple example of how to use AOLS
+
+- Added ModelInformation class. This class have methods to return model information such as max_lag of a model code.
+    - added _list_output_regressor_code
+    - added _list_input_regressor_code
+    - added _get_lag_from_regressor_code
+    - added _get_max_lag_from_model_code
+
+- Minor performance improvement: added the argument "predefined_regressors" in build_information_matrix function on base.py
+    to improve the performance of the Simulation method.
+
+- Pytorch is now an optional dependency. Use pip install sysidentpy['full'] 
+
+- Fix code format issues.
+
+- Fixed minor grammatical and spelling mistakes.
+
+- Fix issues related to html on Jupyter notebooks examples on documentation.
+
+- Updated Readme with examples of how to use.
+
+- Improved descriptions and comments in methods.
+
+- metaheuristics.bpsogsa (detailed description on code docstring)
+    - added evaluate_objective_function
+    - added optimize
+    - added generate_random_population
+    - added mass_calculation
+    - added calculate_gravitational_constant
+    - added calculate_acceleration
+    - added update_velocity_position
+
+- FIX issue #52
+
+
+v0.1.5
+------
+
+CONTRIBUTORS
+~~~~~~~~~~~~
+
+- wilsonrljr
+
+CHANGES
+~~~~~~~
+
+- MAJOR: n-steps-ahead prediction.
+    - Now you can define the numbers of steps ahead in the predict function.
+	- Only for Polynomial models for now. Next update will bring this functionality to Neural NARX and General Estimators.
+
+- MAJOR: Simulating predefined models.
+    - Added the new class SimulatePolynomialNarmax to handle the simulation of known model structures.
+    - Now you can simulate predefined models by just passing the model structure codification. Check the notebook examples.
+
+- Added 4 new notebooks in the example section.
+
+- Added iterative notebooks. Now you can run the notebooks in Jupyter notebook section of the documentation in Colab.
+
+- Fix code format issues.
+
+- Added new tests for SimulatePolynomialNarmax and generate_data.
+
+- Started changes related to numpy 1.19.4 update. There are still some Deprecation warnings that will be fixed in next update.
+
+- Fix issues related to html on Jupyter notebooks examples on documentation.
+
+- Updated Readme with examples of how to use.
+
+
+
+v0.1.4
+------
+
+CONTRIBUTORS
+~~~~~~~~~~~~
+
+- wilsonrljr
+
+CHANGES
+~~~~~~~
+
+- MAJOR: Introducing NARX Neural Network in SysIdentPy.
+    - Now you can build NARX Neural Network on SysIdentPy.
+    - This feature is built on top of Pytorch. See the docs for more details and examples of how to use.
+
+- MAJOR: Introducing general estimators in SysIdentPy.
+    - Now you are able to use any estimator that have Fit/Predict methods (estimators from Sklearn and Catboost, for example) and build NARX models based on those estimators.
+    - We use the core functions of SysIdentPy and keep the Fit/Predict approach from those estimators to keep the process easy to use.
+    - More estimators are coming soon like XGboost.
+
+- Added notebooks to show how to build NARX neural Network.
+
+- Added notebooks to show how to build NARX models using general estimators.
+
+- Changed the default parameters of the plot_results function.
+
+- NOTE: We will keeping improving the Polynomial NARX models (new model structure selection algorithms and multiobjective identification
+is on our roadmap). These recent modifications will allow us to introduce new NARX models like PWARX models very soon.
+
+- New template for the documentation site.
+
+- Fix issues related to html on Jupyter notebooks examples on documentation.
+
+- Updated Readme with examples of how to use.
+
+
+v0.1.3
+------
+
+CONTRIBUTORS
+~~~~~~~~~~~~
+
+- wilsonrljr
+- renard162
+
+CHANGES
+~~~~~~~
+
+- Fixed a bug concerning the xlag and ylag in multiple input scenarios.
+- Refactored predict function. Improved performance up to 87% depending on the number of regressors.
+- You can set lags with different size for each input.
+- Added a new function to get the max value of xlag and ylag. Work with int, list, nested lists.
+- Fixed tests for information criteria.
+- Added SysIdentPy logo.
+- Refactored code of all classes following PEP 8 guidelines to improve readability.
+- Added Citation information on Readme.
+- Changes on information Criteria tests.
+- Added workflow to run the tests when merge branch into master.
+- Added new site domain.
+- Updated docs.
+

@@ -7,7 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Welcome to SysIdentPy’s documentation! &#8212; NARMAX models</title>
     
-  <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+  <link href="_static/css/theme.css" rel="stylesheet" />
+  <link href="_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
 
     
   <link rel="stylesheet"
@@ -19,50 +20,37 @@
 
     
       
-  <link rel="stylesheet"
-    href="_static/vendor/open-sans_all/1.44.1/index.css">
-  <link rel="stylesheet"
-    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
 
     
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.37f24b989f4638ff9c27c22dc7559d4f.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-book-theme.e2363ea40746bee74734a24ffefccd78.css" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
     
-  <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
+  <link rel="preload" as="script" href="_static/js/index.1c5a1a01449ed65a7b51.js">
 
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/togglebutton.js"></script>
     <script src="_static/clipboard.min.js"></script>
     <script src="_static/copybutton.js"></script>
-    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
     <link rel="canonical" href="http://sysidentpy.org/index.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Install Guide" href="installation.html" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
-
-
-<!-- Opengraph tags -->
-<meta property="og:url"         content="http://sysidentpy.org/index.html" />
-<meta property="og:type"        content="article" />
-<meta property="og:title"       content="Welcome to SysIdentPy’s documentation!" />
-<meta property="og:description" content="Welcome to SysIdentPy’s documentation!  SysIdentPy is a Python module for System Identification using NARMAX models built on top of numpy and is distributed und" />
-<meta property="og:image"       content="http://sysidentpy.org/_static/sysidentpy-logo.png" />
-
-<meta name="twitter:card" content="summary" />
-
-
+    
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
     
 
     <div class="container-xl">
@@ -71,20 +59,24 @@
 <div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
     
         <div class="navbar-brand-box">
-<a class="navbar-brand text-wrap" href="#">
-  
-  <img src="_static/sysidentpy-logo.png" class="logo" alt="logo">
-  
-  
-  <h1 class="site-logo" id="site-title">NARMAX models</h1>
-  
-</a>
+    <a class="navbar-brand text-wrap" href="#">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="_static/sysidentpy-logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">NARMAX models</h1>
+      
+    </a>
 </div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
   <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form>
-<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
-    <ul class="nav sidenav_l1">
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Pesquise os documentos ..." aria-label="Pesquise os documentos ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="installation.html">
    Install Guide
@@ -105,11 +97,16 @@
    Contributing
   </a>
  </li>
- <li class="toctree-l1 collapsible-parent">
+ <li class="toctree-l1 has-children">
   <a class="reference internal" href="notebooks.html">
    Jupyter notebooks
   </a>
-  <ul class="collapse-ul">
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
    <li class="toctree-l2">
     <a class="reference internal" href="examples/basic_steps.html">
      Presenting main functionality
@@ -138,6 +135,16 @@
    <li class="toctree-l2">
     <a class="reference internal" href="examples/parameter_estimation.html">
      Parameter Estimation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/metamss.html">
+     Using the Meta-Model Structure Selection (MetaMSS) algorithm for building Polynomial NARX models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/aols.html">
+     Using the Accelerated Orthogonal Least-Squares algorithm for building Polynomial NARX models
     </a>
    </li>
    <li class="toctree-l2">
@@ -176,80 +183,27 @@
     </a>
    </li>
   </ul>
-  <i class="fas fa-chevron-down">
-  </i>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="changelog/v0.1.5.html">
+  <a class="reference internal" href="changelog/v0.1.6.html">
    Changes in SysIdentPy
   </a>
  </li>
- <li class="toctree-l1 collapsible-parent">
+ <li class="toctree-l1 has-children">
   <a class="reference internal" href="code.html">
    Codes
   </a>
-  <ul class="simple collapse-ul">
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="simple">
   </ul>
-  <i class="fas fa-chevron-down">
-  </i>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="code.html#module-sysidentpy.base">
-   sysidentpy base
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="code.html#sysidentpy-narmax">
-   sysidentpy narmax
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="code.html#sysidentpy-simulation">
-   sysidentpy simulation
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="code.html#sysidentpy-narx-neural-network">
-   sysidentpy narx_neural_network
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="code.html#sysidentpy-general-estimators">
-   sysidentpy general_estimators
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="code.html#module-sysidentpy.residues.residues_correlation">
-   sysidentpy residues
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="code.html#module-sysidentpy.metrics._regression">
-   sysidentpy metrics
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="code.html#module-sysidentpy.parameter_estimation.estimators">
-   sysidentpy estimators
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="code.html#module-sysidentpy.utils._check_arrays">
-   sysidentpy utils
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="code.html#module-sysidentpy.utils.generate_data">
-   sysidentpy generate data
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="code.html#indices-and-tables">
-   Indices and tables
-  </a>
  </li>
 </ul>
 
+    </div>
 </nav> <!-- To handle the deprecated key -->
 
 <div class="navbar_extra_footer">
@@ -272,8 +226,8 @@
             
             <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
                 data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
-                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
-                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                aria-expanded="true" aria-label="Alternar de navegação" aria-controls="site-navigation"
+                title="Alternar de navegação" data-toggle="tooltip" data-placement="left">
                 <i class="fas fa-bars"></i>
                 <i class="fas fa-arrow-left"></i>
                 <i class="fas fa-arrow-up"></i>
@@ -281,7 +235,7 @@
             
             
 <div class="dropdown-buttons-trigger">
-    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Baixe esta página"><i
             class="fas fa-download"></i></button>
 
     <div class="dropdown-buttons">
@@ -289,10 +243,10 @@
         
         <!-- Download raw file -->
         <a class="dropdown-buttons" href="_sources/index.rst.txt"><button type="button"
-                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                class="btn btn-secondary topbarbtn" title="Baixar arquivo fonte" data-toggle="tooltip"
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
-        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Imprimir em PDF"
             onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
@@ -305,24 +259,24 @@
     <div class="dropdown-buttons sourcebuttons">
         <a class="repository-button"
             href="https://github.com/wilsonrljr/sysidentpy/"><button type="button" class="btn btn-secondary topbarbtn"
-                data-toggle="tooltip" data-placement="left" title="Source repository"><i
-                    class="fab fa-github"></i>repository</button></a>
+                data-toggle="tooltip" data-placement="left" title="Repositório fonte"><i
+                    class="fab fa-github"></i>repositório</button></a>
         <a class="issues-button"
             href="https://github.com/wilsonrljr/sysidentpy//issues/new?title=Issue%20on%20page%20%2Findex.html&body=Your%20issue%20content%20here."><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
-                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+                title="Abra um problema"><i class="fas fa-lightbulb"></i>questão aberta</button></a>
         <a class="edit-button" href="https://github.com/wilsonrljr/sysidentpy/edit/master/docs/index.rst"><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
-                title="Edit this page"><i class="fas fa-pencil-alt"></i>suggest edit</button></a>
+                title="Edite essa página"><i class="fas fa-pencil-alt"></i>sugerir edição</button></a>
     </div>
 </div>
 
-
             <!-- Full screen (wrap in <a> to have style consistency -->
-            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
-                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
-                    title="Fullscreen mode"><i
-                        class="fas fa-expand"></i></button></a>
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Modo tela cheia"
+        title="Modo tela cheia"><i
+            class="fas fa-expand"></i></button></a>
 
             <!-- Launch buttons -->
 
@@ -331,11 +285,11 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
-        <div class="tocsection onthispage pt-5 pb-3">
-            <i class="fas fa-list"></i> Contents
-        </div>
-        <nav id="bd-toc-nav">
-            <ul class="nav section-nav flex-column">
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Conteúdo
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#polynomial-narx">
    Polynomial NARX
@@ -405,8 +359,7 @@
  </li>
 </ul>
 
-        </nav>
-        
+            </nav>
         </div>
     </div>
 </div>
@@ -419,6 +372,12 @@
 <h1>Welcome to SysIdentPy’s documentation!<a class="headerlink" href="#welcome-to-sysidentpy-s-documentation" title="Permalink to this headline">¶</a></h1>
 <p><strong>SysIdentPy</strong> is a Python module for System Identification using <strong>NARMAX</strong> models built on top of <strong>numpy</strong> and is distributed under the 3-Clause BSD license.</p>
 <p>The project was started in by Wilson R. L. Junior, Luan Pascoal C. Andrade and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019 and since then have contributed.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The update <strong>v0.1.6</strong> added new methods for structure selection of NARMAX models: <strong>MetaMSS</strong> and <strong>AOLS</strong>.</p>
+<p>The <strong>MetaMSS</strong> algorithm is based on metaheuristics (check the following paper <a class="reference external" href="https://arxiv.org/abs/2109.09917">Meta-Model Structure Selection: Building Polynomial NARX Model for Regression and Classification</a> ) and the <strong>AOLS</strong> is based on the <a class="reference external" href="https://users.ece.utexas.edu/~hvikalo/pubs/DSPpaper2018.pdf">Accelerated Orthogonal Least-Squares for Large-Scale Sparse Reconstruction</a>.</p>
+<p>Check the examples of how to use it in the <a class="reference external" href="http://sysidentpy.org/notebooks.html">documentation page</a></p>
+</div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p>The examples directory has several Jupyter notebooks presenting basic tutorials of how to use the package and some specific applications of <strong>SysIdentPy</strong>. <a class="reference external" href="http://sysidentpy.org/notebooks.html">Try it out!</a></p>
@@ -567,7 +526,7 @@
 <img alt="_images/catboost.png" src="_images/catboost.png" />
 <div class="section" id="changelog">
 <h3>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h3>
-<p>See the <a class="reference external" href="https://github.com/wilsonrljr/sysidentpy.whats_is_new.md">changelog</a>
+<p>See the <a class="reference external" href="http://sysidentpy.org/changelog/v0.1.6.html">changelog</a>
 for a history of notable changes to <strong>SysIdentPy</strong>.</p>
 </div>
 <div class="section" id="development">
@@ -593,11 +552,11 @@ for a history of notable changes to <strong>SysIdentPy</strong>.</p>
 <p>Just type <code class="code docutils literal notranslate"><span class="pre">pytest</span></code> and you get a result like</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">==========</span> <span class="n">test</span> <span class="n">session</span> <span class="n">starts</span> <span class="o">==========</span>
 
-<span class="n">platform</span> <span class="n">linux</span> <span class="o">--</span> <span class="n">Python</span> <span class="mf">3.7</span><span class="o">.</span><span class="mi">6</span><span class="p">,</span> <span class="n">pytest</span><span class="o">-</span><span class="mf">5.4</span><span class="o">.</span><span class="mi">2</span><span class="p">,</span> <span class="n">py</span><span class="o">-</span><span class="mf">1.8</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="n">pluggy</span><span class="o">-</span><span class="mf">0.13</span><span class="o">.</span><span class="mi">1</span>
+<span class="n">platform</span> <span class="n">linux</span> <span class="o">--</span> <span class="n">Python</span> <span class="mf">3.7.6</span><span class="p">,</span> <span class="n">pytest</span><span class="o">-</span><span class="mf">5.4.2</span><span class="p">,</span> <span class="n">py</span><span class="o">-</span><span class="mf">1.8.1</span><span class="p">,</span> <span class="n">pluggy</span><span class="o">-</span><span class="mf">0.13.1</span>
 
 <span class="n">rootdir</span><span class="p">:</span> <span class="o">~/</span><span class="n">sysidentpy</span>
 
-<span class="n">plugins</span><span class="p">:</span> <span class="n">cov</span><span class="o">-</span><span class="mf">2.8</span><span class="o">.</span><span class="mi">1</span>
+<span class="n">plugins</span><span class="p">:</span> <span class="n">cov</span><span class="o">-</span><span class="mf">2.8.1</span>
 
 <span class="n">collected</span> <span class="mi">12</span> <span class="n">items</span>
 
@@ -643,8 +602,8 @@ contributors.</p>
 <ul>
 <li><p>Lacerda et al., (2020). SysIdentPy: A Python package for System Identification using NARMAX models. Journal of Open Source Software, 5(54), 2384, <a class="reference external" href="https://doi.org/10.21105/joss.02384">https://doi.org/10.21105/joss.02384</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@article</span><span class="p">{</span><span class="n">Lacerda2020</span><span class="p">,</span>
-  <span class="n">doi</span> <span class="o">=</span> <span class="p">{</span><span class="mf">10.21105</span><span class="o">/</span><span class="n">joss</span><span class="o">.</span><span class="mi">02384</span><span class="p">},</span>
-  <span class="n">url</span> <span class="o">=</span> <span class="p">{</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">doi</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="mf">10.21105</span><span class="o">/</span><span class="n">joss</span><span class="o">.</span><span class="mi">02384</span><span class="p">},</span>
+  <span class="n">doi</span> <span class="o">=</span> <span class="p">{</span><span class="mf">10.21105</span><span class="o">/</span><span class="n">joss</span><span class="mf">.02384</span><span class="p">},</span>
+  <span class="n">url</span> <span class="o">=</span> <span class="p">{</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">doi</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="mf">10.21105</span><span class="o">/</span><span class="n">joss</span><span class="mf">.02384</span><span class="p">},</span>
   <span class="n">year</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2020</span><span class="p">},</span>
   <span class="n">publisher</span> <span class="o">=</span> <span class="p">{</span><span class="n">The</span> <span class="n">Open</span> <span class="n">Journal</span><span class="p">},</span>
   <span class="n">volume</span> <span class="o">=</span> <span class="p">{</span><span class="mi">5</span><span class="p">},</span>
@@ -672,13 +631,15 @@ contributors.</p>
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dev_guide.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks.html">Jupyter notebooks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog/v0.1.5.html">Changes in SysIdentPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog/v0.1.6.html">Changes in SysIdentPy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Codes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.base">sysidentpy base</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-narmax">sysidentpy narmax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-metamss">sysidentpy metamss</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-simulation">sysidentpy simulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-narx-neural-network">sysidentpy narx_neural_network</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-general-estimators">sysidentpy general_estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-bpsogsa">sysidentpy bpsogsa</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.residues.residues_correlation">sysidentpy residues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.metrics._regression">sysidentpy metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.parameter_estimation.estimators">sysidentpy estimators</a></li>
@@ -695,21 +656,33 @@ contributors.</p>
               </div>
               
         
-        <div class='prev-next-bottom'>
             
-    <a class='right-next' id="next-link" href="installation.html" title="next page">Install Guide</a>
 
-        </div>
+
+
+<div class='prev-next-bottom'>
+    
+     <div id="next">
+        <a class="right-next" href="installation.html" title="next page">
+            <div class="prevnext-info">
+                <p class="prevnext-label">next</p>
+                <p class="prevnext-title">Install Guide</p>
+            </div>
+            <i class="prevnext-label fas fa-angle-right"></i>
+        </a>
+     </div>
+
+</div>
         
         </div>
     </div>
-    <footer class="footer mt-5 mt-md-0">
+    <footer class="footer">
     <div class="container">
       <p>
         
-          By Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins<br/>
+          De Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins<br/>
         
-            &copy; Copyright 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.<br/>
+            &copy; direito autoral 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.<br/>
       </p>
     </div>
   </footer>
@@ -718,11 +691,9 @@ contributors.</p>
 
       </div>
     </div>
+  
+  <script src="_static/js/index.1c5a1a01449ed65a7b51.js"></script>
 
-    
-  <script src="_static/js/index.d3f166471bb80abb5163.js"></script>
-
-
-    
+  
   </body>
 </html>
