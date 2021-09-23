@@ -33,6 +33,7 @@ VERSION = sysidentpy.__version__
 
 NUMPY_MIN_VERSION = '1.19.2'
 MATPLOTLIB_MIN_VERSION = '3.3.2'
+SCIPY_MIN_VERSION = '1.7.0'
 PYTORCH_MIN_VERSION = '1.7.1'
 
 
@@ -67,6 +68,7 @@ def setup_package():
         python_requires=">=3.7",
         install_requires=[
         'numpy>={}'.format(NUMPY_MIN_VERSION),
+        'scipy>={}'.format(SCIPY_MIN_VERSION),
         'matplotlib>={}'.format(
             MATPLOTLIB_MIN_VERSION)
     ],
