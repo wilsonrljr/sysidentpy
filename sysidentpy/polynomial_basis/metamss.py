@@ -11,10 +11,14 @@ from ..parameter_estimation.estimators import Estimators
 from ..utils._check_arrays import check_X_y
 from ..metrics import root_relative_squared_error, mean_squared_error
 from ..metaheuristics.bpsogsa import BPSOGSA
+from ..utils.deprecation import deprecated
 
 
+
+@deprecated(version='v0.1.7', future_version='v0.2.0',
+            alternative='from sysidentpy.model_structure_selection import MetaMSS')
 class MetaMSS(BPSOGSA, SimulatePolynomialNarmax):
-    """Meta-Model Structure Selection: Building Polynomial NARXMAX model
+    """Meta-Model Structure Selection: Building Polynomial NARMAX model
 
     Parameters
     ----------
@@ -32,7 +36,7 @@ class MetaMSS(BPSOGSA, SimulatePolynomialNarmax):
         The parameter estimation method.
     estimate_parameter : bool, default=True
         Whether to estimate the model parameters.
-    extended_least_squres : bool, default=False
+    extended_least_squares : bool, default=False
         Whether to use extended least squares method
         for parameter estimation.
         Note that we define a specific set of noise regressors.
@@ -43,7 +47,7 @@ class MetaMSS(BPSOGSA, SimulatePolynomialNarmax):
     offset_covariance : float, default=0.2
         The offset covariance factor of the affine least mean squares
         filter.
-    mu : float, defaul=0.01
+    mu : float, default=0.01
         The convergence coefficient (learning rate) of the filter.
     eps : float
         Normalization factor of the normalized filters.
