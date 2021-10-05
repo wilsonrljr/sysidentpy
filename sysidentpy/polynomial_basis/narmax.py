@@ -17,12 +17,15 @@ from ..base import InformationMatrix
 from ..parameter_estimation.estimators import Estimators
 from ..residues.residues_correlation import ResiduesAnalysis
 from ..utils._check_arrays import check_X_y
+from ..utils.deprecation import deprecated
 
 
+@deprecated(version='v0.1.7', future_version='v0.2.0',
+            alternative='from sysidentpy.model_structure_selection import FROLS')
 class PolynomialNarmax(
     Estimators, GenerateRegressors, HouseHolder, InformationMatrix, ResiduesAnalysis
 ):
-    """Polynomial NARXMAX model
+    """Polynomial NARMAX model
 
     Parameters
     ----------
@@ -47,13 +50,13 @@ class PolynomialNarmax(
         criteria method.
     estimator : str, default="least_squares"
         The parameter estimation method.
-    extended_least_squres : bool, default=False
-        Whether to use extended least squres method
+    extended_least_squares : bool, default=False
+        Whether to use extended least squares method
         for parameter estimation.
         Note that we define a specific set of noise regressors.
     aux_lag : int, default=1
         Temporary lag value used only for parameter estimation.
-        This value is overwriten by the max_lag value and will
+        This value is overwritten by the max_lag value and will
         be removed in v0.1.4.
     lam : float, default=0.98
         Forgetting factor of the Recursive Least Squares method.
@@ -62,7 +65,7 @@ class PolynomialNarmax(
     offset_covariance : float, default=0.2
         The offset covariance factor of the affine least mean squares
         filter.
-    mu : float, defaul=0.01
+    mu : float, default=0.01
         The convergence coefficient (learning rate) of the filter.
     eps : float
         Normalization factor of the normalized filters.
