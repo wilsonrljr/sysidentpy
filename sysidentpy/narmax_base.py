@@ -155,3 +155,65 @@ class GenerateRegressors:
         regressor_code = np.array(regressor_code)
         regressor_code = regressor_code[:, regressor_code.shape[1] :: -1]
         return regressor_code
+    
+    
+class HouseHolder:
+    """Householder reflection and transformation."""
+
+    def _house(self, x):
+        """Perform a Householder reflection of vector.
+
+        Parameters
+        ----------
+        x : array-like of shape = number_of_training_samples
+            The respective column of the matrix of regressors in each
+            iteration of ERR function.
+
+        Returns
+        -------
+        v : array-like of shape = number_of_training_samples
+            The reflection of the array x.
+
+        References
+        ----------
+        [1] Manuscript: Chen, S., Billings, S. A., & Luo, W. (1989).
+            Orthogonal least squares methods and their application to non-linear system identification.
+
+        """
+        u = np.linalg.norm(x, 2)
+        if u != 0:
+            aux_b = x[0] + np.sign(x[0]) * u
+            x = x[1:] / aux_b
+            x = np.concatenate((np.array([1]), x))
+        return x
+
+    def _rowhouse(self, RA, v):
+        """Perform a row Householder transformation.
+
+        Parameters
+        ----------
+        RA : array-like of shape = number_of_training_samples
+            The respective column of the matrix of regressors in each
+            iteration of ERR function.
+        v : array-like of shape = number_of_training_samples
+            The reflected vector obtained by using the householder reflection.
+
+        Returns
+        -------
+        B : array-like of shape = number_of_training_samples
+
+        References
+        ----------
+        [1] Manuscript: Chen, S., Billings, S. A., & Luo, W. (1989).
+            Orthogonal least squares methods and their application to
+            non-linear system identification. International Journal of
+            control, 50(5), 1873-1896.
+
+        """
+        b = -2 / np.dot(v.T, v)
+        w = b * np.dot(RA.T, v)
+        w = w.reshape(1, -1)
+        v = v.reshape(-1, 1)
+        RA = RA + v * w
+        B = RA
+        return B
