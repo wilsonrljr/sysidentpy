@@ -436,7 +436,7 @@ class FROLS(
                 stacklevel=2,
             )
             lagged_data = self.build_output_matrix(y, self.ylag, self.non_degree)
-            self.max_lag = _get_max_lag(ylag=self.ylag)
+            self.max_lag = self._get_max_lag(ylag=self.ylag)
         elif self.model_type == "NFIR":
             warnings.warn(
                 (
