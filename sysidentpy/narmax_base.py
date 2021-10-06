@@ -285,3 +285,289 @@ class ModelInformation:
         ny = np.max(list(chain.from_iterable([[ylag]])))
         nx = np.max(list(chain.from_iterable([[xlag]])))
         return np.max([ny, np.max(nx)])
+    
+class InformationMatrix:
+    """Class for methods regarding preprocessing of columns"""
+
+    def shift_column(self, col_to_shift, lag):
+        """Shift values based on a lag.
+
+        Parameters
+        ----------
+        col_to_shift : array-like of shape = n_samples
+            The samples of the input or output.
+        lag : int
+            The respective lag of the regressor.
+
+        Returns
+        -------
+        tmp_column : array-like of shape = n_samples
+            The shifted array of the input or output.
+
+        Examples
+        --------
+        >>> y = [1, 2, 3, 4, 5]
+        >>> shift_column(y, 1)
+        [0, 1, 2, 3, 4]
+
+        """
+        n_samples = col_to_shift.shape[0]
+        tmp_column = np.zeros((n_samples, 1))
+        aux = col_to_shift[0 : n_samples - lag]
+        aux = np.reshape(aux, (len(aux), 1))
+        tmp_column[lag:, 0] = aux[:, 0]
+        return tmp_column
+
+    def _process_xlag(self, X, xlag):
+        """Create the list of lags to be used for the inputs
+
+        Parameters
+        ----------
+        X : array-like
+            Input data used on training phase.
+        xlag : int
+            The maximum lag of input regressors.
+
+        Returns
+        -------
+        x_lag : ndarray of int
+            The range of lags according to user definition.
+
+        """
+        n_inputs = X.shape[1]
+        if isinstance(xlag, int) and n_inputs > 1:
+            raise ValueError(
+                "If n_inputs > 1, xlag must be a nested list. Got %f" % xlag
+            )
+
+        if isinstance(xlag, int):
+            xlag = range(1, xlag + 1)
+
+        return n_inputs, xlag
+
+    def _process_ylag(self, ylag):
+        """Create the list of lags to be used for the outputs
+
+        Parameters
+        ----------
+        ylag : int, list
+            The maximum lag of input regressors.
+
+        Returns
+        -------
+        y_lag : ndarray of int
+            The range of lags according to user definition.
+
+        """
+        if isinstance(ylag, int):
+            ylag = range(1, ylag + 1)
+
+        return ylag
+
+    def _create_lagged_X(self, X, xlag, n_inputs):
+        """Create a lagged matrix of inputs without combinations.
+
+        Parameters
+        ----------
+        X : array-like
+            Input data used on training phase.
+        xlag : int
+            The maximum lag of input regressors.
+        n_inputs : int
+            Number of input variables.
+
+        Returns
+        -------
+        x_lagged : ndarray of floats
+            A lagged input matrix formed by the input regressors
+            without combinations.
+
+        """
+        if n_inputs == 1:
+            x_lagged = np.column_stack(
+                [self.shift_column(X[:, 0], lag) for lag in xlag]
+            )
+        else:
+            x_lagged = np.zeros([len(X), 1])  # just to stack other columns
+            # if user input a nested list like [[1, 2], 4], the following
+            # line convert it to [[1, 2], [4]].
+            # Remember, for multiple inputs all lags must be entered explicitly
+            xlag = [[i] if isinstance(i, int) else i for i in xlag]
+            for col in range(n_inputs):
+                x_lagged_col = np.column_stack(
+                    [self.shift_column(X[:, col], lag) for lag in xlag[col]]
+                )
+                x_lagged = np.column_stack([x_lagged, x_lagged_col])
+
+            x_lagged = x_lagged[:, 1:]  # remove the column of 0 created above
+
+        return x_lagged
+
+    def _create_lagged_y(self, y, ylag):
+        """Create a lagged matrix of the output without combinations.
+
+        Parameters
+        ----------
+        y : array-like
+            Output data used on training phase.
+        ylag : int
+            The maximum lag of output regressors.
+
+        Returns
+        -------
+        y_lagged : ndarray of floats
+            A lagged input matrix formed by the output regressors
+            without combinations.
+
+        """
+        y_lagged = np.column_stack([self.shift_column(y[:, 0], lag) for lag in ylag])
+        return y_lagged
+
+    def initial_lagged_matrix(self, X, y, xlag, ylag):
+        """Build a lagged matrix concerning each lag for each column.
+
+        Parameters
+        ----------
+        model : ndarray of int
+            The model code representation.
+        y : array-like
+            Target data used on training phase.
+        X : array-like
+            Input data used on training phase.
+        ylag : int
+            The maximum lag of output regressors.
+        xlag : int
+            The maximum lag of input regressors.
+
+        Returns
+        -------
+        lagged_data : ndarray of floats
+            The lagged matrix built in respect with each lag and column.
+
+        Examples
+        --------
+        Let X and y be the input and output values of shape Nx1.
+        If the chosen lags are 2 for both input and output
+        the initial lagged matrix will be formed by Y[k-1], Y[k-2],
+        X[k-1], and X[k-2].
+
+        """
+        n_inputs, xlag = self._process_xlag(X, xlag)
+
+        ylag = self._process_ylag(ylag)
+
+        x_lagged = self._create_lagged_X(X, xlag, n_inputs)
+
+        y_lagged = self._create_lagged_y(y, ylag)
+        lagged_data = np.concatenate([y_lagged, x_lagged], axis=1)
+        return lagged_data
+    
+    def build_output_matrix(self, y, ylag, non_degree, predefined_regressors=None):
+        """Build the information matrix.
+
+        Each columns of the information matrix represents a candidate
+        regressor. The set of candidate regressors are based on xlag,
+        ylag, and non_degree entered by the user.
+
+        Parameters
+        ----------
+        model : ndarray of int
+            The model code representation.
+        y : array-like
+            Target data used on training phase.
+        ylag : int
+            The maximum lag of output regressors.
+        non_degree : int
+            The desired maximum nonlinearity degree.
+
+        Returns
+        -------
+        lagged_data = ndarray of floats
+            The lagged matrix built in respect with each lag and column.
+
+        """
+        # Generate a lagged data which each column is a input or output
+        # related to its respective lags. With this approach we can create
+        # the information matrix by using all possible combination of
+        # the columns as a product in the iterations
+        ylag = self._process_ylag(ylag=ylag)
+        y_lagged = self._create_lagged_y(y, ylag)
+        constant = np.ones([y_lagged.shape[0], 1])
+        data = np.concatenate([constant, y_lagged], axis=1)
+        return data
+    
+    def build_input_matrix(self, X, xlag, non_degree, predefined_regressors=None):
+        """Build the information matrix.
+
+        Each columns of the information matrix represents a candidate
+        regressor. The set of candidate regressors are based on xlag,
+        ylag, and non_degree entered by the user.
+
+        Parameters
+        ----------
+        model : ndarray of int
+            The model code representation.
+        X : array-like
+            Input data used on training phase.
+        xlag : int
+            The maximum lag of input regressors.
+        non_degree : int
+            The desired maximum nonlinearity degree.
+
+        Returns
+        -------
+        lagged_data = ndarray of floats
+            The lagged matrix built in respect with each lag and column.
+
+        """
+        # Generate a lagged data which each column is a input or output
+        # related to its respective lags. With this approach we can create
+        # the information matrix by using all possible combination of
+        # the columns as a product in the iterations
+        
+        n_inputs, xlag = self._process_xlag(X, xlag)
+
+        x_lagged = self._create_lagged_X(X, xlag, n_inputs)
+        
+        constant = np.ones([x_lagged.shape[0], 1])
+        data = np.concatenate([constant, x_lagged], axis=1)
+
+        return data
+
+    def build_input_output_matrix(self, X, y, xlag, ylag, non_degree, predefined_regressors=None):
+        """Build the information matrix.
+
+        Each columns of the information matrix represents a candidate
+        regressor. The set of candidate regressors are based on xlag,
+        ylag, and non_degree entered by the user.
+
+        Parameters
+        ----------
+        model : ndarray of int
+            The model code representation.
+        y : array-like
+            Target data used on training phase.
+        X : array-like
+            Input data used on training phase.
+        ylag : int
+            The maximum lag of output regressors.
+        xlag : int
+            The maximum lag of input regressors.
+        non_degree : int
+            The desired maximum nonlinearity degree.
+
+        Returns
+        -------
+        lagged_data = ndarray of floats
+            The lagged matrix built in respect with each lag and column.
+
+        """
+        # Generate a lagged data which each column is a input or output
+        # related to its respective lags. With this approach we can create
+        # the information matrix by using all possible combination of
+        # the columns as a product in the iterations
+        lagged_data = self.initial_lagged_matrix(X, y, xlag=xlag, ylag=ylag)
+
+        constant = np.ones([lagged_data.shape[0], 1])
+        data = np.concatenate([constant, lagged_data], axis=1)        
+        return data
