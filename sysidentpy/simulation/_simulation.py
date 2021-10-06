@@ -13,7 +13,7 @@ from ..utils._check_arrays import check_X_y
 from ..utils.deprecation import deprecated
 
 
-class SimulatePolynomialNarmax(FROLS):
+class SimulateNarmax(FROLS):
     """Simulation of Polynomial NARMAX model
 
     Parameters
