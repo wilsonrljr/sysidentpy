@@ -11,9 +11,10 @@
 import warnings
 import numpy as np
 from collections import Counter
-from ..base import GenerateRegressors
-from ..base import HouseHolder
-from ..base import InformationMatrix
+from ..narmax_base import GenerateRegressors
+from ..narmax_base import HouseHolder
+from ..narmax_base import InformationMatrix
+from ..narmax_base import ModelInformation
 from ..parameter_estimation.estimators import Estimators
 from ..residues.residues_correlation import ResiduesAnalysis
 from ..utils._check_arrays import check_X_y, _check_positive_int
@@ -22,7 +23,8 @@ import warnings
 
 
 class FROLS(
-    Estimators, GenerateRegressors, HouseHolder, InformationMatrix, ResiduesAnalysis
+    Estimators, GenerateRegressors, HouseHolder,
+    ModelInformation, InformationMatrix, ResiduesAnalysis
 ):
     """Forward Regression Orthogonal Least Squares algorithm.
 
@@ -390,3 +392,98 @@ class FROLS(
         info_criteria_value = e_factor + model_factor
 
         return info_criteria_value
+    
+    def fit(self, X, y):
+        """Fit polynomial NARMAX model.
+
+        This is an 'alpha' version of the 'fit' function which allows
+        a friendly usage by the user. Given two arguments, X and y, fit
+        training data.
+
+        Parameters
+        ----------
+        X : ndarray of floats
+            The input data to be used in the training process.
+        y : ndarray of floats
+            The output data to be used in the training process.
+
+        Returns
+        -------
+        model : ndarray of int
+            The model code representation.
+        piv : array-like of shape = number_of_model_elements
+            Contains the index to put the regressors in the correct order
+            based on err values.
+        theta : array-like of shape = number_of_model_elements
+            The estimated parameters of the model.
+        err : array-like of shape = number_of_model_elements
+            The respective ERR calculated for each regressor.
+        info_values : array-like of shape = n_regressor
+            Vector with values of akaike's information criterion
+            for models with N terms (where N is the
+            vector position + 1).
+
+        """
+        if y is None:
+            raise ValueError("y cannot be None")
+        
+        if self.model_type == "NAR":
+            warnings.warn(
+                (
+                    "Because the user chooses NAR model , the model built"
+                    "will be of the form y(k) = F(y[k-1], y[k-2], ..., y[k-n]) + e(k)"
+                ),
+                stacklevel=2,
+            )
+            lagged_data = self.build_output_matrix(y, self.ylag, self.non_degree)
+            self.max_lag = _get_max_lag(ylag=self.ylag)
+        elif self.model_type == "NFIR":
+            warnings.warn(
+                (
+                    "Because the user chooses the NFIR model, the model built"
+                    "will be of the form y(k) = F(X[k-1], X[k-2], ..., X[k-n]) + e(k)"
+                ),
+                stacklevel=2,
+            )
+            lagged_data = self.build_input_matrix(X, self.xlag, self.non_degree)
+            self.max_lag = _get_max_lag(xlag=self.xlag)
+        elif self.model_type == "NARMAX":
+            warnings.warn(
+                (
+                    "Because the user chooses NARMAX model, the model built"
+                    "will be of the form y(k) = F(y[k-1], y[k-2], ..., y[k-n], X[k-1], X[k-2], ..., X[k-n]) + e(k)"
+                ),
+                stacklevel=2,
+            )
+            check_X_y(X, y)
+            self.max_lag = _get_max_lag(ylag=self.ylag, xlag=self.xlag)
+            lagged_data = self.build_input_output_matrix(X, y, self.xlag, self.ylag, self.non_degree)
+        else:
+            raise ValueError("Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.")
+        
+        reg_matrix = self.basis_function.build_polynomial_basis(
+            lagged_data, self.non_degree, self.max_lag, predefined_regressors=None)
+
+        if self._order_selection is True:
+            self.info_values = self.information_criterion(reg_matrix, y)
+
+        if self.n_terms is None and self._order_selection is True:
+            model_length = np.where(self.info_values == np.amin(self.info_values))
+            model_length = int(model_length[0] + 1)
+            self.n_terms = model_length
+        elif self.n_terms is None and self._order_selection is not True:
+            raise ValueError(
+                "If order_selection is False, you must define n_terms value."
+            )
+        else:
+            model_length = self.n_terms
+
+        (self.final_model, self.err, self.pivv, psi) = self.error_reduction_ratio(
+            reg_matrix, y, model_length
+        )
+
+        self.theta = getattr(self, self.estimator)(psi, y)
+
+        if self._extended_least_squares is True:
+            self.theta = self._unbiased_estimator(psi, X, y)
+        return self
