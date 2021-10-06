@@ -288,3 +288,105 @@ class FROLS(
         psi_orthogonal = psi[:, tmp_piv]
         model_code = self.regressor_code[tmp_piv, :].copy()
         return model_code, err, piv, psi_orthogonal
+    
+    def information_criterion(self, X_base, y):
+        """Determine the model order.
+
+        This function uses a information criterion to determine the model size.
+        'Akaike'-  Akaike's Information Criterion with
+                   critical value 2 (AIC) (default).
+        'Bayes' -  Bayes Information Criterion (BIC).
+        'FPE'   -  Final Prediction Error (FPE).
+        'LILC'  -  Khundrin’s law ofiterated logarithm criterion (LILC).
+
+        Parameters
+        ----------
+        y : array-like of shape = n_samples
+            Target values of the system.
+        X : array-like of shape = n_samples
+            Input system values measured by the user.
+
+        Returns
+        -------
+        output_vector : array-like of shape = n_regressor
+            Vector with values of akaike's information criterion
+            for models with N terms (where N is the
+            vector position + 1).
+
+        References
+        ----------
+
+        """
+        if (
+            self.n_info_values is not None
+            and self.n_info_values > self.regressor_code.shape[0]
+        ):
+            self.n_info_values = self.regressor_code.shape[0]
+            warnings.warn(
+                (
+                    "n_info_values is greater than the maximum number "
+                    "of all regressors space considering the chosen "
+                    "y_lag, u_lag, and non_degree. We set as "
+                    "%d "
+                )
+                % self.regressor_code.shape[0],
+                stacklevel=2,
+            )
+
+        output_vector = np.zeros(self.n_info_values)
+        output_vector[:] = np.nan
+
+        n_samples = len(y) - self.max_lag
+
+        for i in range(0, self.n_info_values):
+            n_theta = i + 1
+            regressor_matrix = self.error_reduction_ratio(X_base, y, n_theta)[3]
+
+            tmp_theta = getattr(self, self.estimator)(regressor_matrix, y)
+
+            tmp_yhat = np.dot(regressor_matrix, tmp_theta)
+            tmp_residual = y[self.max_lag :] - tmp_yhat
+            e_var = np.var(tmp_residual, ddof=1)
+
+            output_vector[i] = self.compute_info_value(n_theta, n_samples, e_var)
+
+        return output_vector
+
+    def compute_info_value(self, n_theta, n_samples, e_var):
+        """Compute the information criteria value.
+
+        This function returns the information criteria concerning each
+        number of regressor. The information criteria can be AIC, BIC,
+        LILC and FPE.
+
+        Parameters
+        ----------
+        n_theta : int
+            Number of parameters of the model.
+        n_samples : int
+            Number of samples given the maximum lag.
+        e_var : float
+            Variance of the residues
+
+        Returns
+        -------
+        info_criteria_value : float
+            The computed value given the information criteria selected by the
+            user.
+
+        """
+        if self.info_criteria == "bic":
+            model_factor = n_theta * np.log(n_samples)
+        elif self.info_criteria == "fpe":
+            model_factor = n_samples * np.log(
+                (n_samples + n_theta) / (n_samples - n_theta)
+            )
+        elif self.info_criteria == "lilc":
+            model_factor = 2 * n_theta * np.log(np.log(n_samples))
+        else:  # AIC
+            model_factor = +2 * n_theta
+
+        e_factor = n_samples * np.log(e_var)
+        info_criteria_value = e_factor + model_factor
+
+        return info_criteria_value
