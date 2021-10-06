@@ -217,3 +217,72 @@ class HouseHolder:
         RA = RA + v * w
         B = RA
         return B
+    
+class ModelInformation:
+    def _list_output_regressor_code(self, model_code):
+        """Create a flattened array of output regressors.
+
+        Parameters
+        ----------
+        model_code : ndarray of int
+            Model defined by the user to simulate.
+
+        Returns
+        -------
+        model_code : ndarray of int
+            Flattened list of output regressors.
+
+        """
+        regressor_code = [
+            code for code in model_code.ravel() if (code != 0) and (str(code)[0] == "1")
+        ]
+
+        return np.asarray(regressor_code)
+
+    def _list_input_regressor_code(self, model_code):
+        """Create a flattened array of input regressors.
+
+        Parameters
+        ----------
+        model_code : ndarray of int
+            Model defined by the user to simulate.
+
+        Returns
+        -------
+        model_code : ndarray of int
+            Flattened list of output regressors.
+
+        """
+        regressor_code = [
+            code for code in model_code.ravel() if (code != 0) and (str(code)[0] != "1")
+        ]
+        return np.asarray(regressor_code)
+
+    def _get_lag_from_regressor_code(self, regressors):
+        """Get the maximum lag from array of regressors.
+
+        Parameters
+        ----------
+        regressors : ndarray of int
+            Flattened list of input or output regressors.
+
+        Returns
+        -------
+        max_lag : int
+            Maximum lag of list of regressors.
+
+        """
+        lag_list = [
+            int(i) for i in regressors.astype("str") for i in [np.sum(int(i[2:]))]
+        ]
+        if len(lag_list) != 0:
+            return max(lag_list)
+        else:
+            return 1
+        
+    def _get_max_lag_from_model_code(self, model_code):
+        xlag_code = self._list_input_regressor_code(model_code)
+        ylag_code = self._list_output_regressor_code(model_code)
+        xlag = self._get_lag_from_regressor_code(xlag_code)
+        ylag = self._get_lag_from_regressor_code(ylag_code)
+        return max(xlag, ylag)
