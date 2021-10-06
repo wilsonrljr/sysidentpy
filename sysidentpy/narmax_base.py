@@ -268,7 +268,7 @@ class ModelInformation:
         ylag = self._get_lag_from_regressor_code(ylag_code)
         return max(xlag, ylag)
     
-    def _get_max_lag(ylag=1, xlag=1):
+    def _get_max_lag(self, ylag=1, xlag=1):
         """Get the max lag defined by the user.
 
         Parameters
