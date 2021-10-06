@@ -8,9 +8,9 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from ..utils.deprecation import deprecated
 
-
-def get_residues_autocorrelation(y, yhat):
+def compute_residues_autocorrelation(y, yhat):
     e = calculate_residues(y, yhat)
     unnormalized_e_acf = get_unnormalized_e_acf(e)
     half_of_symmetry_autocorr = int(np.floor(unnormalized_e_acf.size / 2))
@@ -22,9 +22,7 @@ def get_residues_autocorrelation(y, yhat):
     
     half_of_symmetry_autocorr = int(np.floor(unnormalized_e_acf.size / 2))
     n = len(unnormalized_e_acf) - half_of_symmetry_autocorr
-    upper_bound = np.ones(n) * (
-        1.96 / np.sqrt(len(unnormalized_e_acf))
-    )
+    upper_bound = 1.96 / np.sqrt(len(unnormalized_e_acf))
     lower_bound = upper_bound * (-1)
     return e_acf, upper_bound, lower_bound
 
@@ -42,7 +40,7 @@ def compute_cross_correlation(y, yhat, arr):
     
 def _input_ccf(e, a, n):
     ccf = _normalized_correlation(a, e)
-    upper_bound = np.ones(len(ccf[:, 0])) * (1.96 / np.sqrt(n))
+    upper_bound = 1.96 / np.sqrt(n)
     lower_bound = upper_bound * (-1)
     return ccf, upper_bound, lower_bound
 
@@ -77,7 +75,9 @@ def _normalized_correlation(a, b):
 
 class ResiduesAnalysis:
     """Residues analysis for Polynomial NARX model."""
-
+    
+    @deprecated(version='v0.1.7', future_version='v0.2.0',
+            alternative='from sysidentpy.residues_correlation import compute_cross_correlation, compute_residues_autocorrelation')
     def residuals(self, X, y, yhat):
         """Performs the residual analysis of output to validate model.
 
