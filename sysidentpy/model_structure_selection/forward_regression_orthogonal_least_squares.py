@@ -148,7 +148,7 @@ class FROLS(
         self.regressor_code = self.regressor_space(
             self.non_degree, xlag, ylag, n_inputs, model_type
         )
-        self.max_lag = _get_max_lag(ylag, xlag)
+        self.max_lag = self._get_max_lag(ylag, xlag)
         self.info_criteria = info_criteria
         self.n_info_values = n_info_values
         self.n_terms = n_terms
@@ -446,7 +446,7 @@ class FROLS(
                 stacklevel=2,
             )
             lagged_data = self.build_input_matrix(X, self.xlag, self.non_degree)
-            self.max_lag = _get_max_lag(xlag=self.xlag)
+            self.max_lag = self._get_max_lag(xlag=self.xlag)
         elif self.model_type == "NARMAX":
             warnings.warn(
                 (
@@ -456,7 +456,7 @@ class FROLS(
                 stacklevel=2,
             )
             check_X_y(X, y)
-            self.max_lag = _get_max_lag(ylag=self.ylag, xlag=self.xlag)
+            self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
             lagged_data = self.build_input_output_matrix(X, y, self.xlag, self.ylag, self.non_degree)
         else:
             raise ValueError("Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.")
