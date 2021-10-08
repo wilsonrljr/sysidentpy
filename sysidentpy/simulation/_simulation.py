@@ -1,19 +1,15 @@
-""" Simulation methods for Polynomial NARMAX models """
+""" Simulation methods for NARMAX models """
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
 
-from sysidentpy.parameter_estimation.estimators import Estimators
-from ..base import GenerateRegressors
-from ..base import InformationMatrix
 from ..model_structure_selection import FROLS
 import numpy as np
 from ..utils._check_arrays import check_X_y
-from ..utils.deprecation import deprecated
 
 
-class SimulateNarmax(FROLS):
+class SimulateNARMAX(FROLS):
     """Simulation of Polynomial NARMAX model
 
     Parameters
@@ -127,6 +123,11 @@ class SimulateNarmax(FROLS):
         if not isinstance(self.estimate_parameter, bool):
             raise TypeError(
                 f"estimate_parameter must be False or True. Got {self.estimate_parameter}"
+            )
+        
+        if not isinstance(self.calculate_err, bool):
+            raise TypeError(
+                f"calculate_err must be False or True. Got {self.calculate_err}"
             )
 
     def simulate(
@@ -253,7 +254,7 @@ class SimulateNarmax(FROLS):
             else:
                 raise ValueError("Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.")
             psi = self.basis_function.build_polynomial_basis(
-                lagged_data, self.non_degree, self.max_lag, predefined_regressors=None)
+                lagged_data, self.non_degree, self.max_lag, predefined_regressors=self.pivv)
 
             _, self.err, self.pivv, _ = self.error_reduction_ratio(
                 psi, y_train, self.n_terms
