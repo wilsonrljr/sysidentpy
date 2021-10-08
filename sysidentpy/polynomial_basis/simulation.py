@@ -15,7 +15,7 @@ from ..utils.deprecation import deprecated
 
 
 @deprecated(version='v0.1.7', future_version='v0.2.0',
-            alternative='from sysidentpy.model_simulation import SimulateNarmax')
+            alternative='from sysidentpy.simulation import SimulateNARMAX')
 class SimulatePolynomialNarmax(PolynomialNarmax):
     """Simulation of Polynomial NARMAX model
 
