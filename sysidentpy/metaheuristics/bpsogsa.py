@@ -143,7 +143,7 @@ class BPSOGSA:
         return self
 
     def generate_random_population(self):
-        """Generate the initial population of agennts randomly
+        """Generate the initial population of agents randomly
 
         Returns
         -------
