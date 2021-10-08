@@ -1,1 +1,1 @@
-from ._simulation import SimulatePolynomialNarmax
+from ._simulation import SimulateNARMAX
