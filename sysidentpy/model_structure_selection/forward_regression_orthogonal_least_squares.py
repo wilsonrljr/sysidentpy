@@ -17,7 +17,6 @@ from ..narmax_base import InformationMatrix
 from ..narmax_base import ModelInformation
 from ..narmax_base import ModelPrediction
 from ..parameter_estimation.estimators import Estimators
-from ..residues.residues_correlation import ResiduesAnalysis
 from ..utils._check_arrays import check_X_y, _check_positive_int
 import warnings
 
