@@ -17,6 +17,19 @@ from ..parameter_estimation.estimators import Estimators
 class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
     ModelInformation, InformationMatrix, ModelPrediction):
     """Simulation of Polynomial NARMAX model
+    
+    The NARMAX model is described as:
+    .. math::
+        y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k
+
+    where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,
+    are the maximum lags for the system output and input respectively;
+    :math:`x_k \in \mathbb{R}^{n_x}` is the system input and :math:`y_k \in \mathbb{R}^{n_y}`
+    is the system output at discrete time :math:`k \in \mathbb{N}^n`;
+    :math:`e_k \in \mathbb{R}^{n_e}` stands for uncertainties and possible noise
+    at discrete time :math:`k`. In this case, :math:`\mathcal{F}^\ell` is some nonlinear function
+    of the input and output regressors with nonlinearity degree :math:`\ell \in \mathbb{N}`
+    and :math:`d` is a time delay typically set to :math:`d=1`.
 
     Parameters
     ----------
@@ -220,7 +233,6 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
 
         self.pivv = self._get_index_from_regressor_code(regressor_code, model_code)
         self.final_model = regressor_code[self.pivv]
-        # self.regressor_code = self.final_model
         # to use in the predict function
         self.n_terms = self.final_model.shape[0]
         
@@ -272,11 +284,6 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
                 self.theta = self._unbiased_estimator(psi, y_train, self.theta, self.non_degree, self.elag, self.max_lag)
 
         yhat = self.predict(X_test, y_test, steps_ahead)
-        # results = self.results(err_precision=8, dtype="dec")
-
-        # if plot:
-        #     ee, ex, _, _ = self.residuals(X_test, y_test, yhat)
-        #     self.plot_result(y_test, yhat, ee, ex)
         return yhat
 
     def error_reduction_ratio(self, psi, y, process_term_number, regressor_code):
@@ -303,13 +310,12 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
 
         References
         ----------
-        [1] Manuscript: Orthogonal least squares methods and their application
-            to non-linear system identification
-            https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
-
-        [2] Manuscript (portuguese): Identificação de Sistemas não Lineares
-            Utilizando Modelos NARMAX Polinomiais – Uma Revisão
-            e Novos Resultados
+        .. [1] Manuscript: Orthogonal least squares methods and their application
+           to non-linear system identification
+           https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
+        .. [2] Manuscript (portuguese): Identificação de Sistemas não Lineares
+           Utilizando Modelos NARMAX Polinomiais – Uma Revisão
+           e Novos Resultados
 
         """
         squared_y = np.dot(y[self.max_lag :].T, y[self.max_lag :])

@@ -21,9 +21,22 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
     ModelInformation, InformationMatrix, ModelPrediction):
     """Accelerated Orthogonal Least Squares Algorithm
     
-    Build Polynomial NARMAX model using the Accelerated Orthogonal Least-Squares. 
+    Build Polynomial NARMAX model using the Accelerated Orthogonal Least-Squares ([1]_). 
     This algorithm is based on the Matlab code available on:
     https://github.com/realabolfazl/AOLS/
+    
+    The NARMAX model is described as:
+    .. math::
+        y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k
+
+    where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,
+    are the maximum lags for the system output and input respectively;
+    :math:`x_k \in \mathbb{R}^{n_x}` is the system input and :math:`y_k \in \mathbb{R}^{n_y}`
+    is the system output at discrete time :math:`k \in \mathbb{N}^n`;
+    :math:`e_k \in \mathbb{R}^{n_e}` stands for uncertainties and possible noise
+    at discrete time :math:`k`. In this case, :math:`\mathcal{F}^\ell` is some nonlinear function
+    of the input and output regressors with nonlinearity degree :math:`\ell \in \mathbb{N}`
+    and :math:`d` is a time delay typically set to :math:`d=1`.
 
     Parameters
     ----------
@@ -77,11 +90,11 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
 
     References
     ----------
-    [1] [1] Manuscript: Accelerated Orthogonal Least-Squares for Large-Scale
-        Sparse Reconstruction
-            https://www.sciencedirect.com/science/article/abs/pii/S1051200418305311
-    [2] Code:
-        https://github.com/realabolfazl/AOLS/
+    .. [1] Manuscript: Accelerated Orthogonal Least-Squares for Large-Scale
+       Sparse Reconstruction
+       https://www.sciencedirect.com/science/article/abs/pii/S1051200418305311
+    .. [2] Code:
+       https://github.com/realabolfazl/AOLS/
     """
     def __init__(
         self,
@@ -151,9 +164,9 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
 
         References
         ----------
-        [1] Manuscript: Accelerated Orthogonal Least-Squares for Large-Scale
-        Sparse Reconstruction
-            https://www.sciencedirect.com/science/article/abs/pii/S1051200418305311
+        .. [1] Manuscript: Accelerated Orthogonal Least-Squares for Large-Scale
+           Sparse Reconstruction
+           https://www.sciencedirect.com/science/article/abs/pii/S1051200418305311
         """
         n, m = psi.shape
         theta = np.zeros([m, 1])

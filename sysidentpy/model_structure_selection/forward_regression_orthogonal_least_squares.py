@@ -26,6 +26,20 @@ class FROLS(
     ModelInformation, InformationMatrix, ModelPrediction
 ):
     """Forward Regression Orthogonal Least Squares algorithm.
+    
+    This class uses the FROLS algorithm ([1]_, [2]_) to build NARMAX models.
+    The NARMAX model is described as:
+    .. math::
+        y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k
+
+    where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,
+    are the maximum lags for the system output and input respectively;
+    :math:`x_k \in \mathbb{R}^{n_x}` is the system input and :math:`y_k \in \mathbb{R}^{n_y}`
+    is the system output at discrete time :math:`k \in \mathbb{N}^n`;
+    :math:`e_k \in \mathbb{R}^{n_e}` stands for uncertainties and possible noise
+    at discrete time :math:`k`. In this case, :math:`\mathcal{F}^\ell` is some nonlinear function
+    of the input and output regressors with nonlinearity degree :math:`\ell \in \mathbb{N}`
+    and :math:`d` is a time delay typically set to :math:`d=1`.
 
     Parameters
     ----------
@@ -33,6 +47,8 @@ class FROLS(
         The maximum lag of the output.
     xlag : int, default=2
         The maximum lag of the input.
+    elag : int, default=2
+        The maximum lag of the residues.
     order_selection: bool, default=False
         Whether to use information criteria for order selection.
     info_criteria : str, default="aic"
@@ -109,12 +125,12 @@ class FROLS(
 
     References
     ----------
-    [1] Manuscript: Orthogonal least squares methods and their application
-        to non-linear system identification
-        https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
-    [2] Manuscript (portuguese): Identificação de Sistemas não Lineares
-        Utilizando Modelos NARMAX Polinomiais – Uma Revisão
-        e Novos Resultados
+    .. [1] Manuscript: Orthogonal least squares methods and their application
+       to non-linear system identification
+       https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
+    .. [2] Manuscript (portuguese): Identificação de Sistemas não Lineares
+       Utilizando Modelos NARMAX Polinomiais – Uma Revisão
+       e Novos Resultados
     """
 
     def __init__(
@@ -223,7 +239,7 @@ class FROLS(
             )
     
     def error_reduction_ratio(self, psi, y, process_term_number):
-        """Perform the Error Reduction Ration algorithm.
+        """Perform the Error Reduction Ration algorithm [1]_, [2]_.
 
         Parameters
         ----------
@@ -246,13 +262,13 @@ class FROLS(
 
         References
         ----------
-        [1] Manuscript: Orthogonal least squares methods and their application
-            to non-linear system identification
-            https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
+        .. [1] Manuscript: Orthogonal least squares methods and their application
+           to non-linear system identification
+           https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
 
-        [2] Manuscript (portuguese): Identificação de Sistemas não Lineares
-            Utilizando Modelos NARMAX Polinomiais – Uma Revisão
-            e Novos Resultados
+        .. [2] Manuscript (portuguese): Identificação de Sistemas não Lineares
+           Utilizando Modelos NARMAX Polinomiais – Uma Revisão
+           e Novos Resultados
 
         """
         squared_y = np.dot(y[self.max_lag :].T, y[self.max_lag :])

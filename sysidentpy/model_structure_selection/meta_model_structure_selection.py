@@ -15,6 +15,20 @@ from ..simulation import SimulateNARMAX
 class MetaMSS(SimulateNARMAX, BPSOGSA):
     """Meta-Model Structure Selection: Building Polynomial NARMAX model
 
+    This class uses the MetaMSS ([1]_, [2]_, [3]_) algorithm to build NARMAX models.
+    The NARMAX model is described as:
+    .. math::
+        y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k
+
+    where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,
+    are the maximum lags for the system output and input respectively;
+    :math:`x_k \in \mathbb{R}^{n_x}` is the system input and :math:`y_k \in \mathbb{R}^{n_y}`
+    is the system output at discrete time :math:`k \in \mathbb{N}^n`;
+    :math:`e_k \in \mathbb{R}^{n_e}` stands for uncertainties and possible noise
+    at discrete time :math:`k`. In this case, :math:`\mathcal{F}^\ell` is some nonlinear function
+    of the input and output regressors with nonlinearity degree :math:`\ell \in \mathbb{N}`
+    and :math:`d` is a time delay typically set to :math:`d=1`.
+
     Parameters
     ----------
     non_degree : int, default=2
@@ -80,7 +94,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
     --------
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
-    >>> from sysidentpy.metaheuristics import MetaMSS
+    >>> from sysidentpy.model_structure_selection import MetaMSS
     >>> from sysidentpy.metrics import root_relative_squared_error
     >>> from sysidentpy.utils.generate_data import get_siso_data
     >>> x_train, x_valid, y_train, y_valid = get_siso_data(n=400,
@@ -115,15 +129,15 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
     References
     ----------
-    [1] Manuscript: Meta-Model Structure Selection: Building Polynomial NARX Model
-        for Regression and Classification 
-        https://arxiv.org/pdf/2109.09917.pdf
-    [1] Manuscript (Portuguese): Identificação de Sistemas Não Lineares
-        Utilizando o Algoritmo Híbrido e Binário de Otimização por
-        Enxame de Partículas e Busca Gravitacional
-        DOI: 10.17648/sbai-2019-111317
-    [2] Master thesis: Meta model structure selection: an algorithm for
-        building polynomial NARX models for regression and classification
+    .. [1] Manuscript: Meta-Model Structure Selection: Building Polynomial NARX Model
+       for Regression and Classification 
+       https://arxiv.org/pdf/2109.09917.pdf
+    .. [2] Manuscript (Portuguese): Identificação de Sistemas Não Lineares
+       Utilizando o Algoritmo Híbrido e Binário de Otimização por
+       Enxame de Partículas e Busca Gravitacional
+       DOI: 10.17648/sbai-2019-111317
+    .. [3] Master thesis: Meta model structure selection: an algorithm for
+       building polynomial NARX models for regression and classification
     """
 
     def __init__(

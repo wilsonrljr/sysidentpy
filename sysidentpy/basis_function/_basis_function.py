@@ -4,11 +4,7 @@ from ..narmax_base import InformationMatrix
 
 
 class PolynomialBasis(InformationMatrix):
-    def __init__(
-        self,
-        non_degree=2,
-    ):
-
+    def __init__(self, non_degree=2):
         self.non_degree = non_degree
         
     def build_polynomial_basis(self, data, non_degree, max_lag, predefined_regressors=None):
