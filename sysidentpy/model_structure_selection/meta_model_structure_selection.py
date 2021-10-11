@@ -6,11 +6,10 @@
 import numpy as np
 from scipy.stats import t
 import warnings
-from ..simulation import SimulateNARMAX
 from ..utils._check_arrays import check_X_y
 from ..metrics import root_relative_squared_error, mean_squared_error
-from ..metaheuristics.bpsogsa import BPSOGSA
-
+from ..metaheuristics import BPSOGSA
+from ..simulation import SimulateNARMAX
 
 
 class MetaMSS(SimulateNARMAX, BPSOGSA):
@@ -141,6 +140,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         p_value=0.05,
         xlag=2,
         ylag=2,
+        elag=2,
         n_inputs=1,
         estimator="least_squares",
         extended_least_squares=False,
@@ -151,7 +151,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         eps=np.finfo(np.float64).eps,
         gama=0.2,
         weight=0.02,
-        estimate_parameter=False,
+        estimate_parameter=True,
         loss_func="metamss_loss",
         model_type="NARMAX",
         basis_function=None,
@@ -188,18 +188,10 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         
         self.xlag = xlag
         self.ylag = ylag
+        self.elag = elag
         self.non_degree = basis_function.non_degree
         self.p_value = p_value
-        self._n_inputs = n_inputs
         self.estimator = estimator
-        self.extended_least_squares = extended_least_squares
-        self.lam = lam
-        self.delta = delta
-        self.offset_covariance = offset_covariance
-        self.mu = mu
-        self.eps = eps
-        self.gama = gama
-        self.weight = weight
         self.estimate_parameter = estimate_parameter
         self.loss_func = loss_func
         self.regressor_code = self.regressor_space(
@@ -314,7 +306,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             )
 
             residues = y_test - yhat
-            
+
             if self.model_type == "NAR":
                 warnings.warn(
                     (
