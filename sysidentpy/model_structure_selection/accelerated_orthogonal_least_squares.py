@@ -232,33 +232,12 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
             raise ValueError("y cannot be None")
         
         if self.model_type == "NAR":
-            warnings.warn(
-                (
-                    "Because the user chooses NAR model , the model built"
-                    "will be of the form y(k) = F(y[k-1], y[k-2], ..., y[k-n]) + e(k)"
-                ),
-                stacklevel=2,
-            )
             lagged_data = self.build_output_matrix(y, self.ylag, self.non_degree)
             self.max_lag = self._get_max_lag(ylag=self.ylag)
         elif self.model_type == "NFIR":
-            warnings.warn(
-                (
-                    "Because the user chooses the NFIR model, the model built"
-                    "will be of the form y(k) = F(X[k-1], X[k-2], ..., X[k-n]) + e(k)"
-                ),
-                stacklevel=2,
-            )
             lagged_data = self.build_input_matrix(X, self.xlag, self.non_degree)
             self.max_lag = self._get_max_lag(xlag=self.xlag)
         elif self.model_type == "NARMAX":
-            warnings.warn(
-                (
-                    "Because the user chooses NARMAX model, the model built"
-                    "will be of the form y(k) = F(y[k-1], y[k-2], ..., y[k-n], X[k-1], X[k-2], ..., X[k-n]) + e(k)"
-                ),
-                stacklevel=2,
-            )
             check_X_y(X, y)
             self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
             lagged_data = self.build_input_output_matrix(X, y, self.xlag, self.ylag, self.non_degree)
