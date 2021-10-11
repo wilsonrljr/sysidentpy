@@ -4,12 +4,18 @@
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
 
-from ..model_structure_selection import FROLS
 import numpy as np
 from ..utils._check_arrays import check_X_y
+from ..narmax_base import GenerateRegressors, ModelPrediction
+from ..narmax_base import HouseHolder
+from ..narmax_base import InformationMatrix
+from ..narmax_base import ModelInformation
+from ..narmax_base import ModelPrediction
+from ..parameter_estimation.estimators import Estimators
 
 
-class SimulateNARMAX(FROLS):
+class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
+    ModelInformation, InformationMatrix, ModelPrediction):
     """Simulation of Polynomial NARMAX model
 
     Parameters
@@ -87,7 +93,7 @@ class SimulateNARMAX(FROLS):
         self,
         n_inputs=1,
         estimator="recursive_least_squares",
-        extended_least_squares=True,
+        extended_least_squares=False,
         lam=0.98,
         delta=0.01,
         offset_covariance=0.2,
@@ -95,15 +101,13 @@ class SimulateNARMAX(FROLS):
         eps=np.finfo(np.float64).eps,
         gama=0.2,
         weight=0.02,
-        estimate_parameter=False,
+        estimate_parameter=True,
         calculate_err=False,
         model_type="NARMAX",
         basis_function=None,
     ):
 
         super().__init__(
-            estimator=estimator,
-            extended_least_squares=extended_least_squares,
             lam=lam,
             delta=delta,
             offset_covariance=offset_covariance,
@@ -111,10 +115,11 @@ class SimulateNARMAX(FROLS):
             eps=eps,
             gama=gama,
             weight=weight,
-            model_type=model_type,
-            basis_function=basis_function
         )
-
+        self.model_type = model_type
+        self.basis_function=basis_function
+        self.estimator = estimator
+        self._extended_least_squares = extended_least_squares
         self.estimate_parameter = estimate_parameter
         self.calculate_err = calculate_err
         self._n_inputs = n_inputs
@@ -215,7 +220,7 @@ class SimulateNARMAX(FROLS):
 
         self.pivv = self._get_index_from_regressor_code(regressor_code, model_code)
         self.final_model = regressor_code[self.pivv]
-
+        # self.regressor_code = self.final_model
         # to use in the predict function
         self.n_terms = self.final_model.shape[0]
         
@@ -239,6 +244,9 @@ class SimulateNARMAX(FROLS):
                 lagged_data, self.non_degree, self.max_lag, predefined_regressors=self.pivv)
 
             self.theta = getattr(self, self.estimator)(psi, y_train)
+            if self._extended_least_squares is True:
+                self.theta = self._unbiased_estimator(psi, y_train, self.theta, self.non_degree, self.elag, self.max_lag)
+            
             self.err = self.n_terms * [0]
         else:
             if self.model_type == "NAR":
@@ -257,9 +265,11 @@ class SimulateNARMAX(FROLS):
                 lagged_data, self.non_degree, self.max_lag, predefined_regressors=self.pivv)
 
             _, self.err, self.pivv, _ = self.error_reduction_ratio(
-                psi, y_train, self.n_terms
+                psi, y_train, self.n_terms, self.final_model
             )
             self.theta = getattr(self, self.estimator)(psi, y_train)
+            if self._extended_least_squares is True:
+                self.theta = self._unbiased_estimator(psi, y_train, self.theta, self.non_degree, self.elag, self.max_lag)
 
         yhat = self.predict(X_test, y_test, steps_ahead)
         # results = self.results(err_precision=8, dtype="dec")
@@ -268,3 +278,74 @@ class SimulateNARMAX(FROLS):
         #     ee, ex, _, _ = self.residuals(X_test, y_test, yhat)
         #     self.plot_result(y_test, yhat, ee, ex)
         return yhat
+
+    def error_reduction_ratio(self, psi, y, process_term_number, regressor_code):
+        """Perform the Error Reduction Ration algorithm.
+
+        Parameters
+        ----------
+        y : array-like of shape = n_samples
+            The target data used in the identification process.
+        psi : ndarray of floats
+            The information matrix of the model.
+        process_term_number : int
+            Number of Process Terms defined by the user.
+
+        Returns
+        -------
+        err : array-like of shape = number_of_model_elements
+            The respective ERR calculated for each regressor.
+        piv : array-like of shape = number_of_model_elements
+            Contains the index to put the regressors in the correct order
+            based on err values.
+        psi_orthogonal : ndarray of floats
+            The updated and orthogonal information matrix.
+
+        References
+        ----------
+        [1] Manuscript: Orthogonal least squares methods and their application
+            to non-linear system identification
+            https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
+
+        [2] Manuscript (portuguese): Identificação de Sistemas não Lineares
+            Utilizando Modelos NARMAX Polinomiais – Uma Revisão
+            e Novos Resultados
+
+        """
+        squared_y = np.dot(y[self.max_lag :].T, y[self.max_lag :])
+        tmp_psi = psi.copy()
+        y = y[self.max_lag :, 0].reshape(-1, 1)
+        tmp_y = y.copy()
+        dimension = tmp_psi.shape[1]
+        piv = np.arange(dimension)
+        tmp_err = np.zeros(dimension)
+        err = np.zeros(dimension)
+
+        for i in np.arange(0, dimension):
+            for j in np.arange(i, dimension):
+                # Add `eps` in the denominator to omit division by zero if
+                # denominator is zero
+                tmp_err[j] = (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2) / (
+                    np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) * squared_y + self._eps
+                )
+
+            if i == process_term_number:
+                break
+
+            piv_index = np.argmax(tmp_err[i:]) + i
+            err[i] = tmp_err[piv_index]
+            tmp_psi[:, [piv_index, i]] = tmp_psi[:, [i, piv_index]]
+            piv[[piv_index, i]] = piv[[i, piv_index]]
+
+            v = self._house(tmp_psi[i:, i])
+
+            row_result = self._rowhouse(tmp_psi[i:, i:], v)
+
+            tmp_y[i:] = self._rowhouse(tmp_y[i:], v)
+
+            tmp_psi[i:, i:] = np.copy(row_result)
+
+        tmp_piv = piv[0:process_term_number]
+        psi_orthogonal = psi[:, tmp_piv]
+        model_code = regressor_code[tmp_piv, :].copy()
+        return model_code, err, piv, psi_orthogonal
