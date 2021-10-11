@@ -4,11 +4,23 @@ from sysidentpy.utils._check_arrays import (
     check_infinity,
     check_nan,
     check_X_y,
+    _check_positive_int,
+    _num_features
 )
 from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
 import numpy as np
-from numpy.testing import assert_raises
+from numpy.testing import assert_equal, assert_raises
 
+
+def test_check_positive_int():
+    assert_raises(ValueError, _check_positive_int, -1, 'name')
+
+
+def test_num_features():
+    X = np.random.rand(10, 2)
+    Y = np.random.rand(10, 1)
+    assert_equal(_num_features(X), 2)
+    assert_equal(_num_features(Y), 1)
 
 def test_check_infinity():
     X = np.array([1, 2, 3, 4, 4, 5, 0, 6, np.inf]).reshape((-1, 1))
