@@ -16,9 +16,13 @@ from ..parameter_estimation.estimators import Estimators
 from ..residues.residues_correlation import ResiduesAnalysis
 from ..utils._check_arrays import check_X_y
 from .narmax import PolynomialNarmax
+from ..utils.deprecation import deprecated
 
+
+@deprecated(version='v0.1.7', future_version='v0.2.0',
+            alternative='from sysidentpy.model_structure_selection import AOLS. \n Check the documentation for more details.')
 class AOLS(PolynomialNarmax):
-    """Polynomial NARXMAX model
+    """Polynomial NARMAX model
     
     Build Polynomial NARMAX model using the Accelerated Orthogonal Least-Squares. 
     This algorithm is based on the Matlab code available on:
