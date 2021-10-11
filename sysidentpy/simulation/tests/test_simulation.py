@@ -98,3 +98,6 @@ def test_default_values():
         model.calculate_err
     ]
     assert list(default.values()) == model_values
+
+def test_model_order_selection():
+    assert_raises(TypeError, SimulateNARMAX, test_estimate_parameter=1, basis_function=PolynomialBasis(non_degree=2))

@@ -80,3 +80,6 @@ def test_get_miso_data():
     assert len(y_valid) == 100
     assert x_train.shape[1] == 2
     assert y_train.shape[1] == 1
+
+
+    
