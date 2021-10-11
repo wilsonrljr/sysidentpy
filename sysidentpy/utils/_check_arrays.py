@@ -8,11 +8,13 @@ import numpy as np
 
 
 def _num_features(X):
-    return X.shape[0]
+    return X.shape[1]
 
 def _check_positive_int(value, name):
     if not isinstance(value, int) or value < 1:
         raise ValueError(f"{name} must be integer and > zero. Got {value}")
+    else:
+        pass
 
 def check_infinity(X, y):
     """Check that X and y have no NaN or Inf samples.
