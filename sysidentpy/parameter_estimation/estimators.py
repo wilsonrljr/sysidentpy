@@ -7,10 +7,11 @@
 
 import numpy as np
 import warnings
+from ..narmax_base import InformationMatrix
 
 
-class Estimators:
-    """Oridanry Least squares for linear parameter estimation"""
+class Estimators(InformationMatrix):
+    """Ordinary Least Squares for linear parameter estimation"""
 
     def __init__(
         self,
@@ -113,8 +114,62 @@ class Estimators:
         self._check_linear_dependence_rows(psi)
 
         y = y[self.max_lag :, 0].reshape(-1, 1)
-        theta = np.dot(np.linalg.pinv(np.dot(psi.T, psi)), np.dot(psi.T, y))
+        # theta = np.dot(np.linalg.pinv(np.dot(psi.T, psi)), np.dot(psi.T, y))
+        theta = np.linalg.lstsq(psi, y, rcond=None)[0]
         return theta
+    
+    def _unbiased_estimator(self, psi, y, theta, non_degree, elag, max_lag):
+        """Estimate the model parameters using Extended Least Squares method.
+
+        Parameters
+        ----------
+        psi : ndarray of floats
+            The information matrix of the model.
+        X : ndarray of floats
+            The input data to be used in the training process.
+        y_train : array-like of shape = y_training
+            The data used to training the model.
+        biased_theta : array-like of shape = number_of_model_elements
+            The estimated biased parameters of the model.
+
+        Returns
+        -------
+        theta : array-like of shape = number_of_model_elements
+            The estimated unbiased parameters of the model.
+
+        References
+        ----------
+        [1] Manuscript: Sorenson, H. W. (1970). Least-squares estimation:
+            from Gauss to Kalman. IEEE spectrum, 7(7), 63-68.
+            http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf
+        [2] Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificaçao
+            de sistemas: técnicas lineares e não-lineares aplicadas a sistemas
+            reais. Editora da UFMG. 3a ediçao.
+        [3] Manuscript: Markovsky, I., & Van Huffel, S. (2007).
+            Overview of total least-squares methods.
+            Signal processing, 87(10), 2283-2302.
+            https://eprints.soton.ac.uk/263855/1/tls_overview.pdf
+        [4] Wikipedia entry on Least Squares
+            https://en.wikipedia.org/wiki/Least_squares
+
+        """
+        e = y[max_lag :, 0].reshape(-1, 1) - np.dot(psi, theta)
+        for i in range(30):
+            e = np.concatenate([np.zeros([max_lag, 1]), e], axis=0)
+            
+            lagged_data = self.build_output_matrix(e, elag, non_degree)
+        
+            e_regressors = self.basis_function.build_polynomial_basis(
+                lagged_data, non_degree, max_lag, predefined_regressors=None
+            )
+            
+            psi_extended = np.concatenate([psi, e_regressors], axis=1)
+            unbiased_theta = getattr(self, self.estimator)(psi_extended, y)
+            e = y[max_lag :, 0].reshape(-1, 1) - np.dot(
+                psi_extended, unbiased_theta.reshape(-1, 1)
+            )
+
+        return unbiased_theta[0 : theta.shape[0], 0].reshape(-1, 1)
 
     def total_least_squares(self, psi, y):
         """Estimate the model parameters using Total Least Squares method.
