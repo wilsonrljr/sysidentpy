@@ -11,12 +11,14 @@ from ..base import GenerateRegressors
 from ..base import InformationMatrix
 from ..residues.residues_correlation import ResiduesAnalysis
 from ..utils._check_arrays import check_X_y
+from ..utils.deprecation import deprecated
 from torch.utils.data import DataLoader
 from torch.utils.data import TensorDataset
 from torch import optim
 import torch.nn.functional as F
 import torch
 import sys
+
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -108,11 +110,12 @@ class NARXNN(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
 
     References
     ----------
-    [1]`Manuscript: Orthogonal least squares methods and their application
-        to non-linear system identification
-        <https://eprints.soton.ac.uk/251147/1/778742007_content.pdf>`_
+    .. [1]`Manuscript: Orthogonal least squares methods and their application
+       to non-linear system identification
+       <https://eprints.soton.ac.uk/251147/1/778742007_content.pdf>`_
     """
-
+    @deprecated(version='v0.1.7', future_version='v0.2.0',
+            alternative="NARXNN(ylag=2, xlag=2, basis_function='Some basis function')")
     def __init__(
         self,
         non_degree=1,
