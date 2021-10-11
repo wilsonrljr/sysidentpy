@@ -13,9 +13,6 @@ mpl.rcParams['axes.spines.top'] = False
 def plot_results(y=None, *, yhat=None, figsize=(10, 6), n=100, style="seaborn-white", facecolor="white", title="Free run simulation"):
     plt.style.use(style)
     plt.rcParams["axes.facecolor"] = facecolor
-    hist_data = np.random.randn(1_500)
-
-    # fig = plt.figure(constrained_layout=True, figsize=figsize, facecolor=facecolor)
     fig, ax = plt.subplots(figsize=figsize, facecolor=facecolor) 
     ax.plot(y[:n], c="#1f77b4",
         alpha=1,
@@ -37,7 +34,6 @@ def plot_results(y=None, *, yhat=None, figsize=(10, 6), n=100, style="seaborn-wh
 def plot_residues_correlation(data=None, *, figsize=(10, 6), n=100, style="seaborn-white", facecolor="white", title="Residual Analysis", ylabel="Correlation"):
     plt.style.use(style)
     plt.rcParams["axes.facecolor"] = facecolor
-    hist_data = np.random.randn(1_500)
     fig, ax = plt.subplots(figsize=figsize, facecolor=facecolor)
     ax.plot(data[0], color="#1f77b4")
     ax.axhspan(data[1], data[2], color="#ccd9ff", alpha=0.5, lw=0)
