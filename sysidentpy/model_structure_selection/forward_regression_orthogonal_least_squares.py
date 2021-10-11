@@ -121,13 +121,14 @@ class FROLS(
         self,
         ylag=2,
         xlag=2,
+        elag=2,
         order_selection=False,
         info_criteria="aic",
         n_terms=None,
         n_inputs=1,
         n_info_values=10,
         estimator="recursive_least_squares",
-        extended_least_squares=True,
+        extended_least_squares=False,
         lam=0.98,
         delta=0.01,
         offset_covariance=0.2,
@@ -138,7 +139,6 @@ class FROLS(
         basis_function=None,
         model_type="NARMAX"
     ):
-
         self.non_degree = basis_function.non_degree
         self._order_selection = order_selection
         self._n_inputs = n_inputs
@@ -153,16 +153,19 @@ class FROLS(
         self.n_terms = n_terms
         self.estimator = estimator
         self._extended_least_squares = extended_least_squares
-        self._eps = eps
-        self._mu = mu
-        self._offset_covariance = offset_covariance
-        self._lam = lam
-        self._delta = delta
-        self._gama = gama
-        self._weight = weight  # 0 < weight <1
+        self.elag = elag
         self.model_type = model_type
         self._validate_params()
         self.basis_function = basis_function
+        super().__init__(
+            lam=lam,
+            delta=delta,
+            offset_covariance=offset_covariance,
+            mu=mu,
+            eps=eps,
+            gama=gama,
+            weight=weight,
+        )
 
     def _validate_params(self):
         """Validate input params."""
@@ -218,7 +221,7 @@ class FROLS(
                 % self.regressor_code.shape[0],
                 stacklevel=2,
             )
-            
+    
     def error_reduction_ratio(self, psi, y, process_term_number):
         """Perform the Error Reduction Ration algorithm.
 
@@ -427,33 +430,12 @@ class FROLS(
             raise ValueError("y cannot be None")
         
         if self.model_type == "NAR":
-            warnings.warn(
-                (
-                    "Because the user chooses NAR model , the model built"
-                    "will be of the form y(k) = F(y[k-1], y[k-2], ..., y[k-n]) + e(k)"
-                ),
-                stacklevel=2,
-            )
             lagged_data = self.build_output_matrix(y, self.ylag, self.non_degree)
             self.max_lag = self._get_max_lag(ylag=self.ylag)
         elif self.model_type == "NFIR":
-            warnings.warn(
-                (
-                    "Because the user chooses the NFIR model, the model built"
-                    "will be of the form y(k) = F(X[k-1], X[k-2], ..., X[k-n]) + e(k)"
-                ),
-                stacklevel=2,
-            )
             lagged_data = self.build_input_matrix(X, self.xlag, self.non_degree)
             self.max_lag = self._get_max_lag(xlag=self.xlag)
         elif self.model_type == "NARMAX":
-            warnings.warn(
-                (
-                    "Because the user chooses NARMAX model, the model built"
-                    "will be of the form y(k) = F(y[k-1], y[k-2], ..., y[k-n], X[k-1], X[k-2], ..., X[k-n]) + e(k)"
-                ),
-                stacklevel=2,
-            )
             check_X_y(X, y)
             self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
             lagged_data = self.build_input_output_matrix(X, y, self.xlag, self.ylag, self.non_degree)
@@ -484,7 +466,7 @@ class FROLS(
         self.theta = getattr(self, self.estimator)(psi, y)
 
         if self._extended_least_squares is True:
-            self.theta = self._unbiased_estimator(psi, X, y)
+            self.theta = self._unbiased_estimator(psi, y, self.theta, self.non_degree, self.elag, self.max_lag)
         return self
     
     def predict(self, X, y, steps_ahead=None):
@@ -519,5 +501,4 @@ class FROLS(
         else:
             _check_positive_int(steps_ahead, "steps_ahead")
             return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
-
     
