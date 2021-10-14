@@ -1,11 +1,11 @@
-from numpy.testing._private.utils import assert_allclose
-from sysidentpy.model_structure_selection import FROLS
-from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
-from sysidentpy.basis_function import PolynomialBasis
-
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
 from numpy.testing import assert_raises
+from numpy.testing._private.utils import assert_allclose
+from sysidentpy.model_structure_selection import FROLS
+from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
+from sysidentpy.basis_function import Polynomial
+
 
 
 def create_test_data(n=1000):
@@ -27,12 +27,12 @@ def create_test_data(n=1000):
     return x, y, theta
 
 
-def test_error_reduction_ration():
+def test_error_reduction_ratio():
     piv = np.array([4, 2, 7, 11, 5])
     model_code = np.array(
         [[2002, 0], [1002, 0], [2001, 1001], [2002, 1002], [1001, 1001]]
     )
-    basis_function = PolynomialBasis(non_degree=2)
+    basis_function = Polynomial(degree=2)
     x, y, theta = create_test_data()
     model = FROLS(
         n_terms=5,
@@ -51,7 +51,7 @@ def test_error_reduction_ration():
 
 def test_fit_with_information_criteria():
     x, y, theta = create_test_data()
-    basis_function = PolynomialBasis(non_degree=2)
+    basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=15,
         order_selection=True,
@@ -64,7 +64,7 @@ def test_fit_with_information_criteria():
 
 def test_fit_without_information_criteria():
     x, y, theta = create_test_data()
-    basis_function = PolynomialBasis(non_degree=2)
+    basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=15,
         extended_least_squares=False,
@@ -81,7 +81,6 @@ def test_default_values():
         "order_selection": False,
         "info_criteria": "aic",
         "n_terms": None,
-        "n_inputs": 1,
         "n_info_values": 10,
         "estimator": "recursive_least_squares",
         "extended_least_squares": False,
@@ -94,14 +93,13 @@ def test_default_values():
         "weight": 0.02,
         "model_type": "NARMAX"
     }
-    model = FROLS(basis_function=PolynomialBasis(non_degree=2))
+    model = FROLS(basis_function=Polynomial(degree=2))
     model_values = [
         model.ylag,
         model.xlag,
         model._order_selection,
         model.info_criteria,
         model.n_terms,
-        model._n_inputs,
         model.n_info_values,
         model.estimator,
         model._extended_least_squares,
@@ -118,49 +116,44 @@ def test_default_values():
 
 
 def test_validate_ylag():
-    assert_raises(ValueError, FROLS, ylag=-1, basis_function=PolynomialBasis(non_degree=2))
-    assert_raises(ValueError, FROLS, ylag=1.3, basis_function=PolynomialBasis(non_degree=2))
+    assert_raises(ValueError, FROLS, ylag=-1, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, FROLS, ylag=1.3, basis_function=Polynomial(degree=2))
 
 
 def test_validate_xlag():
-    assert_raises(ValueError, FROLS, xlag=-1, basis_function=PolynomialBasis(non_degree=2))
-    assert_raises(ValueError, FROLS, xlag=1.3, basis_function=PolynomialBasis(non_degree=2))
+    assert_raises(ValueError, FROLS, xlag=-1, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, FROLS, xlag=1.3, basis_function=Polynomial(degree=2))
 
 
 def test_model_order_selection():
-    assert_raises(TypeError, FROLS, order_selection=1, basis_function=PolynomialBasis(non_degree=2))
-    assert_raises(TypeError, FROLS, order_selection="True", basis_function=PolynomialBasis(non_degree=2))
-    assert_raises(TypeError, FROLS, order_selection=None, basis_function=PolynomialBasis(non_degree=2))
+    assert_raises(TypeError, FROLS, order_selection=1, basis_function=Polynomial(degree=2))
+    assert_raises(TypeError, FROLS, order_selection="True", basis_function=Polynomial(degree=2))
+    assert_raises(TypeError, FROLS, order_selection=None, basis_function=Polynomial(degree=2))
 
 
 def test_n_terms():
-    assert_raises(ValueError, FROLS, n_terms=1.2, basis_function=PolynomialBasis(non_degree=2))
-    assert_raises(ValueError, FROLS, n_terms=-1, basis_function=PolynomialBasis(non_degree=2))
-
-
-def test_n_inputs():
-    assert_raises(ValueError, FROLS, n_inputs=1.2, basis_function=PolynomialBasis(non_degree=2))
-    assert_raises(ValueError, FROLS, n_inputs=-1, basis_function=PolynomialBasis(non_degree=2))
+    assert_raises(ValueError, FROLS, n_terms=1.2, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, FROLS, n_terms=-1, basis_function=Polynomial(degree=2))
 
 
 def test_n_info_values():
-    assert_raises(ValueError, FROLS, n_info_values=1.2, basis_function=PolynomialBasis(non_degree=2))
-    assert_raises(ValueError, FROLS, n_info_values=-1, basis_function=PolynomialBasis(non_degree=2))
+    assert_raises(ValueError, FROLS, n_info_values=1.2, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, FROLS, n_info_values=-1, basis_function=Polynomial(degree=2))
 
 
 def test_extended_least_squares():
-    assert_raises(TypeError, FROLS, extended_least_squares=1, basis_function=PolynomialBasis(non_degree=2))
-    assert_raises(TypeError, FROLS, extended_least_squares="True", basis_function=PolynomialBasis(non_degree=2))
-    assert_raises(TypeError, FROLS, extended_least_squares=None, basis_function=PolynomialBasis(non_degree=2))
+    assert_raises(TypeError, FROLS, extended_least_squares=1, basis_function=Polynomial(degree=2))
+    assert_raises(TypeError, FROLS, extended_least_squares="True", basis_function=Polynomial(degree=2))
+    assert_raises(TypeError, FROLS, extended_least_squares=None, basis_function=Polynomial(degree=2))
 
 
 def test_info_criteria():
-    assert_raises(ValueError, FROLS, info_criteria="AIC", basis_function=PolynomialBasis(non_degree=2))
+    assert_raises(ValueError, FROLS, info_criteria="AIC", basis_function=Polynomial(degree=2))
 
 
 def test_predict():
     x, y, theta = create_test_data()
-    basis_function = PolynomialBasis(non_degree=2)
+    basis_function = Polynomial(degree=2)
     train_percentage = 90
     split_data = int(len(x) * (train_percentage / 100))
 
@@ -191,7 +184,7 @@ def test_predict():
 
 def test_model_prediction():
     x, y, theta = create_test_data()
-    basis_function = PolynomialBasis(non_degree=2)
+    basis_function = Polynomial(degree=2)
     train_percentage = 90
     split_data = int(len(x) * (train_percentage / 100))
 
@@ -221,7 +214,7 @@ def test_model_prediction():
 
 def test_information_criteria_bic():
     x, y, theta = create_test_data()
-    basis_function = PolynomialBasis(non_degree=2)
+    basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
         extended_least_squares=False,
@@ -240,7 +233,7 @@ def test_information_criteria_bic():
 
 def test_information_criteria_fpe():
     x, y, theta = create_test_data()
-    basis_function = PolynomialBasis(non_degree=2)
+    basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
         extended_least_squares=False,
@@ -261,7 +254,7 @@ def test_information_criteria_fpe():
 
 def test_information_criteria_lilc():
     x, y, theta = create_test_data()
-    basis_function = PolynomialBasis(non_degree=2)
+    basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
         extended_least_squares=False,

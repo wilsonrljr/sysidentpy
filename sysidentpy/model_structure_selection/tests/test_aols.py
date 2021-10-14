@@ -1,5 +1,5 @@
 from sysidentpy.model_structure_selection.accelerated_orthogonal_least_squares import AOLS
-from sysidentpy.basis_function._basis_function import PolynomialBasis
+from sysidentpy.basis_function._basis_function import Polynomial
 
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
@@ -29,17 +29,15 @@ def test_default_values():
     default = {
         "ylag": 2,
         "xlag": 2,
-        "n_inputs": 1,
         "k": 1,
         "l": 1,
         "threshold": 10e-10,
         "model_type": "NARMAX"
     }
-    model = AOLS(basis_function=PolynomialBasis(non_degree=2))
+    model = AOLS(basis_function=Polynomial(degree=2))
     model_values = [
         model.ylag,
         model.xlag,
-        model._n_inputs,
         model.k,
         model.l,
         model.threshold,
@@ -51,39 +49,34 @@ def test_default_values():
 
 
 def test_validate_ylag():
-    assert_raises(ValueError, AOLS, ylag=-1, basis_function=PolynomialBasis(non_degree=2))
-    assert_raises(ValueError, AOLS, ylag=1.3, basis_function=PolynomialBasis(non_degree=2))
+    assert_raises(ValueError, AOLS, ylag=-1, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, AOLS, ylag=1.3, basis_function=Polynomial(degree=2))
 
 
 def test_validate_xlag():
-    assert_raises(ValueError, AOLS, xlag=-1, basis_function=PolynomialBasis(non_degree=2))
-    assert_raises(ValueError, AOLS, xlag=1.3, basis_function=PolynomialBasis(non_degree=2))
+    assert_raises(ValueError, AOLS, xlag=-1, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, AOLS, xlag=1.3, basis_function=Polynomial(degree=2))
 
 
 def test_k():
-    assert_raises(ValueError, AOLS, k=-1, basis_function=PolynomialBasis(non_degree=2))
-    assert_raises(TypeError, AOLS, k="True", basis_function=PolynomialBasis(non_degree=2))
-    assert_raises(ValueError, AOLS, k=1.3, basis_function=PolynomialBasis(non_degree=2))
+    assert_raises(ValueError, AOLS, k=-1, basis_function=Polynomial(degree=2))
+    assert_raises(TypeError, AOLS, k="True", basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, AOLS, k=1.3, basis_function=Polynomial(degree=2))
 
 
 def test_n_terms():
-    assert_raises(ValueError, AOLS, l=1.2, basis_function=PolynomialBasis(non_degree=2))
-    assert_raises(ValueError, AOLS, l=-1, basis_function=PolynomialBasis(non_degree=2))
-
-
-def test_n_inputs():
-    assert_raises(ValueError, AOLS, n_inputs=1.2, basis_function=PolynomialBasis(non_degree=2))
-    assert_raises(ValueError, AOLS, n_inputs=-1, basis_function=PolynomialBasis(non_degree=2))
+    assert_raises(ValueError, AOLS, l=1.2, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, AOLS, l=-1, basis_function=Polynomial(degree=2))
 
 
 def test_threshold():
-    assert_raises(ValueError, AOLS, threshold=-1.2, basis_function=PolynomialBasis(non_degree=2))
-    assert_raises(TypeError, AOLS, threshold="-1", basis_function=PolynomialBasis(non_degree=2))
+    assert_raises(ValueError, AOLS, threshold=-1.2, basis_function=Polynomial(degree=2))
+    assert_raises(TypeError, AOLS, threshold="-1", basis_function=Polynomial(degree=2))
 
 
 def test_model_prediction():
     x, y, theta = create_test_data()
-    basis_function = PolynomialBasis(non_degree=2)
+    basis_function = Polynomial(degree=2)
     train_percentage = 90
     split_data = int(len(x) * (train_percentage / 100))
 
