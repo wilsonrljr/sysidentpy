@@ -57,8 +57,6 @@ class FROLS(
         The number of the model terms to be selected.
         Note that n_terms overwrite the information criteria
         values.
-    n_inputs : int, default=1
-        The number of inputs of the system.
     n_info_values : int, default=10
         The number of iterations of the information
         criteria method.
@@ -94,14 +92,17 @@ class FROLS(
     --------
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
-    >>> from sysidentpy.polynomial_basis import PolynomialNarmax
+    >>> from sysidentpy.model_structure_selection import FROLS
+    >>> from sysidentpy.basis_function._basis_function import Polynomial
+    >>> from sysidentpy.utils.display_results import results
     >>> from sysidentpy.metrics import root_relative_squared_error
     >>> from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
     >>> x_train, x_valid, y_train, y_valid = get_siso_data(n=1000,
     ...                                                    colored_noise=True,
     ...                                                    sigma=0.2,
     ...                                                    train_percentage=90)
-    >>> model = PolynomialNarmax(non_degree=2,
+    >>> basis_function = Polynomial(degree=2)
+    >>> model = PolynomialNarmax(basis_function=basis_function,
     ...                          order_selection=True,
     ...                          n_info_values=10,
     ...                          extended_least_squares=False,
@@ -114,15 +115,18 @@ class FROLS(
     >>> rrse = root_relative_squared_error(y_valid, yhat)
     >>> print(rrse)
     0.001993603325328823
-    >>> results = pd.DataFrame(model.results(err_precision=8,
-    ...                                      dtype='dec'),
-    ...                        columns=['Regressors', 'Parameters', 'ERR'])
-    >>> print(results)
+    >>> r = pd.DataFrame(
+    ...     results(
+    ...         model.final_model, model.theta, model.err,
+    ...         model.n_terms, err_precision=8, dtype='sci'
+    ...         ),
+    ...     columns=['Regressors', 'Parameters', 'ERR'])
+    >>> print(r)
         Regressors Parameters         ERR
-    0        x1(k-2)     0.9000  0.95556574
-    1         y(k-1)     0.1999  0.04107943
-    2  x1(k-1)y(k-1)     0.1000  0.00335113
-
+    0        x1(k-2)     0.9000       0.0
+    1         y(k-1)     0.1999       0.0
+    2  x1(k-1)y(k-1)     0.1000       0.0
+    
     References
     ----------
     .. [1] Manuscript: Orthogonal least squares methods and their application

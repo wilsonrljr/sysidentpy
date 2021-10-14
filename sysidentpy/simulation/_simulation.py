@@ -69,14 +69,16 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
     --------
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
-    >>> from sysidentpy.polynomial_basis.simulation import SimulatePolynomialNarmax
+    >>> from sysidentpy.simulation import SimulateNARMAX
+    >>> from sysidentpy.basis_function._basis_function import Polynomial
     >>> from sysidentpy.metrics import root_relative_squared_error
     >>> from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
     >>> x_train, x_valid, y_train, y_valid = get_siso_data(n=1000,
     ...                                                    colored_noise=True,
     ...                                                    sigma=0.2,
     ...                                                    train_percentage=90)
-    >>> s = SimulatePolynomialNarmax()
+    >>> basis_function = Polynomial(degree=2)
+    >>> s = SimulateNARMAX(basis_function=basis_function)
     >>> model = np.array(
     ...     [
     ...     [1001,    0], # y(k-1)
@@ -86,20 +88,23 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
     ...                 )
     >>> # theta must be a numpy array of shape (n, 1) where n is the number of regressors
     >>> theta = np.array([[0.2, 0.9, 0.1]]).T
-    >>> yhat, results = s.simulate(
+    >>> yhat = s.simulate(
     ...     X_test=x_test,
     ...     y_test=y_test,
     ...     model_code=model,
     ...     theta=theta,
-    ...     plot=True)
-    >>> results = pd.DataFrame(model.results(err_precision=8,
-    ...                                      dtype='dec'),
-    ...                        columns=['Regressors', 'Parameters', 'ERR'])
-    >>> print(results)
+    ...     )
+    >>> r = pd.DataFrame(
+    ...     results(
+    ...         model.final_model, model.theta, model.err,
+    ...         model.n_terms, err_precision=8, dtype='sci'
+    ...         ),
+    ...     columns=['Regressors', 'Parameters', 'ERR'])
+    >>> print(r)
         Regressors Parameters         ERR
-    0        x1(k-2)     0.9000  0.95556574
-    1         y(k-1)     0.1999  0.04107943
-    2  x1(k-1)y(k-1)     0.1000  0.00335113
+    0        x1(k-2)     0.9000       0.0
+    1         y(k-1)     0.1999       0.0
+    2  x1(k-1)y(k-1)     0.1000       0.0
     """
     def __init__(
         self,

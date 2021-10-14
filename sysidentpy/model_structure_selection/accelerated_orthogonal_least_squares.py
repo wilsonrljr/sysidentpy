@@ -40,14 +40,10 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
 
     Parameters
     ----------
-    non_degree : int, default=2
-        The nonlinearity degree of the polynomial function.
     ylag : int, default=2
         The maximum lag of the output.
     xlag : int, default=2
         The maximum lag of the input.
-    n_inputs : int, default=1
-        The number of inputs of the system.
     k : int, default=1
         The sparsity level.
     L : int, default=1
@@ -68,11 +64,9 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
     ...                                                    colored_noise=True,
     ...                                                    sigma=0.2,
     ...                                                    train_percentage=90)
-    >>> model = AOLS(non_degree=2,
-    ...              order_selection=True,
-    ...              ylag=2, xlag=2,
-    ...              info_criteria='aic',
-    ...              estimator='least_squares',
+    >>> basis_function = Polynomial(degree=2)
+    >>> model = AOLS(basis_function=basis_function,
+    ...              ylag=2, xlag=2
     ...              )
     >>> model.fit(x_train, y_train)
     >>> yhat = model.predict(x_valid, y_valid)

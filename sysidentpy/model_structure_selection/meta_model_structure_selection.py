@@ -31,16 +31,12 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
     Parameters
     ----------
-    non_degree : int, default=2
-        The nonlinearity degree of the polynomial function.
     ylag : int, default=2
         The maximum lag of the output.
     xlag : int, default=2
         The maximum lag of the input.
     loss_func : str, default="metamss_loss"
         The loss function to be minimized.
-    n_inputs : int, default=1
-        The number of inputs of the system.
     estimator : str, default="least_squares"
         The parameter estimation method.
     estimate_parameter : bool, default=True
@@ -96,12 +92,16 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
     >>> import matplotlib.pyplot as plt
     >>> from sysidentpy.model_structure_selection import MetaMSS
     >>> from sysidentpy.metrics import root_relative_squared_error
+    >>> from sysidentpy.basis_function._basis_function import Polynomial
+    >>> from sysidentpy.utils.display_results import results
     >>> from sysidentpy.utils.generate_data import get_siso_data
     >>> x_train, x_valid, y_train, y_valid = get_siso_data(n=400,
     ...                                                    colored_noise=False,
     ...                                                    sigma=0.001,
     ...                                                    train_percentage=80)
+    >>> basis_function = Polynomial(degree=2)
     >>> model = MetaMSS(
+    ...     basis_function=basis_function,
     ...     norm=-2,
     ...     xlag=7,
     ...     ylag=7,
@@ -118,14 +118,17 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
     >>> rrse = root_relative_squared_error(y_valid, yhat)
     >>> print(rrse)
     0.001993603325328823
-    >>> results = pd.DataFrame(model.results(err_precision=8,
-    ...                                      dtype='dec'),
-    ...                        columns=['Regressors', 'Parameters', 'ERR'])
-    >>> print(results)
+    >>> r = pd.DataFrame(
+    ...     results(
+    ...         model.final_model, model.theta, model.err,
+    ...         model.n_terms, err_precision=8, dtype='sci'
+    ...         ),
+    ...     columns=['Regressors', 'Parameters', 'ERR'])
+    >>> print(r)
         Regressors Parameters         ERR
-    0        x1(k-2)     0.9000  0.00000000
-    1         y(k-1)     0.1999  0.00000000
-    2  x1(k-1)y(k-1)     0.1000  0.00000000
+    0        x1(k-2)     0.9000       0.0
+    1         y(k-1)     0.1999       0.0
+    2  x1(k-1)y(k-1)     0.1000       0.0
 
     References
     ----------
@@ -155,7 +158,6 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         xlag=2,
         ylag=2,
         elag=2,
-        # n_inputs=1,
         estimator="least_squares",
         extended_least_squares=False,
         lam=0.98,
@@ -182,7 +184,6 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             gama=gama,
             weight=weight,
             estimate_parameter=estimate_parameter,
-            # n_inputs=n_inputs,
             model_type=model_type,
             basis_function=basis_function
         )
@@ -207,10 +208,6 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self.estimator = estimator
         self.estimate_parameter = estimate_parameter
         self.loss_func = loss_func
-        # self.regressor_code = self.regressor_space(
-        #     non_degree=self.non_degree, xlag=xlag, ylag=ylag, n_inputs=n_inputs, model_type=model_type,
-        # )
-        # self.dimension = self.regressor_code.shape[0]
         self.steps_ahead = steps_ahead
         self._validate_metamss_params()
         
