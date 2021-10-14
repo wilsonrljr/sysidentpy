@@ -22,6 +22,7 @@ def test_num_features():
     assert_equal(_num_features(X), 2)
     assert_equal(_num_features(Y), 1)
 
+
 def test_check_infinity():
     X = np.array([1, 2, 3, 4, 4, 5, 0, 6, np.inf]).reshape((-1, 1))
     y = np.array([1, 2, 3, 4, 2, 5, 5, 6, 9]).reshape((-1, 1))
