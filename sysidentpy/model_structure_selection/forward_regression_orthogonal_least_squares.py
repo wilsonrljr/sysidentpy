@@ -17,7 +17,7 @@ from ..narmax_base import InformationMatrix
 from ..narmax_base import ModelInformation
 from ..narmax_base import ModelPrediction
 from ..parameter_estimation.estimators import Estimators
-from ..utils._check_arrays import check_X_y, _check_positive_int
+from sysidentpy.utils._check_arrays import check_X_y, _check_positive_int, _num_features
 import warnings
 
 
@@ -141,7 +141,6 @@ class FROLS(
         order_selection=False,
         info_criteria="aic",
         n_terms=None,
-        n_inputs=1,
         n_info_values=10,
         estimator="recursive_least_squares",
         extended_least_squares=False,
@@ -155,14 +154,10 @@ class FROLS(
         basis_function=None,
         model_type="NARMAX"
     ):
-        self.non_degree = basis_function.non_degree
+        self.non_degree = basis_function.degree
         self._order_selection = order_selection
-        self._n_inputs = n_inputs
         self.ylag = ylag
         self.xlag = xlag
-        self.regressor_code = self.regressor_space(
-            self.non_degree, xlag, ylag, n_inputs, model_type
-        )
         self.max_lag = self._get_max_lag(ylag, xlag)
         self.info_criteria = info_criteria
         self.n_info_values = n_info_values
@@ -190,11 +185,26 @@ class FROLS(
                 "n_info_values must be integer and > zero. Got %f" % self.n_info_values
             )
 
-        if not isinstance(self._n_inputs, int) or self._n_inputs < 1:
+        if isinstance(self.ylag, int) and self.ylag < 1:
             raise ValueError(
-                "n_inputs must be integer and > zero. Got %f" % self._n_inputs
+                "ylag must be integer and > zero. Got %f" % self.ylag
             )
-
+        
+        if isinstance(self.xlag, int) and self.xlag < 1:
+            raise ValueError(
+                "xlag must be integer and > zero. Got %f" % self.xlag
+            )
+            
+        if not isinstance(self.xlag, (int, list)):
+            raise ValueError(
+                "xlag must be integer and > zero. Got %f" % self.xlag
+            )
+        
+        if not isinstance(self.ylag, (int, list)):
+            raise ValueError(
+                "ylag must be integer and > zero. Got %f" % self.ylag
+            )
+        
         if not isinstance(self._order_selection, bool):
             raise TypeError(
                 "order_selection must be False or True. Got %f" % self._order_selection
@@ -224,19 +234,7 @@ class FROLS(
             raise ValueError(
                 "n_terms must be integer and > zero. Got %f" % self.n_terms
             )
-
-        if self.n_terms is not None and self.n_terms > self.regressor_code.shape[0]:
-            self.n_terms = self.regressor_code.shape[0]
-            warnings.warn(
-                (
-                    "n_terms is greater than the maximum number of "
-                    "all regressors space considering the chosen y_lag,"
-                    "u_lag, and non_degree. We set as "
-                    "%d "
-                )
-                % self.regressor_code.shape[0],
-                stacklevel=2,
-            )
+        
     
     def error_reduction_ratio(self, psi, y, process_term_number):
         """Perform the Error Reduction Ration algorithm [1]_, [2]_.
@@ -306,8 +304,7 @@ class FROLS(
 
         tmp_piv = piv[0:process_term_number]
         psi_orthogonal = psi[:, tmp_piv]
-        model_code = self.regressor_code[tmp_piv, :].copy()
-        return model_code, err, piv, psi_orthogonal
+        return err, piv, psi_orthogonal
     
     def information_criterion(self, X_base, y):
         """Determine the model order.
@@ -360,7 +357,7 @@ class FROLS(
 
         for i in range(0, self.n_info_values):
             n_theta = i + 1
-            regressor_matrix = self.error_reduction_ratio(X_base, y, n_theta)[3]
+            regressor_matrix = self.error_reduction_ratio(X_base, y, n_theta)[2]
 
             tmp_theta = getattr(self, self.estimator)(regressor_matrix, y)
 
@@ -411,6 +408,7 @@ class FROLS(
 
         return info_criteria_value
     
+     
     def fit(self, X, y):
         """Fit polynomial NARMAX model.
 
@@ -445,21 +443,26 @@ class FROLS(
         if y is None:
             raise ValueError("y cannot be None")
         
-        if self.model_type == "NAR":
-            lagged_data = self.build_output_matrix(y, self.ylag, self.non_degree)
-            self.max_lag = self._get_max_lag(ylag=self.ylag)
-        elif self.model_type == "NFIR":
-            lagged_data = self.build_input_matrix(X, self.xlag, self.non_degree)
-            self.max_lag = self._get_max_lag(xlag=self.xlag)
-        elif self.model_type == "NARMAX":
+        if self.model_type == "NARMAX":
             check_X_y(X, y)
             self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
-            lagged_data = self.build_input_output_matrix(X, y, self.xlag, self.ylag, self.non_degree)
+            lagged_data = self.build_input_output_matrix(X, y, self.xlag, self.ylag)
+        elif self.model_type == "NAR":
+            lagged_data = self.build_output_matrix(y, self.ylag)
+            self.max_lag = self._get_max_lag(ylag=self.ylag)
+        elif self.model_type == "NFIR":
+            lagged_data = self.build_input_matrix(X, self.xlag)
+            self.max_lag = self._get_max_lag(xlag=self.xlag)
         else:
             raise ValueError("Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.")
         
-        reg_matrix = self.basis_function.build_polynomial_basis(
-            lagged_data, self.non_degree, self.max_lag, predefined_regressors=None)
+        reg_matrix = self.basis_function.fit(
+            lagged_data, self.max_lag, predefined_regressors=None)   
+        
+        self._n_inputs = _num_features(X)
+        self.regressor_code = self.regressor_space(
+            self.non_degree, self.xlag, self.ylag, self._n_inputs, self.model_type
+            ) 
 
         if self._order_selection is True:
             self.info_values = self.information_criterion(reg_matrix, y)
@@ -475,12 +478,22 @@ class FROLS(
         else:
             model_length = self.n_terms
 
-        (self.final_model, self.err, self.pivv, psi) = self.error_reduction_ratio(
+        (self.err, self.pivv, psi) = self.error_reduction_ratio(
             reg_matrix, y, model_length
         )
+        
+        tmp_piv = self.pivv[0:model_length]
+        if self.basis_function.__class__.__name__ == "Polynomial":
+            self.final_model = self.regressor_code[tmp_piv, :].copy()
+        else:
+            # repetition = _num_features(reg_matrix)
+            self.regressor_code = np.sort(np.tile(self.regressor_code[1:, :], (self.basis_function.repetition, 1)), axis=0)
+            self.final_model = self.regressor_code[tmp_piv, :].copy()
+            
 
+        
         self.theta = getattr(self, self.estimator)(psi, y)
-
+        # self.max_lag = self._get_max_lag_from_model_code(self.final_model)
         if self._extended_least_squares is True:
             self.theta = self._unbiased_estimator(psi, y, self.theta, self.non_degree, self.elag, self.max_lag)
         return self
@@ -510,11 +523,26 @@ class FROLS(
             The predicted values of the model.
 
         """
-        if steps_ahead is None:
-            return self._model_prediction(X, y)
-        elif steps_ahead == 1:
-            return self._one_step_ahead_prediction(X, y)
-        else:
-            _check_positive_int(steps_ahead, "steps_ahead")
-            return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
+        # if steps_ahead is None:
+        #     return self._model_prediction(X, y)
+        # elif steps_ahead == 1:
+        #     return self._one_step_ahead_prediction(X, y)
+        # else:
+        #     _check_positive_int(steps_ahead, "steps_ahead")
+        #     return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
     
+        if self.basis_function.__class__.__name__ == "Polynomial":
+            if steps_ahead is None:
+                return self._model_prediction(X, y)
+            elif steps_ahead == 1:
+                return self._one_step_ahead_prediction(X, y)
+            else:
+                _check_positive_int(steps_ahead, "steps_ahead")
+                return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
+        else:
+            if steps_ahead is None:
+                return self._basis_function_predict(X, y, self.theta)
+            elif steps_ahead == 1:
+                return self._one_step_ahead_prediction(X, y)
+            else:
+                return self.basis_function_n_step_prediction(X, y, steps_ahead=steps_ahead)

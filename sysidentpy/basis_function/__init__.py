@@ -1,1 +1,1 @@
-from ._basis_function import PolynomialBasis
+from ._basis_function import Polynomial, Fourier
