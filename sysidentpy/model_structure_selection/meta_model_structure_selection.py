@@ -6,7 +6,7 @@
 import numpy as np
 from scipy.stats import t
 import warnings
-from ..utils._check_arrays import check_X_y
+from ..utils._check_arrays import check_X_y, _num_features
 from ..metrics import root_relative_squared_error, mean_squared_error
 from ..metaheuristics import BPSOGSA
 from ..simulation import SimulateNARMAX
@@ -155,7 +155,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         xlag=2,
         ylag=2,
         elag=2,
-        n_inputs=1,
+        # n_inputs=1,
         estimator="least_squares",
         extended_least_squares=False,
         lam=0.98,
@@ -182,7 +182,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             gama=gama,
             weight=weight,
             estimate_parameter=estimate_parameter,
-            n_inputs=n_inputs,
+            # n_inputs=n_inputs,
             model_type=model_type,
             basis_function=basis_function
         )
@@ -199,20 +199,42 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             p_ones=p_ones,
         )  
         
-        
         self.xlag = xlag
         self.ylag = ylag
         self.elag = elag
-        self.non_degree = basis_function.non_degree
+        self.non_degree = basis_function.degree
         self.p_value = p_value
         self.estimator = estimator
         self.estimate_parameter = estimate_parameter
         self.loss_func = loss_func
-        self.regressor_code = self.regressor_space(
-            non_degree=self.non_degree, xlag=xlag, ylag=ylag, n_inputs=n_inputs, model_type=model_type,
-        )
-        self.dimension = self.regressor_code.shape[0]
+        # self.regressor_code = self.regressor_space(
+        #     non_degree=self.non_degree, xlag=xlag, ylag=ylag, n_inputs=n_inputs, model_type=model_type,
+        # )
+        # self.dimension = self.regressor_code.shape[0]
         self.steps_ahead = steps_ahead
+        self._validate_metamss_params()
+        
+
+    def _validate_metamss_params(self):
+        if isinstance(self.ylag, int) and self.ylag < 1:
+            raise ValueError(
+                "ylag must be integer and > zero. Got %f" % self.ylag
+            )
+        
+        if isinstance(self.xlag, int) and self.xlag < 1:
+            raise ValueError(
+                "xlag must be integer and > zero. Got %f" % self.xlag
+            )
+            
+        if not isinstance(self.xlag, (int, list)):
+            raise ValueError(
+                "xlag must be integer and > zero. Got %f" % self.xlag
+            )
+        
+        if not isinstance(self.ylag, (int, list)):
+            raise ValueError(
+                "ylag must be integer and > zero. Got %f" % self.ylag
+            )
 
     def fit(self, X_train, y_train, X_test, y_test):
         """Fit the polynomial NARMAX model.
@@ -232,11 +254,19 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         -------
         self : returns an instance of self.
         """
+        if self.basis_function.__class__.__name__ != "Polynomial":
+            raise NotImplementedError("Currently MetaMSS only supports polynomial"
+                                      " models.")
         if y_train is None:
             raise ValueError("y cannot be None")
 
         check_X_y(X_train, y_train)
-
+        
+        self._n_inputs = _num_features(X_train)
+        self.regressor_code = self.regressor_space(
+            self.non_degree, self.xlag, self.ylag, self._n_inputs, self.model_type
+            )
+        self.dimension = self.regressor_code.shape[0]
         velocity = np.zeros([self.dimension, self.n_agents])
         population = self.generate_random_population()
         self.best_by_iter = []
@@ -322,20 +352,20 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             residues = y_test - yhat
 
             if self.model_type == "NAR":
-                lagged_data = self.build_output_matrix(y_train, self.ylag, self.non_degree)
+                lagged_data = self.build_output_matrix(y_train, self.ylag)
                 self.max_lag = self._get_max_lag(ylag=self.ylag)
             elif self.model_type == "NFIR":
-                lagged_data = self.build_input_matrix(X_train, self.xlag, self.non_degree)
+                lagged_data = self.build_input_matrix(X_train, self.xlag)
                 self.max_lag = self._get_max_lag(xlag=self.xlag)
             elif self.model_type == "NARMAX":
                 check_X_y(X_train, y_train)
                 self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
-                lagged_data = self.build_input_output_matrix(X_train, y_train, self.xlag, self.ylag, self.non_degree)
+                lagged_data = self.build_input_output_matrix(X_train, y_train, self.xlag, self.ylag)
             else:
                 raise ValueError("Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.")
             
-            psi = self.basis_function.build_polynomial_basis(
-                lagged_data, self.non_degree, self.max_lag, predefined_regressors=self.pivv)
+            psi = self.basis_function.fit(
+                lagged_data, self.max_lag, predefined_regressors=self.pivv)
             
             pos_insignificant_terms, _, _ = self.perform_t_test(psi, self.theta, residues)
 
