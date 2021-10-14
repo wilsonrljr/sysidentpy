@@ -1,5 +1,5 @@
-Codes
-=====
+Code
+====
 
 .. toctree::
    :maxdepth: 2
@@ -7,36 +7,36 @@ Codes
 
 sysidentpy base
 ===============
-.. automodule:: sysidentpy.base
+.. automodule:: sysidentpy.narmax_base
    :members:
 
-sysidentpy narmax
-===============
-.. automodule:: sysidentpy.polynomial_basis.narmax
+sysidentpy FROLS
+================
+.. automodule:: sysidentpy.model_structure_selection.FROLS
    :members:
 
 sysidentpy metamss
-===============
-.. automodule:: sysidentpy.polynomial_basis.metamss
+==================
+.. automodule:: sysidentpy..model_structure_selection.metamss
    :members:
 
 sysidentpy simulation
-===============
-.. automodule:: sysidentpy.polynomial_basis.simulation
+=====================
+.. automodule:: sysidentpy.simulation._simulation
    :members:
 
 sysidentpy narx_neural_network
-===============
+==============================
 .. automodule:: sysidentpy.narx_neural_network.narx_nn
    :members:
 
 sysidentpy general_estimators
-===============
+=============================
 .. automodule:: sysidentpy.general_estimators.narx
    :members:
 
 sysidentpy bpsogsa
-===============
+==================
 .. automodule:: sysidentpy.metaheuristics.bpsogsa
    :members:
 
@@ -67,6 +67,16 @@ sysidentpy utils
 sysidentpy generate data
 ========================
 .. automodule:: sysidentpy.utils.generate_data
+   :members:
+
+sysidentpy plotting
+===================
+.. automodule:: sysidentpy.utils.plotting
+   :members:
+
+sysidentpy display results
+==========================
+.. automodule:: sysidentpy.utils.display_results
    :members:
 
 Indices and tables
