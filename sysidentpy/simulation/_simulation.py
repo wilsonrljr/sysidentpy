@@ -5,7 +5,7 @@
 # License: BSD 3 clause
 
 import numpy as np
-from ..utils._check_arrays import check_X_y
+from ..utils._check_arrays import check_X_y, _num_features
 from ..narmax_base import GenerateRegressors, ModelPrediction
 from ..narmax_base import HouseHolder
 from ..narmax_base import InformationMatrix
@@ -100,11 +100,9 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
     0        x1(k-2)     0.9000  0.95556574
     1         y(k-1)     0.1999  0.04107943
     2  x1(k-1)y(k-1)     0.1000  0.00335113
-
     """
     def __init__(
         self,
-        n_inputs=1,
         estimator="recursive_least_squares",
         extended_least_squares=False,
         lam=0.98,
@@ -135,7 +133,7 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
         self._extended_least_squares = extended_least_squares
         self.estimate_parameter = estimate_parameter
         self.calculate_err = calculate_err
-        self._n_inputs = n_inputs
+        self._validate_simulate_params()
 
     def _validate_simulate_params(self):
         if not isinstance(self.estimate_parameter, bool):
@@ -147,6 +145,17 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
             raise TypeError(
                 f"calculate_err must be False or True. Got {self.calculate_err}"
             )
+        
+        if self.basis_function is None:
+            raise TypeError(
+                f"basis_function can't be. Got {self.basis_function}"
+            )
+        
+        if self.model_type not in ["NARMAX", "NAR", "NFIR"]:
+            raise ValueError(
+                "model_type must be NARMAX, NAR, or NFIR. Got %s"
+                % self.model_type
+            )
 
     def simulate(
         self,
@@ -157,7 +166,6 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
         model_code=None,
         steps_ahead=None,
         theta=None,
-        plot=True,
     ):
         """Simulate a model defined by the user.
 
@@ -191,6 +199,10 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
                 to each regressor.
 
         """
+        if self.basis_function.__class__.__name__ != "Polynomial":
+            raise NotImplementedError("Currently, SimulateNARMAX only works for polynomial"
+                                      " models.")
+
         if y_test is None:
             raise ValueError("y_test cannot be None")
 
@@ -201,8 +213,7 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
             raise ValueError(
                 f"steps_ahead must be None or integer > zero. Got {steps_ahead}"
             )
-        if not isinstance(plot, bool):
-            raise TypeError(f"plot must be True or False. Got {plot}")
+
         if not isinstance(theta, np.ndarray) and not self.estimate_parameter:
             raise TypeError(
                 f"If estimate_parameter is False, theta must be an np.np.ndarray. Got {theta}"
@@ -218,6 +229,7 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
             if y_train is None:
                 raise ValueError("y_train cannot be None")
 
+        self._n_inputs = _num_features(X_test) ####
         xlag_code = self._list_input_regressor_code(model_code)
         ylag_code = self._list_output_regressor_code(model_code)
         self.xlag = self._get_lag_from_regressor_code(xlag_code)
@@ -235,46 +247,45 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
         self.final_model = regressor_code[self.pivv]
         # to use in the predict function
         self.n_terms = self.final_model.shape[0]
-        
-        if not self.estimate_parameter:
-            self.theta = theta
-            self.err = self.n_terms * [0]
-        elif self.estimate_parameter and not self.calculate_err:
-            if self.model_type == "NAR":
-                lagged_data = self.build_output_matrix(y_train, self.ylag, self.non_degree)
-                self.max_lag = self._get_max_lag(ylag=self.ylag)
-            elif self.model_type == "NFIR":
-                lagged_data = self.build_input_matrix(X_train, self.xlag, self.non_degree)
-                self.max_lag = self._get_max_lag(xlag=self.xlag)
-            elif self.model_type == "NARMAX":
+        if self.estimate_parameter and not self.calculate_err:
+            if self.model_type == "NARMAX":
                 check_X_y(X_train, y_train)
                 self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
-                lagged_data = self.build_input_output_matrix(X_train, y_train, self.xlag, self.ylag, self.non_degree)
+                lagged_data = self.build_input_output_matrix(X_train, y_train, self.xlag, self.ylag)
+            elif self.model_type == "NAR":
+                lagged_data = self.build_output_matrix(y_train, self.ylag)
+                self.max_lag = self._get_max_lag(ylag=self.ylag)
+            elif self.model_type == "NFIR":
+                lagged_data = self.build_input_matrix(X_train, self.xlag)
+                self.max_lag = self._get_max_lag(xlag=self.xlag)
             else:
                 raise ValueError("Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.")
-            psi = self.basis_function.build_polynomial_basis(
-                lagged_data, self.non_degree, self.max_lag, predefined_regressors=self.pivv)
+            psi = self.basis_function.fit(
+                lagged_data, self.max_lag, predefined_regressors=self.pivv)
 
             self.theta = getattr(self, self.estimator)(psi, y_train)
             if self._extended_least_squares is True:
                 self.theta = self._unbiased_estimator(psi, y_train, self.theta, self.non_degree, self.elag, self.max_lag)
             
             self.err = self.n_terms * [0]
+        elif not self.estimate_parameter:
+            self.theta = theta
+            self.err = self.n_terms * [0]
         else:
-            if self.model_type == "NAR":
-                lagged_data = self.build_output_matrix(y_train, self.ylag, self.non_degree)
-                self.max_lag = self._get_max_lag(ylag=self.ylag)
-            elif self.model_type == "NFIR":
-                lagged_data = self.build_input_matrix(X_train, self.xlag, self.non_degree)
-                self.max_lag = self._get_max_lag(xlag=self.xlag)
-            elif self.model_type == "NARMAX":
+            if self.model_type == "NARMAX":
                 check_X_y(X_train, y_train)
                 self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
-                lagged_data = self.build_input_output_matrix(X_train, y_train, self.xlag, self.ylag, self.non_degree)
+                lagged_data = self.build_input_output_matrix(X_train, y_train, self.xlag, self.ylag)
+            elif self.model_type == "NAR":
+                lagged_data = self.build_output_matrix(y_train, self.ylag)
+                self.max_lag = self._get_max_lag(ylag=self.ylag)
+            elif self.model_type == "NFIR":
+                lagged_data = self.build_input_matrix(X_train, self.xlag)
+                self.max_lag = self._get_max_lag(xlag=self.xlag)
             else:
                 raise ValueError("Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.")
-            psi = self.basis_function.build_polynomial_basis(
-                lagged_data, self.non_degree, self.max_lag, predefined_regressors=self.pivv)
+            psi = self.basis_function.fit(
+                lagged_data, self.max_lag, predefined_regressors=self.pivv)
 
             _, self.err, self.pivv, _ = self.error_reduction_ratio(
                 psi, y_train, self.n_terms, self.final_model
