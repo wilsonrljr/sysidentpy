@@ -9,7 +9,7 @@ import numpy as np
 from itertools import combinations_with_replacement
 from itertools import chain
 from collections import Counter
-from .utils._check_arrays import check_X_y, _check_positive_int
+from .utils._check_arrays import check_X_y, _check_positive_int, _num_features
 import warnings
 
 
@@ -341,8 +341,8 @@ class InformationMatrix:
         """
         n_samples = col_to_shift.shape[0]
         tmp_column = np.zeros((n_samples, 1))
-        aux = col_to_shift[0 : n_samples - lag]
-        aux = np.reshape(aux, (len(aux), 1))
+        aux = col_to_shift[0 : n_samples - lag].reshape(-1, 1)
+        # aux = np.reshape(aux, (len(aux), 1))
         tmp_column[lag:, 0] = aux[:, 0]
         return tmp_column
 
@@ -362,7 +362,7 @@ class InformationMatrix:
             The range of lags according to user definition.
 
         """
-        n_inputs = X.shape[1]
+        n_inputs = _num_features(X)
         if isinstance(xlag, int) and n_inputs > 1:
             raise ValueError(
                 "If n_inputs > 1, xlag must be a nested list. Got %f" % xlag
@@ -481,16 +481,13 @@ class InformationMatrix:
 
         """
         n_inputs, xlag = self._process_xlag(X, xlag)
-
         ylag = self._process_ylag(ylag)
-
         x_lagged = self._create_lagged_X(X, xlag, n_inputs)
-
         y_lagged = self._create_lagged_y(y, ylag)
         lagged_data = np.concatenate([y_lagged, x_lagged], axis=1)
         return lagged_data
     
-    def build_output_matrix(self, y, ylag, non_degree, predefined_regressors=None):
+    def build_output_matrix(self, y, ylag):
         """Build the information matrix.
 
         Each columns of the information matrix represents a candidate
@@ -524,7 +521,7 @@ class InformationMatrix:
         data = np.concatenate([constant, y_lagged], axis=1)
         return data
     
-    def build_input_matrix(self, X, xlag, non_degree, predefined_regressors=None):
+    def build_input_matrix(self, X, xlag):
         """Build the information matrix.
 
         Each columns of the information matrix represents a candidate
@@ -554,15 +551,12 @@ class InformationMatrix:
         # the columns as a product in the iterations
         
         n_inputs, xlag = self._process_xlag(X, xlag)
-
         x_lagged = self._create_lagged_X(X, xlag, n_inputs)
-        
         constant = np.ones([x_lagged.shape[0], 1])
         data = np.concatenate([constant, x_lagged], axis=1)
-
         return data
 
-    def build_input_output_matrix(self, X, y, xlag, ylag, non_degree, predefined_regressors=None):
+    def build_input_output_matrix(self, X, y, xlag, ylag):
         """Build the information matrix.
 
         Each columns of the information matrix represents a candidate
@@ -595,7 +589,6 @@ class InformationMatrix:
         # the information matrix by using all possible combination of
         # the columns as a product in the iterations
         lagged_data = self.initial_lagged_matrix(X, y, xlag=xlag, ylag=ylag)
-
         constant = np.ones([lagged_data.shape[0], 1])
         data = np.concatenate([constant, lagged_data], axis=1)        
         return data
@@ -626,13 +619,19 @@ class ModelPrediction:
             The predicted values of the model.
 
         """
-        if steps_ahead is None:
-            return self._model_prediction(X, y)
-        elif steps_ahead == 1:
-            return self._one_step_ahead_prediction(X, y)
+        if self.basis_function.__class__.__name__ == "Polynomial":
+            if steps_ahead is None:
+                return self._model_prediction(X, y)
+            elif steps_ahead == 1:
+                return self._one_step_ahead_prediction(X, y)
+            else:
+                _check_positive_int(steps_ahead, "steps_ahead")
+                return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
         else:
-            _check_positive_int(steps_ahead, "steps_ahead")
-            return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
+            if steps_ahead is None:
+                return self._basis_function_predict(X, y)
+            elif steps_ahead == 1:
+                return self._one_step_ahead_prediction(X, y)
 
     def _code2exponents(self, code):
         """
@@ -686,44 +685,23 @@ class ModelPrediction:
 
         """
         if self.model_type == "NAR":
-            warnings.warn(
-                (
-                    "Because the user chooses NAR model , the model built"
-                    "will be of the form y(k) = F(y[k-1], y[k-2], ..., y[k-n]) + e(k)"
-                ),
-                stacklevel=2,
-            )
-            lagged_data = self.build_output_matrix(y, self.ylag, self.non_degree)
-            self.max_lag = ModelInformation()._get_max_lag(ylag=self.ylag)
+            lagged_data = self.build_output_matrix(y, self.ylag)
+            # self.max_lag = ModelInformation()._get_max_lag(ylag=self.ylag)
         elif self.model_type == "NFIR":
-            warnings.warn(
-                (
-                    "Because the user chooses the NFIR model, the model built"
-                    "will be of the form y(k) = F(X[k-1], X[k-2], ..., X[k-n]) + e(k)"
-                ),
-                stacklevel=2,
-            )
-            lagged_data = self.build_input_matrix(X, self.xlag, self.non_degree)
-            self.max_lag = ModelInformation()._get_max_lag(xlag=self.xlag)
+            lagged_data = self.build_input_matrix(X, self.xlag)
+            # self.max_lag = ModelInformation()._get_max_lag(xlag=self.xlag)
         elif self.model_type == "NARMAX":
-            warnings.warn(
-                (
-                    "Because the user chooses NARMAX model, the model built"
-                    "will be of the form y(k) = F(y[k-1], y[k-2], ..., y[k-n], X[k-1], X[k-2], ..., X[k-n]) + e(k)"
-                ),
-                stacklevel=2,
-            )
-            check_X_y(X, y)
-            self.max_lag = ModelInformation()._get_max_lag(ylag=self.ylag, xlag=self.xlag)
-            lagged_data = self.build_input_output_matrix(X, y, self.xlag, self.ylag, self.non_degree)
+            # check_X_y(X, y)
+            # self.max_lag = ModelInformation()._get_max_lag(ylag=self.ylag, xlag=self.xlag)
+            lagged_data = self.build_input_output_matrix(X, y, self.xlag, self.ylag)
         else:
             raise ValueError("Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.")
         
-        X_base = self.basis_function.build_polynomial_basis(
-            lagged_data, self.non_degree, self.max_lag, predefined_regressors=None)
+        X_base = self.basis_function.transform(
+            lagged_data, self.max_lag, predefined_regressors=self.pivv[: len(self.final_model)])
         
-        piv_final_model = self.pivv[: len(self.final_model)]
-        X_base = X_base[:, piv_final_model]
+        # piv_final_model = self.pivv[: len(self.final_model)]
+        # X_base = X_base[:, piv_final_model]
         yhat = np.dot(X_base, self.theta.flatten())
         yhat = np.concatenate([y[: self.max_lag].flatten(), yhat])
         return yhat.reshape(-1, 1)
@@ -844,3 +822,79 @@ class ModelPrediction:
 
             y_output[i] = np.dot(regressor_value, self.theta.flatten())
         return y_output.reshape(-1, 1)
+    
+    def _basis_function_predict(
+            self, X, y_initial, theta):
+        yhat = np.zeros(X.shape[0], dtype=float)
+        yhat.fill(np.nan)
+        yhat[: self.max_lag] = y_initial[: self.max_lag, 0]
+        
+        # Discard unnecessary initial values
+        # yhat[0:self.max_lag] = y_initial[0:self.max_lag]
+        analysed_elements_number = self.max_lag + 1
+        
+        for i in range(0, len(X)-self.max_lag):
+            if self.model_type == "NARMAX":
+                lagged_data = self.build_input_output_matrix(
+                    X[i:i+analysed_elements_number], yhat[i:i+analysed_elements_number].reshape(-1, 1), self.xlag, self.ylag)
+            elif self.model_type == "NAR":
+                lagged_data = self.build_output_matrix(yhat[i:i+analysed_elements_number].reshape(-1, 1), self.ylag)
+            elif self.model_type == "NFIR":
+                lagged_data = self.build_input_matrix(X[i:i+analysed_elements_number], self.xlag)
+            else:
+                raise ValueError("Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.")
+            
+            X_tmp = self.basis_function.transform(
+                lagged_data, self.max_lag, predefined_regressors=self.pivv[: len(self.final_model)])
+            
+            a = X_tmp @ theta
+            yhat[i+self.max_lag] = a[:, 0]
+
+        return yhat.reshape(-1, 1)
+    
+    def basis_function_n_step_prediction(self, X, y, steps_ahead):
+        """Perform the n-steps-ahead prediction of a model.
+
+        Parameters
+        ----------
+        y : array-like of shape = max_lag
+            Initial conditions values of the model
+            to start recursive process.
+        X : ndarray of floats of shape = n_samples
+            Vector with input values to be used in model simulation.
+
+        Returns
+        -------
+        yhat : ndarray of floats
+               The n-steps-ahead predicted values of the model.
+
+        """
+        if len(y) < self.max_lag:
+            raise Exception("Insufficient initial conditions elements!")
+
+        yhat = np.zeros(X.shape[0], dtype=float)
+        yhat.fill(np.nan)
+        yhat[: self.max_lag] = y[: self.max_lag, 0]
+        
+        # Discard unnecessary initial values
+        # yhat[0:self.max_lag] = y_initial[0:self.max_lag]
+        analysed_elements_number = self.max_lag + 1
+        i = self.max_lag
+        X = X.reshape(-1, self._n_inputs)
+        while i < len(y):
+            k = int(i - self.max_lag)
+            if i + steps_ahead > len(y):
+                steps_ahead = len(y) - i  # predicts the remaining values
+
+            
+            yhat[i : i + steps_ahead] = self._basis_function_predict(
+                X[k : i + steps_ahead], y[k : i + steps_ahead], self.theta
+            )[-steps_ahead:].ravel()
+            
+            i += steps_ahead
+
+        yhat = yhat.ravel()
+        return yhat.reshape(-1, 1)
+
+
+
