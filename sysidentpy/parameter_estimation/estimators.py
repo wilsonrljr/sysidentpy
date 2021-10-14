@@ -157,10 +157,10 @@ class Estimators(InformationMatrix):
         for i in range(30):
             e = np.concatenate([np.zeros([max_lag, 1]), e], axis=0)
             
-            lagged_data = self.build_output_matrix(e, elag, non_degree)
+            lagged_data = self.build_output_matrix(e, elag)
         
-            e_regressors = self.basis_function.build_polynomial_basis(
-                lagged_data, non_degree, max_lag, predefined_regressors=None
+            e_regressors = self.basis_function.fit(
+                lagged_data, max_lag, predefined_regressors=None
             )
             
             psi_extended = np.concatenate([psi, e_regressors], axis=1)
