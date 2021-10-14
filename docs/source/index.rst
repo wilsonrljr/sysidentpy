@@ -8,7 +8,18 @@ Welcome to SysIdentPy's documentation!
 
 **SysIdentPy** is a Python module for System Identification using **NARMAX** models built on top of **numpy** and is distributed under the 3-Clause BSD license.
 
-The project was started in by Wilson R. L. Junior, Luan Pascoal C. Andrade and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019 and since then have contributed.
+The NARMAX model is described as:
+.. math::
+	y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k
+
+where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,
+are the maximum lags for the system output and input respectively;
+:math:`x_k \in \mathbb{R}^{n_x}` is the system input and :math:`y_k \in \mathbb{R}^{n_y}`
+is the system output at discrete time :math:`k \in \mathbb{N}^n`;
+:math:`e_k \in \mathbb{R}^{n_e}` stands for uncertainties and possible noise
+at discrete time :math:`k`. In this case, :math:`\mathcal{F}^\ell` is some nonlinear function
+of the input and output regressors with nonlinearity degree :math:`\ell \in \mathbb{N}`
+and :math:`d` is a time delay typically set to :math:`d=1`.
 
 .. tip::
 	The update **v0.1.6** added new methods for structure selection of NARMAX models: **MetaMSS** and **AOLS**.
@@ -47,9 +58,14 @@ Polynomial NARX
 
 .. code-block:: python
 
-	from sysidentpy.polynomial_basis import PolynomialNarmax
+	from sysidentpy.model_structure_selection import FROLS
+	from sysidentpy.basis_function._basis_function import PolynomialBasis
+	from sysidentpy.utils.display_results import results
+	from sysidentpy.utils.plotting import plot_residues_correlation, plot_results
+	from sysidentpy.residues.residues_correlation import compute_residues_autocorrelation, compute_cross_correlation
+	basis_function = PolynomialBasis(non_degree=2)
 
-	model = PolynomialNarmax(
+	model = FROLS(
 		non_degree=2,
 		order_selection=True,
 		n_info_values=10,
@@ -57,23 +73,32 @@ Polynomial NARX
 		ylag=2,
 		xlag=2,
 		info_criteria='aic',
-		estimator='least_squares'
+		estimator='least_squares',
+		basis_function=basis_function
 	)
 	model.fit(x_train, y_train)
 	yhat = model.predict(x_valid, y_valid)
-	results = pd.DataFrame(model.results(err_precision=8,
-										dtype='dec'),
-						columns=['Regressors', 'Parameters', 'ERR'])
-
+	rrse = root_relative_squared_error(y_valid, yhat)
+	print(rrse)
+	results = pd.DataFrame(
+		results(
+			model.final_model, model.theta, model.err,
+			model.n_terms, err_precision=8, dtype='sci'
+			),
+		columns=['Regressors', 'Parameters', 'ERR'])
 	print(results)
-
+	
 	Regressors     Parameters        ERR
 	0        x1(k-2)     0.9000  0.95556574
 	1         y(k-1)     0.1999  0.04107943
 	2  x1(k-1)y(k-1)     0.1000  0.00335113
 
-	ee, ex, extras, lam = model.residuals(x_valid, y_valid, yhat)
-	model.plot_result(y_valid, yhat, ee, ex)
+	plot_results(y=y_valid, yhat=yhat, n=1000)
+	ee = compute_residues_autocorrelation(y_valid, yhat)
+	plot_residues_correlation(data=ee, title="Residues", ylabel="$e^2$")
+	x1e = compute_cross_correlation(y_valid, yhat, x2_val)
+	plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
+
 
 
 .. image:: ../../examples/figures/polynomial_narmax.png
@@ -182,7 +207,7 @@ The following is the Catboost performance *without* the NARX configuration.
 Changelog
 ---------
 
-See the `changelog <http://sysidentpy.org/changelog/v0.1.6.html>`__
+See the `changelog <http://sysidentpy.org/changelog/v0.1.7.html>`__
 for a history of notable changes to **SysIdentPy**.
 
 
@@ -247,10 +272,7 @@ Project History
 
 The project was started by Wilson R. L. Junior, Luan Pascoal and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019 and since then have contributed.
 
-The initial purpose was to learn the python language. Over time, the project has matured to the state it is in today.
-
-The project is currently maintained by its creators and looking for
-contributors.
+The project is actively maintained by Wilson R. L. Junior and looking for contributors.
 
 Communication
 -------------

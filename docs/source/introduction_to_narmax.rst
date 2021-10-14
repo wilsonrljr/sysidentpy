@@ -7,7 +7,7 @@ This is the first in a series of publications explaining a little bit about NARM
 
 **Note**: As I will use the term *Systems Identification* here and there, let me make a brief definition regarding these terms. Systems identification is one of the major areas that deals with the modeling of data-based processes. In this context, the term "system" can be interpreted as any set of operations that process one or more inputs and return one or more outputs. Examples include electrical systems, mechanical systems, biological systems, financial systems, chemical systems … literally anything you can relate to input and output data. The electricity demand is part of a system whose inputs can be, for example, quantity of the population, quantity of water in the reservoirs, season, events. The price of a property is the output of a system whose entries can be the city, per capita income, neighborhood, number of rooms, how old the house is, and many others. You got the idea.
 
-Althought there are many things related with Machine Learning, Statistical Learning and other fields,  each field has its particularities.
+Although there are many things related with Machine Learning, Statistical Learning and other fields,  each field has its particularities.
 
 So, what is a NARMAX model?
 ---------------------------
@@ -75,7 +75,7 @@ Let's take a look at an example of a NARMAX model for an easy understanding. The
 
 But how those terms were selected? How the parameters were estimated? These questions will lead us to model structure selection and parameter estimation topics, but, for now,  let us discuss about those topics in a more simple manner.
 
-First, the "structure" of a model is the set of terms (also called regressors) included in the final model. The parameters are the values multiplying each of theses terms. And looking at the example above we can notice an really important thing regarding polynomial NARMAX models dealt in this text: they have a non-linear strucuture, but they are linear-in-the-parameters. You will see how this note is important in the post about parameter estimation.
+First, the "structure" of a model is the set of terms (also called regressors) included in the final model. The parameters are the values multiplying each of theses terms. And looking at the example above we can notice an really important thing regarding polynomial NARMAX models dealt in this text: they have a non-linear structure, but they are linear-in-the-parameters. You will see how this note is important in the post about parameter estimation.
 
 In this respect, consider the case where we have the input and output data of some system. For the sake of simplicity, suppose one input and one output. We have the data, but we do not know which lags to choose for the input or the output. Also, we know nothing about the system non-linearity. So, we have to define some values for maximum lags of the input, output and the noise terms, besides the choice of the :math:`\ell` value. It's worth to notice that many assumptions taken for linear cases are not valid in the nonlinear scenario and therefore select the maximum lags is not straightforward. So, how those values can make the modeling harder?
 
@@ -94,7 +94,7 @@ Now, think about the case when we have not 1, but 5, 10 or more inputs... and ha
 
 And the problem is not solved by only identifying the most significant terms. How do you choose the number of terms to include in the final model. It is not just about check the relevance of each regressor, we have to think about the impact of including 5, 10 or 50 regressors in the model. And do not forget: after selecting the terms, we have to estimate its parameters.
 
-As you can see, to select the most significant terms from a huge dictionary of possible terms is not an easy task. And it is hard not only because the complex combinatoric problem and the uncertainty concerning the model order. Identifying the most significant terms in a nonlinear scenario is very difficult because depends on the type of the non-linearity (sparse singularity or near-singular behavior, memory or dumping effects and many others), dynamical response (spatial-temporal systems, time-dependent), the steady-state response,  frequency of the data, the noise...
+As you can see, to select the most significant terms from a huge dictionary of possible terms is not an easy task. And it is hard not only because the complex combinatorial problem and the uncertainty concerning the model order. Identifying the most significant terms in a nonlinear scenario is very difficult because depends on the type of the non-linearity (sparse singularity or near-singular behavior, memory or dumping effects and many others), dynamical response (spatial-temporal systems, time-dependent), the steady-state response,  frequency of the data, the noise...
 
 Despite all this complexity, NARMAX models are widely used because it is able to represent complex system with simple and transparent models, which terms are selected using robust algorithms for model structure selection. Model structure selection is the core of NARMAX methods and the scientific community is very active on improving classical methods and developing new ones. As I said, I will introduce some of those methods in another post.
 
