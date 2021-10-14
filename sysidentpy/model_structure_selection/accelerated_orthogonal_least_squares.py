@@ -14,7 +14,7 @@ from ..narmax_base import InformationMatrix
 from ..narmax_base import ModelInformation
 from ..narmax_base import ModelPrediction
 from ..parameter_estimation.estimators import Estimators
-from ..utils._check_arrays import check_X_y
+from ..utils._check_arrays import check_X_y, _check_positive_int, _num_features
 
 
 class AOLS(Estimators, GenerateRegressors, HouseHolder,
@@ -50,7 +50,7 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
         The number of inputs of the system.
     k : int, default=1
         The sparsity level.
-    l : int, default=1
+    L : int, default=1
         Number of selected indices per iteration.
     threshold : float, default=10e10
         The desired accuracy.
@@ -59,7 +59,9 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
     --------
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
-    >>> from sysidentpy.polynomial_basis import AOLS
+    >>> from sysidentpy.model_structure_selection import AOLS
+    >>> from sysidentpy.basis_function._basis_function import Polynomial
+    >>> from sysidentpy.utils.display_results import results
     >>> from sysidentpy.metrics import root_relative_squared_error
     >>> from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
     >>> x_train, x_valid, y_train, y_valid = get_siso_data(n=1000,
@@ -68,8 +70,6 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
     ...                                                    train_percentage=90)
     >>> model = AOLS(non_degree=2,
     ...              order_selection=True,
-    ...              n_info_values=10,
-    ...              extended_least_squares=False,
     ...              ylag=2, xlag=2,
     ...              info_criteria='aic',
     ...              estimator='least_squares',
@@ -79,10 +79,13 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
     >>> rrse = root_relative_squared_error(y_valid, yhat)
     >>> print(rrse)
     0.001993603325328823
-    >>> results = pd.DataFrame(model.results(err_precision=8,
-    ...                                      dtype='dec'),
-    ...                        columns=['Regressors', 'Parameters', 'ERR'])
-    >>> print(results)
+    >>> r = pd.DataFrame(
+    ...     results(
+    ...         model.final_model, model.theta, model.err,
+    ...         model.n_terms, err_precision=8, dtype='sci'
+    ...         ),
+    ...     columns=['Regressors', 'Parameters', 'ERR'])
+    >>> print(r)
         Regressors Parameters         ERR
     0        x1(k-2)     0.9000       0.0
     1         y(k-1)     0.1999       0.0
@@ -100,9 +103,8 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
         self,
         ylag=2,
         xlag=2,
-        n_inputs=1,
         k=1,
-        l=1,
+        L=1,
         threshold=10e-10 ,
         model_type="NARMAX",
         basis_function=None
@@ -111,28 +113,47 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
         self.model_type = model_type
         self.xlag = xlag
         self.ylag = ylag
-        self.non_degree = basis_function.non_degree
-        self.regressor_code = self.regressor_space(
-            self.non_degree, xlag, ylag, n_inputs
-        )
+        self.non_degree = basis_function.degree
+        # self.regressor_code = self.regressor_space(
+        #     self.non_degree, xlag, ylag, n_inputs
+        # )
         self.max_lag = self._get_max_lag(ylag, xlag)
         self.k = k
-        self.l = l
+        self.L = L
         self.threshold = threshold
-        self._n_inputs = n_inputs
         self._validate_params()
         
 
     def _validate_params(self):
         """Validate input params."""
+        if isinstance(self.ylag, int) and self.ylag < 1:
+            raise ValueError(
+                "ylag must be integer and > zero. Got %f" % self.ylag
+            )
+        
+        if isinstance(self.xlag, int) and self.xlag < 1:
+            raise ValueError(
+                "xlag must be integer and > zero. Got %f" % self.xlag
+            )
+            
+        if not isinstance(self.xlag, (int, list)):
+            raise ValueError(
+                "xlag must be integer and > zero. Got %f" % self.xlag
+            )
+        
+        if not isinstance(self.ylag, (int, list)):
+            raise ValueError(
+                "ylag must be integer and > zero. Got %f" % self.ylag
+            )
+        
         if not isinstance(self.k, int) or self.k < 1:
             raise ValueError(
                 "k must be integer and > zero. Got %f" % self.k
             )
         
-        if not isinstance(self.l, int) or self.l < 1:
+        if not isinstance(self.L, int) or self.L < 1:
             raise ValueError(
-                "k must be integer and > zero. Got %f" % self.l
+                "k must be integer and > zero. Got %f" % self.L
             )
             
         if not isinstance(self.threshold, (int, float)) or self.threshold < 0:
@@ -172,13 +193,13 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
         theta = np.zeros([m, 1])
         r = y.copy();
         it = 0;
-        max_iter = int(min(self.k, np.floor(n / self.l)))
-        AOLS_index = np.zeros(max_iter * self.l)
-        U = np.zeros([n, max_iter * self.l])
+        max_iter = int(min(self.k, np.floor(n / self.L)))
+        AOLS_index = np.zeros(max_iter * self.L)
+        U = np.zeros([n, max_iter * self.L])
         T = psi.copy()
         while LA.norm(r) > self.threshold and it < max_iter:
             it = it + 1
-            temp_in = (it - 1) * self.l
+            temp_in = (it - 1) * self.L
             if it > 1:
                 T = T - U[:, temp_in].reshape(-1, 1) @ (U[:, temp_in].reshape(-1, 1).T @ psi)
             
@@ -187,12 +208,12 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
             sub_ind = list(AOLS_index[: temp_in].astype(int))
             TT[sub_ind] = 0
             sorting_indices = np.argsort(TT)[::-1].ravel()
-            AOLS_index[temp_in: temp_in + self.l] = sorting_indices[:self.l]
-            for i in range(self.l):
+            AOLS_index[temp_in: temp_in + self.L] = sorting_indices[:self.L]
+            for i in range(self.L):
                 TEMP = T[:, sorting_indices[i]].reshape(-1, 1) * q[sorting_indices[i]]
                 U[:, temp_in + i] = (TEMP / np.linalg.norm(TEMP, axis=0)).ravel()
                 r = r - TEMP
-                if i == self.l:
+                if i == self.L:
                     break
                 
                 T = T - U[:, temp_in + i].reshape(-1, 1) @ (U[:, temp_in + i].reshape(-1, 1).T @ psi)
@@ -201,7 +222,7 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
         AOLS_index = AOLS_index[AOLS_index > 0].ravel().astype(int)
         residual_norm = LA.norm(r)
         theta[AOLS_index] = LA.lstsq(psi[:, AOLS_index], y, rcond=None)[0]
-        if self.l > 1:
+        if self.L > 1:
             sorting_indices = np.argsort(np.abs(theta))[::-1]
             AOLS_index = sorting_indices[:self.k].ravel().astype(int)
             theta[AOLS_index] =  LA.lstsq(psi[:, AOLS_index], y, rcond=None)[0]
@@ -245,30 +266,41 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
             raise ValueError("y cannot be None")
         
         if self.model_type == "NAR":
-            lagged_data = self.build_output_matrix(y, self.ylag, self.non_degree)
+            lagged_data = self.build_output_matrix(y, self.ylag)
             self.max_lag = self._get_max_lag(ylag=self.ylag)
         elif self.model_type == "NFIR":
-            lagged_data = self.build_input_matrix(X, self.xlag, self.non_degree)
+            lagged_data = self.build_input_matrix(X, self.xlag)
             self.max_lag = self._get_max_lag(xlag=self.xlag)
         elif self.model_type == "NARMAX":
             check_X_y(X, y)
             self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
-            lagged_data = self.build_input_output_matrix(X, y, self.xlag, self.ylag, self.non_degree)
+            lagged_data = self.build_input_output_matrix(X, y, self.xlag, self.ylag)
         else:
             raise ValueError("Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.")
         
-        reg_matrix = self.basis_function.build_polynomial_basis(
-            lagged_data, self.non_degree, self.max_lag, predefined_regressors=None)
+        reg_matrix = self.basis_function.fit(
+            lagged_data, self.max_lag, predefined_regressors=None)
+        
+        
+        self._n_inputs = _num_features(X)
+        self.regressor_code = self.regressor_space(
+            self.non_degree, self.xlag, self.ylag, self._n_inputs, self.model_type
+            )
         
         y = y[self.max_lag:].reshape(-1, 1)
         
 
         (self.theta, self.pivv, self.res) = self.aols(reg_matrix, y)
-        self.final_model = self.regressor_code[self.pivv, :].copy()
-        self.max_lag = self._get_max_lag_from_model_code(self.final_model)
+        # self.final_model = self.regressor_code[self.pivv, :].copy()
+        if self.basis_function.__class__.__name__ == "Polynomial":
+            self.final_model = self.regressor_code[self.pivv, :].copy()
+        else:
+            self.regressor_code = np.sort(np.tile(self.regressor_code[1:, :], (self.basis_function.repetition, 1)), axis=0)
+            self.final_model = self.regressor_code[self.pivv, :].copy()
+        
+        # self.max_lag = self._get_max_lag_from_model_code(self.final_model)
         self.n_terms = len(self.theta) # the number of terms we selected (necessary in the 'results' methods)
         self.err = self.n_terms*[0] # just to use the `results` method. Will be changed in next update.
-    
         return self
     
     def predict(self, X, y, steps_ahead=None):
@@ -296,11 +328,19 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
             The predicted values of the model.
 
         """
-        if steps_ahead is None:
-            return self._model_prediction(X, y)
-        elif steps_ahead == 1:
-            return self._one_step_ahead_prediction(X, y)
+        if self.basis_function.__class__.__name__ == "Polynomial":
+            if steps_ahead is None:
+                return self._model_prediction(X, y)
+            elif steps_ahead == 1:
+                return self._one_step_ahead_prediction(X, y)
+            else:
+                _check_positive_int(steps_ahead, "steps_ahead")
+                return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
         else:
-            self._check_positive_int(steps_ahead, "steps_ahead")
-            return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
+            if steps_ahead is None:
+                return self._basis_function_predict(X, y, self.theta)
+            elif steps_ahead == 1:
+                return self._one_step_ahead_prediction(X, y)
+            else:
+                return self.basis_function_n_step_prediction(X, y)
     
