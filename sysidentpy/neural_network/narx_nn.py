@@ -131,7 +131,6 @@ class NARXNN(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
         train_percentage=80,
         verbose=False,
         optim_params=None
-        # **opt_params
     ):
         self.non_degree = non_degree
         self.ylag = ylag
