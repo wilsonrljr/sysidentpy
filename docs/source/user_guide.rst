@@ -15,9 +15,13 @@ specific usage.
     import numpy as np
     import pandas as pd
     import matplotlib.pyplot as plt
-    from sysidentpy.polynomial_basis import PolynomialNarmax
+    from sysidentpy.model_structure_selection import FROLS
+    from sysidentpy.basis_function import Polynomial, Fourier
     from sysidentpy.metrics import root_relative_squared_error
-    from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
+    from sysidentpy.utils.generate_data import get_siso_data
+    from sysidentpy.utils.display_results import results
+    from sysidentpy.utils.plotting import plot_residues_correlation, plot_results
+    from sysidentpy.residues.residues_correlation import compute_residues_autocorrelation, compute_cross_correlation
 
 
 Generating 1 input 1 output sample data
@@ -45,19 +49,19 @@ noise and selecting 90% of the data to train the model.
                                                        sigma=0.001,
                                                        train_percentage=90)
 
-To obtain a NARMAX model we have to choose some values, e.g, the nonlinearity degree (``non_degree``), the maximum lag for the inputs and output (``xlag`` and ``ylag``).
+To obtain a NARMAX model we have to choose some values, e.g, the nonlinearity degree (``degree``), the maximum lag for the inputs and output (``xlag`` and ``ylag``).
 
-In addition, you can select the information criteria to be used with the Error Reduction Ratio to select the model order and the method to estimate the model paramaters:
+In addition, you can select the information criteria to be used with the Error Reduction Ratio to select the model order and the method to estimate the model parameters:
 
 -  Information Criteria: aic, bic, lilc, fpe
 -  Parameter Estimation: least_squares, total_least_squares,
-   recursive_least_squares, least_mean_squres and many other (see the
+   recursive_least_squares, least_mean_squares and many other (see the
    docs)
 
 The ``n_terms`` values is optional. It refer to the number of terms to
-inclued in the final model. You can set this value based on the
+included in the final model. You can set this value based on the
 information criteria (see below) or based on priori information about
-the model struture. The default value is ``n_terms=None``, so the
+the model structure. The default value is ``n_terms=None``, so the
 algorithm will choose the minimum value reached by the information
 criteria.
 
@@ -66,16 +70,18 @@ can also select ``n_info_values`` (default = 15).
 
 .. code:: ipython3
 
-    model = PolynomialNarmax(non_degree=2,
-                             order_selection=True,
-                             n_info_values=10,
-                             extended_least_squares=False,
-                             ylag=2, xlag=2,
-                             info_criteria='aic',
-                             estimator='least_squares',
-                             )
+    basis_function = Polynomial(degree=2)
+    model = FROLS(
+        basis_function=basis_function,
+        order_selection=True,
+        n_info_values=10,
+        extended_least_squares=False,
+        ylag=2, xlag=2,
+        info_criteria='aic',
+        estimator='least_squares',
+    )
 
-The ``fit`` method executes the Error Reduction Ratio algorithm using Househoulder reflection to select the model structure.
+The ``fit`` method executes the Error Reduction Ratio algorithm using Householder reflection to select the model structure.
 
 .. code:: ipython3
 
@@ -90,15 +96,15 @@ The ``fit`` method executes the Error Reduction Ratio algorithm using Househould
 
 
 
-The ``predict`` method is use to generate the predictions. For now we only support ``free run simulation`` (also known as ``infinity steps ahead``). Soon we will let the user define a ``one-step ahead`` or ``k-step ahead`` prediction.
+The ``predict`` method is use to generate the predictions. We support ``free run simulation`` (also known as ``infinity steps ahead``), one-step ahead and n-steps ahead prediction.
 
-**Note:** **Free run simulation** means that the ``y`` values used for predictions are the ones predicted in previous iterations. In **one-step ahead** simulation, otherwise, the ``y`` values used are the observed values of the system. In **k-steps ahead**, the ``y`` values are the predicted values but at each *k* iterations the oberved values are used.
+**Note:** **Free run simulation** means that the ``y`` values used for predictions are the ones predicted in previous iterations. In **one-step ahead** simulation, otherwise, the ``y`` values used are the observed values of the system. In **k-steps ahead**, the ``y`` values are the predicted values but at each *k* iterations the observed values are used.
 
 .. code:: ipython3
 
     yhat = model.predict(x_valid, y_valid)
 
-In this example we use the ``root_relative_squared_error`` metric because it is often used in System Idenfication. More metrics and information about it can be found on documentation.
+In this example we use the ``root_relative_squared_error`` metric because it is often used in System Identification. More metrics and information about it can be found on documentation.
 
 .. code:: ipython3
 
@@ -116,11 +122,13 @@ In this example we use the ``root_relative_squared_error`` metric because it is 
 
 .. code:: ipython3
 
-    results = pd.DataFrame(model.results(err_precision=8,
-                                         dtype='dec'),
-                           columns=['Regressors', 'Parameters', 'ERR'])
-
-    print(results)
+    r = pd.DataFrame(
+    results(
+        model.final_model, model.theta, model.err,
+        model.n_terms, err_precision=8, dtype='sci'
+        ),
+    columns=['Regressors', 'Parameters', 'ERR'])
+    print(r)
 
 
 .. parsed-literal::
@@ -131,22 +139,27 @@ In this example we use the ``root_relative_squared_error`` metric because it is 
     2  u1(k-1)y(k-1)     0.1003  0.00332022
 
 
-In addition, you can access the ``residuals`` and ``plot_result`` methods to take a look at the prediction and two residual analysis. The ``extras`` and ``lam`` values below contain another residues analysis so you can plot it mannualy. This method will be improved soon.
+In addition, you can access the ``residuals analysis`` and ``plot_result`` methods to take a look at the prediction and residual analysis.
 
 .. code:: ipython3
 
-    ee, ex, extras, lam = model.residuals(x_valid, y_valid, yhat)
-    model.plot_result(y_valid, yhat, ee, ex)
+    plot_results(y=y_valid, yhat = yhat, n=1000)
+    ee = compute_residues_autocorrelation(y_valid, yhat)
+    plot_residues_correlation(data=ee, title="Residues", ylabel="$e^2$")
+    x1e = compute_cross_correlation(y_valid, yhat, x_valid)
+    plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 
 
 
 
 .. image:: output_16_0.svg
+.. image:: output_16_1.svg
+.. image:: output_16_2.svg
 
 
 In the example above we let the number of terms to compose the final model to be defined as the minimum value of the information criteria. Once you ran the algorithm and choose the best number of parameters, you can turn ``order_selection`` to ``False`` and set the ``n_terms`` value (3 in this example). Here we have a small dataset, but in bigger data this can be critical because running information criteria algorithm is more computational expensive. Since we already know the best number of regressor, we set ``n_terms`` and we get the same result.
 
-However, this is not only critical because computational eficiency. In many situation, the minimum value of the information criteria can lead to overfiting. In some cases, the diference between choosing a model with 30 regressors or 10 is minimal, so you can take the model with 10 terms without loosing accuracy.
+However, this is not only critical because computational efficiency. In many situation, the minimum value of the information criteria can lead to over fitting. In some cases, the difference between choosing a model with 30 regressors or 10 is minimal, so you can take the model with 10 terms without loosing accuracy.
 
 In the following we use ``info_values`` to plot the information criteria values. As you can see, the minimum value relies where :math:`xaxis = 5`
 
@@ -183,14 +196,16 @@ The ``n_info_values`` limits the number of regressors to apply the information c
 
 .. code:: ipython3
 
-    model = PolynomialNarmax(non_degree=2,
-                             order_selection=True,
-                             n_info_values=15,
-                             extended_least_squares=False,
-                             ylag=2, xlag=2,
-                             info_criteria='aic',
-                             estimator='least_squares',
-                             )
+    basis_function = Polynomial(degree=2)
+    model = FROLS(
+        basis_function=basis_function,
+        order_selection=True,
+        n_info_values=15,
+        extended_least_squares=False,
+        ylag=2, xlag=2,
+        info_criteria='aic',
+        estimator='least_squares',
+        )
 
     model.fit(x_train, y_train)
 
@@ -216,26 +231,30 @@ Now running without executing information criteria methods (setting the ``n_term
 
 .. code:: ipython3
 
-    model = PolynomialNarmax(non_degree=2,
-                             # order_selection=True,
-                             n_terms = 3,
-                             # n_info_values=15,
-                             extended_least_squares=False,
-                             ylag=2, xlag=2,
-                             info_criteria='aic',
-                             estimator='least_squares',
-                             )
+    basis_function = Polynomial(degree=2)
+    model = FROLS(
+        basis_function=basis_function,
+        # order_selection=True,
+        n_terms = 3,
+        # n_info_values=15,
+        extended_least_squares=False,
+        ylag=2, xlag=2,
+        info_criteria='aic',
+        estimator='least_squares',
+    )
 
     model.fit(x_train, y_train)
     yhat = model.predict(x_valid, y_valid)
     rrse = root_relative_squared_error(y_valid, yhat)
     print('rrse: ', rrse)
 
-    results = pd.DataFrame(model.results(err_precision=8,
-                                         dtype='dec'),
-                           columns=['Regressors', 'Parameters', 'ERR'])
-
-    print('\n', results)
+    r = pd.DataFrame(
+    results(
+        model.final_model, model.theta, model.err,
+        model.n_terms, err_precision=8, dtype='sci'
+        ),
+    columns=['Regressors', 'Parameters', 'ERR'])
+    print(r)
 
 
 .. parsed-literal::
@@ -248,7 +267,7 @@ Now running without executing information criteria methods (setting the ``n_term
     2  u1(k-1)y(k-1)     0.1003  0.00332022
 
 
-You can acess some extra information like the list of all candidate regressors
+You can access some extra information like the list of all candidate regressors
 
 .. code:: ipython3
 

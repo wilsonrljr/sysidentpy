@@ -59,14 +59,13 @@ Polynomial NARX
 .. code-block:: python
 
 	from sysidentpy.model_structure_selection import FROLS
-	from sysidentpy.basis_function._basis_function import PolynomialBasis
+	from sysidentpy.basis_function._basis_function import Polynomial
 	from sysidentpy.utils.display_results import results
 	from sysidentpy.utils.plotting import plot_residues_correlation, plot_results
 	from sysidentpy.residues.residues_correlation import compute_residues_autocorrelation, compute_cross_correlation
-	basis_function = PolynomialBasis(non_degree=2)
-
+	
+	basis_function = PolynomialBasis(degree=2)
 	model = FROLS(
-		non_degree=2,
 		order_selection=True,
 		n_info_values=10,
 		extended_least_squares=False,
@@ -80,13 +79,13 @@ Polynomial NARX
 	yhat = model.predict(x_valid, y_valid)
 	rrse = root_relative_squared_error(y_valid, yhat)
 	print(rrse)
-	results = pd.DataFrame(
+	r = pd.DataFrame(
 		results(
 			model.final_model, model.theta, model.err,
 			model.n_terms, err_precision=8, dtype='sci'
 			),
 		columns=['Regressors', 'Parameters', 'ERR'])
-	print(results)
+	print(r)
 	
 	Regressors     Parameters        ERR
 	0        x1(k-2)     0.9000  0.95556574
@@ -270,7 +269,7 @@ You can check the latest sources with the command::
 Project History
 ---------------
 
-The project was started by Wilson R. L. Junior, Luan Pascoal and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019 and since then have contributed.
+The project was started by Wilson R. L. Junior, Luan Pascoal and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019.
 
 The project is actively maintained by Wilson R. L. Junior and looking for contributors.
 
@@ -318,5 +317,6 @@ Contents
     user_guide
     dev_guide
     notebooks
-    changelog/v0.1.6
+	notebook_v016
+    changelog/v0.1.7
     code

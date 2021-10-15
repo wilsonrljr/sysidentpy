@@ -25,6 +25,11 @@ sysidentpy simulation
 .. automodule:: sysidentpy.simulation._simulation
    :members:
 
+sysidentpy basis function
+=========================
+.. automodule:: sysidentpy.basis_function._basis_function
+   :members:
+
 sysidentpy narx_neural_network
 ==============================
 .. automodule:: sysidentpy.narx_neural_network.narx_nn
