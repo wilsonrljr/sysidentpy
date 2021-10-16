@@ -19,20 +19,6 @@
 
 SysIdentPy is a Python module for System Identification using **NARMAX** models built on top of **numpy** and is distributed under the 3-Clause BSD license.
 
-The NARMAX model is described as:
-
-$$	
-	 y_k= F[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k
-$$
-
-where $n_y\in \mathbb{N}^*$, $n_x \in \mathbb{N}$, $n_e \in \mathbb{N}$,
-are the maximum lags for the system output and input respectively;
-$x_k \in \mathbb{R}^{n_x}$ is the system input and $y_k \in \mathbb{R}^{n_y}$
-is the system output at discrete time $k \in \mathbb{N}^n$;
-$e_k \in \mathbb{R}^{n_e}$ stands for uncertainties and possible noise
-at discrete time $k$. In this case, $\mathcal{F}$ is some nonlinear function
-of the input and output regressors and $d$ is a time delay typically set to $d=1$.
-
 # Note
 The update **v0.1.7**  has been released with major changes and additional features (Fourier basis function, NAR and NFIR models, possibility to select the lag of the residues for Extended Least Squares algorithm and many more).
 
