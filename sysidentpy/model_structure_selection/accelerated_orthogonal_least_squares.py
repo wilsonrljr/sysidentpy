@@ -26,7 +26,9 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
     https://github.com/realabolfazl/AOLS/
     
     The NARMAX model is described as:
+    
     .. math::
+        
         y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k
 
     where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,
@@ -95,6 +97,7 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
     """
     def __init__(
         self,
+        *,
         ylag=2,
         xlag=2,
         k=1,
@@ -226,7 +229,7 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
         theta = theta[theta > 0]
         return theta.reshape(-1, 1), pivv, residual_norm
     
-    def fit(self, X, y):
+    def fit(self, *, X=None, y=None):
         """Fit polynomial NARMAX model using AOLS algorithm.
 
         The 'fit' function allows a friendly usage by the user.
@@ -276,7 +279,11 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
             lagged_data, self.max_lag, predefined_regressors=None)
         
         
-        self._n_inputs = _num_features(X)
+        if X is not None:
+            self._n_inputs = _num_features(X)
+        else:
+            self._n_inputs = 1 # just to create the regressor space base
+        
         self.regressor_code = self.regressor_space(
             self.non_degree, self.xlag, self.ylag, self._n_inputs, self.model_type
             )
@@ -297,7 +304,7 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
         self.err = self.n_terms*[0] # just to use the `results` method. Will be changed in next update.
         return self
     
-    def predict(self, X, y, steps_ahead=None):
+    def predict(self, X=None, y=None, steps_ahead=None, forecast_horizon=None):
         """Return the predicted values given an input.
 
         The predict function allows a friendly usage by the user.
@@ -324,7 +331,7 @@ class AOLS(Estimators, GenerateRegressors, HouseHolder,
         """
         if self.basis_function.__class__.__name__ == "Polynomial":
             if steps_ahead is None:
-                return self._model_prediction(X, y)
+                return self._model_prediction(X, y, forecast_horizon=forecast_horizon)
             elif steps_ahead == 1:
                 return self._one_step_ahead_prediction(X, y)
             else:

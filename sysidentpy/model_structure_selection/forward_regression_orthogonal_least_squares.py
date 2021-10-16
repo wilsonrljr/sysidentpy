@@ -30,6 +30,7 @@ class FROLS(
     This class uses the FROLS algorithm ([1]_, [2]_) to build NARMAX models.
     The NARMAX model is described as:
     .. math::
+        
         y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k
 
     where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,
@@ -139,6 +140,7 @@ class FROLS(
 
     def __init__(
         self,
+        *,
         ylag=2,
         xlag=2,
         elag=2,
@@ -413,7 +415,7 @@ class FROLS(
         return info_criteria_value
     
      
-    def fit(self, X, y):
+    def fit(self, *, X=None, y=None):
         """Fit polynomial NARMAX model.
 
         This is an 'alpha' version of the 'fit' function which allows
@@ -463,7 +465,11 @@ class FROLS(
         reg_matrix = self.basis_function.fit(
             lagged_data, self.max_lag, predefined_regressors=None)   
         
-        self._n_inputs = _num_features(X)
+        if X is not None:
+            self._n_inputs = _num_features(X)
+        else:
+            self._n_inputs = 1 # just to create the regressor space base
+
         self.regressor_code = self.regressor_space(
             self.non_degree, self.xlag, self.ylag, self._n_inputs, self.model_type
             ) 
@@ -490,7 +496,6 @@ class FROLS(
         if self.basis_function.__class__.__name__ == "Polynomial":
             self.final_model = self.regressor_code[tmp_piv, :].copy()
         else:
-            # repetition = _num_features(reg_matrix)
             self.regressor_code = np.sort(np.tile(self.regressor_code[1:, :], (self.basis_function.repetition, 1)), axis=0)
             self.final_model = self.regressor_code[tmp_piv, :].copy()
             
@@ -502,7 +507,7 @@ class FROLS(
             self.theta = self._unbiased_estimator(psi, y, self.theta, self.non_degree, self.elag, self.max_lag)
         return self
     
-    def predict(self, X, y, steps_ahead=None):
+    def predict(self, X=None, y=None, steps_ahead=None, forecast_horizon=None):
         """Return the predicted values given an input.
 
         The predict function allows a friendly usage by the user.
@@ -527,17 +532,9 @@ class FROLS(
             The predicted values of the model.
 
         """
-        # if steps_ahead is None:
-        #     return self._model_prediction(X, y)
-        # elif steps_ahead == 1:
-        #     return self._one_step_ahead_prediction(X, y)
-        # else:
-        #     _check_positive_int(steps_ahead, "steps_ahead")
-        #     return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
-    
         if self.basis_function.__class__.__name__ == "Polynomial":
             if steps_ahead is None:
-                return self._model_prediction(X, y)
+                return self._model_prediction(X, y, forecast_horizon=forecast_horizon)
             elif steps_ahead == 1:
                 return self._one_step_ahead_prediction(X, y)
             else:

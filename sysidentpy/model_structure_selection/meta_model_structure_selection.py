@@ -5,8 +5,7 @@
 
 import numpy as np
 from scipy.stats import t
-import warnings
-from ..utils._check_arrays import check_X_y, _num_features
+from ..utils._check_arrays import check_X_y, _num_features, _check_positive_int
 from ..metrics import root_relative_squared_error, mean_squared_error
 from ..metaheuristics import BPSOGSA
 from ..simulation import SimulateNARMAX
@@ -17,7 +16,9 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
     This class uses the MetaMSS ([1]_, [2]_, [3]_) algorithm to build NARMAX models.
     The NARMAX model is described as:
+    
     .. math::
+        
         y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k
 
     where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,
@@ -145,6 +146,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
     def __init__(
         self,
+        *,
         maxiter=30,
         alpha=23,
         g_zero=100,
@@ -233,7 +235,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
                 "ylag must be integer and > zero. Got %f" % self.ylag
             )
 
-    def fit(self, X_train, y_train, X_test, y_test):
+    def fit(self, X_train=None, y_train=None, X_test=None, y_test=None):
         """Fit the polynomial NARMAX model.
 
         Parameters
@@ -256,10 +258,14 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
                                       " models.")
         if y_train is None:
             raise ValueError("y cannot be None")
-
-        check_X_y(X_train, y_train)
         
-        self._n_inputs = _num_features(X_train)
+        if X_train is not None:
+            check_X_y(X_train, y_train)
+            self._n_inputs = _num_features(X_train)
+        else:
+            self._n_inputs = 1 # just to create the regressor space base
+        
+        #  self._n_inputs = _num_features(X_train)
         self.regressor_code = self.regressor_space(
             self.non_degree, self.xlag, self.ylag, self._n_inputs, self.model_type
             )
@@ -355,7 +361,6 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
                 lagged_data = self.build_input_matrix(X_train, self.xlag)
                 self.max_lag = self._get_max_lag(xlag=self.xlag)
             elif self.model_type == "NARMAX":
-                check_X_y(X_train, y_train)
                 self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
                 lagged_data = self.build_input_output_matrix(X_train, y_train, self.xlag, self.ylag)
             else:
@@ -541,3 +546,39 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             / (1 + np.exp(-a * (x - c)))
             * (1 + (a * (x - c)) * (1 - 1 / (1 + np.exp(-a * (x - c)))))
         )
+    
+    def predict(self, *, X_test=None, y_test=None, steps_ahead=None, forecast_horizon=None):
+        """Return the predicted values given an input.
+
+        The predict function allows a friendly usage by the user.
+        Given a previously trained model, predict values given
+        a new set of data.
+
+        This method accept y values mainly for prediction n-steps ahead
+        (to be implemented in the future)
+
+        Parameters
+        ----------
+        X : ndarray of floats
+            The input data to be used in the prediction process.
+        y : ndarray of floats
+            The output data to be used in the prediction process.
+        steps_ahead = int (default = None)
+            The forecast horizon.
+
+        Returns
+        -------
+        yhat : ndarray of floats
+            The predicted values of the model.
+
+        """
+        if self.basis_function.__class__.__name__ == "Polynomial":
+            if steps_ahead is None:
+                return self._model_prediction(X_test, y_test, forecast_horizon=forecast_horizon)
+            elif steps_ahead == 1:
+                return self._one_step_ahead_prediction(X_test, y_test)
+            else:
+                _check_positive_int(steps_ahead, "steps_ahead")
+                return self._n_step_ahead_prediction(X_test, y_test, steps_ahead=steps_ahead)
+        else:
+            raise(NotImplementedError, "MetaMSS doesn't support basis functions other than polynomial yet.")
