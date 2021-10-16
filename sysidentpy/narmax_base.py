@@ -488,7 +488,7 @@ class InformationMatrix:
         return lagged_data
     
     def build_output_matrix(self, y, ylag):
-        """Build the information matrix.
+        """Build the information matrix of output values.
 
         Each columns of the information matrix represents a candidate
         regressor. The set of candidate regressors are based on xlag,
@@ -522,7 +522,7 @@ class InformationMatrix:
         return data
     
     def build_input_matrix(self, X, xlag):
-        """Build the information matrix.
+        """Build the information matrix of input values.
 
         Each columns of the information matrix represents a candidate
         regressor. The set of candidate regressors are based on xlag,
@@ -745,7 +745,7 @@ class ModelPrediction:
         yhat = yhat.ravel()
         return yhat.reshape(-1, 1)
 
-    def _model_prediction(self, X, y_initial):
+    def _model_prediction(self, X, y_initial, forecast_horizon=None):
         """Perform the infinity steps-ahead simulation of a model.
 
         Parameters
@@ -763,24 +763,33 @@ class ModelPrediction:
 
         """
         if self.model_type in ["NARMAX", "NAR"]:
-            return self._narmax_predict(X, y_initial)
+            return self._narmax_predict(X, y_initial, forecast_horizon)
         elif self.model_type == "NFIR":
             return self._nfir_predict(X)
         else:
             raise Exception("model_type do not exist! Model type must be NARMAX, NAR or NFIR")
     
-    def _narmax_predict(self, X, y_initial):
+    def _narmax_predict(self, X, y_initial, forecast_horizon):
         if len(y_initial) < self.max_lag:
             raise Exception("Insufficient initial conditions elements!")
 
-        X = X.reshape(-1, self._n_inputs)
-        y_output = np.zeros(X.shape[0], dtype=float)
+        # X = X.reshape(-1, self._n_inputs)
+        if X is not None:
+            forecast_horizon = X.shape[0]
+        else:
+            forecast_horizon = forecast_horizon + self.max_lag
+        
+        if self.model_type == "NAR":
+            self._n_inputs = 0
+        
+        y_output = np.zeros(forecast_horizon, dtype=float)
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
-
+        
+        
         model_exponents = [self._code2exponents(model) for model in self.final_model]
         raw_regressor = np.zeros(len(model_exponents[0]), dtype=float)
-        for i in range(self.max_lag, X.shape[0]):
+        for i in range(self.max_lag, forecast_horizon):
             init = 0
             final = self.max_lag
             k = int(i - self.max_lag)
