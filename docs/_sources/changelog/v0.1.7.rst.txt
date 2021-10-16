@@ -1,0 +1,389 @@
+Changes in SysIdentPy
+=====================
+
+v0.1.7
+------
+
+CONTRIBUTORS
+~~~~~~~~~~~~
+
+- wilsonrljr
+
+CHANGES
+~~~~~~~
+- The update **v0.1.7**  has been released with major changes and additional features. There are several API modifications and you will need to change your code to have the new (and upcoming) features. All modifications are meant to make future expansion easier.
+
+- On the user's side, the changes are not that disruptive, but in the background there are many changes that allowed the inclusion of new features and bug fixes that would be complex to solve without the changes. Check the `documentation page <http://sysidentpy.org/notebooks.html>`__
+
+- Many classes were basically rebuild it from scratch, so I suggest to look at the new examples of how to use the new version.
+
+- I will present the main updates below in order to highlight features and usability and then all API changes will be reported.
+
+- MAJOR: NARX models with Fourier basis function `Issue63 <https://github.com/wilsonrljr/sysidentpy/issues/63>`__, `Issue64 <https://github.com/wilsonrljr/sysidentpy/issues/64>`__
+    - The user can choose which basis they want by importing it from sysidentpy.basis_function. Check the notebooks with examples of how to use it.
+    - Polynomial and Fourier are supported for now. New basis functions will be added in next releases.
+
+- MAJOR: NAR models `Issue58 <https://github.com/wilsonrljr/sysidentpy/issues/58>`__
+    - It was already possible to build Polynomial NAR models, but with some hacks. Now the user just need to pass model_type="NAR" to build NAR models.
+    - The user doesn't need to pass a vector of zeros as input anymore.
+    - Works for any model structure selection algorithm (FROLS, AOLS, MetaMSS)
+
+- Major: NFIR models `Issue59 <https://github.com/wilsonrljr/sysidentpy/issues/59>`__
+    - NFIR models are models where the output depends only on past inputs. It was already possible to build Polynomial NFIR models, but with a lot of code on the user's side (much more than NAR, btw). Now the user just need to pass model_type="NFIR" to build NFIR models.
+    - Works for any model structure selection algorithm (FROLS, AOLS, MetaMSS)
+
+- Major: Select the order for the residues lags to use in Extended Least Squares - elag
+    - The user can select the maximum lag of the residues to be used in the Extended Least Squares algorithm. In previous versions sysidentpy used a predefined subset of residual lags.
+    - The degree of the lags follows the degree of the basis function
+
+- Major: Residual analysis methods `Issue60 <https://github.com/wilsonrljr/sysidentpy/issues/60>`__
+    - There are now specific functions to calculate the autocorrelation of the residuals and cross-correlation for the analysis of the residuals. In previous versions the calculation was limited to just two inputs, for example, limiting user usability.
+
+- Major: Plotting methods `Issue61 <https://github.com/wilsonrljr/sysidentpy/issues/61>`__
+    - The plotting functions are now separated from the models objects, so there are more flexibility regarding what to plot.
+    - Residual plots were separated from the forecast plot
+
+- API Change: sysidentpy.polynomial_basis.PolynomialNarmax is deprecated. Use sysidentpy.model_structure_selection.FROLS instead. `Issue64 <https://github.com/wilsonrljr/sysidentpy/issues/62>`__
+    - Now the user doesn't need to pass the number of inputs as a parameter.
+    - Added the elag parameter for unbiased_estimator. Now the user can define the number of lags of the residues for parameter estimation using the Extended Least Squares algorithm.
+    - model_type parameter: now the user can select the model type to be built. The options are "NARMAX", "NAR" and "NFIR". "NARMAX" is the default. If you want to build a NAR model without any "hack", just set model_type="NAR". The same for "NFIR" models.
+
+- API Change: sysidentpy.polynomial_basis.MetaMSS is deprecated. Use sysidentpy.model_structure_selection.MetaMSS instead. `Issue64 <https://github.com/wilsonrljr/sysidentpy/issues/64>`__
+    - Now the user doesn't need to pass the number of inputs as a parameter.
+    - Added the elag parameter for unbiased_estimator. Now the user can define the number of lags of the residues for parameter estimation using the Extended Least Squares algorithm.
+
+- API Change: sysidentpy.polynomial_basis.AOLS is deprecated. Use sysidentpy.model_structure_selection.AOLS instead. `Issue64 <https://github.com/wilsonrljr/sysidentpy/issues/64>`__
+
+- API Change: sysidentpy.polynomial_basis.SimulatePolynomialNarmax is deprecated. Use sysidentpy.simulation.SimulateNARMAX instead.
+
+- API Change: Introducing sysidentpy.basis_function. Because NARMAX models can be built on different basis function, a new module is added to make easier to implement new basis functions in future updates `Issue64 <https://github.com/wilsonrljr/sysidentpy/issues/64>`__.
+    - Each basis function class must have a fit and predict method to be used in training and prediction respectively. 
+
+- API Change: unbiased_estimator method moved to Estimators class.
+    - added elag option
+    - change the build_information_matrix method to build_output_matrix
+
+- API Change (new): sysidentpy.narmax_base
+    - This is the new base for building NARMAX models. The classes have been rewritten to make it easier to expand functionality.
+
+- API Change (new): sysidentpy.narmax_base.GenerateRegressors
+    - create_narmax_code: Creates the base coding that allows representation for the NARMAX, NAR, and NFIR models.
+    - regressor_space: Creates the encoding representation for the NARMAX, NAR, and NFIR models.
+
+- API Change (new): sysidentpy.narmax_base.ModelInformation
+    - _get_index_from_regressor_code: Get the index of the model code representation in regressor space.
+    - _list_output_regressor_code: Create a flattened array of output regressors.
+    - _list_input_regressor_code: Create a flattened array of input regressors.
+    - _get_lag_from_regressor_code: Get the maximum lag from array of regressors.
+    - _get_max_lag_from_model_code: the name says it all.
+    - _get_max_lag: Get the maximum lag from ylag and xlag.
+
+- API Change (new): sysidentpy.narmax_base.InformationMatrix
+    - _create_lagged_X: Create a lagged matrix of inputs without combinations.
+    - _create_lagged_y: Create a lagged matrix of the output without combinations.
+    - build_output_matrix: Build the information matrix of output values.
+    - build_input_matrix: Build the information matrix of input values.
+    - build_input_output_matrix: Build the information matrix of input and output values.
+
+- API Change (new): sysidentpy.narmax_base.ModelPrediction
+    - predict: base method for prediction. Support infinity_steps ahead, one-step ahead and n-steps ahead prediction and any basis function.
+    - _one_step_ahead_prediction: Perform the 1-step-ahead prediction for any basis function.
+    - _n_step_ahead_prediction: Perform the n-step-ahead prediction for polynomial basis.
+    - _model_prediction: Perform the infinity-step-ahead prediction for polynomial basis.
+    - _narmax_predict: wrapper for NARMAX and NAR models.
+    - _nfir_predict: wrapper for NFIR models.
+    - _basis_function_predict: Perform the infinity-step-ahead prediction for basis functions other than polynomial.
+    - basis_function_n_step_prediction: Perform the n-step-ahead prediction for basis functions other than polynomial.
+
+- API Change (new): sysidentpy.model_structure_selection.FROLS `Issue62 <https://github.com/wilsonrljr/sysidentpy/issues/62>`__, `Issue64 <https://github.com/wilsonrljr/sysidentpy/issues/64>`__
+    - Based on the old sysidentpy.polynomial_basis.PolynomialNARMAX. The class has been rebuilt with new functions and optimized code.
+    - Enforcing keyword-only arguments. This is an effort to promote clear and non-ambiguous use of the library.
+    - Add support for new basis functions.
+    - The user can choose the residual lags.
+    - No need to pass the number of inputs anymore.
+    - Improved docstring.
+    - Fixed minor grammatical and spelling mistakes.
+    - New prediction method.
+    - many under the hood changes.
+ 
+- API Change (new): sysidentpy.model_structure_selection.MetaMSS `Issue64 <https://github.com/wilsonrljr/sysidentpy/issues/64>`__
+    - Based on the old sysidentpy.polynomial_basis.MetaMSS. The class has been rebuilt with new functions and optimized code.
+    - Enforcing keyword-only arguments. This is an effort to promote clear and non-ambiguous use of the library.
+    - The user can choose the residual lags.
+    - Extended Least Squares support.
+    - Add support for new basis functions.
+    - No need to pass the number of inputs anymore.
+    - Improved docstring.
+    - Fixed minor grammatical and spelling mistakes.
+    - New prediction method.
+    - many under the hood changes.
+
+- API Change (new): sysidentpy.model_structure_selection.AOLS `Issue64 <https://github.com/wilsonrljr/sysidentpy/issues/64>`__
+    - Based on the old sysidentpy.polynomial_basis.AOLS. The class has been rebuilt with new functions and optimized code.
+    - Enforcing keyword-only arguments. This is an effort to promote clear and non-ambiguous use of the library.
+    - Add support for new basis functions.
+    - No need to pass the number of inputs anymore.
+    - Improved docstring.
+    - Change "l" parameter to "L".
+    - Fixed minor grammatical and spelling mistakes.
+    - New prediction method.
+    - many under the hood changes.
+
+- API Change (new): sysidentpy.simulation.SimulateNARMAX
+    - Based on the old sysidentpy.polynomial_basis.SimulatePolynomialNarmax. The class has been rebuilt with new functions and optimized code.
+    - Fix the Extended Least Squares support.
+    - Fix n-steps ahead prediction and 1-step ahead prediction.
+    - Enforcing keyword-only arguments. This is an effort to promote clear and non-ambiguous use of the library.
+    - The user can choose the residual lags.
+    - Improved docstring.
+    - Fixed minor grammatical and spelling mistakes.
+    - New prediction method.
+    - Do not inherit from the structure selection algorithm anymore, only from narmax_base. Avoid circular import and other issues.
+    - many under the hood changes.
+
+- API Change (new): sysidentpy.residues
+    - compute_residues_autocorrelation: the name says it all.
+    - calculate_residues: get the residues from y and yhat.
+    - get_unnormalized_e_acf: compute the unnormalized autocorrelation of the residues.
+    - compute_cross_correlation: compute cross correlation between two signals.
+    - _input_ccf
+    - _normalized_correlation: compute the normalized correlation between two signals.
+
+- API Change (new): sysidentpy.utils.plotting
+    - plot_results: plot the forecast
+    - plot_residues_correlation: the name says it all.
+
+- API Change (new): sysidentpy.utils.display_results
+    - results: return the model regressors, estimated parameter and ERR index of the fitted model in a table.
+
+- DOC: Air passenger benchmark
+    - Added notebook with Air passenger forecasting benchmark.
+    - We compare SysIdentPy against prophet, neuralprophet, autoarima, tbats and many more.
+
+- DOC: Load forecasting benchmark
+    - Added notebook with load forecasting benchmark.
+
+- DOC: PV forecasting benchmark
+    - Added notebook with PV forecasting benchmark.
+
+- DOC: Presenting main functionality
+    - Example rewritten following the new api.
+    - Fixed minor grammatical and spelling mistakes.
+
+- DOC: Multiple Inputs usage
+    - Example rewritten following the new api
+    - Fixed minor grammatical and spelling mistakes.
+
+- DOC: Information Criteria - Examples
+    - Example rewritten following the new api.
+    - Fixed minor grammatical and spelling mistakes.
+
+- DOC: Important notes and examples of how to use Extended Least Squares
+    - Example rewritten following the new api.
+    - Fixed minor grammatical and spelling mistakes.
+
+- DOC: Setting specific lags
+    - Example rewritten following the new api.
+    - Fixed minor grammatical and spelling mistakes.
+
+- DOC: Parameter Estimation
+    - Example rewritten following the new api.
+    - Fixed minor grammatical and spelling mistakes.
+
+- DOC: Using the Meta-Model Structure Selection (MetaMSS) algorithm for building Polynomial NARX models
+    - Example rewritten following the new api.
+    - Fixed minor grammatical and spelling mistakes.
+
+- DOC: Using the Accelerated Orthogonal Least-Squares algorithm for building Polynomial NARX models
+    - Example rewritten following the new api.
+    - Fixed minor grammatical and spelling mistakes.
+
+- DOC: Example: F-16 Ground Vibration Test benchmark
+    - Example rewritten following the new api.
+    - Fixed minor grammatical and spelling mistakes.
+
+- DOC: Building NARX Neural Network using Sysidentpy
+    - Example rewritten following the new api.
+    - Fixed minor grammatical and spelling mistakes.
+
+- DOC: Building NARX models using general estimators
+    - Example rewritten following the new api.
+    - Fixed minor grammatical and spelling mistakes.
+
+- DOC: Simulate a Predefined Model
+    - Example rewritten following the new api.
+    - Fixed minor grammatical and spelling mistakes.
+
+- DOC: System Identification Using Adaptive Filters
+    - Example rewritten following the new api.
+    - Fixed minor grammatical and spelling mistakes.
+
+- DOC: Identification of an electromechanical system
+    - Example rewritten following the new api.
+    - Fixed minor grammatical and spelling mistakes.
+
+- DOC: Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark
+    - Example rewritten following the new api.
+    - Fixed minor grammatical and spelling mistakes.
+
+- DOC: Introduction to NARMAX models
+    - Fixed grammatical and spelling mistakes.
+
+
+
+v0.1.6
+------
+
+CONTRIBUTORS
+~~~~~~~~~~~~
+
+- wilsonrljr
+
+CHANGES
+~~~~~~~
+
+- MAJOR: Meta-Model Structure Selection Algorithm (Meta-MSS).
+    - A new method for build NARMAX models based on metaheuristics. The algorithm uses a Binary hybrid Particle Swarm Optimization and Gravitational Search Algorithm with a new cost function to build parsimonious models.
+    
+    - New class for the BPSOGSA algorithm. New algorithms can be adapted in the Meta-MSS framework.
+	
+    - Future updates will add NARX models for classification and multiobjective model structure selection.
+
+- MAJOR: Accelerated Orthogonal Least-Squares algorithm.
+    - Added the new class AOLS to build NARX models using the Accelerated Orthogonal Least-Squares algorithm.
+    
+    - At the best of my knowledge, this is the first time this algorithm is used in the NARMAX framework. The tests I've made are promising, but use it with caution until the results are formalized into a research paper.
+
+- Added notebook with a simple example of how to use MetaMSS and a simple model comparison of the Electromechanical system.
+
+- Added notebook with a simple example of how to use AOLS
+
+- Added ModelInformation class. This class have methods to return model information such as max_lag of a model code.
+    - added _list_output_regressor_code
+    - added _list_input_regressor_code
+    - added _get_lag_from_regressor_code
+    - added _get_max_lag_from_model_code
+
+- Minor performance improvement: added the argument "predefined_regressors" in build_information_matrix function on base.py
+    to improve the performance of the Simulation method.
+
+- Pytorch is now an optional dependency. Use pip install sysidentpy['full'] 
+
+- Fix code format issues.
+
+- Fixed minor grammatical and spelling mistakes.
+
+- Fix issues related to html on Jupyter notebooks examples on documentation.
+
+- Updated Readme with examples of how to use.
+
+- Improved descriptions and comments in methods.
+
+- metaheuristics.bpsogsa (detailed description on code docstring)
+    - added evaluate_objective_function
+    - added optimize
+    - added generate_random_population
+    - added mass_calculation
+    - added calculate_gravitational_constant
+    - added calculate_acceleration
+    - added update_velocity_position
+
+- FIX issue #52
+
+
+v0.1.5
+------
+
+CONTRIBUTORS
+~~~~~~~~~~~~
+
+- wilsonrljr
+
+CHANGES
+~~~~~~~
+
+- MAJOR: n-steps-ahead prediction.
+    - Now you can define the numbers of steps ahead in the predict function.
+	- Only for Polynomial models for now. Next update will bring this functionality to Neural NARX and General Estimators.
+
+- MAJOR: Simulating predefined models.
+    - Added the new class SimulatePolynomialNarmax to handle the simulation of known model structures.
+    - Now you can simulate predefined models by just passing the model structure codification. Check the notebook examples.
+
+- Added 4 new notebooks in the example section.
+
+- Added iterative notebooks. Now you can run the notebooks in Jupyter notebook section of the documentation in Colab.
+
+- Fix code format issues.
+
+- Added new tests for SimulatePolynomialNarmax and generate_data.
+
+- Started changes related to numpy 1.19.4 update. There are still some Deprecation warnings that will be fixed in next update.
+
+- Fix issues related to html on Jupyter notebooks examples on documentation.
+
+- Updated Readme with examples of how to use.
+
+
+
+v0.1.4
+------
+
+CONTRIBUTORS
+~~~~~~~~~~~~
+
+- wilsonrljr
+
+CHANGES
+~~~~~~~
+
+- MAJOR: Introducing NARX Neural Network in SysIdentPy.
+    - Now you can build NARX Neural Network on SysIdentPy.
+    - This feature is built on top of Pytorch. See the docs for more details and examples of how to use.
+
+- MAJOR: Introducing general estimators in SysIdentPy.
+    - Now you are able to use any estimator that have Fit/Predict methods (estimators from Sklearn and Catboost, for example) and build NARX models based on those estimators.
+    - We use the core functions of SysIdentPy and keep the Fit/Predict approach from those estimators to keep the process easy to use.
+    - More estimators are coming soon like XGboost.
+
+- Added notebooks to show how to build NARX neural Network.
+
+- Added notebooks to show how to build NARX models using general estimators.
+
+- Changed the default parameters of the plot_results function.
+
+- NOTE: We will keeping improving the Polynomial NARX models (new model structure selection algorithms and multiobjective identification
+is on our roadmap). These recent modifications will allow us to introduce new NARX models like PWARX models very soon.
+
+- New template for the documentation site.
+
+- Fix issues related to html on Jupyter notebooks examples on documentation.
+
+- Updated Readme with examples of how to use.
+
+
+v0.1.3
+------
+
+CONTRIBUTORS
+~~~~~~~~~~~~
+
+- wilsonrljr
+- renard162
+
+CHANGES
+~~~~~~~
+
+- Fixed a bug concerning the xlag and ylag in multiple input scenarios.
+- Refactored predict function. Improved performance up to 87% depending on the number of regressors.
+- You can set lags with different size for each input.
+- Added a new function to get the max value of xlag and ylag. Work with int, list, nested lists.
+- Fixed tests for information criteria.
+- Added SysIdentPy logo.
+- Refactored code of all classes following PEP 8 guidelines to improve readability.
+- Added Citation information on Readme.
+- Changes on information Criteria tests.
+- Added workflow to run the tests when merge branch into master.
+- Added new site domain.
+- Updated docs.
+

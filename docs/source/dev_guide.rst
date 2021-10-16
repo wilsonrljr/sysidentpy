@@ -3,7 +3,7 @@ Contributing
 
 SysIdentPy is intended to be a community project, hence all contributions are welcome!
 
-Sugestions and Bug reporting
+Suggestions and Bug reporting
 ----------------------------
 There exist many possible use cases in System Identification field
 and we can not test all scenarios without your help! If you find any

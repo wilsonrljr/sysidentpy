@@ -1,0 +1,704 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>V0.1.6 - Important notes and examples of how to use Extended Least Squares &#8212; NARMAX models</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet" />
+  <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-book-theme.css?digest=c3fdc42140077d1ad13ad2f1588a4309" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <link rel="canonical" href="http://sysidentpy.org/examples-v016/extended_least_squares.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="V0.1.6 - Setting specific lags" href="defining_lags.html" />
+    <link rel="prev" title="V0.1.6 - Information Criteria - Examples" href="information_criteria_examples.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../_static/sysidentpy-logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">NARMAX models</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../installation.html">
+   Install Guide
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../introduction_to_narmax.html">
+   A brief introduction to NARMAX models.
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../user_guide.html">
+   User Guide
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../dev_guide.html">
+   Contributing
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../notebooks.html">
+   Examples
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/basic_steps.html">
+     Presenting main functionality
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/air_passenger_benchmark.html">
+     Air Passenger benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/load_forecasting_benchmark.html">
+     Load forecasting benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/PV_forecasting_benchmark.html">
+     PV forecasting benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/multiple_inputs_example.html">
+     Multiple Inputs usage
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/information_criteria_examples.html">
+     Information Criteria - Examples
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/extended_least_squares.html">
+     Extended Least Squares
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/defining_lags.html">
+     Setting specific lags
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/parameter_estimation.html">
+     Parameter Estimation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/metamss.html">
+     Meta-Model Structure Selection (MetaMSS) algorithm for building Polynomial NARX models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/aols.html">
+     Using the Accelerated Orthogonal Least-Squares algorithm for building Polynomial NARX models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/f_16_benchmark.html">
+     Example: F-16 Ground Vibration Test benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/narx_neural_network.html">
+     Building NARX Neural Network using Sysidentpy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/general_estimators.html">
+     Building NARX models using general estimators
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/simulating_a_predefined_model.html">
+     Simulate a Predefined Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/identification_of_an_electromechanical_system.html">
+     Identification of an electromechanical system
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/n_steps_ahead_prediction.html">
+     Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="../notebooksv016.html">
+   Examples v0.1.6
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="basic_steps.html">
+     V0.1.6 - Presenting main functionality
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiple_inputs_example.html">
+     V0.1.6 - Multiple Inputs usage
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="information_criteria_examples.html">
+     V0.1.6 - Information Criteria - Examples
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     V0.1.6 - Important notes and examples of how to use Extended Least Squares
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="defining_lags.html">
+     V0.1.6 - Setting specific lags
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="parameter_estimation.html">
+     V0.1.6 - Parameter Estimation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="metamss.html">
+     V0.1.6 - Using the Meta-Model Structure Selection (MetaMSS) algorithm for building Polynomial NARX models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="aols.html">
+     V0.1.6 - Using the Accelerated Orthogonal Least-Squares algorithm for building Polynomial NARX models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="f_16_benchmark.html">
+     V0.1.6 - Example: F-16 Ground Vibration Test benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="narx_neural_network.html">
+     V0.1.6 - Building NARX Neural Network using Sysidentpy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="general_estimators.html">
+     V0.1.6 - Building NARX models using general estimators
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="simulating_a_predefined_model.html">
+     V0.1.6 - Simulate a Predefined Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="system_identification_using_adaptative_filters.html">
+     V0.1.6 - System Identification Using Adaptative Filters
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="identification_of_an_electromechanical_system.html">
+     V0.1.6 - Identification of an electromechanical system
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="n_steps_ahead_prediction.html">
+     V0.1.6 - Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../changelog/v0.1.7.html">
+   Changes in SysIdentPy
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../code.html">
+   Code
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="simple">
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/examples-v016/extended_least_squares.ipynb.txt"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/wilsonrljr/sysidentpy/"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/wilsonrljr/sysidentpy//issues/new?title=Issue%20on%20page%20%2Fexamples-v016/extended_least_squares.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        <a class="edit-button" href="https://github.com/wilsonrljr/sysidentpy/edit/master/docs/examples-v016/extended_least_squares.ipynb"><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Edit this page"><i class="fas fa-pencil-alt"></i>suggest edit</button></a>
+    </div>
+</div>
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        
+        
+        <a class="colab-button" href="https://colab.research.google.com/github/wilsonrljr/sysidentpy/blob/master/docs/examples-v016/extended_least_squares.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
+                title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
+                    src="../_static/images/logo_colab.png"
+                    alt="Interact on Colab">Colab</button></a>
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#generating-1-input-1-output-sample-data">
+   Generating 1 input 1 output sample data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#build-the-model">
+   Build the model
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#biased-parameter-estimation">
+   Biased parameter estimation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-the-extended-least-squares-algorithm">
+   Using the Extended Least Squares algorithm
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#note">
+   Note
+  </a>
+ </li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="tex2jax_ignore mathjax_ignore section" id="v0-1-6-important-notes-and-examples-of-how-to-use-extended-least-squares">
+<h1>V0.1.6 - Important notes and examples of how to use Extended Least Squares<a class="headerlink" href="#v0-1-6-important-notes-and-examples-of-how-to-use-extended-least-squares" title="Permalink to this headline">¶</a></h1>
+<p>Example created by Wilson Rocha Lacerda Junior</p>
+<p>Here we import the NARMAX model, the metric for model evaluation and the methods to generate sample data for tests. Also, we import pandas for specific usage.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">sysidentpy</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: sysidentpy in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (0.1.6)
+Requirement already satisfied: matplotlib&gt;=3.3.2 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from sysidentpy) (3.4.3)
+Requirement already satisfied: numpy&gt;=1.19.2 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from sysidentpy) (1.20.3)
+Requirement already satisfied: scipy&gt;=1.7.0 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from sysidentpy) (1.7.1)
+Requirement already satisfied: pyparsing&gt;=2.2.1 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (2.4.7)
+Requirement already satisfied: python-dateutil&gt;=2.7 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (2.8.2)
+Requirement already satisfied: cycler&gt;=0.10 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (0.10.0)
+Requirement already satisfied: pillow&gt;=6.2.0 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (8.3.2)
+Requirement already satisfied: kiwisolver&gt;=1.0.1 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (1.3.2)
+Requirement already satisfied: six in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from cycler&gt;=0.10-&gt;matplotlib&gt;=3.3.2-&gt;sysidentpy) (1.16.0)
+Note: you may need to restart the kernel to use updated packages.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.polynomial_basis</span> <span class="kn">import</span> <span class="n">PolynomialNarmax</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.metrics</span> <span class="kn">import</span> <span class="n">root_relative_squared_error</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.utils.generate_data</span> <span class="kn">import</span> <span class="n">get_miso_data</span><span class="p">,</span> <span class="n">get_siso_data</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="generating-1-input-1-output-sample-data">
+<h2>Generating 1 input 1 output sample data<a class="headerlink" href="#generating-1-input-1-output-sample-data" title="Permalink to this headline">¶</a></h2>
+<p>The data is generated by simulating the following model:
+<span class="math notranslate nohighlight">\(y_k = 0.2y_{k-1} + 0.1y_{k-1}x_{k-1} + 0.9x_{k-2} + e_{k}\)</span></p>
+<p>If <em>colored_noise</em> is set to True:</p>
+<p><span class="math notranslate nohighlight">\(e_{k} = 0.8\nu_{k-1} + \nu_{k}\)</span></p>
+<p>where <span class="math notranslate nohighlight">\(x\)</span> is a uniformly distributed random variable and <span class="math notranslate nohighlight">\(\nu\)</span> is a gaussian distributed variable with <span class="math notranslate nohighlight">\(\mu=0\)</span> and <span class="math notranslate nohighlight">\(\sigma\)</span> is defined by the user.</p>
+<p>In the next example we will generate a data with 3000 samples with white noise and selecting 90% of the data to train the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_train</span><span class="p">,</span> <span class="n">x_valid</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="n">get_siso_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                                                   <span class="n">colored_noise</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                   <span class="n">sigma</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                                                   <span class="n">train_percentage</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="build-the-model">
+<h2>Build the model<a class="headerlink" href="#build-the-model" title="Permalink to this headline">¶</a></h2>
+<p>First we will train a model without the Extended Least Squares Algorithm for comparison purpose.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">PolynomialNarmax</span><span class="p">(</span><span class="n">non_degree</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                         <span class="n">order_selection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                         <span class="n">n_info_values</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                         <span class="n">n_terms</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                         <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="n">ylag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                         <span class="n">info_criteria</span><span class="o">=</span><span class="s1">&#39;aic&#39;</span><span class="p">,</span>
+                         <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;least_squares&#39;</span><span class="p">,</span>
+                         <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">yhat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
+<span class="n">rrse</span> <span class="o">=</span> <span class="n">root_relative_squared_error</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rrse</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.49194571160248335
+</pre></div>
+</div>
+</div>
+</div>
+<p>Clearly we have something wrong with the obtained model. See the <em>basic_steps</em> notebook to compare the results obtained using the same data but without colored noise. But let take a look in whats is wrong.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="n">err_precision</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                                     <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;dec&#39;</span><span class="p">),</span>
+                       <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Regressors&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;ERR&#39;</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>      Regressors Parameters         ERR
+0        x1(k-2)     0.9113  0.74960278
+1         y(k-1)     0.2926  0.08431468
+2  x1(k-1)y(k-1)     0.0737  0.00178035
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="biased-parameter-estimation">
+<h2>Biased parameter estimation<a class="headerlink" href="#biased-parameter-estimation" title="Permalink to this headline">¶</a></h2>
+<p>As we can observe above, the model structure is exact the same the one that generate the data. You can se that the ERR ordered the terms in the correct way. And this is an importante note regarding the Error Reduction Ratio algorithm used here: <strong>it is very robust to colored noise!!</strong></p>
+<p>That is a greate feature! However, although the structure is correct, the model <em>parameters</em> are not ok! Here we have a biased estimation! The real parameter for <span class="math notranslate nohighlight">\(y_{k-1}\)</span> is <span class="math notranslate nohighlight">\(0.2\)</span>, not <span class="math notranslate nohighlight">\(0.3\)</span>.</p>
+<p>In this case, we are actually modeling using a NARX model, not a NARMAX. The MA part exists to allow a unbiased estimation of the parameters. To achieve a unbiased estimation of the parameters we have the Extend Least Squares algorithm. Remember, if the data have only white noise, NARX is fine.</p>
+<p>Before applying the Extended Least Squares Algorithm we will run several NARX models to check how different the estimated parameters are from the real ones.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">parameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">50</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>
+    <span class="n">x_train</span><span class="p">,</span> <span class="n">x_valid</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="n">get_siso_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span>
+                                                       <span class="n">colored_noise</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                       <span class="n">train_percentage</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+    
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+    <span class="n">parameters</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">pal</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">cubehelix_palette</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">rot</span><span class="o">=-</span><span class="mf">.5</span><span class="p">,</span> <span class="n">dark</span><span class="o">=</span><span class="mf">.3</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">T</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">T</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">T</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="c1"># plotting a vertical line where the real values must lie</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\wilso\AppData\Local\Temp/ipykernel_1768/3592060221.py:12: DeprecationWarning: setting an array element with a sequence. This was supported in some cases where the elements are arrays with a single element. For example `np.array([1, np.array([2])], dtype=int)`. In the future this will raise the same ValueError as `np.array([1, [2]], dtype=int)`.
+  parameters[:, i] = list(model.theta)
+</pre></div>
+</div>
+<img alt="../_images/extended_least_squares_12_1.png" src="../_images/extended_least_squares_12_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="using-the-extended-least-squares-algorithm">
+<h2>Using the Extended Least Squares algorithm<a class="headerlink" href="#using-the-extended-least-squares-algorithm" title="Permalink to this headline">¶</a></h2>
+<p>As shown in figure above, we have a problem to estimate the parameter for <span class="math notranslate nohighlight">\(y_{k-1}\)</span>. Now we will use the Extended Least Squares Algorithm.</p>
+<p>In SysIdentPy, just set <em>extended_least_squares</em> to <em>True</em> and the algorithm will be applied.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">parameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">50</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>
+    <span class="n">x_train</span><span class="p">,</span> <span class="n">x_valid</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="n">get_siso_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span>
+                                                       <span class="n">colored_noise</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                       <span class="n">train_percentage</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">PolynomialNarmax</span><span class="p">(</span><span class="n">non_degree</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                             <span class="n">n_terms</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                             <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">ylag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                             <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;least_squares&#39;</span><span class="p">,</span>
+                             <span class="p">)</span>
+    
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+    <span class="n">parameters</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">pal</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">cubehelix_palette</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">rot</span><span class="o">=-</span><span class="mf">.5</span><span class="p">,</span> <span class="n">dark</span><span class="o">=</span><span class="mf">.3</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">T</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">T</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">T</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="c1"># plotting a vertical line where the real values must lie</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\wilso\AppData\Local\Temp/ipykernel_1768/636623006.py:16: DeprecationWarning: setting an array element with a sequence. This was supported in some cases where the elements are arrays with a single element. For example `np.array([1, np.array([2])], dtype=int)`. In the future this will raise the same ValueError as `np.array([1, [2]], dtype=int)`.
+  parameters[:, i] = list(model.theta)
+</pre></div>
+</div>
+<img alt="../_images/extended_least_squares_14_1.png" src="../_images/extended_least_squares_14_1.png" />
+</div>
+</div>
+<p>Great! Now we have an unbiased estimation of the parameters!</p>
+</div>
+<div class="section" id="note">
+<h2>Note<a class="headerlink" href="#note" title="Permalink to this headline">¶</a></h2>
+<p>Note: The Extended Least Squares is an iterative algorithm. In SysIdentpy we fixed 30 iterations because it is knwon from literature that the algorithm converges quickly (about 10 or 20 iterations). Also, we create a specific set of noise regressors for estimation (order 2 and nonlinearity also equal 2). It is suposed to work in most cases, however we will add the possibility to choose the order and nonlinearity degree for noise regressors in future releases.</p>
+</div>
+</div>
+
+
+              </div>
+              
+        
+            
+
+
+
+<div class='prev-next-bottom'>
+    
+    <div id="prev">
+        <a class="left-prev" href="information_criteria_examples.html" title="previous page">
+            <i class="prevnext-label fas fa-angle-left"></i>
+            <div class="prevnext-info">
+                <p class="prevnext-label">previous</p>
+                <p class="prevnext-title">V0.1.6 - Information Criteria - Examples</p>
+            </div>
+        </a>
+    </div>
+     <div id="next">
+        <a class="right-next" href="defining_lags.html" title="next page">
+            <div class="prevnext-info">
+                <p class="prevnext-label">next</p>
+                <p class="prevnext-title">V0.1.6 - Setting specific lags</p>
+            </div>
+            <i class="prevnext-label fas fa-angle-right"></i>
+        </a>
+     </div>
+
+</div>
+        
+        </div>
+    </div>
+    <footer class="footer">
+    <div class="container">
+      <p>
+        
+          By Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins<br/>
+        
+            &copy; Copyright 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>

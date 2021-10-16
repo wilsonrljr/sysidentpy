@@ -11,7 +11,7 @@ docs/_build
 docs/build
 # Pycharm editor project files
 .idea
-
+logs.log
 # for virtual environment
 venv/
 

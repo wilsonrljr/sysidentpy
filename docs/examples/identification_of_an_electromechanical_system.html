@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-book-theme.e2363ea40746bee74734a24ffefccd78.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-book-theme.css?digest=c3fdc42140077d1ad13ad2f1588a4309" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
@@ -43,7 +43,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark" href="n_steps_ahead_prediction.html" />
-    <link rel="prev" title="System Identification Using Adaptative Filters" href="system_identification_using_adaptative_filters.html" />
+    <link rel="prev" title="Simulate a Predefined Model" href="simulating_a_predefined_model.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
     
@@ -74,7 +74,7 @@
     </a>
 </div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Pesquise os documentos ..." aria-label="Pesquise os documentos ..." autocomplete="off" >
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item active">
         <ul class="current nav bd-sidenav">
@@ -100,7 +100,7 @@
  </li>
  <li class="toctree-l1 current active has-children">
   <a class="reference internal" href="../notebooks.html">
-   Jupyter notebooks
+   Examples
   </a>
   <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
   <label for="toctree-checkbox-1">
@@ -111,6 +111,21 @@
    <li class="toctree-l2">
     <a class="reference internal" href="basic_steps.html">
      Presenting main functionality
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="air_passenger_benchmark.html">
+     Air Passenger benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="load_forecasting_benchmark.html">
+     Load forecasting benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="PV_forecasting_benchmark.html">
+     PV forecasting benchmark
     </a>
    </li>
    <li class="toctree-l2">
@@ -125,7 +140,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="extended_least_squares.html">
-     Important notes and examples of how to use Extended Least Squares
+     Extended Least Squares
     </a>
    </li>
    <li class="toctree-l2">
@@ -140,7 +155,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="metamss.html">
-     Using the Meta-Model Structure Selection (MetaMSS) algorithm for building Polynomial NARX models
+     Meta-Model Structure Selection (MetaMSS) algorithm for building Polynomial NARX models
     </a>
    </li>
    <li class="toctree-l2">
@@ -168,11 +183,6 @@
      Simulate a Predefined Model
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="system_identification_using_adaptative_filters.html">
-     System Identification Using Adaptative Filters
-    </a>
-   </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
      Identification of an electromechanical system
@@ -185,17 +195,104 @@
    </li>
   </ul>
  </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../notebooksv016.html">
+   Examples v0.1.6
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/basic_steps.html">
+     V0.1.6 - Presenting main functionality
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/multiple_inputs_example.html">
+     V0.1.6 - Multiple Inputs usage
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/information_criteria_examples.html">
+     V0.1.6 - Information Criteria - Examples
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/extended_least_squares.html">
+     V0.1.6 - Important notes and examples of how to use Extended Least Squares
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/defining_lags.html">
+     V0.1.6 - Setting specific lags
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/parameter_estimation.html">
+     V0.1.6 - Parameter Estimation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/metamss.html">
+     V0.1.6 - Using the Meta-Model Structure Selection (MetaMSS) algorithm for building Polynomial NARX models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/aols.html">
+     V0.1.6 - Using the Accelerated Orthogonal Least-Squares algorithm for building Polynomial NARX models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/f_16_benchmark.html">
+     V0.1.6 - Example: F-16 Ground Vibration Test benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/narx_neural_network.html">
+     V0.1.6 - Building NARX Neural Network using Sysidentpy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/general_estimators.html">
+     V0.1.6 - Building NARX models using general estimators
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/simulating_a_predefined_model.html">
+     V0.1.6 - Simulate a Predefined Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/system_identification_using_adaptative_filters.html">
+     V0.1.6 - System Identification Using Adaptative Filters
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/identification_of_an_electromechanical_system.html">
+     V0.1.6 - Identification of an electromechanical system
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/n_steps_ahead_prediction.html">
+     V0.1.6 - Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark
+    </a>
+   </li>
+  </ul>
+ </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="../changelog/v0.1.6.html">
+  <a class="reference internal" href="../changelog/v0.1.7.html">
    Changes in SysIdentPy
   </a>
  </li>
  <li class="toctree-l1 has-children">
   <a class="reference internal" href="../code.html">
-   Codes
+   Code
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
-  <label for="toctree-checkbox-2">
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
    <i class="fas fa-chevron-down">
    </i>
   </label>
@@ -227,8 +324,8 @@
             
             <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
                 data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
-                aria-expanded="true" aria-label="Alternar de navegação" aria-controls="site-navigation"
-                title="Alternar de navegação" data-toggle="tooltip" data-placement="left">
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
                 <i class="fas fa-bars"></i>
                 <i class="fas fa-arrow-left"></i>
                 <i class="fas fa-arrow-up"></i>
@@ -236,7 +333,7 @@
             
             
 <div class="dropdown-buttons-trigger">
-    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Baixe esta página"><i
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
             class="fas fa-download"></i></button>
 
     <div class="dropdown-buttons">
@@ -244,10 +341,10 @@
         
         <!-- Download raw file -->
         <a class="dropdown-buttons" href="../_sources/examples/identification_of_an_electromechanical_system.ipynb.txt"><button type="button"
-                class="btn btn-secondary topbarbtn" title="Baixar arquivo fonte" data-toggle="tooltip"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
-        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Imprimir em PDF"
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
             onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
@@ -260,23 +357,23 @@
     <div class="dropdown-buttons sourcebuttons">
         <a class="repository-button"
             href="https://github.com/wilsonrljr/sysidentpy/"><button type="button" class="btn btn-secondary topbarbtn"
-                data-toggle="tooltip" data-placement="left" title="Repositório fonte"><i
-                    class="fab fa-github"></i>repositório</button></a>
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
         <a class="issues-button"
             href="https://github.com/wilsonrljr/sysidentpy//issues/new?title=Issue%20on%20page%20%2Fexamples/identification_of_an_electromechanical_system.html&body=Your%20issue%20content%20here."><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
-                title="Abra um problema"><i class="fas fa-lightbulb"></i>questão aberta</button></a>
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
         <a class="edit-button" href="https://github.com/wilsonrljr/sysidentpy/edit/master/docs/examples/identification_of_an_electromechanical_system.ipynb"><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
-                title="Edite essa página"><i class="fas fa-pencil-alt"></i>sugerir edição</button></a>
+                title="Edit this page"><i class="fas fa-pencil-alt"></i>suggest edit</button></a>
     </div>
 </div>
 
             <!-- Full screen (wrap in <a> to have style consistency -->
 
 <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
-        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Modo tela cheia"
-        title="Modo tela cheia"><i
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
             class="fas fa-expand"></i></button></a>
 
             <!-- Launch buttons -->
@@ -289,7 +386,7 @@
         
         
         <a class="colab-button" href="https://colab.research.google.com/github/wilsonrljr/sysidentpy/blob/master/docs/examples/identification_of_an_electromechanical_system.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
-                title="Lançamento Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
+                title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
                     src="../_static/images/logo_colab.png"
                     alt="Interact on Colab">Colab</button></a>
         
@@ -303,7 +400,7 @@
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
             <div class="tocsection onthispage pt-5 pb-3">
-                <i class="fas fa-list"></i> Conteúdo
+                <i class="fas fa-list"></i> Contents
             </div>
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
@@ -341,22 +438,24 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">sysidentpy.polynomial_basis</span> <span class="kn">import</span> <span class="n">PolynomialNarmax</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.model_structure_selection</span> <span class="kn">import</span> <span class="n">FROLS</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.basis_function._basis_function</span> <span class="kn">import</span> <span class="n">Polynomial</span>
 <span class="kn">from</span> <span class="nn">sysidentpy.metrics</span> <span class="kn">import</span> <span class="n">root_relative_squared_error</span>
-<span class="kn">from</span> <span class="nn">sysidentpy.utils.generate_data</span> <span class="kn">import</span> <span class="n">get_miso_data</span><span class="p">,</span> <span class="n">get_siso_data</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.utils.generate_data</span> <span class="kn">import</span> <span class="n">get_siso_data</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.utils.display_results</span> <span class="kn">import</span> <span class="n">results</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.utils.plotting</span> <span class="kn">import</span> <span class="n">plot_residues_correlation</span><span class="p">,</span> <span class="n">plot_results</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.residues.residues_correlation</span> <span class="kn">import</span> <span class="n">compute_residues_autocorrelation</span><span class="p">,</span> <span class="n">compute_cross_correlation</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/x_cc.csv&#39;</span><span class="p">)</span>
-<span class="n">df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/y_cc.csv&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;examples/datasets/x_cc.csv&#39;</span><span class="p">)</span>
+<span class="n">df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;examples/datasets/y_cc.csv&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -371,7 +470,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
 </pre></div>
 </div>
-<img alt="../_images/identification_of_an_electromechanical_system_4_1.png" src="../_images/identification_of_an_electromechanical_system_4_1.png" />
+<img alt="../_images/identification_of_an_electromechanical_system_4_11.png" src="../_images/identification_of_an_electromechanical_system_4_11.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -387,55 +486,66 @@
 <h2>Building a Polynomial NARX model<a class="headerlink" href="#building-a-polynomial-narx-model" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">PolynomialNarmax</span><span class="p">(</span><span class="n">non_degree</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                         <span class="n">order_selection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                         <span class="n">n_info_values</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
-                         <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                         <span class="n">ylag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                         <span class="n">info_criteria</span><span class="o">=</span><span class="s1">&#39;bic&#39;</span><span class="p">,</span>
-                         <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;recursive_least_squares&#39;</span>
-                         <span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">basis_function</span> <span class="o">=</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">FROLS</span><span class="p">(</span>
+    <span class="n">order_selection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">n_info_values</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
+    <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">ylag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">info_criteria</span><span class="o">=</span><span class="s1">&#39;bic&#39;</span><span class="p">,</span>
+    <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;recursive_least_squares&#39;</span><span class="p">,</span>
+    <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="n">yhat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">)</span>
+<span class="n">yhat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_valid</span><span class="p">)</span>
 <span class="n">rrse</span> <span class="o">=</span> <span class="n">root_relative_squared_error</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">rrse</span><span class="p">)</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="n">err_precision</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
-                                     <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;dec&#39;</span><span class="p">),</span>
-                       <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Regressors&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;ERR&#39;</span><span class="p">])</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">results</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">final_model</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">theta</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">err</span><span class="p">,</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">n_terms</span><span class="p">,</span> <span class="n">err_precision</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;sci&#39;</span>
+        <span class="p">),</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Regressors&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;ERR&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 
-<span class="n">ee</span><span class="p">,</span> <span class="n">ex</span><span class="p">,</span> <span class="n">extras</span><span class="p">,</span> <span class="n">lam</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">residuals</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
-<span class="n">model</span><span class="o">.</span><span class="n">plot_result</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">ee</span><span class="p">,</span> <span class="n">ex</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">plot_results</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span> <span class="o">=</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">ee</span> <span class="o">=</span> <span class="n">compute_residues_autocorrelation</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+<span class="n">plot_residues_correlation</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ee</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Residues&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;$e^2$&quot;</span><span class="p">)</span>
+<span class="n">x1e</span> <span class="o">=</span> <span class="n">compute_cross_correlation</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">x_valid</span><span class="p">)</span>
+<span class="n">plot_residues_correlation</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">x1e</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Residues&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;$x_1e$&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\wilso\miniconda3\envs\v0.1.4\lib\site-packages\sysidentpy\polynomial_basis\narmax.py:333: UserWarning: n_info_values is greater than the maximum number of all regressors space considering the chosen y_lag, u_lag, and non_degree. We set as 15 
-  self.info_values = self.information_criterion(X, y)
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\model_structure_selection\forward_regression_orthogonal_least_squares.py:472: UserWarning: n_info_values is greater than the maximum number of all regressors space considering the chosen y_lag, u_lag, and non_degree. We set as 15 
+  self.info_values = self.information_criterion(reg_matrix, y)
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.08011571455094049
-       Regressors Parameters         ERR
-0          y(k-1)     1.3016  0.98600038
-1       x1(k-1)^2   103.9300  0.00794805
-2        y(k-2)^2     0.0000  0.00250906
-3   x1(k-1)y(k-1)    -0.1257  0.00143301
-4          y(k-2)    -0.5078  0.00102781
-5   x1(k-1)y(k-2)     0.0560  0.00053520
-6         x1(k-2)   349.8627  0.00027965
-7   x1(k-2)y(k-1)    -0.0840  0.00011221
-8  x1(k-2)x1(k-1)    -7.8186  0.00004547
-9   x1(k-2)y(k-2)     0.0341  0.00003253
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.08011571455967419
+       Regressors   Parameters             ERR
+0          y(k-1)   1.3016E+00  9.86000384E-01
+1       x1(k-1)^2   1.0393E+02  7.94805130E-03
+2        y(k-2)^2   1.6288E-05  2.50905908E-03
+3   x1(k-1)y(k-1)  -1.2567E-01  1.43301039E-03
+4          y(k-2)  -5.0784E-01  1.02781443E-03
+5   x1(k-1)y(k-2)   5.6049E-02  5.35200312E-04
+6         x1(k-2)   3.4986E+02  2.79648078E-04
+7   x1(k-2)y(k-1)  -8.4030E-02  1.12211942E-04
+8  x1(k-2)x1(k-1)  -7.8186E+00  4.54743448E-05
+9   x1(k-2)y(k-2)   3.4050E-02  3.25346101E-05
 </pre></div>
 </div>
-<img alt="../_images/identification_of_an_electromechanical_system_8_2.png" src="../_images/identification_of_an_electromechanical_system_8_2.png" />
+<img alt="../_images/identification_of_an_electromechanical_system_8_21.png" src="../_images/identification_of_an_electromechanical_system_8_21.png" />
+<img alt="../_images/identification_of_an_electromechanical_system_8_3.png" src="../_images/identification_of_an_electromechanical_system_8_3.png" />
+<img alt="../_images/identification_of_an_electromechanical_system_8_4.png" src="../_images/identification_of_an_electromechanical_system_8_4.png" />
 </div>
 </div>
 </div>
@@ -452,23 +562,25 @@
 <span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">BayesianRidge</span><span class="p">,</span> <span class="n">ARDRegression</span>
 <span class="kn">from</span> <span class="nn">sysidentpy.general_estimators</span> <span class="kn">import</span> <span class="n">NARX</span>
 
+<span class="n">basis_function</span> <span class="o">=</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
 
 <span class="n">estimators</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">(</span><span class="s1">&#39;KNeighborsRegressor&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
         <span class="n">base_estimator</span><span class="o">=</span><span class="n">KNeighborsRegressor</span><span class="p">(),</span>
         <span class="n">xlag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
         <span class="n">ylag</span><span class="o">=</span><span class="mi">10</span><span class="p">)),</span>
-    <span class="p">(</span><span class="s1">&#39;DecisionTreeRegressor&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
+    <span class="p">(</span><span class="s1">&#39;NARX-DecisionTreeRegressor&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
         <span class="n">base_estimator</span><span class="o">=</span><span class="n">DecisionTreeRegressor</span><span class="p">(),</span>
         <span class="n">xlag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
         <span class="n">ylag</span><span class="o">=</span><span class="mi">10</span><span class="p">)),</span>
-    <span class="p">(</span><span class="s1">&#39;RandomForestRegressor&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
+    <span class="p">(</span><span class="s1">&#39;NARX-RandomForestRegressor&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
         <span class="n">base_estimator</span><span class="o">=</span><span class="n">RandomForestRegressor</span><span class="p">(</span>
             <span class="n">n_estimators</span><span class="o">=</span><span class="mi">200</span><span class="p">),</span>
         <span class="n">xlag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
         <span class="n">ylag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
     <span class="p">)),</span>
-    <span class="p">(</span><span class="s1">&#39;Catboost_NARX&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
+    <span class="p">(</span><span class="s1">&#39;NARX-Catboost&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
         <span class="n">base_estimator</span><span class="o">=</span><span class="n">CatBoostRegressor</span><span class="p">(</span>
         <span class="n">iterations</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
         <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
@@ -478,76 +590,83 @@
         <span class="n">non_degree</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">fit_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;verbose&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
     <span class="p">)),</span>
-    <span class="p">(</span><span class="s1">&#39;ARD_NARX&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
+    <span class="p">(</span><span class="s1">&#39;NARX-ARD&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
         <span class="n">base_estimator</span><span class="o">=</span><span class="n">ARDRegression</span><span class="p">(),</span>
         <span class="n">xlag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
         <span class="n">ylag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
         <span class="n">non_degree</span><span class="o">=</span><span class="mi">2</span>
     <span class="p">)),</span>
-    <span class="p">(</span><span class="s1">&#39;Polynomial_NARX&#39;</span><span class="p">,</span> <span class="n">PolynomialNarmax</span><span class="p">(</span><span class="n">non_degree</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                         <span class="n">order_selection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                         <span class="n">n_info_values</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-                         <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                         <span class="n">ylag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                         <span class="n">info_criteria</span><span class="o">=</span><span class="s1">&#39;bic&#39;</span><span class="p">,</span>
-                         <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;recursive_least_squares&#39;</span><span class="p">,</span>
-                         <span class="p">)),</span>
+    <span class="p">(</span><span class="s1">&#39;FROLS-Polynomial_NARX&#39;</span><span class="p">,</span> <span class="n">FROLS</span><span class="p">(</span>
+        <span class="n">order_selection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">n_info_values</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">ylag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">info_criteria</span><span class="o">=</span><span class="s1">&#39;bic&#39;</span><span class="p">,</span>
+        <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;recursive_least_squares&#39;</span><span class="p">,</span>
+        <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
     
     <span class="p">]</span>
-
-
-
 
 <span class="n">resultados</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">nome_do_modelo</span><span class="p">,</span> <span class="n">modelo</span> <span class="ow">in</span> <span class="n">estimators</span><span class="p">:</span>
     <span class="n">resultados</span><span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nome_do_modelo</span><span class="p">)]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">modelo</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-    <span class="n">yhat</span> <span class="o">=</span> <span class="n">modelo</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span>  <span class="n">y_valid</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">root_relative_squared_error</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+    <span class="n">modelo</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">)</span>
+    <span class="n">yhat</span> <span class="o">=</span> <span class="n">modelo</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_valid</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">root_relative_squared_error</span><span class="p">(</span><span class="n">y_valid</span><span class="p">[</span><span class="n">modelo</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:],</span> <span class="n">yhat</span><span class="p">[</span><span class="n">modelo</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:])</span>
     <span class="n">resultados</span><span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nome_do_modelo</span><span class="p">)]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">nome_do_modelo</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-08 22:53:49 - INFO - Training the model
-03-08 22:53:49 - INFO - Creating the regressor matrix
-03-08 22:53:49 - INFO - The regressor matrix have 21 features
-03-08 22:53:49 - INFO - Done! Model is built!
-KNeighborsRegressor 1.833
-03-08 22:53:50 - INFO - Training the model
-03-08 22:53:50 - INFO - Creating the regressor matrix
-03-08 22:53:50 - INFO - The regressor matrix have 21 features
-03-08 22:53:50 - INFO - Done! Model is built!
-DecisionTreeRegressor 0.346
-03-08 22:53:50 - INFO - Training the model
-03-08 22:53:50 - INFO - Creating the regressor matrix
-03-08 22:53:50 - INFO - The regressor matrix have 21 features
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-14 20:35:42 - INFO - Training the model
+10-14 20:35:42 - INFO - Creating the regressor matrix
+10-14 20:35:42 - INFO - The regressor matrix have 21 features
+10-14 20:35:42 - INFO - Done! Model is built!
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\wilso\miniconda3\envs\v0.1.4\lib\site-packages\sysidentpy\general_estimators\narx.py:154: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples,), for example using ravel().
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\utils\deprecation.py:27: FutureWarning: Function __init__ has been deprecated since v0.1.7.
+ Use NARXNN(ylag=2, xlag=2, basis_function=&#39;Some basis function&#39;) instead.This module was deprecated in favor of NARXNN(ylag=2, xlag=2, basis_function=&#39;Some basis function&#39;) module into which all the refactored classes and functions are moved.
+ This feature will be removed in version v0.2.0.
+  warnings.warn(message, FutureWarning)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>KNeighborsRegressor 1.871
+10-14 20:35:42 - INFO - Training the model
+10-14 20:35:42 - INFO - Creating the regressor matrix
+10-14 20:35:42 - INFO - The regressor matrix have 21 features
+10-14 20:35:42 - INFO - Done! Model is built!
+NARX-DecisionTreeRegressor 0.137
+10-14 20:35:43 - INFO - Training the model
+10-14 20:35:43 - INFO - Creating the regressor matrix
+10-14 20:35:43 - INFO - The regressor matrix have 21 features
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\general_estimators\narx.py:161: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples,), for example using ravel().
   self.base_estimator.fit(X, y, **self.fit_params)
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-08 22:53:51 - INFO - Done! Model is built!
-RandomForestRegressor 0.178
-03-08 22:54:03 - INFO - Training the model
-03-08 22:54:03 - INFO - Creating the regressor matrix
-03-08 22:54:03 - INFO - The regressor matrix have 21 features
-03-08 22:54:12 - INFO - Done! Model is built!
-Catboost_NARX 0.179
-03-08 22:54:13 - INFO - Training the model
-03-08 22:54:13 - INFO - Creating the regressor matrix
-03-08 22:54:13 - INFO - The regressor matrix have 231 features
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-14 20:35:43 - INFO - Done! Model is built!
+NARX-RandomForestRegressor 0.167
+10-14 20:35:47 - INFO - Training the model
+10-14 20:35:47 - INFO - Creating the regressor matrix
+10-14 20:35:47 - INFO - The regressor matrix have 21 features
+10-14 20:35:49 - INFO - Done! Model is built!
+NARX-Catboost 0.182
+10-14 20:35:50 - INFO - Training the model
+10-14 20:35:50 - INFO - Creating the regressor matrix
+10-14 20:35:50 - INFO - The regressor matrix have 231 features
+10-14 20:35:50 - INFO - Done! Model is built!
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\wilso\miniconda3\envs\v0.1.4\lib\site-packages\sklearn\utils\validation.py:63: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\sklearn\utils\validation.py:63: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().
   return f(*args, **kwargs)
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-08 22:54:14 - INFO - Done! Model is built!
-ARD_NARX 0.074
-Polynomial_NARX 0.032
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NARX-ARD 0.075
+FROLS-Polynomial_NARX 0.047
 </pre></div>
 </div>
 </div>
@@ -560,12 +679,12 @@ Polynomial_NARX 0.032
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Polynomial_NARX 0.03208119098997185
-ARD_NARX 0.07364659571266981
-RandomForestRegressor 0.17752025859574144
-Catboost_NARX 0.17923040407121107
-DecisionTreeRegressor 0.3457206837080308
-KNeighborsRegressor 1.833370478725381
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>FROLS-Polynomial_NARX 0.04663897799085836
+NARX-ARD 0.07507698375814373
+NARX-DecisionTreeRegressor 0.1370352822444405
+NARX-RandomForestRegressor 0.16746617689296395
+NARX-Catboost 0.1818567377511571
+KNeighborsRegressor 1.8710938813353852
 </pre></div>
 </div>
 </div>
@@ -584,11 +703,11 @@ KNeighborsRegressor 1.833370478725381
 <div class='prev-next-bottom'>
     
     <div id="prev">
-        <a class="left-prev" href="system_identification_using_adaptative_filters.html" title="previous page">
+        <a class="left-prev" href="simulating_a_predefined_model.html" title="previous page">
             <i class="prevnext-label fas fa-angle-left"></i>
             <div class="prevnext-info">
                 <p class="prevnext-label">previous</p>
-                <p class="prevnext-title">System Identification Using Adaptative Filters</p>
+                <p class="prevnext-title">Simulate a Predefined Model</p>
             </div>
         </a>
     </div>
@@ -610,9 +729,9 @@ KNeighborsRegressor 1.833370478725381
     <div class="container">
       <p>
         
-          De Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins<br/>
+          By Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins<br/>
         
-            &copy; direito autoral 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.<br/>
+            &copy; Copyright 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.<br/>
       </p>
     </div>
   </footer>

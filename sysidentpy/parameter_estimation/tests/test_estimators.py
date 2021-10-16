@@ -1,8 +1,8 @@
 from sysidentpy.polynomial_basis import PolynomialNarmax
 
 import numpy as np
-from numpy.testing import assert_almost_equal
-
+from numpy.testing import assert_almost_equal, assert_raises
+from .. import Estimators
 
 def create_test_data(n=1000):
     np.random.seed(42)
@@ -222,3 +222,7 @@ def test_least_mean_squares_mixed_norm():
     )
     model.fit(x, y)
     assert_almost_equal(model.theta, theta, decimal=2)
+
+def test_model_order_selection():
+    assert_raises(ValueError, Estimators, max_lag=-1)
+    

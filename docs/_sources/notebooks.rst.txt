@@ -1,11 +1,29 @@
-Jupyter notebooks
-=================
+Examples
+========
 
 .. toctree::
    :maxdepth: 1
    :caption: Basic steps
 
    /examples/basic_steps.ipynb
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Air passengers benchmark
+
+   /examples/air_passenger_benchmark.ipynb
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Load forecasting benchmark
+
+   /examples/load_forecasting_benchmark.ipynb
+
+.. toctree::
+   :maxdepth: 1
+   :caption: PV forecasting benchmark
+
+   /examples/PV_forecasting_benchmark.ipynb
 
 .. toctree::
    :maxdepth: 1
@@ -72,13 +90,7 @@ Jupyter notebooks
    :caption: Simulate a predefined model
 
    /examples/simulating_a_predefined_model.ipynb
-   
-.. toctree::
-   :maxdepth: 1
-   :caption: System Identification Using Adaptative Filters
-
-   /examples/system_identification_using_adaptative_filters.ipynb
-   
+     
 .. toctree::
    :maxdepth: 1
    :caption: Identification of an electromechanical system

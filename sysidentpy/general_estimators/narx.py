@@ -11,7 +11,7 @@ from ..base import GenerateRegressors
 from ..base import InformationMatrix
 from ..residues.residues_correlation import ResiduesAnalysis
 from ..utils._check_arrays import check_X_y
-
+from ..utils.deprecation import deprecated
 import sys
 
 logging.basicConfig(
@@ -70,7 +70,8 @@ class NARX(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
     >>> print(mean_squared_error(y_valid, yhat))
     0.000131
     """
-
+    @deprecated(version='v0.1.7', future_version='v0.2.0',
+            alternative="NARXNN(ylag=2, xlag=2, basis_function='Some basis function')")
     def __init__(
         self,
         non_degree=1,
