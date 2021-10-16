@@ -6,9 +6,9 @@ Requirements
 
 SysIdentPy requires:
 
-- Python (>= 3.6)
+- Python (>= 3.7)
 - NumPy (>= 1.5.0) for all numerical algorithms
-- Matplotlib >= 1.5.2 for static plotiing and visualizations
+- Matplotlib >= 1.5.2 for static plotting and visualizations
 
 ==============   ===================
 Platform         Status

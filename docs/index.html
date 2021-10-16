@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinx-book-theme.e2363ea40746bee74734a24ffefccd78.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-book-theme.css?digest=c3fdc42140077d1ad13ad2f1588a4309" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
@@ -39,6 +39,8 @@
     <script src="_static/copybutton.js"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="canonical" href="http://sysidentpy.org/index.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -73,7 +75,7 @@
     </a>
 </div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
   <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Pesquise os documentos ..." aria-label="Pesquise os documentos ..." autocomplete="off" >
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item active">
         <ul class="nav bd-sidenav">
@@ -99,7 +101,7 @@
  </li>
  <li class="toctree-l1 has-children">
   <a class="reference internal" href="notebooks.html">
-   Jupyter notebooks
+   Examples
   </a>
   <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
   <label for="toctree-checkbox-1">
@@ -110,6 +112,21 @@
    <li class="toctree-l2">
     <a class="reference internal" href="examples/basic_steps.html">
      Presenting main functionality
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/air_passenger_benchmark.html">
+     Air Passenger benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/load_forecasting_benchmark.html">
+     Load forecasting benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/PV_forecasting_benchmark.html">
+     PV forecasting benchmark
     </a>
    </li>
    <li class="toctree-l2">
@@ -124,7 +141,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="examples/extended_least_squares.html">
-     Important notes and examples of how to use Extended Least Squares
+     Extended Least Squares
     </a>
    </li>
    <li class="toctree-l2">
@@ -139,7 +156,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="examples/metamss.html">
-     Using the Meta-Model Structure Selection (MetaMSS) algorithm for building Polynomial NARX models
+     Meta-Model Structure Selection (MetaMSS) algorithm for building Polynomial NARX models
     </a>
    </li>
    <li class="toctree-l2">
@@ -168,11 +185,6 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="examples/system_identification_using_adaptative_filters.html">
-     System Identification Using Adaptative Filters
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="examples/identification_of_an_electromechanical_system.html">
      Identification of an electromechanical system
     </a>
@@ -184,17 +196,104 @@
    </li>
   </ul>
  </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="notebooksv016.html">
+   Examples v0.1.6
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples-v016/basic_steps.html">
+     V0.1.6 - Presenting main functionality
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples-v016/multiple_inputs_example.html">
+     V0.1.6 - Multiple Inputs usage
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples-v016/information_criteria_examples.html">
+     V0.1.6 - Information Criteria - Examples
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples-v016/extended_least_squares.html">
+     V0.1.6 - Important notes and examples of how to use Extended Least Squares
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples-v016/defining_lags.html">
+     V0.1.6 - Setting specific lags
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples-v016/parameter_estimation.html">
+     V0.1.6 - Parameter Estimation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples-v016/metamss.html">
+     V0.1.6 - Using the Meta-Model Structure Selection (MetaMSS) algorithm for building Polynomial NARX models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples-v016/aols.html">
+     V0.1.6 - Using the Accelerated Orthogonal Least-Squares algorithm for building Polynomial NARX models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples-v016/f_16_benchmark.html">
+     V0.1.6 - Example: F-16 Ground Vibration Test benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples-v016/narx_neural_network.html">
+     V0.1.6 - Building NARX Neural Network using Sysidentpy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples-v016/general_estimators.html">
+     V0.1.6 - Building NARX models using general estimators
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples-v016/simulating_a_predefined_model.html">
+     V0.1.6 - Simulate a Predefined Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples-v016/system_identification_using_adaptative_filters.html">
+     V0.1.6 - System Identification Using Adaptative Filters
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples-v016/identification_of_an_electromechanical_system.html">
+     V0.1.6 - Identification of an electromechanical system
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples-v016/n_steps_ahead_prediction.html">
+     V0.1.6 - Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark
+    </a>
+   </li>
+  </ul>
+ </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="changelog/v0.1.6.html">
+  <a class="reference internal" href="changelog/v0.1.7.html">
    Changes in SysIdentPy
   </a>
  </li>
  <li class="toctree-l1 has-children">
   <a class="reference internal" href="code.html">
-   Codes
+   Code
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
-  <label for="toctree-checkbox-2">
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
    <i class="fas fa-chevron-down">
    </i>
   </label>
@@ -226,8 +325,8 @@
             
             <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
                 data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
-                aria-expanded="true" aria-label="Alternar de navegação" aria-controls="site-navigation"
-                title="Alternar de navegação" data-toggle="tooltip" data-placement="left">
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
                 <i class="fas fa-bars"></i>
                 <i class="fas fa-arrow-left"></i>
                 <i class="fas fa-arrow-up"></i>
@@ -235,7 +334,7 @@
             
             
 <div class="dropdown-buttons-trigger">
-    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Baixe esta página"><i
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
             class="fas fa-download"></i></button>
 
     <div class="dropdown-buttons">
@@ -243,10 +342,10 @@
         
         <!-- Download raw file -->
         <a class="dropdown-buttons" href="_sources/index.rst.txt"><button type="button"
-                class="btn btn-secondary topbarbtn" title="Baixar arquivo fonte" data-toggle="tooltip"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
-        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Imprimir em PDF"
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
             onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
@@ -259,23 +358,23 @@
     <div class="dropdown-buttons sourcebuttons">
         <a class="repository-button"
             href="https://github.com/wilsonrljr/sysidentpy/"><button type="button" class="btn btn-secondary topbarbtn"
-                data-toggle="tooltip" data-placement="left" title="Repositório fonte"><i
-                    class="fab fa-github"></i>repositório</button></a>
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
         <a class="issues-button"
             href="https://github.com/wilsonrljr/sysidentpy//issues/new?title=Issue%20on%20page%20%2Findex.html&body=Your%20issue%20content%20here."><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
-                title="Abra um problema"><i class="fas fa-lightbulb"></i>questão aberta</button></a>
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
         <a class="edit-button" href="https://github.com/wilsonrljr/sysidentpy/edit/master/docs/index.rst"><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
-                title="Edite essa página"><i class="fas fa-pencil-alt"></i>sugerir edição</button></a>
+                title="Edit this page"><i class="fas fa-pencil-alt"></i>suggest edit</button></a>
     </div>
 </div>
 
             <!-- Full screen (wrap in <a> to have style consistency -->
 
 <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
-        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Modo tela cheia"
-        title="Modo tela cheia"><i
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
             class="fas fa-expand"></i></button></a>
 
             <!-- Launch buttons -->
@@ -286,7 +385,7 @@
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
             <div class="tocsection onthispage pt-5 pb-3">
-                <i class="fas fa-list"></i> Conteúdo
+                <i class="fas fa-list"></i> Contents
             </div>
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
@@ -371,12 +470,22 @@
   <div class="section" id="welcome-to-sysidentpy-s-documentation">
 <h1>Welcome to SysIdentPy’s documentation!<a class="headerlink" href="#welcome-to-sysidentpy-s-documentation" title="Permalink to this headline">¶</a></h1>
 <p><strong>SysIdentPy</strong> is a Python module for System Identification using <strong>NARMAX</strong> models built on top of <strong>numpy</strong> and is distributed under the 3-Clause BSD license.</p>
-<p>The project was started in by Wilson R. L. Junior, Luan Pascoal C. Andrade and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019 and since then have contributed.</p>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>The update <strong>v0.1.6</strong> added new methods for structure selection of NARMAX models: <strong>MetaMSS</strong> and <strong>AOLS</strong>.</p>
-<p>The <strong>MetaMSS</strong> algorithm is based on metaheuristics (check the following paper <a class="reference external" href="https://arxiv.org/abs/2109.09917">Meta-Model Structure Selection: Building Polynomial NARX Model for Regression and Classification</a> ) and the <strong>AOLS</strong> is based on the <a class="reference external" href="https://users.ece.utexas.edu/~hvikalo/pubs/DSPpaper2018.pdf">Accelerated Orthogonal Least-Squares for Large-Scale Sparse Reconstruction</a>.</p>
-<p>Check the examples of how to use it in the <a class="reference external" href="http://sysidentpy.org/notebooks.html">documentation page</a></p>
+<p>The NARMAX model is described as:</p>
+<div class="math notranslate nohighlight">
+\[y_k= F[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k\]</div>
+<p>where <span class="math notranslate nohighlight">\(n_y\in \mathbb{N}^*\)</span>, <span class="math notranslate nohighlight">\(n_x \in \mathbb{N}\)</span>, <span class="math notranslate nohighlight">\(n_e \in \mathbb{N}\)</span>,
+are the maximum lags for the system output and input respectively;
+<span class="math notranslate nohighlight">\(x_k \in \mathbb{R}^{n_x}\)</span> is the system input and <span class="math notranslate nohighlight">\(y_k \in \mathbb{R}^{n_y}\)</span>
+is the system output at discrete time <span class="math notranslate nohighlight">\(k \in \mathbb{N}^n\)</span>;
+<span class="math notranslate nohighlight">\(e_k \in \mathbb{R}^{n_e}\)</span> stands for uncertainties and possible noise
+at discrete time <span class="math notranslate nohighlight">\(k\)</span>. In this case, <span class="math notranslate nohighlight">\(\mathcal{F}\)</span> is some nonlinear function
+of the input and output regressors and <span class="math notranslate nohighlight">\(d\)</span> is a time delay typically set to <span class="math notranslate nohighlight">\(d=1\)</span>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The update <strong>v0.1.7</strong>  has been released with major changes and additional features.</p>
+<p>There are several API modifications and you will need to change your code to have the new (and upcoming) features.</p>
+<p>Check the examples of how to use the new version in the <a class="reference external" href="http://sysidentpy.org/notebooks.html">documentation page</a></p>
+<p>For more details, please see the <a class="reference external" href="http://sysidentpy.org/changelog/v0.1.7.html">changelog</a></p>
 </div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -404,33 +513,45 @@
 </div>
 <div class="section" id="polynomial-narx">
 <h2>Polynomial NARX<a class="headerlink" href="#polynomial-narx" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sysidentpy.polynomial_basis</span> <span class="kn">import</span> <span class="n">PolynomialNarmax</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sysidentpy.model_structure_selection</span> <span class="kn">import</span> <span class="n">FROLS</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.basis_function._basis_function</span> <span class="kn">import</span> <span class="n">Polynomial</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.utils.display_results</span> <span class="kn">import</span> <span class="n">results</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.utils.plotting</span> <span class="kn">import</span> <span class="n">plot_residues_correlation</span><span class="p">,</span> <span class="n">plot_results</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.residues.residues_correlation</span> <span class="kn">import</span> <span class="n">compute_residues_autocorrelation</span><span class="p">,</span> <span class="n">compute_cross_correlation</span>
 
-<span class="n">model</span> <span class="o">=</span> <span class="n">PolynomialNarmax</span><span class="p">(</span>
-        <span class="n">non_degree</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="n">basis_function</span> <span class="o">=</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">FROLS</span><span class="p">(</span>
         <span class="n">order_selection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">n_info_values</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
         <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">ylag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="n">info_criteria</span><span class="o">=</span><span class="s1">&#39;aic&#39;</span><span class="p">,</span>
-        <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;least_squares&#39;</span>
+        <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;least_squares&#39;</span><span class="p">,</span>
+        <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span>
 <span class="p">)</span>
-<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="n">yhat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="n">err_precision</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
-                                                                        <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;dec&#39;</span><span class="p">),</span>
-                                        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Regressors&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;ERR&#39;</span><span class="p">])</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">)</span>
+<span class="n">yhat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_valid</span><span class="p">)</span>
+<span class="n">rrse</span> <span class="o">=</span> <span class="n">root_relative_squared_error</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rrse</span><span class="p">)</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="n">results</span><span class="p">(</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">final_model</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">theta</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">err</span><span class="p">,</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">n_terms</span><span class="p">,</span> <span class="n">err_precision</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;sci&#39;</span>
+                <span class="p">),</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Regressors&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;ERR&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 
 <span class="n">Regressors</span>     <span class="n">Parameters</span>        <span class="n">ERR</span>
 <span class="mi">0</span>        <span class="n">x1</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>     <span class="mf">0.9000</span>  <span class="mf">0.95556574</span>
 <span class="mi">1</span>         <span class="n">y</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>     <span class="mf">0.1999</span>  <span class="mf">0.04107943</span>
 <span class="mi">2</span>  <span class="n">x1</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="n">y</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>     <span class="mf">0.1000</span>  <span class="mf">0.00335113</span>
 
-<span class="n">ee</span><span class="p">,</span> <span class="n">ex</span><span class="p">,</span> <span class="n">extras</span><span class="p">,</span> <span class="n">lam</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">residuals</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
-<span class="n">model</span><span class="o">.</span><span class="n">plot_result</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">ee</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span>
+<span class="n">plot_results</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="o">=</span><span class="n">yhat</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">ee</span> <span class="o">=</span> <span class="n">compute_residues_autocorrelation</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+<span class="n">plot_residues_correlation</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ee</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Residues&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;$e^2$&quot;</span><span class="p">)</span>
+<span class="n">x1e</span> <span class="o">=</span> <span class="n">compute_cross_correlation</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">x2_val</span><span class="p">)</span>
+<span class="n">plot_residues_correlation</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">x1e</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Residues&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;$x_1e$&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="_images/polynomial_narmax.png" src="_images/polynomial_narmax.png" />
@@ -526,7 +647,7 @@
 <img alt="_images/catboost.png" src="_images/catboost.png" />
 <div class="section" id="changelog">
 <h3>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h3>
-<p>See the <a class="reference external" href="http://sysidentpy.org/changelog/v0.1.6.html">changelog</a>
+<p>See the <a class="reference external" href="http://sysidentpy.org/changelog/v0.1.7.html">changelog</a>
 for a history of notable changes to <strong>SysIdentPy</strong>.</p>
 </div>
 <div class="section" id="development">
@@ -583,10 +704,8 @@ for a history of notable changes to <strong>SysIdentPy</strong>.</p>
 </div>
 <div class="section" id="project-history">
 <h3>Project History<a class="headerlink" href="#project-history" title="Permalink to this headline">¶</a></h3>
-<p>The project was started by Wilson R. L. Junior, Luan Pascoal and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019 and since then have contributed.</p>
-<p>The initial purpose was to learn the python language. Over time, the project has matured to the state it is in today.</p>
-<p>The project is currently maintained by its creators and looking for
-contributors.</p>
+<p>The project was started by Wilson R. L. Junior, Luan Pascoal and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019.</p>
+<p>The project is actively maintained by Wilson R. L. Junior and looking for contributors.</p>
 </div>
 <div class="section" id="communication">
 <h3>Communication<a class="headerlink" href="#communication" title="Permalink to this headline">¶</a></h3>
@@ -630,21 +749,25 @@ contributors.</p>
 <li class="toctree-l1"><a class="reference internal" href="introduction_to_narmax.html">A brief introduction to NARMAX models.</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dev_guide.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks.html">Jupyter notebooks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog/v0.1.6.html">Changes in SysIdentPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html">Codes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.base">sysidentpy base</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-narmax">sysidentpy narmax</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-metamss">sysidentpy metamss</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-simulation">sysidentpy simulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooksv016.html">Examples v0.1.6</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog/v0.1.7.html">Changes in SysIdentPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.narmax_base">sysidentpy base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.model_structure_selection.FROLS">sysidentpy FROLS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.model_structure_selection.MetaMSS">sysidentpy metamss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.simulation._simulation">sysidentpy simulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.basis_function._basis_function">sysidentpy basis function</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-narx-neural-network">sysidentpy narx_neural_network</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-general-estimators">sysidentpy general_estimators</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-bpsogsa">sysidentpy bpsogsa</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.general_estimators.narx">sysidentpy general_estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.metaheuristics.bpsogsa">sysidentpy bpsogsa</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.residues.residues_correlation">sysidentpy residues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.metrics._regression">sysidentpy metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.parameter_estimation.estimators">sysidentpy estimators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.utils._check_arrays">sysidentpy utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.utils.generate_data">sysidentpy generate data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.utils.plotting">sysidentpy plotting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.utils.display_results">sysidentpy display results</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html#indices-and-tables">Indices and tables</a></li>
 </ul>
 </div>
@@ -680,9 +803,9 @@ contributors.</p>
     <div class="container">
       <p>
         
-          De Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins<br/>
+          By Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins<br/>
         
-            &copy; direito autoral 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.<br/>
+            &copy; Copyright 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.<br/>
       </p>
     </div>
   </footer>

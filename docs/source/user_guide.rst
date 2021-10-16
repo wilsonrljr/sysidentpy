@@ -85,7 +85,7 @@ The ``fit`` method executes the Error Reduction Ratio algorithm using Householde
 
 .. code:: ipython3
 
-    model.fit(x_train, y_train)
+    model.fit(X=x_train, y=y_train)
 
 
 
@@ -102,7 +102,7 @@ The ``predict`` method is use to generate the predictions. We support ``free run
 
 .. code:: ipython3
 
-    yhat = model.predict(x_valid, y_valid)
+    yhat = model.predict(X=x_valid, y=y_valid)
 
 In this example we use the ``root_relative_squared_error`` metric because it is often used in System Identification. More metrics and information about it can be found on documentation.
 
@@ -207,7 +207,7 @@ The ``n_info_values`` limits the number of regressors to apply the information c
         estimator='least_squares',
         )
 
-    model.fit(x_train, y_train)
+    model.fit(X=x_train, y=y_train)
 
     xaxis = np.arange(1, model.n_info_values + 1)
     plt.plot(xaxis, model.info_values)
@@ -243,8 +243,8 @@ Now running without executing information criteria methods (setting the ``n_term
         estimator='least_squares',
     )
 
-    model.fit(x_train, y_train)
-    yhat = model.predict(x_valid, y_valid)
+    model.fit(X=x_train, y=y_train)
+    yhat = model.predict(X=x_valid, y=y_valid)
     rrse = root_relative_squared_error(y_valid, yhat)
     print('rrse: ', rrse)
 

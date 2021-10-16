@@ -45,7 +45,7 @@ def test_error_reduction_ratio():
         estimator="least_squares",
         basis_function=basis_function
     )
-    model.fit(x, y)
+    model.fit(X=x, y=y)
     assert_array_equal(model.final_model, model_code)
 
 
@@ -58,7 +58,7 @@ def test_fit_with_information_criteria():
         extended_least_squares=False,
         basis_function=basis_function
     )
-    model.fit(x, y)
+    model.fit(X=x, y=y)
     assert "info_values" in dir(model)
 
 
@@ -70,7 +70,7 @@ def test_fit_without_information_criteria():
         extended_least_squares=False,
         basis_function=basis_function
     )
-    model.fit(x, y)
+    model.fit(X=x, y=y)
     assert "info_values" not in dir(model)
 
 
@@ -177,8 +177,8 @@ def test_predict():
         estimator="least_squares",
         basis_function=basis_function
     )
-    model.fit(X_train, y_train)
-    yhat = model.predict(X_test, y_test)
+    model.fit(X=X_train, y=y_train)
+    yhat = model.predict(X=X_test, y=y_test)
     assert_almost_equal(yhat, y_test, decimal=10)
 
 
@@ -208,8 +208,8 @@ def test_model_prediction():
         estimator="least_squares",
         basis_function=basis_function
     )
-    model.fit(X_train, y_train)
-    assert_raises(Exception, model.predict, X_test, y_test[:1])
+    model.fit(X=X_train, y=y_train)
+    assert_raises(Exception, model.predict, X=X_test, y=y_test[:1])
 
 
 def test_information_criteria_bic():
@@ -226,7 +226,7 @@ def test_information_criteria_bic():
         estimator="least_squares",
         basis_function=basis_function
     )
-    model.fit(x, y)
+    model.fit(X=x, y=y)
     info_values = np.array([-1764.885, -2320.101, -2976.391, -4461.908, -72845.768])
     assert_almost_equal(model.info_values[:4], info_values[:4], decimal=3)
 
@@ -245,7 +245,7 @@ def test_information_criteria_fpe():
         estimator="least_squares",
         basis_function=basis_function
     )
-    model.fit(x, y)
+    model.fit(X=x, y=y)
     info_values = np.array(
         [-1769.7907932, -2329.9129013, -2991.1078281, -4481.5306067, -72870.296884]
     )
@@ -266,7 +266,7 @@ def test_information_criteria_lilc():
         estimator="least_squares",
         basis_function=basis_function
     )
-    model.fit(x, y)
+    model.fit(X=x, y=y)
     info_values = np.array([-1767.926, -2326.183, -2985.514, -4474.072, -72860.973])
     assert_almost_equal(model.info_values[:4], info_values[:4], decimal=3)
 

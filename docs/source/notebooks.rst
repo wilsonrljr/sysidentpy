@@ -9,6 +9,24 @@ Examples
 
 .. toctree::
    :maxdepth: 1
+   :caption: Air passengers benchmark
+
+   /examples/air_passenger_benchmark.ipynb
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Load forecasting benchmark
+
+   /examples/load_forecasting_benchmark.ipynb
+
+.. toctree::
+   :maxdepth: 1
+   :caption: PV forecasting benchmark
+
+   /examples/PV_forecasting_benchmark.ipynb
+
+.. toctree::
+   :maxdepth: 1
    :caption: Multiple Inputs usage
 
    /examples/multiple_inputs_example.ipynb

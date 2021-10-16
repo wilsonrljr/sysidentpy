@@ -17,7 +17,7 @@ sysidentpy FROLS
 
 sysidentpy metamss
 ==================
-.. automodule:: sysidentpy..model_structure_selection.metamss
+.. automodule:: sysidentpy.model_structure_selection.MetaMSS
    :members:
 
 sysidentpy simulation
@@ -32,7 +32,7 @@ sysidentpy basis function
 
 sysidentpy narx_neural_network
 ==============================
-.. automodule:: sysidentpy.narx_neural_network.narx_nn
+.. automodule:: sysidentpy.narx_neural_network
    :members:
 
 sysidentpy general_estimators

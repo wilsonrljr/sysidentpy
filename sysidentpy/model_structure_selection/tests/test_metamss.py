@@ -133,7 +133,7 @@ def test_predict():
         basis_function=basis_function
     )
     model.fit(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test)
-    yhat = model.predict(X_test, y_test)
+    yhat = model.predict(X_test=X_test, y_test=y_test)
     assert_almost_equal(yhat, y_test, decimal=2)
 
 
@@ -163,4 +163,4 @@ def test_model_prediction():
         basis_function=basis_function
     )
     model.fit(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test)
-    assert_raises(Exception, model.predict, X_test, y_test[:1])
+    assert_raises(Exception, model.predict, X_test=X_test, y_test=y_test[:1])

@@ -9,25 +9,27 @@ Welcome to SysIdentPy's documentation!
 **SysIdentPy** is a Python module for System Identification using **NARMAX** models built on top of **numpy** and is distributed under the 3-Clause BSD license.
 
 The NARMAX model is described as:
+
 .. math::
-	y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k
+	
+	 y_k= F[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k
 
 where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,
 are the maximum lags for the system output and input respectively;
 :math:`x_k \in \mathbb{R}^{n_x}` is the system input and :math:`y_k \in \mathbb{R}^{n_y}`
 is the system output at discrete time :math:`k \in \mathbb{N}^n`;
 :math:`e_k \in \mathbb{R}^{n_e}` stands for uncertainties and possible noise
-at discrete time :math:`k`. In this case, :math:`\mathcal{F}^\ell` is some nonlinear function
-of the input and output regressors with nonlinearity degree :math:`\ell \in \mathbb{N}`
-and :math:`d` is a time delay typically set to :math:`d=1`.
+at discrete time :math:`k`. In this case, :math:`\mathcal{F}` is some nonlinear function
+of the input and output regressors and :math:`d` is a time delay typically set to :math:`d=1`.
 
-.. tip::
-	The update **v0.1.6** added new methods for structure selection of NARMAX models: **MetaMSS** and **AOLS**.
+.. note::
+	The update **v0.1.7**  has been released with major changes and additional features.
 	
-	The **MetaMSS** algorithm is based on metaheuristics (check the following paper `Meta-Model Structure Selection: Building Polynomial NARX Model for Regression and Classification <https://arxiv.org/abs/2109.09917>`__ ) and the **AOLS** is based on the `Accelerated Orthogonal Least-Squares for Large-Scale Sparse Reconstruction <https://users.ece.utexas.edu/~hvikalo/pubs/DSPpaper2018.pdf>`__.
+	There are several API modifications and you will need to change your code to have the new (and upcoming) features.
 	
-	Check the examples of how to use it in the `documentation page <http://sysidentpy.org/notebooks.html>`__
+	Check the examples of how to use the new version in the `documentation page <http://sysidentpy.org/notebooks.html>`__
 
+	For more details, please see the `changelog <http://sysidentpy.org/changelog/v0.1.7.html>`__
 
 .. seealso::
 	The examples directory has several Jupyter notebooks presenting basic tutorials of how to use the package and some specific applications of **SysIdentPy**. `Try it out! <http://sysidentpy.org/notebooks.html>`__
@@ -64,7 +66,7 @@ Polynomial NARX
 	from sysidentpy.utils.plotting import plot_residues_correlation, plot_results
 	from sysidentpy.residues.residues_correlation import compute_residues_autocorrelation, compute_cross_correlation
 	
-	basis_function = PolynomialBasis(degree=2)
+	basis_function = Polynomial(degree=2)
 	model = FROLS(
 		order_selection=True,
 		n_info_values=10,
@@ -75,8 +77,8 @@ Polynomial NARX
 		estimator='least_squares',
 		basis_function=basis_function
 	)
-	model.fit(x_train, y_train)
-	yhat = model.predict(x_valid, y_valid)
+	model.fit(X=x_train, y=y_train)
+	yhat = model.predict(X=x_valid, y=y_valid)
 	rrse = root_relative_squared_error(y_valid, yhat)
 	print(rrse)
 	r = pd.DataFrame(
@@ -317,6 +319,6 @@ Contents
     user_guide
     dev_guide
     notebooks
-	notebook_v016
+    notebooksv016
     changelog/v0.1.7
     code

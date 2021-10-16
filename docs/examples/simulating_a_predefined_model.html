@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-book-theme.e2363ea40746bee74734a24ffefccd78.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-book-theme.css?digest=c3fdc42140077d1ad13ad2f1588a4309" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
@@ -44,7 +44,7 @@
     <link rel="canonical" href="http://sysidentpy.org/examples/simulating_a_predefined_model.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="System Identification Using Adaptative Filters" href="system_identification_using_adaptative_filters.html" />
+    <link rel="next" title="Identification of an electromechanical system" href="identification_of_an_electromechanical_system.html" />
     <link rel="prev" title="Building NARX models using general estimators" href="general_estimators.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -76,7 +76,7 @@
     </a>
 </div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Pesquise os documentos ..." aria-label="Pesquise os documentos ..." autocomplete="off" >
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item active">
         <ul class="current nav bd-sidenav">
@@ -102,7 +102,7 @@
  </li>
  <li class="toctree-l1 current active has-children">
   <a class="reference internal" href="../notebooks.html">
-   Jupyter notebooks
+   Examples
   </a>
   <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
   <label for="toctree-checkbox-1">
@@ -113,6 +113,21 @@
    <li class="toctree-l2">
     <a class="reference internal" href="basic_steps.html">
      Presenting main functionality
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="air_passenger_benchmark.html">
+     Air Passenger benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="load_forecasting_benchmark.html">
+     Load forecasting benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="PV_forecasting_benchmark.html">
+     PV forecasting benchmark
     </a>
    </li>
    <li class="toctree-l2">
@@ -127,7 +142,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="extended_least_squares.html">
-     Important notes and examples of how to use Extended Least Squares
+     Extended Least Squares
     </a>
    </li>
    <li class="toctree-l2">
@@ -142,7 +157,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="metamss.html">
-     Using the Meta-Model Structure Selection (MetaMSS) algorithm for building Polynomial NARX models
+     Meta-Model Structure Selection (MetaMSS) algorithm for building Polynomial NARX models
     </a>
    </li>
    <li class="toctree-l2">
@@ -171,11 +186,6 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="system_identification_using_adaptative_filters.html">
-     System Identification Using Adaptative Filters
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="identification_of_an_electromechanical_system.html">
      Identification of an electromechanical system
     </a>
@@ -187,17 +197,104 @@
    </li>
   </ul>
  </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../notebooksv016.html">
+   Examples v0.1.6
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/basic_steps.html">
+     V0.1.6 - Presenting main functionality
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/multiple_inputs_example.html">
+     V0.1.6 - Multiple Inputs usage
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/information_criteria_examples.html">
+     V0.1.6 - Information Criteria - Examples
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/extended_least_squares.html">
+     V0.1.6 - Important notes and examples of how to use Extended Least Squares
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/defining_lags.html">
+     V0.1.6 - Setting specific lags
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/parameter_estimation.html">
+     V0.1.6 - Parameter Estimation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/metamss.html">
+     V0.1.6 - Using the Meta-Model Structure Selection (MetaMSS) algorithm for building Polynomial NARX models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/aols.html">
+     V0.1.6 - Using the Accelerated Orthogonal Least-Squares algorithm for building Polynomial NARX models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/f_16_benchmark.html">
+     V0.1.6 - Example: F-16 Ground Vibration Test benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/narx_neural_network.html">
+     V0.1.6 - Building NARX Neural Network using Sysidentpy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/general_estimators.html">
+     V0.1.6 - Building NARX models using general estimators
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/simulating_a_predefined_model.html">
+     V0.1.6 - Simulate a Predefined Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/system_identification_using_adaptative_filters.html">
+     V0.1.6 - System Identification Using Adaptative Filters
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/identification_of_an_electromechanical_system.html">
+     V0.1.6 - Identification of an electromechanical system
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples-v016/n_steps_ahead_prediction.html">
+     V0.1.6 - Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark
+    </a>
+   </li>
+  </ul>
+ </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="../changelog/v0.1.6.html">
+  <a class="reference internal" href="../changelog/v0.1.7.html">
    Changes in SysIdentPy
   </a>
  </li>
  <li class="toctree-l1 has-children">
   <a class="reference internal" href="../code.html">
-   Codes
+   Code
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
-  <label for="toctree-checkbox-2">
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
    <i class="fas fa-chevron-down">
    </i>
   </label>
@@ -229,8 +326,8 @@
             
             <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
                 data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
-                aria-expanded="true" aria-label="Alternar de navegação" aria-controls="site-navigation"
-                title="Alternar de navegação" data-toggle="tooltip" data-placement="left">
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
                 <i class="fas fa-bars"></i>
                 <i class="fas fa-arrow-left"></i>
                 <i class="fas fa-arrow-up"></i>
@@ -238,7 +335,7 @@
             
             
 <div class="dropdown-buttons-trigger">
-    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Baixe esta página"><i
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
             class="fas fa-download"></i></button>
 
     <div class="dropdown-buttons">
@@ -246,10 +343,10 @@
         
         <!-- Download raw file -->
         <a class="dropdown-buttons" href="../_sources/examples/simulating_a_predefined_model.ipynb.txt"><button type="button"
-                class="btn btn-secondary topbarbtn" title="Baixar arquivo fonte" data-toggle="tooltip"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
-        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Imprimir em PDF"
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
             onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
@@ -262,23 +359,23 @@
     <div class="dropdown-buttons sourcebuttons">
         <a class="repository-button"
             href="https://github.com/wilsonrljr/sysidentpy/"><button type="button" class="btn btn-secondary topbarbtn"
-                data-toggle="tooltip" data-placement="left" title="Repositório fonte"><i
-                    class="fab fa-github"></i>repositório</button></a>
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
         <a class="issues-button"
             href="https://github.com/wilsonrljr/sysidentpy//issues/new?title=Issue%20on%20page%20%2Fexamples/simulating_a_predefined_model.html&body=Your%20issue%20content%20here."><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
-                title="Abra um problema"><i class="fas fa-lightbulb"></i>questão aberta</button></a>
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
         <a class="edit-button" href="https://github.com/wilsonrljr/sysidentpy/edit/master/docs/examples/simulating_a_predefined_model.ipynb"><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
-                title="Edite essa página"><i class="fas fa-pencil-alt"></i>sugerir edição</button></a>
+                title="Edit this page"><i class="fas fa-pencil-alt"></i>suggest edit</button></a>
     </div>
 </div>
 
             <!-- Full screen (wrap in <a> to have style consistency -->
 
 <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
-        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Modo tela cheia"
-        title="Modo tela cheia"><i
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
             class="fas fa-expand"></i></button></a>
 
             <!-- Launch buttons -->
@@ -291,7 +388,7 @@
         
         
         <a class="colab-button" href="https://colab.research.google.com/github/wilsonrljr/sysidentpy/blob/master/docs/examples/simulating_a_predefined_model.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
-                title="Lançamento Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
+                title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
                     src="../_static/images/logo_colab.png"
                     alt="Interact on Colab">Colab</button></a>
         
@@ -305,7 +402,7 @@
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
             <div class="tocsection onthispage pt-5 pb-3">
-                <i class="fas fa-list"></i> Conteúdo
+                <i class="fas fa-list"></i> Contents
             </div>
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
@@ -327,8 +424,8 @@
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#importante-note">
-     Importante Note
+    <a class="reference internal nav-link" href="#important-note">
+     Important Note
     </a>
    </li>
   </ul>
@@ -370,23 +467,18 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Note: you may need to restart the kernel to use updated packages.
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A sintaxe do nome do arquivo, do nome do diret¢rio ou do r¢tulo do volume est  incorreta.
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.simulation</span> <span class="kn">import</span> <span class="n">SimulateNARMAX</span>
 <span class="kn">from</span> <span class="nn">sysidentpy.metrics</span> <span class="kn">import</span> <span class="n">root_relative_squared_error</span>
-<span class="kn">from</span> <span class="nn">sysidentpy.utils.generate_data</span> <span class="kn">import</span> <span class="n">get_miso_data</span><span class="p">,</span> <span class="n">get_siso_data</span>
-<span class="kn">from</span> <span class="nn">sysidentpy.polynomial_basis.simulation</span> <span class="kn">import</span> <span class="n">SimulatePolynomialNarmax</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.utils.generate_data</span> <span class="kn">import</span> <span class="n">get_siso_data</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.basis_function._basis_function</span> <span class="kn">import</span> <span class="n">Polynomial</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.utils.display_results</span> <span class="kn">import</span> <span class="n">results</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.utils.plotting</span> <span class="kn">import</span> <span class="n">plot_residues_correlation</span><span class="p">,</span> <span class="n">plot_results</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.residues.residues_correlation</span> <span class="kn">import</span> <span class="n">compute_residues_autocorrelation</span><span class="p">,</span> <span class="n">compute_cross_correlation</span>
 </pre></div>
 </div>
 </div>
@@ -402,10 +494,12 @@
 <p>In the next example we will generate a data with 1000 samples with white noise and selecting 90% of the data to train the model.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">get_siso_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
-                                                 <span class="n">colored_noise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                                 <span class="n">sigma</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
-                                                 <span class="n">train_percentage</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">get_siso_data</span><span class="p">(</span>
+    <span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">colored_noise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">sigma</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+    <span class="n">train_percentage</span><span class="o">=</span><span class="mi">90</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -426,8 +520,8 @@
 <li><p><span class="math notranslate nohighlight">\([12001, 1003, 1001] = x11_{k-1} \times y_{k-3} \times y_{k-1}\)</span></p></li>
 <li><p>and so on</p></li>
 </ul>
-<div class="section" id="importante-note">
-<h3>Importante Note<a class="headerlink" href="#importante-note" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="important-note">
+<h3>Important Note<a class="headerlink" href="#important-note" title="Permalink to this headline">¶</a></h3>
 <p>The order of the arrays matter.</p>
 <p>If you use [2001, 1001], it will work, but [1001, 2001] will not (the regressor will be ignored). Always put the highest value first:</p>
 <ul class="simple">
@@ -437,7 +531,7 @@
 <p>We will handle this limitation in upcoming update.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">SimulatePolynomialNarmax</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">SimulateNARMAX</span><span class="p">(</span><span class="n">basis_function</span><span class="o">=</span><span class="n">Polynomial</span><span class="p">(),</span> <span class="n">calculate_err</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">estimate_parameter</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">extended_least_squares</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># the model must be a numpy array</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
@@ -462,112 +556,80 @@
 parameters and ERR values.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">yhat</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">yhat</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span>
     <span class="n">X_test</span><span class="o">=</span><span class="n">x_test</span><span class="p">,</span>
     <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span>
     <span class="n">model_code</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
     <span class="n">theta</span><span class="o">=</span><span class="n">theta</span><span class="p">,</span>
-    <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">r</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">results</span><span class="p">(</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">final_model</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">theta</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">err</span><span class="p">,</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">n_terms</span><span class="p">,</span> <span class="n">err_precision</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;sci&#39;</span>
+        <span class="p">),</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Regressors&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;ERR&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+<span class="n">plot_results</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span> <span class="n">yhat</span> <span class="o">=</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">ee</span> <span class="o">=</span> <span class="n">compute_residues_autocorrelation</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+<span class="n">plot_residues_correlation</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ee</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Residues&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;$e^2$&quot;</span><span class="p">)</span>
+<span class="n">x1e</span> <span class="o">=</span> <span class="n">compute_cross_correlation</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">x_test</span><span class="p">)</span>
+<span class="n">plot_residues_correlation</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">x1e</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Residues&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;$x_1e$&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/simulating_a_predefined_model_8_0.png" src="../_images/simulating_a_predefined_model_8_0.png" />
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Regressors&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;ERR&#39;</span><span class="p">])</span>
-<span class="n">results</span>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>      Regressors  Parameters             ERR
+0         y(k-1)  2.0000E-01  0.00000000E+00
+1        x1(k-2)  9.0000E-01  0.00000000E+00
+2  x1(k-1)y(k-1)  1.0000E-01  0.00000000E+00
 </pre></div>
 </div>
+<img alt="../_images/simulating_a_predefined_model_8_1.png" src="../_images/simulating_a_predefined_model_8_1.png" />
+<img alt="../_images/simulating_a_predefined_model_8_2.png" src="../_images/simulating_a_predefined_model_8_2.png" />
+<img alt="../_images/simulating_a_predefined_model_8_3.png" src="../_images/simulating_a_predefined_model_8_3.png" />
 </div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Regressors</th>
-      <th>Parameters</th>
-      <th>ERR</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>y(k-1)</td>
-      <td>0.2000</td>
-      <td>0.00000000</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>x1(k-2)</td>
-      <td>0.9000</td>
-      <td>0.00000000</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>x1(k-1)y(k-1)</td>
-      <td>0.1000</td>
-      <td>0.00000000</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
 </div>
 <div class="section" id="options">
 <h3>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h3>
 <p>You can set the <code class="docutils literal notranslate"><span class="pre">steps_ahead</span></code> to run the prediction/simulation:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">yhat</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">yhat</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span>
     <span class="n">X_test</span><span class="o">=</span><span class="n">x_test</span><span class="p">,</span>
     <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span>
     <span class="n">model_code</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
     <span class="n">theta</span><span class="o">=</span><span class="n">theta</span><span class="p">,</span>
-    <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">steps_ahead</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">steps_ahead</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
 <span class="n">rrse</span> <span class="o">=</span> <span class="n">root_relative_squared_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
-<span class="n">rrse</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rrse</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0019492271982048336
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0018611005609298847
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">yhat</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">yhat</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span>
     <span class="n">X_test</span><span class="o">=</span><span class="n">x_test</span><span class="p">,</span>
     <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span>
     <span class="n">model_code</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
     <span class="n">theta</span><span class="o">=</span><span class="n">theta</span><span class="p">,</span>
-    <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">steps_ahead</span><span class="o">=</span><span class="mi">21</span><span class="p">)</span>
+    <span class="n">steps_ahead</span><span class="o">=</span><span class="mi">21</span><span class="p">,</span>
+    <span class="p">)</span>
 <span class="n">rrse</span> <span class="o">=</span> <span class="n">root_relative_squared_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
-<span class="n">rrse</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rrse</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0020257239001025655
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0018387456847899486
 </pre></div>
 </div>
 </div>
@@ -581,150 +643,43 @@ for parameters estimation.</p>
 <p>When <code class="docutils literal notranslate"><span class="pre">estimate_parameter=True</span></code>, we also computate the ERR considering only the regressors defined by the user.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s2</span> <span class="o">=</span> <span class="n">SimulatePolynomialNarmax</span><span class="p">(</span><span class="n">estimate_parameter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;recursive_least_squares&#39;</span><span class="p">)</span>
-<span class="n">yhat</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">s2</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">SimulateNARMAX</span><span class="p">(</span><span class="n">basis_function</span><span class="o">=</span><span class="n">Polynomial</span><span class="p">(),</span> <span class="n">estimate_parameter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;least_squares&#39;</span><span class="p">,</span> <span class="n">calculate_err</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">yhat</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span>
     <span class="n">X_train</span><span class="o">=</span><span class="n">x_train</span><span class="p">,</span>
     <span class="n">y_train</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span>
     <span class="n">X_test</span><span class="o">=</span><span class="n">x_test</span><span class="p">,</span>
     <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span>
     <span class="n">model_code</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
     <span class="c1"># theta will be estimated using the defined estimator</span>
-    <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="p">)</span>
 
-<span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Regressors&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;ERR&#39;</span><span class="p">])</span>
-<span class="n">results</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">results</span><span class="p">(</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">final_model</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">theta</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">err</span><span class="p">,</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">n_terms</span><span class="p">,</span> <span class="n">err_precision</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;sci&#39;</span>
+        <span class="p">),</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Regressors&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;ERR&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+<span class="n">plot_results</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span> <span class="n">yhat</span> <span class="o">=</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">ee</span> <span class="o">=</span> <span class="n">compute_residues_autocorrelation</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+<span class="n">plot_residues_correlation</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ee</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Residues&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;$e^2$&quot;</span><span class="p">)</span>
+<span class="n">x1e</span> <span class="o">=</span> <span class="n">compute_cross_correlation</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">x_test</span><span class="p">)</span>
+<span class="n">plot_residues_correlation</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">x1e</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Residues&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;$x_1e$&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/simulating_a_predefined_model_14_0.png" src="../_images/simulating_a_predefined_model_14_0.png" />
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Regressors</th>
-      <th>Parameters</th>
-      <th>ERR</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>y(k-1)</td>
-      <td>0.1999</td>
-      <td>0.95619296</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>x1(k-2)</td>
-      <td>0.9001</td>
-      <td>0.04049808</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>x1(k-1)y(k-1)</td>
-      <td>0.0994</td>
-      <td>0.00330530</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">yhat</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">s2</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span>
-    <span class="n">X_train</span><span class="o">=</span><span class="n">x_train</span><span class="p">,</span>
-    <span class="n">y_train</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span>
-    <span class="n">X_test</span><span class="o">=</span><span class="n">x_test</span><span class="p">,</span>
-    <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span>
-    <span class="n">model_code</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-    <span class="c1"># theta will be estimated using the defined estimator</span>
-    <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">steps_ahead</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
-
-<span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Regressors&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;ERR&#39;</span><span class="p">])</span>
-<span class="n">results</span>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>      Regressors  Parameters             ERR
+0         y(k-1)  2.0006E-01  9.56312958E-01
+1        x1(k-2)  8.9993E-01  4.04769137E-02
+2  x1(k-1)y(k-1)  9.9979E-02  3.20650789E-03
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/simulating_a_predefined_model_15_0.png" src="../_images/simulating_a_predefined_model_15_0.png" />
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Regressors</th>
-      <th>Parameters</th>
-      <th>ERR</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>y(k-1)</td>
-      <td>0.1999</td>
-      <td>0.95619296</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>x1(k-2)</td>
-      <td>0.9001</td>
-      <td>0.04049808</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>x1(k-1)y(k-1)</td>
-      <td>0.0994</td>
-      <td>0.00330530</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">yhat</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">s2</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span>
-    <span class="n">X_train</span><span class="o">=</span><span class="n">x_train</span><span class="p">,</span>
-    <span class="n">y_train</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span>
-    <span class="n">X_test</span><span class="o">=</span><span class="n">x_test</span><span class="p">,</span>
-    <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span>
-    <span class="n">model_code</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-    <span class="c1"># theta will be estimated using the defined estimator</span>
-    <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">steps_ahead</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/simulating_a_predefined_model_16_0.png" src="../_images/simulating_a_predefined_model_16_0.png" />
+<img alt="../_images/simulating_a_predefined_model_13_1.png" src="../_images/simulating_a_predefined_model_13_1.png" />
+<img alt="../_images/simulating_a_predefined_model_13_2.png" src="../_images/simulating_a_predefined_model_13_2.png" />
+<img alt="../_images/simulating_a_predefined_model_13_3.png" src="../_images/simulating_a_predefined_model_13_3.png" />
 </div>
 </div>
 </div>
@@ -751,10 +706,10 @@ for parameters estimation.</p>
         </a>
     </div>
      <div id="next">
-        <a class="right-next" href="system_identification_using_adaptative_filters.html" title="next page">
+        <a class="right-next" href="identification_of_an_electromechanical_system.html" title="next page">
             <div class="prevnext-info">
                 <p class="prevnext-label">next</p>
-                <p class="prevnext-title">System Identification Using Adaptative Filters</p>
+                <p class="prevnext-title">Identification of an electromechanical system</p>
             </div>
             <i class="prevnext-label fas fa-angle-right"></i>
         </a>
@@ -768,9 +723,9 @@ for parameters estimation.</p>
     <div class="container">
       <p>
         
-          De Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins<br/>
+          By Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins<br/>
         
-            &copy; direito autoral 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.<br/>
+            &copy; Copyright 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.<br/>
       </p>
     </div>
   </footer>

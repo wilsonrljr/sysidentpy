@@ -19,17 +19,32 @@
 
 SysIdentPy is a Python module for System Identification using **NARMAX** models built on top of **numpy** and is distributed under the 3-Clause BSD license.
 
-The project was started in by Wilson R. L. Junior, Luan Pascoal C. Andrade and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019 and since then have contributed.
+The NARMAX model is described as:
+
+$$	
+	 y_k= F[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k
+$$
+
+where $n_y\in \mathbb{N}^*$, $n_x \in \mathbb{N}$, $n_e \in \mathbb{N}$,
+are the maximum lags for the system output and input respectively;
+$x_k \in \mathbb{R}^{n_x}$ is the system input and $y_k \in \mathbb{R}^{n_y}$
+is the system output at discrete time $k \in \mathbb{N}^n$;
+$e_k \in \mathbb{R}^{n_e}$ stands for uncertainties and possible noise
+at discrete time $k$. In this case, $\mathcal{F}$ is some nonlinear function
+of the input and output regressors and $d$ is a time delay typically set to $d=1$.
+
+# Note
+The update **v0.1.7**  has been released with major changes and additional features (Fourier basis function, NAR and NFIR models, possibility to select the lag of the residues for Extended Least Squares algorithm and many more).
+
+There are several API modifications and you will need to change your code to have the new (and upcoming) features.
+
+Check the examples of how to use the new version in the [documentation page](<http://sysidentpy.org/notebooks.html>).
+  
+For more details, please see the [changelog](<http://sysidentpy.org/changelog/v0.1.7.html>).
 
 # Documentation
 
 - Website: https://sysidentpy.org
-
-# New Update!
-
-The update v0.1.6 added new methods for structure selection of NARMAX models: MetaMSS and AOLS. The MetaMSS algorithm is based on metaheuristics (check the paper [Meta-Model Structure Selection: Building Polynomial NARX Model for Regression and Classification](https://arxiv.org/abs/2109.09917) ) and the AOLS is based on the [Accelerated Orthogonal Least-Squares for Large-Scale Sparse Reconstruction](https://users.ece.utexas.edu/~hvikalo/pubs/DSPpaper2018.pdf).
-
-Check the examples of how to use it in the documentation page: http://sysidentpy.org/notebooks.html
 
 # Examples
 
@@ -52,34 +67,47 @@ x_train, x_valid, y_train, y_valid = get_siso_data(n=1000,
                                                    train_percentage=80)
 ```
 
-#### Polynomial NARX
+#### Building Polynomial NARX models with FROLS algorithm
 
 ```python
-from sysidentpy.polynomial_basis import PolynomialNarmax
+from sysidentpy.model_structure_selection import FROLS
+from sysidentpy.basis_function import Polynomial
+from sysidentpy.utils.display_results import results
+from sysidentpy.utils.plotting import plot_residues_correlation, plot_results
+from sysidentpy.residues.residues_correlation import compute_residues_autocorrelation
+from sysidentpy.residues.residues_correlation import compute_cross_correlation
 
-model = PolynomialNarmax(non_degree=2,
-                         order_selection=True,
-                         n_info_values=10,
-                         extended_least_squares=False,
-                         ylag=2, xlag=2,
-                         info_criteria='aic',
-                         estimator='least_squares'
+basis_function=Polynomial(degree=2)
+model = PolynomialNarmax(
+  order_selection=True,
+  n_info_values=10,
+  extended_least_squares=False,
+  ylag=2, xlag=2,
+  info_criteria='aic',
+  estimator='least_squares',
+  basis_function=basis_function
 )
-model.fit(x_train, y_train)
-yhat = model.predict(x_valid, y_valid)
-results = pd.DataFrame(model.results(err_precision=8,
-                                     dtype='dec'),
-                       columns=['Regressors', 'Parameters', 'ERR'])
-
-print(results)
-
-   Regressors     Parameters        ERR
+model.fit(X=x_train, y=y_train)
+yhat = model.predict(X=x_valid, y=y_valid)
+print(rrse)
+r = pd.DataFrame(
+	results(
+		model.final_model, model.theta, model.err,
+		model.n_terms, err_precision=8, dtype='sci'
+		),
+	columns=['Regressors', 'Parameters', 'ERR'])
+print(r)
+	
+Regressors     Parameters        ERR
 0        x1(k-2)     0.9000  0.95556574
 1         y(k-1)     0.1999  0.04107943
 2  x1(k-1)y(k-1)     0.1000  0.00335113
 
-ee, ex, extras, lam = model.residuals(x_valid, y_valid, yhat)
-model.plot_result(y_valid, yhat, ee, ex)
+plot_results(y=y_valid, yhat=yhat, n=1000)
+ee = compute_residues_autocorrelation(y_valid, yhat)
+plot_residues_correlation(data=ee, title="Residues", ylabel="$e^2$")
+x1e = compute_cross_correlation(y_valid, yhat, x2_val)
+plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 ```
 ![polynomial](./examples/figures/polynomial_narmax.png)
 
@@ -175,7 +203,7 @@ SysIdentPy requires:
 
 - Python (>= 3.6)
 - NumPy (>= 1.5.0) for all numerical algorithms
-- Matplotlib >= 1.5.2 for static plotiing and visualizations
+- Matplotlib >= 1.5.2 for static plotting and visualizations
 - Pytorch (>=1.7.1) for building feed-forward neural networks
 
 | Platform | Status |
@@ -264,11 +292,9 @@ git clone https://github.com/wilsonrljr/sysidentpy.git
 
 # Project History
 
-The project was started by Wilson R. L. Junior, Luan Pascoal and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019 and since then have contributed.
+The project was started by Wilson R. L. Junior, Luan Pascoal and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019.
 
-The initial purpose was to learn the python language. Over time, the project has matured to the state it is in today.
-
-The project is currently maintained by its creators and looking for contributors.
+The project is actively maintained by Wilson R. L. Junior and looking for contributors.
 
 # Communication
 

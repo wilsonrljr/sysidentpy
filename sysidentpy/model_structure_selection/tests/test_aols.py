@@ -30,7 +30,7 @@ def test_default_values():
         "ylag": 2,
         "xlag": 2,
         "k": 1,
-        "l": 1,
+        "L": 1,
         "threshold": 10e-10,
         "model_type": "NARMAX"
     }
@@ -39,7 +39,7 @@ def test_default_values():
         model.ylag,
         model.xlag,
         model.k,
-        model.l,
+        model.L,
         model.threshold,
         model.model_type,
         
@@ -65,8 +65,8 @@ def test_k():
 
 
 def test_n_terms():
-    assert_raises(ValueError, AOLS, l=1.2, basis_function=Polynomial(degree=2))
-    assert_raises(ValueError, AOLS, l=-1, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, AOLS, L=1.2, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, AOLS, L=-1, basis_function=Polynomial(degree=2))
 
 
 def test_threshold():
@@ -97,5 +97,5 @@ def test_model_prediction():
         xlag=2,
         basis_function=basis_function
     )
-    model.fit(X_train, y_train)
-    assert_raises(Exception, model.predict, X_test, y_test[:1])
+    model.fit(X=X_train, y=y_train)
+    assert_raises(Exception, model.predict, X=X_test, y=y_test[:1])
