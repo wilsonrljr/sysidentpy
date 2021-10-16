@@ -5,7 +5,7 @@
 # License: BSD 3 clause
 
 import numpy as np
-from ..utils._check_arrays import check_X_y, _num_features
+from ..utils._check_arrays import check_X_y, _num_features, _check_positive_int
 from ..narmax_base import GenerateRegressors, ModelPrediction
 from ..narmax_base import HouseHolder
 from ..narmax_base import InformationMatrix
@@ -19,7 +19,9 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
     """Simulation of Polynomial NARMAX model
     
     The NARMAX model is described as:
+    
     .. math::
+        
         y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k
 
     where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,
@@ -33,8 +35,6 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
 
     Parameters
     ----------
-    n_inputs : int, default=1
-        The number of inputs of the system.
     estimator : str, default="least_squares"
         The parameter estimation method.
     extended_least_squares : bool, default=False
@@ -108,6 +108,7 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
     """
     def __init__(
         self,
+        *,
         estimator="recursive_least_squares",
         extended_least_squares=False,
         lam=0.98,
@@ -164,6 +165,7 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
 
     def simulate(
         self,
+        *,
         X_train=None,
         y_train=None,
         X_test=None,
@@ -171,6 +173,7 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
         model_code=None,
         steps_ahead=None,
         theta=None,
+        forecast_horizon=None
     ):
         """Simulate a model defined by the user.
 
@@ -224,17 +227,21 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
                 f"If estimate_parameter is False, theta must be an np.np.ndarray. Got {theta}"
             )
 
-        check_X_y(X_test, y_test)
         if self.estimate_parameter:
-            if not all(isinstance(i, np.ndarray) for i in [X_train, y_train]):
+            if not all(isinstance(i, np.ndarray) for i in [y_train]):
                 raise TypeError(
-                    f"If estimate_parameter is True, X_train and y_train must be an np.ndarray. Got {type(X_train), type(y_train)}"
+                    f"If estimate_parameter is True, X_train and y_train must be an np.ndarray. Got {type(y_train)}"
                 )
-            check_X_y(X_train, y_train)
             if y_train is None:
                 raise ValueError("y_train cannot be None")
 
-        self._n_inputs = _num_features(X_test) ####
+        # self._n_inputs = _num_features(X_test) ####
+        
+        if X_test is not None:
+            self._n_inputs = _num_features(X_test)
+        else:
+            self._n_inputs = 1 # just to create the regressor space base
+        
         xlag_code = self._list_input_regressor_code(model_code)
         ylag_code = self._list_output_regressor_code(model_code)
         self.xlag = self._get_lag_from_regressor_code(xlag_code)
@@ -242,6 +249,10 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
         self.max_lag = max(self.xlag, self.ylag)
         if self._n_inputs != 1:
             self.xlag = self._n_inputs * [list(range(1, self.max_lag + 1))]
+        
+        # for MetaMSS NAR modelling
+        if self.model_type == "NAR" and forecast_horizon is None:
+            forecast_horizon = y_test.shape[0] - self.max_lag
 
         self.non_degree = model_code.shape[1]
         regressor_code = self.regressor_space(
@@ -254,7 +265,6 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
         self.n_terms = self.final_model.shape[0]
         if self.estimate_parameter and not self.calculate_err:
             if self.model_type == "NARMAX":
-                check_X_y(X_train, y_train)
                 self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
                 lagged_data = self.build_input_output_matrix(X_train, y_train, self.xlag, self.ylag)
             elif self.model_type == "NAR":
@@ -278,7 +288,6 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
             self.err = self.n_terms * [0]
         else:
             if self.model_type == "NARMAX":
-                check_X_y(X_train, y_train)
                 self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
                 lagged_data = self.build_input_output_matrix(X_train, y_train, self.xlag, self.ylag)
             elif self.model_type == "NAR":
@@ -299,8 +308,19 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
             if self._extended_least_squares is True:
                 self.theta = self._unbiased_estimator(psi, y_train, self.theta, self.non_degree, self.elag, self.max_lag)
 
-        yhat = self.predict(X_test, y_test, steps_ahead)
-        return yhat
+        # yhat = self.predict(X_test, y_test, steps_ahead)
+        #return yhat
+        
+        if self.basis_function.__class__.__name__ == "Polynomial":
+            if steps_ahead is None:
+                return self._model_prediction(X_test, y_test, forecast_horizon=forecast_horizon)
+            elif steps_ahead == 1:
+                return self._one_step_ahead_prediction(X_test, y_test)
+            else:
+                _check_positive_int(steps_ahead, "steps_ahead")
+                return self._n_step_ahead_prediction(X_test, y_test, steps_ahead=steps_ahead)
+        
+        
 
     def error_reduction_ratio(self, psi, y, process_term_number, regressor_code):
         """Perform the Error Reduction Ration algorithm.
