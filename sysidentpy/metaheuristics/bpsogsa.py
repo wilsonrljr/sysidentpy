@@ -4,7 +4,7 @@
 # License: BSD 3 clause
 
 import numpy as np
-
+from sysidentpy.utils._check_arrays import check_random_state
 
 class BPSOGSA:
     """Binary Hybrid Particle Swarm Optimization and Gravitational Search Algorithm [1]_, [2]_, [3]_, [4]_, [5]_
@@ -142,7 +142,7 @@ class BPSOGSA:
 
         return self
 
-    def generate_random_population(self):
+    def generate_random_population(self, random_state=None):
         """Generate the initial population of agents randomly
 
         Returns
@@ -150,7 +150,8 @@ class BPSOGSA:
         population : ndarray of zeros and ones
             The initial population of agents.
         """
-        population = np.random.choice(
+        rng = check_random_state(random_state)
+        population = rng.choice(
             [0, 1], size=(self.dimension, self.n_agents), p=[self.p_zeros, self.p_ones]
         )
         return population

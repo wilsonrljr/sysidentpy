@@ -6,6 +6,7 @@
 import numpy as np
 from scipy.stats import t
 from ..utils._check_arrays import check_X_y, _num_features, _check_positive_int
+from ..utils._check_arrays import check_random_state
 from ..metrics import root_relative_squared_error, mean_squared_error
 from ..metaheuristics import BPSOGSA
 from ..simulation import SimulateNARMAX
@@ -173,7 +174,8 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         loss_func="metamss_loss",
         model_type="NARMAX",
         basis_function=None,
-        steps_ahead=None
+        steps_ahead=None,
+        random_state=None,
     ):
         super().__init__(
             estimator=estimator,
@@ -212,6 +214,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self.estimate_parameter = estimate_parameter
         self.loss_func = loss_func
         self.steps_ahead = steps_ahead
+        self.random_state = random_state
         self._validate_metamss_params()
 
     def _validate_metamss_params(self):
@@ -264,7 +267,8 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         )
         self.dimension = self.regressor_code.shape[0]
         velocity = np.zeros([self.dimension, self.n_agents])
-        population = self.generate_random_population()
+        self.random_state = check_random_state(self.random_state)
+        population = self.generate_random_population(self.random_state)
         self.best_by_iter = []
         self.mean_by_iter = []
         self.optimal_fitness_value = np.inf
