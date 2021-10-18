@@ -7,10 +7,11 @@ class Polynomial(InformationMatrix):
     """Build polynomial basis function.
     Generate a new feature matrix consisting of all polynomial combinations
     of the features with degree less than or equal to the specified degree.
-    ..math: 
-        y_k = \sum_{i=1}^{p}\Theta_i \times \prod_{j=0}^{n_x}u_{k-j}^{b_i, j}\prod_{l=1}^{n_e}e_{k-l}^{d_i, l}\prod_{m=1}^{n_y}y_{k-m}^{a_i, m} 
-        \label{eq5:narx} 
-    
+
+    ..math:
+        y_k = \sum_{i=1}^{p}\Theta_i \times \prod_{j=0}^{n_x}u_{k-j}^{b_i, j}\prod_{l=1}^{n_e}e_{k-l}^{d_i, l}\prod_{m=1}^{n_y}y_{k-m}^{a_i, m}
+        \label{eq5:narx}
+
     where :math:`p` is the number of regressors, :math:`\Theta_i` are the
     model parameters, and :math:`a_i, m, b_i, j` and :math:`d_i, l \in \mathbb{N}`
     are the exponents of the output, input and noise terms, respectively.
@@ -24,12 +25,13 @@ class Polynomial(InformationMatrix):
     significantly as the number of inputs, the max lag of the input and output, and
     degree increases. High degrees can cause overfitting.
     """
+
     def __init__(
         self,
         degree=2,
-        ):
+    ):
         self.degree = degree
-        
+
     def fit(self, data, max_lag, predefined_regressors=None):
         """Build the Polynomial information matrix.
 
@@ -66,15 +68,16 @@ class Polynomial(InformationMatrix):
         )
         psi = psi[max_lag:, :]
         return psi
-    
+
     def transform(self, data, max_lag, predefined_regressors=None):
         return self.fit(data, max_lag, predefined_regressors)
-    
+
+
 class Fourier:
     """Build Fourier basis function.
     Generate a new feature matrix consisting of all Fourier features
     with respect to the number of harmonics.
-    
+
     Parameters
     ----------
     degree : int (max_degree), default=2
@@ -84,14 +87,19 @@ class Fourier:
     Be aware that the number of features in the output array scales
     significantly as the number of inputs, the max lag of the input and output.
     """
-    def __init__(self, n=1, p=2*np.pi, degree=1):
+
+    def __init__(self, n=1, p=2 * np.pi, degree=1):
         self.n = n
         self.p = p
         self.degree = degree
-    
+
     def _fourier_expansion(self, data, n):
-        base = np.column_stack([np.cos(2*np.pi*data*n/self.p),
-                                np.sin(2*np.pi*data*n/self.p)])
+        base = np.column_stack(
+            [
+                np.cos(2 * np.pi * data * n / self.p),
+                np.sin(2 * np.pi * data * n / self.p),
+            ]
+        )
         return base
 
     def fit(self, data, max_lag, predefined_regressors=None):
@@ -116,21 +124,24 @@ class Fourier:
             The lagged matrix built in respect with each lag and column.
 
         """
-        data = data[max_lag:, 1:] # because the data always have the intercept
+        # remove intercept (because the data always have the intercept)
+        data = data[max_lag:, 1:]
         columns = list(range(data.shape[1]))
-        harmonics = list(range(1, self.n+1))
-        psi = np.zeros([len(data), 1]) 
-        
+        harmonics = list(range(1, self.n + 1))
+        psi = np.zeros([len(data), 1])
+
         for col in columns:
-            base_col = np.column_stack([self._fourier_expansion(data[:, col], h) for h in harmonics])
+            base_col = np.column_stack(
+                [self._fourier_expansion(data[:, col], h) for h in harmonics]
+            )
             psi = np.column_stack([psi, base_col])
-            
+
         self.repetition = self.n * 2
         psi = psi[:, 1:]
         if predefined_regressors is None:
             return psi
         else:
             return psi[:, predefined_regressors]
-    
+
     def transform(self, data, max_lag, predefined_regressors=None):
         return self.fit(data, max_lag, predefined_regressors)

@@ -19,12 +19,15 @@ from .narmax import PolynomialNarmax
 from ..utils.deprecation import deprecated
 
 
-@deprecated(version='v0.1.7', future_version='v0.2.0',
-            alternative='from sysidentpy.model_structure_selection import AOLS. \n Check the documentation for more details.')
+@deprecated(
+    version="v0.1.7",
+    future_version="v0.2.0",
+    alternative="from sysidentpy.model_structure_selection import AOLS. \n Check the documentation for more details.",
+)
 class AOLS(PolynomialNarmax):
     """Polynomial NARMAX model
-    
-    Build Polynomial NARMAX model using the Accelerated Orthogonal Least-Squares. 
+
+    Build Polynomial NARMAX model using the Accelerated Orthogonal Least-Squares.
     This algorithm is based on the Matlab code available on:
     https://github.com/realabolfazl/AOLS/
 
@@ -86,17 +89,11 @@ class AOLS(PolynomialNarmax):
     [2] Code:
         https://github.com/realabolfazl/AOLS/
     """
+
     def __init__(
-        self,
-        non_degree=2,
-        ylag=2,
-        xlag=2,
-        n_inputs=1,
-        k=1,
-        l=1,
-        threshold=10e-10    
+        self, non_degree=2, ylag=2, xlag=2, n_inputs=1, k=1, l=1, threshold=10e-10
     ):
-        
+
         # self.non_degree = non_degree
         # self.ylag = ylag
         # self.xlag = xlag
@@ -119,20 +116,16 @@ class AOLS(PolynomialNarmax):
     def _validate_params(self):
         """Validate input params."""
         if not isinstance(self.k, int) or self.k < 1:
-            raise ValueError(
-                "k must be integer and > zero. Got %f" % self.k
-            )
-        
+            raise ValueError("k must be integer and > zero. Got %f" % self.k)
+
         if not isinstance(self.l, int) or self.l < 1:
-            raise ValueError(
-                "k must be integer and > zero. Got %f" % self.l
-            )
-            
+            raise ValueError("k must be integer and > zero. Got %f" % self.l)
+
         if not isinstance(self.threshold, (int, float)) or self.threshold < 0:
             raise ValueError(
                 "threshold must be integer and > zero. Got %f" % self.threshold
             )
-    
+
     def aols(self, psi, y):
         """Perform the Accelerated Orthogonal Least-Squares algorithm.
 
@@ -163,8 +156,8 @@ class AOLS(PolynomialNarmax):
         """
         n, m = psi.shape
         theta = np.zeros([m, 1])
-        r = y.copy();
-        it = 0;
+        r = y.copy()
+        it = 0
         max_iter = int(min(self.k, np.floor(n / self.l)))
         AOLS_index = np.zeros(max_iter * self.l)
         U = np.zeros([n, max_iter * self.l])
@@ -173,37 +166,41 @@ class AOLS(PolynomialNarmax):
             it = it + 1
             temp_in = (it - 1) * self.l
             if it > 1:
-                T = T - U[:, temp_in].reshape(-1, 1) @ (U[:, temp_in].reshape(-1, 1).T @ psi)
-            
-            q = ((r.T @ psi)/np.sum(psi * T, axis=0)).ravel()
-            TT = np.sum(T**2, axis=0) * (q**2)
-            sub_ind = list(AOLS_index[: temp_in].astype(int))
+                T = T - U[:, temp_in].reshape(-1, 1) @ (
+                    U[:, temp_in].reshape(-1, 1).T @ psi
+                )
+
+            q = ((r.T @ psi) / np.sum(psi * T, axis=0)).ravel()
+            TT = np.sum(T ** 2, axis=0) * (q ** 2)
+            sub_ind = list(AOLS_index[:temp_in].astype(int))
             TT[sub_ind] = 0
             sorting_indices = np.argsort(TT)[::-1].ravel()
-            AOLS_index[temp_in: temp_in + self.l] = sorting_indices[:self.l]
+            AOLS_index[temp_in : temp_in + self.l] = sorting_indices[: self.l]
             for i in range(self.l):
                 TEMP = T[:, sorting_indices[i]].reshape(-1, 1) * q[sorting_indices[i]]
                 U[:, temp_in + i] = (TEMP / np.linalg.norm(TEMP, axis=0)).ravel()
                 r = r - TEMP
                 if i == self.l:
                     break
-                
-                T = T - U[:, temp_in + i].reshape(-1, 1) @ (U[:, temp_in + i].reshape(-1, 1).T @ psi)
+
+                T = T - U[:, temp_in + i].reshape(-1, 1) @ (
+                    U[:, temp_in + i].reshape(-1, 1).T @ psi
+                )
                 q = ((r.T @ psi) / np.sum(psi * T, axis=0)).ravel()
-        
+
         AOLS_index = AOLS_index[AOLS_index > 0].ravel().astype(int)
         residual_norm = LA.norm(r)
         theta[AOLS_index] = LA.lstsq(psi[:, AOLS_index], y, rcond=None)[0]
         if self.l > 1:
             sorting_indices = np.argsort(np.abs(theta))[::-1]
-            AOLS_index = sorting_indices[:self.k].ravel().astype(int)
-            theta[AOLS_index] =  LA.lstsq(psi[:, AOLS_index], y, rcond=None)[0]
+            AOLS_index = sorting_indices[: self.k].ravel().astype(int)
+            theta[AOLS_index] = LA.lstsq(psi[:, AOLS_index], y, rcond=None)[0]
             residual_norm = LA.norm(y - psi[:, AOLS_index] @ theta[AOLS_index])
-        
+
         pivv = np.argwhere(theta.ravel() > 0).ravel()
         theta = theta[theta > 0]
         return theta.reshape(-1, 1), pivv, residual_norm
-    
+
     def fit(self, X, y):
         """Fit polynomial NARMAX model using AOLS algorithm.
 
@@ -243,17 +240,20 @@ class AOLS(PolynomialNarmax):
             X, y, self.xlag, self.ylag, self.non_degree
         )
         # self.max_lag = _get_max_lag(self.ylag, self.xlag)
-        y = y[self.max_lag:].reshape(-1, 1)
-        
+        y = y[self.max_lag :].reshape(-1, 1)
 
         (self.theta, self.pivv, self.res) = self.aols(reg_Matrix, y)
         self.final_model = self.regressor_code[self.pivv, :].copy()
         self.max_lag = ModelInformation()._get_max_lag_from_model_code(self.final_model)
-        self.n_terms = len(self.theta) # the number of terms we selected (necessary in the 'results' methods)
-        self.err = self.n_terms*[0] # just to use the `results` method. Will be changed in next update.
-    
+        self.n_terms = len(
+            self.theta
+        )  # the number of terms we selected (necessary in the 'results' methods)
+        self.err = self.n_terms * [
+            0
+        ]  # just to use the `results` method. Will be changed in next update.
+
         return self
-    
+
     def predict(self, X, y, steps_ahead=None):
         """Return the predicted values given an input.
 
@@ -286,4 +286,3 @@ class AOLS(PolynomialNarmax):
         else:
             self._check_positive_int(steps_ahead, "steps_ahead")
             return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
-    

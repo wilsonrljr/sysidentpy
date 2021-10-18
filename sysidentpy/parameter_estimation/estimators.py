@@ -117,7 +117,7 @@ class Estimators(InformationMatrix):
         # theta = np.dot(np.linalg.pinv(np.dot(psi.T, psi)), np.dot(psi.T, y))
         theta = np.linalg.lstsq(psi, y, rcond=None)[0]
         return theta
-    
+
     def _unbiased_estimator(self, psi, y, theta, non_degree, elag, max_lag):
         """Estimate the model parameters using Extended Least Squares method.
 
@@ -153,19 +153,19 @@ class Estimators(InformationMatrix):
            https://en.wikipedia.org/wiki/Least_squares
 
         """
-        e = y[max_lag :, 0].reshape(-1, 1) - np.dot(psi, theta)
+        e = y[max_lag:, 0].reshape(-1, 1) - np.dot(psi, theta)
         for i in range(30):
             e = np.concatenate([np.zeros([max_lag, 1]), e], axis=0)
-            
+
             lagged_data = self.build_output_matrix(e, elag)
-        
+
             e_regressors = self.basis_function.fit(
                 lagged_data, max_lag, predefined_regressors=None
             )
-            
+
             psi_extended = np.concatenate([psi, e_regressors], axis=1)
             unbiased_theta = getattr(self, self.estimator)(psi_extended, y)
-            e = y[max_lag :, 0].reshape(-1, 1) - np.dot(
+            e = y[max_lag:, 0].reshape(-1, 1) - np.dot(
                 psi_extended, unbiased_theta.reshape(-1, 1)
             )
 
@@ -224,7 +224,7 @@ class Estimators(InformationMatrix):
             The information matrix of the model.
         y_train : array-like of shape = y_training
             The data used to training the model.
-        
+
         Returns
         -------
         theta : array-like of shape = number_of_model_elements

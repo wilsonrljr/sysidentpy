@@ -14,8 +14,11 @@ from ..utils._check_arrays import check_X_y
 from ..utils.deprecation import deprecated
 
 
-@deprecated(version='v0.1.7', future_version='v0.2.0',
-            alternative='from sysidentpy.simulation import SimulateNARMAX')
+@deprecated(
+    version="v0.1.7",
+    future_version="v0.2.0",
+    alternative="from sysidentpy.simulation import SimulateNARMAX",
+)
 class SimulatePolynomialNarmax(PolynomialNarmax):
     """Simulation of Polynomial NARMAX model
 
@@ -90,6 +93,7 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
     2  x1(k-1)y(k-1)     0.1000  0.00335113
 
     """
+
     def __init__(
         self,
         n_inputs=1,
@@ -316,7 +320,7 @@ class SimulatePolynomialNarmax(PolynomialNarmax):
             self.err = self.n_terms * [0]
         else:
             psi = self.build_information_matrix(
-                X_train, y_train, self.xlag, self.ylag, self.non_degree,self.pivv
+                X_train, y_train, self.xlag, self.ylag, self.non_degree, self.pivv
             )
             # psi = psi[:, self.pivv]
 

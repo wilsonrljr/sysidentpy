@@ -28,23 +28,15 @@ def create_test_data(n=1000):
 def test_metamss():
     piv = np.array([4, 2, 7, 11, 5])
     model_code = np.array(
-         [
-         [1001,    0], # y(k-1)
-         [2002,    0], # x1(k-2)
-         [2001, 1001]  # x1(k-1)y(k-1)
-         ]
+        [[1001, 0], [2002, 0], [2001, 1001]]  # y(k-1)  # x1(k-2)  # x1(k-1)y(k-1)
     )
     basis_function = Polynomial(degree=2)
     X_train, X_test, y_train, y_test = get_siso_data(
         n=1000, colored_noise=False, sigma=0.0001, train_percentage=90
     )
-    
+
     model = MetaMSS(
-        ylag=[1, 2],
-        xlag=2,
-        maxiter=30,
-        n_agents=20,
-        basis_function=basis_function
+        ylag=[1, 2], xlag=2, maxiter=30, n_agents=20, basis_function=basis_function
     )
     model.fit(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test)
     assert_array_equal(model.final_model, model_code)
@@ -76,7 +68,7 @@ def test_default_values():
         "weight": 0.02,
         "steps_ahead": None,
         "estimate_parameter": True,
-        "loss_func": "metamss_loss"
+        "loss_func": "metamss_loss",
     }
     model = MetaMSS(basis_function=Polynomial(degree=2))
     model_values = [
@@ -104,8 +96,7 @@ def test_default_values():
         model._weight,
         model.steps_ahead,
         model.estimate_parameter,
-        model.loss_func
-        
+        model.loss_func,
     ]
     assert list(default.values()) == model_values
 
@@ -126,11 +117,7 @@ def test_predict():
     )
     basis_function = Polynomial(degree=2)
     model = MetaMSS(
-        ylag=[1, 2],
-        xlag=2,
-        maxiter=30,
-        n_agents=10,
-        basis_function=basis_function
+        ylag=[1, 2], xlag=2, maxiter=30, n_agents=10, basis_function=basis_function
     )
     model.fit(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test)
     yhat = model.predict(X_test=X_test, y_test=y_test)
@@ -156,11 +143,7 @@ def test_model_prediction():
     y_test = np.reshape(y_test, (len(y_test), 1))
     X_test = np.reshape(X_test, (len(X_test), 1))
     model = MetaMSS(
-        ylag=[1, 2],
-        xlag=2,
-        maxiter=30,
-        n_agents=20,
-        basis_function=basis_function
+        ylag=[1, 2], xlag=2, maxiter=30, n_agents=20, basis_function=basis_function
     )
     model.fit(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test)
     assert_raises(Exception, model.predict, X_test=X_test, y_test=y_test[:1])

@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.testing import assert_almost_equal
 from numpy.testing import assert_raises
+
 # from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.utils.generate_data import get_siso_data
 from sysidentpy.simulation import SimulateNARMAX
@@ -25,9 +26,7 @@ def test_simulate():
     # theta must be a numpy array of shape (n, 1) where n is the number of regressors
     theta = np.array([[0.2, 0.9, 0.1]]).T
 
-    yhat = s.simulate(
-        X_test=x_valid, y_test=y_valid, model_code=model, theta=theta
-    )
+    yhat = s.simulate(X_test=x_valid, y_test=y_valid, model_code=model, theta=theta)
     assert yhat.shape == (100, 1)
 
 
@@ -62,13 +61,20 @@ def test_estimate_parameter():
     x_train, x_valid, y_train, y_valid = get_siso_data(
         n=1000, colored_noise=False, sigma=0.001, train_percentage=90
     )
-    assert_raises(TypeError, SimulateNARMAX, estimate_parameter='False', x_train=x_train, y_train=y_train, basis_function=Polynomial())
+    assert_raises(
+        TypeError,
+        SimulateNARMAX,
+        estimate_parameter="False",
+        x_train=x_train,
+        y_train=y_train,
+        basis_function=Polynomial(),
+    )
 
 
 def test_default_values():
     default = {
         "estimator": "recursive_least_squares",
-        "extended_least_squares": False,       
+        "extended_least_squares": False,
         "lam": 0.98,
         "delta": 0.01,
         "offset_covariance": 0.2,
@@ -78,7 +84,7 @@ def test_default_values():
         "weight": 0.02,
         "model_type": "NARMAX",
         "estimate_parameter": True,
-        "calculate_err": False
+        "calculate_err": False,
     }
     model = SimulateNARMAX(basis_function=Polynomial())
     model_values = [
@@ -93,19 +99,34 @@ def test_default_values():
         model._weight,
         model.model_type,
         model.estimate_parameter,
-        model.calculate_err
+        model.calculate_err,
     ]
     assert list(default.values()) == model_values
 
+
 def test_estimate_parameter_error():
-    assert_raises(TypeError, SimulateNARMAX, estimate_parameter=1, basis_function=Polynomial(degree=2))
+    assert_raises(
+        TypeError,
+        SimulateNARMAX,
+        estimate_parameter=1,
+        basis_function=Polynomial(degree=2),
+    )
+
 
 def test_calculate_error():
-    assert_raises(TypeError, SimulateNARMAX, calculate_err=1, basis_function=Polynomial(degree=2))
-    
+    assert_raises(
+        TypeError, SimulateNARMAX, calculate_err=1, basis_function=Polynomial(degree=2)
+    )
+
+
 def test_model_type_error():
-    assert_raises(ValueError, SimulateNARMAX, model_type="NFAR", basis_function=Polynomial(degree=2))
-    
+    assert_raises(
+        ValueError,
+        SimulateNARMAX,
+        model_type="NFAR",
+        basis_function=Polynomial(degree=2),
+    )
+
 
 def test_model_order_selection():
     x_train, x_valid, y_train, y_valid = get_siso_data(
@@ -124,9 +145,11 @@ def test_model_order_selection():
     )
     # theta must be a numpy array of shape (n, 1) where n is the number of regressors
     theta = np.array([[0.2, 0.9, 0.1]]).T
-    assert_raises(NotImplementedError, s.simulate,
-                  X_test=x_valid,
-                  y_test=y_valid,
-                  model_code=model,
-                  theta=theta,
-                  )
+    assert_raises(
+        NotImplementedError,
+        s.simulate,
+        X_test=x_valid,
+        y_test=y_valid,
+        model_code=model,
+        theta=theta,
+    )

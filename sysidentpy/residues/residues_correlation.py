@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from ..utils.deprecation import deprecated
 
+
 def compute_residues_autocorrelation(y, yhat):
     e = calculate_residues(y, yhat)
     unnormalized_e_acf = get_unnormalized_e_acf(e)
@@ -19,30 +20,35 @@ def compute_residues_autocorrelation(y, yhat):
         unnormalized_e_acf[half_of_symmetry_autocorr:]
         / unnormalized_e_acf[half_of_symmetry_autocorr]
     )
-    
+
     half_of_symmetry_autocorr = int(np.floor(unnormalized_e_acf.size / 2))
     n = len(unnormalized_e_acf) - half_of_symmetry_autocorr
     upper_bound = 1.96 / np.sqrt(len(unnormalized_e_acf))
     lower_bound = upper_bound * (-1)
     return e_acf, upper_bound, lower_bound
 
+
 def calculate_residues(y, yhat):
     return (y - yhat).flatten()
 
+
 def get_unnormalized_e_acf(e):
     return np.correlate(e, e, mode="full")
+
 
 def compute_cross_correlation(y, yhat, arr):
     e = calculate_residues(y, yhat)
     n = len(e) * 2 - 1
     ccf, upper_bound, lower_bound = _input_ccf(e, arr, n)
-    return ccf, upper_bound, lower_bound    
-    
+    return ccf, upper_bound, lower_bound
+
+
 def _input_ccf(e, a, n):
     ccf = _normalized_correlation(a, e)
     upper_bound = 1.96 / np.sqrt(n)
     lower_bound = upper_bound * (-1)
     return ccf, upper_bound, lower_bound
+
 
 def _normalized_correlation(a, b):
     """Compute the normalized correlation between two signals.
@@ -73,11 +79,15 @@ def _normalized_correlation(a, b):
 
     return ruy
 
+
 class ResiduesAnalysis:
     """Residues analysis for Polynomial NARX model."""
-    
-    @deprecated(version='v0.1.7', future_version='v0.2.0',
-            alternative='from sysidentpy.residues_correlation import compute_cross_correlation, compute_residues_autocorrelation')
+
+    @deprecated(
+        version="v0.1.7",
+        future_version="v0.2.0",
+        alternative="from sysidentpy.residues_correlation import compute_cross_correlation, compute_residues_autocorrelation",
+    )
     def residuals(self, X, y, yhat):
         """Performs the residual analysis of output to validate model.
 

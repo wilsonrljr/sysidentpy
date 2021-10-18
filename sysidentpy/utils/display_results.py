@@ -6,7 +6,15 @@ import numpy as np
 from collections import Counter
 
 
-def results(final_model=None, theta=None, err=None, n_terms=None, theta_precision=4, err_precision=8, dtype="dec"):
+def results(
+    final_model=None,
+    theta=None,
+    err=None,
+    n_terms=None,
+    theta_precision=4,
+    err_precision=8,
+    dtype="dec",
+):
     """Write the model regressors, parameters and ERR values.
 
     This function returns the model regressors, its respectives parameter
@@ -85,9 +93,7 @@ def results(final_model=None, theta=None, err=None, n_terms=None, theta_precisio
                     if regressor_dic[regressor_key] < 2:
                         translated_exponent = ""
                     else:
-                        translated_exponent = "^" + str(
-                            regressor_dic[regressor_key]
-                        )
+                        translated_exponent = "^" + str(regressor_dic[regressor_key])
                 regressor_string.append(translated_key + translated_exponent)
             tmp_regressor = "".join(regressor_string)
 

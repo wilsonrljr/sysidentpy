@@ -118,7 +118,7 @@ class GenerateRegressors:
             x_vec = x_vec_tmp
 
         return x_vec, y_vec
-    
+
     def regressor_space(self, non_degree, xlag, ylag, n_inputs, model_type="NARMAX"):
         x_vec, y_vec = self.create_narmax_code(non_degree, xlag, ylag, n_inputs)
         reg_aux = np.array([0])
@@ -129,15 +129,17 @@ class GenerateRegressors:
         elif model_type == "NFIR":
             reg_aux = np.concatenate([reg_aux, x_vec])
         else:
-            raise Exception("Unrecognized model type. Model type should be NARMAX, NAR or NFIR")
+            raise Exception(
+                "Unrecognized model type. Model type should be NARMAX, NAR or NFIR"
+            )
 
         regressor_code = list(combinations_with_replacement(reg_aux, non_degree))
 
         regressor_code = np.array(regressor_code)
         regressor_code = regressor_code[:, regressor_code.shape[1] :: -1]
         return regressor_code
-    
-    
+
+
 class HouseHolder:
     """Householder reflection and transformation."""
 
@@ -198,7 +200,8 @@ class HouseHolder:
         RA = RA + v * w
         B = RA
         return B
-    
+
+
 class ModelInformation:
     def _get_index_from_regressor_code(self, regressor_code, model_code):
         """Get the index of user regressor in regressor space.
@@ -226,7 +229,7 @@ class ModelInformation:
             )
         )[0]
         return model_index
-    
+
     def _list_output_regressor_code(self, model_code):
         """Create a flattened array of output regressors.
 
@@ -287,14 +290,14 @@ class ModelInformation:
             return max(lag_list)
         else:
             return 1
-        
+
     def _get_max_lag_from_model_code(self, model_code):
         xlag_code = self._list_input_regressor_code(model_code)
         ylag_code = self._list_output_regressor_code(model_code)
         xlag = self._get_lag_from_regressor_code(xlag_code)
         ylag = self._get_lag_from_regressor_code(ylag_code)
         return max(xlag, ylag)
-    
+
     def _get_max_lag(self, ylag=1, xlag=1):
         """Get the max lag defined by the user.
 
@@ -313,7 +316,8 @@ class ModelInformation:
         ny = np.max(list(chain.from_iterable([[ylag]])))
         nx = np.max(list(chain.from_iterable([[xlag]])))
         return np.max([ny, np.max(nx)])
-    
+
+
 class InformationMatrix:
     """Class for methods regarding preprocessing of columns"""
 
@@ -486,7 +490,7 @@ class InformationMatrix:
         y_lagged = self._create_lagged_y(y, ylag)
         lagged_data = np.concatenate([y_lagged, x_lagged], axis=1)
         return lagged_data
-    
+
     def build_output_matrix(self, y, ylag):
         """Build the information matrix of output values.
 
@@ -520,7 +524,7 @@ class InformationMatrix:
         constant = np.ones([y_lagged.shape[0], 1])
         data = np.concatenate([constant, y_lagged], axis=1)
         return data
-    
+
     def build_input_matrix(self, X, xlag):
         """Build the information matrix of input values.
 
@@ -549,7 +553,7 @@ class InformationMatrix:
         # related to its respective lags. With this approach we can create
         # the information matrix by using all possible combination of
         # the columns as a product in the iterations
-        
+
         n_inputs, xlag = self._process_xlag(X, xlag)
         x_lagged = self._create_lagged_X(X, xlag, n_inputs)
         constant = np.ones([x_lagged.shape[0], 1])
@@ -590,9 +594,10 @@ class InformationMatrix:
         # the columns as a product in the iterations
         lagged_data = self.initial_lagged_matrix(X, y, xlag=xlag, ylag=ylag)
         constant = np.ones([lagged_data.shape[0], 1])
-        data = np.concatenate([constant, lagged_data], axis=1)        
+        data = np.concatenate([constant, lagged_data], axis=1)
         return data
-    
+
+
 class ModelPrediction:
     def predict(self, X, y, steps_ahead=None):
         """Return the predicted values given an input.
@@ -695,11 +700,16 @@ class ModelPrediction:
             # self.max_lag = ModelInformation()._get_max_lag(ylag=self.ylag, xlag=self.xlag)
             lagged_data = self.build_input_output_matrix(X, y, self.xlag, self.ylag)
         else:
-            raise ValueError("Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.")
-        
+            raise ValueError(
+                "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+            )
+
         X_base = self.basis_function.transform(
-            lagged_data, self.max_lag, predefined_regressors=self.pivv[: len(self.final_model)])
-        
+            lagged_data,
+            self.max_lag,
+            predefined_regressors=self.pivv[: len(self.final_model)],
+        )
+
         # piv_final_model = self.pivv[: len(self.final_model)]
         # X_base = X_base[:, piv_final_model]
         yhat = np.dot(X_base, self.theta.flatten())
@@ -767,8 +777,10 @@ class ModelPrediction:
         elif self.model_type == "NFIR":
             return self._nfir_predict(X)
         else:
-            raise Exception("model_type do not exist! Model type must be NARMAX, NAR or NFIR")
-    
+            raise Exception(
+                "model_type do not exist! Model type must be NARMAX, NAR or NFIR"
+            )
+
     def _narmax_predict(self, X, y_initial, forecast_horizon):
         if len(y_initial) < self.max_lag:
             raise Exception("Insufficient initial conditions elements!")
@@ -778,15 +790,14 @@ class ModelPrediction:
             forecast_horizon = X.shape[0]
         else:
             forecast_horizon = forecast_horizon + self.max_lag
-        
+
         if self.model_type == "NAR":
             self._n_inputs = 0
-        
+
         y_output = np.zeros(forecast_horizon, dtype=float)
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
-        
-        
+
         model_exponents = [self._code2exponents(model) for model in self.final_model]
         raw_regressor = np.zeros(len(model_exponents[0]), dtype=float)
         for i in range(self.max_lag, forecast_horizon):
@@ -831,36 +842,48 @@ class ModelPrediction:
 
             y_output[i] = np.dot(regressor_value, self.theta.flatten())
         return y_output.reshape(-1, 1)
-    
-    def _basis_function_predict(
-            self, X, y_initial, theta):
+
+    def _basis_function_predict(self, X, y_initial, theta):
         yhat = np.zeros(X.shape[0], dtype=float)
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y_initial[: self.max_lag, 0]
-        
+
         # Discard unnecessary initial values
         # yhat[0:self.max_lag] = y_initial[0:self.max_lag]
         analysed_elements_number = self.max_lag + 1
-        
-        for i in range(0, len(X)-self.max_lag):
+
+        for i in range(0, len(X) - self.max_lag):
             if self.model_type == "NARMAX":
                 lagged_data = self.build_input_output_matrix(
-                    X[i:i+analysed_elements_number], yhat[i:i+analysed_elements_number].reshape(-1, 1), self.xlag, self.ylag)
+                    X[i : i + analysed_elements_number],
+                    yhat[i : i + analysed_elements_number].reshape(-1, 1),
+                    self.xlag,
+                    self.ylag,
+                )
             elif self.model_type == "NAR":
-                lagged_data = self.build_output_matrix(yhat[i:i+analysed_elements_number].reshape(-1, 1), self.ylag)
+                lagged_data = self.build_output_matrix(
+                    yhat[i : i + analysed_elements_number].reshape(-1, 1), self.ylag
+                )
             elif self.model_type == "NFIR":
-                lagged_data = self.build_input_matrix(X[i:i+analysed_elements_number], self.xlag)
+                lagged_data = self.build_input_matrix(
+                    X[i : i + analysed_elements_number], self.xlag
+                )
             else:
-                raise ValueError("Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.")
-            
+                raise ValueError(
+                    "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+                )
+
             X_tmp = self.basis_function.transform(
-                lagged_data, self.max_lag, predefined_regressors=self.pivv[: len(self.final_model)])
-            
+                lagged_data,
+                self.max_lag,
+                predefined_regressors=self.pivv[: len(self.final_model)],
+            )
+
             a = X_tmp @ theta
-            yhat[i+self.max_lag] = a[:, 0]
+            yhat[i + self.max_lag] = a[:, 0]
 
         return yhat.reshape(-1, 1)
-    
+
     def basis_function_n_step_prediction(self, X, y, steps_ahead):
         """Perform the n-steps-ahead prediction of a model.
 
@@ -884,7 +907,7 @@ class ModelPrediction:
         yhat = np.zeros(X.shape[0], dtype=float)
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
-        
+
         # Discard unnecessary initial values
         # yhat[0:self.max_lag] = y_initial[0:self.max_lag]
         analysed_elements_number = self.max_lag + 1
@@ -895,15 +918,11 @@ class ModelPrediction:
             if i + steps_ahead > len(y):
                 steps_ahead = len(y) - i  # predicts the remaining values
 
-            
             yhat[i : i + steps_ahead] = self._basis_function_predict(
                 X[k : i + steps_ahead], y[k : i + steps_ahead], self.theta
             )[-steps_ahead:].ravel()
-            
+
             i += steps_ahead
 
         yhat = yhat.ravel()
         return yhat.reshape(-1, 1)
-
-
-

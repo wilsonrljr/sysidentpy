@@ -14,7 +14,6 @@ from itertools import chain
 from collections import Counter
 
 
-
 def _get_max_lag(ylag, xlag):
     """Get the max lag defined by the user.
 
@@ -388,7 +387,9 @@ class InformationMatrix:
         lagged_data = np.concatenate([y_lagged, x_lagged], axis=1)
         return lagged_data
 
-    def build_information_matrix(self, X, y, xlag, ylag, non_degree, predefined_regressors=None):
+    def build_information_matrix(
+        self, X, y, xlag, ylag, non_degree, predefined_regressors=None
+    ):
         """Build the information matrix.
 
         Each columns of the information matrix represents a candidate
@@ -441,6 +442,7 @@ class InformationMatrix:
         )
         psi = psi[max_lag:, :]
         return psi
+
 
 class ModelInformation:
     def _list_output_regressor_code(self, model_code):
@@ -503,7 +505,7 @@ class ModelInformation:
             return max(lag_list)
         else:
             return 1
-        
+
     def _get_max_lag_from_model_code(self, model_code):
         xlag_code = self._list_input_regressor_code(model_code)
         ylag_code = self._list_output_regressor_code(model_code)
