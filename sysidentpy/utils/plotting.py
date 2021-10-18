@@ -6,32 +6,44 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
-mpl.rcParams['axes.spines.right'] = False
-mpl.rcParams['axes.spines.top'] = False
+mpl.rcParams["axes.spines.right"] = False
+mpl.rcParams["axes.spines.top"] = False
 
 
-def plot_results(y=None, *, yhat=None, figsize=(10, 6), n=100, style="seaborn-white", facecolor="white", title="Free run simulation"):
+def plot_results(
+    y=None,
+    *,
+    yhat=None,
+    figsize=(10, 6),
+    n=100,
+    style="seaborn-white",
+    facecolor="white",
+    title="Free run simulation"
+):
     plt.style.use(style)
     plt.rcParams["axes.facecolor"] = facecolor
-    fig, ax = plt.subplots(figsize=figsize, facecolor=facecolor) 
-    ax.plot(y[:n], c="#1f77b4",
-        alpha=1,
-        marker="o",
-        label="Data",
-        linewidth=1.5)
-    ax.plot(yhat[:n], c="#ff7f0e",
-        marker="*",
-        label="Model",
-        linewidth=1.5)
-    
+    fig, ax = plt.subplots(figsize=figsize, facecolor=facecolor)
+    ax.plot(y[:n], c="#1f77b4", alpha=1, marker="o", label="Data", linewidth=1.5)
+    ax.plot(yhat[:n], c="#ff7f0e", marker="*", label="Model", linewidth=1.5)
+
     ax.set_title(title, fontsize=18)
     ax.legend()
     ax.tick_params(labelsize=14)
     ax.set_xlabel("Samples", fontsize=14)
     ax.set_ylabel("y, $\hat{y}$", fontsize=14)
     plt.show()
-    
-def plot_residues_correlation(data=None, *, figsize=(10, 6), n=100, style="seaborn-white", facecolor="white", title="Residual Analysis", ylabel="Correlation"):
+
+
+def plot_residues_correlation(
+    data=None,
+    *,
+    figsize=(10, 6),
+    n=100,
+    style="seaborn-white",
+    facecolor="white",
+    title="Residual Analysis",
+    ylabel="Correlation"
+):
     plt.style.use(style)
     plt.rcParams["axes.facecolor"] = facecolor
     fig, ax = plt.subplots(figsize=figsize, facecolor=facecolor)

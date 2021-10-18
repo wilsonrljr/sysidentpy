@@ -5,7 +5,7 @@ from sysidentpy.utils._check_arrays import (
     check_nan,
     check_X_y,
     _check_positive_int,
-    _num_features
+    _num_features,
 )
 from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
 import numpy as np
@@ -13,7 +13,7 @@ from numpy.testing import assert_equal, assert_raises
 
 
 def test_check_positive_int():
-    assert_raises(ValueError, _check_positive_int, -1, 'name')
+    assert_raises(ValueError, _check_positive_int, -1, "name")
 
 
 def test_num_features():
@@ -81,6 +81,3 @@ def test_get_miso_data():
     assert len(y_valid) == 100
     assert x_train.shape[1] == 2
     assert y_train.shape[1] == 1
-
-
-    

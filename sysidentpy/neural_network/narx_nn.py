@@ -114,8 +114,12 @@ class NARXNN(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
        to non-linear system identification
        <https://eprints.soton.ac.uk/251147/1/778742007_content.pdf>`_
     """
-    @deprecated(version='v0.1.7', future_version='v0.2.0',
-            alternative="NARXNN(ylag=2, xlag=2, basis_function='Some basis function')")
+
+    @deprecated(
+        version="v0.1.7",
+        future_version="v0.2.0",
+        alternative="NARXNN(ylag=2, xlag=2, basis_function='Some basis function')",
+    )
     def __init__(
         self,
         non_degree=1,
@@ -130,7 +134,7 @@ class NARXNN(GenerateRegressors, InformationMatrix, ResiduesAnalysis):
         net=None,
         train_percentage=80,
         verbose=False,
-        optim_params=None
+        optim_params=None,
     ):
         self.non_degree = non_degree
         self.ylag = ylag

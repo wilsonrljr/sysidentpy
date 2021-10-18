@@ -14,9 +14,11 @@ from ..metaheuristics.bpsogsa import BPSOGSA
 from ..utils.deprecation import deprecated
 
 
-
-@deprecated(version='v0.1.7', future_version='v0.2.0',
-            alternative='from sysidentpy.model_structure_selection import MetaMSS')
+@deprecated(
+    version="v0.1.7",
+    future_version="v0.2.0",
+    alternative="from sysidentpy.model_structure_selection import MetaMSS",
+)
 class MetaMSS(BPSOGSA, SimulatePolynomialNarmax):
     """Meta-Model Structure Selection: Building Polynomial NARMAX model
 
@@ -121,7 +123,7 @@ class MetaMSS(BPSOGSA, SimulatePolynomialNarmax):
     References
     ----------
     [1] Manuscript: Meta-Model Structure Selection: Building Polynomial NARX Model
-        for Regression and Classification 
+        for Regression and Classification
         https://arxiv.org/pdf/2109.09917.pdf
     [1] Manuscript (Portuguese): Identificação de Sistemas Não Lineares
         Utilizando o Algoritmo Híbrido e Binário de Otimização por
@@ -296,7 +298,7 @@ class MetaMSS(BPSOGSA, SimulatePolynomialNarmax):
         fitness = []
         for agent in population.T:
             if np.all(agent == 0):
-                fitness.append(30) # penalty for cases where there is no terms
+                fitness.append(30)  # penalty for cases where there is no terms
                 continue
 
             m = self.regressor_code[agent == 1].copy()

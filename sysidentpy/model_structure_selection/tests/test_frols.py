@@ -7,7 +7,6 @@ from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
 from sysidentpy.basis_function import Polynomial
 
 
-
 def create_test_data(n=1000):
     # np.random.seed(42)
     # x = np.random.uniform(-1, 1, n).T
@@ -43,7 +42,7 @@ def test_error_reduction_ratio():
         ylag=[1, 2],
         xlag=2,
         estimator="least_squares",
-        basis_function=basis_function
+        basis_function=basis_function,
     )
     model.fit(X=x, y=y)
     assert_array_equal(model.final_model, model_code)
@@ -56,7 +55,7 @@ def test_fit_with_information_criteria():
         n_terms=15,
         order_selection=True,
         extended_least_squares=False,
-        basis_function=basis_function
+        basis_function=basis_function,
     )
     model.fit(X=x, y=y)
     assert "info_values" in dir(model)
@@ -66,9 +65,7 @@ def test_fit_without_information_criteria():
     x, y, theta = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
-        n_terms=15,
-        extended_least_squares=False,
-        basis_function=basis_function
+        n_terms=15, extended_least_squares=False, basis_function=basis_function
     )
     model.fit(X=x, y=y)
     assert "info_values" not in dir(model)
@@ -91,7 +88,7 @@ def test_default_values():
         "eps": np.finfo(np.float64).eps,
         "gama": 0.2,
         "weight": 0.02,
-        "model_type": "NARMAX"
+        "model_type": "NARMAX",
     }
     model = FROLS(basis_function=Polynomial(degree=2))
     model_values = [
@@ -110,7 +107,7 @@ def test_default_values():
         model._eps,
         model._gama,
         model._weight,
-        model.model_type
+        model.model_type,
     ]
     assert list(default.values()) == model_values
 
@@ -126,9 +123,15 @@ def test_validate_xlag():
 
 
 def test_model_order_selection():
-    assert_raises(TypeError, FROLS, order_selection=1, basis_function=Polynomial(degree=2))
-    assert_raises(TypeError, FROLS, order_selection="True", basis_function=Polynomial(degree=2))
-    assert_raises(TypeError, FROLS, order_selection=None, basis_function=Polynomial(degree=2))
+    assert_raises(
+        TypeError, FROLS, order_selection=1, basis_function=Polynomial(degree=2)
+    )
+    assert_raises(
+        TypeError, FROLS, order_selection="True", basis_function=Polynomial(degree=2)
+    )
+    assert_raises(
+        TypeError, FROLS, order_selection=None, basis_function=Polynomial(degree=2)
+    )
 
 
 def test_n_terms():
@@ -137,18 +140,36 @@ def test_n_terms():
 
 
 def test_n_info_values():
-    assert_raises(ValueError, FROLS, n_info_values=1.2, basis_function=Polynomial(degree=2))
-    assert_raises(ValueError, FROLS, n_info_values=-1, basis_function=Polynomial(degree=2))
+    assert_raises(
+        ValueError, FROLS, n_info_values=1.2, basis_function=Polynomial(degree=2)
+    )
+    assert_raises(
+        ValueError, FROLS, n_info_values=-1, basis_function=Polynomial(degree=2)
+    )
 
 
 def test_extended_least_squares():
-    assert_raises(TypeError, FROLS, extended_least_squares=1, basis_function=Polynomial(degree=2))
-    assert_raises(TypeError, FROLS, extended_least_squares="True", basis_function=Polynomial(degree=2))
-    assert_raises(TypeError, FROLS, extended_least_squares=None, basis_function=Polynomial(degree=2))
+    assert_raises(
+        TypeError, FROLS, extended_least_squares=1, basis_function=Polynomial(degree=2)
+    )
+    assert_raises(
+        TypeError,
+        FROLS,
+        extended_least_squares="True",
+        basis_function=Polynomial(degree=2),
+    )
+    assert_raises(
+        TypeError,
+        FROLS,
+        extended_least_squares=None,
+        basis_function=Polynomial(degree=2),
+    )
 
 
 def test_info_criteria():
-    assert_raises(ValueError, FROLS, info_criteria="AIC", basis_function=Polynomial(degree=2))
+    assert_raises(
+        ValueError, FROLS, info_criteria="AIC", basis_function=Polynomial(degree=2)
+    )
 
 
 def test_predict():
@@ -175,7 +196,7 @@ def test_predict():
         ylag=[1, 2],
         xlag=2,
         estimator="least_squares",
-        basis_function=basis_function
+        basis_function=basis_function,
     )
     model.fit(X=X_train, y=y_train)
     yhat = model.predict(X=X_test, y=y_test)
@@ -206,7 +227,7 @@ def test_model_prediction():
         ylag=[1, 2],
         xlag=2,
         estimator="least_squares",
-        basis_function=basis_function
+        basis_function=basis_function,
     )
     model.fit(X=X_train, y=y_train)
     assert_raises(Exception, model.predict, X=X_test, y=y_test[:1])
@@ -224,7 +245,7 @@ def test_information_criteria_bic():
         ylag=[1, 2],
         xlag=2,
         estimator="least_squares",
-        basis_function=basis_function
+        basis_function=basis_function,
     )
     model.fit(X=x, y=y)
     info_values = np.array([-1764.885, -2320.101, -2976.391, -4461.908, -72845.768])
@@ -243,7 +264,7 @@ def test_information_criteria_fpe():
         ylag=[1, 2],
         xlag=2,
         estimator="least_squares",
-        basis_function=basis_function
+        basis_function=basis_function,
     )
     model.fit(X=x, y=y)
     info_values = np.array(
@@ -264,9 +285,8 @@ def test_information_criteria_lilc():
         ylag=[1, 2],
         xlag=2,
         estimator="least_squares",
-        basis_function=basis_function
+        basis_function=basis_function,
     )
     model.fit(X=x, y=y)
     info_values = np.array([-1767.926, -2326.183, -2985.514, -4474.072, -72860.973])
     assert_almost_equal(model.info_values[:4], info_values[:4], decimal=3)
-

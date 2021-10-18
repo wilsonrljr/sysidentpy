@@ -14,14 +14,20 @@ from ..narmax_base import ModelPrediction
 from ..parameter_estimation.estimators import Estimators
 
 
-class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
-    ModelInformation, InformationMatrix, ModelPrediction):
+class SimulateNARMAX(
+    Estimators,
+    GenerateRegressors,
+    HouseHolder,
+    ModelInformation,
+    InformationMatrix,
+    ModelPrediction,
+):
     """Simulation of Polynomial NARMAX model
-    
+
     The NARMAX model is described as:
-    
+
     .. math::
-        
+
         y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k
 
     where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,
@@ -106,6 +112,7 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
     1         y(k-1)     0.1999       0.0
     2  x1(k-1)y(k-1)     0.1000       0.0
     """
+
     def __init__(
         self,
         *,
@@ -134,7 +141,7 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
             weight=weight,
         )
         self.model_type = model_type
-        self.basis_function=basis_function
+        self.basis_function = basis_function
         self.estimator = estimator
         self._extended_least_squares = extended_least_squares
         self.estimate_parameter = estimate_parameter
@@ -146,21 +153,18 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
             raise TypeError(
                 f"estimate_parameter must be False or True. Got {self.estimate_parameter}"
             )
-        
+
         if not isinstance(self.calculate_err, bool):
             raise TypeError(
                 f"calculate_err must be False or True. Got {self.calculate_err}"
             )
-        
+
         if self.basis_function is None:
-            raise TypeError(
-                f"basis_function can't be. Got {self.basis_function}"
-            )
-        
+            raise TypeError(f"basis_function can't be. Got {self.basis_function}")
+
         if self.model_type not in ["NARMAX", "NAR", "NFIR"]:
             raise ValueError(
-                "model_type must be NARMAX, NAR, or NFIR. Got %s"
-                % self.model_type
+                "model_type must be NARMAX, NAR, or NFIR. Got %s" % self.model_type
             )
 
     def simulate(
@@ -173,7 +177,7 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
         model_code=None,
         steps_ahead=None,
         theta=None,
-        forecast_horizon=None
+        forecast_horizon=None,
     ):
         """Simulate a model defined by the user.
 
@@ -208,8 +212,9 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
 
         """
         if self.basis_function.__class__.__name__ != "Polynomial":
-            raise NotImplementedError("Currently, SimulateNARMAX only works for polynomial"
-                                      " models.")
+            raise NotImplementedError(
+                "Currently, SimulateNARMAX only works for polynomial" " models."
+            )
 
         if y_test is None:
             raise ValueError("y_test cannot be None")
@@ -236,12 +241,12 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
                 raise ValueError("y_train cannot be None")
 
         # self._n_inputs = _num_features(X_test) ####
-        
+
         if X_test is not None:
             self._n_inputs = _num_features(X_test)
         else:
-            self._n_inputs = 1 # just to create the regressor space base
-        
+            self._n_inputs = 1  # just to create the regressor space base
+
         xlag_code = self._list_input_regressor_code(model_code)
         ylag_code = self._list_output_regressor_code(model_code)
         self.xlag = self._get_lag_from_regressor_code(xlag_code)
@@ -249,7 +254,7 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
         self.max_lag = max(self.xlag, self.ylag)
         if self._n_inputs != 1:
             self.xlag = self._n_inputs * [list(range(1, self.max_lag + 1))]
-        
+
         # for MetaMSS NAR modelling
         if self.model_type == "NAR" and forecast_horizon is None:
             forecast_horizon = y_test.shape[0] - self.max_lag
@@ -266,7 +271,9 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
         if self.estimate_parameter and not self.calculate_err:
             if self.model_type == "NARMAX":
                 self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
-                lagged_data = self.build_input_output_matrix(X_train, y_train, self.xlag, self.ylag)
+                lagged_data = self.build_input_output_matrix(
+                    X_train, y_train, self.xlag, self.ylag
+                )
             elif self.model_type == "NAR":
                 lagged_data = self.build_output_matrix(y_train, self.ylag)
                 self.max_lag = self._get_max_lag(ylag=self.ylag)
@@ -274,14 +281,19 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
                 lagged_data = self.build_input_matrix(X_train, self.xlag)
                 self.max_lag = self._get_max_lag(xlag=self.xlag)
             else:
-                raise ValueError("Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.")
+                raise ValueError(
+                    "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+                )
             psi = self.basis_function.fit(
-                lagged_data, self.max_lag, predefined_regressors=self.pivv)
+                lagged_data, self.max_lag, predefined_regressors=self.pivv
+            )
 
             self.theta = getattr(self, self.estimator)(psi, y_train)
             if self._extended_least_squares is True:
-                self.theta = self._unbiased_estimator(psi, y_train, self.theta, self.non_degree, self.elag, self.max_lag)
-            
+                self.theta = self._unbiased_estimator(
+                    psi, y_train, self.theta, self.non_degree, self.elag, self.max_lag
+                )
+
             self.err = self.n_terms * [0]
         elif not self.estimate_parameter:
             self.theta = theta
@@ -289,7 +301,9 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
         else:
             if self.model_type == "NARMAX":
                 self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
-                lagged_data = self.build_input_output_matrix(X_train, y_train, self.xlag, self.ylag)
+                lagged_data = self.build_input_output_matrix(
+                    X_train, y_train, self.xlag, self.ylag
+                )
             elif self.model_type == "NAR":
                 lagged_data = self.build_output_matrix(y_train, self.ylag)
                 self.max_lag = self._get_max_lag(ylag=self.ylag)
@@ -297,30 +311,37 @@ class SimulateNARMAX(Estimators, GenerateRegressors, HouseHolder,
                 lagged_data = self.build_input_matrix(X_train, self.xlag)
                 self.max_lag = self._get_max_lag(xlag=self.xlag)
             else:
-                raise ValueError("Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.")
+                raise ValueError(
+                    "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+                )
             psi = self.basis_function.fit(
-                lagged_data, self.max_lag, predefined_regressors=self.pivv)
+                lagged_data, self.max_lag, predefined_regressors=self.pivv
+            )
 
             _, self.err, self.pivv, _ = self.error_reduction_ratio(
                 psi, y_train, self.n_terms, self.final_model
             )
             self.theta = getattr(self, self.estimator)(psi, y_train)
             if self._extended_least_squares is True:
-                self.theta = self._unbiased_estimator(psi, y_train, self.theta, self.non_degree, self.elag, self.max_lag)
+                self.theta = self._unbiased_estimator(
+                    psi, y_train, self.theta, self.non_degree, self.elag, self.max_lag
+                )
 
         # yhat = self.predict(X_test, y_test, steps_ahead)
-        #return yhat
-        
+        # return yhat
+
         if self.basis_function.__class__.__name__ == "Polynomial":
             if steps_ahead is None:
-                return self._model_prediction(X_test, y_test, forecast_horizon=forecast_horizon)
+                return self._model_prediction(
+                    X_test, y_test, forecast_horizon=forecast_horizon
+                )
             elif steps_ahead == 1:
                 return self._one_step_ahead_prediction(X_test, y_test)
             else:
                 _check_positive_int(steps_ahead, "steps_ahead")
-                return self._n_step_ahead_prediction(X_test, y_test, steps_ahead=steps_ahead)
-        
-        
+                return self._n_step_ahead_prediction(
+                    X_test, y_test, steps_ahead=steps_ahead
+                )
 
     def error_reduction_ratio(self, psi, y, process_term_number, regressor_code):
         """Perform the Error Reduction Ration algorithm.

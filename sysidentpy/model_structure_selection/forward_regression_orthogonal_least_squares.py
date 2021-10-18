@@ -22,15 +22,20 @@ import warnings
 
 
 class FROLS(
-    Estimators, GenerateRegressors, HouseHolder,
-    ModelInformation, InformationMatrix, ModelPrediction
+    Estimators,
+    GenerateRegressors,
+    HouseHolder,
+    ModelInformation,
+    InformationMatrix,
+    ModelPrediction,
 ):
     """Forward Regression Orthogonal Least Squares algorithm.
-    
+
     This class uses the FROLS algorithm ([1]_, [2]_) to build NARMAX models.
     The NARMAX model is described as:
+    
     .. math::
-        
+
         y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k
 
     where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,
@@ -127,7 +132,7 @@ class FROLS(
     0        x1(k-2)     0.9000       0.0
     1         y(k-1)     0.1999       0.0
     2  x1(k-1)y(k-1)     0.1000       0.0
-    
+
     References
     ----------
     .. [1] Manuscript: Orthogonal least squares methods and their application
@@ -192,25 +197,17 @@ class FROLS(
             )
 
         if isinstance(self.ylag, int) and self.ylag < 1:
-            raise ValueError(
-                "ylag must be integer and > zero. Got %f" % self.ylag
-            )
-        
+            raise ValueError("ylag must be integer and > zero. Got %f" % self.ylag)
+
         if isinstance(self.xlag, int) and self.xlag < 1:
-            raise ValueError(
-                "xlag must be integer and > zero. Got %f" % self.xlag
-            )
-            
+            raise ValueError("xlag must be integer and > zero. Got %f" % self.xlag)
+
         if not isinstance(self.xlag, (int, list)):
-            raise ValueError(
-                "xlag must be integer and > zero. Got %f" % self.xlag
-            )
-        
+            raise ValueError("xlag must be integer and > zero. Got %f" % self.xlag)
+
         if not isinstance(self.ylag, (int, list)):
-            raise ValueError(
-                "ylag must be integer and > zero. Got %f" % self.ylag
-            )
-        
+            raise ValueError("ylag must be integer and > zero. Got %f" % self.ylag)
+
         if not isinstance(self._order_selection, bool):
             raise TypeError(
                 "order_selection must be False or True. Got %f" % self._order_selection
@@ -227,11 +224,10 @@ class FROLS(
                 "info_criteria must be aic, bic, fpe or lilc. Got %s"
                 % self.info_criteria
             )
-            
+
         if self.model_type not in ["NARMAX", "NAR", "NFIR"]:
             raise ValueError(
-                "model_type must be NARMAX, NAR or NFIR. Got %s"
-                % self.model_type
+                "model_type must be NARMAX, NAR or NFIR. Got %s" % self.model_type
             )
 
         if (
@@ -240,8 +236,7 @@ class FROLS(
             raise ValueError(
                 "n_terms must be integer and > zero. Got %f" % self.n_terms
             )
-        
-    
+
     def error_reduction_ratio(self, psi, y, process_term_number):
         """Perform the Error Reduction Ration algorithm [1]_, [2]_.
 
@@ -311,7 +306,7 @@ class FROLS(
         tmp_piv = piv[0:process_term_number]
         psi_orthogonal = psi[:, tmp_piv]
         return err, piv, psi_orthogonal
-    
+
     def information_criterion(self, X_base, y):
         """Determine the model order.
 
@@ -413,8 +408,7 @@ class FROLS(
         info_criteria_value = e_factor + model_factor
 
         return info_criteria_value
-    
-     
+
     def fit(self, *, X=None, y=None):
         """Fit polynomial NARMAX model.
 
@@ -448,7 +442,7 @@ class FROLS(
         """
         if y is None:
             raise ValueError("y cannot be None")
-        
+
         if self.model_type == "NARMAX":
             check_X_y(X, y)
             self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
@@ -460,19 +454,22 @@ class FROLS(
             lagged_data = self.build_input_matrix(X, self.xlag)
             self.max_lag = self._get_max_lag(xlag=self.xlag)
         else:
-            raise ValueError("Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.")
-        
+            raise ValueError(
+                "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+            )
+
         reg_matrix = self.basis_function.fit(
-            lagged_data, self.max_lag, predefined_regressors=None)   
-        
+            lagged_data, self.max_lag, predefined_regressors=None
+        )
+
         if X is not None:
             self._n_inputs = _num_features(X)
         else:
-            self._n_inputs = 1 # just to create the regressor space base
+            self._n_inputs = 1  # just to create the regressor space base
 
         self.regressor_code = self.regressor_space(
             self.non_degree, self.xlag, self.ylag, self._n_inputs, self.model_type
-            ) 
+        )
 
         if self._order_selection is True:
             self.info_values = self.information_criterion(reg_matrix, y)
@@ -491,22 +488,27 @@ class FROLS(
         (self.err, self.pivv, psi) = self.error_reduction_ratio(
             reg_matrix, y, model_length
         )
-        
+
         tmp_piv = self.pivv[0:model_length]
         if self.basis_function.__class__.__name__ == "Polynomial":
             self.final_model = self.regressor_code[tmp_piv, :].copy()
         else:
-            self.regressor_code = np.sort(np.tile(self.regressor_code[1:, :], (self.basis_function.repetition, 1)), axis=0)
+            self.regressor_code = np.sort(
+                np.tile(
+                    self.regressor_code[1:, :], (self.basis_function.repetition, 1)
+                ),
+                axis=0,
+            )
             self.final_model = self.regressor_code[tmp_piv, :].copy()
-            
 
-        
         self.theta = getattr(self, self.estimator)(psi, y)
         # self.max_lag = self._get_max_lag_from_model_code(self.final_model)
         if self._extended_least_squares is True:
-            self.theta = self._unbiased_estimator(psi, y, self.theta, self.non_degree, self.elag, self.max_lag)
+            self.theta = self._unbiased_estimator(
+                psi, y, self.theta, self.non_degree, self.elag, self.max_lag
+            )
         return self
-    
+
     def predict(self, X=None, y=None, steps_ahead=None, forecast_horizon=None):
         """Return the predicted values given an input.
 
@@ -546,4 +548,6 @@ class FROLS(
             elif steps_ahead == 1:
                 return self._one_step_ahead_prediction(X, y)
             else:
-                return self.basis_function_n_step_prediction(X, y, steps_ahead=steps_ahead)
+                return self.basis_function_n_step_prediction(
+                    X, y, steps_ahead=steps_ahead
+                )

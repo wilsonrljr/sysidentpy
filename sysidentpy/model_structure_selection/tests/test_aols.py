@@ -1,4 +1,6 @@
-from sysidentpy.model_structure_selection.accelerated_orthogonal_least_squares import AOLS
+from sysidentpy.model_structure_selection.accelerated_orthogonal_least_squares import (
+    AOLS,
+)
 from sysidentpy.basis_function._basis_function import Polynomial
 
 import numpy as np
@@ -32,7 +34,7 @@ def test_default_values():
         "k": 1,
         "L": 1,
         "threshold": 10e-10,
-        "model_type": "NARMAX"
+        "model_type": "NARMAX",
     }
     model = AOLS(basis_function=Polynomial(degree=2))
     model_values = [
@@ -42,7 +44,6 @@ def test_default_values():
         model.L,
         model.threshold,
         model.model_type,
-        
     ]
     print(model_values)
     assert list(default.values()) == model_values
@@ -92,10 +93,6 @@ def test_model_prediction():
 
     y_test = np.reshape(y_test, (len(y_test), 1))
     X_test = np.reshape(X_test, (len(X_test), 1))
-    model = AOLS(
-        ylag=[1, 2],
-        xlag=2,
-        basis_function=basis_function
-    )
+    model = AOLS(ylag=[1, 2], xlag=2, basis_function=basis_function)
     model.fit(X=X_train, y=y_train)
     assert_raises(Exception, model.predict, X=X_test, y=y_test[:1])

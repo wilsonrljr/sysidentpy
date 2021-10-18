@@ -20,8 +20,11 @@ from ..utils._check_arrays import check_X_y
 from ..utils.deprecation import deprecated
 
 
-@deprecated(version='v0.1.7', future_version='v0.2.0',
-            alternative='from sysidentpy.model_structure_selection import FROLS')
+@deprecated(
+    version="v0.1.7",
+    future_version="v0.2.0",
+    alternative="from sysidentpy.model_structure_selection import FROLS",
+)
 class PolynomialNarmax(
     Estimators, GenerateRegressors, HouseHolder, InformationMatrix, ResiduesAnalysis
 ):
@@ -648,8 +651,11 @@ class PolynomialNarmax(
 
         return output_vector
 
-    @deprecated(version='v0.1.7', future_version='v0.2.0',
-            alternative='from sysidentpy.utils.display_results import results')
+    @deprecated(
+        version="v0.1.7",
+        future_version="v0.2.0",
+        alternative="from sysidentpy.utils.display_results import results",
+    )
     def results(self, theta_precision=4, err_precision=8, dtype="dec"):
         """Write the model regressors, parameters and ERR values.
 
