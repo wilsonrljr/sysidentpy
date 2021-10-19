@@ -6,6 +6,7 @@
 import numpy as np
 from sysidentpy.utils._check_arrays import check_random_state
 
+
 class BPSOGSA:
     """Binary Hybrid Particle Swarm Optimization and Gravitational Search Algorithm [1]_, [2]_, [3]_, [4]_, [5]_
 
