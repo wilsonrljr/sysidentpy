@@ -36,7 +36,12 @@ def test_metamss():
     )
 
     model = MetaMSS(
-        ylag=[1, 2], xlag=2, maxiter=30, n_agents=20, basis_function=basis_function
+        ylag=[1, 2],
+        xlag=2,
+        maxiter=30,
+        n_agents=20,
+        basis_function=basis_function,
+        random_state=42,
     )
     model.fit(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test)
     assert_array_equal(model.final_model, model_code)
@@ -69,6 +74,7 @@ def test_default_values():
         "steps_ahead": None,
         "estimate_parameter": True,
         "loss_func": "metamss_loss",
+        "random_state": None,
     }
     model = MetaMSS(basis_function=Polynomial(degree=2))
     model_values = [
@@ -97,6 +103,7 @@ def test_default_values():
         model.steps_ahead,
         model.estimate_parameter,
         model.loss_func,
+        model.random_state,
     ]
     assert list(default.values()) == model_values
 
@@ -117,7 +124,12 @@ def test_predict():
     )
     basis_function = Polynomial(degree=2)
     model = MetaMSS(
-        ylag=[1, 2], xlag=2, maxiter=30, n_agents=10, basis_function=basis_function
+        ylag=[1, 2],
+        xlag=2,
+        maxiter=30,
+        n_agents=10,
+        basis_function=basis_function,
+        random_state=42,
     )
     model.fit(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test)
     yhat = model.predict(X_test=X_test, y_test=y_test)
@@ -143,7 +155,12 @@ def test_model_prediction():
     y_test = np.reshape(y_test, (len(y_test), 1))
     X_test = np.reshape(X_test, (len(X_test), 1))
     model = MetaMSS(
-        ylag=[1, 2], xlag=2, maxiter=30, n_agents=20, basis_function=basis_function
+        ylag=[1, 2],
+        xlag=2,
+        maxiter=30,
+        n_agents=20,
+        basis_function=basis_function,
+        random_state=42,
     )
     model.fit(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test)
     assert_raises(Exception, model.predict, X_test=X_test, y_test=y_test[:1])
