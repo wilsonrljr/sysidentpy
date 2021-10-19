@@ -42,7 +42,7 @@ def test_transform_polynomial():
 
 
 def test_fit_fourier():
-    basis_function = Fourier(n=5)
+    basis_function = Fourier(n=5, ensemble=False)
     data = np.array(([1, 1, 1], [2, 3, 4], [3, 3, 3]))
     max_lag = 1
     output = np.array(
@@ -94,13 +94,13 @@ def test_fit_fourier():
         ]
     )
 
-    r = basis_function.fit(data=data, max_lag=max_lag)
+    r, _ = basis_function.fit(data=data, max_lag=max_lag)
 
     assert_almost_equal(output, r, decimal=7)
 
 
 def test_fit_fourier_predefined():
-    basis_function = Fourier(n=5)
+    basis_function = Fourier(n=5, ensemble=False)
     data = np.array(([1, 1, 1], [2, 3, 4], [3, 3, 3]))
     max_lag = 1
     predefined_regressors = np.array([0, 2, 4])
@@ -108,7 +108,7 @@ def test_fit_fourier_predefined():
         [[-0.9899925, 0.96017029, -0.91113026], [-0.9899925, 0.96017029, -0.91113026]]
     )
 
-    r = basis_function.fit(
+    r, _ = basis_function.fit(
         data=data, max_lag=max_lag, predefined_regressors=predefined_regressors
     )
 
@@ -116,7 +116,7 @@ def test_fit_fourier_predefined():
 
 
 def test_transform_fourier():
-    basis_function = Fourier(n=5)
+    basis_function = Fourier(n=5, ensemble=False)
     data = np.array(([1, 1, 1], [2, 3, 4], [3, 3, 3]))
     max_lag = 1
     output = np.array(
@@ -168,6 +168,6 @@ def test_transform_fourier():
         ]
     )
 
-    r = basis_function.transform(data=data, max_lag=max_lag)
+    r, _ = basis_function.transform(data=data, max_lag=max_lag)
 
     assert_almost_equal(output, r, decimal=7)
