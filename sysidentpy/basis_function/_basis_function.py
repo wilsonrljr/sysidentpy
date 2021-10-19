@@ -88,10 +88,11 @@ class Fourier:
     significantly as the number of inputs, the max lag of the input and output.
     """
 
-    def __init__(self, n=1, p=2 * np.pi, degree=1):
+    def __init__(self, n=1, p=2 * np.pi, degree=1, ensemble=True):
         self.n = n
         self.p = p
         self.degree = degree
+        self.ensemble = ensemble
 
     def _fourier_expansion(self, data, n):
         base = np.column_stack(
@@ -125,7 +126,12 @@ class Fourier:
 
         """
         # remove intercept (because the data always have the intercept)
-        data = data[max_lag:, 1:]
+        if self.degree > 1:
+            data = Polynomial().fit(data, max_lag, predefined_regressors=None)
+            data = data[:, 1:]
+        else:
+            data = data[max_lag:, 1:]
+
         columns = list(range(data.shape[1]))
         harmonics = list(range(1, self.n + 1))
         psi = np.zeros([len(data), 1])
@@ -137,11 +143,17 @@ class Fourier:
             psi = np.column_stack([psi, base_col])
 
         self.repetition = self.n * 2
-        psi = psi[:, 1:]
-        if predefined_regressors is None:
-            return psi
+        if self.ensemble:
+
+            psi = psi[:, 1:]
+            psi = np.column_stack([data, psi])
         else:
-            return psi[:, predefined_regressors]
+            psi = psi[:, 1:]
+
+        if predefined_regressors is None:
+            return psi, self.ensemble
+        else:
+            return psi[:, predefined_regressors], self.ensemble
 
     def transform(self, data, max_lag, predefined_regressors=None):
         return self.fit(data, max_lag, predefined_regressors)
