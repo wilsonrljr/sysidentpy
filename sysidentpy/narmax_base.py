@@ -704,11 +704,18 @@ class ModelPrediction:
                 "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
             )
 
-        X_base = self.basis_function.transform(
-            lagged_data,
-            self.max_lag,
-            predefined_regressors=self.pivv[: len(self.final_model)],
-        )
+        if self.basis_function.__class__.__name__ == "Polynomial":
+            X_base = self.basis_function.transform(
+                lagged_data,
+                self.max_lag,
+                predefined_regressors=self.pivv[: len(self.final_model)],
+            )
+        else:
+            X_base, _ = self.basis_function.transform(
+                lagged_data,
+                self.max_lag,
+                predefined_regressors=self.pivv[: len(self.final_model)],
+            )
 
         # piv_final_model = self.pivv[: len(self.final_model)]
         # X_base = X_base[:, piv_final_model]
@@ -873,7 +880,7 @@ class ModelPrediction:
                     "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
                 )
 
-            X_tmp = self.basis_function.transform(
+            X_tmp, _ = self.basis_function.transform(
                 lagged_data,
                 self.max_lag,
                 predefined_regressors=self.pivv[: len(self.final_model)],
