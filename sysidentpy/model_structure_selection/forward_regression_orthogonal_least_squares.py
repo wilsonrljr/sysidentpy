@@ -33,7 +33,7 @@ class FROLS(
 
     This class uses the FROLS algorithm ([1]_, [2]_) to build NARMAX models.
     The NARMAX model is described as:
-    
+
     .. math::
 
         y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k
@@ -458,9 +458,14 @@ class FROLS(
                 "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
             )
 
-        reg_matrix = self.basis_function.fit(
-            lagged_data, self.max_lag, predefined_regressors=None
-        )
+        if self.basis_function.__class__.__name__ == "Polynomial":
+            reg_matrix = self.basis_function.fit(
+                lagged_data, self.max_lag, predefined_regressors=None
+            )
+        else:
+            reg_matrix, self.ensemble = self.basis_function.fit(
+                lagged_data, self.max_lag, predefined_regressors=None
+            )
 
         if X is not None:
             self._n_inputs = _num_features(X)
@@ -491,6 +496,15 @@ class FROLS(
 
         tmp_piv = self.pivv[0:model_length]
         if self.basis_function.__class__.__name__ == "Polynomial":
+            self.final_model = self.regressor_code[tmp_piv, :].copy()
+        elif self.basis_function.__class__.__name__ != "Polynomial" and self.ensemble:
+            basis_code = np.sort(
+                np.tile(
+                    self.regressor_code[1:, :], (self.basis_function.repetition, 1)
+                ),
+                axis=0,
+            )
+            self.regressor_code = np.concatenate([self.regressor_code[1:], basis_code])
             self.final_model = self.regressor_code[tmp_piv, :].copy()
         else:
             self.regressor_code = np.sort(
