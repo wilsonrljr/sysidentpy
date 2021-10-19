@@ -272,9 +272,14 @@ class AOLS(
                 "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
             )
 
-        reg_matrix = self.basis_function.fit(
-            lagged_data, self.max_lag, predefined_regressors=None
-        )
+        if self.basis_function.__class__.__name__ == "Polynomial":
+            reg_matrix = self.basis_function.fit(
+                lagged_data, self.max_lag, predefined_regressors=None
+            )
+        else:
+            reg_matrix, self.ensemble = self.basis_function.fit(
+                lagged_data, self.max_lag, predefined_regressors=None
+            )
 
         if X is not None:
             self._n_inputs = _num_features(X)
@@ -290,6 +295,15 @@ class AOLS(
         (self.theta, self.pivv, self.res) = self.aols(reg_matrix, y)
         # self.final_model = self.regressor_code[self.pivv, :].copy()
         if self.basis_function.__class__.__name__ == "Polynomial":
+            self.final_model = self.regressor_code[self.pivv, :].copy()
+        elif self.basis_function.__class__.__name__ != "Polynomial" and self.ensemble:
+            basis_code = np.sort(
+                np.tile(
+                    self.regressor_code[1:, :], (self.basis_function.repetition, 1)
+                ),
+                axis=0,
+            )
+            self.regressor_code = np.concatenate([self.regressor_code[1:], basis_code])
             self.final_model = self.regressor_code[self.pivv, :].copy()
         else:
             self.regressor_code = np.sort(
@@ -348,4 +362,6 @@ class AOLS(
             elif steps_ahead == 1:
                 return self._one_step_ahead_prediction(X, y)
             else:
-                return self.basis_function_n_step_prediction(X, y)
+                return self.basis_function_n_step_prediction(
+                    X, y, steps_ahead=steps_ahead
+                )
