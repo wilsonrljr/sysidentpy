@@ -383,6 +383,7 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">..utils.deprecation</span> <span class="kn">import</span> <span class="n">deprecated</span>
 
+
 <div class="viewcode-block" id="compute_residues_autocorrelation"><a class="viewcode-back" href="../../../code.html#sysidentpy.residues.residues_correlation.compute_residues_autocorrelation">[docs]</a><span class="k">def</span> <span class="nf">compute_residues_autocorrelation</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">):</span>
     <span class="n">e</span> <span class="o">=</span> <span class="n">calculate_residues</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
     <span class="n">unnormalized_e_acf</span> <span class="o">=</span> <span class="n">get_unnormalized_e_acf</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
@@ -392,30 +393,35 @@
         <span class="n">unnormalized_e_acf</span><span class="p">[</span><span class="n">half_of_symmetry_autocorr</span><span class="p">:]</span>
         <span class="o">/</span> <span class="n">unnormalized_e_acf</span><span class="p">[</span><span class="n">half_of_symmetry_autocorr</span><span class="p">]</span>
     <span class="p">)</span>
-    
+
     <span class="n">half_of_symmetry_autocorr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">unnormalized_e_acf</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
     <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unnormalized_e_acf</span><span class="p">)</span> <span class="o">-</span> <span class="n">half_of_symmetry_autocorr</span>
     <span class="n">upper_bound</span> <span class="o">=</span> <span class="mf">1.96</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">unnormalized_e_acf</span><span class="p">))</span>
     <span class="n">lower_bound</span> <span class="o">=</span> <span class="n">upper_bound</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">e_acf</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">,</span> <span class="n">lower_bound</span></div>
 
+
 <div class="viewcode-block" id="calculate_residues"><a class="viewcode-back" href="../../../code.html#sysidentpy.residues.residues_correlation.calculate_residues">[docs]</a><span class="k">def</span> <span class="nf">calculate_residues</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">yhat</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span></div>
 
+
 <div class="viewcode-block" id="get_unnormalized_e_acf"><a class="viewcode-back" href="../../../code.html#sysidentpy.residues.residues_correlation.get_unnormalized_e_acf">[docs]</a><span class="k">def</span> <span class="nf">get_unnormalized_e_acf</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">correlate</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;full&quot;</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="compute_cross_correlation"><a class="viewcode-back" href="../../../code.html#sysidentpy.residues.residues_correlation.compute_cross_correlation">[docs]</a><span class="k">def</span> <span class="nf">compute_cross_correlation</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">arr</span><span class="p">):</span>
     <span class="n">e</span> <span class="o">=</span> <span class="n">calculate_residues</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
     <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span>
     <span class="n">ccf</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">,</span> <span class="n">lower_bound</span> <span class="o">=</span> <span class="n">_input_ccf</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">ccf</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">,</span> <span class="n">lower_bound</span>    </div>
-    
+    <span class="k">return</span> <span class="n">ccf</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">,</span> <span class="n">lower_bound</span></div>
+
+
 <span class="k">def</span> <span class="nf">_input_ccf</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
     <span class="n">ccf</span> <span class="o">=</span> <span class="n">_normalized_correlation</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
     <span class="n">upper_bound</span> <span class="o">=</span> <span class="mf">1.96</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
     <span class="n">lower_bound</span> <span class="o">=</span> <span class="n">upper_bound</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ccf</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">,</span> <span class="n">lower_bound</span>
+
 
 <span class="k">def</span> <span class="nf">_normalized_correlation</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute the normalized correlation between two signals.</span>
@@ -446,11 +452,15 @@
 
     <span class="k">return</span> <span class="n">ruy</span>
 
+
 <div class="viewcode-block" id="ResiduesAnalysis"><a class="viewcode-back" href="../../../code.html#sysidentpy.residues.residues_correlation.ResiduesAnalysis">[docs]</a><span class="k">class</span> <span class="nc">ResiduesAnalysis</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Residues analysis for Polynomial NARX model.&quot;&quot;&quot;</span>
-    
-<div class="viewcode-block" id="ResiduesAnalysis.residuals"><a class="viewcode-back" href="../../../code.html#sysidentpy.residues.residues_correlation.ResiduesAnalysis.residuals">[docs]</a>    <span class="nd">@deprecated</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="s1">&#39;v0.1.7&#39;</span><span class="p">,</span> <span class="n">future_version</span><span class="o">=</span><span class="s1">&#39;v0.2.0&#39;</span><span class="p">,</span>
-            <span class="n">alternative</span><span class="o">=</span><span class="s1">&#39;from sysidentpy.residues_correlation import compute_cross_correlation, compute_residues_autocorrelation&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ResiduesAnalysis.residuals"><a class="viewcode-back" href="../../../code.html#sysidentpy.residues.residues_correlation.ResiduesAnalysis.residuals">[docs]</a>    <span class="nd">@deprecated</span><span class="p">(</span>
+        <span class="n">version</span><span class="o">=</span><span class="s2">&quot;v0.1.7&quot;</span><span class="p">,</span>
+        <span class="n">future_version</span><span class="o">=</span><span class="s2">&quot;v0.2.0&quot;</span><span class="p">,</span>
+        <span class="n">alternative</span><span class="o">=</span><span class="s2">&quot;from sysidentpy.residues_correlation import compute_cross_correlation, compute_residues_autocorrelation&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="k">def</span> <span class="nf">residuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Performs the residual analysis of output to validate model.</span>
 

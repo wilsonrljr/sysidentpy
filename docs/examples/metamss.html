@@ -454,16 +454,18 @@
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">basis_function</span> <span class="o">=</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
-<span class="n">model</span> <span class="o">=</span> <span class="n">MetaMSS</span><span class="p">(</span><span class="n">norm</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span>
-                <span class="n">xlag</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                <span class="n">ylag</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                <span class="n">estimator</span><span class="o">=</span><span class="s2">&quot;recursive_least_squares&quot;</span><span class="p">,</span>
-                <span class="n">k_agents_percent</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                <span class="n">estimate_parameter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">maxiter</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
-                <span class="n">n_agents</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                <span class="n">loss_func</span><span class="o">=</span><span class="s1">&#39;metamss_loss&#39;</span><span class="p">,</span>
-                <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">MetaMSS</span><span class="p">(</span>
+    <span class="n">norm</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">xlag</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">ylag</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">estimator</span><span class="o">=</span><span class="s2">&quot;recursive_least_squares&quot;</span><span class="p">,</span>
+    <span class="n">k_agents_percent</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">estimate_parameter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">maxiter</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="n">n_agents</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">loss_func</span><span class="o">=</span><span class="s1">&#39;metamss_loss&#39;</span><span class="p">,</span>
+    <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span>
+<span class="p">)</span>
 <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="o">=</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span><span class="p">)</span>
 </pre></div>
 </div>

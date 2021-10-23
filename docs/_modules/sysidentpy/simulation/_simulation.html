@@ -387,14 +387,20 @@
 <span class="kn">from</span> <span class="nn">..parameter_estimation.estimators</span> <span class="kn">import</span> <span class="n">Estimators</span>
 
 
-<div class="viewcode-block" id="SimulateNARMAX"><a class="viewcode-back" href="../../../code.html#sysidentpy.simulation._simulation.SimulateNARMAX">[docs]</a><span class="k">class</span> <span class="nc">SimulateNARMAX</span><span class="p">(</span><span class="n">Estimators</span><span class="p">,</span> <span class="n">GenerateRegressors</span><span class="p">,</span> <span class="n">HouseHolder</span><span class="p">,</span>
-    <span class="n">ModelInformation</span><span class="p">,</span> <span class="n">InformationMatrix</span><span class="p">,</span> <span class="n">ModelPrediction</span><span class="p">):</span>
+<div class="viewcode-block" id="SimulateNARMAX"><a class="viewcode-back" href="../../../code.html#sysidentpy.simulation._simulation.SimulateNARMAX">[docs]</a><span class="k">class</span> <span class="nc">SimulateNARMAX</span><span class="p">(</span>
+    <span class="n">Estimators</span><span class="p">,</span>
+    <span class="n">GenerateRegressors</span><span class="p">,</span>
+    <span class="n">HouseHolder</span><span class="p">,</span>
+    <span class="n">ModelInformation</span><span class="p">,</span>
+    <span class="n">InformationMatrix</span><span class="p">,</span>
+    <span class="n">ModelPrediction</span><span class="p">,</span>
+<span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Simulation of Polynomial NARMAX model</span>
-<span class="sd">    </span>
+
 <span class="sd">    The NARMAX model is described as:</span>
-<span class="sd">    </span>
+
 <span class="sd">    .. math::</span>
-<span class="sd">        </span>
+
 <span class="sd">        y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k</span>
 
 <span class="sd">    where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,</span>
@@ -479,6 +485,7 @@
 <span class="sd">    1         y(k-1)     0.1999       0.0</span>
 <span class="sd">    2  x1(k-1)y(k-1)     0.1000       0.0</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -507,7 +514,7 @@
             <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="n">model_type</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basis_function</span> <span class="o">=</span> <span class="n">basis_function</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="n">estimator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_extended_least_squares</span> <span class="o">=</span> <span class="n">extended_least_squares</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">estimate_parameter</span> <span class="o">=</span> <span class="n">estimate_parameter</span>
@@ -519,21 +526,18 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;estimate_parameter must be False or True. Got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">estimate_parameter</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calculate_err</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;calculate_err must be False or True. Got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">calculate_err</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis_function</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;basis_function can&#39;t be. Got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">basis_function</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-        
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;basis_function can&#39;t be. Got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">basis_function</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;NARMAX&quot;</span><span class="p">,</span> <span class="s2">&quot;NAR&quot;</span><span class="p">,</span> <span class="s2">&quot;NFIR&quot;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;model_type must be NARMAX, NAR, or NFIR. Got </span><span class="si">%s</span><span class="s2">&quot;</span>
-                <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span>
+                <span class="s2">&quot;model_type must be NARMAX, NAR, or NFIR. Got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span>
             <span class="p">)</span>
 
 <div class="viewcode-block" id="SimulateNARMAX.simulate"><a class="viewcode-back" href="../../../code.html#sysidentpy.simulation._simulation.SimulateNARMAX.simulate">[docs]</a>    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span>
@@ -546,7 +550,7 @@
         <span class="n">model_code</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">steps_ahead</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">theta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">forecast_horizon</span><span class="o">=</span><span class="kc">None</span>
+        <span class="n">forecast_horizon</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Simulate a model defined by the user.</span>
 
@@ -581,8 +585,9 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis_function</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">!=</span> <span class="s2">&quot;Polynomial&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Currently, SimulateNARMAX only works for polynomial&quot;</span>
-                                      <span class="s2">&quot; models.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;Currently, SimulateNARMAX only works for polynomial&quot;</span> <span class="s2">&quot; models.&quot;</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">y_test</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;y_test cannot be None&quot;</span><span class="p">)</span>
@@ -609,12 +614,12 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;y_train cannot be None&quot;</span><span class="p">)</span>
 
         <span class="c1"># self._n_inputs = _num_features(X_test) ####</span>
-        
+
         <span class="k">if</span> <span class="n">X_test</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_n_inputs</span> <span class="o">=</span> <span class="n">_num_features</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_n_inputs</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># just to create the regressor space base</span>
-        
+            <span class="bp">self</span><span class="o">.</span><span class="n">_n_inputs</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># just to create the regressor space base</span>
+
         <span class="n">xlag_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_input_regressor_code</span><span class="p">(</span><span class="n">model_code</span><span class="p">)</span>
         <span class="n">ylag_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_output_regressor_code</span><span class="p">(</span><span class="n">model_code</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_lag_from_regressor_code</span><span class="p">(</span><span class="n">xlag_code</span><span class="p">)</span>
@@ -622,7 +627,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_inputs</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_inputs</span> <span class="o">*</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))]</span>
-        
+
         <span class="c1"># for MetaMSS NAR modelling</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;NAR&quot;</span> <span class="ow">and</span> <span class="n">forecast_horizon</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">forecast_horizon</span> <span class="o">=</span> <span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span>
@@ -639,7 +644,9 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_parameter</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_err</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;NARMAX&quot;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_max_lag</span><span class="p">(</span><span class="n">ylag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">)</span>
-                <span class="n">lagged_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_input_output_matrix</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">)</span>
+                <span class="n">lagged_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_input_output_matrix</span><span class="p">(</span>
+                    <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span>
+                <span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;NAR&quot;</span><span class="p">:</span>
                 <span class="n">lagged_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_output_matrix</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_max_lag</span><span class="p">(</span><span class="n">ylag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">)</span>
@@ -647,14 +654,19 @@
                 <span class="n">lagged_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_input_matrix</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_max_lag</span><span class="p">(</span><span class="n">xlag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.&quot;</span>
+                <span class="p">)</span>
             <span class="n">psi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis_function</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
-                <span class="n">lagged_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">,</span> <span class="n">predefined_regressors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pivv</span><span class="p">)</span>
+                <span class="n">lagged_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">,</span> <span class="n">predefined_regressors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pivv</span>
+            <span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">)(</span><span class="n">psi</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extended_least_squares</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unbiased_estimator</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_degree</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">)</span>
-            
+                <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unbiased_estimator</span><span class="p">(</span>
+                    <span class="n">psi</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_degree</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span>
+                <span class="p">)</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">err</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_terms</span> <span class="o">*</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_parameter</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span>
@@ -662,7 +674,9 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;NARMAX&quot;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_max_lag</span><span class="p">(</span><span class="n">ylag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">)</span>
-                <span class="n">lagged_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_input_output_matrix</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">)</span>
+                <span class="n">lagged_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_input_output_matrix</span><span class="p">(</span>
+                    <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span>
+                <span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;NAR&quot;</span><span class="p">:</span>
                 <span class="n">lagged_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_output_matrix</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_max_lag</span><span class="p">(</span><span class="n">ylag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">)</span>
@@ -670,30 +684,37 @@
                 <span class="n">lagged_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_input_matrix</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_max_lag</span><span class="p">(</span><span class="n">xlag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.&quot;</span>
+                <span class="p">)</span>
             <span class="n">psi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis_function</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
-                <span class="n">lagged_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">,</span> <span class="n">predefined_regressors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pivv</span><span class="p">)</span>
+                <span class="n">lagged_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">,</span> <span class="n">predefined_regressors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pivv</span>
+            <span class="p">)</span>
 
             <span class="n">_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">err</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pivv</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_reduction_ratio</span><span class="p">(</span>
                 <span class="n">psi</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_terms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_model</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">)(</span><span class="n">psi</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extended_least_squares</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unbiased_estimator</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_degree</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unbiased_estimator</span><span class="p">(</span>
+                    <span class="n">psi</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_degree</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span>
+                <span class="p">)</span>
 
         <span class="c1"># yhat = self.predict(X_test, y_test, steps_ahead)</span>
-        <span class="c1">#return yhat</span>
-        
+        <span class="c1"># return yhat</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis_function</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;Polynomial&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">steps_ahead</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_prediction</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">forecast_horizon</span><span class="o">=</span><span class="n">forecast_horizon</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_prediction</span><span class="p">(</span>
+                    <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">forecast_horizon</span><span class="o">=</span><span class="n">forecast_horizon</span>
+                <span class="p">)</span>
             <span class="k">elif</span> <span class="n">steps_ahead</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_one_step_ahead_prediction</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">_check_positive_int</span><span class="p">(</span><span class="n">steps_ahead</span><span class="p">,</span> <span class="s2">&quot;steps_ahead&quot;</span><span class="p">)</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_step_ahead_prediction</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">steps_ahead</span><span class="o">=</span><span class="n">steps_ahead</span><span class="p">)</span></div>
-        
-        
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_step_ahead_prediction</span><span class="p">(</span>
+                    <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">steps_ahead</span><span class="o">=</span><span class="n">steps_ahead</span>
+                <span class="p">)</span></div>
 
 <div class="viewcode-block" id="SimulateNARMAX.error_reduction_ratio"><a class="viewcode-back" href="../../../code.html#sysidentpy.simulation._simulation.SimulateNARMAX.error_reduction_ratio">[docs]</a>    <span class="k">def</span> <span class="nf">error_reduction_ratio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psi</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">process_term_number</span><span class="p">,</span> <span class="n">regressor_code</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Perform the Error Reduction Ration algorithm.</span>

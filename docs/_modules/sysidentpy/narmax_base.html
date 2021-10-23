@@ -491,7 +491,7 @@
             <span class="n">x_vec</span> <span class="o">=</span> <span class="n">x_vec_tmp</span>
 
         <span class="k">return</span> <span class="n">x_vec</span><span class="p">,</span> <span class="n">y_vec</span></div>
-    
+
     <span class="k">def</span> <span class="nf">regressor_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">non_degree</span><span class="p">,</span> <span class="n">xlag</span><span class="p">,</span> <span class="n">ylag</span><span class="p">,</span> <span class="n">n_inputs</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;NARMAX&quot;</span><span class="p">):</span>
         <span class="n">x_vec</span><span class="p">,</span> <span class="n">y_vec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_narmax_code</span><span class="p">(</span><span class="n">non_degree</span><span class="p">,</span> <span class="n">xlag</span><span class="p">,</span> <span class="n">ylag</span><span class="p">,</span> <span class="n">n_inputs</span><span class="p">)</span>
         <span class="n">reg_aux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
@@ -502,15 +502,17 @@
         <span class="k">elif</span> <span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;NFIR&quot;</span><span class="p">:</span>
             <span class="n">reg_aux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">reg_aux</span><span class="p">,</span> <span class="n">x_vec</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unrecognized model type. Model type should be NARMAX, NAR or NFIR&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;Unrecognized model type. Model type should be NARMAX, NAR or NFIR&quot;</span>
+            <span class="p">)</span>
 
         <span class="n">regressor_code</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">combinations_with_replacement</span><span class="p">(</span><span class="n">reg_aux</span><span class="p">,</span> <span class="n">non_degree</span><span class="p">))</span>
 
         <span class="n">regressor_code</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">regressor_code</span><span class="p">)</span>
         <span class="n">regressor_code</span> <span class="o">=</span> <span class="n">regressor_code</span><span class="p">[:,</span> <span class="n">regressor_code</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">::</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">regressor_code</span></div>
-    
-    
+
+
 <div class="viewcode-block" id="HouseHolder"><a class="viewcode-back" href="../../code.html#sysidentpy.narmax_base.HouseHolder">[docs]</a><span class="k">class</span> <span class="nc">HouseHolder</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Householder reflection and transformation.&quot;&quot;&quot;</span>
 
@@ -571,7 +573,8 @@
         <span class="n">RA</span> <span class="o">=</span> <span class="n">RA</span> <span class="o">+</span> <span class="n">v</span> <span class="o">*</span> <span class="n">w</span>
         <span class="n">B</span> <span class="o">=</span> <span class="n">RA</span>
         <span class="k">return</span> <span class="n">B</span></div>
-    
+
+
 <span class="k">class</span> <span class="nc">ModelInformation</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">_get_index_from_regressor_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regressor_code</span><span class="p">,</span> <span class="n">model_code</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get the index of user regressor in regressor space.</span>
@@ -599,7 +602,7 @@
             <span class="p">)</span>
         <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">model_index</span>
-    
+
     <span class="k">def</span> <span class="nf">_list_output_regressor_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_code</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a flattened array of output regressors.</span>
 
@@ -660,14 +663,14 @@
             <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">lag_list</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">1</span>
-        
+
     <span class="k">def</span> <span class="nf">_get_max_lag_from_model_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_code</span><span class="p">):</span>
         <span class="n">xlag_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_input_regressor_code</span><span class="p">(</span><span class="n">model_code</span><span class="p">)</span>
         <span class="n">ylag_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_output_regressor_code</span><span class="p">(</span><span class="n">model_code</span><span class="p">)</span>
         <span class="n">xlag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_lag_from_regressor_code</span><span class="p">(</span><span class="n">xlag_code</span><span class="p">)</span>
         <span class="n">ylag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_lag_from_regressor_code</span><span class="p">(</span><span class="n">ylag_code</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">xlag</span><span class="p">,</span> <span class="n">ylag</span><span class="p">)</span>
-    
+
     <span class="k">def</span> <span class="nf">_get_max_lag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ylag</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get the max lag defined by the user.</span>
 
@@ -686,7 +689,8 @@
         <span class="n">ny</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">([[</span><span class="n">ylag</span><span class="p">]])))</span>
         <span class="n">nx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">([[</span><span class="n">xlag</span><span class="p">]])))</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">ny</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">nx</span><span class="p">)])</span>
-    
+
+
 <div class="viewcode-block" id="InformationMatrix"><a class="viewcode-back" href="../../code.html#sysidentpy.narmax_base.InformationMatrix">[docs]</a><span class="k">class</span> <span class="nc">InformationMatrix</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Class for methods regarding preprocessing of columns&quot;&quot;&quot;</span>
 
@@ -859,7 +863,7 @@
         <span class="n">y_lagged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_lagged_y</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">ylag</span><span class="p">)</span>
         <span class="n">lagged_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">y_lagged</span><span class="p">,</span> <span class="n">x_lagged</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">lagged_data</span></div>
-    
+
 <div class="viewcode-block" id="InformationMatrix.build_output_matrix"><a class="viewcode-back" href="../../code.html#sysidentpy.narmax_base.InformationMatrix.build_output_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">build_output_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ylag</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Build the information matrix of output values.</span>
 
@@ -893,7 +897,7 @@
         <span class="n">constant</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="n">y_lagged</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">])</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">constant</span><span class="p">,</span> <span class="n">y_lagged</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span></div>
-    
+
 <div class="viewcode-block" id="InformationMatrix.build_input_matrix"><a class="viewcode-back" href="../../code.html#sysidentpy.narmax_base.InformationMatrix.build_input_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">build_input_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">xlag</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Build the information matrix of input values.</span>
 
@@ -922,7 +926,7 @@
         <span class="c1"># related to its respective lags. With this approach we can create</span>
         <span class="c1"># the information matrix by using all possible combination of</span>
         <span class="c1"># the columns as a product in the iterations</span>
-        
+
         <span class="n">n_inputs</span><span class="p">,</span> <span class="n">xlag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_xlag</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">xlag</span><span class="p">)</span>
         <span class="n">x_lagged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_lagged_X</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">xlag</span><span class="p">,</span> <span class="n">n_inputs</span><span class="p">)</span>
         <span class="n">constant</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="n">x_lagged</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">])</span>
@@ -963,9 +967,10 @@
         <span class="c1"># the columns as a product in the iterations</span>
         <span class="n">lagged_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_lagged_matrix</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="n">xlag</span><span class="p">,</span> <span class="n">ylag</span><span class="o">=</span><span class="n">ylag</span><span class="p">)</span>
         <span class="n">constant</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="n">lagged_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">])</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">constant</span><span class="p">,</span> <span class="n">lagged_data</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>        
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">constant</span><span class="p">,</span> <span class="n">lagged_data</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span></div></div>
-    
+
+
 <span class="k">class</span> <span class="nc">ModelPrediction</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">steps_ahead</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the predicted values given an input.</span>
@@ -1068,11 +1073,23 @@
             <span class="c1"># self.max_lag = ModelInformation()._get_max_lag(ylag=self.ylag, xlag=self.xlag)</span>
             <span class="n">lagged_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_input_output_matrix</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.&quot;</span><span class="p">)</span>
-        
-        <span class="n">X_base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis_function</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
-            <span class="n">lagged_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">,</span> <span class="n">predefined_regressors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pivv</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_model</span><span class="p">)])</span>
-        
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis_function</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;Polynomial&quot;</span><span class="p">:</span>
+            <span class="n">X_base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis_function</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+                <span class="n">lagged_data</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">,</span>
+                <span class="n">predefined_regressors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pivv</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_model</span><span class="p">)],</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">X_base</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis_function</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+                <span class="n">lagged_data</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">,</span>
+                <span class="n">predefined_regressors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pivv</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_model</span><span class="p">)],</span>
+            <span class="p">)</span>
+
         <span class="c1"># piv_final_model = self.pivv[: len(self.final_model)]</span>
         <span class="c1"># X_base = X_base[:, piv_final_model]</span>
         <span class="n">yhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X_base</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
@@ -1138,10 +1155,12 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;NARMAX&quot;</span><span class="p">,</span> <span class="s2">&quot;NAR&quot;</span><span class="p">]:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_narmax_predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y_initial</span><span class="p">,</span> <span class="n">forecast_horizon</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;NFIR&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nfir_predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nfir_predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y_initial</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;model_type do not exist! Model type must be NARMAX, NAR or NFIR&quot;</span><span class="p">)</span>
-    
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;model_type do not exist! Model type must be NARMAX, NAR or NFIR&quot;</span>
+            <span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">_narmax_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y_initial</span><span class="p">,</span> <span class="n">forecast_horizon</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_initial</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Insufficient initial conditions elements!&quot;</span><span class="p">)</span>
@@ -1151,15 +1170,14 @@
             <span class="n">forecast_horizon</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">forecast_horizon</span> <span class="o">=</span> <span class="n">forecast_horizon</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;NAR&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_n_inputs</span> <span class="o">=</span> <span class="mi">0</span>
-        
+
         <span class="n">y_output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">forecast_horizon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="n">y_output</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
         <span class="n">y_output</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_initial</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-        
-        
+
         <span class="n">model_exponents</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_code2exponents</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_model</span><span class="p">]</span>
         <span class="n">raw_regressor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">model_exponents</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">,</span> <span class="n">forecast_horizon</span><span class="p">):</span>
@@ -1181,9 +1199,10 @@
             <span class="n">y_output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">regressor_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">y_output</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_nfir_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_nfir_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y_initial</span><span class="p">):</span>
         <span class="n">y_output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="n">y_output</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">y_output</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_initial</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
         <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_inputs</span><span class="p">)</span>
         <span class="n">model_exponents</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_code2exponents</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_model</span><span class="p">]</span>
         <span class="n">raw_regressor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">model_exponents</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
@@ -1204,37 +1223,57 @@
 
             <span class="n">y_output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">regressor_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">y_output</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    
-    <span class="k">def</span> <span class="nf">_basis_function_predict</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y_initial</span><span class="p">,</span> <span class="n">theta</span><span class="p">):</span>
-        <span class="n">yhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_basis_function_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y_initial</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">forecast_horizon</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">forecast_horizon</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">forecast_horizon</span> <span class="o">=</span> <span class="n">forecast_horizon</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;NAR&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_n_inputs</span> <span class="o">=</span> <span class="mi">0</span>
+        
+        <span class="n">yhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">forecast_horizon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="n">yhat</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
         <span class="n">yhat</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_initial</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-        
+
         <span class="c1"># Discard unnecessary initial values</span>
         <span class="c1"># yhat[0:self.max_lag] = y_initial[0:self.max_lag]</span>
         <span class="n">analysed_elements_number</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span> <span class="o">+</span> <span class="mi">1</span>
-        
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">):</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">forecast_horizon</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;NARMAX&quot;</span><span class="p">:</span>
                 <span class="n">lagged_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_input_output_matrix</span><span class="p">(</span>
-                    <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">analysed_elements_number</span><span class="p">],</span> <span class="n">yhat</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">analysed_elements_number</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">)</span>
+                    <span class="n">X</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">analysed_elements_number</span><span class="p">],</span>
+                    <span class="n">yhat</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">analysed_elements_number</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">,</span>
+                <span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;NAR&quot;</span><span class="p">:</span>
-                <span class="n">lagged_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_output_matrix</span><span class="p">(</span><span class="n">yhat</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">analysed_elements_number</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span><span class="p">)</span>
+                <span class="n">lagged_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_output_matrix</span><span class="p">(</span>
+                    <span class="n">yhat</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">analysed_elements_number</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylag</span>
+                <span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;NFIR&quot;</span><span class="p">:</span>
-                <span class="n">lagged_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_input_matrix</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">analysed_elements_number</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span><span class="p">)</span>
+                <span class="n">lagged_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_input_matrix</span><span class="p">(</span>
+                    <span class="n">X</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">analysed_elements_number</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlag</span>
+                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.&quot;</span><span class="p">)</span>
-            
-            <span class="n">X_tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis_function</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
-                <span class="n">lagged_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">,</span> <span class="n">predefined_regressors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pivv</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_model</span><span class="p">)])</span>
-            
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">X_tmp</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis_function</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+                <span class="n">lagged_data</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">,</span>
+                <span class="n">predefined_regressors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pivv</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_model</span><span class="p">)],</span>
+            <span class="p">)</span>
+
             <span class="n">a</span> <span class="o">=</span> <span class="n">X_tmp</span> <span class="o">@</span> <span class="n">theta</span>
-            <span class="n">yhat</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">yhat</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">yhat</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    
-    <span class="k">def</span> <span class="nf">basis_function_n_step_prediction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">steps_ahead</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">basis_function_n_step_prediction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">steps_ahead</span><span class="p">,</span> <span class="n">forecast_horizon</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Perform the n-steps-ahead prediction of a model.</span>
 
 <span class="sd">        Parameters</span>
@@ -1254,32 +1293,91 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Insufficient initial conditions elements!&quot;</span><span class="p">)</span>
 
-        <span class="n">yhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">forecast_horizon</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">forecast_horizon</span> <span class="o">=</span> <span class="n">forecast_horizon</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span>
+        
+        <span class="n">yhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">forecast_horizon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="n">yhat</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
         <span class="n">yhat</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-        
+ 
         <span class="c1"># Discard unnecessary initial values</span>
-        <span class="c1"># yhat[0:self.max_lag] = y_initial[0:self.max_lag]</span>
         <span class="n">analysed_elements_number</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_inputs</span><span class="p">)</span>
+ 
         <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
             <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
                 <span class="n">steps_ahead</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">-</span> <span class="n">i</span>  <span class="c1"># predicts the remaining values</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;NARMAX&quot;</span><span class="p">:</span>
+                <span class="n">yhat</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basis_function_predict</span><span class="p">(</span>
+                    <span class="n">X</span><span class="p">[</span><span class="n">k</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">k</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span>
+                <span class="p">)[</span><span class="o">-</span><span class="n">steps_ahead</span><span class="p">:]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;NAR&quot;</span><span class="p">:</span>
+                <span class="n">yhat</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basis_function_predict</span><span class="p">(</span>
+                    <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_initial</span><span class="o">=</span><span class="n">y</span><span class="p">[</span><span class="n">k</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">],</span> <span class="n">theta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">,</span> <span class="n">forecast_horizon</span><span class="o">=</span><span class="n">forecast_horizon</span>
+                <span class="p">)[</span><span class="o">-</span><span class="n">forecast_horizon</span><span class="p">:</span> <span class="o">-</span><span class="n">forecast_horizon</span><span class="o">+</span><span class="n">steps_ahead</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;NFIR&quot;</span><span class="p">:</span>
+                <span class="n">yhat</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basis_function_predict</span><span class="p">(</span>
+                    <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">[</span><span class="n">k</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">],</span> <span class="n">y_initial</span><span class="o">=</span><span class="n">y</span><span class="p">[</span><span class="n">k</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">],</span> <span class="n">theta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span>
+                <span class="p">)[</span><span class="o">-</span><span class="n">steps_ahead</span><span class="p">:]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.&quot;</span>
+                <span class="p">)</span>
+                     
+        <span class="c1"># yhat[i : i + steps_ahead] = self._basis_function_predict(</span>
+        <span class="c1">#     X[k : i + steps_ahead], y[k : i + steps_ahead], self.theta</span>
+        <span class="c1"># )[-steps_ahead:].ravel()</span>
+ 
+            <span class="n">i</span> <span class="o">+=</span> <span class="n">steps_ahead</span>
+ 
+        <span class="c1"># yhat = yhat.ravel()</span>
+        <span class="k">return</span> <span class="n">yhat</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_basis_function_n_steps_horizon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">steps_ahead</span><span class="p">,</span> <span class="n">forecast_horizon</span><span class="p">):</span>
+        <span class="n">yhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">forecast_horizon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">yhat</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">yhat</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 
+        <span class="c1"># Discard unnecessary initial values</span>
+        <span class="n">analysed_elements_number</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span>
+
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lag</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+                <span class="n">steps_ahead</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">-</span> <span class="n">i</span>  <span class="c1"># predicts the remaining values</span>
             
-            <span class="n">yhat</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basis_function_predict</span><span class="p">(</span>
-                <span class="n">X</span><span class="p">[</span><span class="n">k</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">k</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span>
-            <span class="p">)[</span><span class="o">-</span><span class="n">steps_ahead</span><span class="p">:]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;NARMAX&quot;</span><span class="p">:</span>
+                <span class="n">yhat</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basis_function_predict</span><span class="p">(</span>
+                    <span class="n">X</span><span class="p">[</span><span class="n">k</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">k</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span>
+                <span class="p">)[</span><span class="o">-</span><span class="n">forecast_horizon</span><span class="p">:</span> <span class="o">-</span><span class="n">forecast_horizon</span><span class="o">+</span><span class="n">steps_ahead</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;NAR&quot;</span><span class="p">:</span>
+                <span class="n">yhat</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basis_function_predict</span><span class="p">(</span>
+                    <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_initial</span><span class="o">=</span><span class="n">y</span><span class="p">[</span><span class="n">k</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">],</span> <span class="n">theta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">,</span> <span class="n">forecast_horizon</span><span class="o">=</span><span class="n">forecast_horizon</span>
+                <span class="p">)[</span><span class="o">-</span><span class="n">forecast_horizon</span><span class="p">:</span> <span class="o">-</span><span class="n">forecast_horizon</span><span class="o">+</span><span class="n">steps_ahead</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;NFIR&quot;</span><span class="p">:</span>
+                <span class="n">yhat</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basis_function_predict</span><span class="p">(</span>
+                    <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">[</span><span class="n">k</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">],</span> <span class="n">y_initial</span><span class="o">=</span><span class="n">y</span><span class="p">[</span><span class="n">k</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">steps_ahead</span><span class="p">],</span> <span class="n">theta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span>
+                <span class="p">)[</span><span class="o">-</span><span class="n">forecast_horizon</span><span class="p">:</span> <span class="o">-</span><span class="n">forecast_horizon</span><span class="o">+</span><span class="n">steps_ahead</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Unrecognized model type. The model_type should be NARMAX, NAR or NFIR.&quot;</span>
+                <span class="p">)</span>
             
+            <span class="c1"># yhat[i : i + steps_ahead] = self._basis_function_predict(</span>
+            <span class="c1">#     X[k : i + steps_ahead], y[k : i + steps_ahead], self.theta</span>
+            <span class="c1"># )[-steps_ahead:].ravel()</span>
+
             <span class="n">i</span> <span class="o">+=</span> <span class="n">steps_ahead</span>
 
         <span class="n">yhat</span> <span class="o">=</span> <span class="n">yhat</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">yhat</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-
-
+        
 </pre></div>
 
               </div>

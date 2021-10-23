@@ -379,7 +379,15 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
 
 
-<div class="viewcode-block" id="results"><a class="viewcode-back" href="../../../code.html#sysidentpy.utils.display_results.results">[docs]</a><span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="n">final_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">err</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_terms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">theta_precision</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">err_precision</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;dec&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="results"><a class="viewcode-back" href="../../../code.html#sysidentpy.utils.display_results.results">[docs]</a><span class="k">def</span> <span class="nf">results</span><span class="p">(</span>
+    <span class="n">final_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">theta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">err</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_terms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">theta_precision</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">err_precision</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;dec&quot;</span><span class="p">,</span>
+<span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write the model regressors, parameters and ERR values.</span>
 
 <span class="sd">    This function returns the model regressors, its respectives parameter</span>
@@ -458,9 +466,7 @@
                     <span class="k">if</span> <span class="n">regressor_dic</span><span class="p">[</span><span class="n">regressor_key</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
                         <span class="n">translated_exponent</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">translated_exponent</span> <span class="o">=</span> <span class="s2">&quot;^&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
-                            <span class="n">regressor_dic</span><span class="p">[</span><span class="n">regressor_key</span><span class="p">]</span>
-                        <span class="p">)</span>
+                        <span class="n">translated_exponent</span> <span class="o">=</span> <span class="s2">&quot;^&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">regressor_dic</span><span class="p">[</span><span class="n">regressor_key</span><span class="p">])</span>
                 <span class="n">regressor_string</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">translated_key</span> <span class="o">+</span> <span class="n">translated_exponent</span><span class="p">)</span>
             <span class="n">tmp_regressor</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">regressor_string</span><span class="p">)</span>
 
