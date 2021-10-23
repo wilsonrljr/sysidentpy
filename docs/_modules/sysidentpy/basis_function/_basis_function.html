@@ -380,10 +380,11 @@
     <span class="sd">&quot;&quot;&quot;Build polynomial basis function.</span>
 <span class="sd">    Generate a new feature matrix consisting of all polynomial combinations</span>
 <span class="sd">    of the features with degree less than or equal to the specified degree.</span>
-<span class="sd">    ..math: </span>
-<span class="sd">        y_k = \sum_{i=1}^{p}\Theta_i \times \prod_{j=0}^{n_x}u_{k-j}^{b_i, j}\prod_{l=1}^{n_e}e_{k-l}^{d_i, l}\prod_{m=1}^{n_y}y_{k-m}^{a_i, m} </span>
-<span class="sd">        \label{eq5:narx} </span>
-<span class="sd">    </span>
+
+<span class="sd">    ..math:</span>
+<span class="sd">        y_k = \sum_{i=1}^{p}\Theta_i \times \prod_{j=0}^{n_x}u_{k-j}^{b_i, j}\prod_{l=1}^{n_e}e_{k-l}^{d_i, l}\prod_{m=1}^{n_y}y_{k-m}^{a_i, m}</span>
+<span class="sd">        \label{eq5:narx}</span>
+
 <span class="sd">    where :math:`p` is the number of regressors, :math:`\Theta_i` are the</span>
 <span class="sd">    model parameters, and :math:`a_i, m, b_i, j` and :math:`d_i, l \in \mathbb{N}`</span>
 <span class="sd">    are the exponents of the output, input and noise terms, respectively.</span>
@@ -397,12 +398,13 @@
 <span class="sd">    significantly as the number of inputs, the max lag of the input and output, and</span>
 <span class="sd">    degree increases. High degrees can cause overfitting.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="p">):</span>
+    <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">degree</span> <span class="o">=</span> <span class="n">degree</span>
-        
+
 <div class="viewcode-block" id="Polynomial.fit"><a class="viewcode-back" href="../../../code.html#sysidentpy.basis_function._basis_function.Polynomial.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">max_lag</span><span class="p">,</span> <span class="n">predefined_regressors</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Build the Polynomial information matrix.</span>
 
@@ -439,15 +441,16 @@
         <span class="p">)</span>
         <span class="n">psi</span> <span class="o">=</span> <span class="n">psi</span><span class="p">[</span><span class="n">max_lag</span><span class="p">:,</span> <span class="p">:]</span>
         <span class="k">return</span> <span class="n">psi</span></div>
-    
+
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">max_lag</span><span class="p">,</span> <span class="n">predefined_regressors</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">max_lag</span><span class="p">,</span> <span class="n">predefined_regressors</span><span class="p">)</span></div>
-    
+
+
 <div class="viewcode-block" id="Fourier"><a class="viewcode-back" href="../../../code.html#sysidentpy.basis_function._basis_function.Fourier">[docs]</a><span class="k">class</span> <span class="nc">Fourier</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Build Fourier basis function.</span>
 <span class="sd">    Generate a new feature matrix consisting of all Fourier features</span>
 <span class="sd">    with respect to the number of harmonics.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    degree : int (max_degree), default=2</span>
@@ -457,14 +460,20 @@
 <span class="sd">    Be aware that the number of features in the output array scales</span>
 <span class="sd">    significantly as the number of inputs, the max lag of the input and output.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ensemble</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">degree</span> <span class="o">=</span> <span class="n">degree</span>
-    
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span> <span class="o">=</span> <span class="n">ensemble</span>
+
     <span class="k">def</span> <span class="nf">_fourier_expansion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
-        <span class="n">base</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">data</span><span class="o">*</span><span class="n">n</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">),</span>
-                                <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">data</span><span class="o">*</span><span class="n">n</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)])</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">data</span> <span class="o">*</span> <span class="n">n</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">data</span> <span class="o">*</span> <span class="n">n</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">base</span>
 
 <div class="viewcode-block" id="Fourier.fit"><a class="viewcode-back" href="../../../code.html#sysidentpy.basis_function._basis_function.Fourier.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">max_lag</span><span class="p">,</span> <span class="n">predefined_regressors</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -489,22 +498,36 @@
 <span class="sd">            The lagged matrix built in respect with each lag and column.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">max_lag</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span> <span class="c1"># because the data always have the intercept</span>
-        <span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-        <span class="n">harmonics</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
-        <span class="n">psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="mi">1</span><span class="p">])</span> 
-        
-        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
-            <span class="n">base_col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_fourier_expansion</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="n">col</span><span class="p">],</span> <span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">harmonics</span><span class="p">])</span>
-            <span class="n">psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">psi</span><span class="p">,</span> <span class="n">base_col</span><span class="p">])</span>
-            
-        <span class="bp">self</span><span class="o">.</span><span class="n">repetition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">*</span> <span class="mi">2</span>
-        <span class="n">psi</span> <span class="o">=</span> <span class="n">psi</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
-        <span class="k">if</span> <span class="n">predefined_regressors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">psi</span>
+        <span class="c1"># remove intercept (because the data always have the intercept)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">degree</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">Polynomial</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">max_lag</span><span class="p">,</span> <span class="n">predefined_regressors</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">psi</span><span class="p">[:,</span> <span class="n">predefined_regressors</span><span class="p">]</span></div>
-    
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">max_lag</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>
+
+        <span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">harmonics</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+            <span class="n">base_col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_fourier_expansion</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="n">col</span><span class="p">],</span> <span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">harmonics</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">psi</span><span class="p">,</span> <span class="n">base_col</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">repetition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">*</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="p">:</span>
+
+            <span class="n">psi</span> <span class="o">=</span> <span class="n">psi</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
+            <span class="n">psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">data</span><span class="p">,</span> <span class="n">psi</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">psi</span> <span class="o">=</span> <span class="n">psi</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
+
+        <span class="k">if</span> <span class="n">predefined_regressors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">psi</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">psi</span><span class="p">[:,</span> <span class="n">predefined_regressors</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span></div>
+
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">max_lag</span><span class="p">,</span> <span class="n">predefined_regressors</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">max_lag</span><span class="p">,</span> <span class="n">predefined_regressors</span><span class="p">)</span></div>
 </pre></div>

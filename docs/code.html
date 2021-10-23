@@ -691,11 +691,9 @@ ylag, and non_degree entered by the user.</p>
 <span id="sysidentpy-frols"></span><h1>sysidentpy FROLS<a class="headerlink" href="#module-sysidentpy.model_structure_selection.FROLS" title="Permalink to this headline">¶</a></h1>
 <p>Forward Regression Orthogonal Least Squares algorithm.</p>
 <p>This class uses the FROLS algorithm (<a href="#id96"><span class="problematic" id="id1">[1]_</span></a>, <a href="#id97"><span class="problematic" id="id2">[2]_</span></a>) to build NARMAX models.
-The NARMAX model is described as:
-.. math:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y_k</span><span class="o">=</span> <span class="n">F</span><span class="o">^</span>\<span class="n">ell</span><span class="p">[</span><span class="n">y_</span><span class="p">{</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">},</span> \<span class="n">dotsc</span><span class="p">,</span> <span class="n">y_</span><span class="p">{</span><span class="n">k</span><span class="o">-</span><span class="n">n_y</span><span class="p">},</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="o">-</span><span class="n">d</span><span class="p">},</span> <span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="o">-</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span><span class="p">},</span> \<span class="n">dotsc</span><span class="p">,</span> <span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="o">-</span><span class="n">d</span><span class="o">-</span><span class="n">n_x</span><span class="p">}</span> <span class="o">+</span> <span class="n">e_</span><span class="p">{</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">},</span> \<span class="n">dotsc</span><span class="p">,</span> <span class="n">e_</span><span class="p">{</span><span class="n">k</span><span class="o">-</span><span class="n">n_e</span><span class="p">}]</span> <span class="o">+</span> <span class="n">e_k</span>
-</pre></div>
-</div>
+The NARMAX model is described as:</p>
+<div class="math notranslate nohighlight">
+\[y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k\]</div>
 <p>where <span class="math notranslate nohighlight">\(n_y\in \mathbb{N}^*\)</span>, <span class="math notranslate nohighlight">\(n_x \in \mathbb{N}\)</span>, <span class="math notranslate nohighlight">\(n_e \in \mathbb{N}\)</span>,
 are the maximum lags for the system output and input respectively;
 <span class="math notranslate nohighlight">\(x_k \in \mathbb{R}^{n_x}\)</span> is the system input and <span class="math notranslate nohighlight">\(y_k \in \mathbb{R}^{n_y}\)</span>
@@ -1263,12 +1261,12 @@ e Novos Resultados</p>
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sysidentpy.basis_function._basis_function.</span></span><span class="sig-name descname"><span class="pre">Polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/basis_function/_basis_function.html#Polynomial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sysidentpy.basis_function._basis_function.Polynomial" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build polynomial basis function.
 Generate a new feature matrix consisting of all polynomial combinations
-of the features with degree less than or equal to the specified degree.
-..math:</p>
-<blockquote>
-<div><p>y_k = sum_{i=1}^{p}Theta_i    imes prod_{j=0}^{n_x}u_{k-j}^{b_i, j}prod_{l=1}^{n_e}e_{k-l}^{d_i, l}prod_{m=1}^{n_y}y_{k-m}^{a_i, m}
+of the features with degree less than or equal to the specified degree.</p>
+<dl class="simple">
+<dt>..math:</dt><dd><p>y_k = sum_{i=1}^{p}Theta_i    imes prod_{j=0}^{n_x}u_{k-j}^{b_i, j}prod_{l=1}^{n_e}e_{k-l}^{d_i, l}prod_{m=1}^{n_y}y_{k-m}^{a_i, m}
 label{eq5:narx}</p>
-</div></blockquote>
+</dd>
+</dl>
 <p>where <span class="math notranslate nohighlight">\(p\)</span> is the number of regressors, <span class="math notranslate nohighlight">\(\Theta_i\)</span> are the
 model parameters, and <span class="math notranslate nohighlight">\(a_i, m, b_i, j\)</span> and <span class="math notranslate nohighlight">\(d_i, l \in \mathbb{N}\)</span>
 are the exponents of the output, input and noise terms, respectively.
@@ -1307,7 +1305,7 @@ Selection algorithm.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="sysidentpy.basis_function._basis_function.Fourier">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sysidentpy.basis_function._basis_function.</span></span><span class="sig-name descname"><span class="pre">Fourier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.283185307179586</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/basis_function/_basis_function.html#Fourier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sysidentpy.basis_function._basis_function.Fourier" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sysidentpy.basis_function._basis_function.</span></span><span class="sig-name descname"><span class="pre">Fourier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.283185307179586</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensemble</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/basis_function/_basis_function.html#Fourier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sysidentpy.basis_function._basis_function.Fourier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build Fourier basis function.
 Generate a new feature matrix consisting of all Fourier features
 with respect to the number of harmonics.</p>
@@ -1563,7 +1561,7 @@ particle swarm optimization</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="sysidentpy.metaheuristics.bpsogsa.BPSOGSA.generate_random_population">
-<span class="sig-name descname"><span class="pre">generate_random_population</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/metaheuristics/bpsogsa.html#BPSOGSA.generate_random_population"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sysidentpy.metaheuristics.bpsogsa.BPSOGSA.generate_random_population" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">generate_random_population</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/metaheuristics/bpsogsa.html#BPSOGSA.generate_random_population"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sysidentpy.metaheuristics.bpsogsa.BPSOGSA.generate_random_population" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate the initial population of agents randomly</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>

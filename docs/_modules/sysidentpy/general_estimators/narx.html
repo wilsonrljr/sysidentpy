@@ -443,8 +443,12 @@
 <span class="sd">    &gt;&gt;&gt; print(mean_squared_error(y_valid, yhat))</span>
 <span class="sd">    0.000131</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nd">@deprecated</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="s1">&#39;v0.1.7&#39;</span><span class="p">,</span> <span class="n">future_version</span><span class="o">=</span><span class="s1">&#39;v0.2.0&#39;</span><span class="p">,</span>
-            <span class="n">alternative</span><span class="o">=</span><span class="s2">&quot;NARXNN(ylag=2, xlag=2, basis_function=&#39;Some basis function&#39;)&quot;</span><span class="p">)</span>
+
+    <span class="nd">@deprecated</span><span class="p">(</span>
+        <span class="n">version</span><span class="o">=</span><span class="s2">&quot;v0.1.7&quot;</span><span class="p">,</span>
+        <span class="n">future_version</span><span class="o">=</span><span class="s2">&quot;v0.2.0&quot;</span><span class="p">,</span>
+        <span class="n">alternative</span><span class="o">=</span><span class="s2">&quot;NARXNN(ylag=2, xlag=2, basis_function=&#39;Some basis function&#39;)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">non_degree</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
