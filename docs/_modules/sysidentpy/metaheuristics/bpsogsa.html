@@ -377,6 +377,7 @@
 <span class="c1"># License: BSD 3 clause</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.utils._check_arrays</span> <span class="kn">import</span> <span class="n">check_random_state</span>
 
 
 <div class="viewcode-block" id="BPSOGSA"><a class="viewcode-back" href="../../../code.html#sysidentpy.metaheuristics.bpsogsa.BPSOGSA">[docs]</a><span class="k">class</span> <span class="nc">BPSOGSA</span><span class="p">:</span>
@@ -515,7 +516,7 @@
 
         <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="BPSOGSA.generate_random_population"><a class="viewcode-back" href="../../../code.html#sysidentpy.metaheuristics.bpsogsa.BPSOGSA.generate_random_population">[docs]</a>    <span class="k">def</span> <span class="nf">generate_random_population</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BPSOGSA.generate_random_population"><a class="viewcode-back" href="../../../code.html#sysidentpy.metaheuristics.bpsogsa.BPSOGSA.generate_random_population">[docs]</a>    <span class="k">def</span> <span class="nf">generate_random_population</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generate the initial population of agents randomly</span>
 
 <span class="sd">        Returns</span>
@@ -523,7 +524,8 @@
 <span class="sd">        population : ndarray of zeros and ones</span>
 <span class="sd">            The initial population of agents.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">population</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
+        <span class="n">population</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
             <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dimension</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_agents</span><span class="p">),</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">p_zeros</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_ones</span><span class="p">]</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">population</span></div>

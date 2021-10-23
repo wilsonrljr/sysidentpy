@@ -405,17 +405,21 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">)):</span>
         <span class="k">return</span> <span class="n">seed</span>
 
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%r</span><span class="s1"> cannot be used to seed a numpy.random.RandomState&#39;</span>
-                     <span class="s1">&#39; instance&#39;</span> <span class="o">%</span> <span class="n">seed</span><span class="p">)</span></div>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="s2">&quot;</span><span class="si">%r</span><span class="s2"> cannot be used to seed a numpy.random.RandomState&quot;</span> <span class="s2">&quot; instance&quot;</span> <span class="o">%</span> <span class="n">seed</span>
+    <span class="p">)</span></div>
+
 
 <span class="k">def</span> <span class="nf">_num_features</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
 
 <span class="k">def</span> <span class="nf">_check_positive_int</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be integer and &gt; zero. Got </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">pass</span>
+
 
 <div class="viewcode-block" id="check_infinity"><a class="viewcode-back" href="../../../code.html#sysidentpy.utils._check_arrays.check_infinity">[docs]</a><span class="k">def</span> <span class="nf">check_infinity</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Check that X and y have no NaN or Inf samples.</span>

@@ -507,7 +507,7 @@
 <span class="n">basis_function</span> <span class="o">=</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">sysidentpy</span> <span class="o">=</span> <span class="n">FROLS</span><span class="p">(</span>
     <span class="n">order_selection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">ylag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">ylag</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
     <span class="n">info_criteria</span><span class="o">=</span><span class="s1">&#39;bic&#39;</span><span class="p">,</span>
     <span class="n">estimator</span><span class="o">=</span><span class="s1">&#39;recursive_least_squares&#39;</span><span class="p">,</span>
     <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span><span class="p">,</span>
@@ -518,7 +518,7 @@
 <span class="n">y_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">y_train</span><span class="p">[</span><span class="o">-</span><span class="n">sysidentpy</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:],</span> <span class="n">y_test</span><span class="p">])</span>
 
 <span class="n">yhat</span> <span class="o">=</span> <span class="n">sysidentpy</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">x_test</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span> <span class="n">steps_ahead</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">sysidentpy_loss</span> <span class="o">=</span> <span class="n">loss</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">y_test</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="o">-</span><span class="n">sysidentpy</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:]),</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">yhat</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="o">-</span><span class="n">sysidentpy</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:]))</span>
+<span class="n">sysidentpy_loss</span> <span class="o">=</span> <span class="n">loss</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">y_test</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="n">sysidentpy</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:]),</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">yhat</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="n">sysidentpy</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:]))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">sysidentpy_loss</span><span class="p">)</span>
 
 
@@ -527,14 +527,10 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\model_structure_selection\forward_regression_orthogonal_least_squares.py:478: UserWarning: n_info_values is greater than the maximum number of all regressors space considering the chosen y_lag, u_lag, and non_degree. We set as 5 
-  self.info_values = self.information_criterion(reg_matrix, y)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>3755.24253007921
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>169.1363985943965
-</pre></div>
-</div>
-<img alt="../_images/PV_forecasting_benchmark_5_2.png" src="../_images/PV_forecasting_benchmark_5_2.png" />
+<img alt="../_images/PV_forecasting_benchmark_5_1.png" src="../_images/PV_forecasting_benchmark_5_1.png" />
 </div>
 </div>
 </div>
@@ -562,8 +558,8 @@
 <span class="n">sysidentpy_metamss</span> <span class="o">=</span> <span class="n">MetaMSS</span><span class="p">(</span>
     <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span><span class="p">,</span>
     <span class="n">norm</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">ylag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">xlag</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
+    <span class="n">ylag</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
     <span class="n">estimator</span><span class="o">=</span><span class="s2">&quot;least_squares&quot;</span><span class="p">,</span>
     <span class="n">k_agents_percent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="n">estimate_parameter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -581,7 +577,7 @@
 <span class="n">y_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">y_train</span><span class="p">[</span><span class="o">-</span><span class="n">sysidentpy_metamss</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:],</span> <span class="n">y_test</span><span class="p">])</span>
 
 <span class="n">yhat</span> <span class="o">=</span> <span class="n">sysidentpy_metamss</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="o">=</span><span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span> <span class="n">steps_ahead</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">metamss_loss</span> <span class="o">=</span> <span class="n">loss</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">y_test</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="o">-</span><span class="n">sysidentpy_metamss</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:]),</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">yhat</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="o">-</span><span class="n">sysidentpy_metamss</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:]))</span>
+<span class="n">metamss_loss</span> <span class="o">=</span> <span class="n">loss</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">y_test</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="n">sysidentpy_metamss</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:]),</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">yhat</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="n">sysidentpy_metamss</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:]))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">metamss_loss</span><span class="p">)</span>
 
 
@@ -590,7 +586,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2395.3382668034546
 </pre></div>
 </div>
 <img alt="../_images/PV_forecasting_benchmark_7_1.png" src="../_images/PV_forecasting_benchmark_7_1.png" />
@@ -619,7 +615,7 @@
 <span class="n">x_test</span> <span class="o">=</span> <span class="n">df_val</span><span class="p">[</span><span class="s1">&#39;ds&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">hour</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="n">basis_function</span> <span class="o">=</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">sysidentpy_AOLS</span> <span class="o">=</span> <span class="n">AOLS</span><span class="p">(</span>
-    <span class="n">ylag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">ylag</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">xlag</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
     <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;NARMAX&quot;</span><span class="p">,</span>
@@ -630,7 +626,7 @@
 <span class="n">y_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">y_train</span><span class="p">[</span><span class="o">-</span><span class="n">sysidentpy_AOLS</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:],</span> <span class="n">y_test</span><span class="p">])</span>
 
 <span class="n">yhat</span> <span class="o">=</span> <span class="n">sysidentpy_metamss</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="o">=</span><span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span> <span class="n">steps_ahead</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">aols_loss</span> <span class="o">=</span> <span class="n">loss</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">y_test</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="o">-</span><span class="n">sysidentpy_AOLS</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:]),</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">yhat</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="o">-</span><span class="n">sysidentpy_AOLS</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:]))</span>
+<span class="n">aols_loss</span> <span class="o">=</span> <span class="n">loss</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">y_test</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="n">sysidentpy_AOLS</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:]),</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">yhat</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="n">sysidentpy_AOLS</span><span class="o">.</span><span class="n">max_lag</span><span class="p">:]))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">aols_loss</span><span class="p">)</span>
 
 
@@ -639,7 +635,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2395.3382668034546
 </pre></div>
 </div>
 <img alt="../_images/PV_forecasting_benchmark_9_1.png" src="../_images/PV_forecasting_benchmark_9_1.png" />
@@ -682,40 +678,40 @@
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>WARNING: nprophet - fit: Parts of code may break if using other than daily data.
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-16 15:25:44 - WARNING - Parts of code may break if using other than daily data.
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-23 19:15:39 - WARNING - Parts of code may break if using other than daily data.
 </pre></div>
 </div>
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>INFO: nprophet.utils - set_auto_seasonalities: Disabling yearly seasonality. Run NeuralProphet with yearly_seasonality=True to override this.
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-16 15:25:44 - INFO - Disabling yearly seasonality. Run NeuralProphet with yearly_seasonality=True to override this.
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-23 19:15:39 - INFO - Disabling yearly seasonality. Run NeuralProphet with yearly_seasonality=True to override this.
 </pre></div>
 </div>
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>INFO: nprophet.config - set_auto_batch_epoch: Auto-set batch_size to 32
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-16 15:25:44 - INFO - Auto-set batch_size to 32
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-23 19:15:39 - INFO - Auto-set batch_size to 32
 </pre></div>
 </div>
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>INFO: nprophet.config - set_auto_batch_epoch: Auto-set epochs to 7
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-16 15:25:44 - INFO - Auto-set epochs to 7
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-23 19:15:39 - INFO - Auto-set epochs to 7
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 87%|████████▋ | 87/100 [00:00&lt;00:00, 762.47it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 87%|████████▋ | 87/100 [00:00&lt;00:00, 724.34it/s]
 INFO: nprophet - _lr_range_test: learning rate range test found optimal lr: 1.87E-01
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-16 15:25:44 - INFO - learning rate range test found optimal lr: 1.87E-01
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-23 19:15:39 - INFO - learning rate range test found optimal lr: 1.87E-01
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch[7/7]: 100%|██████████| 7/7 [00:02&lt;00:00,  2.87it/s, SmoothL1Loss=0.0031, MAE=51.3, RegLoss=0.0102]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch[7/7]: 100%|██████████| 7/7 [00:02&lt;00:00,  2.88it/s, SmoothL1Loss=0.0031, MAE=51.3, RegLoss=0.0102]
 INFO: nprophet - _evaluate: Validation metrics:    SmoothL1Loss    MAE
 1         0.002 44.072
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-16 15:25:47 - INFO - Validation metrics:    SmoothL1Loss    MAE
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-23 19:15:42 - INFO - Validation metrics:    SmoothL1Loss    MAE
 1         0.002 44.072
 3679.9220330403255
 </pre></div>
@@ -730,7 +726,7 @@ INFO: nprophet - _evaluate: Validation metrics:    SmoothL1Loss    MAE
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x2300ff35fd0&gt;]
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x23a770d21f0&gt;]
 </pre></div>
 </div>
 <img alt="../_images/PV_forecasting_benchmark_12_1.png" src="../_images/PV_forecasting_benchmark_12_1.png" />
