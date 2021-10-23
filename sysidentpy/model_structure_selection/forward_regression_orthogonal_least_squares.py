@@ -558,10 +558,10 @@ class FROLS(
                 return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
         else:
             if steps_ahead is None:
-                return self._basis_function_predict(X, y, self.theta)
+                return self._basis_function_predict(X, y, self.theta, forecast_horizon=forecast_horizon)
             elif steps_ahead == 1:
                 return self._one_step_ahead_prediction(X, y)
             else:
                 return self.basis_function_n_step_prediction(
-                    X, y, steps_ahead=steps_ahead
+                    X, y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
                 )
