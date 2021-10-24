@@ -285,7 +285,7 @@
   </ul>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="../changelog/v0.1.7.html">
+  <a class="reference internal" href="../changelog/v0.1.8.html">
    Changes in SysIdentPy
   </a>
  </li>
@@ -450,14 +450,14 @@
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: sysidentpy in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (0.1.6)
-Requirement already satisfied: scipy&gt;=1.7.0 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from sysidentpy) (1.7.1)
-Requirement already satisfied: matplotlib&gt;=3.3.2 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from sysidentpy) (3.4.3)
 Requirement already satisfied: numpy&gt;=1.19.2 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from sysidentpy) (1.20.3)
-Requirement already satisfied: cycler&gt;=0.10 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (0.10.0)
-Requirement already satisfied: pyparsing&gt;=2.2.1 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (2.4.7)
+Requirement already satisfied: matplotlib&gt;=3.3.2 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from sysidentpy) (3.4.3)
+Requirement already satisfied: scipy&gt;=1.7.0 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from sysidentpy) (1.7.1)
 Requirement already satisfied: python-dateutil&gt;=2.7 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (2.8.2)
-Requirement already satisfied: pillow&gt;=6.2.0 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (8.3.2)
+Requirement already satisfied: cycler&gt;=0.10 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (0.10.0)
 Requirement already satisfied: kiwisolver&gt;=1.0.1 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (1.3.2)
+Requirement already satisfied: pillow&gt;=6.2.0 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (8.3.2)
+Requirement already satisfied: pyparsing&gt;=2.2.1 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (2.4.7)
 Requirement already satisfied: six in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from cycler&gt;=0.10-&gt;matplotlib&gt;=3.3.2-&gt;sysidentpy) (1.16.0)
 Note: you may need to restart the kernel to use updated packages.
 </pre></div>
@@ -518,7 +518,7 @@ Note: you may need to restart the kernel to use updated packages.
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;sysidentpy.polynomial_basis.narmax.PolynomialNarmax at 0x194dddf16d0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;sysidentpy.polynomial_basis.narmax.PolynomialNarmax at 0x27672c85820&gt;
 </pre></div>
 </div>
 </div>
@@ -544,12 +544,12 @@ Note: you may need to restart the kernel to use updated packages.
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0028839406093487795
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0025720880126656447
        Regressors Parameters         ERR
-0         x2(k-1)     0.6000  0.91340130
-1  x2(k-2)x1(k-1)    -0.2998  0.04424634
-2        y(k-1)^2     0.4001  0.04202835
-3   x1(k-1)y(k-1)     0.0997  0.00031617
+0         x2(k-1)     0.6001  0.90504940
+1  x2(k-2)x1(k-1)    -0.3000  0.05060522
+2        y(k-1)^2     0.3999  0.04398562
+3   x1(k-1)y(k-1)     0.1001  0.00035238
 </pre></div>
 </div>
 <img alt="../_images/multiple_inputs_example_10_1.png" src="../_images/multiple_inputs_example_10_1.png" />
