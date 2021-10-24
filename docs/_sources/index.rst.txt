@@ -320,5 +320,5 @@ Contents
     dev_guide
     notebooks
     notebooksv016
-    changelog/v0.1.7
+    changelog/v0.1.8
     code
