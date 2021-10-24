@@ -1,7 +1,7 @@
 Changes in SysIdentPy
 =====================
 
-v0.1.8
+v0.1.9
 ------
 
 CONTRIBUTORS
@@ -15,6 +15,38 @@ CHANGES
 
 - DOC: PV forecasting benchmark
     - FIX AOLS prediction. The example was using the meta_mss model in prediction, so the results for AOLS were wrong.
+
+
+v0.1.8
+------
+
+CONTRIBUTORS
+~~~~~~~~~~~~
+
+- wilsonrljr
+
+CHANGES
+~~~~~~~
+- The update **v0.1.8**  has been released with additional feature, minor API changes and fixes of the new features added in v0.1.7. 
+
+- MAJOR: Ensemble Basis Functions
+    - Now you can use different basis function together. For now we allow to use Fourier combined with Polynomial of different degrees. 
+
+- API change: Add "ensemble" parameter in basis function to combine the features of different basis function.
+
+- Fix: N-steps ahead prediction for model_type="NAR" is working properly now with different forecast horizon.
+
+- DOC: Air passenger benchmark
+    - Remove unused code.
+    - Use default hyperparameter in SysIdentPy models.
+
+- DOC: Load forecasting benchmark
+    - Remove unused code.
+    - Use default hyperparameter in SysIdentPy models.
+
+- DOC: PV forecasting benchmark
+    - Remove unused code.
+    - Use default hyperparameter in SysIdentPy models.
 
 
 v0.1.7
