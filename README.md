@@ -118,14 +118,15 @@ class NARX(nn.Module):
         z = self.lin3(z)
         return z
 
-narx_net = NARXNN(net=NARX(),
-                  ylag=2,
-                  xlag=2,
-                  loss_func='mse_loss',
-                  optimizer='Adam',
-                  epochs=200,
-                  verbose=False,
-                  optim_params={'betas': (0.9, 0.999), 'eps': 1e-05} # optional parameters of the optimizer
+narx_net = NARXNN(
+  net=NARX(),
+  ylag=2,
+  xlag=2,
+  loss_func='mse_loss',
+  optimizer='Adam',
+  epochs=200,
+  verbose=False,
+  optim_params={'betas': (0.9, 0.999), 'eps': 1e-05} # optional parameters of the optimizer
 )
 
 train_dl = narx_net.data_transform(x_train, y_train)
@@ -142,12 +143,14 @@ narx_net.plot_result(y_valid, yhat, ee, ex)
 from sysidentpy.general_estimators import NARX
 from catboost import CatBoostRegressor
 
-catboost_narx = NARX(base_estimator=CatBoostRegressor(iterations=300,
-                                                      learning_rate=0.1,
-                                                      depth=6),
-                     xlag=2,
-                     ylag=2,
-                     fit_params={'verbose': False}
+catboost_narx = NARX(
+  base_estimator=CatBoostRegressor(
+    iterations=300,
+    learning_rate=0.1,
+    depth=6),
+  xlag=2,
+  ylag=2,
+  fit_params={'verbose': False}
 )
 
 catboost_narx.fit(x_train, y_train)
@@ -174,9 +177,11 @@ def plot_results(yvalid, yhat):
     ax.legend(fontsize=18)
     plt.show()
 
-catboost = CatBoostRegressor(iterations=300,
-                            learning_rate=0.1,
-                            depth=6)
+catboost = CatBoostRegressor(
+  iterations=300,
+  learning_rate=0.1,
+  depth=6
+)
 catboost.fit(x_train, y_train, verbose=False)
 plot_results(y_valid, catboost.predict(x_valid))
 ```
