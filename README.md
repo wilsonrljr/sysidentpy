@@ -64,11 +64,12 @@ from sysidentpy.residues.residues_correlation import compute_residues_autocorrel
 from sysidentpy.residues.residues_correlation import compute_cross_correlation
 
 basis_function=Polynomial(degree=2)
-model = PolynomialNarmax(
+model = FROLS(
   order_selection=True,
   n_info_values=10,
   extended_least_squares=False,
-  ylag=2, xlag=2,
+  ylag=2,
+  xlag=2,
   info_criteria='aic',
   estimator='least_squares',
   basis_function=basis_function
