@@ -8,7 +8,7 @@ import os
 def save_model(
     model, 
     file_name,
-    path = [],
+    path = None,
 ):
     """ This method saves the model "model" in folder "folder" using an extension .syspy
     
@@ -27,26 +27,19 @@ def save_model(
     """
     
     # Checking if path is provided
-    if path != []:
+    if path is not None:
         
-        # Getting current working directory
-        cwd = os.getcwd()
-        
-        # Changing to where the model will be saved
-        os.chdir(path)
+        # Composing file_name with path
+        file_name = os.path.join(path,file_name)
         
     # Saving model
     with open(file_name, "wb") as fp:
         pk.dump(model, fp)    
-        
-    # Restoring the working directory, if needed
-    if path != []:
-        os.chdir(cwd)
-    
+      
     
 def load_model(
     file_name,
-    path = [], 
+    path = None, 
 ):
     
     """ This method loads the model from file "file_name.syspy" located at path "path"
@@ -65,23 +58,17 @@ def load_model(
     
     """
     # Checking if path is provided
-    if path != []:
+    if path is not None:
         
-        # Getting current working directory
-        cwd = os.getcwd()
-        
-        # Changing to where the model will be saved
-        os.chdir(path)
+        # Composing file_name with path
+        file_name = os.path.join(path,file_name)
     
     
     # Loading the model
     with open(file_name, 'rb') as fp:
         model_loaded = pk.load(fp)
-        
-    # Restoring the working directory, if needed
-    if path != []:
-        os.chdir(cwd)
-        
+
+
     return model_loaded
         
     
