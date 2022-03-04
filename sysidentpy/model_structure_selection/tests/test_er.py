@@ -75,3 +75,8 @@ def test_default_values():
 def test_validate_ylag():
     assert_raises(ValueError, ER, ylag=-1, basis_function=Polynomial(degree=2))
     assert_raises(ValueError, ER, ylag=1.3, basis_function=Polynomial(degree=2))
+
+
+def test_validate_xlag():
+    assert_raises(ValueError, ER, xlag=-1, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, ER, xlag=1.3, basis_function=Polynomial(degree=2))
