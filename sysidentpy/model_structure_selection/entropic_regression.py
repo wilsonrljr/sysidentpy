@@ -477,3 +477,45 @@ class ER(
         arr = psi(y_f2 + 1) + psi(f1_f2 + 1) - psi(f2_f2 + 1)
         vp_estimation = psi(self.k) - np.nanmean(arr[np.isfinite(arr)])
         return vp_estimation
+
+    def tolerance_estimator(self, y):
+        """Tolerance Estimation for mutual independence test.
+        Finds the conditioned mutual information between :math:`y` and :math:`f1` given :math:`f2`.
+
+        This code is based on Matlab Entropic Regression package.
+        https://github.com/almomaa/ERFit-Package
+
+        Parameters
+        ----------
+        y : ndarray of floats
+            The source signal.
+
+        Returns
+        -------
+        tol : float
+            The tolerance value given q.
+
+        References
+        ----------
+        .. [1] Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
+            Regression Beats the Outliers Problem in Nonlinear System
+            Identification. Chaos 30, 013107 (2020).
+        .. [2] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+            Estimating mutual information. Physical Review E, 69:066-138,2004
+        .. [3] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+            Estimating mutual information. Physical Review E, 69:066-138,2004
+        .. [4] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+            Estimating mutual information. Physical Review E, 69:066-138,2004
+
+        """
+        ksg_estimation = []
+        for i in range(self.n_perm):
+            mutual_information_output = getattr(
+                self, self.mutual_information_estimator
+            )(y, self.rng.permutation(y))
+
+            ksg_estimation.append(mutual_information_output)
+
+        ksg_estimation = np.array(ksg_estimation)
+        tol = np.quantile(ksg_estimation, self.q)
+        return tol
