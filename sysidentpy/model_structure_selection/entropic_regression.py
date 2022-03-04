@@ -519,3 +519,139 @@ class ER(
         ksg_estimation = np.array(ksg_estimation)
         tol = np.quantile(ksg_estimation, self.q)
         return tol
+
+    def fit(self, *, X=None, y=None):
+        """Fit polynomial NARMAX model using AOLS algorithm.
+
+        The 'fit' function allows a friendly usage by the user.
+        Given two arguments, X and y, fit training data.
+
+        The Entropic Regression algorithm is based on the Matlab package available on:
+        https://github.com/almomaa/ERFit-Package
+
+        Parameters
+        ----------
+        X : ndarray of floats
+            The input data to be used in the training process.
+        y : ndarray of floats
+            The output data to be used in the training process.
+
+        Returns
+        -------
+        model : ndarray of int
+            The model code representation.
+        theta : array-like of shape = number_of_model_elements
+            The estimated parameters of the model.
+
+        References
+        ----------
+        .. [1] Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
+            Regression Beats the Outliers Problem in Nonlinear System
+            Identification. Chaos 30, 013107 (2020).
+        .. [2] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+            Estimating mutual information. Physical Review E, 69:066-138,2004
+        .. [3] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+            Estimating mutual information. Physical Review E, 69:066-138,2004
+        .. [4] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+            Estimating mutual information. Physical Review E, 69:066-138,2004
+        """
+        if y is None:
+            raise ValueError("y cannot be None")
+
+        if self.model_type == "NAR":
+            lagged_data = self.build_output_matrix(y, self.ylag)
+            self.max_lag = self._get_max_lag(ylag=self.ylag)
+        elif self.model_type == "NFIR":
+            lagged_data = self.build_input_matrix(X, self.xlag)
+            self.max_lag = self._get_max_lag(xlag=self.xlag)
+        elif self.model_type == "NARMAX":
+            check_X_y(X, y)
+            self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
+            lagged_data = self.build_input_output_matrix(X, y, self.xlag, self.ylag)
+        else:
+            raise ValueError(
+                "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+            )
+
+        if self.basis_function.__class__.__name__ == "Polynomial":
+            reg_matrix = self.basis_function.fit(
+                lagged_data, self.max_lag, predefined_regressors=None
+            )
+        else:
+            reg_matrix, self.ensemble = self.basis_function.fit(
+                lagged_data, self.max_lag, predefined_regressors=None
+            )
+
+        if X is not None:
+            self._n_inputs = _num_features(X)
+        else:
+            self._n_inputs = 1  # just to create the regressor space base
+
+        self.regressor_code = self.regressor_space(
+            self.non_degree, self.xlag, self.ylag, self._n_inputs, self.model_type
+        )
+        y_full = y.copy()
+        y = y[self.max_lag :].reshape(-1, 1)
+        self.tol = 0
+        ksg_estimation = []
+        for i in range(self.n_perm):
+            mutual_information_output = getattr(
+                self, self.mutual_information_estimator
+            )(y, self.rng.permutation(y))
+            ksg_estimation.append(mutual_information_output)
+
+        ksg_estimation = np.array(ksg_estimation).reshape(-1, 1)
+        self.tol = np.quantile(ksg_estimation, self.q)
+        self.estimated_tolerance = self.tol
+        success = False
+        if not self.skip_forward:
+            selected_terms, success = self.entropic_regression_forward(reg_matrix, y)
+
+        if not success or self.skip_forward:
+            selected_terms = np.array(list(range(reg_matrix.shape[1])))
+
+        selected_terms_backward = self.entropic_regression_backward(
+            reg_matrix[:, selected_terms], y, list(range(len(selected_terms)))
+        )
+
+        final_model = selected_terms[selected_terms_backward]
+        # re-check for the constant term (add it to the estimated indices)
+        if 0 not in final_model:
+            final_model = np.array([0, *final_model])
+
+        if self.basis_function.__class__.__name__ == "Polynomial":
+            self.final_model = self.regressor_code[final_model, :].copy()
+        elif self.basis_function.__class__.__name__ != "Polynomial" and self.ensemble:
+            basis_code = np.sort(
+                np.tile(
+                    self.regressor_code[1:, :], (self.basis_function.repetition, 1)
+                ),
+                axis=0,
+            )
+            self.regressor_code = np.concatenate([self.regressor_code[1:], basis_code])
+            self.final_model = self.regressor_code[final_model, :].copy()
+        else:
+            self.regressor_code = np.sort(
+                np.tile(
+                    self.regressor_code[1:, :], (self.basis_function.repetition, 1)
+                ),
+                axis=0,
+            )
+            self.final_model = self.regressor_code[final_model, :].copy()
+
+        self.theta = getattr(self, self.estimator)(reg_matrix[:, final_model], y_full)
+        if (np.abs(self.theta[0]) < self.h) and (
+            np.sum((self.theta != 0).astype(int)) > 1
+        ):
+            self.theta = self.theta[1:].reshape(-1, 1)
+            self.final_model = self.final_model[1:, :]
+            final_model = final_model[1:]
+
+        self.n_terms = len(
+            self.theta
+        )  # the number of terms we selected (necessary in the 'results' methods)
+        self.err = self.n_terms * [
+            0
+        ]  # just to use the `results` method. Will be changed in next update.
+        self.pivv = final_model
+        return self
