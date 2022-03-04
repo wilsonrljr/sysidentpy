@@ -85,3 +85,8 @@ def test_validate_xlag():
 def test_k():
     assert_raises(ValueError, ER, k=-1, basis_function=Polynomial(degree=2))
     assert_raises(ValueError, ER, k=1.3, basis_function=Polynomial(degree=2))
+
+
+def test_n_perm():
+    assert_raises(ValueError, ER, n_perm=-1, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, ER, n_perm=1.3, basis_function=Polynomial(degree=2))
