@@ -407,3 +407,73 @@ class ER(
                 stop_criteria = True
 
         return selected_terms, success
+
+    def conditional_mutual_information(self, y, f1, f2):
+        """Finds the conditional mutual information.
+        Finds the conditioned mutual information between :math:`y` and :math:`f1` given :math:`f2`.
+
+        This code is based on Matlab Entropic Regression package.
+        https://github.com/almomaa/ERFit-Package
+
+        Parameters
+        ----------
+        y : ndarray of floats
+            The source signal.
+        f1 : ndarray of floats
+            The destination signal.
+        f2 : ndarray of floats
+            The condition set.
+
+        Returns
+        -------
+        vp_estimation : float
+            The conditioned mutual information.
+
+        References
+        ----------
+        .. [1] Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
+            Regression Beats the Outliers Problem in Nonlinear System
+            Identification. Chaos 30, 013107 (2020).
+        .. [2] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+            Estimating mutual information. Physical Review E, 69:066-138,2004
+        .. [3] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+            Estimating mutual information. Physical Review E, 69:066-138,2004
+        .. [4] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+            Estimating mutual information. Physical Review E, 69:066-138,2004
+
+        """
+        joint_space = np.concatenate([y, f1, f2], axis=1)
+        smallest_distance = np.sort(
+            cdist(joint_space, joint_space, "minkowski", p=self.p).T
+        )
+        idx = np.argpartition(smallest_distance[-1, :], self.k + 1)[: self.k + 1]
+        smallest_distance = smallest_distance[:, idx]
+        epsilon = smallest_distance[:, -1].reshape(-1, 1)
+        # Find number of points from (y,f2), (f1,f2), and (f2,f2) that lies withing the
+        # k^{th} nearest neighbor distance from each point of themself.
+        smallest_distance_y_f2 = cdist(
+            np.concatenate([y, f2], axis=1),
+            np.concatenate([y, f2], axis=1),
+            "minkowski",
+            p=self.p,
+        )
+        less_than_array_y_f2 = np.array((smallest_distance_y_f2 < epsilon)).astype(int)
+        y_f2 = (np.sum(less_than_array_y_f2, axis=1) - 1).reshape(-1, 1)
+
+        smallest_distance_f1_f2 = cdist(
+            np.concatenate([f1, f2], axis=1),
+            np.concatenate([f1, f2], axis=1),
+            "minkowski",
+            p=self.p,
+        )
+        less_than_array_f1_f2 = np.array((smallest_distance_f1_f2 < epsilon)).astype(
+            int
+        )
+        f1_f2 = (np.sum(less_than_array_f1_f2, axis=1) - 1).reshape(-1, 1)
+
+        smallest_distance_f2 = cdist(f2, f2, "minkowski", p=self.p)
+        less_than_array_f2 = np.array((smallest_distance_f2 < epsilon)).astype(int)
+        f2_f2 = (np.sum(less_than_array_f2, axis=1) - 1).reshape(-1, 1)
+        arr = psi(y_f2 + 1) + psi(f1_f2 + 1) - psi(f2_f2 + 1)
+        vp_estimation = psi(self.k) - np.nanmean(arr[np.isfinite(arr)])
+        return vp_estimation
