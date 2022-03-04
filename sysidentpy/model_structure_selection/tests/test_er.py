@@ -180,3 +180,17 @@ def test_conditional_mutual_information_knn():
 
     r = model.conditional_mutual_information(x, y, z)
     assert_almost_equal(r, 0.2, decimal=3)
+
+
+def test_tolerance_estimator():
+    basis_function = Polynomial(degree=1)
+    model = ER(
+        ylag=2,
+        xlag=2,
+        estimator="least_squares",
+        basis_function=basis_function,
+        random_state=42,
+    )
+    x = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)
+    r = model.tolerance_estimator(x)
+    assert_almost_equal(r, 2.6833, decimal=4)
