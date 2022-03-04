@@ -90,3 +90,8 @@ def test_k():
 def test_n_perm():
     assert_raises(ValueError, ER, n_perm=-1, basis_function=Polynomial(degree=2))
     assert_raises(ValueError, ER, n_perm=1.3, basis_function=Polynomial(degree=2))
+
+
+def test_q():
+    assert_raises(ValueError, ER, q=-1, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, ER, q=1.3, basis_function=Polynomial(degree=2))
