@@ -95,3 +95,11 @@ def test_n_perm():
 def test_q():
     assert_raises(ValueError, ER, q=-1, basis_function=Polynomial(degree=2))
     assert_raises(ValueError, ER, q=1.3, basis_function=Polynomial(degree=2))
+
+
+def test_skip_forward():
+    assert_raises(TypeError, ER, skip_forward=1, basis_function=Polynomial(degree=2))
+    assert_raises(
+        TypeError, ER, skip_forward="True", basis_function=Polynomial(degree=2)
+    )
+    assert_raises(TypeError, ER, skip_forward=None, basis_function=Polynomial(degree=2))
