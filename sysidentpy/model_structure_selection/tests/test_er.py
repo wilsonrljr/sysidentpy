@@ -164,3 +164,19 @@ def test_mutual_information_knn():
 
     r = model.mutual_information_knn(x, y)
     assert_almost_equal(r, 0.6000, decimal=3)
+
+
+def test_conditional_mutual_information_knn():
+    basis_function = Polynomial(degree=1)
+    model = ER(
+        ylag=2,
+        xlag=2,
+        estimator="least_squares",
+        basis_function=basis_function,
+    )
+    x = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)
+    y = np.array([0.3, 0.87, 0, 0.1, 0.9]).reshape(-1, 1)
+    z = np.array([90, 12, 212, 13, 15]).reshape(-1, 1)
+
+    r = model.conditional_mutual_information(x, y, z)
+    assert_almost_equal(r, 0.2, decimal=3)
