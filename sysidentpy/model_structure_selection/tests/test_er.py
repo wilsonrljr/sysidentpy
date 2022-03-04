@@ -80,3 +80,8 @@ def test_validate_ylag():
 def test_validate_xlag():
     assert_raises(ValueError, ER, xlag=-1, basis_function=Polynomial(degree=2))
     assert_raises(ValueError, ER, xlag=1.3, basis_function=Polynomial(degree=2))
+
+
+def test_k():
+    assert_raises(ValueError, ER, k=-1, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, ER, k=1.3, basis_function=Polynomial(degree=2))
