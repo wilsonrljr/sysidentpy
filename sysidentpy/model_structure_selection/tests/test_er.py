@@ -149,3 +149,18 @@ def test_model_prediction():
     )
     model.fit(X=X_train, y=y_train)
     assert_raises(Exception, model.predict, X=X_test, y=y_test[:1])
+
+
+def test_mutual_information_knn():
+    basis_function = Polynomial(degree=1)
+    model = ER(
+        ylag=2,
+        xlag=2,
+        estimator="least_squares",
+        basis_function=basis_function,
+    )
+    x = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)
+    y = np.array([0.3, 0.87, 0, 0.1, 0.9]).reshape(-1, 1)
+
+    r = model.mutual_information_knn(x, y)
+    assert_almost_equal(r, 0.6000, decimal=3)
