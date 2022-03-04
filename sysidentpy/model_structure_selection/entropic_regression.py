@@ -4,6 +4,8 @@
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
 
+import warnings
+
 import numpy as np
 from numpy import linalg as LA
 from scipy.spatial.distance import cdist
@@ -20,8 +22,8 @@ from ..parameter_estimation.estimators import Estimators
 from ..utils._check_arrays import (
     _check_positive_int,
     _num_features,
-    check_X_y,
     check_random_state,
+    check_X_y,
 )
 
 
@@ -590,6 +592,17 @@ class ER(
         self.regressor_code = self.regressor_space(
             self.non_degree, self.xlag, self.ylag, self._n_inputs, self.model_type
         )
+
+        if self.regressor_code.shape[0] > 90:
+            warnings.warn(
+                (
+                    f"Given the higher number of possible regressors ({self.regressor_code.shape[0]}), "
+                    "the Entropic Regression algorithm may take long time to run. "
+                    "Consider reducing the number of regressors "
+                ),
+                stacklevel=2,
+            )
+
         y_full = y.copy()
         y = y[self.max_lag :].reshape(-1, 1)
         self.tol = 0
