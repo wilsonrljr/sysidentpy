@@ -103,3 +103,21 @@ def test_skip_forward():
         TypeError, ER, skip_forward="True", basis_function=Polynomial(degree=2)
     )
     assert_raises(TypeError, ER, skip_forward=None, basis_function=Polynomial(degree=2))
+
+
+def test_extended_least_squares():
+    assert_raises(
+        TypeError, ER, extended_least_squares=1, basis_function=Polynomial(degree=2)
+    )
+    assert_raises(
+        TypeError,
+        ER,
+        extended_least_squares="True",
+        basis_function=Polynomial(degree=2),
+    )
+    assert_raises(
+        TypeError,
+        ER,
+        extended_least_squares=None,
+        basis_function=Polynomial(degree=2),
+    )
