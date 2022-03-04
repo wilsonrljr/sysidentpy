@@ -249,7 +249,7 @@ class BPSOGSA:
                     ] * (
                         population[:, maximum_value_index[j]] - population[:, i]
                     ) / (
-                        euclidian_distance ** self._power + np.finfo(np.float64).eps
+                        euclidian_distance**self._power + np.finfo(np.float64).eps
                     )
 
         acceleration = gravitational_force * gravitational_constant
@@ -282,8 +282,8 @@ class BPSOGSA:
         population : ndarray of zeros and ones
             The updated population defined by the agents.
         """
-        c_factor_local_best = -2 * ((iteration ** 3) / (self.maxiter ** 3)) + 2
-        c_factor_global_best = 2 * ((iteration ** 3) / (self.maxiter ** 3)) + 2
+        c_factor_local_best = -2 * ((iteration**3) / (self.maxiter**3)) + 2
+        c_factor_global_best = 2 * ((iteration**3) / (self.maxiter**3)) + 2
         global_best = np.repeat(self.optimal_model, self.n_agents, axis=0).reshape(
             self.dimension, self.n_agents
         )
