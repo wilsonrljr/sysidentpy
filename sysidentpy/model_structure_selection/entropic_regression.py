@@ -283,3 +283,43 @@ class ER(
             psi(self.k) + psi(y.shape[0]) - np.nanmean(arr[np.isfinite(arr)])
         )
         return ksg_estimation
+
+    def entropic_regression_backward(self, reg_matrix, y, piv):
+        """Entropic Regression Backward Greedy Feature Elimination.
+
+        This algorithm is based on the Matlab package available on:
+        https://github.com/almomaa/ERFit-Package
+
+        Parameters
+        ----------
+        reg_matrix : ndarray of floats
+            The input data to be used in the prediction process.
+        y : ndarray of floats
+            The output data to be used in the prediction process.
+        piv : ndarray of ints
+            The set of indices to investigate
+
+        Returns
+        -------
+        piv : ndarray of ints
+            The set of remaining indices after the
+            Backward Greedy Feature Elimination.
+
+        """
+        min_value = -np.inf
+        piv = np.array(piv)
+        ix = []
+        while (min_value <= self.tol) and (len(piv) > 1):
+            initial_array = np.full((1, len(piv)), np.inf)
+            for i in range(initial_array.shape[1]):
+                if piv[i] not in []:  # if you want to keep any regressor
+                    rem = np.setdiff1d(piv, piv[i])
+                    f1 = reg_matrix[:, piv] @ LA.pinv(reg_matrix[:, piv]) @ y
+                    f2 = reg_matrix[:, rem] @ LA.pinv(reg_matrix[:, rem]) @ y
+                    initial_array[0, i] = self.conditional_mutual_information(y, f1, f2)
+
+            ix = np.argmin(initial_array)
+            min_value = initial_array[0, ix]
+            piv = np.delete(piv, ix)
+
+        return piv
