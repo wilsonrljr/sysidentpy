@@ -121,3 +121,31 @@ def test_extended_least_squares():
         extended_least_squares=None,
         basis_function=Polynomial(degree=2),
     )
+
+
+def test_model_prediction():
+    x, y, theta = create_test_data()
+    basis_function = Polynomial(degree=2)
+    train_percentage = 90
+    split_data = int(len(x) * (train_percentage / 100))
+
+    X_train = x[0:split_data, 0]
+    X_test = x[split_data::, 0]
+
+    y1 = y[0:split_data, 0]
+    y_test = y[split_data::, 0]
+    y_train = y1.copy()
+
+    y_train = np.reshape(y_train, (len(y_train), 1))
+    X_train = np.reshape(X_train, (len(X_train), 1))
+
+    y_test = np.reshape(y_test, (len(y_test), 1))
+    X_test = np.reshape(X_test, (len(X_test), 1))
+    model = ER(
+        ylag=2,
+        xlag=2,
+        estimator="least_squares",
+        basis_function=basis_function,
+    )
+    model.fit(X=X_train, y=y_train)
+    assert_raises(Exception, model.predict, X=X_test, y=y_test[:1])
