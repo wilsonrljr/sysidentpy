@@ -655,3 +655,48 @@ class ER(
         ]  # just to use the `results` method. Will be changed in next update.
         self.pivv = final_model
         return self
+
+    def predict(self, X=None, y=None, steps_ahead=None, forecast_horizon=None):
+        """Return the predicted values given an input.
+
+        The predict function allows a friendly usage by the user.
+        Given a previously trained model, predict values given
+        a new set of data.
+
+        Parameters
+        ----------
+        X : ndarray of floats
+            The input data to be used in the prediction process.
+        y : ndarray of floats
+            The output data to be used in the prediction process.
+        steps_ahead : int (default = None)
+            The user can use free run simulation, one-step ahead prediction
+            and n-step ahead prediction.
+        forecast_horizon : int, default=None
+            The number of predictions over the time.
+
+        Returns
+        -------
+        yhat : ndarray of floats
+            The predicted values of the model.
+
+        """
+        if self.basis_function.__class__.__name__ == "Polynomial":
+            if steps_ahead is None:
+                return self._model_prediction(X, y, forecast_horizon=forecast_horizon)
+            elif steps_ahead == 1:
+                return self._one_step_ahead_prediction(X, y)
+            else:
+                _check_positive_int(steps_ahead, "steps_ahead")
+                return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
+        else:
+            if steps_ahead is None:
+                return self._basis_function_predict(
+                    X, y, self.theta, forecast_horizon=forecast_horizon
+                )
+            elif steps_ahead == 1:
+                return self._one_step_ahead_prediction(X, y)
+            else:
+                return self.basis_function_n_step_prediction(
+                    X, y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
+                )
