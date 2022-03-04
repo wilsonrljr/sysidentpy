@@ -70,3 +70,8 @@ def test_default_values():
         model.random_state,
     ]
     assert list(default.values()) == model_values
+
+
+def test_validate_ylag():
+    assert_raises(ValueError, ER, ylag=-1, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, ER, ylag=1.3, basis_function=Polynomial(degree=2))
