@@ -323,3 +323,87 @@ class ER(
             piv = np.delete(piv, ix)
 
         return piv
+
+    def entropic_regression_forward(self, reg_matrix, y):
+        """Entropic Regression Forward Greedy Feature Selection.
+
+        This algorithm is based on the Matlab package available on:
+        https://github.com/almomaa/ERFit-Package
+
+        Parameters
+        ----------
+        reg_matrix : ndarray of floats
+            The input data to be used in the prediction process.
+        y : ndarray of floats
+            The output data to be used in the prediction process.
+
+        Returns
+        -------
+        selected_terms : ndarray of ints
+            The set of selected regressors after the
+            Forward Greedy Feature Selection.
+        success : boolean
+            Indicate if the forward selection succeed.
+            If high degree of uncertainty is detected, and many parameters are
+            selected, the success flag will be set to false. Then, the
+            backward elimination will be applied for all indices.
+
+        """
+        success = True
+        ix = []
+        selected_terms = []
+        reg_matrix_columns = np.array(list(range(reg_matrix.shape[1])))
+        self.tol = self.tolerance_estimator(y)
+        ksg_max = getattr(self, self.mutual_information_estimator)(
+            y, reg_matrix @ LA.pinv(reg_matrix) @ y
+        )
+        stop_criteria = False
+        while stop_criteria is False:
+            selected_terms = np.ravel(
+                [*selected_terms, *np.array([reg_matrix_columns[ix]])]
+            )
+            if len(selected_terms) != 0:
+                ksg_local = getattr(self, self.mutual_information_estimator)(
+                    y,
+                    reg_matrix[:, selected_terms]
+                    @ LA.pinv(reg_matrix[:, selected_terms])
+                    @ y,
+                )
+            else:
+                ksg_local = getattr(self, self.mutual_information_estimator)(
+                    y, np.zeros_like(y)
+                )
+
+            initial_vector = np.full((1, reg_matrix.shape[1]), -np.inf)
+            for i in range(reg_matrix.shape[1]):
+                if reg_matrix_columns[i] not in selected_terms:
+                    f1 = (
+                        reg_matrix[:, [*selected_terms, reg_matrix_columns[i]]]
+                        @ LA.pinv(
+                            reg_matrix[:, [*selected_terms, reg_matrix_columns[i]]]
+                        )
+                        @ y
+                    )
+                    if len(selected_terms) != 0:
+                        f2 = (
+                            reg_matrix[:, selected_terms]
+                            @ LA.pinv(reg_matrix[:, selected_terms])
+                            @ y
+                        )
+                    else:
+                        f2 = np.zeros_like(y)
+                    vp_estimation = self.conditional_mutual_information(y, f1, f2)
+                    initial_vector[0, i] = vp_estimation
+                else:
+                    continue
+
+            ix = np.nanargmax(initial_vector)
+            max_value = initial_vector[0, ix]
+
+            if (ksg_max - ksg_local <= self.tol) or (max_value <= self.tol):
+                stop_criteria = True
+            elif len(selected_terms) > np.max([8, reg_matrix.shape[1] / 2]):
+                success = False
+                stop_criteria = True
+
+        return selected_terms, success
