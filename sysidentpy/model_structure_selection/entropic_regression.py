@@ -234,3 +234,52 @@ class ER(
             raise ValueError(
                 "model_type must be NARMAX, NAR or NFIR. Got %s" % self.model_type
             )
+
+    def mutual_information_knn(self, y, y_perm):
+        """Finds the mutual information.
+        Finds the mutual information between :math:`x` and :math:`y` given :math:`z`.
+
+        This code is based on Matlab Entropic Regression package.
+
+        Parameters
+        ----------
+        y : ndarray of floats
+            The source signal.
+        y_perm : ndarray of floats
+            The destination signal.
+
+        Returns
+        -------
+        ksg_estimation : float
+            The conditioned mutual information.
+
+        References
+        ----------
+        .. [1] Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
+            Regression Beats the Outliers Problem in Nonlinear System
+            Identification. Chaos 30, 013107 (2020).
+        .. [2] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+            Estimating mutual information. Physical Review E, 69:066-138,2004
+        .. [3] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+            Estimating mutual information. Physical Review E, 69:066-138,2004
+        .. [4] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+            Estimating mutual information. Physical Review E, 69:066-138,2004
+        """
+        joint_space = np.concatenate([y, y_perm], axis=1)
+        smallest_distance = np.sort(
+            cdist(joint_space, joint_space, "minkowski", p=self.p).T
+        )
+        idx = np.argpartition(smallest_distance[-1, :], self.k + 1)[: self.k + 1]
+        smallest_distance = smallest_distance[:, idx]
+        epsilon = smallest_distance[:, -1].reshape(-1, 1)
+        smallest_distance_y = cdist(y, y, "minkowski", p=self.p)
+        less_than_array_nx = np.array((smallest_distance_y < epsilon)).astype(int)
+        nx = (np.sum(less_than_array_nx, axis=1) - 1).reshape(-1, 1)
+        smallest_distance_y_perm = cdist(y_perm, y_perm, "minkowski", p=self.p)
+        less_than_array_ny = np.array((smallest_distance_y_perm < epsilon)).astype(int)
+        ny = (np.sum(less_than_array_ny, axis=1) - 1).reshape(-1, 1)
+        arr = psi(nx + 1) + psi(ny + 1)
+        ksg_estimation = (
+            psi(self.k) + psi(y.shape[0]) - np.nanmean(arr[np.isfinite(arr)])
+        )
+        return ksg_estimation
