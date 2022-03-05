@@ -303,7 +303,7 @@
   </ul>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="../changelog/v0.1.8.html">
+  <a class="reference internal" href="../changelog/v0.1.9.html">
    Changes in SysIdentPy
   </a>
  </li>
@@ -534,14 +534,14 @@
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: sysidentpy in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (0.1.6)Note: you may need to restart the kernel to use updated packages.
-Requirement already satisfied: numpy&gt;=1.19.2 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from sysidentpy) (1.20.3)
 Requirement already satisfied: matplotlib&gt;=3.3.2 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from sysidentpy) (3.4.3)
 Requirement already satisfied: scipy&gt;=1.7.0 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from sysidentpy) (1.7.1)
-Requirement already satisfied: kiwisolver&gt;=1.0.1 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (1.3.2)
-Requirement already satisfied: cycler&gt;=0.10 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (0.10.0)
-Requirement already satisfied: python-dateutil&gt;=2.7 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (2.8.2)
+Requirement already satisfied: numpy&gt;=1.19.2 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from sysidentpy) (1.20.3)
 Requirement already satisfied: pyparsing&gt;=2.2.1 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (2.4.7)
 Requirement already satisfied: pillow&gt;=6.2.0 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (8.3.2)
+Requirement already satisfied: cycler&gt;=0.10 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (0.10.0)
+Requirement already satisfied: python-dateutil&gt;=2.7 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (2.8.2)
+Requirement already satisfied: kiwisolver&gt;=1.0.1 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (1.3.2)
 Requirement already satisfied: six in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from cycler&gt;=0.10-&gt;matplotlib&gt;=3.3.2-&gt;sysidentpy) (1.16.0)
 </pre></div>
 </div>
@@ -610,7 +610,7 @@ Requirement already satisfied: six in c:\users\wilso\miniconda3\envs\sysidentpy\
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;sysidentpy.polynomial_basis.narmax.PolynomialNarmax at 0x1cc771b3fa0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;sysidentpy.polynomial_basis.narmax.PolynomialNarmax at 0x1fdcb073c70&gt;
 </pre></div>
 </div>
 </div>
@@ -638,7 +638,7 @@ Requirement already satisfied: six in c:\users\wilso\miniconda3\envs\sysidentpy\
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0017732752223333062
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0019108040114135909
 </pre></div>
 </div>
 </div>
@@ -656,12 +656,10 @@ Requirement already satisfied: six in c:\users\wilso\miniconda3\envs\sysidentpy\
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>       Regressors Parameters         ERR
-0         x1(k-2)     0.9000  0.95690372
-1          y(k-1)     0.2000  0.03970782
-2   x1(k-1)y(k-1)     0.1002  0.00338530
-3  x1(k-2)x1(k-1)    -0.0002  0.00000002
-4        y(k-2)^2    -0.0002  0.00000001
-5         x1(k-1)     0.0001  0.00000001
+0         x1(k-2)     0.9000  0.95519316
+1          y(k-1)     0.2000  0.04156217
+2   x1(k-1)y(k-1)     0.0999  0.00324087
+3  x1(k-2)x1(k-1)     0.0002  0.00000002
 </pre></div>
 </div>
 </div>
@@ -777,12 +775,12 @@ see <a class="reference external" href="https://myst-parser.readthedocs.io/">the
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>rrse:  0.0018089838872002789
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>rrse:  0.0019134586564929074
 
        Regressors Parameters         ERR
-0        x1(k-2)     0.9000  0.95690372
-1         y(k-1)     0.2000  0.03970782
-2  x1(k-1)y(k-1)     0.1002  0.00338530
+0        x1(k-2)     0.9000  0.95519316
+1         y(k-1)     0.2000  0.04156217
+2  x1(k-1)y(k-1)     0.0999  0.00324087
 </pre></div>
 </div>
 </div>
@@ -826,14 +824,14 @@ see <a class="reference external" href="https://myst-parser.readthedocs.io/">the
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[0.95690372 0.03970782 0.0033853  0.         0.         0.
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[0.95519316 0.04156217 0.00324087 0.         0.         0.
  0.         0.         0.         0.         0.         0.
  0.         0.         0.        ] 
 
 
-[[0.90004547]
- [0.19995732]
- [0.10023315]]
+[[0.90000197]
+ [0.20002948]
+ [0.09989095]]
 </pre></div>
 </div>
 </div>
