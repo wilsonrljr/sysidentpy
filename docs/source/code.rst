@@ -20,6 +20,11 @@ sysidentpy metamss
 .. automodule:: sysidentpy.model_structure_selection.MetaMSS
    :members:
 
+sysidentpy er
+=============
+.. automodule:: sysidentpy.model_structure_selection.ER
+   :members:
+
 sysidentpy simulation
 =====================
 .. automodule:: sysidentpy.simulation._simulation
