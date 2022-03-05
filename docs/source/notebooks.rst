@@ -69,6 +69,12 @@ Examples
 
 .. toctree::
    :maxdepth: 1
+   :caption: Entropic Regression algorithm
+
+   /examples/entropic_regression.ipynb
+
+.. toctree::
+   :maxdepth: 1
    :caption: F-16 aircraft
 
    /examples/f_16_benchmark.ipynb
