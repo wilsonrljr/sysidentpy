@@ -89,6 +89,11 @@ sysidentpy display results
 .. automodule:: sysidentpy.utils.display_results
    :members:
 
+sysidentpy save_load
+====================
+.. automodule:: sysidentpy.utils.save_load
+   :members:
+
 Indices and tables
 ==================
 
