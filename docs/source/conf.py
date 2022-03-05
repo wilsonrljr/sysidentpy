@@ -14,42 +14,44 @@
 # import sphinx_book_theme
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../../'))
+
+sys.path.insert(0, os.path.abspath("../../"))
 # sys.setrecursionlimit(1500)
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'sysidentpy'
-copyright = '2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins'
-author = 'Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins'
+project = "sysidentpy"
+copyright = "2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins"
+author = "Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins"
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.7'
+release = "0.1.9"
 
 autodoc_member_order = "bysource"
 add_function_parentheses = True
 add_module_names = True
 
-extensions = ['myst_nb',
-              'sphinx.ext.autodoc',
-              'sphinx.ext.viewcode',
-              'sphinx.ext.napoleon',
-              "sphinx.ext.todo",
-              'sphinx.ext.mathjax',
-              # 'nbsphinx',
-              'sphinx.ext.intersphinx',
-              'IPython.sphinxext.ipython_console_highlighting',
-              'sphinx.ext.githubpages',
-              'sphinx_copybutton',
-              'sphinx_togglebutton',
-              # "ablog",
-              ]
+extensions = [
+    "myst_nb",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.todo",
+    "sphinx.ext.mathjax",
+    # 'nbsphinx',
+    "sphinx.ext.intersphinx",
+    "IPython.sphinxext.ipython_console_highlighting",
+    "sphinx.ext.githubpages",
+    "sphinx_copybutton",
+    "sphinx_togglebutton",
+    # "ablog",
+]
 
 source_suffix = {
-    '.rst': 'restructuredtext',
-    '.ipynb': 'myst-nb',
-    '.myst': 'myst-nb',
+    ".rst": "restructuredtext",
+    ".ipynb": "myst-nb",
+    ".myst": "myst-nb",
 }
 
 master_doc = "index"
@@ -63,20 +65,18 @@ napoleon_google_docstring = False
 
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
-    'papersize': 'letterpaper',
-
+    "papersize": "letterpaper",
     # The font size ('10pt', '11pt' or '12pt').
-    'pointsize': '11pt',
-
+    "pointsize": "11pt",
     # Additional stuff for the LaTeX preamble.
-    'preamble': r'''
+    "preamble": r"""
         \usepackage{charter}
         % \usepackage[defaultsans]{lato}
         % \usepackage{inconsolata}
-    ''',
+    """,
 }
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -111,6 +111,6 @@ html_theme_options = {
     "path_to_docs": "docs",
     "launch_buttons": {
         "colab_url": "https://colab.research.google.com",
-        "notebook_interface": "jupyterlab"
+        "notebook_interface": "jupyterlab",
     },
 }

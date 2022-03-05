@@ -1,15 +1,16 @@
-from sysidentpy.utils._check_arrays import (
-    check_length,
-    check_dimension,
-    check_infinity,
-    check_nan,
-    check_X_y,
-    _check_positive_int,
-    _num_features,
-)
-from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
 import numpy as np
 from numpy.testing import assert_equal, assert_raises
+from sysidentpy.utils._check_arrays import (
+    _check_positive_int,
+    _num_features,
+    check_dimension,
+    check_infinity,
+    check_length,
+    check_nan,
+    check_X_y,
+)
+from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
+from sysidentpy.utils.save_load import load_model, save_model
 
 
 def test_check_positive_int():
@@ -81,3 +82,15 @@ def test_get_miso_data():
     assert len(y_valid) == 100
     assert x_train.shape[1] == 2
     assert y_train.shape[1] == 1
+
+
+def test_save_model():
+    assert_raises(TypeError, save_model, path=1)
+    assert_raises(TypeError, save_model, path=False)
+    assert_raises(TypeError, save_model, model=None)
+
+
+def test_load_model():
+    assert_raises(TypeError, load_model, path=1)
+    assert_raises(TypeError, load_model, path=False)
+    assert_raises(TypeError, load_model, model=None)

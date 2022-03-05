@@ -2,6 +2,50 @@
 File for tracking changes in SysIdentPy
 --------------------------------------------------------------------------------------------------------------
 
+Changes in SysIdentPy
+=====================
+
+v0.1.9
+------
+
+CONTRIBUTORS
+~~~~~~~~~~~~
+
+- wilsonrljr
+- samirmartins
+
+CHANGES
+~~~~~~~
+- The update **v0.1.9**  has been released with additional feature, minor API changes and fixes of the new features added in v0.1.7. 
+
+- MAJOR: Entropic Regression Algorithm
+    - Added the new class ER to build NARX models using the Entropic Regression algorithm.
+    - Only the Mutual Information KNN is implemented in this version and it may take too long to run on a high number of regressor, so the user should be careful regarding the number of candidates to put in the model.
+
+- API: save_load
+    - Added a function to save and load models from file.
+
+- API: Added tests for python 3.9
+
+- Fix : Change condition for n_info_values in FROLS. Now the value defined by the user is compared against X matrix shape instead of regressor space shape. This fix the Fourier basis function usage with more the 15 regressors in FROLS.
+
+- DOC: Save and Load models
+    - Added a notebook showing how to use the save_load method.
+
+- DOC: Entropic Regression example 
+    - Added notebook with a simple example of how to use AOLS
+
+- DOC: Fourier Basis Function Example 
+    - Added notebook with a simple example of how to use Fourier Basis Function
+
+- DOC: PV forecasting benchmark
+    - FIX AOLS prediction. The example was using the meta_mss model in prediction, so the results for AOLS were wrong.
+
+- DOC: Fixed minor grammatical and spelling mistakes.
+
+- DOC: Fix issues related to html on Jupyter notebooks examples on documentation.
+
+
 v0.1.8
 ------
 

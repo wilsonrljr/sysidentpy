@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Building NARX Neural Network using Sysidentpy &#8212; NARMAX models</title>
     
-  <link href="../_static/css/theme.css" rel="stylesheet" />
-  <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+  <link href="../_static/css/theme.css" rel="stylesheet">
+  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -23,12 +23,12 @@
 
     
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-book-theme.css?digest=c3fdc42140077d1ad13ad2f1588a4309" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-book-theme.css?digest=84ace793992934648b4de8eed757e5a2" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.1c5a1a01449ed65a7b51.js">
+  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -38,7 +38,7 @@
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="../_static/sphinx-book-theme.9d8b4a8b9bb19db25eeaddc40d639ba2.js"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="canonical" href="http://sysidentpy.org/examples/narx_neural_network.html" />
@@ -47,7 +47,10 @@
     <link rel="next" title="Building NARX models using general estimators" href="general_estimators.html" />
     <link rel="prev" title="Example: F-16 Ground Vibration Test benchmark" href="f_16_benchmark.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
     
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
@@ -59,7 +62,12 @@
     <div class="container-xl">
       <div class="row">
           
-<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<div class="col-12 col-md-3 bd-sidebar site-navigation " id="site-navigation">
     
         <div class="navbar-brand-box">
     <a class="navbar-brand text-wrap" href="../index.html">
@@ -76,7 +84,7 @@
     </a>
 </div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Pesquise os documentos ..." aria-label="Pesquise os documentos ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item active">
         <ul class="current nav bd-sidenav">
@@ -136,6 +144,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="fourier_basis_function.html">
+     Fourier Basis Function
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="information_criteria_examples.html">
      Information Criteria - Examples
     </a>
@@ -163,6 +176,11 @@
    <li class="toctree-l2">
     <a class="reference internal" href="aols.html">
      Using the Accelerated Orthogonal Least-Squares algorithm for building Polynomial NARX models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="entropic_regression.html">
+     Identification of an electromechanical system using Entropic Regression
     </a>
    </li>
    <li class="toctree-l2">
@@ -285,7 +303,7 @@
   </ul>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="../changelog/v0.1.8.html">
+  <a class="reference internal" href="../changelog/v0.1.9.html">
    Changes in SysIdentPy
   </a>
  </li>
@@ -317,25 +335,25 @@
 
 
           
+<!-- This is an invisible pixel that we watch to see if we've scrolled. -->
+<div class="sbt-scroll-pixel-helper"></div>
 <main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
     
     <div class="topbar container-xl fixed-top">
     <div class="topbar-contents row">
         <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
         <div class="col pl-md-4 topbar-main">
-            
-            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
-                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
-                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
-                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
-                <i class="fas fa-bars"></i>
-                <i class="fas fa-arrow-left"></i>
-                <i class="fas fa-arrow-up"></i>
-            </button>
-            
+            <div class="topbar-left">
+                
+                <label class="nav-toggle-button" for="__navigation">
+                    <div class="visually-hidden">Alternar de navegação</div>
+                    <i class="fas fa-bars"></i>
+                </label>
+                
+            </div>
             
 <div class="dropdown-buttons-trigger">
-    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Baixe esta página"><i
             class="fas fa-download"></i></button>
 
     <div class="dropdown-buttons">
@@ -343,11 +361,11 @@
         
         <!-- Download raw file -->
         <a class="dropdown-buttons" href="../_sources/examples/narx_neural_network.ipynb.txt"><button type="button"
-                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                class="btn btn-secondary topbarbtn" title="Baixar arquivo fonte" data-toggle="tooltip"
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
-        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Imprimir em PDF"
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -359,23 +377,23 @@
     <div class="dropdown-buttons sourcebuttons">
         <a class="repository-button"
             href="https://github.com/wilsonrljr/sysidentpy/"><button type="button" class="btn btn-secondary topbarbtn"
-                data-toggle="tooltip" data-placement="left" title="Source repository"><i
-                    class="fab fa-github"></i>repository</button></a>
+                data-toggle="tooltip" data-placement="left" title="Repositório fonte"><i
+                    class="fab fa-github"></i>repositório</button></a>
         <a class="issues-button"
             href="https://github.com/wilsonrljr/sysidentpy//issues/new?title=Issue%20on%20page%20%2Fexamples/narx_neural_network.html&body=Your%20issue%20content%20here."><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
-                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+                title="Abra um problema"><i class="fas fa-lightbulb"></i>questão aberta</button></a>
         <a class="edit-button" href="https://github.com/wilsonrljr/sysidentpy/edit/master/docs/examples/narx_neural_network.ipynb"><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
-                title="Edit this page"><i class="fas fa-pencil-alt"></i>suggest edit</button></a>
+                title="Edite essa página"><i class="fas fa-pencil-alt"></i>sugerir edição</button></a>
     </div>
 </div>
 
             <!-- Full screen (wrap in <a> to have style consistency -->
 
 <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
-        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
-        title="Fullscreen mode"><i
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Modo tela cheia"
+        title="Modo tela cheia"><i
             class="fas fa-expand"></i></button></a>
 
             <!-- Launch buttons -->
@@ -388,9 +406,10 @@
         
         
         <a class="colab-button" href="https://colab.research.google.com/github/wilsonrljr/sysidentpy/blob/master/docs/examples/narx_neural_network.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
-                title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
+                title="Lançamento Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
                     src="../_static/images/logo_colab.png"
                     alt="Interact on Colab">Colab</button></a>
+        
         
         
     </div>
@@ -399,10 +418,10 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
             <div class="tocsection onthispage pt-5 pb-3">
-                <i class="fas fa-list"></i> Contents
+                <i class="fas fa-list"></i> Conteúdo
             </div>
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
@@ -454,7 +473,65 @@
 </div>
     <div id="main-content" class="row">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
-        
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Building NARX Neural Network using Sysidentpy</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Conteúdo </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#series-parallen-training-and-parallel-prediction">
+   Series-Parallen Training and Parallel prediction
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#building-a-narx-neural-network">
+   Building a NARX Neural Network
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#getting-the-data">
+   Getting the data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#choosing-the-narx-parameters-loss-function-and-optmizer">
+   Choosing the NARX parameters, loss function and optmizer
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#building-the-narx-neural-network">
+   Building the NARX Neural Network
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#numpy-array-to-tensor">
+   Numpy array to Tensor
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#fit-and-predict">
+   Fit and Predict
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#note">
+   Note
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            
               <div>
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="building-narx-neural-network-using-sysidentpy">
@@ -484,10 +561,10 @@ network training</a></p>
 Requirement already satisfied: matplotlib&gt;=3.3.2 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from sysidentpy) (3.4.3)
 Requirement already satisfied: scipy&gt;=1.7.0 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from sysidentpy) (1.7.1)
 Requirement already satisfied: numpy&gt;=1.19.2 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from sysidentpy) (1.20.3)
-Requirement already satisfied: python-dateutil&gt;=2.7 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (2.8.2)
-Requirement already satisfied: cycler&gt;=0.10 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (0.10.0)
-Requirement already satisfied: pillow&gt;=6.2.0 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (8.3.2)
 Requirement already satisfied: kiwisolver&gt;=1.0.1 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (1.3.2)
+Requirement already satisfied: pillow&gt;=6.2.0 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (8.3.2)
+Requirement already satisfied: cycler&gt;=0.10 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (0.10.0)
+Requirement already satisfied: python-dateutil&gt;=2.7 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (2.8.2)
 Requirement already satisfied: pyparsing&gt;=2.2.1 in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from matplotlib&gt;=3.3.2-&gt;sysidentpy) (2.4.7)
 Requirement already satisfied: six in c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages (from cycler&gt;=0.10-&gt;matplotlib&gt;=3.3.2-&gt;sysidentpy) (1.16.0)
 Note: you may need to restart the kernel to use updated packages.
@@ -619,604 +696,604 @@ Note: you may need to restart the kernel to use updated packages.
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.16806536382601076 | Validation metrics: 0.19143791511805372
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.158500081875868 | Validation metrics: 0.15204523563987077
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.04396688168807735 | Validation metrics: 0.05291818944041175
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.02290440334898786 | Validation metrics: 0.022254473332202797
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.018999136680909863 | Validation metrics: 0.019625746616811462
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0181103205322323 | Validation metrics: 0.018054702987123018
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.00973955181691058 | Validation metrics: 0.011352929766431
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.004258315417364726 | Validation metrics: 0.004328042456899026
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.00794094160110468 | Validation metrics: 0.01032234225045852
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.006136122591476094 | Validation metrics: 0.006244097427098137
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.005137437730467409 | Validation metrics: 0.006661770583102198
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0020210025692008493 | Validation metrics: 0.0022563112575109258
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.004405114736716102 | Validation metrics: 0.005433360401616253
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.002757198264808359 | Validation metrics: 0.0030287025388179706
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0033278282280115035 | Validation metrics: 0.004189286503301124
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0017172715505281637 | Validation metrics: 0.0019270943376621364
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0031792024812219957 | Validation metrics: 0.004398279494107372
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.001730692492655588 | Validation metrics: 0.0019292553776235441
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.002685105367120178 | Validation metrics: 0.003483336679919651
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0016337691066333824 | Validation metrics: 0.001850063838487999
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.002477162881149796 | Validation metrics: 0.003195261942561377
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0015514155019443472 | Validation metrics: 0.0017667755889094838
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0022668421223530906 | Validation metrics: 0.003088613221835759
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0015171460059231012 | Validation metrics: 0.00172228478671362
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.002087549311995861 | Validation metrics: 0.0027197964484756343
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0014941115019828977 | Validation metrics: 0.0016951040221340578
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0019387531562248493 | Validation metrics: 0.0025245971281570617
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0014578429844935325 | Validation metrics: 0.0016557742721598709
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0018047694925610955 | Validation metrics: 0.0023919838066730234
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0014306183214086974 | Validation metrics: 0.0016283725607067797
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0016937999840811791 | Validation metrics: 0.0021980560497578345
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0014068609352146549 | Validation metrics: 0.0015985819045454264
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0015963944335139 | Validation metrics: 0.002047549963768835
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0013788877388247684 | Validation metrics: 0.0015681489297856737
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0015026465527197452 | Validation metrics: 0.001939540688945639
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0013533661499115308 | Validation metrics: 0.0015399043631711693
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0014219466739224462 | Validation metrics: 0.0018108760693458595
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0013285949131833356 | Validation metrics: 0.0015123347220283867
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0013502024320995243 | Validation metrics: 0.0017000608607148282
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.001303066279830173 | Validation metrics: 0.0014838082821701062
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.001281261479833343 | Validation metrics: 0.0016031437141896046
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0012783440472418093 | Validation metrics: 0.0014565558786588636
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0012172459304346738 | Validation metrics: 0.0015077988553622906
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0012534219464683965 | Validation metrics: 0.0014290722037637324
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0011580369925712304 | Validation metrics: 0.0014218501805450129
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0012285929044269792 | Validation metrics: 0.0014018225906924768
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0011028099321074 | Validation metrics: 0.0013382973259954592
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0012038758892290538 | Validation metrics: 0.0013746359653658037
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0010508070565657434 | Validation metrics: 0.001260646965796824
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0011789402098775395 | Validation metrics: 0.0013474781157900438
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0010017021489154576 | Validation metrics: 0.0011876036749324864
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.001154012274041417 | Validation metrics: 0.001320307053663213
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0009556427967961046 | Validation metrics: 0.0011183543311845926
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0011289360455090278 | Validation metrics: 0.0012931197169095728
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0009129859323561995 | Validation metrics: 0.001053783763905592
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0011035989996811427 | Validation metrics: 0.0012657290308105975
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0008739300947788085 | Validation metrics: 0.0009934645912826362
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0010781188376999477 | Validation metrics: 0.0012383138363465968
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0008390102352256091 | Validation metrics: 0.0009382788710427856
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0010523160570592883 | Validation metrics: 0.00121065238232
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0008085266560640532 | Validation metrics: 0.0008885255248069462
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0010262486317141313 | Validation metrics: 0.0011828379820787696
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0007829209028119992 | Validation metrics: 0.0008447706873406365
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.000999844746540457 | Validation metrics: 0.0011547839309023035
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0007622455078104796 | Validation metrics: 0.0008073412846171796
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0009731159765474068 | Validation metrics: 0.001126519551340754
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0007461250246441772 | Validation metrics: 0.0007761061683090196
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:20 - INFO - Train metrics: 0.0009460455625969216 | Validation metrics: 0.0010980322799466625
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0007334773127925594 | Validation metrics: 0.0007504023431630975
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0009186413494477931 | Validation metrics: 0.0010693252187767865
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0007223450626307319 | Validation metrics: 0.0007286668182444768
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0008909294179250908 | Validation metrics: 0.001040434620032708
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.000710040292665269 | Validation metrics: 0.0007086822003445993
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0008629466306924689 | Validation metrics: 0.001011395224868649
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0006935876462419511 | Validation metrics: 0.0006878220375081656
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0008347570377677437 | Validation metrics: 0.0009822692637416449
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0006705832031303386 | Validation metrics: 0.0006639026146560833
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0008064392177425418 | Validation metrics: 0.000953131640503992
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0006402221338807099 | Validation metrics: 0.0006360281893814152
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0007781036041168155 | Validation metrics: 0.0009240833007627063
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0006039775039254918 | Validation metrics: 0.0006052230642355904
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0007498797408846629 | Validation metrics: 0.0008952419010150914
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0005654076182570561 | Validation metrics: 0.0005742111866541132
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.00072192458624375 | Validation metrics: 0.0008667487177217021
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0005289371372527329 | Validation metrics: 0.0005462999706100109
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0006944161050843267 | Validation metrics: 0.0008387601360528156
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0004980927699404234 | Validation metrics: 0.0005238023386666119
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0006675457717257933 | Validation metrics: 0.0008114404979895687
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0004741801520842209 | Validation metrics: 0.0005069396427992468
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0006415108055399175 | Validation metrics: 0.0007849553990356549
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0004561831443780627 | Validation metrics: 0.0004939413794099983
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0006164940140317462 | Validation metrics: 0.0007594476043566535
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.00044187412060094636 | Validation metrics: 0.00048228372546910034
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0005926454733277584 | Validation metrics: 0.0007350189409058805
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0004292757090333999 | Validation metrics: 0.00047017543957653373
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0005700562775419806 | Validation metrics: 0.0007117001164582266
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.00041742734395126276 | Validation metrics: 0.00045723689959920716
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0005487312282958444 | Validation metrics: 0.0006894241187091202
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.000406168837142282 | Validation metrics: 0.00044407057423012875
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0005285812360654704 | Validation metrics: 0.0006680130015475431
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0003955648114372577 | Validation metrics: 0.0004313900482351657
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0005094340120099092 | Validation metrics: 0.0006471942549317398
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0003856074255786108 | Validation metrics: 0.0004194889034172802
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0004910975340158588 | Validation metrics: 0.0006266698379991482
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0003761893277170888 | Validation metrics: 0.0004082127439558995
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.00047346731904021144 | Validation metrics: 0.0006062385327455521
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.000367183133231518 | Validation metrics: 0.0003972713399861911
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.00045665997752445965 | Validation metrics: 0.0005859550138032346
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0003585538259832268 | Validation metrics: 0.00038659100413717556
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0004410964347402283 | Validation metrics: 0.000566243733199445
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.00035035885897591096 | Validation metrics: 0.0003763399321487117
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.00042743615073473996 | Validation metrics: 0.0005478623277281947
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.00034263417033424934 | Validation metrics: 0.00036665353209081324
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0004163062216580978 | Validation metrics: 0.0005316473496607458
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.00033535009669023274 | Validation metrics: 0.00035749619175219025
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0004079050957347806 | Validation metrics: 0.000518103855699677
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.0003284660708054172 | Validation metrics: 0.0003487938874509336
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0004017203006097454 | Validation metrics: 0.0005070766054253761
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:18 - INFO - Train metrics: 0.00032197563746479575 | Validation metrics: 0.0003405610685039199
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.00039663291989970383 | Validation metrics: 0.0004977738982151178
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0003158814276838185 | Validation metrics: 0.00033283804988987144
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.00039143227255216946 | Validation metrics: 0.0004891916921931423
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0003101695738155115 | Validation metrics: 0.0003256125903613113
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.00038542939927125523 | Validation metrics: 0.0004806587457271161
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0003048215939063476 | Validation metrics: 0.0003188591540998055
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.00037869690025498377 | Validation metrics: 0.0004720703626376097
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00029982068694959905 | Validation metrics: 0.00031257243950456154
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.00037178946373036555 | Validation metrics: 0.0004636795093032597
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002951459564679398 | Validation metrics: 0.00030673643770495973
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0003652518503817223 | Validation metrics: 0.00045573454282030163
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002907782002792164 | Validation metrics: 0.0003013226222435031
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0003593157986931755 | Validation metrics: 0.00044830253517085856
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002867004446502084 | Validation metrics: 0.00029631170933370034
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0003539001549311673 | Validation metrics: 0.00044130516677125915
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002828918471535607 | Validation metrics: 0.0002916796844937095
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.00034877597888287407 | Validation metrics: 0.0004346218201769234
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00027933291872650533 | Validation metrics: 0.0002873969752920058
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.00034376963381340406 | Validation metrics: 0.0004281685572950113
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00027600661794571 | Validation metrics: 0.00028344171152290223
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.00033886560920467205 | Validation metrics: 0.0004219315961389003
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00027289557095499183 | Validation metrics: 0.0002797882632949775
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0003341482799059074 | Validation metrics: 0.0004159384280692485
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002699841836812838 | Validation metrics: 0.0002764131126553761
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.00032966477202104504 | Validation metrics: 0.0004101970951505607
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00026725824685407834 | Validation metrics: 0.00027329523781916557
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0003253811019773882 | Validation metrics: 0.0004046814783118816
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002647048293278532 | Validation metrics: 0.0002704161896036392
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0003212375815387087 | Validation metrics: 0.0003993510955949361
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002623123319132165 | Validation metrics: 0.00026775665041482586
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0003172169975763686 | Validation metrics: 0.0003941840000657572
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00026007000519427236 | Validation metrics: 0.0002653024167015283
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0003133329317320306 | Validation metrics: 0.00038917394351411724
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002579685918552647 | Validation metrics: 0.0002630384382556635
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0003095873540213663 | Validation metrics: 0.0003843220007238966
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002560000447235432 | Validation metrics: 0.00026095210165349823
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0003059633974981422 | Validation metrics: 0.0003796196622054347
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002541562128665607 | Validation metrics: 0.00025903340781841314
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0003024506038941798 | Validation metrics: 0.00037505667341515575
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00025243047975823004 | Validation metrics: 0.00025727059762699133
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.000299046648623081 | Validation metrics: 0.0003706233551245973
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00025081688538631353 | Validation metrics: 0.0002556569286918437
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0002957469495456843 | Validation metrics: 0.00036631396858755386
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002493100071382501 | Validation metrics: 0.0002541837615849958
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0002925449775568067 | Validation metrics: 0.000362123119600136
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00024790461515053117 | Validation metrics: 0.000252844152250092
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0002894368793530609 | Validation metrics: 0.0003580462126969125
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002465965035549461 | Validation metrics: 0.0002516325203951147
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0002864201456590796 | Validation metrics: 0.00035407930239799877
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002453811821921082 | Validation metrics: 0.0002505424355434235
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.00028348932749379364 | Validation metrics: 0.00035021649708858496
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00024425542538747527 | Validation metrics: 0.00024957026765361955
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.00028064167582170853 | Validation metrics: 0.0003464540526637751
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00024321539063306577 | Validation metrics: 0.0002487111599137536
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:21 - INFO - Train metrics: 0.0002778743488981358 | Validation metrics: 0.0003427883387881924
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002422578160021977 | Validation metrics: 0.00024796139320706705
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00027518334877583896 | Validation metrics: 0.0003392154308543964
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00024137997091368523 | Validation metrics: 0.00024731677423014937
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00027256666094456846 | Validation metrics: 0.00033573224326840254
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00024057884789877257 | Validation metrics: 0.0002467753903615768
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.0002700219452083531 | Validation metrics: 0.00033233509395469093
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023985213663120915 | Validation metrics: 0.0002463330782837037
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.0002675460876761597 | Validation metrics: 0.0003290217072289023
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023919706298347637 | Validation metrics: 0.0002459877986705514
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00026513701774539395 | Validation metrics: 0.00032578835456697927
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023861152546207203 | Validation metrics: 0.00024573670493231877
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.000262792585890292 | Validation metrics: 0.0003226328414225142
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023809398743580737 | Validation metrics: 0.00024557861792290527
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00026051040763913055 | Validation metrics: 0.00031955255580021804
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023764203230203842 | Validation metrics: 0.0002455104532242386
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00025828842748829484 | Validation metrics: 0.00031654442562909814
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023725346552983 | Validation metrics: 0.000245530990239308
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.0002561244298995736 | Validation metrics: 0.0003136061114315508
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002369274141866233 | Validation metrics: 0.0002456379368209816
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00025401723824667845 | Validation metrics: 0.00031073537574036783
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023666177783657406 | Validation metrics: 0.0002458297589916096
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00025196391326155895 | Validation metrics: 0.00030793002371516345
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023645524199314435 | Validation metrics: 0.00024610559421948936
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.0002499627920140729 | Validation metrics: 0.0003051868527586751
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023630646806248792 | Validation metrics: 0.00024646262237284746
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00024801224461677284 | Validation metrics: 0.0003025043712260973
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002362137932968174 | Validation metrics: 0.0002468997963017436
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00024611005429143464 | Validation metrics: 0.00029988026756774447
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023617481980309414 | Validation metrics: 0.00024741312642958055
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00024425401483641417 | Validation metrics: 0.00029731119396117977
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023618784719549427 | Validation metrics: 0.0002480009344354686
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00024244310127169753 | Validation metrics: 0.0002947965777370928
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023625067233593486 | Validation metrics: 0.0002486589726300515
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00024067474027890197 | Validation metrics: 0.0002923331119360007
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023635987227842126 | Validation metrics: 0.00024938184710341797
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00023894565815122374 | Validation metrics: 0.0002899182545293988
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023651110066858383 | Validation metrics: 0.00025016204524559504
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00023725599916780222 | Validation metrics: 0.0002875506879075082
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002366997200772773 | Validation metrics: 0.00025099232461247027
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00023560205678441526 | Validation metrics: 0.0002852271518533617
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002369191774378944 | Validation metrics: 0.0002518606315145852
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.000233981082476162 | Validation metrics: 0.00028294524221417655
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002371611570055949 | Validation metrics: 0.00025275215768782105
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.0002323918905719545 | Validation metrics: 0.0002807033847373054
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023741610433566698 | Validation metrics: 0.0002536500699470064
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00023083196260574224 | Validation metrics: 0.00027849859789700596
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023767145988525575 | Validation metrics: 0.0002545326735913716
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00022929768539897463 | Validation metrics: 0.00027632918014811975
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.000237914405532361 | Validation metrics: 0.0002553738724802517
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00022778638599459127 | Validation metrics: 0.0002741908667505615
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023813065111387362 | Validation metrics: 0.0002561456757842215
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00022629568181735906 | Validation metrics: 0.0002720824468085975
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023830740173979846 | Validation metrics: 0.00025682047866708177
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00022482252987580172 | Validation metrics: 0.00027000134154646236
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023843441056414392 | Validation metrics: 0.0002573700471795305
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00022336317329576478 | Validation metrics: 0.00026794419858505893
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023850770721172348 | Validation metrics: 0.0002577722438898013
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00022191419726427886 | Validation metrics: 0.0002659088058862835
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002385312288326741 | Validation metrics: 0.0002580130833784363
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00022047363530335607 | Validation metrics: 0.00026389328419522504
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.000238520734239414 | Validation metrics: 0.00025809218288596833
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.000219037617260023 | Validation metrics: 0.00026189531035006346
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023850460225607696 | Validation metrics: 0.00025802437037304797
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00021760277715593315 | Validation metrics: 0.0002599127452192602
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023852131248657175 | Validation metrics: 0.0002578410312340529
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00021616591389797497 | Validation metrics: 0.00025794393400017246
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023861610497532407 | Validation metrics: 0.0002575861698726775
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00021472658159212444 | Validation metrics: 0.0002559893205997092
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023882878883881844 | Validation metrics: 0.00025730784700223893
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.0002132816716356385 | Validation metrics: 0.0002540486507268265
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023918010719397098 | Validation metrics: 0.00025704538836520205
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00021183046766581307 | Validation metrics: 0.0002521224103272996
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002396580774321298 | Validation metrics: 0.00025681368571546195
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00021037325638090785 | Validation metrics: 0.0002502138321311448
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00024020293549392933 | Validation metrics: 0.00025659152471244035
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00020891207647142246 | Validation metrics: 0.0002483258617987781
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00024070497616812737 | Validation metrics: 0.0002563132124252128
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00020745064254166246 | Validation metrics: 0.00024646633957874857
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00024101231750485984 | Validation metrics: 0.00025587389451413973
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.0002059940785799236 | Validation metrics: 0.0002446434487920311
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002409556722965787 | Validation metrics: 0.00025515102180464176
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00020455100362359508 | Validation metrics: 0.00024286808529539467
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00024038812272947393 | Validation metrics: 0.0002540352832493043
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.0002031321107409311 | Validation metrics: 0.00024115387173933965
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.0002392254302098432 | Validation metrics: 0.00025246817162354485
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00020175068885762534 | Validation metrics: 0.0002395180881557271
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.00023747499885427343 | Validation metrics: 0.0002504649774625314
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.0002004213609708179 | Validation metrics: 0.00023797807557687087
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:19 - INFO - Train metrics: 0.000235246058183204 | Validation metrics: 0.00024812387077918633
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.0001991630351243256 | Validation metrics: 0.00023655554310846697
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00023272142839357772 | Validation metrics: 0.0002456001992951232
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00019799460750890145 | Validation metrics: 0.00023527262774131476
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.0002301126681831327 | Validation metrics: 0.00024306655563343543
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00019693535952163593 | Validation metrics: 0.00023414991279203218
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.0002276062535619209 | Validation metrics: 0.0002406703260012272
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00019600248084033613 | Validation metrics: 0.00023320609894157812
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00022533411824758302 | Validation metrics: 0.00023851319389050883
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00019521164949423166 | Validation metrics: 0.00023245611131036034
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00022336011050055435 | Validation metrics: 0.0002366459103550461
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00019457261876773817 | Validation metrics: 0.00023190797241334099
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00022168869436701017 | Validation metrics: 0.00023507835129464065
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00019409030181050002 | Validation metrics: 0.00023156245247310384
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.0002202948558340923 | Validation metrics: 0.00023380325192284555
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.0001937607343379819 | Validation metrics: 0.0002314062017978009
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021913934798524913 | Validation metrics: 0.00023280292960481172
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00019357221493267578 | Validation metrics: 0.0002314191280142169
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021818653150242206 | Validation metrics: 0.00023205769221848723
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.0001935037972249749 | Validation metrics: 0.00023156766264671177
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021740442244300997 | Validation metrics: 0.0002315429661357117
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00019352583867179133 | Validation metrics: 0.00023180582487692284
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021676961957671934 | Validation metrics: 0.00023123413495451325
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00019360019666093744 | Validation metrics: 0.00023208047199237039
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021626195785143696 | Validation metrics: 0.00023110873992507807
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00019368698121979833 | Validation metrics: 0.0002323366337658066
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.0002158717114818551 | Validation metrics: 0.00023114880619834019
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.0001937424692408156 | Validation metrics: 0.00023251904114125993
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.0002155876726485126 | Validation metrics: 0.0002313372720211669
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.0001937275258827147 | Validation metrics: 0.0002325816962496387
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021539883262694891 | Validation metrics: 0.00023165669405687074
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00019360964242217218 | Validation metrics: 0.00023249012148807372
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.0002152919444330807 | Validation metrics: 0.00023208937747051206
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00019336420898109834 | Validation metrics: 0.0002322257414102705
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021525456052638806 | Validation metrics: 0.0002326187513053718
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:22 - INFO - Train metrics: 0.00019298132117586748 | Validation metrics: 0.00023178796908898146
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021527112775422718 | Validation metrics: 0.0002332253303999702
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00019246488001388977 | Validation metrics: 0.0002311951330289094
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021532798248820502 | Validation metrics: 0.00023389132878616113
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00019183214235249068 | Validation metrics: 0.0002304808435975715
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021541185567930415 | Validation metrics: 0.0002345995349289774
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00019111155434120634 | Validation metrics: 0.00022969012530261857
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021550962171881438 | Validation metrics: 0.00023533189842698512
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00019033893874705182 | Validation metrics: 0.0002288722726833922
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021560906472978857 | Validation metrics: 0.0002360725637191361
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.000189552446388182 | Validation metrics: 0.00022807712619653855
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021570065415599723 | Validation metrics: 0.0002368065051445173
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018879129609850498 | Validation metrics: 0.00022735266188968613
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.0002157737264341971 | Validation metrics: 0.00023751967995794433
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018809079111613248 | Validation metrics: 0.0002267378217169093
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.0002158180144040689 | Validation metrics: 0.0002381992269121581
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018747907644983867 | Validation metrics: 0.00022626240550178208
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021582641698627785 | Validation metrics: 0.0002388333780643991
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018697674251260717 | Validation metrics: 0.00022594389303427453
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021579191421291659 | Validation metrics: 0.00023941243831138831
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.0001865947673568166 | Validation metrics: 0.000225787953534775
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021570654844755497 | Validation metrics: 0.00023992745513849037
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018633684556421248 | Validation metrics: 0.00022579118450092285
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021556873156200105 | Validation metrics: 0.0002403726870067079
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018619803962254556 | Validation metrics: 0.00022593930447732823
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021537152017737484 | Validation metrics: 0.00024074065173279984
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018616765806828405 | Validation metrics: 0.00022621229561422057
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021511642007042834 | Validation metrics: 0.0002410308022235492
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018622870163853165 | Validation metrics: 0.00022658391816264038
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.0002148007334109027 | Validation metrics: 0.00024123982255314148
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018636309645339417 | Validation metrics: 0.00022702782933430916
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.0002144251301339629 | Validation metrics: 0.00024136819440466963
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018655144725342684 | Validation metrics: 0.00022751735576259142
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021399194434492901 | Validation metrics: 0.00024141727051829373
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018677552679832558 | Validation metrics: 0.00022802861834255358
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.0002134980799870701 | Validation metrics: 0.00024138554131654516
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018701937386181373 | Validation metrics: 0.00022854271457728112
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021295315912226798 | Validation metrics: 0.0002412800527191862
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018726905985393406 | Validation metrics: 0.000229042722500221
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021234900474123526 | Validation metrics: 0.00024109825049762172
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.0001875169146024064 | Validation metrics: 0.00022952205200463233
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021170304405717717 | Validation metrics: 0.00024085144487073212
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.0001877570009987596 | Validation metrics: 0.00022997430024781462
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021100151551715833 | Validation metrics: 0.00024053434232212227
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018798864852429315 | Validation metrics: 0.0002304027666928096
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00021026552093004046 | Validation metrics: 0.00024016014040998098
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018821137970112694 | Validation metrics: 0.00023080735270996963
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00020947860558091297 | Validation metrics: 0.0002397243762529935
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018842802587972445 | Validation metrics: 0.0002311943259120759
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.0002086664314987488 | Validation metrics: 0.0002392414230277122
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018864153584705802 | Validation metrics: 0.00023156916002408986
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00020780875777182657 | Validation metrics: 0.00023870550450572574
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.0001888562422444143 | Validation metrics: 0.00023193744665618533
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00020693078087724484 | Validation metrics: 0.00023813180788890507
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018907490479328057 | Validation metrics: 0.00023230422429876835
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00020601650636367742 | Validation metrics: 0.0002375151112445188
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.0001893010533725222 | Validation metrics: 0.00023267419351443572
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.0002050853027208804 | Validation metrics: 0.00023686824230632433
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.0001895370115838212 | Validation metrics: 0.00023305074445846859
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00020412885453225229 | Validation metrics: 0.00023619074320345364
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00018978498048641553 | Validation metrics: 0.00023343678207531798
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00020315224997160075 | Validation metrics: 0.00023548757202330637
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00019004631118369253 | Validation metrics: 0.00023383371716581585
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00020216358603091495 | Validation metrics: 0.00023476741684723006
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00019032350051442025 | Validation metrics: 0.00023424470661363253
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00020116036164079487 | Validation metrics: 0.00023403036131198996
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00019061356354889956 | Validation metrics: 0.00023466589357327633
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00020014452945673255 | Validation metrics: 0.00023328177963096572
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.0001909151542896783 | Validation metrics: 0.00023509482891331755
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00019912173088061107 | Validation metrics: 0.00023252818341874942
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.0001912272985243264 | Validation metrics: 0.00023553116573961545
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00019809408184843496 | Validation metrics: 0.00023177429190554628
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00019155025581670527 | Validation metrics: 0.00023597437650849573
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.0001970621465295693 | Validation metrics: 0.00023102346540786176
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00019188180501207493 | Validation metrics: 0.00023642222037200224
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00019602918652245744 | Validation metrics: 0.00023028133257710836
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.0001922197679184928 | Validation metrics: 0.0002368712933578839
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.0001949978667970182 | Validation metrics: 0.0002295532718893479
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00019256388807212957 | Validation metrics: 0.00023732151109443018
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.0001939708727469112 | Validation metrics: 0.00022884496726387302
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.0001929112059270781 | Validation metrics: 0.00023776951385309187
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00019295201613509416 | Validation metrics: 0.00022816381886403894
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00019325876434451498 | Validation metrics: 0.00023821139495909177
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00019194575221823963 | Validation metrics: 0.00022751641312186051
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00019360818351061085 | Validation metrics: 0.00023864980388992475
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00019095394874743202 | Validation metrics: 0.00022690783188951137
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.0001939562264448242 | Validation metrics: 0.00023908000113089767
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00018998022998839543 | Validation metrics: 0.00022634676956886782
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00019430438371551432 | Validation metrics: 0.00023950427280259177
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00018903220757751033 | Validation metrics: 0.00022584557441542998
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.0001946514703080707 | Validation metrics: 0.00023992129335781992
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00018812059704914578 | Validation metrics: 0.00022541721086276488
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00019499458054420224 | Validation metrics: 0.00024032786651984837
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00018725578358366545 | Validation metrics: 0.00022507036816813239
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.0001953322657606889 | Validation metrics: 0.0002407218490414453
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00018644342685490613 | Validation metrics: 0.0002248069424901835
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00019566497203390952 | Validation metrics: 0.00024110414725704815
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00018568238440987405 | Validation metrics: 0.00022462290824000545
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00019598822419404432 | Validation metrics: 0.0002414691423635102
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00018497256043934285 | Validation metrics: 0.00022452296642116223
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.00019630277514770476 | Validation metrics: 0.000241817507276669
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:20 - INFO - Train metrics: 0.00018433090245390877 | Validation metrics: 0.00022454191742446087
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:23 - INFO - Train metrics: 0.0001966059279399352 | Validation metrics: 0.00024214702892949748
 </pre></div>
 </div>
 </div>
@@ -1231,10 +1308,10 @@ Note: you may need to restart the kernel to use updated packages.
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.00023765524019037584
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.00027869169132727577
 </pre></div>
 </div>
-<img alt="../_images/narx_neural_network_20_11.png" src="../_images/narx_neural_network_20_11.png" />
+<img alt="../_images/narx_neural_network_20_1.png" src="../_images/narx_neural_network_20_1.png" />
 </div>
 </div>
 </div>
@@ -1278,604 +1355,604 @@ Note: you may need to restart the kernel to use updated packages.
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.17840660974047237 | Validation metrics: 0.20712975676011558
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0454738918682537 | Validation metrics: 0.04410000051362346
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.035934985412242715 | Validation metrics: 0.040638373318043625
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.020950881176088985 | Validation metrics: 0.02067970608671506
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.02026423336681268 | Validation metrics: 0.02162840546607369
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0025225296741430846 | Validation metrics: 0.0027480544287222203
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.00586070684263282 | Validation metrics: 0.006543761481427484
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.00680420057553994 | Validation metrics: 0.0066205651094817155
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.006659210272096004 | Validation metrics: 0.008439958622359266
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.001765396029345299 | Validation metrics: 0.001954676093053863
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.002855182246638831 | Validation metrics: 0.003381007779013328
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0021925827518647027 | Validation metrics: 0.002383223245616513
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0025860285462302748 | Validation metrics: 0.002734864960810301
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0017717007820711548 | Validation metrics: 0.0018883601637707666
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0018715397991650833 | Validation metrics: 0.002458080637616792
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0014675815538958386 | Validation metrics: 0.0016673095583106684
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0016622954397754075 | Validation metrics: 0.002102674333134083
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0014614990686549617 | Validation metrics: 0.0016348152421414852
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0015264996557956313 | Validation metrics: 0.0017398941410573744
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0013583956795737596 | Validation metrics: 0.0015054580313388747
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0013980163928858918 | Validation metrics: 0.0017443015781052485
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0013048009150999978 | Validation metrics: 0.0014814316151626032
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0013038875314262334 | Validation metrics: 0.0015986902719231867
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0012754034571919152 | Validation metrics: 0.0014442521279132126
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0012463187513800623 | Validation metrics: 0.0014677469105920707
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0012122241938883498 | Validation metrics: 0.0013733406814586634
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.001185331801285169 | Validation metrics: 0.001429664401450392
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0011740662875284154 | Validation metrics: 0.0013335020213171539
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.001132535755769688 | Validation metrics: 0.0013479699293678306
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0011272236385632464 | Validation metrics: 0.0012828024348827325
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0010874970615631376 | Validation metrics: 0.0012713023402605844
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0010862609731584303 | Validation metrics: 0.0012413990951961641
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0010429982060652908 | Validation metrics: 0.001225984413082702
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.001045177293734807 | Validation metrics: 0.0011991708341873054
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0010019505865064293 | Validation metrics: 0.0011613967268718313
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0010004072226315532 | Validation metrics: 0.0011525373974100056
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0009636063302895124 | Validation metrics: 0.0011085999325256455
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0009576767853129758 | Validation metrics: 0.0011086336976726247
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0009267588214888086 | Validation metrics: 0.0010601712374317675
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0009117568752618698 | Validation metrics: 0.0010606266471152805
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0008917352847549551 | Validation metrics: 0.0010089858745535214
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0008677456715846794 | Validation metrics: 0.0010148794601925395
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0008579818355351369 | Validation metrics: 0.0009641226432803604
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0008232603306219188 | Validation metrics: 0.0009678242436487867
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0008257890245900548 | Validation metrics: 0.000918954283920954
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0007810843778764806 | Validation metrics: 0.000922742908270183
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0007949364831131932 | Validation metrics: 0.0008761283619366962
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0007438759510883861 | Validation metrics: 0.0008817697114386417
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.000765405666931558 | Validation metrics: 0.0008354794605625699
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0007134954412094315 | Validation metrics: 0.0008471555763272324
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0007372061401911379 | Validation metrics: 0.0007959329193890697
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0006919663347231509 | Validation metrics: 0.00082117099329039
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.000710400666068203 | Validation metrics: 0.0007587644110452572
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0006767067236050888 | Validation metrics: 0.0008019920046949251
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0006850700887307562 | Validation metrics: 0.0007230153547204806
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0006617246806052021 | Validation metrics: 0.0007843181850727309
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.000661368308796601 | Validation metrics: 0.0006894554785274044
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0006404501917879365 | Validation metrics: 0.0007621495657591055
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0006394291558900479 | Validation metrics: 0.0006578380789965241
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0006117235584987472 | Validation metrics: 0.0007342597936524661
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0006194863679794301 | Validation metrics: 0.0006285205964384732
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0005807119971934828 | Validation metrics: 0.0007050138048009213
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0006017530115086697 | Validation metrics: 0.0006016512493123159
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0005542996259555594 | Validation metrics: 0.0006800033681263977
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0005865011503978312 | Validation metrics: 0.0005774672103180278
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.00053531589044286 | Validation metrics: 0.0006610420726550122
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0005739699341041645 | Validation metrics: 0.0005562462658160413
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0005219600410381551 | Validation metrics: 0.0006463971721582265
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0005643471667279295 | Validation metrics: 0.0005381532340319921
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0005101645023989162 | Validation metrics: 0.0006329374407850808
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0005576982874660181 | Validation metrics: 0.0005233443084624455
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0004976112202228862 | Validation metrics: 0.0006189897469470673
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0005538696450890885 | Validation metrics: 0.0005117285146490868
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0004855317560655945 | Validation metrics: 0.0006055075115514825
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0005524026508324017 | Validation metrics: 0.0005030068833465604
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0004754083557579582 | Validation metrics: 0.0005935184161338691
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0005524435875217259 | Validation metrics: 0.0004964998383498328
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.00046642114725465743 | Validation metrics: 0.0005823850080210979
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0005527101500884147 | Validation metrics: 0.0004911650580147074
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.000457456802326677 | Validation metrics: 0.000571323476962256
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0005515485456800391 | Validation metrics: 0.0004856063463405302
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.00044888177277394253 | Validation metrics: 0.0005606043333601621
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0005471238162267001 | Validation metrics: 0.00047825257507896034
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0004409844164309421 | Validation metrics: 0.0005504361564302911
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0005377505498618485 | Validation metrics: 0.00046764406660157774
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0004333457184481647 | Validation metrics: 0.0005405363685573743
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.00052234526612168 | Validation metrics: 0.0004528297953345258
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.00042600595021158235 | Validation metrics: 0.0005309348096929942
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0005008230404665735 | Validation metrics: 0.00043371978222928715
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.00041908630627128095 | Validation metrics: 0.0005217305957245631
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.0004743180138655334 | Validation metrics: 0.00041126724446634527
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.000412415706871759 | Validation metrics: 0.0005128139164298773
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.00044502615172971495 | Validation metrics: 0.0003873088997976873
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0004060388170562003 | Validation metrics: 0.0005041980990114612
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.00041567016634238153 | Validation metrics: 0.00036406841433625855
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0003999507472352043 | Validation metrics: 0.0004958945042524261
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:21 - INFO - Train metrics: 0.00038874453198594185 | Validation metrics: 0.00034347518183751915
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.00039410678772512533 | Validation metrics: 0.000487872534325685
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00036586760442626937 | Validation metrics: 0.00032661236455720484
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0003885274110647866 | Validation metrics: 0.0004801344425732627
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0003475194234829303 | Validation metrics: 0.00031354058930189397
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0003831810498829548 | Validation metrics: 0.0004726641672084842
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0003332330983594284 | Validation metrics: 0.00030355355608267613
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.00037807086125228617 | Validation metrics: 0.00046545761282264133
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0003220616451920918 | Validation metrics: 0.0002956660996506348
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0003731807881008068 | Validation metrics: 0.0004585011996860343
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00031302952273126766 | Validation metrics: 0.0002890352422554949
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0003685055073452203 | Validation metrics: 0.00045178744811423576
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00030537672463558233 | Validation metrics: 0.00028314135705280783
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.00036403452752876964 | Validation metrics: 0.0004453055397137021
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0002986058845321291 | Validation metrics: 0.00027774343463460527
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.00035976179359588107 | Validation metrics: 0.0004390481212105828
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00029243633959542744 | Validation metrics: 0.00027274815136369205
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:24 - INFO - Train metrics: 0.0003556790049006943 | Validation metrics: 0.00043300547045561476
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0002867361095344139 | Validation metrics: 0.00026811050184099287
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0003517803109168101 | Validation metrics: 0.00042717045377657723
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0002814456483496255 | Validation metrics: 0.00026377628326905195
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00034805714074851373 | Validation metrics: 0.00042153425094897324
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0002765204872846146 | Validation metrics: 0.000259682064290356
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00034450661041773856 | Validation metrics: 0.000416090210130664
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00027191215343563293 | Validation metrics: 0.00025578554763195266
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00034112002203686814 | Validation metrics: 0.00041083051091662107
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0002675748408747543 | Validation metrics: 0.0002520735924734235
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00033789244823258154 | Validation metrics: 0.0004057475807253422
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00026347204125375443 | Validation metrics: 0.00024854216396554625
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00033481859327480663 | Validation metrics: 0.00040083449313915666
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00025957610680900264 | Validation metrics: 0.00024517678809728513
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0003318913664784338 | Validation metrics: 0.0003960841826887594
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0002558660452174756 | Validation metrics: 0.0002419541544643127
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0003291063634637874 | Validation metrics: 0.00039148917204154786
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00025232314993744076 | Validation metrics: 0.0002388569942059353
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00032645518183101315 | Validation metrics: 0.0003870420153205744
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0002489317722987958 | Validation metrics: 0.0002358776218530656
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00032393075868587725 | Validation metrics: 0.0003827339043544436
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.000245678863208916 | Validation metrics: 0.000233009131272521
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00032152420153169146 | Validation metrics: 0.00037855668125128504
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0002425523774385018 | Validation metrics: 0.00023024229978380555
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0003192232245401967 | Validation metrics: 0.00037449898023036017
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0002395415502538517 | Validation metrics: 0.00022756595357387055
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0003170124906492198 | Validation metrics: 0.0003705480417608274
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00023663740246679241 | Validation metrics: 0.0002249748201457539
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00031487380070109995 | Validation metrics: 0.0003666887906464663
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00023383174488673402 | Validation metrics: 0.00022246299847734696
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00031277989009616985 | Validation metrics: 0.00036290138865811654
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0002311179325037652 | Validation metrics: 0.0002200251072997961
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0003106938419749209 | Validation metrics: 0.00035915957737921015
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0002284889101190259 | Validation metrics: 0.00021765644472760307
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0003085674256008156 | Validation metrics: 0.00035542898930167083
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0002259399258210102 | Validation metrics: 0.00021535302133115968
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.000306339499515535 | Validation metrics: 0.0003516686427044786
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00022346524097624103 | Validation metrics: 0.00021311069481225328
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0003039303057293704 | Validation metrics: 0.0003478264937652369
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0002210604556180294 | Validation metrics: 0.00021092673499640454
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0003012463517976052 | Validation metrics: 0.00034384340114863306
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0002187214366742118 | Validation metrics: 0.00020879764795406826
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00029818010490205617 | Validation metrics: 0.000339656608764816
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00021644468832980458 | Validation metrics: 0.00020672251338684798
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00029462870379050906 | Validation metrics: 0.0003352125981973127
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00021422639036058615 | Validation metrics: 0.00020469730805765574
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00029051463453176157 | Validation metrics: 0.0003304889897764143
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00021206376156367054 | Validation metrics: 0.00020272077814995716
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00028582117380224225 | Validation metrics: 0.00032552136660958026
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0002099541937544321 | Validation metrics: 0.00020079107263073738
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00028062880616623413 | Validation metrics: 0.00032043309748229205
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00020789495000573703 | Validation metrics: 0.00019890678099314258
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00027515073446907046 | Validation metrics: 0.0003154566987756301
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00020588391237567766 | Validation metrics: 0.00019706745345070205
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0002697281906921603 | Validation metrics: 0.0003109207162821684
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00020391826734809265 | Validation metrics: 0.0001952695752014265
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00026477842784561404 | Validation metrics: 0.0003071913673222592
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00020199706321313772 | Validation metrics: 0.00019351449589870607
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0002606913220093009 | Validation metrics: 0.0003045683998892065
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00020011753277277765 | Validation metrics: 0.00019179942804233482
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0002577051231205781 | Validation metrics: 0.00030317602354581607
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00019827903785805842 | Validation metrics: 0.00019012494018592993
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00025582095156750527 | Validation metrics: 0.00030289512248756834
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0001964794124218689 | Validation metrics: 0.00018848952069417622
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0002548109121763038 | Validation metrics: 0.0003033933018668169
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00019471740773482188 | Validation metrics: 0.00018689321601561112
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0002543037713658214 | Validation metrics: 0.0003042262314461322
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00019299188247452346 | Validation metrics: 0.00018533449702322333
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0002539092487390655 | Validation metrics: 0.000304968754532794
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00019130194200819037 | Validation metrics: 0.0001838137258980141
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0002533167800200837 | Validation metrics: 0.000305305542882927
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00018964652514013984 | Validation metrics: 0.00018233172210389655
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.000252334707440519 | Validation metrics: 0.0003050561107088332
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00018802404625867646 | Validation metrics: 0.00018088588790351882
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00025087951044703747 | Validation metrics: 0.0003041507187652204
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00018643508747688035 | Validation metrics: 0.0001794784129926502
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0002489421221387939 | Validation metrics: 0.000302581101858217
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00018487811325769172 | Validation metrics: 0.00017810837927772992
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0002465512803236354 | Validation metrics: 0.0003003612207131216
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0001833534338960849 | Validation metrics: 0.00017677696355303393
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00024376173240668315 | Validation metrics: 0.00029752045491183494
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00018185998987404158 | Validation metrics: 0.00017548371147543116
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00024066296734183066 | Validation metrics: 0.00029412624831875843
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00018039828861210458 | Validation metrics: 0.00017423000738772592
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00023738880953804022 | Validation metrics: 0.00029030966724156207
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0001789681715709869 | Validation metrics: 0.00017301650921287335
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00023410618383254165 | Validation metrics: 0.00028626527754834505
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00017757044884377394 | Validation metrics: 0.00017184492760935252
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00023098341740765855 | Validation metrics: 0.0002822197755890419
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.000176205145449548 | Validation metrics: 0.00017071689224467998
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00022814730478434316 | Validation metrics: 0.00027836943127572384
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.000174873718549264 | Validation metrics: 0.00016963382641375628
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0002256535339174456 | Validation metrics: 0.00027482807380500054
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00017357691948128196 | Validation metrics: 0.0001685980663604263
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00022349743477277748 | Validation metrics: 0.00027162366607837906
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00017231744961354432 | Validation metrics: 0.00016761387226811488
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0002216396487961619 | Validation metrics: 0.00026872926353444014
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00017109636612992762 | Validation metrics: 0.00016668339370458265
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00022003569278864887 | Validation metrics: 0.0002661055380788942
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0001699171110142704 | Validation metrics: 0.00016581131712147833
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00021864356215457365 | Validation metrics: 0.00026371611359839636
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00016878267539633592 | Validation metrics: 0.00016500232118003147
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00021742702984626878 | Validation metrics: 0.0002615307892832642
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00016769757915934767 | Validation metrics: 0.00016426308800212362
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00021635222750281761 | Validation metrics: 0.00025951543221993355
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00016666715103960165 | Validation metrics: 0.00016360044155406267
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00021538650894182778 | Validation metrics: 0.0002576389655440274
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00016569664311142436 | Validation metrics: 0.00016302201938650786
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00021450881652077683 | Validation metrics: 0.0002558828362985749
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00016479506406800022 | Validation metrics: 0.00016253893460603337
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0002137044781526051 | Validation metrics: 0.0002542334700454817
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0001639702685882237 | Validation metrics: 0.00016216165136258973
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00021296190938219092 | Validation metrics: 0.0002526763425034593
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.000163234621459994 | Validation metrics: 0.0001619051144731165
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00021226960613642047 | Validation metrics: 0.00025119701655572184
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00016260077880128265 | Validation metrics: 0.00016178596030445676
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00021161909741355354 | Validation metrics: 0.0002497852691143488
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0001620852763290146 | Validation metrics: 0.000161823222173773
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00021100556353903036 | Validation metrics: 0.0002484318478070576
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00016170722873149707 | Validation metrics: 0.0001620396566306796
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00021042512746686514 | Validation metrics: 0.0002471291921054474
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00016149015638966785 | Validation metrics: 0.0001624629440637437
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0002098734774901053 | Validation metrics: 0.0002458711902051223
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00016146081965562553 | Validation metrics: 0.00016312335113373896
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00020934723978914684 | Validation metrics: 0.00024465164798782255
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00016165097026133392 | Validation metrics: 0.00016405649607850595
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0002088446697388848 | Validation metrics: 0.00024346728759789556
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0001620984150308014 | Validation metrics: 0.00016530391800151478
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00020836326280517742 | Validation metrics: 0.0002423141401841992
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.0001628437218954203 | Validation metrics: 0.0001669094369822003
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00020790217844168316 | Validation metrics: 0.00024118878031408208
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00016393473678657128 | Validation metrics: 0.00016892379716584326
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.0002074578856754077 | Validation metrics: 0.00024008843974290283
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:22 - INFO - Train metrics: 0.00016541963493198222 | Validation metrics: 0.00017139613551953148
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:25 - INFO - Train metrics: 0.00020702952721983632 | Validation metrics: 0.0002390103828575876
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00016735287517849544 | Validation metrics: 0.00017438266535684693
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00020661514899710935 | Validation metrics: 0.00023795370714541411
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00016978422799386914 | Validation metrics: 0.0001779299805874494
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00020621390816321443 | Validation metrics: 0.00023691651512483002
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0001727612293792193 | Validation metrics: 0.00018208309822254862
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.0002058227439288442 | Validation metrics: 0.00023589609631788775
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.000176325335078651 | Validation metrics: 0.00018687757726340093
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00020543989981583 | Validation metrics: 0.0002348913259644325
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00018050988900059726 | Validation metrics: 0.00019233933687586374
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00020506544526489008 | Validation metrics: 0.00023390021515572727
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00018533915188659523 | Validation metrics: 0.00019848317136009685
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.0002046946556812717 | Validation metrics: 0.00023292220930211396
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00019083425847878842 | Validation metrics: 0.00020532067241899746
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00020433160275650354 | Validation metrics: 0.00023195725181281114
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00019701564170853154 | Validation metrics: 0.00021286121721854527
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00020396899722106894 | Validation metrics: 0.00023100231074483482
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002039140927719704 | Validation metrics: 0.00022112486550038813
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00020360845944349348 | Validation metrics: 0.0002300568659039628
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00021158680886544876 | Validation metrics: 0.0002301607856872689
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.0002032475181511559 | Validation metrics: 0.00022912019572098448
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00022011655573919882 | Validation metrics: 0.000240042513457475
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00020288482585129443 | Validation metrics: 0.00022819016664994484
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00022960388304270048 | Validation metrics: 0.00025086046603386
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00020251913950399247 | Validation metrics: 0.0002272668026500579
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002401602306557273 | Validation metrics: 0.0002627155356664173
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.0002021479478644506 | Validation metrics: 0.00022634777247510624
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00025187059686219266 | Validation metrics: 0.0002756753076230072
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00020177103805164327 | Validation metrics: 0.00022543291840584705
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002647312376986638 | Validation metrics: 0.00028971332505185423
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00020138775752705609 | Validation metrics: 0.0002245220780193881
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002785814967021617 | Validation metrics: 0.00030463708757488714
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00020099622398768937 | Validation metrics: 0.0002236140598225492
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002930188434254518 | Validation metrics: 0.0003200056689269276
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00020059546457053883 | Validation metrics: 0.00022270784268245064
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00030732179588094393 | Validation metrics: 0.0003350535257733568
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.0002001842711748728 | Validation metrics: 0.00022180291610614708
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00032042132960142275 | Validation metrics: 0.00034866865161063167
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00019976326336945292 | Validation metrics: 0.00022089903447494814
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0003309724955290864 | Validation metrics: 0.0003594690710400241
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.0001993294287254721 | Validation metrics: 0.00021999511933024746
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00033754964894790174 | Validation metrics: 0.00036600758256908093
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00019888541248205694 | Validation metrics: 0.00021909149757567606
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0003389631664114339 | Validation metrics: 0.0003670914615433889
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00019842683644568488 | Validation metrics: 0.00021818644003213542
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00033460410898563016 | Validation metrics: 0.00036213223821238963
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00019795703169198843 | Validation metrics: 0.00021728167249797608
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00032470351162968775 | Validation metrics: 0.00035140970504297074
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.0001974743635922946 | Validation metrics: 0.00021637660393025726
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0003104047396221434 | Validation metrics: 0.0003361468332128204
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00019697908649511664 | Validation metrics: 0.00021547039634444646
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00029353721619917447 | Validation metrics: 0.0003182859418118805
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.0001964709120245305 | Validation metrics: 0.0002145635931590346
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002762044220929382 | Validation metrics: 0.0003000573188094704
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00019594887380936372 | Validation metrics: 0.00021365538475837445
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002602861770314928 | Validation metrics: 0.00028345459746432046
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00019541459779819954 | Validation metrics: 0.00021274591622065113
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00024707723865699825 | Validation metrics: 0.0002698395971556881
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00019486716911686877 | Validation metrics: 0.00021183546079849504
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002371846076540467 | Validation metrics: 0.000259829611597451
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00019430798474923336 | Validation metrics: 0.00021092416107127763
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00023064327506928524 | Validation metrics: 0.00025342335963311297
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.0001937348731410664 | Validation metrics: 0.00021001148655554373
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00022713137784871251 | Validation metrics: 0.0002502371093159485
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00019314964277813336 | Validation metrics: 0.00020909818880626875
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00022617810256113962 | Validation metrics: 0.00024973671980945376
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00019255480103931135 | Validation metrics: 0.00020818485210489745
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002272916394770192 | Validation metrics: 0.00025137737005328137
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00019194670093746478 | Validation metrics: 0.00020727050676471506
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00023001760321979722 | Validation metrics: 0.00025466562194674454
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00019132792983229802 | Validation metrics: 0.00020635648685827325
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002339497984113886 | Validation metrics: 0.00025916894523878443
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00019070053834031642 | Validation metrics: 0.00020544250311113594
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.000238722612011132 | Validation metrics: 0.00026450525543586625
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00019006034630534 | Validation metrics: 0.00020452792920299214
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00024400636020412944 | Validation metrics: 0.00027033429554042715
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.0001894116599636764 | Validation metrics: 0.00020361386960950878
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002494785267778586 | Validation metrics: 0.000276323175645725
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00018875185067048834 | Validation metrics: 0.00020269968669221858
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00025484074929199254 | Validation metrics: 0.000282167193345782
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.0001880833838265716 | Validation metrics: 0.00020178551494609565
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00025982152471344514 | Validation metrics: 0.0002875891952149833
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00018740463760456207 | Validation metrics: 0.00020087139391119244
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.000264178086175784 | Validation metrics: 0.00029234181456926344
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.0001867170184343017 | Validation metrics: 0.00019995790316530438
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002677174868079061 | Validation metrics: 0.0002962316103006779
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00018602288379899941 | Validation metrics: 0.00019904558891971417
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002703024485827725 | Validation metrics: 0.00029912232474254614
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00018531932561328043 | Validation metrics: 0.0001981339944794661
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002718801907920757 | Validation metrics: 0.00030096624289977956
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.0001846077724448627 | Validation metrics: 0.0001972238018737184
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002724644940995371 | Validation metrics: 0.00030178443065402333
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.0001838903646288267 | Validation metrics: 0.00019631481722392368
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00027215269838143515 | Validation metrics: 0.00030168483646426616
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00018316390825684104 | Validation metrics: 0.00019540622459390586
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002711005542817687 | Validation metrics: 0.00030083477237224205
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00018242970898947014 | Validation metrics: 0.00019449867734995982
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00026950467473309123 | Validation metrics: 0.0002994422361047731
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00018169057727931417 | Validation metrics: 0.0001935927643301906
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00026758204057157967 | Validation metrics: 0.0002977335984310643
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00018094215167302377 | Validation metrics: 0.00019268717409835922
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00026553529571452384 | Validation metrics: 0.0002959195363942082
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00018018913313216602 | Validation metrics: 0.00019178424774894887
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002635400127027216 | Validation metrics: 0.0002941801882998058
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.0001794307380780475 | Validation metrics: 0.00019088274337153769
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002617327937926924 | Validation metrics: 0.0002926526514159497
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00017866522443853085 | Validation metrics: 0.00018998260070061818
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002601999266263924 | Validation metrics: 0.0002914223404874028
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00017789459428726637 | Validation metrics: 0.00018908438917174182
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002589848236516958 | Validation metrics: 0.0002905285539166682
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00017711882898759068 | Validation metrics: 0.00018818887165804026
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00025809333054436357 | Validation metrics: 0.00028997282803322027
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00017633861609014513 | Validation metrics: 0.00018729574830186638
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002575000270414528 | Validation metrics: 0.00028972509299461365
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00017555380989342257 | Validation metrics: 0.00018640446789431
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002571610190959899 | Validation metrics: 0.00028973697000324273
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00017476342185190354 | Validation metrics: 0.00018551567498232343
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.000257022555543747 | Validation metrics: 0.0002899512735599972
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00017397046377438876 | Validation metrics: 0.00018462994737983353
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00025702303670519465 | Validation metrics: 0.00029030299864267234
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00017317469502544793 | Validation metrics: 0.0001837471209000796
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002571089464714774 | Validation metrics: 0.0002907363873097406
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00017237374149111186 | Validation metrics: 0.0001828670435563915
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002572260801254405 | Validation metrics: 0.0002911955064087354
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00017156901237301594 | Validation metrics: 0.0001819897203463967
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.000257334771772081 | Validation metrics: 0.0002916395041569503
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00017076386974711335 | Validation metrics: 0.00018111683106087525
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00025740598931933115 | Validation metrics: 0.0002920396130348584
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00016995520931423495 | Validation metrics: 0.00018024754991538523
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002574118897744821 | Validation metrics: 0.0002923657946556694
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:26 - INFO - Train metrics: 0.00016914572784698155 | Validation metrics: 0.00017938267991106694
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.000257342218049104 | Validation metrics: 0.0002926080731670325
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:27 - INFO - Train metrics: 0.00016833486365601375 | Validation metrics: 0.00017852227411096483
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00025719081412418454 | Validation metrics: 0.00029275864639056076
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:27 - INFO - Train metrics: 0.00016752328780709642 | Validation metrics: 0.00017766710332561887
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00025695545640733224 | Validation metrics: 0.00029281514074719236
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:27 - INFO - Train metrics: 0.00016671013495363156 | Validation metrics: 0.00017681607939514586
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002566488898597905 | Validation metrics: 0.00029279000356304224
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:27 - INFO - Train metrics: 0.00016589944589624 | Validation metrics: 0.0001759717342058065
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00025627889034669744 | Validation metrics: 0.00029269063691232314
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:27 - INFO - Train metrics: 0.00016508710835120853 | Validation metrics: 0.00017513226905268512
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.0002558612937071503 | Validation metrics: 0.0002925325140375832
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:27 - INFO - Train metrics: 0.00016427705523804214 | Validation metrics: 0.00017429965520583356
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:23 - INFO - Train metrics: 0.00025540904031382564 | Validation metrics: 0.000292328866010513
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:27 - INFO - Train metrics: 0.00016346896925934108 | Validation metrics: 0.00017347370922292648
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:24 - INFO - Train metrics: 0.00025493746949009654 | Validation metrics: 0.0002920955332522892
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:27 - INFO - Train metrics: 0.0001626636395738565 | Validation metrics: 0.00017265550412397568
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:24 - INFO - Train metrics: 0.00025446232834120135 | Validation metrics: 0.0002918483432490529
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:27 - INFO - Train metrics: 0.0001618617988103431 | Validation metrics: 0.0001718445482306333
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:24 - INFO - Train metrics: 0.0002539961618216087 | Validation metrics: 0.00029160047739019827
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:27 - INFO - Train metrics: 0.00016106122282344177 | Validation metrics: 0.00017104112052810237
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-24 13:11:24 - INFO - Train metrics: 0.0002535544564515086 | Validation metrics: 0.0002913689146740268
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>03-05 15:32:27 - INFO - Train metrics: 0.00016026746019642837 | Validation metrics: 0.00017024712276061753
 </pre></div>
 </div>
 <img alt="../_images/narx_neural_network_22_2001.png" src="../_images/narx_neural_network_22_2001.png" />
@@ -1887,54 +1964,42 @@ Note: you may need to restart the kernel to use updated packages.
 
               </div>
               
-        
             
-
-
-
-<div class='prev-next-bottom'>
-    
-    <div id="prev">
-        <a class="left-prev" href="f_16_benchmark.html" title="previous page">
-            <i class="prevnext-label fas fa-angle-left"></i>
-            <div class="prevnext-info">
-                <p class="prevnext-label">previous</p>
-                <p class="prevnext-title">Example: F-16 Ground Vibration Test benchmark</p>
-            </div>
-        </a>
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="f_16_benchmark.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Example: F-16 Ground Vibration Test benchmark</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="general_estimators.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Building NARX models using general estimators</p>
     </div>
-     <div id="next">
-        <a class="right-next" href="general_estimators.html" title="next page">
-            <div class="prevnext-info">
-                <p class="prevnext-label">next</p>
-                <p class="prevnext-title">Building NARX models using general estimators</p>
-            </div>
-            <i class="prevnext-label fas fa-angle-right"></i>
-        </a>
-     </div>
-
+    <i class="fas fa-angle-right"></i>
+    </a>
 </div>
-        
+            
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins<br/>
-        
-            &copy; Copyright 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.<br/>
-      </p>
-    </div>
-  </footer>
+  <p>
+    
+      De Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins<br/>
+    
+        &copy; direito autoral 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.<br/>
+  </p>
+</footer>
 </main>
 
 
       </div>
     </div>
   
-  <script src="../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
 
-  
   </body>
 </html>

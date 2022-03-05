@@ -6,8 +6,9 @@ import pickle as pk
 import os
 
 def save_model(
-    model, 
-    file_name,
+    *,
+    model = None, 
+    file_name = "model",
     path = None,
 ):
     """ This method saves the model "model" in folder "folder" using an extension .syspy
@@ -26,6 +27,9 @@ def save_model(
     file file_name.syspy located at "path", containing the estimated model.     
     """
     
+    if model is None:
+        raise TypeError("model cannot be None.")
+    
     # Checking if path is provided
     if path is not None:
         
@@ -38,7 +42,8 @@ def save_model(
       
     
 def load_model(
-    file_name,
+    *,
+    file_name = "model",
     path = None, 
 ):
     
@@ -53,7 +58,7 @@ def load_model(
     
     Returns 
     ----------
-    model_loaded: model loaded, as a variable, containing model and its atributes
+    model_loaded: model loaded, as a variable, containing model and its attributes
     
     
     """

@@ -1,0 +1,73 @@
+Traceback (most recent call last):
+  File "c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\jupyter_cache\executors\utils.py", line 51, in single_nb_execution
+    executenb(
+  File "c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\nbclient\client.py", line 1117, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+  File "c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\nbclient\util.py", line 78, in wrapped
+    return just_run(coro(*args, **kwargs))
+  File "c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\nbclient\util.py", line 57, in just_run
+    return loop.run_until_complete(coro)
+  File "c:\users\wilso\miniconda3\envs\sysidentpy\lib\asyncio\base_events.py", line 616, in run_until_complete
+    return future.result()
+  File "c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\nbclient\client.py", line 558, in async_execute
+    await self.async_execute_cell(
+  File "c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\nbclient\client.py", line 862, in async_execute_cell
+    self._check_raise_for_error(cell, exec_reply)
+  File "c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\nbclient\client.py", line 765, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+import pandas as pd
+from sysidentpy.model_structure_selection import FROLS
+from sysidentpy.basis_function._basis_function import Polynomial
+from sysidentpy.utils.generate_data import get_siso_data
+from sysidentpy.utils.display_results import results
+from sysidentpy.utils.plotting import plot_results
+from sysidentpy.utils.save_load import save_model, load_model
+
+
+# Generating 1 input 1 output sample data from a benchmark system
+x_train, x_valid, y_train, y_valid = get_siso_data(
+    n=1000,
+    colored_noise=False,
+    sigma=0.0001,
+    train_percentage=90
+)
+
+basis_function = Polynomial(degree=2)
+
+model = FROLS(
+    order_selection=True,
+    n_info_values=3,
+    extended_least_squares=False,
+    ylag=2, xlag=2,
+    info_criteria='aic',
+    estimator='least_squares',
+    basis_function=basis_function
+)
+
+model.fit(X=x_train, y=y_train)
+
+yhat = model.predict(X=x_valid, y=y_valid)
+
+# Gathering results
+r = pd.DataFrame(
+    results(
+        model.final_model, model.theta, model.err,
+        model.n_terms, err_precision=8, dtype='sci'
+        ),
+    columns=['Regressors', 'Parameters', 'ERR'])
+------------------
+
+[1;31m---------------------------------------------------------------------------[0m
+[1;31mModuleNotFoundError[0m                       Traceback (most recent call last)
+[1;32m~\AppData\Local\Temp/ipykernel_111080/1206758719.py[0m in [0;36m<module>[1;34m[0m
+[0;32m      1[0m [1;32mimport[0m [0mpandas[0m [1;32mas[0m [0mpd[0m[1;33m[0m[1;33m[0m[0m
+[1;32m----> 2[1;33m [1;32mfrom[0m [0msysidentpy[0m[1;33m.[0m[0mmodel_structure_selection[0m [1;32mimport[0m [0mFROLS[0m[1;33m[0m[1;33m[0m[0m
+[0m[0;32m      3[0m [1;32mfrom[0m [0msysidentpy[0m[1;33m.[0m[0mbasis_function[0m[1;33m.[0m[0m_basis_function[0m [1;32mimport[0m [0mPolynomial[0m[1;33m[0m[1;33m[0m[0m
+[0;32m      4[0m [1;32mfrom[0m [0msysidentpy[0m[1;33m.[0m[0mutils[0m[1;33m.[0m[0mgenerate_data[0m [1;32mimport[0m [0mget_siso_data[0m[1;33m[0m[1;33m[0m[0m
+[0;32m      5[0m [1;32mfrom[0m [0msysidentpy[0m[1;33m.[0m[0mutils[0m[1;33m.[0m[0mdisplay_results[0m [1;32mimport[0m [0mresults[0m[1;33m[0m[1;33m[0m[0m
+
+[1;31mModuleNotFoundError[0m: No module named 'sysidentpy.model_structure_selection'
+ModuleNotFoundError: No module named 'sysidentpy.model_structure_selection'
+

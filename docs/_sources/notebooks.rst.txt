@@ -33,6 +33,12 @@ Examples
 
 .. toctree::
    :maxdepth: 1
+   :caption: Fourier Basis Function Example
+
+   /examples/fourier_basis_function.ipynb
+
+.. toctree::
+   :maxdepth: 1
    :caption: Information Criteria - Examples
 
    /examples/information_criteria_examples.ipynb
@@ -66,6 +72,12 @@ Examples
    :caption: Accelerated Orthogonal Least-Squares algorithm
 
    /examples/aols.ipynb
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Entropic Regression algorithm
+
+   /examples/entropic_regression.ipynb
 
 .. toctree::
    :maxdepth: 1

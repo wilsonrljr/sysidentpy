@@ -1,0 +1,45 @@
+Traceback (most recent call last):
+  File "c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\jupyter_cache\executors\utils.py", line 51, in single_nb_execution
+    executenb(
+  File "c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\nbclient\client.py", line 1117, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+  File "c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\nbclient\util.py", line 78, in wrapped
+    return just_run(coro(*args, **kwargs))
+  File "c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\nbclient\util.py", line 57, in just_run
+    return loop.run_until_complete(coro)
+  File "c:\users\wilso\miniconda3\envs\sysidentpy\lib\asyncio\base_events.py", line 616, in run_until_complete
+    return future.result()
+  File "c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\nbclient\client.py", line 558, in async_execute
+    await self.async_execute_cell(
+  File "c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\nbclient\client.py", line 862, in async_execute_cell
+    self._check_raise_for_error(cell, exec_reply)
+  File "c:\users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\nbclient\client.py", line 765, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+import numpy as np
+import matplotlib.pyplot as plt
+
+from sysidentpy.model_structure_selection import FROLS
+from sysidentpy.basis_function import Polynomial, Fourier
+from sysidentpy.utils.plotting import plot_results
+from sysidentpy.metrics import root_relative_squared_error
+
+np.seterr(all="ignore")
+np.random.seed(1)
+
+%matplotlib inline
+------------------
+
+[1;31m---------------------------------------------------------------------------[0m
+[1;31mModuleNotFoundError[0m                       Traceback (most recent call last)
+[1;32m~\AppData\Local\Temp/ipykernel_110308/248133683.py[0m in [0;36m<module>[1;34m[0m
+[0;32m      2[0m [1;32mimport[0m [0mmatplotlib[0m[1;33m.[0m[0mpyplot[0m [1;32mas[0m [0mplt[0m[1;33m[0m[1;33m[0m[0m
+[0;32m      3[0m [1;33m[0m[0m
+[1;32m----> 4[1;33m [1;32mfrom[0m [0msysidentpy[0m[1;33m.[0m[0mmodel_structure_selection[0m [1;32mimport[0m [0mFROLS[0m[1;33m[0m[1;33m[0m[0m
+[0m[0;32m      5[0m [1;32mfrom[0m [0msysidentpy[0m[1;33m.[0m[0mbasis_function[0m [1;32mimport[0m [0mPolynomial[0m[1;33m,[0m [0mFourier[0m[1;33m[0m[1;33m[0m[0m
+[0;32m      6[0m [1;32mfrom[0m [0msysidentpy[0m[1;33m.[0m[0mutils[0m[1;33m.[0m[0mplotting[0m [1;32mimport[0m [0mplot_results[0m[1;33m[0m[1;33m[0m[0m
+
+[1;31mModuleNotFoundError[0m: No module named 'sysidentpy.model_structure_selection'
+ModuleNotFoundError: No module named 'sysidentpy.model_structure_selection'
+

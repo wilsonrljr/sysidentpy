@@ -5,11 +5,16 @@
 
 import numpy as np
 from scipy.stats import t
-from ..utils._check_arrays import check_X_y, _num_features, _check_positive_int
-from ..utils._check_arrays import check_random_state
-from ..metrics import root_relative_squared_error, mean_squared_error
+
 from ..metaheuristics import BPSOGSA
+from ..metrics import mean_squared_error, root_relative_squared_error
 from ..simulation import SimulateNARMAX
+from ..utils._check_arrays import (
+    _check_positive_int,
+    _num_features,
+    check_random_state,
+    check_X_y,
+)
 
 
 class MetaMSS(SimulateNARMAX, BPSOGSA):
@@ -427,7 +432,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
         """
 
-        sum_of_squared_residues = np.sum(residues ** 2)
+        sum_of_squared_residues = np.sum(residues**2)
         variance_of_residues = (sum_of_squared_residues) / (
             len(residues) - psi.shape[1]
         )
@@ -569,8 +574,11 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             The input data to be used in the prediction process.
         y : ndarray of floats
             The output data to be used in the prediction process.
-        steps_ahead = int (default = None)
-            The forecast horizon.
+        steps_ahead : int (default = None)
+            The user can use free run simulation, one-step ahead prediction
+            and n-step ahead prediction.
+        forecast_horizon : int, default=None
+            The number of predictions over the time.
 
         Returns
         -------

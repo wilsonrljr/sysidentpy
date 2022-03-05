@@ -20,6 +20,11 @@ sysidentpy metamss
 .. automodule:: sysidentpy.model_structure_selection.MetaMSS
    :members:
 
+sysidentpy er
+=============
+.. automodule:: sysidentpy.model_structure_selection.ER
+   :members:
+
 sysidentpy simulation
 =====================
 .. automodule:: sysidentpy.simulation._simulation
@@ -82,6 +87,11 @@ sysidentpy plotting
 sysidentpy display results
 ==========================
 .. automodule:: sysidentpy.utils.display_results
+   :members:
+
+sysidentpy save_load
+====================
+.. automodule:: sysidentpy.utils.save_load
    :members:
 
 Indices and tables

@@ -9,16 +9,18 @@
 
 
 import warnings
+
 import numpy as np
-from collections import Counter
-from ..narmax_base import GenerateRegressors, ModelPrediction
-from ..narmax_base import HouseHolder
-from ..narmax_base import InformationMatrix
-from ..narmax_base import ModelInformation
-from ..narmax_base import ModelPrediction
+from sysidentpy.utils._check_arrays import _check_positive_int, _num_features, check_X_y
+
+from ..narmax_base import (
+    GenerateRegressors,
+    HouseHolder,
+    InformationMatrix,
+    ModelInformation,
+    ModelPrediction,
+)
 from ..parameter_estimation.estimators import Estimators
-from sysidentpy.utils._check_arrays import check_X_y, _check_positive_int, _num_features
-import warnings
 
 
 class FROLS(
@@ -93,6 +95,8 @@ class FROLS(
         Weight factor to control the proportions of the error norms
         and offers an extra degree of freedom within the adaptation
         of the LMS mixed norm method.
+    model_type: str, default="NARMAX"
+        The user can choose "NARMAX", "NAR" and "NFIR" models
 
     Examples
     --------
@@ -335,11 +339,8 @@ class FROLS(
         ----------
 
         """
-        if (
-            self.n_info_values is not None
-            and self.n_info_values > self.regressor_code.shape[0]
-        ):
-            self.n_info_values = self.regressor_code.shape[0]
+        if self.n_info_values is not None and self.n_info_values > X_base.shape[1]:
+            self.n_info_values = X_base.shape[1]
             warnings.warn(
                 (
                     "n_info_values is greater than the maximum number "
@@ -347,7 +348,7 @@ class FROLS(
                     "y_lag, u_lag, and non_degree. We set as "
                     "%d "
                 )
-                % self.regressor_code.shape[0],
+                % X_base.shape[1],
                 stacklevel=2,
             )
 
@@ -539,8 +540,11 @@ class FROLS(
             The input data to be used in the prediction process.
         y : ndarray of floats
             The output data to be used in the prediction process.
-        steps_ahead = int (default = None)
-            The forecast horizon.
+        steps_ahead : int (default = None)
+            The user can use free run simulation, one-step ahead prediction
+            and n-step ahead prediction.
+        forecast_horizon : int, default=None
+            The number of predictions over the time.
 
         Returns
         -------
@@ -558,7 +562,9 @@ class FROLS(
                 return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
         else:
             if steps_ahead is None:
-                return self._basis_function_predict(X, y, self.theta, forecast_horizon=forecast_horizon)
+                return self._basis_function_predict(
+                    X, y, self.theta, forecast_horizon=forecast_horizon
+                )
             elif steps_ahead == 1:
                 return self._one_step_ahead_prediction(X, y)
             else:
