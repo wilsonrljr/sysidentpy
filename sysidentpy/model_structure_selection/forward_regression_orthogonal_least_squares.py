@@ -339,11 +339,8 @@ class FROLS(
         ----------
 
         """
-        if (
-            self.n_info_values is not None
-            and self.n_info_values > self.regressor_code.shape[0]
-        ):
-            self.n_info_values = self.regressor_code.shape[0]
+        if self.n_info_values is not None and self.n_info_values > X_base.shape[1]:
+            self.n_info_values = X_base.shape[1]
             warnings.warn(
                 (
                     "n_info_values is greater than the maximum number "
@@ -351,7 +348,7 @@ class FROLS(
                     "y_lag, u_lag, and non_degree. We set as "
                     "%d "
                 )
-                % self.regressor_code.shape[0],
+                % X_base.shape[1],
                 stacklevel=2,
             )
 
