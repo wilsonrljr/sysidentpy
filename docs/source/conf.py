@@ -26,7 +26,7 @@ copyright = "2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins"
 author = "Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins"
 
 # The full version, including alpha/beta/rc tags
-release = "0.1.9"
+release = "0.2.0"
 
 autodoc_member_order = "bysource"
 add_function_parentheses = True

@@ -100,7 +100,7 @@ class Estimators(InformationMatrix):
         .. [1] Manuscript: Sorenson, H. W. (1970). Least-squares estimation:
            from Gauss to Kalman. IEEE spectrum, 7(7), 63-68.
            http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf
-        .. [2] Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificação
+        .. [2] Book (Portuguese): Aguirre, L. A. (2007). Introdução identificação
            de sistemas: técnicas lineares e não-lineares aplicadas a sistemas
            reais. Editora da UFMG. 3a edição.
         .. [3] Manuscript: Markovsky, I., & Van Huffel, S. (2007).
@@ -217,7 +217,7 @@ class Estimators(InformationMatrix):
     def recursive_least_squares(self, psi, y):
         """Estimate the model parameters using the Recursive Least Squares method.
 
-        The implementation consider the forgeting factor.
+        The implementation consider the forgetting factor.
         Parameters
         ----------
         psi : ndarray of floats
@@ -238,7 +238,7 @@ class Estimators(InformationMatrix):
 
         References
         ----------
-        .. [1] Book (Portuguese): Aguirre, L. A. (2007). Introduçaoa identificação
+        .. [1] Book (Portuguese): Aguirre, L. A. (2007). Introdução identificação
            de sistemas: técnicas lineares e não-lineares aplicadas a sistemas
            reais. Editora da UFMG. 3a edição.
 

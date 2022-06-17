@@ -1,4 +1,4 @@
-.. sys-identpy documentation master file, created by
+.. sysidentpy documentation master file, created by
    sphinx-quickstart on Sun Mar 15 08:37:08 2020.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
@@ -23,13 +23,13 @@ at discrete time :math:`k`. In this case, :math:`\mathcal{F}` is some nonlinear 
 of the input and output regressors and :math:`d` is a time delay typically set to :math:`d=1`.
 
 .. note::
-	The update **v0.1.7**  has been released with major changes and additional features.
+	The update **v0.2.0**  has been released with major changes and additional features.
 	
 	There are several API modifications and you will need to change your code to have the new (and upcoming) features.
 	
 	Check the examples of how to use the new version in the `documentation page <http://sysidentpy.org/notebooks.html>`__
 
-	For more details, please see the `changelog <http://sysidentpy.org/changelog/v0.1.7.html>`__
+	For more details, please see the `changelog <http://sysidentpy.org/changelog/v0.2.0.html>`__
 
 .. seealso::
 	The examples directory has several Jupyter notebooks presenting basic tutorials of how to use the package and some specific applications of **SysIdentPy**. `Try it out! <http://sysidentpy.org/notebooks.html>`__
@@ -100,8 +100,6 @@ Polynomial NARX
 	x1e = compute_cross_correlation(y_valid, yhat, x2_val)
 	plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 
-
-
 .. image:: ../../examples/figures/polynomial_narmax.png
 
 NARX Neural Network
@@ -111,6 +109,9 @@ NARX Neural Network
 
 	from torch import nn
 	from sysidentpy.neural_network import NARXNN
+	from sysidentpy.basis_function._basis_function import Polynomial
+	from sysidentpy.utils.plotting import plot_residues_correlation, plot_results
+	from sysidentpy.residues.residues_correlation import compute_residues_autocorrelation, compute_cross_correlation
 
 	class NARX(nn.Module):
 		def __init__(self):
@@ -128,10 +129,14 @@ NARX Neural Network
 			z = self.lin3(z)
 			return z
 
+	basis_function=Polynomial(degree=1)
+
 	narx_net = NARXNN(
 		net=NARX(),
 		ylag=2,
 		xlag=2,
+		basis_function=basis_function,
+  		model_type="NARMAX",
 		loss_func='mse_loss',
 		optimizer='Adam',
 		epochs=200,
@@ -139,13 +144,13 @@ NARX Neural Network
 		optim_params={'betas': (0.9, 0.999), 'eps': 1e-05} # optional parameters of the optimizer
 	)
 
-	train_dl = narx_net.data_transform(x_train, y_train)
-	valid_dl = narx_net.data_transform(x_valid, y_valid)
-	narx_net.fit(train_dl, valid_dl)
-	yhat = narx_net.predict(x_valid, y_valid)
-	ee, ex, extras, lam = narx_net.residuals(x_valid, y_valid, yhat)
-	narx_net.plot_result(y_valid, yhat, ee, ex)
-
+	narx_net.fit(X=x_train, y=y_train)
+	yhat = narx_net.predict(X=x_valid, y=y_valid)
+	plot_results(y=y_valid, yhat=yhat, n=200)
+	ee = compute_residues_autocorrelation(y_valid, yhat)
+	plot_residues_correlation(data=ee, title="Residues", ylabel="$e^2$")
+	x1e = compute_cross_correlation(y_valid, yhat, x_valid)
+	plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 
 .. image:: ../../examples/figures/narx_network.png
 
@@ -156,6 +161,9 @@ Catboost-narx
 
 	from sysidentpy.general_estimators import NARX
 	from catboost import CatBoostRegressor
+	from sysidentpy.basis_function._basis_function import Polynomial
+	from sysidentpy.utils.plotting import plot_residues_correlation, plot_results
+	from sysidentpy.residues.residues_correlation import compute_residues_autocorrelation, compute_cross_correlation
 
 	catboost_narx = NARX(
 		base_estimator=CatBoostRegressor(
@@ -164,13 +172,18 @@ Catboost-narx
 			depth=6),
 		xlag=2,
 		ylag=2,
+		basis_function=basis_function,
+		model_type="NARMAX",
 		fit_params={'verbose': False}
 	)
 
-	catboost_narx.fit(x_train, y_train)
-	yhat = catboost_narx.predict(x_valid, y_valid)
-	ee, ex, extras, lam = catboost_narx.residuals(x_valid, y_valid, yhat)
-	catboost_narx.plot_result(y_valid, yhat, ee, ex)
+	catboost_narx.fit(X=x_train, y=y_train)
+	yhat = catboost_narx.predict(X=x_valid, y=y_valid)
+	plot_results(y=y_valid, yhat=yhat, n=200)
+	ee = compute_residues_autocorrelation(y_valid, yhat)
+	plot_residues_correlation(data=ee, title="Residues", ylabel="$e^2$")
+	x1e = compute_cross_correlation(y_valid, yhat, x_valid)
+	plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 
 
 .. image:: ../../examples/figures/catboost_narx.png
@@ -182,7 +195,7 @@ The following is the Catboost performance *without* the NARX configuration.
 
 .. code-block:: python
 
-	def plot_results(yvalid, yhat):
+	def plot_results_tmp(y_valid, yhat):
 		_, ax = plt.subplots(figsize=(14, 8))
 		ax.plot(y_valid[:200], label='Data', marker='o')
 		ax.plot(yhat[:200], label='Prediction', marker='*')
@@ -208,7 +221,7 @@ The following is the Catboost performance *without* the NARX configuration.
 Changelog
 ---------
 
-See the `changelog <http://sysidentpy.org/changelog/v0.1.7.html>`__
+See the `changelog <http://sysidentpy.org/changelog/v0.2.0.html>`__
 for a history of notable changes to **SysIdentPy**.
 
 
@@ -319,6 +332,5 @@ Contents
     user_guide
     dev_guide
     notebooks
-    notebooksv016
-    changelog/v0.1.9
+    changelog/v0.2.0
     code

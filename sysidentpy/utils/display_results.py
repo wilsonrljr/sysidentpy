@@ -17,7 +17,7 @@ def results(
 ):
     """Write the model regressors, parameters and ERR values.
 
-    This function returns the model regressors, its respectives parameter
+    This function returns the model regressors, its respective parameter
     and ERR value on a string matrix.
 
     Parameters

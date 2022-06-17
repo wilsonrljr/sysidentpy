@@ -7,7 +7,7 @@ import functools
 
 
 def deprecated(version, future_version=None, message=None, alternative=None, **kwargs):
-    """This docorater is adapted from astroML decorator:
+    """This decorator is adapted from astroML decorator:
     https://github.com/astroML/astroML/blob/f66558232f6d33cb34ecd1bed8a80b9db7ae1c30/astroML/utils/decorators.py#L120
     """
 

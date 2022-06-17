@@ -452,7 +452,7 @@ class ER(
         smallest_distance = smallest_distance[:, idx]
         epsilon = smallest_distance[:, -1].reshape(-1, 1)
         # Find number of points from (y,f2), (f1,f2), and (f2,f2) that lies withing the
-        # k^{th} nearest neighbor distance from each point of themself.
+        # k^{th} nearest neighbor distance from each point of themselves.
         smallest_distance_y_f2 = cdist(
             np.concatenate([y, f2], axis=1),
             np.concatenate([y, f2], axis=1),
