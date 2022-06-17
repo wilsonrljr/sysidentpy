@@ -30,7 +30,10 @@ def regressor_code(
             axis=0,
         )
         regressor_code = np.concatenate([regressor_code[1:], basis_code])
-    else:
+    elif (
+        basis_function.__class__.__name__ != "Polynomial"
+        and basis_function.ensemble is False
+    ):
         repetition = basis_function.n * 2
         regressor_code = np.sort(
             np.tile(regressor_code[1:, :], (repetition, 1)),
