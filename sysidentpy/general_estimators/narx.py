@@ -247,8 +247,7 @@ class ModelPrediction:
                     np.power(raw_regressor, model_exponents[j])
                 )
 
-            # y_output[i] = np.dot(regressor_value, self.theta.flatten())
-            y_output[i] = self.base_estimator.predict(regressor_value)
+            y_output[i] = self.base_estimator.predict(regressor_value.reshape(1, -1))
         return y_output.reshape(-1, 1)
 
     def _nfir_predict(self, X, y_initial):
