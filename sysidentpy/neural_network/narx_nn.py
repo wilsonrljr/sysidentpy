@@ -141,15 +141,13 @@ class ModelPrediction:
                 self.max_lag,
             )
 
-        # yhat = np.dot(X_base, self.theta.flatten())
-        yhat = self.base_estimator.predict(X_base)
-        yhat = np.concatenate([y[: self.max_lag].flatten(), yhat])
-
+        yhat = np.zeros(X.shape[0], dtype=float)
         X_base = X_base[:, 1:]
         X_base = np.atleast_1d(X_base).astype(np.float32)
         yhat = yhat.astype(np.float32)
-        x_valid, y_valid = map(torch.tensor, (X_base, yhat))
+        x_valid, _ = map(torch.tensor, (X_base, yhat))
         yhat = self.net(x_valid).detach().numpy()
+        yhat = np.concatenate([y.ravel()[: self.max_lag].flatten(), yhat.ravel()])
         return yhat.reshape(-1, 1)
 
     def _n_step_ahead_prediction(self, X, y, steps_ahead):
