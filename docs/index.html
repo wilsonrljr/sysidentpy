@@ -1,633 +1,517 @@
+
 <!DOCTYPE html>
 
 <html>
-
-<head>
-  <meta name="google-site-verification" content="kA6jl7EJGGtVoDdYEZwiDSoSa0jqLxgeyJgy2_XHCgw" />
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to SysIdentPy’s documentation! &#8212; NARMAX models</title>
-
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to SysIdentPy’s documentation! &#8212; NARMAX models</title>
+    
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
 
-
-  <link rel="stylesheet" href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
+    
+      
 
-
-
-
-  <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-  <link rel="stylesheet" type="text/css" href="_static/sphinx-book-theme.css?digest=84ace793992934648b4de8eed757e5a2" />
-  <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
-  <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
-  <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
-
+    
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-book-theme.css?digest=84ace793992934648b4de8eed757e5a2" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    
   <link rel="preload" as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js">
 
-  <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-  <script src="_static/jquery.js"></script>
-  <script src="_static/underscore.js"></script>
-  <script src="_static/doctools.js"></script>
-  <script src="_static/togglebutton.js"></script>
-  <script src="_static/clipboard.min.js"></script>
-  <script src="_static/copybutton.js"></script>
-  <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-  <script src="_static/sphinx-book-theme.9d8b4a8b9bb19db25eeaddc40d639ba2.js"></script>
-  <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <script>window.MathJax = { "options": { "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area" } }</script>
-  <link rel="canonical" href="http://sysidentpy.org/index.html" />
-  <link rel="index" title="Index" href="genindex.html" />
-  <link rel="search" title="Search" href="search.html" />
-  <link rel="next" title="Install Guide" href="installation.html" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="docsearch:language" content="None">
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/sphinx-book-theme.9d8b4a8b9bb19db25eeaddc40d639ba2.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <link rel="canonical" href="http://sysidentpy.org/index.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Install Guide" href="installation.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
 
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
 
-  <!-- Google Analytics -->
+    
 
-</head>
-
-<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
-
-  <div class="container-fluid" id="banner"></div>
-
-
-
-  <div class="container-xl">
-    <div class="row">
-
-      <!-- Checkboxes to toggle the left sidebar -->
-      <input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation"
-        aria-label="Toggle navigation sidebar">
-      <label class="overlay" for="__navigation">
-        <div class="visually-hidden">Toggle navigation sidebar</div>
-      </label>
-      <div class="col-12 col-md-3 bd-sidebar site-navigation " id="site-navigation">
-
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<div class="col-12 col-md-3 bd-sidebar site-navigation " id="site-navigation">
+    
         <div class="navbar-brand-box">
-          <a class="navbar-brand text-wrap" href="#">
+    <a class="navbar-brand text-wrap" href="#">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="_static/sysidentpy-logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">NARMAX models</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="installation.html">
+   Install Guide
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="introduction_to_narmax.html">
+   A brief introduction to NARMAX models.
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="user_guide.html">
+   User Guide
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="dev_guide.html">
+   Contributing
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="notebooks.html">
+   Examples
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/basic_steps.html">
+     Presenting main functionality
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/air_passenger_benchmark.html">
+     Air Passenger benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/load_forecasting_benchmark.html">
+     Load forecasting benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/PV_forecasting_benchmark.html">
+     PV forecasting benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/multiple_inputs_example.html">
+     Multiple Inputs usage
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/fourier_basis_function.html">
+     Fourier Basis Function
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/information_criteria_examples.html">
+     Information Criteria - Examples
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/extended_least_squares.html">
+     Extended Least Squares
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/defining_lags.html">
+     Setting specific lags
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/parameter_estimation.html">
+     Parameter Estimation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/metamss.html">
+     Meta-Model Structure Selection (MetaMSS) algorithm for building Polynomial NARX models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/aols.html">
+     Using the Accelerated Orthogonal Least-Squares algorithm for building Polynomial NARX models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/entropic_regression.html">
+     Identification of an electromechanical system using Entropic Regression
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/f_16_benchmark.html">
+     Example: F-16 Ground Vibration Test benchmark
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/narx_neural_network.html">
+     Building NARX Neural Network using Sysidentpy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/general_estimators.html">
+     Building NARX models using general estimators
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/simulating_a_predefined_model.html">
+     Simulate a Predefined Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/identification_of_an_electromechanical_system.html">
+     Identification of an electromechanical system
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="examples/n_steps_ahead_prediction.html">
+     Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="changelog/v0.2.0.html">
+   Changes in SysIdentPy
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="code.html">
+   Code
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="simple">
+  </ul>
+ </li>
+</ul>
 
-            <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+    </div>
+</nav> <!-- To handle the deprecated key -->
 
+<div class="navbar_extra_footer">
+  Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+</div>
 
-
-            <img src="_static/sysidentpy-logo.png" class="logo" alt="logo">
-
-
-            <h1 class="site-logo" id="site-title">NARMAX models</h1>
-
-          </a>
-        </div>
-        <form class="bd-search d-flex align-items-center" action="search.html" method="get">
-          <i class="icon fas fa-search"></i>
-          <input type="search" class="form-control" name="q" id="search-input" placeholder="Pesquise os documentos ..."
-            aria-label="Pesquise os documentos ..." autocomplete="off">
-        </form>
-        <nav class="bd-links" id="bd-docs-nav" aria-label="Main">
-          <div class="bd-toc-item active">
-            <ul class="nav bd-sidenav">
-              <li class="toctree-l1">
-                <a class="reference internal" href="installation.html">
-                  Install Guide
-                </a>
-              </li>
-              <li class="toctree-l1">
-                <a class="reference internal" href="introduction_to_narmax.html">
-                  A brief introduction to NARMAX models.
-                </a>
-              </li>
-              <li class="toctree-l1">
-                <a class="reference internal" href="user_guide.html">
-                  User Guide
-                </a>
-              </li>
-              <li class="toctree-l1">
-                <a class="reference internal" href="dev_guide.html">
-                  Contributing
-                </a>
-              </li>
-              <li class="toctree-l1 has-children">
-                <a class="reference internal" href="notebooks.html">
-                  Examples
-                </a>
-                <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox" />
-                <label for="toctree-checkbox-1">
-                  <i class="fas fa-chevron-down">
-                  </i>
-                </label>
-                <ul>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/basic_steps.html">
-                      Presenting main functionality
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/air_passenger_benchmark.html">
-                      Air Passenger benchmark
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/load_forecasting_benchmark.html">
-                      Load forecasting benchmark
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/PV_forecasting_benchmark.html">
-                      PV forecasting benchmark
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/multiple_inputs_example.html">
-                      Multiple Inputs usage
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/fourier_basis_function.html">
-                      Fourier Basis Function
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/information_criteria_examples.html">
-                      Information Criteria - Examples
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/extended_least_squares.html">
-                      Extended Least Squares
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/defining_lags.html">
-                      Setting specific lags
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/parameter_estimation.html">
-                      Parameter Estimation
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/metamss.html">
-                      Meta-Model Structure Selection (MetaMSS) algorithm for building Polynomial NARX models
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/aols.html">
-                      Using the Accelerated Orthogonal Least-Squares algorithm for building Polynomial NARX models
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/entropic_regression.html">
-                      Identification of an electromechanical system using Entropic Regression
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/f_16_benchmark.html">
-                      Example: F-16 Ground Vibration Test benchmark
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/narx_neural_network.html">
-                      Building NARX Neural Network using Sysidentpy
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/general_estimators.html">
-                      Building NARX models using general estimators
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/simulating_a_predefined_model.html">
-                      Simulate a Predefined Model
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/identification_of_an_electromechanical_system.html">
-                      Identification of an electromechanical system
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples/n_steps_ahead_prediction.html">
-                      Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li class="toctree-l1 has-children">
-                <a class="reference internal" href="notebooksv016.html">
-                  Examples v0.1.6
-                </a>
-                <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox" />
-                <label for="toctree-checkbox-2">
-                  <i class="fas fa-chevron-down">
-                  </i>
-                </label>
-                <ul>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples-v016/basic_steps.html">
-                      V0.1.6 - Presenting main functionality
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples-v016/multiple_inputs_example.html">
-                      V0.1.6 - Multiple Inputs usage
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples-v016/information_criteria_examples.html">
-                      V0.1.6 - Information Criteria - Examples
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples-v016/extended_least_squares.html">
-                      V0.1.6 - Important notes and examples of how to use Extended Least Squares
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples-v016/defining_lags.html">
-                      V0.1.6 - Setting specific lags
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples-v016/parameter_estimation.html">
-                      V0.1.6 - Parameter Estimation
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples-v016/metamss.html">
-                      V0.1.6 - Using the Meta-Model Structure Selection (MetaMSS) algorithm for building Polynomial NARX
-                      models
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples-v016/aols.html">
-                      V0.1.6 - Using the Accelerated Orthogonal Least-Squares algorithm for building Polynomial NARX
-                      models
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples-v016/f_16_benchmark.html">
-                      V0.1.6 - Example: F-16 Ground Vibration Test benchmark
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples-v016/narx_neural_network.html">
-                      V0.1.6 - Building NARX Neural Network using Sysidentpy
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples-v016/general_estimators.html">
-                      V0.1.6 - Building NARX models using general estimators
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples-v016/simulating_a_predefined_model.html">
-                      V0.1.6 - Simulate a Predefined Model
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal"
-                      href="examples-v016/system_identification_using_adaptative_filters.html">
-                      V0.1.6 - System Identification Using Adaptative Filters
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal"
-                      href="examples-v016/identification_of_an_electromechanical_system.html">
-                      V0.1.6 - Identification of an electromechanical system
-                    </a>
-                  </li>
-                  <li class="toctree-l2">
-                    <a class="reference internal" href="examples-v016/n_steps_ahead_prediction.html">
-                      V0.1.6 - Example: N-steps-ahead prediction - F-16 Ground Vibration Test benchmark
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li class="toctree-l1">
-                <a class="reference internal" href="changelog/v0.1.9.html">
-                  Changes in SysIdentPy
-                </a>
-              </li>
-              <li class="toctree-l1 has-children">
-                <a class="reference internal" href="code.html">
-                  Code
-                </a>
-                <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox" />
-                <label for="toctree-checkbox-3">
-                  <i class="fas fa-chevron-down">
-                  </i>
-                </label>
-                <ul class="simple">
-                </ul>
-              </li>
-            </ul>
-
-          </div>
-        </nav> <!-- To handle the deprecated key -->
-
-        <div class="navbar_extra_footer">
-          Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
-        </div>
-
-      </div>
+</div>
 
 
+          
 
 
-
-
-      <!-- This is an invisible pixel that we watch to see if we've scrolled. -->
-      <div class="sbt-scroll-pixel-helper"></div>
-      <main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
-
-        <div class="topbar container-xl fixed-top">
-          <div class="topbar-contents row">
-            <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
-            <div class="col pl-md-4 topbar-main">
-              <div class="topbar-left">
-
+          
+<!-- This is an invisible pixel that we watch to see if we've scrolled. -->
+<div class="sbt-scroll-pixel-helper"></div>
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            <div class="topbar-left">
+                
                 <label class="nav-toggle-button" for="__navigation">
-                  <div class="visually-hidden">Alternar de navegação</div>
-                  <i class="fas fa-bars"></i>
+                    <div class="visually-hidden">Toggle navigation</div>
+                    <i class="fas fa-bars"></i>
                 </label>
-
-              </div>
-
-              <div class="dropdown-buttons-trigger">
-                <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
-                  aria-label="Baixe esta página"><i class="fas fa-download"></i></button>
-
-                <div class="dropdown-buttons">
-                  <!-- ipynb file if we had a myst markdown file -->
-
-                  <!-- Download raw file -->
-                  <a class="dropdown-buttons" href="_sources/index.rst.txt"><button type="button"
-                      class="btn btn-secondary topbarbtn" title="Baixar arquivo fonte" data-toggle="tooltip"
-                      data-placement="left">.rst</button></a>
-                  <!-- Download PDF via print -->
-                  <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Imprimir em PDF"
-                    onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
-                </div>
-              </div>
-
-              <!-- Source interaction buttons -->
-
-              <div class="dropdown-buttons-trigger">
-                <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
-                  aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
-                <div class="dropdown-buttons sourcebuttons">
-                  <a class="repository-button" href="https://github.com/wilsonrljr/sysidentpy/"><button type="button"
-                      class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
-                      title="Repositório fonte"><i class="fab fa-github"></i>repositório</button></a>
-                  <a class="issues-button"
-                    href="https://github.com/wilsonrljr/sysidentpy//issues/new?title=Issue%20on%20page%20%2Findex.html&body=Your%20issue%20content%20here."><button
-                      type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
-                      title="Abra um problema"><i class="fas fa-lightbulb"></i>questão aberta</button></a>
-                  <a class="edit-button"
-                    href="https://github.com/wilsonrljr/sysidentpy/edit/master/docs/index.rst"><button type="button"
-                      class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
-                      title="Edite essa página"><i class="fas fa-pencil-alt"></i>sugerir edição</button></a>
-                </div>
-              </div>
-
-              <!-- Full screen (wrap in <a> to have style consistency -->
-
-              <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn"
-                  data-toggle="tooltip" data-placement="bottom" onclick="toggleFullScreen()"
-                  aria-label="Modo tela cheia" title="Modo tela cheia"><i class="fas fa-expand"></i></button></a>
-
-              <!-- Launch buttons -->
-
+                
             </div>
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
 
-            <!-- Table of contents -->
-            <div class="d-none d-md-block col-md-2 bd-toc show noprint">
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="_sources/index.rst.txt"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.rst</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
 
-              <div class="tocsection onthispage pt-5 pb-3">
-                <i class="fas fa-list"></i> Conteúdo
-              </div>
-              <nav id="bd-toc-nav" aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
-                  <li class="toc-h2 nav-item toc-entry">
-                    <a class="reference internal nav-link" href="#polynomial-narx">
-                      Polynomial NARX
-                    </a>
-                  </li>
-                  <li class="toc-h2 nav-item toc-entry">
-                    <a class="reference internal nav-link" href="#narx-neural-network">
-                      NARX Neural Network
-                    </a>
-                  </li>
-                  <li class="toc-h2 nav-item toc-entry">
-                    <a class="reference internal nav-link" href="#catboost-narx">
-                      Catboost-narx
-                    </a>
-                  </li>
-                  <li class="toc-h2 nav-item toc-entry">
-                    <a class="reference internal nav-link" href="#catboost-without-narx-configuration">
-                      Catboost without NARX configuration
-                    </a>
-                    <ul class="nav section-nav flex-column">
-                      <li class="toc-h3 nav-item toc-entry">
-                        <a class="reference internal nav-link" href="#changelog">
-                          Changelog
-                        </a>
-                      </li>
-                      <li class="toc-h3 nav-item toc-entry">
-                        <a class="reference internal nav-link" href="#development">
-                          Development
-                        </a>
-                      </li>
-                      <li class="toc-h3 nav-item toc-entry">
-                        <a class="reference internal nav-link" href="#example-of-how-to-run-the-tests">
-                          Example of how to run the tests:
-                        </a>
-                      </li>
-                      <li class="toc-h3 nav-item toc-entry">
-                        <a class="reference internal nav-link" href="#source-code">
-                          Source code
-                        </a>
-                      </li>
-                      <li class="toc-h3 nav-item toc-entry">
-                        <a class="reference internal nav-link" href="#project-history">
-                          Project History
-                        </a>
-                      </li>
-                      <li class="toc-h3 nav-item toc-entry">
-                        <a class="reference internal nav-link" href="#communication">
-                          Communication
-                        </a>
-                      </li>
-                      <li class="toc-h3 nav-item toc-entry">
-                        <a class="reference internal nav-link" href="#citation">
-                          Citation
-                        </a>
-                      </li>
-                      <li class="toc-h3 nav-item toc-entry">
-                        <a class="reference internal nav-link" href="#inspiration">
-                          Inspiration
-                        </a>
-                      </li>
-                      <li class="toc-h3 nav-item toc-entry">
-                        <a class="reference internal nav-link" href="#contents">
-                          Contents
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
+            <!-- Source interaction buttons -->
 
-              </nav>
-            </div>
-          </div>
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/wilsonrljr/sysidentpy/"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/wilsonrljr/sysidentpy//issues/new?title=Issue%20on%20page%20%2Findex.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        <a class="edit-button" href="https://github.com/wilsonrljr/sysidentpy/edit/master/docs/index.rst"><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Edit this page"><i class="fas fa-pencil-alt"></i>suggest edit</button></a>
+    </div>
+</div>
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
         </div>
-        <div id="main-content" class="row">
-          <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
+            
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#polynomial-narx">
+   Polynomial NARX
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#narx-neural-network">
+   NARX Neural Network
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#catboost-narx">
+   Catboost-narx
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#catboost-without-narx-configuration">
+   Catboost without NARX configuration
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#changelog">
+     Changelog
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#development">
+     Development
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#example-of-how-to-run-the-tests">
+     Example of how to run the tests:
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#source-code">
+     Source code
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#project-history">
+     Project History
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#communication">
+     Communication
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#citation">
+     Citation
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#inspiration">
+     Inspiration
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#contents">
+     Contents
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-              <h1>Welcome to SysIdentPy’s documentation!</h1>
-              <!-- Table of contents -->
-              <div id="print-main-content">
-                <div id="jb-print-toc">
+                <h1>Welcome to SysIdentPy’s documentation!</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#polynomial-narx">
+   Polynomial NARX
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#narx-neural-network">
+   NARX Neural Network
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#catboost-narx">
+   Catboost-narx
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#catboost-without-narx-configuration">
+   Catboost without NARX configuration
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#changelog">
+     Changelog
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#development">
+     Development
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#example-of-how-to-run-the-tests">
+     Example of how to run the tests:
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#source-code">
+     Source code
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#project-history">
+     Project History
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#communication">
+     Communication
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#citation">
+     Citation
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#inspiration">
+     Inspiration
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#contents">
+     Contents
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
 
-                  <div>
-                    <h2> Conteúdo </h2>
-                  </div>
-                  <nav aria-label="Page">
-                    <ul class="visible nav section-nav flex-column">
-                      <li class="toc-h2 nav-item toc-entry">
-                        <a class="reference internal nav-link" href="#polynomial-narx">
-                          Polynomial NARX
-                        </a>
-                      </li>
-                      <li class="toc-h2 nav-item toc-entry">
-                        <a class="reference internal nav-link" href="#narx-neural-network">
-                          NARX Neural Network
-                        </a>
-                      </li>
-                      <li class="toc-h2 nav-item toc-entry">
-                        <a class="reference internal nav-link" href="#catboost-narx">
-                          Catboost-narx
-                        </a>
-                      </li>
-                      <li class="toc-h2 nav-item toc-entry">
-                        <a class="reference internal nav-link" href="#catboost-without-narx-configuration">
-                          Catboost without NARX configuration
-                        </a>
-                        <ul class="nav section-nav flex-column">
-                          <li class="toc-h3 nav-item toc-entry">
-                            <a class="reference internal nav-link" href="#changelog">
-                              Changelog
-                            </a>
-                          </li>
-                          <li class="toc-h3 nav-item toc-entry">
-                            <a class="reference internal nav-link" href="#development">
-                              Development
-                            </a>
-                          </li>
-                          <li class="toc-h3 nav-item toc-entry">
-                            <a class="reference internal nav-link" href="#example-of-how-to-run-the-tests">
-                              Example of how to run the tests:
-                            </a>
-                          </li>
-                          <li class="toc-h3 nav-item toc-entry">
-                            <a class="reference internal nav-link" href="#source-code">
-                              Source code
-                            </a>
-                          </li>
-                          <li class="toc-h3 nav-item toc-entry">
-                            <a class="reference internal nav-link" href="#project-history">
-                              Project History
-                            </a>
-                          </li>
-                          <li class="toc-h3 nav-item toc-entry">
-                            <a class="reference internal nav-link" href="#communication">
-                              Communication
-                            </a>
-                          </li>
-                          <li class="toc-h3 nav-item toc-entry">
-                            <a class="reference internal nav-link" href="#citation">
-                              Citation
-                            </a>
-                          </li>
-                          <li class="toc-h3 nav-item toc-entry">
-                            <a class="reference internal nav-link" href="#inspiration">
-                              Inspiration
-                            </a>
-                          </li>
-                          <li class="toc-h3 nav-item toc-entry">
-                            <a class="reference internal nav-link" href="#contents">
-                              Contents
-                            </a>
-                          </li>
-                        </ul>
-                      </li>
-                    </ul>
-
-                  </nav>
+                        </nav>
+                    </div>
                 </div>
-              </div>
             </div>
-
-            <div>
-
-              <div class="section" id="welcome-to-sysidentpy-s-documentation">
-                <h1>Welcome to SysIdentPy’s documentation!<a class="headerlink"
-                    href="#welcome-to-sysidentpy-s-documentation" title="Permalink to this headline">¶</a></h1>
-                <p><strong>SysIdentPy</strong> is a Python module for System Identification using
-                  <strong>NARMAX</strong> models built on top of <strong>numpy</strong> and is distributed under the
-                  3-Clause BSD license.</p>
-                <p>The NARMAX model is described as:</p>
-                <div class="math notranslate nohighlight">
-                  \[y_k= F[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc,
-                  e_{k-n_e}] + e_k\]</div>
-                <p>where <span class="math notranslate nohighlight">\(n_y\in \mathbb{N}^*\)</span>, <span
-                    class="math notranslate nohighlight">\(n_x \in \mathbb{N}\)</span>, <span
-                    class="math notranslate nohighlight">\(n_e \in \mathbb{N}\)</span>,
-                  are the maximum lags for the system output and input respectively;
-                  <span class="math notranslate nohighlight">\(x_k \in \mathbb{R}^{n_x}\)</span> is the system input and
-                  <span class="math notranslate nohighlight">\(y_k \in \mathbb{R}^{n_y}\)</span>
-                  is the system output at discrete time <span class="math notranslate nohighlight">\(k \in
-                    \mathbb{N}^n\)</span>;
-                  <span class="math notranslate nohighlight">\(e_k \in \mathbb{R}^{n_e}\)</span> stands for
-                  uncertainties and possible noise
-                  at discrete time <span class="math notranslate nohighlight">\(k\)</span>. In this case, <span
-                    class="math notranslate nohighlight">\(\mathcal{F}\)</span> is some nonlinear function
-                  of the input and output regressors and <span class="math notranslate nohighlight">\(d\)</span> is a
-                  time delay typically set to <span class="math notranslate nohighlight">\(d=1\)</span>.
-                </p>
-                <div class="admonition note">
-                  <p class="admonition-title">Note</p>
-                  <p>The update <strong>v0.1.7</strong> has been released with major changes and additional features.
-                  </p>
-                  <p>There are several API modifications and you will need to change your code to have the new (and
-                    upcoming) features.</p>
-                  <p>Check the examples of how to use the new version in the <a class="reference external"
-                      href="http://sysidentpy.org/notebooks.html">documentation page</a></p>
-                  <p>For more details, please see the <a class="reference external"
-                      href="http://sysidentpy.org/changelog/v0.1.7.html">changelog</a></p>
-                </div>
-                <div class="admonition seealso">
-                  <p class="admonition-title">See also</p>
-                  <p>The examples directory has several Jupyter notebooks presenting basic tutorials of how to use the
-                    package and some specific applications of <strong>SysIdentPy</strong>. <a class="reference external"
-                      href="http://sysidentpy.org/notebooks.html">Try it out!</a></p>
-                </div>
-                <div class="admonition tip">
-                  <p class="admonition-title">Tip</p>
-                  <p>SysIdentPy now support NARX Neural Network and General estimators, e.g., sklearn estimators and
-                    Catboost. Check it out!</p>
-                </div>
-                <div class="highlight-python notranslate">
-                  <div class="highlight">
-                    <pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+            
+              <div>
+                
+  <div class="section" id="welcome-to-sysidentpy-s-documentation">
+<h1>Welcome to SysIdentPy’s documentation!<a class="headerlink" href="#welcome-to-sysidentpy-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p><strong>SysIdentPy</strong> is a Python module for System Identification using <strong>NARMAX</strong> models built on top of <strong>numpy</strong> and is distributed under the 3-Clause BSD license.</p>
+<p>The NARMAX model is described as:</p>
+<div class="math notranslate nohighlight">
+\[y_k= F[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k\]</div>
+<p>where <span class="math notranslate nohighlight">\(n_y\in \mathbb{N}^*\)</span>, <span class="math notranslate nohighlight">\(n_x \in \mathbb{N}\)</span>, <span class="math notranslate nohighlight">\(n_e \in \mathbb{N}\)</span>,
+are the maximum lags for the system output and input respectively;
+<span class="math notranslate nohighlight">\(x_k \in \mathbb{R}^{n_x}\)</span> is the system input and <span class="math notranslate nohighlight">\(y_k \in \mathbb{R}^{n_y}\)</span>
+is the system output at discrete time <span class="math notranslate nohighlight">\(k \in \mathbb{N}^n\)</span>;
+<span class="math notranslate nohighlight">\(e_k \in \mathbb{R}^{n_e}\)</span> stands for uncertainties and possible noise
+at discrete time <span class="math notranslate nohighlight">\(k\)</span>. In this case, <span class="math notranslate nohighlight">\(\mathcal{F}\)</span> is some nonlinear function
+of the input and output regressors and <span class="math notranslate nohighlight">\(d\)</span> is a time delay typically set to <span class="math notranslate nohighlight">\(d=1\)</span>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The update <strong>v0.2.0</strong>  has been released with major changes and additional features.</p>
+<p>There are several API modifications and you will need to change your code to have the new (and upcoming) features.</p>
+<p>Check the examples of how to use the new version in the <a class="reference external" href="http://sysidentpy.org/notebooks.html">documentation page</a></p>
+<p>For more details, please see the <a class="reference external" href="http://sysidentpy.org/changelog/v0.2.0.html">changelog</a></p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>The examples directory has several Jupyter notebooks presenting basic tutorials of how to use the package and some specific applications of <strong>SysIdentPy</strong>. <a class="reference external" href="http://sysidentpy.org/notebooks.html">Try it out!</a></p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>SysIdentPy now support NARX Neural Network and General estimators, e.g., sklearn estimators and Catboost. Check it out!</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">sysidentpy.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
@@ -641,15 +525,11 @@
 <span class="n">sigma</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
 <span class="n">train_percentage</span><span class="o">=</span><span class="mi">80</span>
 <span class="p">)</span>
-</pre>
-                  </div>
-                </div>
-                <div class="section" id="polynomial-narx">
-                  <h2>Polynomial NARX<a class="headerlink" href="#polynomial-narx"
-                      title="Permalink to this headline">¶</a></h2>
-                  <div class="highlight-python notranslate">
-                    <div class="highlight">
-                      <pre><span></span><span class="kn">from</span> <span class="nn">sysidentpy.model_structure_selection</span> <span class="kn">import</span> <span class="n">FROLS</span>
+</pre></div>
+</div>
+<div class="section" id="polynomial-narx">
+<h2>Polynomial NARX<a class="headerlink" href="#polynomial-narx" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sysidentpy.model_structure_selection</span> <span class="kn">import</span> <span class="n">FROLS</span>
 <span class="kn">from</span> <span class="nn">sysidentpy.basis_function._basis_function</span> <span class="kn">import</span> <span class="n">Polynomial</span>
 <span class="kn">from</span> <span class="nn">sysidentpy.utils.display_results</span> <span class="kn">import</span> <span class="n">results</span>
 <span class="kn">from</span> <span class="nn">sysidentpy.utils.plotting</span> <span class="kn">import</span> <span class="n">plot_residues_correlation</span><span class="p">,</span> <span class="n">plot_results</span>
@@ -688,18 +568,17 @@
 <span class="n">plot_residues_correlation</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ee</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Residues&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;$e^2$&quot;</span><span class="p">)</span>
 <span class="n">x1e</span> <span class="o">=</span> <span class="n">compute_cross_correlation</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">x2_val</span><span class="p">)</span>
 <span class="n">plot_residues_correlation</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">x1e</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Residues&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;$x_1e$&quot;</span><span class="p">)</span>
-</pre>
-                    </div>
-                  </div>
-                  <img alt="_images/polynomial_narmax.png" src="_images/polynomial_narmax.png" />
-                </div>
-                <div class="section" id="narx-neural-network">
-                  <h2>NARX Neural Network<a class="headerlink" href="#narx-neural-network"
-                      title="Permalink to this headline">¶</a></h2>
-                  <div class="highlight-python notranslate">
-                    <div class="highlight">
-                      <pre><span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+</pre></div>
+</div>
+<img alt="_images/polynomial_narmax.png" src="_images/polynomial_narmax.png" />
+</div>
+<div class="section" id="narx-neural-network">
+<h2>NARX Neural Network<a class="headerlink" href="#narx-neural-network" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 <span class="kn">from</span> <span class="nn">sysidentpy.neural_network</span> <span class="kn">import</span> <span class="n">NARXNN</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.basis_function._basis_function</span> <span class="kn">import</span> <span class="n">Polynomial</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.utils.plotting</span> <span class="kn">import</span> <span class="n">plot_residues_correlation</span><span class="p">,</span> <span class="n">plot_results</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.residues.residues_correlation</span> <span class="kn">import</span> <span class="n">compute_residues_autocorrelation</span><span class="p">,</span> <span class="n">compute_cross_correlation</span>
 
 <span class="k">class</span> <span class="nc">NARX</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
         <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -717,10 +596,14 @@
                 <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin3</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">z</span>
 
+<span class="n">basis_function</span><span class="o">=</span><span class="n">Polynomial</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
 <span class="n">narx_net</span> <span class="o">=</span> <span class="n">NARXNN</span><span class="p">(</span>
         <span class="n">net</span><span class="o">=</span><span class="n">NARX</span><span class="p">(),</span>
         <span class="n">ylag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span><span class="p">,</span>
+        <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;NARMAX&quot;</span><span class="p">,</span>
         <span class="n">loss_func</span><span class="o">=</span><span class="s1">&#39;mse_loss&#39;</span><span class="p">,</span>
         <span class="n">optimizer</span><span class="o">=</span><span class="s1">&#39;Adam&#39;</span><span class="p">,</span>
         <span class="n">epochs</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
@@ -728,24 +611,24 @@
         <span class="n">optim_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;betas&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.999</span><span class="p">),</span> <span class="s1">&#39;eps&#39;</span><span class="p">:</span> <span class="mf">1e-05</span><span class="p">}</span> <span class="c1"># optional parameters of the optimizer</span>
 <span class="p">)</span>
 
-<span class="n">train_dl</span> <span class="o">=</span> <span class="n">narx_net</span><span class="o">.</span><span class="n">data_transform</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="n">valid_dl</span> <span class="o">=</span> <span class="n">narx_net</span><span class="o">.</span><span class="n">data_transform</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
-<span class="n">narx_net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_dl</span><span class="p">,</span> <span class="n">valid_dl</span><span class="p">)</span>
-<span class="n">yhat</span> <span class="o">=</span> <span class="n">narx_net</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
-<span class="n">ee</span><span class="p">,</span> <span class="n">ex</span><span class="p">,</span> <span class="n">extras</span><span class="p">,</span> <span class="n">lam</span> <span class="o">=</span> <span class="n">narx_net</span><span class="o">.</span><span class="n">residuals</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
-<span class="n">narx_net</span><span class="o">.</span><span class="n">plot_result</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">ee</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span>
-</pre>
-                    </div>
-                  </div>
-                  <img alt="_images/narx_network.png" src="_images/narx_network.png" />
-                </div>
-                <div class="section" id="catboost-narx">
-                  <h2>Catboost-narx<a class="headerlink" href="#catboost-narx" title="Permalink to this headline">¶</a>
-                  </h2>
-                  <div class="highlight-python notranslate">
-                    <div class="highlight">
-                      <pre><span></span><span class="kn">from</span> <span class="nn">sysidentpy.general_estimators</span> <span class="kn">import</span> <span class="n">NARX</span>
+<span class="n">narx_net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">)</span>
+<span class="n">yhat</span> <span class="o">=</span> <span class="n">narx_net</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_valid</span><span class="p">)</span>
+<span class="n">plot_results</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="o">=</span><span class="n">yhat</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="n">ee</span> <span class="o">=</span> <span class="n">compute_residues_autocorrelation</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+<span class="n">plot_residues_correlation</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ee</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Residues&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;$e^2$&quot;</span><span class="p">)</span>
+<span class="n">x1e</span> <span class="o">=</span> <span class="n">compute_cross_correlation</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">x_valid</span><span class="p">)</span>
+<span class="n">plot_residues_correlation</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">x1e</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Residues&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;$x_1e$&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/narx_network.png" src="_images/narx_network.png" />
+</div>
+<div class="section" id="catboost-narx">
+<h2>Catboost-narx<a class="headerlink" href="#catboost-narx" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sysidentpy.general_estimators</span> <span class="kn">import</span> <span class="n">NARX</span>
 <span class="kn">from</span> <span class="nn">catboost</span> <span class="kn">import</span> <span class="n">CatBoostRegressor</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.basis_function._basis_function</span> <span class="kn">import</span> <span class="n">Polynomial</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.utils.plotting</span> <span class="kn">import</span> <span class="n">plot_residues_correlation</span><span class="p">,</span> <span class="n">plot_results</span>
+<span class="kn">from</span> <span class="nn">sysidentpy.residues.residues_correlation</span> <span class="kn">import</span> <span class="n">compute_residues_autocorrelation</span><span class="p">,</span> <span class="n">compute_cross_correlation</span>
 
 <span class="n">catboost_narx</span> <span class="o">=</span> <span class="n">NARX</span><span class="p">(</span>
         <span class="n">base_estimator</span><span class="o">=</span><span class="n">CatBoostRegressor</span><span class="p">(</span>
@@ -754,25 +637,26 @@
                 <span class="n">depth</span><span class="o">=</span><span class="mi">6</span><span class="p">),</span>
         <span class="n">xlag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="n">ylag</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span><span class="p">,</span>
+        <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;NARMAX&quot;</span><span class="p">,</span>
         <span class="n">fit_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;verbose&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 <span class="p">)</span>
 
-<span class="n">catboost_narx</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="n">yhat</span> <span class="o">=</span> <span class="n">catboost_narx</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
-<span class="n">ee</span><span class="p">,</span> <span class="n">ex</span><span class="p">,</span> <span class="n">extras</span><span class="p">,</span> <span class="n">lam</span> <span class="o">=</span> <span class="n">catboost_narx</span><span class="o">.</span><span class="n">residuals</span><span class="p">(</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
-<span class="n">catboost_narx</span><span class="o">.</span><span class="n">plot_result</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">ee</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span>
-</pre>
-                    </div>
-                  </div>
-                  <img alt="_images/catboost_narx.png" src="_images/catboost_narx.png" />
-                </div>
-                <div class="section" id="catboost-without-narx-configuration">
-                  <h2>Catboost without NARX configuration<a class="headerlink"
-                      href="#catboost-without-narx-configuration" title="Permalink to this headline">¶</a></h2>
-                  <p>The following is the Catboost performance <em>without</em> the NARX configuration.</p>
-                  <div class="highlight-python notranslate">
-                    <div class="highlight">
-                      <pre><span></span><span class="k">def</span> <span class="nf">plot_results</span><span class="p">(</span><span class="n">yvalid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">):</span>
+<span class="n">catboost_narx</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">)</span>
+<span class="n">yhat</span> <span class="o">=</span> <span class="n">catboost_narx</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">x_valid</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_valid</span><span class="p">)</span>
+<span class="n">plot_results</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="o">=</span><span class="n">yhat</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="n">ee</span> <span class="o">=</span> <span class="n">compute_residues_autocorrelation</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+<span class="n">plot_residues_correlation</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ee</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Residues&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;$e^2$&quot;</span><span class="p">)</span>
+<span class="n">x1e</span> <span class="o">=</span> <span class="n">compute_cross_correlation</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">x_valid</span><span class="p">)</span>
+<span class="n">plot_residues_correlation</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">x1e</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Residues&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;$x_1e$&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/catboost_narx.png" src="_images/catboost_narx.png" />
+</div>
+<div class="section" id="catboost-without-narx-configuration">
+<h2>Catboost without NARX configuration<a class="headerlink" href="#catboost-without-narx-configuration" title="Permalink to this headline">¶</a></h2>
+<p>The following is the Catboost performance <em>without</em> the NARX configuration.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_results_tmp</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="p">):</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y_valid</span><span class="p">[:</span><span class="mi">200</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Data&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">yhat</span><span class="p">[:</span><span class="mi">200</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Prediction&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
@@ -790,53 +674,36 @@
 
 <span class="n">catboost</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">plot_results</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">catboost</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_valid</span><span class="p">))</span>
-</pre>
-                    </div>
-                  </div>
-                  <img alt="_images/catboost.png" src="_images/catboost.png" />
-                  <div class="section" id="changelog">
-                    <h3>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h3>
-                    <p>See the <a class="reference external"
-                        href="http://sysidentpy.org/changelog/v0.1.7.html">changelog</a>
-                      for a history of notable changes to <strong>SysIdentPy</strong>.</p>
-                  </div>
-                  <div class="section" id="development">
-                    <h3>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a>
-                    </h3>
-                    <p>We welcome new contributors of all experience levels. The <strong>SysIdentPy</strong> community
-                      goals are to be helpful, welcoming, and effective.</p>
-                    <div class="admonition note">
-                      <p class="admonition-title">Note</p>
-                      <p>We use the <cite>pytest</cite> package for testing. The test functions are located in tests
-                        subdirectories at each folder inside <strong>SysIdentPy</strong>, which check the validity of
-                        the algorithms.</p>
-                    </div>
-                    <p>Run the <cite>pytest</cite> in the respective folder to perform all the tests of the
-                      corresponding sub-packages.</p>
-                    <p>Currently, we have around 81% of code coverage.</p>
-                    <p>You can install pytest using</p>
-                    <div class="highlight-default notranslate">
-                      <div class="highlight">
-                        <pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">U</span> <span class="n">pytest</span>
-</pre>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="section" id="example-of-how-to-run-the-tests">
-                    <h3>Example of how to run the tests:<a class="headerlink" href="#example-of-how-to-run-the-tests"
-                        title="Permalink to this headline">¶</a></h3>
-                    <p>Open a terminal emulator of your choice and go to a subdirectory, e.g,</p>
-                    <div class="highlight-default notranslate">
-                      <div class="highlight">
-                        <pre><span></span>\<span class="n">sysidentpy</span>\<span class="n">metrics</span>\
-</pre>
-                      </div>
-                    </div>
-                    <p>Just type <code class="code docutils literal notranslate"><span class="pre">pytest</span></code>
-                      and you get a result like</p>
-                    <div class="highlight-default notranslate">
-                      <div class="highlight">
-                        <pre><span></span><span class="o">==========</span> <span class="n">test</span> <span class="n">session</span> <span class="n">starts</span> <span class="o">==========</span>
+</pre></div>
+</div>
+<img alt="_images/catboost.png" src="_images/catboost.png" />
+<div class="section" id="changelog">
+<h3>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h3>
+<p>See the <a class="reference external" href="http://sysidentpy.org/changelog/v0.2.0.html">changelog</a>
+for a history of notable changes to <strong>SysIdentPy</strong>.</p>
+</div>
+<div class="section" id="development">
+<h3>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h3>
+<p>We welcome new contributors of all experience levels. The <strong>SysIdentPy</strong> community goals are to be helpful, welcoming, and effective.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We use the <cite>pytest</cite> package for testing. The test functions are located in tests subdirectories at each folder inside <strong>SysIdentPy</strong>, which check the validity of the algorithms.</p>
+</div>
+<p>Run the <cite>pytest</cite> in the respective folder to perform all the tests of the corresponding sub-packages.</p>
+<p>Currently, we have around 81% of code coverage.</p>
+<p>You can install pytest using</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">U</span> <span class="n">pytest</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-of-how-to-run-the-tests">
+<h3>Example of how to run the tests:<a class="headerlink" href="#example-of-how-to-run-the-tests" title="Permalink to this headline">¶</a></h3>
+<p>Open a terminal emulator of your choice and go to a subdirectory, e.g,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>\<span class="n">sysidentpy</span>\<span class="n">metrics</span>\
+</pre></div>
+</div>
+<p>Just type <code class="code docutils literal notranslate"><span class="pre">pytest</span></code> and you get a result like</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">==========</span> <span class="n">test</span> <span class="n">session</span> <span class="n">starts</span> <span class="o">==========</span>
 
 <span class="n">platform</span> <span class="n">linux</span> <span class="o">--</span> <span class="n">Python</span> <span class="mf">3.7.6</span><span class="p">,</span> <span class="n">pytest</span><span class="o">-</span><span class="mf">5.4.2</span><span class="p">,</span> <span class="n">py</span><span class="o">-</span><span class="mf">1.8.1</span><span class="p">,</span> <span class="n">pluggy</span><span class="o">-</span><span class="mf">0.13.1</span>
 
@@ -849,74 +716,43 @@
 <span class="n">tests</span><span class="o">/</span><span class="n">test_regression</span><span class="o">.</span><span class="n">py</span> <span class="o">............</span> <span class="p">[</span><span class="mi">100</span><span class="o">%</span><span class="p">]</span>
 
 <span class="o">==========</span> <span class="mi">12</span> <span class="n">passed</span> <span class="ow">in</span> <span class="mf">2.45</span><span class="n">s</span> <span class="o">==================</span>
-</pre>
-                      </div>
-                    </div>
-                    <p>You can also see the code coverage using the <code
-                        class="code docutils literal notranslate"><span class="pre">pytest-cov</span></code> package.
-                      First, install <code
-                        class="code docutils literal notranslate"><span class="pre">pytest-cov</span></code> using</p>
-                    <div class="highlight-default notranslate">
-                      <div class="highlight">
-                        <pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pytest</span><span class="o">-</span><span class="n">cov</span>
-</pre>
-                      </div>
-                    </div>
-                    <p>Run the command below in the <strong>SysIdentPy</strong> root directory, to generate the report.
-                    </p>
-                    <div class="highlight-default notranslate">
-                      <div class="highlight">
-                        <pre><span></span><span class="n">pytest</span> <span class="o">--</span><span class="n">cov</span><span class="o">=.</span>
-</pre>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="section" id="source-code">
-                    <h3>Source code<a class="headerlink" href="#source-code" title="Permalink to this headline">¶</a>
-                    </h3>
-                    <p>You can check the latest sources with the command:</p>
-                    <div class="highlight-default notranslate">
-                      <div class="highlight">
-                        <pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">wilsonrljr</span><span class="o">/</span><span class="n">sysidentpy</span><span class="o">.</span><span class="n">git</span>
-</pre>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="section" id="project-history">
-                    <h3>Project History<a class="headerlink" href="#project-history"
-                        title="Permalink to this headline">¶</a></h3>
-                    <p>The project was started by Wilson R. L. Junior, Luan Pascoal and Samir A. M. Martins as a project
-                      for System Identification discipline. Samuel joined early in 2019.</p>
-                    <p>The project is actively maintained by Wilson R. L. Junior and looking for contributors.</p>
-                  </div>
-                  <div class="section" id="communication">
-                    <h3>Communication<a class="headerlink" href="#communication"
-                        title="Permalink to this headline">¶</a></h3>
-                    <ul class="simple">
-                      <li>
-                        <p>Discord server: <a class="reference external"
-                            href="https://discord.gg/8eGE3PQ">https://discord.gg/8eGE3PQ</a></p>
-                      </li>
-                      <li>
-                        <p>Website(soon): <a class="reference external"
-                            href="http://sysidentpy.org">http://sysidentpy.org</a></p>
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="section" id="citation">
-                    <h3>Citation<a class="headerlink" href="#citation" title="Permalink to this headline">¶</a></h3>
-                    <p>If you use <strong>SysIdentPy</strong> on your project, please <a class="reference external"
-                        href="mailto:wilsonrljr&#37;&#52;&#48;outlook&#46;com">drop me a line</a>.</p>
-                    <p>If you use <strong>SysIdentPy</strong> on your scientific publication, we would appreciate
-                      citations to the following paper:</p>
-                    <ul>
-                      <li>
-                        <p>Lacerda et al., (2020). SysIdentPy: A Python package for System Identification using NARMAX
-                          models. Journal of Open Source Software, 5(54), 2384, <a class="reference external"
-                            href="https://doi.org/10.21105/joss.02384">https://doi.org/10.21105/joss.02384</a></p>
-                        <div class="highlight-default notranslate">
-                          <div class="highlight">
-                            <pre><span></span><span class="nd">@article</span><span class="p">{</span><span class="n">Lacerda2020</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>You can also see the code coverage using the <code class="code docutils literal notranslate"><span class="pre">pytest-cov</span></code> package. First, install <code class="code docutils literal notranslate"><span class="pre">pytest-cov</span></code> using</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pytest</span><span class="o">-</span><span class="n">cov</span>
+</pre></div>
+</div>
+<p>Run the command below in the <strong>SysIdentPy</strong> root directory, to generate the report.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="o">--</span><span class="n">cov</span><span class="o">=.</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="source-code">
+<h3>Source code<a class="headerlink" href="#source-code" title="Permalink to this headline">¶</a></h3>
+<p>You can check the latest sources with the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">wilsonrljr</span><span class="o">/</span><span class="n">sysidentpy</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="project-history">
+<h3>Project History<a class="headerlink" href="#project-history" title="Permalink to this headline">¶</a></h3>
+<p>The project was started by Wilson R. L. Junior, Luan Pascoal and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019.</p>
+<p>The project is actively maintained by Wilson R. L. Junior and looking for contributors.</p>
+</div>
+<div class="section" id="communication">
+<h3>Communication<a class="headerlink" href="#communication" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Discord server: <a class="reference external" href="https://discord.gg/8eGE3PQ">https://discord.gg/8eGE3PQ</a></p></li>
+<li><p>Website(soon): <a class="reference external" href="http://sysidentpy.org">http://sysidentpy.org</a></p></li>
+</ul>
+</div>
+<div class="section" id="citation">
+<h3>Citation<a class="headerlink" href="#citation" title="Permalink to this headline">¶</a></h3>
+<p>If you use <strong>SysIdentPy</strong> on your project, please <a class="reference external" href="mailto:wilsonrljr&#37;&#52;&#48;outlook&#46;com">drop me a line</a>.</p>
+<p>If you use <strong>SysIdentPy</strong> on your scientific publication, we would appreciate citations to the following paper:</p>
+<ul>
+<li><p>Lacerda et al., (2020). SysIdentPy: A Python package for System Identification using NARMAX models. Journal of Open Source Software, 5(54), 2384, <a class="reference external" href="https://doi.org/10.21105/joss.02384">https://doi.org/10.21105/joss.02384</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@article</span><span class="p">{</span><span class="n">Lacerda2020</span><span class="p">,</span>
   <span class="n">doi</span> <span class="o">=</span> <span class="p">{</span><span class="mf">10.21105</span><span class="o">/</span><span class="n">joss</span><span class="mf">.02384</span><span class="p">},</span>
   <span class="n">url</span> <span class="o">=</span> <span class="p">{</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">doi</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="mf">10.21105</span><span class="o">/</span><span class="n">joss</span><span class="mf">.02384</span><span class="p">},</span>
   <span class="n">year</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2020</span><span class="p">},</span>
@@ -928,114 +764,82 @@
   <span class="n">title</span> <span class="o">=</span> <span class="p">{</span><span class="n">SysIdentPy</span><span class="p">:</span> <span class="n">A</span> <span class="n">Python</span> <span class="n">package</span> <span class="k">for</span> <span class="n">System</span> <span class="n">Identification</span> <span class="n">using</span> <span class="n">NARMAX</span> <span class="n">models</span><span class="p">},</span>
   <span class="n">journal</span> <span class="o">=</span> <span class="p">{</span><span class="n">Journal</span> <span class="n">of</span> <span class="n">Open</span> <span class="n">Source</span> <span class="n">Software</span><span class="p">}</span>
 <span class="p">}</span>
-</pre>
-                          </div>
-                        </div>
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="section" id="inspiration">
-                    <h3>Inspiration<a class="headerlink" href="#inspiration" title="Permalink to this headline">¶</a>
-                    </h3>
-                    <p>The documentation and structure (even this section) is openly inspired by sklearn, einsteinpy,
-                      and many others as we used (and keep using) them to learn.</p>
-                  </div>
-                  <div class="section" id="contents">
-                    <h3>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h3>
-                    <div class="toctree-wrapper compound">
-                      <ul>
-                        <li class="toctree-l1"><a class="reference internal" href="installation.html">Install Guide</a>
-                        </li>
-                        <li class="toctree-l1"><a class="reference internal" href="introduction_to_narmax.html">A brief
-                            introduction to NARMAX models.</a></li>
-                        <li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
-                        <li class="toctree-l1"><a class="reference internal" href="dev_guide.html">Contributing</a></li>
-                        <li class="toctree-l1"><a class="reference internal" href="notebooks.html">Examples</a></li>
-                        <li class="toctree-l1"><a class="reference internal" href="notebooksv016.html">Examples
-                            v0.1.6</a></li>
-                        <li class="toctree-l1"><a class="reference internal" href="changelog/v0.1.9.html">Changes in
-                            SysIdentPy</a></li>
-                        <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
-                        <li class="toctree-l1"><a class="reference internal"
-                            href="code.html#module-sysidentpy.narmax_base">sysidentpy base</a></li>
-                        <li class="toctree-l1"><a class="reference internal"
-                            href="code.html#module-sysidentpy.model_structure_selection.FROLS">sysidentpy FROLS</a></li>
-                        <li class="toctree-l1"><a class="reference internal"
-                            href="code.html#module-sysidentpy.model_structure_selection.MetaMSS">sysidentpy metamss</a>
-                        </li>
-                        <li class="toctree-l1"><a class="reference internal"
-                            href="code.html#module-sysidentpy.model_structure_selection.ER">sysidentpy er</a></li>
-                        <li class="toctree-l1"><a class="reference internal"
-                            href="code.html#module-sysidentpy.simulation._simulation">sysidentpy simulation</a></li>
-                        <li class="toctree-l1"><a class="reference internal"
-                            href="code.html#module-sysidentpy.basis_function._basis_function">sysidentpy basis
-                            function</a></li>
-                        <li class="toctree-l1"><a class="reference internal"
-                            href="code.html#sysidentpy-narx-neural-network">sysidentpy narx_neural_network</a></li>
-                        <li class="toctree-l1"><a class="reference internal"
-                            href="code.html#module-sysidentpy.general_estimators.narx">sysidentpy general_estimators</a>
-                        </li>
-                        <li class="toctree-l1"><a class="reference internal"
-                            href="code.html#module-sysidentpy.metaheuristics.bpsogsa">sysidentpy bpsogsa</a></li>
-                        <li class="toctree-l1"><a class="reference internal"
-                            href="code.html#module-sysidentpy.residues.residues_correlation">sysidentpy residues</a>
-                        </li>
-                        <li class="toctree-l1"><a class="reference internal"
-                            href="code.html#module-sysidentpy.metrics._regression">sysidentpy metrics</a></li>
-                        <li class="toctree-l1"><a class="reference internal"
-                            href="code.html#module-sysidentpy.parameter_estimation.estimators">sysidentpy estimators</a>
-                        </li>
-                        <li class="toctree-l1"><a class="reference internal"
-                            href="code.html#module-sysidentpy.utils._check_arrays">sysidentpy utils</a></li>
-                        <li class="toctree-l1"><a class="reference internal"
-                            href="code.html#module-sysidentpy.utils.generate_data">sysidentpy generate data</a></li>
-                        <li class="toctree-l1"><a class="reference internal"
-                            href="code.html#module-sysidentpy.utils.plotting">sysidentpy plotting</a></li>
-                        <li class="toctree-l1"><a class="reference internal"
-                            href="code.html#module-sysidentpy.utils.display_results">sysidentpy display results</a></li>
-                        <li class="toctree-l1"><a class="reference internal"
-                            href="code.html#module-sysidentpy.utils.save_load">sysidentpy save_load</a></li>
-                        <li class="toctree-l1"><a class="reference internal" href="code.html#indices-and-tables">Indices
-                            and tables</a></li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="inspiration">
+<h3>Inspiration<a class="headerlink" href="#inspiration" title="Permalink to this headline">¶</a></h3>
+<p>The documentation and structure (even this section) is openly inspired by sklearn, einsteinpy, and many others as we used (and keep using) them to learn.</p>
+</div>
+<div class="section" id="contents">
+<h3>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h3>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction_to_narmax.html">A brief introduction to NARMAX models.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev_guide.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog/v0.2.0.html">Changes in SysIdentPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-base">sysidentpy base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.model_structure_selection.FROLS">sysidentpy FROLS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.model_structure_selection.MetaMSS">sysidentpy metamss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.model_structure_selection.ER">sysidentpy er</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.simulation._simulation">sysidentpy simulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.basis_function._basis_function">sysidentpy basis function</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#sysidentpy-narx-neural-network">sysidentpy narx_neural_network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.general_estimators.narx">sysidentpy general_estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.metaheuristics.bpsogsa">sysidentpy bpsogsa</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.residues.residues_correlation">sysidentpy residues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.metrics._regression">sysidentpy metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.parameter_estimation.estimators">sysidentpy estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.utils._check_arrays">sysidentpy utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.utils.generate_data">sysidentpy generate data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.utils.plotting">sysidentpy plotting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.utils.display_results">sysidentpy display results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-sysidentpy.utils.save_load">sysidentpy save_load</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+
               </div>
-
-
-            </div>
-
-
-            <!-- Previous / next buttons -->
-            <div class='prev-next-area'>
-              <a class='right-next' id="next-link" href="installation.html" title="next page">
-                <div class="prev-next-info">
-                  <p class="prev-next-subtitle">next</p>
-                  <p class="prev-next-title">Install Guide</p>
-                </div>
-                <i class="fas fa-angle-right"></i>
-              </a>
-            </div>
-
-          </div>
-        </div>
-        <footer class="footer">
-          <p>
-
-            De Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins<br />
-
-            &copy; direito autoral 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.<br />
-          </p>
-        </footer>
-      </main>
-
-
+              
+            
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='right-next' id="next-link" href="installation.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Install Guide</p>
     </div>
-  </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            
+        </div>
+    </div>
+    <footer class="footer">
+  <p>
+    
+      By Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins<br/>
+    
+        &copy; Copyright 2020, Wilson Rocha, Luan Pascoal, Samuel Oliveira, Samir Martins.<br/>
+  </p>
+</footer>
+</main>
 
+
+      </div>
+    </div>
+  
   <script src="_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
 
-</body>
-
+  </body>
 </html>

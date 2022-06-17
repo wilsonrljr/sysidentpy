@@ -17,6 +17,67 @@ CHANGES
 ~~~~~~~
 - The update **v0.2.0**  has been released with additional feature, minor API changes and fixes. 
 
+- MAJOR: Many new features for General Estimators
+    - Now the user can build General NARX models with Fourier basis function.
+    - The user can choose which basis they want by importing it from sysidentpy.basis_function. Check the notebooks with examples of how to use it.
+    - Now it is possible to build General NAR models. The user just need to pass model_type="NAR" to build NAR models.
+    - Now it is possible to build General NFIR models. The user just need to pass model_type="NFIR" to build NAR models.
+    - Now it is possible to run n-steps ahead prediction using General Estimators. Until now only infinity-steps ahead were allowed. Now the users can set any steps they want.
+    - Polynomial and Fourier are supported for now. New basis functions will be added in next releases.
+    - No need to pass the number of inputs anymore.
+    - Improved docstring.
+    - Fixed minor grammatical and spelling mistakes.
+    - many under the hood changes.
+
+- MAJOR: Many new features for NARX Neural Network
+    - Now the user can build Neural NARX models with Fourier basis function.
+    - The user can choose which basis they want by importing it from sysidentpy.basis_function. Check the notebooks with examples of how to use it.
+    - Now it is possible to build Neural NAR models. The user just need to pass model_type="NAR" to build NAR models.
+    - Now it is possible to build Neural NFIR models. The user just need to pass model_type="NFIR" to build NAR models.
+    - Now it is possible to run n-steps ahead prediction using Neural NARX. Until now only infinity-steps ahead were allowed. Now the users can set any steps they want.
+    - Polynomial and Fourier are supported for now. New basis functions will be added in next releases.
+    - No need to pass the number of inputs anymore.
+    - Improved docstring.
+    - Fixed minor grammatical and spelling mistakes.
+    - many under the hood changes.
+
+- Major: Support for old methods removed.
+    - Now the old sysidentpy.PolynomialNarmax is not available anymore. All the old features are included in the new API with a lot of new features and performance improvements.
+
+- API Change (new): sysidentpy.general_estimators.ModelPrediction
+    - ModelPrediction class was adapted to support General Estimators as a stand-alone class.
+    - predict: base method for prediction. Support infinity_steps ahead, one-step ahead and n-steps ahead prediction and any basis function.
+    - _one_step_ahead_prediction: Perform the 1-step-ahead prediction for any basis function.
+    - _n_step_ahead_prediction: Perform the n-step-ahead prediction for polynomial basis.
+    - _model_prediction: Perform the infinity-step-ahead prediction for polynomial basis.
+    - _narmax_predict: wrapper for NARMAX and NAR models.
+    - _nfir_predict: wrapper for NFIR models.
+    - _basis_function_predict: Perform the infinity-step-ahead prediction for basis functions other than polynomial.
+    - basis_function_n_step_prediction: Perform the n-step-ahead prediction for basis functions other than polynomial.
+
+- API Change (new): sysidentpy.neural_network.ModelPrediction
+    - ModelPrediction class was adapted to support Neural NARX as a stand-alone class.
+    - predict: base method for prediction. Support infinity_steps ahead, one-step ahead and n-steps ahead prediction and any basis function.
+    - _one_step_ahead_prediction: Perform the 1-step-ahead prediction for any basis function.
+    - _n_step_ahead_prediction: Perform the n-step-ahead prediction for polynomial basis.
+    - _model_prediction: Perform the infinity-step-ahead prediction for polynomial basis.
+    - _narmax_predict: wrapper for NARMAX and NAR models.
+    - _nfir_predict: wrapper for NFIR models.
+    - _basis_function_predict: Perform the infinity-step-ahead prediction for basis functions other than polynomial.
+    - basis_function_n_step_prediction: Perform the n-step-ahead prediction for basis functions other than polynomial.
+
+- API Change: Fit method for Neural NARX revamped.
+    - No need to convert the data to tensor before calling Fit method anymore.
+
+API Change: Keyword and positional arguments
+    - Now users have to provide parameters with their names, as keyword arguments, instead of positional arguments. This is valid for every model class now.
+
+- API Change (new): sysidentpy.utils.narmax_tools
+    - New functions to help user getting useful information to build model. Now we have the regressor_code helper function to help to build neural NARX models.
+
+- DOC: Fixed minor grammatical and spelling mistakes, including Issues #77 and #78.
+- DOC: Fix issues related to html on Jupyter notebooks examples on documentation.
+
 
 v0.1.9
 ------

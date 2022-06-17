@@ -44,10 +44,11 @@ noise and selecting 90% of the data to train the model.
 
 .. code:: ipython3
 
-    x_train, x_valid, y_train, y_valid = get_siso_data(n=1000,
-                                                       colored_noise=False,
-                                                       sigma=0.001,
-                                                       train_percentage=90)
+    x_train, x_valid, y_train, y_valid = get_siso_data(
+        n=1000,
+        colored_noise=False,
+        sigma=0.001,
+        train_percentage=90)
 
 To obtain a NARMAX model we have to choose some values, e.g, the nonlinearity degree (``degree``), the maximum lag for the inputs and output (``xlag`` and ``ylag``).
 
