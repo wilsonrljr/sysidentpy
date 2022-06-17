@@ -20,13 +20,13 @@
 SysIdentPy is a Python module for System Identification using **NARMAX** models built on top of **numpy** and is distributed under the 3-Clause BSD license.
 
 # Note
-The update **v0.1.7**  has been released with major changes and additional features (Fourier basis function, NAR and NFIR models, possibility to select the lag of the residues for Extended Least Squares algorithm and many more).
+The update **v0.2.0**  has been released with major changes and additional features (Fourier basis function, NAR and NFIR models, n-steps ahead prediction for both General Estimators and Neural NARX and more).
 
-There are several API modifications and you will need to change your code to have the new (and upcoming) features.
+There are API modifications and you will need to change your code to have the new (and upcoming) features.
 
 Check the examples of how to use the new version in the [documentation page](<http://sysidentpy.org/notebooks.html>).
   
-For more details, please see the [changelog](<http://sysidentpy.org/changelog/v0.1.7.html>).
+For more details, please see the [changelog](<http://sysidentpy.org/changelog/v0.2.0.html>).
 
 # Documentation
 
@@ -216,7 +216,7 @@ The examples directory has several Jupyter notebooks with tutorials of how to us
 
 SysIdentPy requires:
 
-- Python (>= 3.6)
+- Python (>= 3.7)
 - NumPy (>= 1.5.0) for all numerical algorithms
 - Matplotlib >= 1.5.2 for static plotting and visualizations
 - Pytorch (>=1.7.1) for building feed-forward neural networks
