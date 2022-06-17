@@ -867,23 +867,23 @@ class ModelPrediction:
 
         # Discard unnecessary initial values
         # yhat[0:self.max_lag] = y_initial[0:self.max_lag]
-        analysed_elements_number = self.max_lag + 1
+        analyzed_elements_number = self.max_lag + 1
 
         for i in range(0, forecast_horizon - self.max_lag):
             if self.model_type == "NARMAX":
                 lagged_data = self.build_input_output_matrix(
-                    X[i : i + analysed_elements_number],
-                    yhat[i : i + analysed_elements_number].reshape(-1, 1),
+                    X[i : i + analyzed_elements_number],
+                    yhat[i : i + analyzed_elements_number].reshape(-1, 1),
                     self.xlag,
                     self.ylag,
                 )
             elif self.model_type == "NAR":
                 lagged_data = self.build_output_matrix(
-                    yhat[i : i + analysed_elements_number].reshape(-1, 1), self.ylag
+                    yhat[i : i + analyzed_elements_number].reshape(-1, 1), self.ylag
                 )
             elif self.model_type == "NFIR":
                 lagged_data = self.build_input_matrix(
-                    X[i : i + analysed_elements_number], self.xlag
+                    X[i : i + analyzed_elements_number], self.xlag
                 )
             else:
                 raise ValueError(
@@ -931,7 +931,7 @@ class ModelPrediction:
         yhat[: self.max_lag] = y[: self.max_lag, 0]
 
         # Discard unnecessary initial values
-        analysed_elements_number = self.max_lag + 1
+        analyzed_elements_number = self.max_lag + 1
         i = self.max_lag
 
         while i < len(y):
@@ -976,7 +976,7 @@ class ModelPrediction:
         yhat[: self.max_lag] = y[: self.max_lag, 0]
 
         # Discard unnecessary initial values
-        analysed_elements_number = self.max_lag + 1
+        analyzed_elements_number = self.max_lag + 1
         i = self.max_lag
 
         while i < len(y):

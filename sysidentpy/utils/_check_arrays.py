@@ -7,7 +7,7 @@
 import numpy as np
 import numbers
 
-# copy-pasted/adpted from scikit-learn utils/validation.py
+# copy-pasted/adapted from scikit-learn utils/validation.py
 def check_random_state(seed):
     """Turn `seed` into a `np.random.RandomState` instance.
     Parameters
