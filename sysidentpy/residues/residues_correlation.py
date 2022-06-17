@@ -154,15 +154,15 @@ class ResiduesAnalysis:
     def _residuals_acf(self, y, yhat):
         e = (y - yhat).flatten()
         unnormalized_e_acf = np.correlate(e, e, mode="full")
-        half_of_simmetry_autocorr = int(np.floor(unnormalized_e_acf.size / 2))
+        half_of_symmetry_autocorr = int(np.floor(unnormalized_e_acf.size / 2))
 
         e_acf = np.zeros(
-            (len(unnormalized_e_acf) - half_of_simmetry_autocorr, 3), dtype=float
+            (len(unnormalized_e_acf) - half_of_symmetry_autocorr, 3), dtype=float
         )
 
         e_acf[:, 0] = (
-            unnormalized_e_acf[half_of_simmetry_autocorr:]
-            / unnormalized_e_acf[half_of_simmetry_autocorr]
+            unnormalized_e_acf[half_of_symmetry_autocorr:]
+            / unnormalized_e_acf[half_of_symmetry_autocorr]
         )
 
         e_acf[:, 1] = np.ones(len(e_acf[:, 0])) * (
@@ -261,7 +261,6 @@ class ResiduesAnalysis:
         ax.tick_params(labelsize=14)
         ax.set_xlabel("Samples", fontsize=14)
         ax.set_ylabel("y, yhat", fontsize=14)
-        # ax.grid(color="grey", linestyle="-.", alpha=0.1)
         ax.spines["right"].set_visible(False)
         ax.spines["top"].set_visible(False)
         ax.xaxis.set_ticks_position("bottom")
