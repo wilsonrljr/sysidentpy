@@ -71,6 +71,9 @@ API Change: Keyword and positional arguments
 - API Change (new): sysidentpy.utils.narmax_tools
     - New functions to help user getting useful information to build model. Now we have the regressor_code helper function to help to build neural NARX models.
 
+- DOC: Improved Basic Steps notebook with new details about the prediction function.
+- DOC: NARX Neural Network notebook was updated following the new api and showing new features.
+- DOC: General Estimators notebook was updated following the new api and showing new features.
 - DOC: Fixed minor grammatical and spelling mistakes, including Issues #77 and #78.
 - DOC: Fix issues related to html on Jupyter notebooks examples on documentation.
 
