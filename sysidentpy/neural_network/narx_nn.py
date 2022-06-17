@@ -737,8 +737,6 @@ class NARXNN(
         if y is None:
             raise ValueError("y cannot be None")
 
-        check_X_y(X, y)
-
         x_train, y_train = self.split_data(X, y)
         train_ds = self.convert_to_tensor(x_train, y_train)
         train_dl = self.get_data(train_ds)
