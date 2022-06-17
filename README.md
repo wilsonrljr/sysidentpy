@@ -105,7 +105,6 @@ plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 ```python
 from sysidentpy.neural_network import NARXNN
 from sysidentpy.basis_function import Polynomial
-from sysidentpy.utils.display_results import results
 from sysidentpy.utils.plotting import plot_residues_correlation, plot_results
 from sysidentpy.residues.residues_correlation import compute_residues_autocorrelation
 from sysidentpy.residues.residues_correlation import compute_cross_correlation
@@ -156,7 +155,6 @@ plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 from catboost import CatBoostRegressor
 from sysidentpy.general_estimators import NARX
 from sysidentpy.basis_function import Polynomial
-from sysidentpy.utils.display_results import results
 from sysidentpy.utils.plotting import plot_residues_correlation, plot_results
 from sysidentpy.residues.residues_correlation import compute_residues_autocorrelation
 from sysidentpy.residues.residues_correlation import compute_cross_correlation
@@ -192,7 +190,7 @@ The following is the Catboost performance without the NARX configuration.
 
 ```python
 
-def plot_results_tmp(yvalid, yhat):
+def plot_results_tmp(y_valid, yhat):
     _, ax = plt.subplots(figsize=(14, 8))
     ax.plot(y_valid[:200], label='Data', marker='o')
     ax.plot(yhat[:200], label='Prediction', marker='*')
