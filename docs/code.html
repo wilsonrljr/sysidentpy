@@ -326,7 +326,7 @@
   </a>
  </li>
  <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#sysidentpy-base">
+  <a class="reference internal nav-link" href="#module-sysidentpy.narmax_base">
    sysidentpy base
   </a>
  </li>
@@ -441,7 +441,7 @@
   </a>
  </li>
  <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#sysidentpy-base">
+  <a class="reference internal nav-link" href="#module-sysidentpy.narmax_base">
    sysidentpy base
   </a>
  </li>
@@ -544,8 +544,202 @@
 <div class="toctree-wrapper compound">
 </div>
 </div>
-<div class="section" id="sysidentpy-base">
-<h1>sysidentpy base<a class="headerlink" href="#sysidentpy-base" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-sysidentpy.narmax_base">
+<span id="sysidentpy-base"></span><h1>sysidentpy base<a class="headerlink" href="#module-sysidentpy.narmax_base" title="Permalink to this headline">¶</a></h1>
+<p>Base classes for NARMAX estimator.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="sysidentpy.narmax_base.GenerateRegressors">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sysidentpy.narmax_base.</span></span><span class="sig-name descname"><span class="pre">GenerateRegressors</span></span><a class="reference internal" href="_modules/sysidentpy/narmax_base.html#GenerateRegressors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sysidentpy.narmax_base.GenerateRegressors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Polynomial NARMAX model</p>
+<p>Provides the main functions to generate the regressor dictionary
+and regressor codes for polynomial basis.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="sysidentpy.narmax_base.GenerateRegressors.create_narmax_code">
+<span class="sig-name descname"><span class="pre">create_narmax_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">non_degree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_inputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/narmax_base.html#GenerateRegressors.create_narmax_code"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sysidentpy.narmax_base.GenerateRegressors.create_narmax_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the code representation of the regressors.</p>
+<p>This function generates a codification from all possibles
+regressors given the maximum lag of the input and output.
+This is used to write the final terms of the model in a
+readable form. [1001] -&gt; y(k-1).
+This code format was based on a dissertation from UFMG. See
+reference below.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>non_degree</strong> (<em>int</em>) – The desired maximum nonlinearity degree.</p></li>
+<li><p><strong>ylag</strong> (<em>int</em>) – The maximum lag of output regressors.</p></li>
+<li><p><strong>xlag</strong> (<em>int</em>) – The maximum lag of input regressors.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>max_lag</strong> (<em>int</em>) – This value can be used by another functions.</p></li>
+<li><p><strong>regressor_code</strong> (<em>ndarray of int</em>) – Matrix codification of all possible regressors.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>The codification is defined as:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="mi">100</span><span class="n">n</span> <span class="o">=</span> <span class="n">y</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">200</span><span class="n">n</span> <span class="o">=</span> <span class="n">u</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="mi">100</span><span class="n">n</span> <span class="mi">100</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="n">n</span><span class="p">)</span><span class="n">y</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="mi">200</span><span class="n">n</span> <span class="mi">200</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="n">n</span><span class="p">)</span><span class="n">u</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">References</p>
+<dl class="simple">
+<dt>[1] Master Thesis: Barbosa, Alípio Monteiro.</dt><dd><p>Técnicas de otimização bi-objetivo para a determinação
+da estrutura de modelos NARX (2010).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sysidentpy.narmax_base.HouseHolder">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sysidentpy.narmax_base.</span></span><span class="sig-name descname"><span class="pre">HouseHolder</span></span><a class="reference internal" href="_modules/sysidentpy/narmax_base.html#HouseHolder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sysidentpy.narmax_base.HouseHolder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Householder reflection and transformation.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sysidentpy.narmax_base.InformationMatrix">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sysidentpy.narmax_base.</span></span><span class="sig-name descname"><span class="pre">InformationMatrix</span></span><a class="reference internal" href="_modules/sysidentpy/narmax_base.html#InformationMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sysidentpy.narmax_base.InformationMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for methods regarding preprocessing of columns</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="sysidentpy.narmax_base.InformationMatrix.shift_column">
+<span class="sig-name descname"><span class="pre">shift_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">col_to_shift</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/narmax_base.html#InformationMatrix.shift_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sysidentpy.narmax_base.InformationMatrix.shift_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shift values based on a lag.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>col_to_shift</strong> (<em>array-like of shape = n_samples</em>) – The samples of the input or output.</p></li>
+<li><p><strong>lag</strong> (<em>int</em>) – The respective lag of the regressor.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>tmp_column</strong> – The shifted array of the input or output.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array-like of shape = n_samples</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shift_column</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">[0, 1, 2, 3, 4]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sysidentpy.narmax_base.InformationMatrix.initial_lagged_matrix">
+<span class="sig-name descname"><span class="pre">initial_lagged_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/narmax_base.html#InformationMatrix.initial_lagged_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sysidentpy.narmax_base.InformationMatrix.initial_lagged_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a lagged matrix concerning each lag for each column.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>ndarray of int</em>) – The model code representation.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – Target data used on training phase.</p></li>
+<li><p><strong>X</strong> (<em>array-like</em>) – Input data used on training phase.</p></li>
+<li><p><strong>ylag</strong> (<em>int</em>) – The maximum lag of output regressors.</p></li>
+<li><p><strong>xlag</strong> (<em>int</em>) – The maximum lag of input regressors.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>lagged_data</strong> – The lagged matrix built in respect with each lag and column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray of floats</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Let X and y be the input and output values of shape Nx1.
+If the chosen lags are 2 for both input and output
+the initial lagged matrix will be formed by Y[k-1], Y[k-2],
+X[k-1], and X[k-2].</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sysidentpy.narmax_base.InformationMatrix.build_output_matrix">
+<span class="sig-name descname"><span class="pre">build_output_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/narmax_base.html#InformationMatrix.build_output_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sysidentpy.narmax_base.InformationMatrix.build_output_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the information matrix of output values.</p>
+<p>Each columns of the information matrix represents a candidate
+regressor. The set of candidate regressors are based on xlag,
+ylag, and non_degree entered by the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>ndarray of int</em>) – The model code representation.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – Target data used on training phase.</p></li>
+<li><p><strong>ylag</strong> (<em>int</em>) – The maximum lag of output regressors.</p></li>
+<li><p><strong>non_degree</strong> (<em>int</em>) – The desired maximum nonlinearity degree.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The lagged matrix built in respect with each lag and column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>lagged_data = ndarray of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sysidentpy.narmax_base.InformationMatrix.build_input_matrix">
+<span class="sig-name descname"><span class="pre">build_input_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/narmax_base.html#InformationMatrix.build_input_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sysidentpy.narmax_base.InformationMatrix.build_input_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the information matrix of input values.</p>
+<p>Each columns of the information matrix represents a candidate
+regressor. The set of candidate regressors are based on xlag,
+ylag, and non_degree entered by the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>ndarray of int</em>) – The model code representation.</p></li>
+<li><p><strong>X</strong> (<em>array-like</em>) – Input data used on training phase.</p></li>
+<li><p><strong>xlag</strong> (<em>int</em>) – The maximum lag of input regressors.</p></li>
+<li><p><strong>non_degree</strong> (<em>int</em>) – The desired maximum nonlinearity degree.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The lagged matrix built in respect with each lag and column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>lagged_data = ndarray of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sysidentpy.narmax_base.InformationMatrix.build_input_output_matrix">
+<span class="sig-name descname"><span class="pre">build_input_output_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sysidentpy/narmax_base.html#InformationMatrix.build_input_output_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sysidentpy.narmax_base.InformationMatrix.build_input_output_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the information matrix.</p>
+<p>Each columns of the information matrix represents a candidate
+regressor. The set of candidate regressors are based on xlag,
+ylag, and non_degree entered by the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>ndarray of int</em>) – The model code representation.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – Target data used on training phase.</p></li>
+<li><p><strong>X</strong> (<em>array-like</em>) – Input data used on training phase.</p></li>
+<li><p><strong>ylag</strong> (<em>int</em>) – The maximum lag of output regressors.</p></li>
+<li><p><strong>xlag</strong> (<em>int</em>) – The maximum lag of input regressors.</p></li>
+<li><p><strong>non_degree</strong> (<em>int</em>) – The desired maximum nonlinearity degree.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The lagged matrix built in respect with each lag and column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>lagged_data = ndarray of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-sysidentpy.model_structure_selection.FROLS">
 <span id="sysidentpy-frols"></span><h1>sysidentpy FROLS<a class="headerlink" href="#module-sysidentpy.model_structure_selection.FROLS" title="Permalink to this headline">¶</a></h1>

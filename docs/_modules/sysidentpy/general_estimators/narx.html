@@ -561,8 +561,7 @@
                     <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">raw_regressor</span><span class="p">,</span> <span class="n">model_exponents</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
                 <span class="p">)</span>
 
-            <span class="c1"># y_output[i] = np.dot(regressor_value, self.theta.flatten())</span>
-            <span class="n">y_output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_estimator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">regressor_value</span><span class="p">)</span>
+            <span class="n">y_output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_estimator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">regressor_value</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">y_output</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_nfir_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y_initial</span><span class="p">):</span>

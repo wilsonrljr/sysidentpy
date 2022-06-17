@@ -404,7 +404,6 @@
 <span class="kn">from</span> <span class="nn">sysidentpy.model_structure_selection</span> <span class="kn">import</span> <span class="n">FROLS</span>
 <span class="kn">from</span> <span class="nn">sysidentpy.basis_function._basis_function</span> <span class="kn">import</span> <span class="n">Polynomial</span>
 <span class="kn">from</span> <span class="nn">sysidentpy.metrics</span> <span class="kn">import</span> <span class="n">root_relative_squared_error</span>
-<span class="kn">from</span> <span class="nn">sysidentpy.utils.generate_data</span> <span class="kn">import</span> <span class="n">get_siso_data</span>
 <span class="kn">from</span> <span class="nn">sysidentpy.utils.display_results</span> <span class="kn">import</span> <span class="n">results</span>
 <span class="kn">from</span> <span class="nn">sysidentpy.utils.plotting</span> <span class="kn">import</span> <span class="n">plot_residues_correlation</span><span class="p">,</span> <span class="n">plot_results</span>
 <span class="kn">from</span> <span class="nn">sysidentpy.residues.residues_correlation</span> <span class="kn">import</span> <span class="n">compute_residues_autocorrelation</span><span class="p">,</span> <span class="n">compute_cross_correlation</span>
@@ -485,7 +484,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\model_structure_selection\forward_regression_orthogonal_least_squares.py:472: UserWarning: n_info_values is greater than the maximum number of all regressors space considering the chosen y_lag, u_lag, and non_degree. We set as 15 
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\model_structure_selection\forward_regression_orthogonal_least_squares.py:481: UserWarning: n_info_values is greater than the maximum number of all regressors space considering the chosen y_lag, u_lag, and non_degree. We set as 15 
   self.info_values = self.information_criterion(reg_matrix, y)
 </pre></div>
 </div>
@@ -529,16 +528,20 @@
     <span class="p">(</span><span class="s1">&#39;KNeighborsRegressor&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
         <span class="n">base_estimator</span><span class="o">=</span><span class="n">KNeighborsRegressor</span><span class="p">(),</span>
         <span class="n">xlag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-        <span class="n">ylag</span><span class="o">=</span><span class="mi">10</span><span class="p">)),</span>
+        <span class="n">ylag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span><span class="p">,</span>
+        <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;NARMAX&quot;</span><span class="p">)),</span>
     <span class="p">(</span><span class="s1">&#39;NARX-DecisionTreeRegressor&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
         <span class="n">base_estimator</span><span class="o">=</span><span class="n">DecisionTreeRegressor</span><span class="p">(),</span>
         <span class="n">xlag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-        <span class="n">ylag</span><span class="o">=</span><span class="mi">10</span><span class="p">)),</span>
+        <span class="n">ylag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span><span class="p">)),</span>
     <span class="p">(</span><span class="s1">&#39;NARX-RandomForestRegressor&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
         <span class="n">base_estimator</span><span class="o">=</span><span class="n">RandomForestRegressor</span><span class="p">(</span>
             <span class="n">n_estimators</span><span class="o">=</span><span class="mi">200</span><span class="p">),</span>
         <span class="n">xlag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
         <span class="n">ylag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span>
     <span class="p">)),</span>
     <span class="p">(</span><span class="s1">&#39;NARX-Catboost&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
         <span class="n">base_estimator</span><span class="o">=</span><span class="n">CatBoostRegressor</span><span class="p">(</span>
@@ -547,14 +550,14 @@
         <span class="n">depth</span><span class="o">=</span><span class="mi">8</span><span class="p">),</span>
         <span class="n">xlag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
         <span class="n">ylag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-        <span class="n">non_degree</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span><span class="p">,</span>
         <span class="n">fit_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;verbose&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
     <span class="p">)),</span>
     <span class="p">(</span><span class="s1">&#39;NARX-ARD&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
         <span class="n">base_estimator</span><span class="o">=</span><span class="n">ARDRegression</span><span class="p">(),</span>
         <span class="n">xlag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
         <span class="n">ylag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-        <span class="n">non_degree</span><span class="o">=</span><span class="mi">2</span>
+        <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span>
     <span class="p">)),</span>
     <span class="p">(</span><span class="s1">&#39;FROLS-Polynomial_NARX&#39;</span><span class="p">,</span> <span class="n">FROLS</span><span class="p">(</span>
         <span class="n">order_selection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -581,51 +584,11 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-14 20:35:42 - INFO - Training the model
-10-14 20:35:42 - INFO - Creating the regressor matrix
-10-14 20:35:42 - INFO - The regressor matrix have 21 features
-10-14 20:35:42 - INFO - Done! Model is built!
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\utils\deprecation.py:27: FutureWarning: Function __init__ has been deprecated since v0.1.7.
- Use NARXNN(ylag=2, xlag=2, basis_function=&#39;Some basis function&#39;) instead.This module was deprecated in favor of NARXNN(ylag=2, xlag=2, basis_function=&#39;Some basis function&#39;) module into which all the refactored classes and functions are moved.
- This feature will be removed in version v0.2.0.
-  warnings.warn(message, FutureWarning)
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>KNeighborsRegressor 1.871
-10-14 20:35:42 - INFO - Training the model
-10-14 20:35:42 - INFO - Creating the regressor matrix
-10-14 20:35:42 - INFO - The regressor matrix have 21 features
-10-14 20:35:42 - INFO - Done! Model is built!
-NARX-DecisionTreeRegressor 0.137
-10-14 20:35:43 - INFO - Training the model
-10-14 20:35:43 - INFO - Creating the regressor matrix
-10-14 20:35:43 - INFO - The regressor matrix have 21 features
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\general_estimators\narx.py:161: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples,), for example using ravel().
-  self.base_estimator.fit(X, y, **self.fit_params)
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-14 20:35:43 - INFO - Done! Model is built!
-NARX-RandomForestRegressor 0.167
-10-14 20:35:47 - INFO - Training the model
-10-14 20:35:47 - INFO - Creating the regressor matrix
-10-14 20:35:47 - INFO - The regressor matrix have 21 features
-10-14 20:35:49 - INFO - Done! Model is built!
-NARX-Catboost 0.182
-10-14 20:35:50 - INFO - Training the model
-10-14 20:35:50 - INFO - Creating the regressor matrix
-10-14 20:35:50 - INFO - The regressor matrix have 231 features
-10-14 20:35:50 - INFO - Done! Model is built!
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\sklearn\utils\validation.py:63: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().
-  return f(*args, **kwargs)
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NARX-ARD 0.075
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>KNeighborsRegressor 2.051
+NARX-DecisionTreeRegressor 0.281
+NARX-RandomForestRegressor 0.253
+NARX-Catboost 0.177
+NARX-ARD 0.075
 FROLS-Polynomial_NARX 0.047
 </pre></div>
 </div>
@@ -641,10 +604,10 @@ FROLS-Polynomial_NARX 0.047
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>FROLS-Polynomial_NARX 0.04663897799085836
 NARX-ARD 0.07507698375814373
-NARX-DecisionTreeRegressor 0.1370352822444405
-NARX-RandomForestRegressor 0.16746617689296395
-NARX-Catboost 0.1818567377511571
-KNeighborsRegressor 1.8710938813353852
+NARX-Catboost 0.1771087608749771
+NARX-RandomForestRegressor 0.2527000702594562
+NARX-DecisionTreeRegressor 0.2807847246249198
+KNeighborsRegressor 2.050790293434399
 </pre></div>
 </div>
 </div>

@@ -413,23 +413,25 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\narmax_base.py:796: RuntimeWarning: overflow encountered in power
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\narmax_base.py:824: RuntimeWarning: overflow encountered in power
   np.power(raw_regressor, model_exponents[j])
-C:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\numpy\core\fromnumeric.py:87: RuntimeWarning: overflow encountered in reduce
+c:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\numpy\core\fromnumeric.py:87: RuntimeWarning: invalid value encountered in reduce
   return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
-c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\model_structure_selection\meta_model_structure_selection.py:421: RuntimeWarning: overflow encountered in square
-  sum_of_squared_residues = np.sum(residues ** 2)
-C:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\numpy\core\fromnumeric.py:87: RuntimeWarning: invalid value encountered in reduce
-  return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\model_structure_selection\meta_model_structure_selection.py:435: RuntimeWarning: overflow encountered in square
+  sum_of_squared_residues = np.sum(residues**2)
 c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\metrics\_regression.py:215: RuntimeWarning: overflow encountered in square
   numerator = np.sum(np.square((y_predicted - y)))
 c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\metrics\_regression.py:216: RuntimeWarning: overflow encountered in square
   denominator = np.sum(np.square((y_predicted - np.mean(y, axis=0))))
-C:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\numpy\linalg\linalg.py:2567: RuntimeWarning: divide by zero encountered in power
+c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\metrics\_regression.py:217: RuntimeWarning: invalid value encountered in true_divide
+  return np.sqrt(np.divide(numerator, denominator))
+c:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\numpy\core\fromnumeric.py:87: RuntimeWarning: overflow encountered in reduce
+  return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+c:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\numpy\linalg\linalg.py:2567: RuntimeWarning: divide by zero encountered in power
   absx **= ord
 </pre></div>
 </div>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;sysidentpy.model_structure_selection.meta_model_structure_selection.MetaMSS at 0x284fd469a90&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;sysidentpy.model_structure_selection.meta_model_structure_selection.MetaMSS at 0x27b3c21e490&gt;
 </pre></div>
 </div>
 </div>
@@ -457,29 +459,29 @@ C:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\numpy\linalg\linalg.
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.042484059098656546
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.038462417177693324
         Regressors   Parameters             ERR
-0           y(k-1)   1.1373E+00  0.00000000E+00
-1           y(k-3)  -3.5811E-01  0.00000000E+00
-2          x1(k-1)   5.8621E+02  0.00000000E+00
-3          x1(k-2)   7.3266E-02  0.00000000E+00
-4          x1(k-3)   1.1304E+01  0.00000000E+00
-5         y(k-1)^2  -4.9046E-05  0.00000000E+00
-6     y(k-3)y(k-1)   1.3034E-04  0.00000000E+00
-7    x1(k-1)y(k-1)  -1.6871E-01  0.00000000E+00
-8    x1(k-2)y(k-1)   1.0762E-01  0.00000000E+00
-9    x1(k-3)y(k-1)  -1.6445E-01  0.00000000E+00
-10        y(k-2)^2  -4.6619E-05  0.00000000E+00
-11   x1(k-1)y(k-2)   9.8404E-02  0.00000000E+00
-12   x1(k-2)y(k-2)  -9.8212E-02  0.00000000E+00
-13   x1(k-3)y(k-2)   1.5368E-01  0.00000000E+00
-14        y(k-3)^2  -1.3976E-05  0.00000000E+00
-15   x1(k-1)y(k-3)  -1.9331E-02  0.00000000E+00
-16   x1(k-3)y(k-3)  -5.1422E-02  0.00000000E+00
-17  x1(k-3)x1(k-1)   4.4025E+00  0.00000000E+00
-18       x1(k-2)^2   3.6633E-01  0.00000000E+00
-19  x1(k-3)x1(k-2)   8.7208E+00  0.00000000E+00
-20       x1(k-3)^2   5.6522E+01  0.00000000E+00
+0                1  -3.2204E+02  0.00000000E+00
+1           y(k-1)   1.3930E+00  0.00000000E+00
+2           y(k-2)  -5.4673E-01  0.00000000E+00
+3           y(k-3)   6.3161E-02  0.00000000E+00
+4          x1(k-1)   2.2296E+01  0.00000000E+00
+5          x1(k-2)   1.7402E+01  0.00000000E+00
+6          x1(k-3)  -4.2603E+00  0.00000000E+00
+7     y(k-3)y(k-1)   2.8055E-05  0.00000000E+00
+8    x1(k-1)y(k-1)  -1.5244E-01  0.00000000E+00
+9    x1(k-2)y(k-1)  -1.3620E-01  0.00000000E+00
+10   x1(k-3)y(k-1)   3.9445E-02  0.00000000E+00
+11    y(k-3)y(k-2)  -1.6138E-05  0.00000000E+00
+12   x1(k-1)y(k-2)   9.2426E-02  0.00000000E+00
+13   x1(k-2)y(k-2)   8.1630E-02  0.00000000E+00
+14   x1(k-3)y(k-2)  -2.0450E-02  0.00000000E+00
+15   x1(k-1)y(k-3)  -2.3994E-02  0.00000000E+00
+16   x1(k-2)y(k-3)  -2.1218E-02  0.00000000E+00
+17       x1(k-1)^2   1.1148E+02  0.00000000E+00
+18  x1(k-2)x1(k-1)  -3.6302E+00  0.00000000E+00
+19       x1(k-2)^2   8.7010E+01  0.00000000E+00
+20       x1(k-3)^2  -2.1302E+01  0.00000000E+00
 </pre></div>
 </div>
 <img alt="../_images/metamss_5_1.png" src="../_images/metamss_5_1.png" />
@@ -496,7 +498,7 @@ C:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\numpy\linalg\linalg.
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.005137296582679524
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.004650987888650369
 </pre></div>
 </div>
 <img alt="../_images/metamss_6_1.png" src="../_images/metamss_6_1.png" />
@@ -527,16 +529,19 @@ C:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\numpy\linalg\linalg.
     <span class="p">(</span><span class="s1">&#39;NARX_KNeighborsRegressor&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
         <span class="n">base_estimator</span><span class="o">=</span><span class="n">KNeighborsRegressor</span><span class="p">(),</span>
         <span class="n">xlag</span><span class="o">=</span><span class="n">xlag</span><span class="p">,</span>
-        <span class="n">ylag</span><span class="o">=</span><span class="n">ylag</span><span class="p">)),</span>
+        <span class="n">ylag</span><span class="o">=</span><span class="n">ylag</span><span class="p">,</span>
+        <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span><span class="p">)),</span>
     <span class="p">(</span><span class="s1">&#39;NARX_DecisionTreeRegressor&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
         <span class="n">base_estimator</span><span class="o">=</span><span class="n">DecisionTreeRegressor</span><span class="p">(),</span>
         <span class="n">xlag</span><span class="o">=</span><span class="n">xlag</span><span class="p">,</span>
-        <span class="n">ylag</span><span class="o">=</span><span class="n">ylag</span><span class="p">)),</span>
+        <span class="n">ylag</span><span class="o">=</span><span class="n">ylag</span><span class="p">,</span>
+        <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span><span class="p">)),</span>
     <span class="p">(</span><span class="s1">&#39;NARX_RandomForestRegressor&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
         <span class="n">base_estimator</span><span class="o">=</span><span class="n">RandomForestRegressor</span><span class="p">(</span>
             <span class="n">n_estimators</span><span class="o">=</span><span class="mi">200</span><span class="p">),</span>
         <span class="n">xlag</span><span class="o">=</span><span class="n">xlag</span><span class="p">,</span>
         <span class="n">ylag</span><span class="o">=</span><span class="n">ylag</span><span class="p">,</span>
+        <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span>
     <span class="p">)),</span>
     <span class="p">(</span><span class="s1">&#39;NARX_Catboost&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
         <span class="n">base_estimator</span><span class="o">=</span><span class="n">CatBoostRegressor</span><span class="p">(</span>
@@ -545,14 +550,14 @@ C:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\numpy\linalg\linalg.
         <span class="n">depth</span><span class="o">=</span><span class="mi">8</span><span class="p">),</span>
         <span class="n">xlag</span><span class="o">=</span><span class="n">xlag</span><span class="p">,</span>
         <span class="n">ylag</span><span class="o">=</span><span class="n">ylag</span><span class="p">,</span>
-        <span class="n">non_degree</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span><span class="p">,</span>
         <span class="n">fit_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;verbose&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
     <span class="p">)),</span>
     <span class="p">(</span><span class="s1">&#39;NARX_ARD&#39;</span><span class="p">,</span> <span class="n">NARX</span><span class="p">(</span>
         <span class="n">base_estimator</span><span class="o">=</span><span class="n">ARDRegression</span><span class="p">(),</span>
         <span class="n">xlag</span><span class="o">=</span><span class="n">xlag</span><span class="p">,</span>
         <span class="n">ylag</span><span class="o">=</span><span class="n">ylag</span><span class="p">,</span>
-        <span class="n">non_degree</span><span class="o">=</span><span class="mi">2</span>
+        <span class="n">basis_function</span><span class="o">=</span><span class="n">basis_function</span>
     <span class="p">)),</span>
     <span class="p">(</span><span class="s1">&#39;FROLS-Polynomial_NARX&#39;</span><span class="p">,</span> <span class="n">FROLS</span><span class="p">(</span>
         <span class="n">order_selection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -598,73 +603,33 @@ C:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\numpy\linalg\linalg.
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-14 20:43:29 - INFO - Training the model
-10-14 20:43:29 - INFO - Creating the regressor matrix
-10-14 20:43:29 - INFO - The regressor matrix have 21 features
-10-14 20:43:29 - INFO - Done! Model is built!
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\utils\deprecation.py:27: FutureWarning: Function __init__ has been deprecated since v0.1.7.
- Use NARXNN(ylag=2, xlag=2, basis_function=&#39;Some basis function&#39;) instead.This module was deprecated in favor of NARXNN(ylag=2, xlag=2, basis_function=&#39;Some basis function&#39;) module into which all the refactored classes and functions are moved.
- This feature will be removed in version v0.2.0.
-  warnings.warn(message, FutureWarning)
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NARX_KNeighborsRegressor 1.833
-10-14 20:43:29 - INFO - Training the model
-10-14 20:43:29 - INFO - Creating the regressor matrix
-10-14 20:43:29 - INFO - The regressor matrix have 21 features
-10-14 20:43:29 - INFO - Done! Model is built!
-NARX_DecisionTreeRegressor 0.277
-10-14 20:43:29 - INFO - Training the model
-10-14 20:43:29 - INFO - Creating the regressor matrix
-10-14 20:43:29 - INFO - The regressor matrix have 21 features
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\general_estimators\narx.py:161: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples,), for example using ravel().
-  self.base_estimator.fit(X, y, **self.fit_params)
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10-14 20:43:30 - INFO - Done! Model is built!
-NARX_RandomForestRegressor 0.194
-10-14 20:43:34 - INFO - Training the model
-10-14 20:43:34 - INFO - Creating the regressor matrix
-10-14 20:43:34 - INFO - The regressor matrix have 21 features
-10-14 20:43:36 - INFO - Done! Model is built!
-NARX_Catboost 0.179
-10-14 20:43:37 - INFO - Training the model
-10-14 20:43:37 - INFO - Creating the regressor matrix
-10-14 20:43:37 - INFO - The regressor matrix have 231 features
-10-14 20:43:37 - INFO - Done! Model is built!
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\sklearn\utils\validation.py:63: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().
-  return f(*args, **kwargs)
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NARX_ARD 0.074
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NARX_KNeighborsRegressor 1.992
+NARX_DecisionTreeRegressor 0.264
+NARX_RandomForestRegressor 0.223
+NARX_Catboost 0.175
+NARX_ARD 0.074
 FROLS-Polynomial_NARX 0.047
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\numpy\core\fromnumeric.py:87: RuntimeWarning: overflow encountered in reduce
-  return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
-c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\narmax_base.py:796: RuntimeWarning: overflow encountered in power
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\narmax_base.py:824: RuntimeWarning: overflow encountered in power
   np.power(raw_regressor, model_exponents[j])
-c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\model_structure_selection\meta_model_structure_selection.py:421: RuntimeWarning: overflow encountered in square
-  sum_of_squared_residues = np.sum(residues ** 2)
-c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\model_structure_selection\meta_model_structure_selection.py:431: RuntimeWarning: invalid value encountered in sqrt
+c:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\numpy\core\fromnumeric.py:87: RuntimeWarning: invalid value encountered in reduce
+  return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\model_structure_selection\meta_model_structure_selection.py:435: RuntimeWarning: overflow encountered in square
+  sum_of_squared_residues = np.sum(residues**2)
+c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\model_structure_selection\meta_model_structure_selection.py:445: RuntimeWarning: invalid value encountered in sqrt
   se_theta = np.sqrt(var_e)
-C:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\numpy\core\fromnumeric.py:87: RuntimeWarning: invalid value encountered in reduce
+c:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\numpy\core\fromnumeric.py:87: RuntimeWarning: overflow encountered in reduce
   return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
 c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\metrics\_regression.py:215: RuntimeWarning: overflow encountered in square
   numerator = np.sum(np.square((y_predicted - y)))
 c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\metrics\_regression.py:216: RuntimeWarning: overflow encountered in square
   denominator = np.sum(np.square((y_predicted - np.mean(y, axis=0))))
-C:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\numpy\linalg\linalg.py:2567: RuntimeWarning: divide by zero encountered in power
+c:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\numpy\linalg\linalg.py:2567: RuntimeWarning: divide by zero encountered in power
   absx **= ord
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>MetaMSS 0.030
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>MetaMSS 0.025
 </pre></div>
 </div>
 </div>
@@ -677,13 +642,13 @@ C:\Users\wilso\miniconda3\envs\sysidentpy\lib\site-packages\numpy\linalg\linalg.
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>MetaMSS 0.03020874227035109
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>MetaMSS 0.025150310881841744
 FROLS-Polynomial_NARX 0.04663897799085836
 NARX_ARD 0.07413356855178779
-NARX_Catboost 0.17923040407121107
-NARX_RandomForestRegressor 0.19361475059211708
-NARX_DecisionTreeRegressor 0.2765294836744295
-NARX_KNeighborsRegressor 1.833370478725381
+NARX_Catboost 0.17463008529882576
+NARX_RandomForestRegressor 0.2230679886687048
+NARX_DecisionTreeRegressor 0.2643109391717239
+NARX_KNeighborsRegressor 1.9917717932592363
 </pre></div>
 </div>
 </div>
