@@ -6,6 +6,7 @@ from ._check_arrays import (
     check_X_y,
 )
 
+from .narmax_tools import regressor_code
 from .generate_data import get_miso_data, get_siso_data
 
 __ALL__ = [
@@ -16,4 +17,5 @@ __ALL__ = [
     "check_X_y",
     "get_miso_data",
     "get_siso_data",
+    "regressor_code",
 ]
