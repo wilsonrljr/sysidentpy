@@ -29,7 +29,7 @@ NARMAX models **are not**, however, a simple extension of ARMAX models. NARMAX m
 
 .. math::
 
-    y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x} + e_{k-1}, \dotsc, e_{k-n_e}] + e_k
+    y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x}, e_{k-1}, \dotsc, e_{k-n_e}] + e_k
 
 where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}` , are the maximum lags for the system output and input respectively; :math:`x_k \in \mathbb{R}^{n_x}` is the system input and :math:`y_k \in \mathbb{R}^{n_y}` is the system output at discrete time :math:`k \in \mathbb{N}^n`; :math:`e_k \in \mathbb{R}^{n_e}` stands for uncertainties and possible noise at discrete time :math:`k`. In this case, :math:`\mathcal{F}^\ell` is some nonlinear function of the input and output regressors with nonlinearity degree :math:`\ell \in \mathbb{N}` and :math:`d` is a time delay typically set to :math:`d=1`.
 
