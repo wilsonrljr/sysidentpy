@@ -6,6 +6,7 @@
 
 
 import logging
+import warnings
 import sys
 from collections import Counter
 from tabnanny import verbose
@@ -146,7 +147,7 @@ class ModelPrediction:
         X_base = np.atleast_1d(X_base).astype(np.float32)
         yhat = yhat.astype(np.float32)
         x_valid, _ = map(torch.tensor, (X_base, yhat))
-        yhat = self.net(x_valid).detach().numpy()
+        yhat = self.net(x_valid.to(self.device)).detach().cpu().numpy()
         yhat = np.concatenate([y.ravel()[: self.max_lag].flatten(), yhat.ravel()])
         return yhat.reshape(-1, 1)
 
@@ -250,15 +251,10 @@ class ModelPrediction:
                     np.power(raw_regressor, model_exponents[j])
                 )
 
-            # print(regressor_value.shape, regressor_value)
-            # regressor_value = regressor_value[1:]
-            # print(regressor_value.shape, regressor_value)
             regressor_value = np.atleast_1d(regressor_value).astype(np.float32)
-            # print(regressor_value.shape, regressor_value)
             y_output = y_output.astype(np.float32)
             x_valid, y_valid = map(torch.tensor, (regressor_value, y_output))
-            # print(x_valid)
-            y_output[i] = self.net(x_valid)[0].detach().numpy()
+            y_output[i] = self.net(x_valid.to(self.device))[0].detach().cpu().numpy()
         return y_output.reshape(-1, 1)
 
     def _nfir_predict(self, X, y_initial):
@@ -287,7 +283,7 @@ class ModelPrediction:
             regressor_value = np.atleast_1d(regressor_value).astype(np.float32)
             y_output = y_output.astype(np.float32)
             x_valid, y_valid = map(torch.tensor, (regressor_value, y_output))
-            y_output[i] = self.net(x_valid)[0].detach().numpy()
+            y_output[i] = self.net(x_valid.to(self.device))[0].detach().cpu().numpy()
         return y_output.reshape(-1, 1)
 
     def _basis_function_predict(self, X, y_initial, forecast_horizon=None):
@@ -337,7 +333,9 @@ class ModelPrediction:
             X_tmp = np.atleast_1d(X_tmp).astype(np.float32)
             yhat = yhat.astype(np.float32)
             x_valid, y_valid = map(torch.tensor, (X_tmp, yhat))
-            yhat[i + self.max_lag] = self.net(x_valid)[0].detach().numpy()
+            yhat[i + self.max_lag] = (
+                self.net(x_valid.to(self.device))[0].detach().cpu().numpy()
+            )
         return yhat.reshape(-1, 1)
 
     def basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
@@ -553,6 +551,7 @@ class NARXNN(
         train_percentage=80,
         verbose=False,
         optim_params=None,
+        device="cpu",
     ):
         self.ylag = ylag
         self.xlag = xlag
@@ -569,6 +568,7 @@ class NARXNN(
         self.train_percentage = train_percentage
         self.verbose = verbose
         self.optim_params = optim_params
+        self.device = self._check_cuda(device)
         self._validate_params()
 
     def _validate_params(self):
@@ -589,6 +589,22 @@ class NARXNN(
 
         if not isinstance(self.verbose, bool):
             raise TypeError("verbose must be False or True. Got %f" % self.verbose)
+
+    def _check_cuda(self, device):
+        if device not in ["cpu", "cuda"]:
+            raise ValueError(f"device must be 'cpu' or 'cuda'. Got {device}")
+
+        if device == "cpu":
+            return torch.device("cpu")
+        else:
+            if torch.cuda.is_available():
+                return torch.device("cuda")
+            else:
+                warnings.warn(
+                    "No CUDA available. We set the device as CPU",
+                    stacklevel=2,
+                )
+                return torch.device("cpu")
 
     def define_opt(self):
         opt = getattr(optim, self.optimizer)
@@ -718,7 +734,10 @@ class NARXNN(
         Dataloader: dataloader
             tensors that have the same size of the first dimension.
         """
-        return DataLoader(train_ds, batch_size=self.batch_size, shuffle=False)
+        pin_memory = False if self.device.type == "cpu" else True
+        return DataLoader(
+            train_ds, batch_size=self.batch_size, pin_memory=pin_memory, shuffle=False
+        )
 
     def data_transform(self, X, y):
         """Return the data transformed in tensors using Dataloader.
@@ -779,11 +798,15 @@ class NARXNN(
         for epoch in range(self.epochs):
             self.net.train()
             for X, y in train_dl:
+                X, y = X.to(self.device), y.to(self.device)
                 self.loss_batch(X, y, opt=opt)
 
-            if self.verbose == True:
+            if self.verbose:
                 train_losses, train_nums = zip(
-                    *[self.loss_batch(X, y) for X, y in train_dl]
+                    *[
+                        self.loss_batch(X.to(self.device), y.to(self.device))
+                        for X, y in train_dl
+                    ]
                 )
                 self.train_loss.append(
                     np.sum(np.multiply(train_losses, train_nums)) / np.sum(train_nums)
@@ -791,7 +814,12 @@ class NARXNN(
 
                 self.net.eval()
                 with torch.no_grad():
-                    losses, nums = zip(*[self.loss_batch(X, y) for X, y in valid_dl])
+                    losses, nums = zip(
+                        *[
+                            self.loss_batch(X.to(self.device), y.to(self.device))
+                            for X, y in valid_dl
+                        ]
+                    )
                 self.val_loss.append(np.sum(np.multiply(losses, nums)) / np.sum(nums))
 
                 logging.info(
