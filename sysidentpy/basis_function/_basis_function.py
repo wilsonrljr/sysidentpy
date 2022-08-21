@@ -1,5 +1,7 @@
-import numpy as np
 from itertools import combinations_with_replacement
+
+import numpy as np
+
 from sysidentpy.narmax_base import InformationMatrix
 
 

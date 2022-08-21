@@ -6,18 +6,14 @@
 
 
 import logging
+import sys
+from collections import Counter
+
 import numpy as np
 
-# from ..base import GenerateRegressors
-# from ..base import InformationMatrix
-# from ..residues.residues_correlation import ResiduesAnalysis
-# from ..utils._check_arrays import check_X_y, _check_positive_int
-from collections import Counter
-from ..utils.deprecation import deprecated
-import sys
 from ..narmax_base import GenerateRegressors, InformationMatrix, ModelInformation
 from ..utils._check_arrays import _check_positive_int, _num_features, check_X_y
-
+from ..utils.deprecation import deprecated
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -75,6 +71,7 @@ class ModelPrediction:
         ----------
         code : 1D-array of int
             Codification of one regressor.
+
         """
         regressors = np.array(list(set(code)))
         regressors_count = Counter(code)
@@ -142,7 +139,6 @@ class ModelPrediction:
                 # predefined_regressors=self.pivv[: len(self.final_model)],
             )
 
-        # yhat = np.dot(X_base, self.theta.flatten())
         yhat = self.base_estimator.predict(X_base)
         yhat = np.concatenate([y[: self.max_lag].flatten(), yhat])
         return yhat.reshape(-1, 1)
@@ -216,7 +212,6 @@ class ModelPrediction:
         if len(y_initial) < self.max_lag:
             raise Exception("Insufficient initial conditions elements!")
 
-        # X = X.reshape(-1, self._n_inputs)
         if X is not None:
             forecast_horizon = X.shape[0]
         else:
@@ -272,7 +267,6 @@ class ModelPrediction:
                     np.power(raw_regressor, model_exponents[j])
                 )
 
-            # y_output[i] = np.dot(regressor_value, self.theta.flatten())
             y_output[i] = self.base_estimator.predict(regressor_value)
         return y_output.reshape(-1, 1)
 
@@ -289,8 +283,6 @@ class ModelPrediction:
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y_initial[: self.max_lag, 0]
 
-        # Discard unnecessary initial values
-        # yhat[0:self.max_lag] = y_initial[0:self.max_lag]
         analyzed_elements_number = self.max_lag + 1
 
         for i in range(0, forecast_horizon - self.max_lag):
@@ -320,7 +312,6 @@ class ModelPrediction:
                 # predefined_regressors=self.pivv[: len(self.final_model)],
             )
 
-            # a = X_tmp @ theta
             a = self.base_estimator.predict(X_tmp)
             yhat[i + self.max_lag] = a[0]
 
@@ -355,7 +346,6 @@ class ModelPrediction:
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
 
-        # Discard unnecessary initial values
         analyzed_elements_number = self.max_lag + 1
         i = self.max_lag
 
@@ -384,13 +374,8 @@ class ModelPrediction:
                     "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
                 )
 
-            # yhat[i : i + steps_ahead] = self._basis_function_predict(
-            #     X[k : i + steps_ahead], y[k : i + steps_ahead], self.theta
-            # )[-steps_ahead:].ravel()
-
             i += steps_ahead
 
-        # yhat = yhat.ravel()
         return yhat.reshape(-1, 1)
 
     def _basis_function_n_steps_horizon(self, X, y, steps_ahead, forecast_horizon):
@@ -398,7 +383,6 @@ class ModelPrediction:
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
 
-        # Discard unnecessary initial values
         analyzed_elements_number = self.max_lag + 1
         i = self.max_lag
 
@@ -495,6 +479,7 @@ class NARX(GenerateRegressors, InformationMatrix, ModelInformation, ModelPredict
     >>> x1e = compute_cross_correlation(y_valid, yhat, x_valid)
     >>> plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
     0.000131
+
     """
 
     def __init__(
@@ -551,6 +536,7 @@ class NARX(GenerateRegressors, InformationMatrix, ModelInformation, ModelPredict
         -------
         base_estimator : sklearn estimator
             The model fitted.
+
         """
         if y is None:
             raise ValueError("y cannot be None")

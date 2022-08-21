@@ -114,7 +114,6 @@ class Estimators(InformationMatrix):
         self._check_linear_dependence_rows(psi)
 
         y = y[self.max_lag :, 0].reshape(-1, 1)
-        # theta = np.dot(np.linalg.pinv(np.dot(psi.T, psi)), np.dot(psi.T, y))
         theta = np.linalg.lstsq(psi, y, rcond=None)[0]
         return theta
 

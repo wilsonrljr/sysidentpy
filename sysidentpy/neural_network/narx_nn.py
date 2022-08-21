@@ -6,8 +6,8 @@
 
 
 import logging
-import warnings
 import sys
+import warnings
 from collections import Counter
 from tabnanny import verbose
 
@@ -18,8 +18,7 @@ from torch import optim
 from torch.utils.data import DataLoader, TensorDataset
 
 from ..narmax_base import GenerateRegressors, InformationMatrix, ModelInformation
-from ..utils._check_arrays import _check_positive_int, check_X_y, _num_features
-from ..utils.deprecation import deprecated
+from ..utils._check_arrays import _check_positive_int, _num_features, check_X_y
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -77,6 +76,7 @@ class ModelPrediction:
         ----------
         code : 1D-array of int
             Codification of one regressor.
+
         """
         regressors = np.array(list(set(code)))
         regressors_count = Counter(code)
@@ -220,7 +220,6 @@ class ModelPrediction:
         if len(y_initial) < self.max_lag:
             raise Exception("Insufficient initial conditions elements!")
 
-        # X = X.reshape(-1, self._n_inputs)
         if X is not None:
             forecast_horizon = X.shape[0]
         else:
@@ -279,7 +278,6 @@ class ModelPrediction:
                     np.power(raw_regressor, model_exponents[j])
                 )
 
-            # regressor_value = regressor_value[:, 1:]
             regressor_value = np.atleast_1d(regressor_value).astype(np.float32)
             y_output = y_output.astype(np.float32)
             x_valid, y_valid = map(torch.tensor, (regressor_value, y_output))
@@ -299,8 +297,6 @@ class ModelPrediction:
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y_initial[: self.max_lag, 0]
 
-        # Discard unnecessary initial values
-        # yhat[0:self.max_lag] = y_initial[0:self.max_lag]
         analyzed_elements_number = self.max_lag + 1
 
         for i in range(0, forecast_horizon - self.max_lag):
@@ -367,7 +363,6 @@ class ModelPrediction:
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
 
-        # Discard unnecessary initial values
         analyzed_elements_number = self.max_lag + 1
         i = self.max_lag
 
@@ -405,7 +400,6 @@ class ModelPrediction:
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
 
-        # Discard unnecessary initial values
         analyzed_elements_number = self.max_lag + 1
         i = self.max_lag
 
@@ -533,6 +527,7 @@ class NARXNN(
     .. [1]`Manuscript: Orthogonal least squares methods and their application
        to non-linear system identification
        <https://eprints.soton.ac.uk/251147/1/778742007_content.pdf>`_
+
     """
 
     def __init__(
@@ -624,6 +619,7 @@ class NARXNN(
         -------
         loss : float
             The loss of one batch.
+
         """
         loss = self.loss_func(self.net(X), y)
 
@@ -650,6 +646,7 @@ class NARXNN(
             The y values considering the lags.
         reg_matrix : ndarray of floats
             The information matrix of the model.
+
         """
 
         if y is None:
@@ -714,6 +711,7 @@ class NARXNN(
         -------
         Tensor: tensor
             tensors that have the same size of the first dimension.
+
         """
         reg_matrix, y = map(torch.tensor, (reg_matrix, y))
         return TensorDataset(reg_matrix, y)
@@ -733,6 +731,7 @@ class NARXNN(
         -------
         Dataloader: dataloader
             tensors that have the same size of the first dimension.
+
         """
         pin_memory = False if self.device.type == "cpu" else True
         return DataLoader(
@@ -752,6 +751,7 @@ class NARXNN(
         Returns
         -------
         Tensors : Dataloader
+
         """
         if y is None:
             raise ValueError("y cannot be None")
@@ -783,6 +783,7 @@ class NARXNN(
             The training loss of each batch
         val_loss: ndarrays of floats
             The validation loss of each batch
+
         """
         train_dl = self.data_transform(X, y)
         if self.verbose:

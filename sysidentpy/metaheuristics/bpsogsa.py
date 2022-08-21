@@ -4,6 +4,7 @@
 # License: BSD 3 clause
 
 import numpy as np
+
 from sysidentpy.utils._check_arrays import check_random_state
 
 
@@ -60,6 +61,7 @@ class BPSOGSA:
        particle swarm optimization
     .. [4] Manuscript: BGSA: Binary Gravitational Search Algorithm.
     .. [5] Manuscript: A taxonomy of hybrid metaheuristics
+
     """
 
     def __init__(
@@ -109,6 +111,7 @@ class BPSOGSA:
            particle swarm optimization
         .. [4] Manuscript: BGSA: Binary Gravitational Search Algorithm.
         .. [5] Manuscript: A taxonomy of hybrid metaheuristics.
+
         """
         velocity = np.zeros([self.dimension, self.n_agents])
         population = self.generate_random_population()
@@ -150,6 +153,7 @@ class BPSOGSA:
         -------
         population : ndarray of zeros and ones
             The initial population of agents.
+
         """
         rng = check_random_state(random_state)
         population = rng.choice(
@@ -169,6 +173,7 @@ class BPSOGSA:
         -------
         agent_mass : ndarray of floats
             The mass of each agent.
+
         """
 
         highest_fitness_value = np.nanmax(fitness_value)
@@ -199,6 +204,7 @@ class BPSOGSA:
         -------
         gravitational_constant : float
             The gravitational_constant at time defined by the iteration.
+
         """
         gravitational_constant = self.g_zero * np.exp(
             (-self.alpha * (iteration + 1)) / self.maxiter
@@ -226,6 +232,7 @@ class BPSOGSA:
         -------
         acceleration : ndarray of floats
             The acceleration of each agent.
+
         """
 
         k_best_agents = self.k_agents_percent + (1 - iteration / self.maxiter) * (
@@ -281,6 +288,7 @@ class BPSOGSA:
             The updated velocity of each agent.
         population : ndarray of zeros and ones
             The updated population defined by the agents.
+
         """
         c_factor_local_best = -2 * ((iteration**3) / (self.maxiter**3)) + 2
         c_factor_global_best = 2 * ((iteration**3) / (self.maxiter**3)) + 2

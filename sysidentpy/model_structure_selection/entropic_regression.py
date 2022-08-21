@@ -141,6 +141,7 @@ class ER(
         Estimating mutual information. Physical Review E, 69:066-138,2004
     .. [4] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
         Estimating mutual information. Physical Review E, 69:066-138,2004
+
     """
 
     def __init__(
@@ -239,6 +240,7 @@ class ER(
 
     def mutual_information_knn(self, y, y_perm):
         """Finds the mutual information.
+
         Finds the mutual information between :math:`x` and :math:`y` given :math:`z`.
 
         This code is based on Matlab Entropic Regression package.
@@ -266,6 +268,7 @@ class ER(
             Estimating mutual information. Physical Review E, 69:066-138,2004
         .. [4] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
+
         """
         joint_space = np.concatenate([y, y_perm], axis=1)
         smallest_distance = np.sort(
@@ -556,6 +559,7 @@ class ER(
             Estimating mutual information. Physical Review E, 69:066-138,2004
         .. [4] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
+
         """
         if y is None:
             raise ValueError("y cannot be None")

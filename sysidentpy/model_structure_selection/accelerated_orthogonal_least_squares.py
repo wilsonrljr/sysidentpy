@@ -104,6 +104,7 @@ class AOLS(
        https://www.sciencedirect.com/science/article/abs/pii/S1051200418305311
     .. [2] Code:
        https://github.com/realabolfazl/AOLS/
+
     """
 
     def __init__(
@@ -180,6 +181,7 @@ class AOLS(
         .. [1] Manuscript: Accelerated Orthogonal Least-Squares for Large-Scale
            Sparse Reconstruction
            https://www.sciencedirect.com/science/article/abs/pii/S1051200418305311
+
         """
         n, m = psi.shape
         theta = np.zeros([m, 1])
@@ -297,7 +299,6 @@ class AOLS(
         y = y[self.max_lag :].reshape(-1, 1)
 
         (self.theta, self.pivv, self.res) = self.aols(reg_matrix, y)
-        # self.final_model = self.regressor_code[self.pivv, :].copy()
         if self.basis_function.__class__.__name__ == "Polynomial":
             self.final_model = self.regressor_code[self.pivv, :].copy()
         elif self.basis_function.__class__.__name__ != "Polynomial" and self.ensemble:

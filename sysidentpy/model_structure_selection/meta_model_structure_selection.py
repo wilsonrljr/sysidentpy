@@ -148,6 +148,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
        DOI: 10.17648/sbai-2019-111317
     .. [3] Master thesis: Meta model structure selection: an algorithm for
        building polynomial NARX models for regression and classification
+
     """
 
     def __init__(
@@ -252,6 +253,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         Returns
         -------
         self : returns an instance of self.
+
         """
         if self.basis_function.__class__.__name__ != "Polynomial":
             raise NotImplementedError(
@@ -431,7 +433,6 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
                 the values of the p_value of each regressor of the model
 
         """
-
         sum_of_squared_residues = np.sum(residues**2)
         variance_of_residues = (sum_of_squared_residues) / (
             len(residues) - psi.shape[1]
@@ -473,6 +474,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         -------
         aic : float
             The Akaike Information Criterion
+
         """
         mse = mean_squared_error(y_test, yhat)
         n = y_test.shape[0]
@@ -494,6 +496,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         -------
         bic : float
             The Bayesian Information Criterion
+
         """
         mse = mean_squared_error(y_test, yhat)
         n = y_test.shape[0]
@@ -515,6 +518,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         -------
         metamss_loss : float
             The MetaMSS loss function
+
         """
         penalty_count = np.arange(0, self.dimension)
         penalty_distribution = (np.log(n_terms + 1) ** (-1)) / self.dimension
@@ -549,6 +553,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         -------
         penalty : ndarray of floats
             The values of the penalty function
+
         """
         return (
             1

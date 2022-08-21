@@ -11,6 +11,7 @@
 import warnings
 
 import numpy as np
+
 from sysidentpy.utils._check_arrays import _check_positive_int, _num_features, check_X_y
 
 from ..narmax_base import (
@@ -145,6 +146,7 @@ class FROLS(
     .. [2] Manuscript (portuguese): Identificação de Sistemas não Lineares
        Utilizando Modelos NARMAX Polinomiais – Uma Revisão
        e Novos Resultados
+
     """
 
     def __init__(
