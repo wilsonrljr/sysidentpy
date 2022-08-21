@@ -44,13 +44,13 @@ theme:
   palette:
     - scheme: default
       primary: white
-      accent: white
+      accent: orange
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - scheme: slate
       primary: black
-      accent: black
+      accent: orange
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
@@ -65,17 +65,6 @@ extra_javascript:
         - 'overrides/assets/javascripts/mathjax.js'
         - 'https://polyfill.io/v3/polyfill.min.js?features=es6'
         - 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
-extra_css:
-        - 'overrides/assets/css/animate.css'
-        - 'overrides/assets/css/bootstrap.min.css'
-        - 'overrides/assets/css/default.css'
-        - 'overrides/assets/css/font-awesome.min.css'
-        - 'overrides/assets/css/LineIcons.css'
-        - 'overrides/assets/css/magnific-popup.css'
-        - 'overrides/assets/css/slick.css'
-        - 'overrides/assets/css/style.css'
-        - 'overrides/assets/css/style.css.map'
-        - 'overrides/assets/extra.css'
 
 # Plugins
 plugins:
@@ -192,7 +181,6 @@ nav:
     - landing-page/about-us.md
   - Changelog:
       - changelog/changelog.md
-      - How to upgrade: upgrade.md
   - Sponsors: landing-page/sponsor.md
   - Code:
     - NARMAX Base: code/narmax-base.md

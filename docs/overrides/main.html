@@ -1,15 +1,17 @@
-{#-
-  This file was automatically generated - do not edit
--#}
 {% extends "base.html" %}
-{% block extrahead %}
-  <link rel="stylesheet" href="{{ 'overrides/assets/stylesheets/main.82a244a8.min.css' | url }}">
+
+<!-- Announcement bar -->
+{% block announce %}
+<a href="https://github.com/sponsors/wilsonrljr">
+  Sponsor <strong>SysIdentPy</strong> on
+  <span class="twemoji github">
+    {% include ".icons/fontawesome/brands/github.svg" %}
+  </span>
+  <strong>Github</strong>
+</a>
 {% endblock %}
-#- put twitter here
+
+<!-- Content -->
 {% block content %}
-  {% include "overrides/partials/content.html" %}
-{% endblock %}
-{% block scripts %}
-  {{ super() }}
-  <script src="{{ 'overrides/assets/javascripts/bundle.a163e2c4.min.js' | url }}"></script>
+{% include "overrides/partials/content.html" %}
 {% endblock %}
