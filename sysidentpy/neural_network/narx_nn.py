@@ -466,7 +466,7 @@ class NARXNN(
         Select the loss function available in torch.nn.functional
     optimizer : str, default='SGD'
         The solver for weight optimization
-    opt_params : dict, default=None
+    optim_params : dict, default=None
         Optional parameters for the optimizer
     net : default=None
         The defined network using nn.Module
@@ -724,7 +724,7 @@ class NARXNN(
 
         Parameters
         ----------
-        Tensor: tensor
+        train_ds: tensor
             Tensors that have the same size of the first dimension.
 
         Returns
@@ -770,10 +770,14 @@ class NARXNN(
 
         Parameters
         ----------
-        train_dl : Tensor
+        X : ndarray of floats
             The input data to be used in the training process.
-        valid_dl : Tensor
+        y : ndarray of floats
             The output data to be used in the training process.
+        X_test : ndarray of floats
+            The input data to be used in the prediction process.
+        y_test : ndarray of floats
+            The output data (initial conditions) to be used in the prediction process.
 
         Returns
         -------

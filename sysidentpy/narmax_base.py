@@ -11,7 +11,7 @@ from itertools import chain, combinations_with_replacement
 
 import numpy as np
 
-from .utils._check_arrays import _check_positive_int, _num_features, check_X_y
+from .utils._check_arrays import _check_positive_int, _num_features
 
 
 class GenerateRegressors:
@@ -461,8 +461,6 @@ class InformationMatrix:
 
         Parameters
         ----------
-        model : ndarray of int
-            The model code representation.
         y : array-like
             Target data used on training phase.
         X : array-like
@@ -501,14 +499,10 @@ class InformationMatrix:
 
         Parameters
         ----------
-        model : ndarray of int
-            The model code representation.
         y : array-like
             Target data used on training phase.
         ylag : int
             The maximum lag of output regressors.
-        non_degree : int
-            The desired maximum nonlinearity degree.
 
         Returns
         -------
@@ -535,14 +529,10 @@ class InformationMatrix:
 
         Parameters
         ----------
-        model : ndarray of int
-            The model code representation.
         X : array-like
             Input data used on training phase.
         xlag : int
             The maximum lag of input regressors.
-        non_degree : int
-            The desired maximum nonlinearity degree.
 
         Returns
         -------
@@ -570,8 +560,6 @@ class InformationMatrix:
 
         Parameters
         ----------
-        model : ndarray of int
-            The model code representation.
         y : array-like
             Target data used on training phase.
         X : array-like
@@ -580,8 +568,6 @@ class InformationMatrix:
             The maximum lag of output regressors.
         xlag : int
             The maximum lag of input regressors.
-        non_degree : int
-            The desired maximum nonlinearity degree.
 
         Returns
         -------

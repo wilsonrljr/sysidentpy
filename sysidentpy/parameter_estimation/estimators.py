@@ -87,7 +87,7 @@ class Estimators(InformationMatrix):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y_train : array-like of shape = y_training
+        y : array-like of shape = y_training
             The data used to training the model.
 
         Returns
@@ -126,7 +126,7 @@ class Estimators(InformationMatrix):
             The information matrix of the model.
         X : ndarray of floats
             The input data to be used in the training process.
-        y_train : array-like of shape = y_training
+        y : array-like of shape = y_training
             The data used to training the model.
         biased_theta : array-like of shape = number_of_model_elements
             The estimated biased parameters of the model.
@@ -177,7 +177,7 @@ class Estimators(InformationMatrix):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y_train : array-like of shape = y_training
+        y : array-like of shape = y_training
             The data used to training the model.
 
         Returns
@@ -221,7 +221,7 @@ class Estimators(InformationMatrix):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y_train : array-like of shape = y_training
+        y : array-like of shape = y_training
             The data used to training the model.
 
         Returns
@@ -273,7 +273,7 @@ class Estimators(InformationMatrix):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y_train : array-like of shape = y_training
+        y : array-like of shape = y_training
             The data used to training the model.
 
         Returns
@@ -315,7 +315,7 @@ class Estimators(InformationMatrix):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y_train : array-like of shape = y_training
+        y : array-like of shape = y_training
             The data used to training the model.
 
         Returns
@@ -361,7 +361,7 @@ class Estimators(InformationMatrix):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y_train : array-like of shape = y_training
+        y : array-like of shape = y_training
             The data used to training the model.
 
         Returns
@@ -408,7 +408,7 @@ class Estimators(InformationMatrix):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y_train : array-like of shape = y_training
+        y : array-like of shape = y_training
             The data used to training the model.
 
         Returns
@@ -459,7 +459,7 @@ class Estimators(InformationMatrix):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y_train : array-like of shape = y_training
+        y : array-like of shape = y_training
             The data used to training the model.
 
         Returns
@@ -509,7 +509,7 @@ class Estimators(InformationMatrix):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y_train : array-like of shape = y_training
+        y : array-like of shape = y_training
             The data used to training the model.
 
         Returns
@@ -557,7 +557,7 @@ class Estimators(InformationMatrix):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y_train : array-like of shape = y_training
+        y : array-like of shape = y_training
             The data used to training the model.
 
         Returns
@@ -607,7 +607,7 @@ class Estimators(InformationMatrix):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y_train : array-like of shape = y_training
+        y : array-like of shape = y_training
             The data used to training the model.
 
         Returns
@@ -656,7 +656,7 @@ class Estimators(InformationMatrix):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y_train : array-like of shape = y_training
+        y : array-like of shape = y_training
             The data used to training the model.
 
         Returns
@@ -706,7 +706,7 @@ class Estimators(InformationMatrix):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y_train : array-like of shape = y_training
+        y : array-like of shape = y_training
             The data used to training the model.
 
         Returns
@@ -756,7 +756,7 @@ class Estimators(InformationMatrix):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y_train : array-like of shape = y_training
+        y : array-like of shape = y_training
             The data used to training the model.
 
         Returns
@@ -803,7 +803,7 @@ class Estimators(InformationMatrix):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y_train : array-like of shape = y_training
+        y : array-like of shape = y_training
             The data used to training the model.
 
         Returns
@@ -859,7 +859,7 @@ class Estimators(InformationMatrix):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y_train : array-like of shape = y_training
+        y : array-like of shape = y_training
             The data used to training the model.
 
         Returns

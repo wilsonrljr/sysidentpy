@@ -5,13 +5,16 @@
 # License: BSD 3 clause
 
 import numpy as np
-from ..utils._check_arrays import check_X_y, _num_features, _check_positive_int
-from ..narmax_base import GenerateRegressors, ModelPrediction
-from ..narmax_base import HouseHolder
-from ..narmax_base import InformationMatrix
-from ..narmax_base import ModelInformation
-from ..narmax_base import ModelPrediction
+
+from ..narmax_base import (
+    GenerateRegressors,
+    HouseHolder,
+    InformationMatrix,
+    ModelInformation,
+    ModelPrediction,
+)
 from ..parameter_estimation.estimators import Estimators
+from ..utils._check_arrays import _check_positive_int, _num_features
 
 
 class SimulateNARMAX(
@@ -197,8 +200,7 @@ class SimulateNARMAX(
             The forecast horizon.
         theta : array-like of shape = number_of_model_elements
             The parameters of the model.
-        plot : bool, default=True
-            Indicate if the user wants to plot or not.
+
         Returns
         -------
         yhat : ndarray of floats
@@ -239,8 +241,6 @@ class SimulateNARMAX(
                 )
             if y_train is None:
                 raise ValueError("y_train cannot be None")
-
-        # self._n_inputs = _num_features(X_test) ####
 
         if X_test is not None:
             self._n_inputs = _num_features(X_test)
@@ -326,9 +326,6 @@ class SimulateNARMAX(
                 self.theta = self._unbiased_estimator(
                     psi, y_train, self.theta, self.non_degree, self.elag, self.max_lag
                 )
-
-        # yhat = self.predict(X_test, y_test, steps_ahead)
-        # return yhat
 
         if self.basis_function.__class__.__name__ == "Polynomial":
             if steps_ahead is None:

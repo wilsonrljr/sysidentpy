@@ -163,8 +163,6 @@ class AOLS(
             The target data used in the identification process.
         psi : ndarray of floats
             The information matrix of the model.
-        process_term_number : int
-            Number of Process Terms defined by the user.
 
         Returns
         -------

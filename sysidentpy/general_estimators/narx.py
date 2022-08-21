@@ -428,20 +428,14 @@ class NARX(GenerateRegressors, InformationMatrix, ModelInformation, ModelPredict
 
     Parameters
     ----------
-    non_degree : int, default=1
-        The nonlinearity degree of the polynomial function.
     ylag : int, default=2
         The maximum lag of the output.
     xlag : int, default=2
         The maximum lag of the input.
-    n_inputs : int, default=1
-        The number of inputs of the system.
     fit_params : dict, default=None
         Optional parameters of the fit function of the baseline estimator
     base_estimator : default=None
         The defined base estimator of the sklearn
-    verbose : bool, default=False
-        Print messages
 
     Examples
     --------

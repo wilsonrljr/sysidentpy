@@ -10,6 +10,7 @@ import numbers
 # copy-pasted/adapted from scikit-learn utils/validation.py
 def check_random_state(seed):
     """Turn `seed` into a `np.random.RandomState` instance.
+
     Parameters
     ----------
     seed : {None, int, `numpy.random.Generator`,
@@ -20,10 +21,12 @@ def check_random_state(seed):
         seeded with `seed`.
         If `seed` is already a ``Generator`` or ``RandomState`` instance then
         that instance is used.
+
     Returns
     -------
     seed : {`numpy.random.Generator`, `numpy.random.RandomState`}
         Random number generator.
+
     """
     if seed is None or seed is np.random:
         return np.random.mtrand._rand

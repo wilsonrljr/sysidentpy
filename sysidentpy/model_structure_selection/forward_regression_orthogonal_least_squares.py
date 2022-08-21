@@ -75,10 +75,6 @@ class FROLS(
         Whether to use extended least squares method
         for parameter estimation.
         Note that we define a specific set of noise regressors.
-    aux_lag : int, default=1
-        Temporary lag value used only for parameter estimation.
-        This value is overwritten by the max_lag value and will
-        be removed in v0.1.4.
     lam : float, default=0.98
         Forgetting factor of the Recursive Least Squares method.
     delta : float, default=0.01
@@ -327,7 +323,7 @@ class FROLS(
         ----------
         y : array-like of shape = n_samples
             Target values of the system.
-        X : array-like of shape = n_samples
+        X_base : array-like of shape = n_samples
             Input system values measured by the user.
 
         Returns
@@ -336,9 +332,6 @@ class FROLS(
             Vector with values of akaike's information criterion
             for models with N terms (where N is the
             vector position + 1).
-
-        References
-        ----------
 
         """
         if self.n_info_values is not None and self.n_info_values > X_base.shape[1]:
