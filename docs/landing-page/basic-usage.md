@@ -51,8 +51,8 @@ model = FROLS(
 )
 model.fit(X=x_train, y=y_train)
 yhat = model.predict(X=x_valid, y=y_valid)
-rrse = root_relative_squared_error(y_valid, yhat)
-print(rrse)
+mse = mean_squared_error(y_valid, yhat)
+print(mse)
 r = pd.DataFrame(
 	results(
 		model.final_model, model.theta, model.err,

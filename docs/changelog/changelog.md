@@ -3,15 +3,38 @@ template: overrides/main.html
 ---
 
 
-Changes in SysIdentPy
+# Changes in SysIdentPy
 
-### v0.2.0
+## v0.2.1
 
-#### CONTRIBUTORS
+### CONTRIBUTORS
 
 - wilsonrljr
 
-#### CHANGES
+### CHANGES
+
+- The update **v0.2.1**  has been released with additional feature, minor API changes and fixes. 
+
+- MAJOR: Neural NARX now support CUDA
+    - Now the user can build Neural NARX models with CUDA support. Just add `device='cuda'` to use the GPU benefits. 
+
+
+- MAJOR: New documentation website
+    - The documentation is now entirely based on Markdown (no rst anymore).
+    - We use MkDocs and Material for MkDocs theme now.
+    - The Contribute page have more details to help those who wants to contribute with SysIdentPy.
+    - New sections (e.g., Blog, Sponsors, etc.)
+
+- The setup is now handled by the pyproject.toml file.    
+
+
+## v0.2.0
+
+### CONTRIBUTORS
+
+- wilsonrljr
+
+### CHANGES
 
 - The update **v0.2.0**  has been released with additional feature, minor API changes and fixes. 
 
@@ -80,14 +103,14 @@ API Change: Keyword and positional arguments
 - DOC: Fix issues related to html on Jupyter notebooks examples on documentation.
 
 
-### v0.1.9
+## v0.1.9
 
-#### CONTRIBUTORS
+### CONTRIBUTORS
 
 - wilsonrljr
 - samirmartins
 
-#### CHANGES
+### CHANGES
 
 - The update **v0.1.9**  has been released with additional feature, minor API changes and fixes of the new features added in v0.1.7. 
 
@@ -119,13 +142,13 @@ API Change: Keyword and positional arguments
 - DOC: Fix issues related to html on Jupyter notebooks examples on documentation.
 
 
-### v0.1.8
+## v0.1.8
 
-#### CONTRIBUTORS
+### CONTRIBUTORS
 
 - wilsonrljr
 
-#### CHANGES
+### CHANGES
 
 - The update **v0.1.8**  has been released with additional feature, minor API changes and fixes of the new features added in v0.1.7. 
 
@@ -149,13 +172,13 @@ API Change: Keyword and positional arguments
     - Use default hyperparameter in SysIdentPy models.
 
 
-### v0.1.7
+## v0.1.7
 
-#### CONTRIBUTORS
+### CONTRIBUTORS
 
 - wilsonrljr
 
-#### CHANGES
+### CHANGES
 
 - The update **v0.1.7**  has been released with major changes and additional features. There are several API modifications and you will need to change your code to have the new (and upcoming) features. All modifications are meant to make future expansion easier.
 
@@ -377,13 +400,13 @@ API Change: Keyword and positional arguments
 
 
 
-### v0.1.6
+## v0.1.6
 
-#### CONTRIBUTORS
+### CONTRIBUTORS
 
 - wilsonrljr
 
-#### CHANGES
+### CHANGES
 
 - MAJOR: Meta-Model Structure Selection Algorithm (Meta-MSS).
     - A new method for build NARMAX models based on metaheuristics. The algorithm uses a Binary hybrid Particle Swarm Optimization and Gravitational Search Algorithm with a new cost function to build parsimonious models.
@@ -430,13 +453,13 @@ API Change: Keyword and positional arguments
 - FIX issue #52
 
 
-### v0.1.5
+## v0.1.5
 
-#### CONTRIBUTORS
+### CONTRIBUTORS
 
 - wilsonrljr
 
-#### CHANGES
+### CHANGES
 
 - MAJOR: n-steps-ahead prediction.
     - Now you can define the numbers of steps ahead in the predict function.
@@ -461,13 +484,13 @@ API Change: Keyword and positional arguments
 - Updated Readme with examples of how to use.
 
 
-### v0.1.4
+## v0.1.4
 
-#### CONTRIBUTORS
+### CONTRIBUTORS
 
 - wilsonrljr
 
-#### CHANGES
+### CHANGES
 
 - MAJOR: Introducing NARX Neural Network in SysIdentPy.
     - Now you can build NARX Neural Network on SysIdentPy.
@@ -493,14 +516,14 @@ is on our roadmap). These recent modifications will allow us to introduce new NA
 
 - Updated Readme with examples of how to use.
 
-### v0.1.3
+## v0.1.3
 
-#### CONTRIBUTORS
+### CONTRIBUTORS
 
 - wilsonrljr
 - renard162
 
-#### CHANGES
+### CHANGES
 
 - Fixed a bug concerning the xlag and ylag in multiple input scenarios.
 - Refactored predict function. Improved performance up to 87% depending on the number of regressors.
