@@ -1,0 +1,15 @@
+{#-
+  This file was automatically generated - do not edit
+-#}
+{% extends "base.html" %}
+{% block extrahead %}
+  <link rel="stylesheet" href="{{ 'overrides/assets/stylesheets/main.82a244a8.min.css' | url }}">
+{% endblock %}
+#- put twitter here
+{% block content %}
+  {% include "overrides/partials/content.html" %}
+{% endblock %}
+{% block scripts %}
+  {{ super() }}
+  <script src="{{ 'overrides/assets/javascripts/bundle.a163e2c4.min.js' | url }}"></script>
+{% endblock %}
