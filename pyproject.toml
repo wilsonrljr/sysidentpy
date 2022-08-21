@@ -1,0 +1,91 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sysidentpy"
+description = "A Python Package For System Identification Using NARMAX Models"
+readme = "README.md"
+requires-python = ">=3.7"
+license = { file = "LICENSE" }
+keywords = ["NARMAX", "NARX", "system identification", "machine learning"]
+authors = [
+    { email = "wilsonrljr@outlook.com" },
+    { name = "Wilson Rocha Lacerda Junior" },
+]
+maintainers = [
+    { name = "Wilson Rocha Lacerda Junior", email = "wilsonrljr@outlook.com" },
+]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: BSD 3-Clause",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Libraries",
+    "Operating System :: OS Independent",
+]
+
+dependencies = ["numpy>=1.19.2", "scipy>=1.7.0", "matplotlib>=3.3.2"]
+
+dynamic = ["version"]
+
+[project.optional-dependencies]
+test = [
+    "pytest >=6.2.4,<7.0.0",
+    "pytest-cov >=2.12.0,<4.0.0",
+    "flake8 >=3.8.3,<4.0.0",
+    "black == 22.3.0",
+    "isort >=5.0.6,<6.0.0",
+]
+doc = [
+    "mkdocs >=1.1.2,<2.0.0",
+    "mkdocs-material >=8.1.4,<9.0.0",
+    "mdx-include >=1.4.1,<2.0.0",
+    "mkdocs-markdownextradata-plugin >=0.1.7,<0.3.0",
+    # TODO: upgrade and enable typer-cli once it supports Click 8.x.x
+    # "typer-cli >=0.0.12,<0.0.13",
+    "typer >=0.4.1,<0.5.0",
+    "pyyaml >=5.3.1,<7.0.0",
+]
+all = ["torch >=1.7.1"]
+
+[project.urls]
+homepage = "http://sysidentpy.org"
+documentation = "http://sysidentpy.org/"
+repository = "https://github.com/wilsonrljr/sysidentpy"
+changelog = "https://github.com/wilsonrljr/sysidentpy/blob/master/CHANGELOG"
+
+[tool.setuptools.dynamic]
+version = { attr = "sysidentpy.__version__" }
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+addopts = ["--strict-config", "--strict-markers", "--cov=sysidentpy"]
+xfail_strict = true
+junit_family = "xunit2"
+
+[tool.coverage.paths]
+source = ["sysidentpy"]
+
+[tool.coverage.run]
+source = ["sysidentpy"]
+disable_warnings = ['no-data-collected']
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 60
