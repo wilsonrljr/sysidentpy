@@ -244,70 +244,17 @@ We will make it available at conda repository as soon as possible.
 
 See the [changelog]( <http://sysidentpy.org/changelog/v0.1.6.html>) for a history of notable changes to SysIdentPy.
 
-# Development
-
-We welcome new contributors of all experience levels. The sysidentpy community goals are to be helpful, welcoming, and effective.
-
-*Note*: we use the `pytest` package for testing. The test functions are located in tests subdirectories at each folder inside **SysIdentPy**, which check the validity of the algorithms.
-
-Run the `pytest` in the respective folder to perform all the tests of the corresponding sub-packages.
-
-Currently, we have around 81% of code coverage.
-
-You can install pytest using
-~~~~~~~~~~~~~~~~~~~~~~
-pip install -U pytest
-~~~~~~~~~~~~~~~~~~~~~~
-
-### Example of how to run the tests:
-
-Open a terminal emulator of your choice and go to a subdirectory, e.g,
-~~~~~~~~~~~~~~~~~~~~
-\sysidentpy\metrics\
-~~~~~~~~~~~~~~~~~~~~
-
-Just type `pytest` and you get a result like
-
-~~~~~~~~
-========== test session starts ==========
-
-platform linux -- Python 3.7.6, pytest-5.4.2, py-1.8.1, pluggy-0.13.1
-
-rootdir: ~/sysidentpy
-
-plugins: cov-2.8.1
-
-collected 12 items
-
-tests/test_regression.py ............ [100%]
-
-========== 12 passed in 2.45s ==================
-~~~~~~~~~~~~~~
-You can also see the code coverage using the `pytest-cov` package. First, install `pytest-cov` using
-~~~
-pip install pytest-cov
-~~~
-Run the command below in the SysIdentPy root directory, to generate the report.
-~~~
-pytest --cov=.
-~~~
-
 # Important links
 
 - Official source code repo: https://github.com/wilsonrljr/sysidentpy
 
 - Download releases: https://pypi.org/project/sysidentpy/
 
-# Source code
-
-You can check the latest sources with the command::
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-git clone https://github.com/wilsonrljr/sysidentpy.git
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# Project History
+# Project Goal
 
 The project was started by Wilson R. L. Junior, Luan Pascoal and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019.
+
+SysIdentPy aims to be a free and open source package to help the community design NARMAX models. More than that, be a free and robust alternative to one of the most used tools to build NARMAX models, which is the Matlab's System Identification Toolbox.
 
 The project is actively maintained by Wilson R. L. Junior and looking for contributors.
 
