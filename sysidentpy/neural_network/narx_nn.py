@@ -131,11 +131,13 @@ class ModelPrediction:
                 "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
             )
 
-        if self.basis_function.__class__.__name__ == "Polynomial":
+        basis_name = self.basis_function.__class__.__name__
+        if basis_name == "Polynomial":
             X_base = self.basis_function.transform(
                 lagged_data,
                 self.max_lag,
             )
+            X_base = X_base[:, 1:]
         else:
             X_base, _ = self.basis_function.transform(
                 lagged_data,
@@ -143,7 +145,6 @@ class ModelPrediction:
             )
 
         yhat = np.zeros(X.shape[0], dtype=float)
-        X_base = X_base[:, 1:]
         X_base = np.atleast_1d(X_base).astype(np.float32)
         yhat = yhat.astype(np.float32)
         x_valid, _ = map(torch.tensor, (X_base, yhat))
@@ -325,7 +326,7 @@ class ModelPrediction:
                 self.max_lag,
             )
 
-            X_tmp = X_tmp[:, 1:]
+            # X_tmp = X_tmp[:, 1:]
             X_tmp = np.atleast_1d(X_tmp).astype(np.float32)
             yhat = yhat.astype(np.float32)
             x_valid, y_valid = map(torch.tensor, (X_tmp, yhat))
@@ -667,10 +668,12 @@ class NARXNN(
                 "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
             )
 
-        if self.basis_function.__class__.__name__ == "Polynomial":
+        basis_name = self.basis_function.__class__.__name__
+        if basis_name == "Polynomial":
             reg_matrix = self.basis_function.fit(
                 lagged_data, self.max_lag, predefined_regressors=None
             )
+            reg_matrix = reg_matrix[:, 1:]
         else:
             reg_matrix, self.ensemble = self.basis_function.fit(
                 lagged_data, self.max_lag, predefined_regressors=None
@@ -685,10 +688,32 @@ class NARXNN(
             self.non_degree, self.xlag, self.ylag, self._n_inputs, self.model_type
         )
         # [:, 1] and [1:] removes the column of the constant
-        reg_matrix = reg_matrix[:, 1:]
-        self.regressor_code = self.regressor_code[1:]
-        self.final_model = self.regressor_code
+        # reg_matrix = reg_matrix[:, 1:]
+        # self.regressor_code = self.regressor_code[1:]
+        # self.final_model = self.regressor_code
 
+        if basis_name != "Polynomial" and self.basis_function.ensemble:
+            basis_code = np.sort(
+                np.tile(
+                    self.regressor_code[1:, :], (self.basis_function.repetition, 1)
+                ),
+                axis=0,
+            )
+            self.regressor_code = np.concatenate([self.regressor_code[1:], basis_code])
+        elif basis_name != "Polynomial" and self.basis_function.ensemble is False:
+            self.regressor_code = np.sort(
+                np.tile(
+                    self.regressor_code[1:, :], (self.basis_function.repetition, 1)
+                ),
+                axis=0,
+            )
+
+        if basis_name == "Polynomial":
+            self.regressor_code = self.regressor_code[
+                1:
+            ]  # removes the column of the constant
+
+        self.final_model = self.regressor_code.copy()
         reg_matrix = np.atleast_1d(reg_matrix).astype(np.float32)
 
         y = np.atleast_1d(y[self.max_lag :]).astype(np.float32)
