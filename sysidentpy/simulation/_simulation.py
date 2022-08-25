@@ -120,6 +120,7 @@ class SimulateNARMAX(
         self,
         *,
         estimator="recursive_least_squares",
+        elag=2,
         extended_least_squares=False,
         lam=0.98,
         delta=0.01,
@@ -143,6 +144,7 @@ class SimulateNARMAX(
             gama=gama,
             weight=weight,
         )
+        self.elag = elag
         self.model_type = model_type
         self.basis_function = basis_function
         self.estimator = estimator
@@ -239,8 +241,6 @@ class SimulateNARMAX(
                 raise TypeError(
                     f"If estimate_parameter is True, X_train and y_train must be an np.ndarray. Got {type(y_train)}"
                 )
-            if y_train is None:
-                raise ValueError("y_train cannot be None")
 
         if X_test is not None:
             self._n_inputs = _num_features(X_test)
@@ -280,10 +280,7 @@ class SimulateNARMAX(
             elif self.model_type == "NFIR":
                 lagged_data = self.build_input_matrix(X_train, self.xlag)
                 self.max_lag = self._get_max_lag(xlag=self.xlag)
-            else:
-                raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
-                )
+
             psi = self.basis_function.fit(
                 lagged_data, self.max_lag, predefined_regressors=self.pivv
             )
@@ -310,10 +307,7 @@ class SimulateNARMAX(
             elif self.model_type == "NFIR":
                 lagged_data = self.build_input_matrix(X_train, self.xlag)
                 self.max_lag = self._get_max_lag(xlag=self.xlag)
-            else:
-                raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
-                )
+
             psi = self.basis_function.fit(
                 lagged_data, self.max_lag, predefined_regressors=self.pivv
             )
