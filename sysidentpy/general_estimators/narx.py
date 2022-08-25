@@ -267,7 +267,7 @@ class ModelPrediction:
                     np.power(raw_regressor, model_exponents[j])
                 )
 
-            y_output[i] = self.base_estimator.predict(regressor_value)
+            y_output[i] = self.base_estimator.predict(regressor_value.reshape(1, -1))
         return y_output.reshape(-1, 1)
 
     def _basis_function_predict(self, X, y_initial, forecast_horizon=None):
@@ -303,7 +303,8 @@ class ModelPrediction:
                 )
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
+                    " NFIR."
                 )
 
             X_tmp, _ = self.basis_function.transform(
@@ -371,7 +372,8 @@ class ModelPrediction:
                 )[-steps_ahead:].ravel()
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
+                    " NFIR."
                 )
 
             i += steps_ahead
@@ -408,7 +410,8 @@ class ModelPrediction:
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
+                    " NFIR."
                 )
 
             i += steps_ahead
