@@ -1,13 +1,15 @@
 import numpy as np
-from numpy.testing import assert_almost_equal
-from numpy.testing import assert_equal
-from sysidentpy.residues.residues_correlation import compute_residues_autocorrelation
-from sysidentpy.residues.residues_correlation import calculate_residues
-from sysidentpy.residues.residues_correlation import get_unnormalized_e_acf
-from sysidentpy.residues.residues_correlation import compute_cross_correlation
-from sysidentpy.residues.residues_correlation import _input_ccf
-from sysidentpy.residues.residues_correlation import _normalized_correlation
+from numpy.testing import assert_almost_equal, assert_equal
 
+from sysidentpy.model_structure_selection import FROLS
+from sysidentpy.residues.residues_correlation import (
+    _input_ccf,
+    _normalized_correlation,
+    calculate_residues,
+    compute_cross_correlation,
+    compute_residues_autocorrelation,
+    get_unnormalized_e_acf,
+)
 
 def test_compute_residues_autocorrelation():
     a = np.array([1, 3, 2, 4])
