@@ -130,7 +130,7 @@ class GenerateRegressors:
         elif model_type == "NFIR":
             reg_aux = np.concatenate([reg_aux, x_vec])
         else:
-            raise Exception(
+            raise ValueError(
                 "Unrecognized model type. Model type should be NARMAX, NAR or NFIR"
             )
 
@@ -873,7 +873,8 @@ class ModelPrediction:
                 )
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
+                    " NFIR."
                 )
 
             X_tmp, _ = self.basis_function.transform(
@@ -944,16 +945,11 @@ class ModelPrediction:
                 )[-steps_ahead:].ravel()
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
+                    " NFIR."
                 )
 
-            # yhat[i : i + steps_ahead] = self._basis_function_predict(
-            #     X[k : i + steps_ahead], y[k : i + steps_ahead], self.theta
-            # )[-steps_ahead:].ravel()
-
             i += steps_ahead
-
-        # yhat = yhat.ravel()
         return yhat.reshape(-1, 1)
 
     def _basis_function_n_steps_horizon(self, X, y, steps_ahead, forecast_horizon):
@@ -989,7 +985,8 @@ class ModelPrediction:
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
+                    " NFIR."
                 )
 
             # yhat[i : i + steps_ahead] = self._basis_function_predict(
