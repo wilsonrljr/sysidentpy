@@ -89,3 +89,32 @@ disable_warnings = ['no-data-collected']
 [tool.coverage.report]
 show_missing = true
 fail_under = 60
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "def __str__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "if typing.TYPE_CHECKING:",
+]
+
+[tool.black]
+line-length = 88
+target_version = ['py37', 'py38', 'py39', 'py310']
+preview = true
+exclude = '''
+/(
+    \.eggs         # exclude a few common directories in the
+  | \.git          # root of the project
+  | \.mypy_cache
+  | \.vscode
+  | paper
+  | examples
+  | images
+  | build
+  | dist
+  | docs/*
+)/
+'''
