@@ -7,7 +7,6 @@ import numpy as np
 def regressor_code(
     *,
     X=None,
-    degree=1,
     xlag=2,
     ylag=2,
     model_type="NARMAX",
@@ -20,7 +19,7 @@ def regressor_code(
         n_inputs = 1  # only used to create the regressor space base
 
     regressor_code = GenerateRegressors().regressor_space(
-        degree, xlag, ylag, n_inputs, model_type
+        basis_function.degree, xlag, ylag, n_inputs, model_type
     )
 
     basis_name = basis_function.__class__.__name__
@@ -37,7 +36,7 @@ def regressor_code(
             np.tile(regressor_code[1:, :], (repetition, 1)),
             axis=0,
         )
-    
+
     if basis_name == "Polynomial" and model_representation == "neural_network":
         return regressor_code[1:]
     elif basis_name == "Polynomial" and model_representation is None:
