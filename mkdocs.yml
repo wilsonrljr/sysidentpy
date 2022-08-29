@@ -179,6 +179,7 @@ nav:
       - GCoM Meetup: events/gcom-meetup.md
   - About:
     - landing-page/about-us.md
+    - landing-page/attribute.md
   - Changelog:
       - changelog/changelog.md
   - Sponsors: landing-page/sponsor.md

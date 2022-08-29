@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "sysidentpy"
 description = "A Python Package For System Identification Using NARMAX Models"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.7,<=3.10"
 license = { file = "LICENSE" }
 keywords = ["NARMAX", "NARX", "system identification", "machine learning"]
 authors = [
@@ -43,7 +43,7 @@ dependencies = ["numpy>=1.19.2", "scipy>=1.7.0", "matplotlib>=3.3.2"]
 dynamic = ["version"]
 
 [project.optional-dependencies]
-test = [
+dev = [
     "pytest >=6.2.4,<7.0.0",
     "pytest-cov >=2.12.0,<4.0.0",
     "flake8 >=3.8.3,<4.0.0",
@@ -74,6 +74,9 @@ homepage = "http://sysidentpy.org"
 documentation = "http://sysidentpy.org/"
 repository = "https://github.com/wilsonrljr/sysidentpy"
 changelog = "https://github.com/wilsonrljr/sysidentpy/blob/master/CHANGELOG"
+
+[tool.setuptools]
+packages = ["sysidentpy"]
 
 [tool.setuptools.dynamic]
 version = { attr = "sysidentpy.__version__" }
@@ -107,7 +110,7 @@ omit = [
     "sysidentpy/simulation/tests/*",
 ]
 show_missing = true
-fail_under = 80
+fail_under = 70
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
