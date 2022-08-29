@@ -7,6 +7,7 @@
 
 import logging
 import sys
+import warnings
 from collections import Counter
 from tabnanny import verbose
 
@@ -17,8 +18,7 @@ from torch import optim
 from torch.utils.data import DataLoader, TensorDataset
 
 from ..narmax_base import GenerateRegressors, InformationMatrix, ModelInformation
-from ..utils._check_arrays import _check_positive_int, check_X_y, _num_features
-from ..utils.deprecation import deprecated
+from ..utils._check_arrays import _check_positive_int, _num_features, check_X_y
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -76,6 +76,7 @@ class ModelPrediction:
         ----------
         code : 1D-array of int
             Codification of one regressor.
+
         """
         regressors = np.array(list(set(code)))
         regressors_count = Counter(code)
@@ -130,11 +131,13 @@ class ModelPrediction:
                 "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
             )
 
-        if self.basis_function.__class__.__name__ == "Polynomial":
+        basis_name = self.basis_function.__class__.__name__
+        if basis_name == "Polynomial":
             X_base = self.basis_function.transform(
                 lagged_data,
                 self.max_lag,
             )
+            X_base = X_base[:, 1:]
         else:
             X_base, _ = self.basis_function.transform(
                 lagged_data,
@@ -142,11 +145,10 @@ class ModelPrediction:
             )
 
         yhat = np.zeros(X.shape[0], dtype=float)
-        X_base = X_base[:, 1:]
         X_base = np.atleast_1d(X_base).astype(np.float32)
         yhat = yhat.astype(np.float32)
         x_valid, _ = map(torch.tensor, (X_base, yhat))
-        yhat = self.net(x_valid).detach().numpy()
+        yhat = self.net(x_valid.to(self.device)).detach().cpu().numpy()
         yhat = np.concatenate([y.ravel()[: self.max_lag].flatten(), yhat.ravel()])
         return yhat.reshape(-1, 1)
 
@@ -219,7 +221,6 @@ class ModelPrediction:
         if len(y_initial) < self.max_lag:
             raise Exception("Insufficient initial conditions elements!")
 
-        # X = X.reshape(-1, self._n_inputs)
         if X is not None:
             forecast_horizon = X.shape[0]
         else:
@@ -250,15 +251,10 @@ class ModelPrediction:
                     np.power(raw_regressor, model_exponents[j])
                 )
 
-            # print(regressor_value.shape, regressor_value)
-            # regressor_value = regressor_value[1:]
-            # print(regressor_value.shape, regressor_value)
             regressor_value = np.atleast_1d(regressor_value).astype(np.float32)
-            # print(regressor_value.shape, regressor_value)
             y_output = y_output.astype(np.float32)
             x_valid, y_valid = map(torch.tensor, (regressor_value, y_output))
-            # print(x_valid)
-            y_output[i] = self.net(x_valid)[0].detach().numpy()
+            y_output[i] = self.net(x_valid.to(self.device))[0].detach().cpu().numpy()
         return y_output.reshape(-1, 1)
 
     def _nfir_predict(self, X, y_initial):
@@ -283,11 +279,10 @@ class ModelPrediction:
                     np.power(raw_regressor, model_exponents[j])
                 )
 
-            # regressor_value = regressor_value[:, 1:]
             regressor_value = np.atleast_1d(regressor_value).astype(np.float32)
             y_output = y_output.astype(np.float32)
             x_valid, y_valid = map(torch.tensor, (regressor_value, y_output))
-            y_output[i] = self.net(x_valid)[0].detach().numpy()
+            y_output[i] = self.net(x_valid.to(self.device))[0].detach().cpu().numpy()
         return y_output.reshape(-1, 1)
 
     def _basis_function_predict(self, X, y_initial, forecast_horizon=None):
@@ -303,8 +298,6 @@ class ModelPrediction:
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y_initial[: self.max_lag, 0]
 
-        # Discard unnecessary initial values
-        # yhat[0:self.max_lag] = y_initial[0:self.max_lag]
         analyzed_elements_number = self.max_lag + 1
 
         for i in range(0, forecast_horizon - self.max_lag):
@@ -333,11 +326,13 @@ class ModelPrediction:
                 self.max_lag,
             )
 
-            X_tmp = X_tmp[:, 1:]
+            # X_tmp = X_tmp[:, 1:]
             X_tmp = np.atleast_1d(X_tmp).astype(np.float32)
             yhat = yhat.astype(np.float32)
             x_valid, y_valid = map(torch.tensor, (X_tmp, yhat))
-            yhat[i + self.max_lag] = self.net(x_valid)[0].detach().numpy()
+            yhat[i + self.max_lag] = (
+                self.net(x_valid.to(self.device))[0].detach().cpu().numpy()
+            )
         return yhat.reshape(-1, 1)
 
     def basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
@@ -369,7 +364,6 @@ class ModelPrediction:
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
 
-        # Discard unnecessary initial values
         analyzed_elements_number = self.max_lag + 1
         i = self.max_lag
 
@@ -407,7 +401,6 @@ class ModelPrediction:
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
 
-        # Discard unnecessary initial values
         analyzed_elements_number = self.max_lag + 1
         i = self.max_lag
 
@@ -474,7 +467,7 @@ class NARXNN(
         Select the loss function available in torch.nn.functional
     optimizer : str, default='SGD'
         The solver for weight optimization
-    opt_params : dict, default=None
+    optim_params : dict, default=None
         Optional parameters for the optimizer
     net : default=None
         The defined network using nn.Module
@@ -535,6 +528,7 @@ class NARXNN(
     .. [1]`Manuscript: Orthogonal least squares methods and their application
        to non-linear system identification
        <https://eprints.soton.ac.uk/251147/1/778742007_content.pdf>`_
+
     """
 
     def __init__(
@@ -553,6 +547,7 @@ class NARXNN(
         train_percentage=80,
         verbose=False,
         optim_params=None,
+        device="cpu",
     ):
         self.ylag = ylag
         self.xlag = xlag
@@ -569,6 +564,7 @@ class NARXNN(
         self.train_percentage = train_percentage
         self.verbose = verbose
         self.optim_params = optim_params
+        self.device = self._check_cuda(device)
         self._validate_params()
 
     def _validate_params(self):
@@ -590,6 +586,22 @@ class NARXNN(
         if not isinstance(self.verbose, bool):
             raise TypeError("verbose must be False or True. Got %f" % self.verbose)
 
+    def _check_cuda(self, device):
+        if device not in ["cpu", "cuda"]:
+            raise ValueError(f"device must be 'cpu' or 'cuda'. Got {device}")
+
+        if device == "cpu":
+            return torch.device("cpu")
+        else:
+            if torch.cuda.is_available():
+                return torch.device("cuda")
+            else:
+                warnings.warn(
+                    "No CUDA available. We set the device as CPU",
+                    stacklevel=2,
+                )
+                return torch.device("cpu")
+
     def define_opt(self):
         opt = getattr(optim, self.optimizer)
         return opt(self.net.parameters(), lr=self.learning_rate, **self.optim_params)
@@ -608,6 +620,7 @@ class NARXNN(
         -------
         loss : float
             The loss of one batch.
+
         """
         loss = self.loss_func(self.net(X), y)
 
@@ -634,6 +647,7 @@ class NARXNN(
             The y values considering the lags.
         reg_matrix : ndarray of floats
             The information matrix of the model.
+
         """
 
         if y is None:
@@ -654,10 +668,12 @@ class NARXNN(
                 "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
             )
 
-        if self.basis_function.__class__.__name__ == "Polynomial":
+        basis_name = self.basis_function.__class__.__name__
+        if basis_name == "Polynomial":
             reg_matrix = self.basis_function.fit(
                 lagged_data, self.max_lag, predefined_regressors=None
             )
+            reg_matrix = reg_matrix[:, 1:]
         else:
             reg_matrix, self.ensemble = self.basis_function.fit(
                 lagged_data, self.max_lag, predefined_regressors=None
@@ -672,10 +688,32 @@ class NARXNN(
             self.non_degree, self.xlag, self.ylag, self._n_inputs, self.model_type
         )
         # [:, 1] and [1:] removes the column of the constant
-        reg_matrix = reg_matrix[:, 1:]
-        self.regressor_code = self.regressor_code[1:]
-        self.final_model = self.regressor_code
+        # reg_matrix = reg_matrix[:, 1:]
+        # self.regressor_code = self.regressor_code[1:]
+        # self.final_model = self.regressor_code
 
+        if basis_name != "Polynomial" and self.basis_function.ensemble:
+            basis_code = np.sort(
+                np.tile(
+                    self.regressor_code[1:, :], (self.basis_function.repetition, 1)
+                ),
+                axis=0,
+            )
+            self.regressor_code = np.concatenate([self.regressor_code[1:], basis_code])
+        elif basis_name != "Polynomial" and self.basis_function.ensemble is False:
+            self.regressor_code = np.sort(
+                np.tile(
+                    self.regressor_code[1:, :], (self.basis_function.repetition, 1)
+                ),
+                axis=0,
+            )
+
+        if basis_name == "Polynomial":
+            self.regressor_code = self.regressor_code[
+                1:
+            ]  # removes the column of the constant
+
+        self.final_model = self.regressor_code.copy()
         reg_matrix = np.atleast_1d(reg_matrix).astype(np.float32)
 
         y = np.atleast_1d(y[self.max_lag :]).astype(np.float32)
@@ -698,6 +736,7 @@ class NARXNN(
         -------
         Tensor: tensor
             tensors that have the same size of the first dimension.
+
         """
         reg_matrix, y = map(torch.tensor, (reg_matrix, y))
         return TensorDataset(reg_matrix, y)
@@ -710,15 +749,19 @@ class NARXNN(
 
         Parameters
         ----------
-        Tensor: tensor
+        train_ds: tensor
             Tensors that have the same size of the first dimension.
 
         Returns
         -------
         Dataloader: dataloader
             tensors that have the same size of the first dimension.
+
         """
-        return DataLoader(train_ds, batch_size=self.batch_size, shuffle=False)
+        pin_memory = False if self.device.type == "cpu" else True
+        return DataLoader(
+            train_ds, batch_size=self.batch_size, pin_memory=pin_memory, shuffle=False
+        )
 
     def data_transform(self, X, y):
         """Return the data transformed in tensors using Dataloader.
@@ -733,6 +776,7 @@ class NARXNN(
         Returns
         -------
         Tensors : Dataloader
+
         """
         if y is None:
             raise ValueError("y cannot be None")
@@ -751,10 +795,14 @@ class NARXNN(
 
         Parameters
         ----------
-        train_dl : Tensor
+        X : ndarray of floats
             The input data to be used in the training process.
-        valid_dl : Tensor
+        y : ndarray of floats
             The output data to be used in the training process.
+        X_test : ndarray of floats
+            The input data to be used in the prediction process.
+        y_test : ndarray of floats
+            The output data (initial conditions) to be used in the prediction process.
 
         Returns
         -------
@@ -764,6 +812,7 @@ class NARXNN(
             The training loss of each batch
         val_loss: ndarrays of floats
             The validation loss of each batch
+
         """
         train_dl = self.data_transform(X, y)
         if self.verbose:
@@ -779,11 +828,15 @@ class NARXNN(
         for epoch in range(self.epochs):
             self.net.train()
             for X, y in train_dl:
+                X, y = X.to(self.device), y.to(self.device)
                 self.loss_batch(X, y, opt=opt)
 
-            if self.verbose == True:
+            if self.verbose:
                 train_losses, train_nums = zip(
-                    *[self.loss_batch(X, y) for X, y in train_dl]
+                    *[
+                        self.loss_batch(X.to(self.device), y.to(self.device))
+                        for X, y in train_dl
+                    ]
                 )
                 self.train_loss.append(
                     np.sum(np.multiply(train_losses, train_nums)) / np.sum(train_nums)
@@ -791,7 +844,12 @@ class NARXNN(
 
                 self.net.eval()
                 with torch.no_grad():
-                    losses, nums = zip(*[self.loss_batch(X, y) for X, y in valid_dl])
+                    losses, nums = zip(
+                        *[
+                            self.loss_batch(X.to(self.device), y.to(self.device))
+                            for X, y in valid_dl
+                        ]
+                    )
                 self.val_loss.append(np.sum(np.multiply(losses, nums)) / np.sum(nums))
 
                 logging.info(

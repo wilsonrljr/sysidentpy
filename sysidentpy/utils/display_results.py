@@ -2,8 +2,9 @@
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
 
-import numpy as np
 from collections import Counter
+
+import numpy as np
 
 
 def results(

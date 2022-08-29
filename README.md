@@ -16,25 +16,61 @@
 [![stars](https://img.shields.io/github/stars/wilsonrljr/sysidentpy?style=social)](https://github.com/wilsonrljr/sysidentpy/stargazers)
 
 
+## What is SysIdentPy?
 
-SysIdentPy is a Python module for System Identification using **NARMAX** models built on top of **numpy** and is distributed under the 3-Clause BSD license.
+SysIdentPy is an open-source Python module for System Identification using **NARMAX** models built on top of **numpy** and is distributed under the 3-Clause BSD license. SysIdentPy provides an easy-to-use and  flexible framework for building Dynamical Nonlinear Models for time series and dynamic systems.
 
-# Note
-The update **v0.2.0**  has been released with major changes and additional features (Fourier basis function, NAR and NFIR models, n-steps ahead prediction for both General Estimators and Neural NARX and more).
+Check our [documentation](https://sysidentpy.org)!
 
-There are API modifications and you will need to change your code to have the new (and upcoming) features.
+## How do I install SysIdentPy?
 
-Check the examples of how to use the new version in the [documentation page](<http://sysidentpy.org/notebooks.html>).
-  
-For more details, please see the [changelog](<http://sysidentpy.org/changelog/v0.2.0.html>).
+The easiest way to get SysIdentPy running is to install it using ``pip``
+``` console
+pip install sysidentpy
+```
 
-# Documentation
+### Requirements
 
-- Website: https://sysidentpy.org
+SysIdentPy requires:
 
-# Examples
+- Python (>= 3.7)
+- NumPy (>= 1.9.2) for all numerical algorithms
+- Matplotlib >= 3.3.2 for static plotting and visualizations
+- Pytorch (>=1.7.1) for building feed-forward neural networks
 
-## SysIdentPy now support NARX Neural Network and General estimators, e.g., sklearn estimators and Catboost.
+| Platform | Status |
+| --------- | -----:|
+| Linux | ok |
+| Windows | ok |
+| macOS | ok |
+
+A few examples require pandas >= 0.18.0. However, it is not required to use SysIdentPy.
+
+## What are the main features of SysIdentPy?
+
+| Feature | What is this? |
+|----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| NARMAX philosophy | You can build variations of NARMAX models like NARX, NAR, NARMA, NFIR, ARMA, ARX, AR, and others. |
+| Model Structure Selection | Easy-to-use methods to select the best terms to build your models, including FROLS and MetaMSS and several combinations with parameter estimation techniques to select the model terms. |
+| Basis Function | You can use different basis functions to build your models. You can set linear and nonlinear basis functions and ensemble them to get custom NARMAX models. |
+| Parameter Estimation | More than 15 methods to estimate the model parameters and test different structure selection scenarios. |
+| Model Simulation | You can reproduce results from papers easily with SimulateNARMAX class. Moreover, you can test published models with different parameter estimation methods and compare the performance. |
+| Neural NARX | You can use SysIdentPy with Pytorch to create custom neural NARX models architectures which support all the optimizers and loss functions from Pytorch. |
+| General Estimators | You can use estimators from packages like scikit-learn, Catboost, and many other compatible interfaces and composition tools, to create NARMAX models. |
+
+## Why does SysIdentPy exist?
+
+SysIdentPy aims to be a free and open source package to help the community to design NARMAX models. More than that, be a free and robust alternative to one of the most used tools to build NARMAX models, which is the Matlab's System Identification Toolbox.
+
+The project is actively maintained by Wilson R. L. Junior and looking for contributors.
+
+## How do I use sysIdentPy?
+
+The [SysIdentPy documentation](https://sysidentpy.org) includes 20 examples to help get you started:
+- Typical "Hello World" example, for an [entry-level description of the main SysIdentPy concepts](https://sysidentpy.org/examples/basic_steps/)
+- A dedicated section focusing on SysIdentPy features, like model structure selection algorithms, basis functions, parameter estimation, and more.
+- A dedicated section focusing on use cases using SysIdentPy with real world datasets. Besides, there is some brief comparisons and benchmarks against other time series tools, like Prophet, Neural Prophet, ARIMA, and more.  
+
 
 ### Examples
 ```python
@@ -212,106 +248,7 @@ plot_results_tmp(y_valid, catboost.predict(x_valid))
 
 The examples directory has several Jupyter notebooks with tutorials of how to use the package and some specific applications of sysidentpy. Try it out!
 
-# Requirements
-
-SysIdentPy requires:
-
-- Python (>= 3.7)
-- NumPy (>= 1.5.0) for all numerical algorithms
-- Matplotlib >= 1.5.2 for static plotting and visualizations
-- Pytorch (>=1.7.1) for building feed-forward neural networks
-
-| Platform | Status |
-| --------- | -----:|
-| Linux | ok |
-| Windows | ok |
-| macOS | ok |
-
-**SysIdentPy do not to support Python 2.7.**
-
-A few examples require pandas >= 0.18.0. However, it is not required to use sysidentpy.
-
-# Installation
-
-The easiest way to get sysidentpy running is to install it using ``pip``
-~~~~~~~~~~~~~~~~~~~~~~
-pip install sysidentpy
-~~~~~~~~~~~~~~~~~~~~~~
-
-We will make it available at conda repository as soon as possible.
-
-# Changelog
-
-See the [changelog]( <http://sysidentpy.org/changelog/v0.1.6.html>) for a history of notable changes to SysIdentPy.
-
-# Development
-
-We welcome new contributors of all experience levels. The sysidentpy community goals are to be helpful, welcoming, and effective.
-
-*Note*: we use the `pytest` package for testing. The test functions are located in tests subdirectories at each folder inside **SysIdentPy**, which check the validity of the algorithms.
-
-Run the `pytest` in the respective folder to perform all the tests of the corresponding sub-packages.
-
-Currently, we have around 81% of code coverage.
-
-You can install pytest using
-~~~~~~~~~~~~~~~~~~~~~~
-pip install -U pytest
-~~~~~~~~~~~~~~~~~~~~~~
-
-### Example of how to run the tests:
-
-Open a terminal emulator of your choice and go to a subdirectory, e.g,
-~~~~~~~~~~~~~~~~~~~~
-\sysidentpy\metrics\
-~~~~~~~~~~~~~~~~~~~~
-
-Just type `pytest` and you get a result like
-
-~~~~~~~~
-========== test session starts ==========
-
-platform linux -- Python 3.7.6, pytest-5.4.2, py-1.8.1, pluggy-0.13.1
-
-rootdir: ~/sysidentpy
-
-plugins: cov-2.8.1
-
-collected 12 items
-
-tests/test_regression.py ............ [100%]
-
-========== 12 passed in 2.45s ==================
-~~~~~~~~~~~~~~
-You can also see the code coverage using the `pytest-cov` package. First, install `pytest-cov` using
-~~~
-pip install pytest-cov
-~~~
-Run the command below in the SysIdentPy root directory, to generate the report.
-~~~
-pytest --cov=.
-~~~
-
-# Important links
-
-- Official source code repo: https://github.com/wilsonrljr/sysidentpy
-
-- Download releases: https://pypi.org/project/sysidentpy/
-
-# Source code
-
-You can check the latest sources with the command::
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-git clone https://github.com/wilsonrljr/sysidentpy.git
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# Project History
-
-The project was started by Wilson R. L. Junior, Luan Pascoal and Samir A. M. Martins as a project for System Identification discipline. Samuel joined early in 2019.
-
-The project is actively maintained by Wilson R. L. Junior and looking for contributors.
-
-# Communication
+## Communication
 
 - Discord server: https://discord.gg/8eGE3PQ
 
@@ -320,7 +257,7 @@ The project is actively maintained by Wilson R. L. Junior and looking for contri
 
 - Website: http://sysidentpy.org
 
-# Citation
+## Citation
 [![DOI](https://img.shields.io/badge/DOI-10.21105%2Fjoss.02384-%23FF7800)](https://joss.theoj.org/papers/10.21105/joss.02384)
 
 If you use SysIdentPy on your project, please [drop me a line](mailto:wilsonrljr@outlook.com).
@@ -344,6 +281,6 @@ If you use SysIdentPy on your scientific publication, we would appreciate citati
 }
 ```
 
-# Inspiration
+## Inspiration
 
 The documentation and structure (even this section) is openly inspired by sklearn, einsteinpy, and many others as we used (and keep using) them to learn.

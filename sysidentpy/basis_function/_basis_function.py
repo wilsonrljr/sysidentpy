@@ -1,5 +1,7 @@
-import numpy as np
 from itertools import combinations_with_replacement
+
+import numpy as np
+
 from sysidentpy.narmax_base import InformationMatrix
 
 
@@ -15,15 +17,18 @@ class Polynomial(InformationMatrix):
     where :math:`p` is the number of regressors, :math:`\Theta_i` are the
     model parameters, and :math:`a_i, m, b_i, j` and :math:`d_i, l \in \mathbb{N}`
     are the exponents of the output, input and noise terms, respectively.
+
     Parameters
     ----------
     degree : int (max_degree), default=2
         The maximum degree of the polynomial features.
+
     Notes
     -----
     Be aware that the number of features in the output array scales
     significantly as the number of inputs, the max lag of the input and output, and
     degree increases. High degrees can cause overfitting.
+
     """
 
     def __init__(
@@ -48,6 +53,7 @@ class Polynomial(InformationMatrix):
         predefined_regressors : ndarray of int
             The index of the selected regressors by the Model Structure
             Selection algorithm.
+
         Returns
         -------
         psi = ndarray of floats
@@ -82,10 +88,12 @@ class Fourier:
     ----------
     degree : int (max_degree), default=2
         The maximum degree of the polynomial features.
+
     Notes
     -----
     Be aware that the number of features in the output array scales
     significantly as the number of inputs, the max lag of the input and output.
+
     """
 
     def __init__(self, n=1, p=2 * np.pi, degree=1, ensemble=True):
@@ -119,6 +127,7 @@ class Fourier:
         predefined_regressors : ndarray of int
             The index of the selected regressors by the Model Structure
             Selection algorithm.
+
         Returns
         -------
         psi = ndarray of floats

@@ -11,6 +11,7 @@ from sysidentpy.utils._check_arrays import (
 )
 from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
 from sysidentpy.utils.save_load import load_model, save_model
+from sysidentpy.utils.display_results import results
 
 
 def test_check_positive_int():
@@ -94,3 +95,32 @@ def test_load_model():
     assert_raises(TypeError, load_model, path=1)
     assert_raises(TypeError, load_model, path=False)
     assert_raises(TypeError, load_model, model=None)
+
+
+def test_results():
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [2001, 1001],  # x1(k-1)y(k-1)
+            [2002, 0],  # x1(k-2)
+        ]
+    )
+    theta = np.array([[0.19999698], [0.90011667], [0.10080975]])
+    err = np.array([0.98, 0.01, 0.01])
+    table = results(
+        final_model=model,
+        theta=theta,
+        err=err,
+        n_terms=3,
+        theta_precision=4,
+        err_precision=8,
+        dtype="sci",
+    )
+    assert_equal(
+        table,
+        [
+            ["y(k-1)", "2.0000E-01", "9.80000000E-01"],
+            ["x1(k-1)y(k-1)", "9.0012E-01", "1.00000000E-02"],
+            ["x1(k-2)", "1.0081E-01", "1.00000000E-02"],
+        ],
+    )

@@ -11,7 +11,7 @@ from itertools import chain, combinations_with_replacement
 
 import numpy as np
 
-from .utils._check_arrays import _check_positive_int, _num_features, check_X_y
+from .utils._check_arrays import _check_positive_int, _num_features
 
 
 class GenerateRegressors:
@@ -130,7 +130,7 @@ class GenerateRegressors:
         elif model_type == "NFIR":
             reg_aux = np.concatenate([reg_aux, x_vec])
         else:
-            raise Exception(
+            raise ValueError(
                 "Unrecognized model type. Model type should be NARMAX, NAR or NFIR"
             )
 
@@ -461,8 +461,6 @@ class InformationMatrix:
 
         Parameters
         ----------
-        model : ndarray of int
-            The model code representation.
         y : array-like
             Target data used on training phase.
         X : array-like
@@ -501,14 +499,10 @@ class InformationMatrix:
 
         Parameters
         ----------
-        model : ndarray of int
-            The model code representation.
         y : array-like
             Target data used on training phase.
         ylag : int
             The maximum lag of output regressors.
-        non_degree : int
-            The desired maximum nonlinearity degree.
 
         Returns
         -------
@@ -535,14 +529,10 @@ class InformationMatrix:
 
         Parameters
         ----------
-        model : ndarray of int
-            The model code representation.
         X : array-like
             Input data used on training phase.
         xlag : int
             The maximum lag of input regressors.
-        non_degree : int
-            The desired maximum nonlinearity degree.
 
         Returns
         -------
@@ -570,8 +560,6 @@ class InformationMatrix:
 
         Parameters
         ----------
-        model : ndarray of int
-            The model code representation.
         y : array-like
             Target data used on training phase.
         X : array-like
@@ -580,8 +568,6 @@ class InformationMatrix:
             The maximum lag of output regressors.
         xlag : int
             The maximum lag of input regressors.
-        non_degree : int
-            The desired maximum nonlinearity degree.
 
         Returns
         -------
@@ -887,7 +873,8 @@ class ModelPrediction:
                 )
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
+                    " NFIR."
                 )
 
             X_tmp, _ = self.basis_function.transform(
@@ -958,16 +945,11 @@ class ModelPrediction:
                 )[-steps_ahead:].ravel()
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
+                    " NFIR."
                 )
 
-            # yhat[i : i + steps_ahead] = self._basis_function_predict(
-            #     X[k : i + steps_ahead], y[k : i + steps_ahead], self.theta
-            # )[-steps_ahead:].ravel()
-
             i += steps_ahead
-
-        # yhat = yhat.ravel()
         return yhat.reshape(-1, 1)
 
     def _basis_function_n_steps_horizon(self, X, y, steps_ahead, forecast_horizon):
@@ -1003,7 +985,8 @@ class ModelPrediction:
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
+                    " NFIR."
                 )
 
             # yhat[i : i + steps_ahead] = self._basis_function_predict(

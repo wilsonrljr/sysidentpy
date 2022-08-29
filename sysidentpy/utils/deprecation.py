@@ -2,8 +2,8 @@
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
 
-import warnings
 import functools
+import warnings
 
 
 def deprecated(version, future_version=None, message=None, alternative=None, **kwargs):

@@ -1,0 +1,200 @@
+site_name: SysIdentPy
+site_description: From Classical Approaches to Neural Networks
+site_url: https://sysidentpy.org/
+site_author: Wilson Rocha
+
+# Repository
+repo_name: wilsonrljr/sysidentpy
+repo_url: https://github.com/wilsonrljr/sysidentpy
+
+# Copyright
+copyright: Copyright &copy; 2016 - 2022 Wilson Rocha
+
+# Configuration
+theme:
+  name: material
+  custom_dir: docs/
+  favicon: overrides/assets/images/favicon.png
+  icon:
+    logo: fontawesome/solid/house
+
+  # Static files
+
+  # Don't include MkDocs' JavaScript
+  include_search_page: false
+  search_index_only: true
+
+  # Default values, taken from mkdocs_theme.yml
+  language: en
+  features:
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+    # - header.autohide
+    - navigation.indexes
+    # - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+  palette:
+    - scheme: default
+      primary: white
+      accent: orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: black
+      accent: orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+  
+
+## Custom theme additions
+extra_javascript:
+        - 'overrides/assets/extra.js'
+        - 'overrides/assets/javascripts/mathjax.js'
+        - 'https://polyfill.io/v3/polyfill.min.js?features=es6'
+        - 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
+
+# Plugins
+plugins:
+  - search
+  - minify:
+      minify_html: true
+  - glightbox
+  - mkdocs-jupyter:
+      include_source: True
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            show_source: true
+          selection:
+            docstring_style: numpy
+
+
+# Customization
+extra:
+  analytics:
+    provider: google
+    property: !ENV GOOGLE_ANALYTICS_KEY
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/wilsonrljr
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/sysidentpy/
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/wilsonrljr
+
+# Extensions
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:materialx.emoji.twemoji
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      user: squidfunk
+      repo: mkdocs-material
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+# Page tree
+nav:
+  - Home: index.md
+  - Getting started:
+    - Installation: landing-page/getting-started.md
+    - Introduction to NARMAX: landing-page/ch0-narmax-intro.md
+    - Basic Usage: landing-page/basic-usage.md
+    - Get Help: landing-page/get-help.md
+    - How to contribute: landing-page/contribute.md
+    - License: landing-page/license.md
+  - Tutorials:
+        - Features:
+          - basic-steps: examples/basic_steps.ipynb
+          - defining-lags: examples/defining_lags.ipynb
+          - miso: examples/multiple_inputs_example.ipynb
+          - parameter-estimation: examples/parameter_estimation.ipynb
+          - els: examples/extended_least_squares.ipynb
+          - n-steps-prediction: examples/n_steps_ahead_prediction.ipynb
+          - simulating: examples/simulating_a_predefined_model.ipynb
+          - save-load: examples/save_and_load_models.ipynb
+          - information-criteria: examples/information_criteria_examples.ipynb
+          - general-estimators: examples/general_estimators.ipynb
+          - fourier-basis: examples/fourier_basis_function.ipynb
+          - metamss: examples/metamss.ipynb
+          - neural-narx: examples/narx_neural_network.ipynb
+          - aols: examples/aols.ipynb
+          - entropic: examples/entropic_regression.ipynb
+        - Cases:
+          - air-passenger: examples/air_passenger_benchmark.ipynb
+          - f16: examples/f_16_benchmark.ipynb
+          - electromechanical: examples/identification_of_an_electromechanical_system.ipynb
+          - load-forecasting: examples/load_forecasting_benchmark.ipynb
+          - pv-forecasting: examples/PV_forecasting_benchmark.ipynb
+      
+  - Blog:
+    - Events: events/events.md
+    - Meetups:
+      - Nubank Timeseries Meetup: events/nubank-meetup.md
+      - Nubank Open Source Talk: events/nubank-meetup-open-source.md
+      - GCoM Meetup: events/gcom-meetup.md
+  - About:
+    - landing-page/about-us.md
+    - landing-page/attribute.md
+  - Changelog:
+      - changelog/changelog.md
+  - Sponsors: landing-page/sponsor.md
+  - Code:
+    - NARMAX Base: code/narmax-base.md
+    - Basis Functions: code/basis-function.md
+    - FROLS: code/frols.md
+    - MetaMSS: code/metamss.md
+    - AOLS: code/aols.md
+    - Entropic Regression: code/entropic-regression.md
+    - Neural NARX: code/neural-narx.md
+    - General Estimators: code/general-estimators.md
+    - Parameter Estimation: code/parameter-estimation.md
+    - Simulation: code/simulation.md
+    - Residual Analysis: code/residues.md
+    - Metaheuristics: code/metaheuristics.md
+    - Metrics: code/metrics.md
+    - Utils: code/utils.md
