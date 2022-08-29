@@ -9,6 +9,7 @@ __pycache__/
 # Sphinx
 docs/_build
 docs/build
+site/
 # Pycharm editor project files
 .idea
 logs.log
