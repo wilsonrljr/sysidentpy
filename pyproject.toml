@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools>=45.0", "setuptools_scm[toml]>=6.3.1", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -59,6 +59,13 @@ doc = [
     # "typer-cli >=0.0.12,<0.0.13",
     "typer >=0.4.1,<0.5.0",
     "pyyaml >=5.3.1,<7.0.0",
+    "mkdocstrings[python]",
+    "mkdocs-redirects",
+    "mkdocs-minify-plugin",
+    "mkdocs-glightbox",
+    "mkdocs-jupyter",
+    # avoid jinja import error using 3.0.3 version
+    "jinja2==3.0.3",
 ]
 all = ["torch >=1.7.1"]
 
@@ -87,8 +94,20 @@ source = ["sysidentpy"]
 disable_warnings = ['no-data-collected']
 
 [tool.coverage.report]
+omit = [
+    "sysidentpy/utils/plotting.py",
+    "sysidentpy/basis_function/tests/*",
+    "sysidentpy/tests/*",
+    "sysidentpy/general_estimators/tests/*",
+    "sysidentpy/metaheuristics/tests/*",
+    "sysidentpy/metrics/tests/*",
+    "sysidentpy/model_structure_selection/tests/*",
+    "sysidentpy/parameter_estimation/tests/*",
+    "sysidentpy/residues/tests/*",
+    "sysidentpy/simulation/tests/*",
+]
 show_missing = true
-fail_under = 60
+fail_under = 80
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
