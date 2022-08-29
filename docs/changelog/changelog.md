@@ -16,16 +16,41 @@ template: overrides/main.html
 - The update **v0.2.1**  has been released with additional feature, minor API changes and fixes. 
 
 - MAJOR: Neural NARX now support CUDA
-    - Now the user can build Neural NARX models with CUDA support. Just add `device='cuda'` to use the GPU benefits. 
+    - Now the user can build Neural NARX models with CUDA support. Just add `device='cuda'` to use the GPU benefits.
+    - Updated docs to show how to use the new feature.
 
 
 - MAJOR: New documentation website
     - The documentation is now entirely based on Markdown (no rst anymore).
     - We use MkDocs and Material for MkDocs theme now.
+    - Dark theme option.
     - The Contribute page have more details to help those who wants to contribute with SysIdentPy.
     - New sections (e.g., Blog, Sponsors, etc.)
+    - Many improvements under the hood.
+
+- MAJOR: Github Sponsor
+    - Now you can support SysIdentPy by becoming a Sponsor! Details: https://github.com/sponsors/wilsonrljr
+
+- Tests: 
+    - Now there are test for almost every function.
+    - Neural NARX tests are raising numpy issues. It'll be fixed til next update.
+
+- FIX: NFIR models in General Estimators
+    - Fix support for NFIR models using sklearn estimators.
 
 - The setup is now handled by the pyproject.toml file.    
+
+- Remove unused code.
+
+- Fix docstring variables.
+
+- Fix code format issues.
+
+- Fix minor grammatical and spelling mistakes.
+
+- Fix issues related to html on Jupyter notebooks examples on documentation.
+
+- Updated Readme.
 
 
 ## v0.2.0
