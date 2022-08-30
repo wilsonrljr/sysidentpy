@@ -13,7 +13,6 @@ import numpy as np
 
 from ..narmax_base import GenerateRegressors, InformationMatrix, ModelInformation
 from ..utils._check_arrays import _check_positive_int, _num_features, check_X_y
-from ..utils.deprecation import deprecated
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -347,7 +346,6 @@ class ModelPrediction:
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
 
-        analyzed_elements_number = self.max_lag + 1
         i = self.max_lag
 
         while i < len(y):
@@ -385,7 +383,6 @@ class ModelPrediction:
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
 
-        analyzed_elements_number = self.max_lag + 1
         i = self.max_lag
 
         while i < len(y):
@@ -452,7 +449,10 @@ class NARX(GenerateRegressors, InformationMatrix, ModelInformation, ModelPredict
     >>> from sysidentpy.basis_function._basis_function import Polynomial
     >>> from sysidentpy.utils.display_results import results
     >>> from sysidentpy.utils.plotting import plot_residues_correlation, plot_results
-    >>> from sysidentpy.residues.residues_correlation import compute_residues_autocorrelation, compute_cross_correlation
+    >>> from sysidentpy.residues.residues_correlation import(
+    ...    compute_residues_autocorrelation,
+    ...    compute_cross_correlation
+    ... )
     >>> from sklearn.linear_model import BayesianRidge # to use as base estimator
     >>> x_train, x_valid, y_train, y_valid = get_siso_data(
     ...    n=1000,

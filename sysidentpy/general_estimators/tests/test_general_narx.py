@@ -1,9 +1,7 @@
-from unicodedata import decimal
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from numpy.testing import (
     assert_almost_equal,
-    assert_array_equal,
     assert_equal,
     assert_raises,
 )

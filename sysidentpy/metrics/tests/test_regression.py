@@ -15,7 +15,6 @@ from sysidentpy.metrics import (
 
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
-from numpy.testing import assert_raises
 
 
 def test_mean_forecast_error():
@@ -30,13 +29,6 @@ def test_forecast_error():
     y_predicted = np.array([2.5, 0.0, 2, 8])
     metric = [0.5, -0.5, 0, -1]
     assert_array_equal(metric, forecast_error(y, y_predicted))
-
-
-def test_mean_squared_error():
-    y = np.array([3, -0.5, 2, 7])
-    y_predicted = np.array([2.5, 0.0, 2, 8])
-    metric = 0.375
-    assert_array_equal(metric, mean_squared_error(y, y_predicted))
 
 
 def test_mean_squared_error():
