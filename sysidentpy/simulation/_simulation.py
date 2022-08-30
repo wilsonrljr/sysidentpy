@@ -362,10 +362,10 @@ class SimulateNARMAX(
 
         References
         ----------
-        .. [1] Manuscript: Orthogonal least squares methods and their application
+        - Manuscript: Orthogonal least squares methods and their application
            to non-linear system identification
            https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
-        .. [2] Manuscript (portuguese): Identificação de Sistemas não Lineares
+        - Manuscript (portuguese): Identificação de Sistemas não Lineares
            Utilizando Modelos NARMAX Polinomiais – Uma Revisão
            e Novos Resultados
 

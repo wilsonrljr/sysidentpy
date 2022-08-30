@@ -57,7 +57,7 @@ class GenerateRegressors:
 
         References
         ----------
-        [1] Master Thesis: Barbosa, Alípio Monteiro.
+        - Master Thesis: Barbosa, Alípio Monteiro.
             Técnicas de otimização bi-objetivo para a determinação
             da estrutura de modelos NARX (2010).
 
@@ -159,7 +159,7 @@ class HouseHolder:
 
         References
         ----------
-        [1] Manuscript: Chen, S., Billings, S. A., & Luo, W. (1989).
+        - Manuscript: Chen, S., Billings, S. A., & Luo, W. (1989).
             Orthogonal least squares methods and their application to non-linear
             system identification.
 
@@ -188,7 +188,7 @@ class HouseHolder:
 
         References
         ----------
-        [1] Manuscript: Chen, S., Billings, S. A., & Luo, W. (1989).
+        - Manuscript: Chen, S., Billings, S. A., & Luo, W. (1989).
             Orthogonal least squares methods and their application to
             non-linear system identification. International Journal of
             control, 50(5), 1873-1896.

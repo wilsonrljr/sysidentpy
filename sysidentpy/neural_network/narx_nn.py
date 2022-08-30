@@ -526,7 +526,7 @@ class NARXNN(
 
     References
     ----------
-    .. [1]`Manuscript: Orthogonal least squares methods and their application
+    - Manuscript: Orthogonal least squares methods and their application
        to non-linear system identification
        <https://eprints.soton.ac.uk/251147/1/778742007_content.pdf>`_
 

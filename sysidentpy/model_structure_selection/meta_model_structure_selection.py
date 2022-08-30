@@ -136,16 +136,14 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
     References
     ----------
-    .. [1] Manuscript: Meta-Model Structure Selection: Building Polynomial NARX Model
+    - Manuscript: Meta-Model Structure Selection: Building Polynomial NARX Model
        for Regression and Classification
        https://arxiv.org/pdf/2109.09917.pdf
-
-    .. [2] Manuscript (Portuguese): Identificação de Sistemas Não Lineares
+    - Manuscript (Portuguese): Identificação de Sistemas Não Lineares
        Utilizando o Algoritmo Híbrido e Binário de Otimização por
        Enxame de Partículas e Busca Gravitacional
        DOI: 10.17648/sbai-2019-111317
-
-    .. [3] Master thesis: Meta model structure selection: an algorithm for
+    - Master thesis: Meta model structure selection: an algorithm for
        building polynomial NARX models for regression and classification
 
     """
