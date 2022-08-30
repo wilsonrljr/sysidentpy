@@ -23,18 +23,18 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
     This class uses the MetaMSS ([1]_, [2]_, [3]_) algorithm to build NARMAX models.
     The NARMAX model is described as:
 
-    .. math::
-
+    $$
         y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x}, e_{k-1}, \dotsc, e_{k-n_e}] + e_k
+    $$
 
-    where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,
+    where $n_y\in \mathbb{N}^*$, $n_x \in \mathbb{N}$, $n_e \in \mathbb{N}$,
     are the maximum lags for the system output and input respectively;
-    :math:`x_k \in \mathbb{R}^{n_x}` is the system input and :math:`y_k \in \mathbb{R}^{n_y}`
-    is the system output at discrete time :math:`k \in \mathbb{N}^n`;
-    :math:`e_k \in \mathbb{R}^{n_e}` stands for uncertainties and possible noise
-    at discrete time :math:`k`. In this case, :math:`\mathcal{F}^\ell` is some nonlinear function
-    of the input and output regressors with nonlinearity degree :math:`\ell \in \mathbb{N}`
-    and :math:`d` is a time delay typically set to :math:`d=1`.
+    $x_k \in \mathbb{R}^{n_x}$ is the system input and $y_k \in \mathbb{R}^{n_y}$
+    is the system output at discrete time $k \in \mathbb{N}^n$;
+    $e_k \in \mathbb{R}^{n_e}$ stands for uncertainties and possible noise
+    at discrete time $k$. In this case, $\mathcal{F}^\ell$ is some nonlinear function
+    of the input and output regressors with nonlinearity degree $\ell \in \mathbb{N}$
+    and $d$ is a time delay typically set to $d=1$.
 
     Parameters
     ----------
@@ -139,10 +139,12 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
     .. [1] Manuscript: Meta-Model Structure Selection: Building Polynomial NARX Model
        for Regression and Classification
        https://arxiv.org/pdf/2109.09917.pdf
+
     .. [2] Manuscript (Portuguese): Identificação de Sistemas Não Lineares
        Utilizando o Algoritmo Híbrido e Binário de Otimização por
        Enxame de Partículas e Busca Gravitacional
        DOI: 10.17648/sbai-2019-111317
+
     .. [3] Master thesis: Meta model structure selection: an algorithm for
        building polynomial NARX models for regression and classification
 
@@ -254,7 +256,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         """
         if self.basis_function.__class__.__name__ != "Polynomial":
             raise NotImplementedError(
-                "Currently MetaMSS only supports polynomial" " models."
+                "Currently MetaMSS only supports polynomial models."
             )
         if y_train is None:
             raise ValueError("y cannot be None")
@@ -368,7 +370,8 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
                 )
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
+                    " NFIR."
                 )
 
             psi = self.basis_function.fit(

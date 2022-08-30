@@ -15,7 +15,7 @@ def create_test_data(n=1000):
 
 
 def test_metamss():
-    piv = np.array([4, 2, 7, 11, 5])
+    # piv = np.array([4, 2, 7, 11, 5])
     model_code = np.array(
         [[1001, 0], [2002, 0], [2001, 1001]]  # y(k-1)  # x1(k-2)  # x1(k-1)y(k-1)
     )

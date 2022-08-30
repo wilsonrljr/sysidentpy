@@ -43,18 +43,18 @@ class ER(
 
     The NARMAX model is described as:
 
-    .. math::
-
+    $$
         y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x}, e_{k-1}, \dotsc, e_{k-n_e}] + e_k
+    $$
 
-    where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,
+    where $n_y\in \mathbb{N}^*$, $n_x \in \mathbb{N}$, $n_e \in \mathbb{N}$,
     are the maximum lags for the system output and input respectively;
-    :math:`x_k \in \mathbb{R}^{n_x}` is the system input and :math:`y_k \in \mathbb{R}^{n_y}`
-    is the system output at discrete time :math:`k \in \mathbb{N}^n`;
-    :math:`e_k \in \mathbb{R}^{n_e}` stands for uncertainties and possible noise
-    at discrete time :math:`k`. In this case, :math:`\mathcal{F}^\ell` is some nonlinear function
-    of the input and output regressors with nonlinearity degree :math:`\ell \in \mathbb{N}`
-    and :math:`d` is a time delay typically set to :math:`d=1`.
+    $x_k \in \mathbb{R}^{n_x}$ is the system input and $y_k \in \mathbb{R}^{n_y}$
+    is the system output at discrete time $k \in \mathbb{N}^n$;
+    $e_k \in \mathbb{R}^{n_e}$ stands for uncertainties and possible noise
+    at discrete time $k$. In this case, $\mathcal{F}^\ell$ is some nonlinear function
+    of the input and output regressors with nonlinearity degree $\ell \in \mathbb{N}$
+    and $d$ is a time delay typically set to $d=1$.
 
     Parameters
     ----------
@@ -135,10 +135,13 @@ class ER(
     .. [1] Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
         Regression Beats the Outliers Problem in Nonlinear System
         Identification. Chaos 30, 013107 (2020).
+
     .. [2] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
         Estimating mutual information. Physical Review E, 69:066-138,2004
+
     .. [3] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
         Estimating mutual information. Physical Review E, 69:066-138,2004
+
     .. [4] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
         Estimating mutual information. Physical Review E, 69:066-138,2004
 
@@ -241,7 +244,7 @@ class ER(
     def mutual_information_knn(self, y, y_perm):
         """Finds the mutual information.
 
-        Finds the mutual information between :math:`x` and :math:`y` given :math:`z`.
+        Finds the mutual information between $x$ and $y$ given $z$.
 
         This code is based on Matlab Entropic Regression package.
 
@@ -262,10 +265,13 @@ class ER(
         .. [1] Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
             Regression Beats the Outliers Problem in Nonlinear System
             Identification. Chaos 30, 013107 (2020).
+
         .. [2] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
+
         .. [3] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
+
         .. [4] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
 
@@ -415,7 +421,7 @@ class ER(
 
     def conditional_mutual_information(self, y, f1, f2):
         """Finds the conditional mutual information.
-        Finds the conditioned mutual information between :math:`y` and :math:`f1` given :math:`f2`.
+        Finds the conditioned mutual information between $y$ and $f1$ given $f2$.
 
         This code is based on Matlab Entropic Regression package.
         https://github.com/almomaa/ERFit-Package
@@ -439,10 +445,13 @@ class ER(
         .. [1] Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
             Regression Beats the Outliers Problem in Nonlinear System
             Identification. Chaos 30, 013107 (2020).
+
         .. [2] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
+
         .. [3] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
+
         .. [4] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
 
@@ -485,7 +494,7 @@ class ER(
 
     def tolerance_estimator(self, y):
         """Tolerance Estimation for mutual independence test.
-        Finds the conditioned mutual information between :math:`y` and :math:`f1` given :math:`f2`.
+        Finds the conditioned mutual information between $y$ and $f1$ given $f2$.
 
         This code is based on Matlab Entropic Regression package.
         https://github.com/almomaa/ERFit-Package
@@ -505,10 +514,13 @@ class ER(
         .. [1] Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
             Regression Beats the Outliers Problem in Nonlinear System
             Identification. Chaos 30, 013107 (2020).
+
         .. [2] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
+
         .. [3] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
+
         .. [4] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
 
@@ -553,10 +565,13 @@ class ER(
         .. [1] Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
             Regression Beats the Outliers Problem in Nonlinear System
             Identification. Chaos 30, 013107 (2020).
+
         .. [2] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
+
         .. [3] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
+
         .. [4] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
 
@@ -599,11 +614,10 @@ class ER(
 
         if self.regressor_code.shape[0] > 90:
             warnings.warn(
-                (
-                    f"Given the higher number of possible regressors ({self.regressor_code.shape[0]}), "
-                    "the Entropic Regression algorithm may take long time to run. "
-                    "Consider reducing the number of regressors "
-                ),
+                "Given the higher number of possible regressors"
+                f" ({self.regressor_code.shape[0]}), the Entropic Regression algorithm"
+                " may take long time to run. Consider reducing the number of"
+                " regressors ",
                 stacklevel=2,
             )
 

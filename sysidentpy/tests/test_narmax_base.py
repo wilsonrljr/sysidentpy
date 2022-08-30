@@ -323,7 +323,7 @@ def test_process_xlag():
     assert_equal(output2, xlag)
 
 
-def test_process_xlag():
+def test_process_ylag():
     ylag = IM._process_ylag(2)
     output1 = range(1, 3)
     assert_equal(output1, ylag)
@@ -676,7 +676,7 @@ def test_model_predict_fourier_nar_inputs():
     MP.ylag = model.ylag
     MP.pivv = model.pivv
     MP.theta = model.theta
-    yhat = MP._basis_function_predict(X=X_test, y_initial=y_test, theta=MP.theta)
+    _ = MP._basis_function_predict(X=X_test, y_initial=y_test, theta=MP.theta)
     assert_equal(MP._n_inputs, 0)
 
 

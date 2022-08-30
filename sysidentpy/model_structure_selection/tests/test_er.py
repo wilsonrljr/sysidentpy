@@ -1,9 +1,7 @@
 import numpy as np
-from numpy.testing import assert_almost_equal, assert_array_equal
+from numpy.testing import assert_almost_equal
 from numpy.testing import assert_raises
-from numpy.testing._private.utils import assert_allclose
 from sysidentpy.model_structure_selection import ER
-from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
 from sysidentpy.basis_function import Polynomial
 
 

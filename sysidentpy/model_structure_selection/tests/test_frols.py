@@ -1,9 +1,7 @@
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
 from numpy.testing import assert_raises
-from numpy.testing._private.utils import assert_allclose
 from sysidentpy.model_structure_selection import FROLS
-from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
 from sysidentpy.basis_function import Polynomial
 
 
@@ -27,7 +25,7 @@ def create_test_data(n=1000):
 
 
 def test_error_reduction_ratio():
-    piv = np.array([4, 2, 7, 11, 5])
+    # piv = np.array([4, 2, 7, 11, 5])
     model_code = np.array(
         [[2002, 0], [1002, 0], [2001, 1001], [2002, 1002], [1001, 1001]]
     )

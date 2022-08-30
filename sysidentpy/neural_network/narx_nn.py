@@ -9,7 +9,6 @@ import logging
 import sys
 import warnings
 from collections import Counter
-from tabnanny import verbose
 
 import numpy as np
 import torch
@@ -318,7 +317,8 @@ class ModelPrediction:
                 )
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
+                    " NFIR."
                 )
 
             X_tmp, _ = self.basis_function.transform(
@@ -364,7 +364,6 @@ class ModelPrediction:
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
 
-        analyzed_elements_number = self.max_lag + 1
         i = self.max_lag
 
         while i < len(y):
@@ -389,7 +388,8 @@ class ModelPrediction:
                 )[-steps_ahead:].ravel()
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
+                    " NFIR."
                 )
 
             i += steps_ahead
@@ -401,7 +401,6 @@ class ModelPrediction:
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
 
-        analyzed_elements_number = self.max_lag + 1
         i = self.max_lag
 
         while i < len(y):
@@ -426,7 +425,8 @@ class ModelPrediction:
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
+                    " NFIR."
                 )
 
             i += steps_ahead
@@ -445,7 +445,8 @@ class NARXNN(
 
     Currently we support a Series-Parallel (open-loop) Feedforward Network training
     process, which make the training process easier, and we convert the
-    NARX network from Series-Parallel to the Parallel (closed-loop) configuration for prediction.
+    NARX network from Series-Parallel to the Parallel (closed-loop) configuration for
+    prediction.
 
     Parameters
     ----------
@@ -499,7 +500,7 @@ class NARXNN(
     ...     optimizer='Adam',
     ...     epochs=200,
     ...     verbose=False,
-    ...     optim_params={'betas': (0.9, 0.999), 'eps': 1e-05} # optional parameters of the optimizer
+    ...     optim_params={'betas': (0.9, 0.999), 'eps': 1e-05} # for the optimizer
     ... )
     >>> class Net(nn.Module):
     ...     def __init__(self):

@@ -37,18 +37,18 @@ class FROLS(
     This class uses the FROLS algorithm ([1]_, [2]_) to build NARMAX models.
     The NARMAX model is described as:
 
-    .. math::
-
+    $$
         y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x}, e_{k-1}, \dotsc, e_{k-n_e}] + e_k
+    $$
 
-    where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,
+    where $n_y\in \mathbb{N}^*$, $n_x \in \mathbb{N}$, $n_e \in \mathbb{N}$,
     are the maximum lags for the system output and input respectively;
-    :math:`x_k \in \mathbb{R}^{n_x}` is the system input and :math:`y_k \in \mathbb{R}^{n_y}`
-    is the system output at discrete time :math:`k \in \mathbb{N}^n`;
-    :math:`e_k \in \mathbb{R}^{n_e}` stands for uncertainties and possible noise
-    at discrete time :math:`k`. In this case, :math:`\mathcal{F}^\ell` is some nonlinear function
-    of the input and output regressors with nonlinearity degree :math:`\ell \in \mathbb{N}`
-    and :math:`d` is a time delay typically set to :math:`d=1`.
+    $x_k \in \mathbb{R}^{n_x}$ is the system input and $y_k \in \mathbb{R}^{n_y}$
+    is the system output at discrete time $k \in \mathbb{N}^n$;
+    $e_k \in \mathbb{R}^{n_e}4 stands for uncertainties and possible noise
+    at discrete time $k$. In this case, $\mathcal{F}^\ell$ is some nonlinear function
+    of the input and output regressors with nonlinearity degree $\ell \in \mathbb{N}$
+    and $d$ is a time delay typically set to $d=1$.
 
     Parameters
     ----------
@@ -139,6 +139,7 @@ class FROLS(
     .. [1] Manuscript: Orthogonal least squares methods and their application
        to non-linear system identification
        https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
+
     .. [2] Manuscript (portuguese): Identificação de Sistemas não Lineares
        Utilizando Modelos NARMAX Polinomiais – Uma Revisão
        e Novos Resultados
@@ -165,7 +166,7 @@ class FROLS(
         gama=0.2,
         weight=0.02,
         basis_function=None,
-        model_type="NARMAX"
+        model_type="NARMAX",
     ):
         self.non_degree = basis_function.degree
         self._order_selection = order_selection
@@ -337,12 +338,10 @@ class FROLS(
         if self.n_info_values is not None and self.n_info_values > X_base.shape[1]:
             self.n_info_values = X_base.shape[1]
             warnings.warn(
-                (
-                    "n_info_values is greater than the maximum number "
-                    "of all regressors space considering the chosen "
-                    "y_lag, u_lag, and non_degree. We set as "
-                    "%d "
-                )
+                "n_info_values is greater than the maximum number "
+                "of all regressors space considering the chosen "
+                "y_lag, u_lag, and non_degree. We set as "
+                "%d "
                 % X_base.shape[1],
                 stacklevel=2,
             )

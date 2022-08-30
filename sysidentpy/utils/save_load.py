@@ -50,11 +50,12 @@ def load_model(
 
     Parameters
     ----------
-    file_name: file name (str), along with .syspy extension of the file containing model to be loaded
+    file_name: file name (str), along with .syspy extension of the file containing
+        model to be loaded
     path: location where "file_name.syspy" is (optional).
 
     Returns
-    ----------
+    -------
     model_loaded: model loaded, as a variable, containing model and its attributes
 
     """
