@@ -9,7 +9,7 @@ from sysidentpy.utils._check_arrays import check_random_state
 
 
 class BPSOGSA:
-    """Binary Hybrid Particle Swarm Optimization and Gravitational Search Algorithm [1]_, [2]_, [3]_, [4]_, [5]_
+    """Binary Hybrid Particle Swarm Optimization and Gravitational Search Algorithm
 
     Parameters
     ----------
@@ -54,7 +54,7 @@ class BPSOGSA:
 
     References
     ----------
-    .. [1] A New Hybrid PSOGSA Algorithm for Function Optimization
+    .. [1] A New Hybrid PSOGSA Algorithm for Function Optimization,
        https://www.mathworks.com/matlabcentral/fileexchange/35939-hybrid-particle-swarm-optimization-and-gravitational-search-algorithm-psogsa
     .. [2] Manuscript: Particle swarm optimization: developments, applications and resources.
     .. [3] Manuscript: S-shaped versus v-shaped transfer functions for binary
