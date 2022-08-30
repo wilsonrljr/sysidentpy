@@ -29,18 +29,18 @@ class SimulateNARMAX(
 
     The NARMAX model is described as:
 
-    .. math::
-
+    $$
         y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x}, e_{k-1}, \dotsc, e_{k-n_e}] + e_k
+    $$
 
-    where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,
+    where $n_y\in \mathbb{N}^*$, $n_x \in \mathbb{N}$, $n_e \in \mathbb{N}$,
     are the maximum lags for the system output and input respectively;
-    :math:`x_k \in \mathbb{R}^{n_x}` is the system input and :math:`y_k \in \mathbb{R}^{n_y}`
-    is the system output at discrete time :math:`k \in \mathbb{N}^n`;
-    :math:`e_k \in \mathbb{R}^{n_e}` stands for uncertainties and possible noise
-    at discrete time :math:`k`. In this case, :math:`\mathcal{F}^\ell` is some nonlinear function
-    of the input and output regressors with nonlinearity degree :math:`\ell \in \mathbb{N}`
-    and :math:`d` is a time delay typically set to :math:`d=1`.
+    $x_k \in \mathbb{R}^{n_x}$ is the system input and $y_k \in \mathbb{R}^{n_y}$
+    is the system output at discrete time $k \in \mathbb{N}^n$;
+    $e_k \in \mathbb{R}^{n_e}$ stands for uncertainties and possible noise
+    at discrete time $k$. In this case, $\mathcal{F}^\ell$ is some nonlinear function
+    of the input and output regressors with nonlinearity degree $\ell \in \mathbb{N}$
+    and $d$ is a time delay typically set to $d=1$.
 
     Parameters
     ----------
@@ -95,7 +95,8 @@ class SimulateNARMAX(
     ...     [2002,    0], # x1(k-2)
     ...     ]
     ...                 )
-    >>> # theta must be a numpy array of shape (n, 1) where n is the number of regressors
+    >>> # theta must be a numpy array of shape (n, 1) where n
+    ... is the number of regressors
     >>> theta = np.array([[0.2, 0.9, 0.1]]).T
     >>> yhat = s.simulate(
     ...     X_test=x_test,
@@ -156,7 +157,8 @@ class SimulateNARMAX(
     def _validate_simulate_params(self):
         if not isinstance(self.estimate_parameter, bool):
             raise TypeError(
-                f"estimate_parameter must be False or True. Got {self.estimate_parameter}"
+                "estimate_parameter must be False or True. Got"
+                f" {self.estimate_parameter}"
             )
 
         if not isinstance(self.calculate_err, bool):
@@ -217,7 +219,7 @@ class SimulateNARMAX(
         """
         if self.basis_function.__class__.__name__ != "Polynomial":
             raise NotImplementedError(
-                "Currently, SimulateNARMAX only works for polynomial" " models."
+                "Currently, SimulateNARMAX only works for polynomial models."
             )
 
         if y_test is None:
@@ -233,13 +235,15 @@ class SimulateNARMAX(
 
         if not isinstance(theta, np.ndarray) and not self.estimate_parameter:
             raise TypeError(
-                f"If estimate_parameter is False, theta must be an np.np.ndarray. Got {theta}"
+                "If estimate_parameter is False, theta must be an np.ndarray. Got"
+                f" {theta}"
             )
 
         if self.estimate_parameter:
             if not all(isinstance(i, np.ndarray) for i in [y_train]):
                 raise TypeError(
-                    f"If estimate_parameter is True, X_train and y_train must be an np.ndarray. Got {type(y_train)}"
+                    "If estimate_parameter is True, X_train and y_train must be an"
+                    f" np.ndarray. Got {type(y_train)}"
                 )
 
         if X_test is not None:

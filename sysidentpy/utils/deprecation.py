@@ -23,9 +23,9 @@ def deprecated(version, future_version=None, message=None, alternative=None, **k
             if alternative is not None:
                 message += (
                     f"\n Use {alternative} instead."
-                    f"This module was deprecated in favor of "
+                    "This module was deprecated in favor of "
                     f"{alternative} module into which all the refactored "
-                    f"classes and functions are moved."
+                    "classes and functions are moved."
                 )
             if future_version is not None:
                 message += (
@@ -51,9 +51,9 @@ def deprecated(version, future_version=None, message=None, alternative=None, **k
             if alternative is not None:
                 message += (
                     f"\n Use {alternative} instead."
-                    f"This module was deprecated in favor of "
+                    "This module was deprecated in favor of "
                     f"{alternative} module into which all the refactored "
-                    f"classes and functions are moved."
+                    "classes and functions are moved."
                 )
             if future_version is not None:
                 message += (

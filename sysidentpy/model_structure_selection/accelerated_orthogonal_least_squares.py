@@ -4,9 +4,6 @@
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
 
-
-import warnings
-
 import numpy as np
 from numpy import linalg as LA
 
@@ -37,18 +34,18 @@ class AOLS(
 
     The NARMAX model is described as:
 
-    .. math::
-
+    $$
         y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x}, e_{k-1}, \dotsc, e_{k-n_e}] + e_k
+    $$
 
-    where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,
+    where $n_y\in \mathbb{N}^*$, $n_x \in \mathbb{N}$, $n_e \in \mathbb{N}$,
     are the maximum lags for the system output and input respectively;
-    :math:`x_k \in \mathbb{R}^{n_x}` is the system input and :math:`y_k \in \mathbb{R}^{n_y}`
-    is the system output at discrete time :math:`k \in \mathbb{N}^n`;
-    :math:`e_k \in \mathbb{R}^{n_e}` stands for uncertainties and possible noise
-    at discrete time :math:`k`. In this case, :math:`\mathcal{F}^\ell` is some nonlinear function
-    of the input and output regressors with nonlinearity degree :math:`\ell \in \mathbb{N}`
-    and :math:`d` is a time delay typically set to :math:`d=1`.
+    $x_k \in \mathbb{R}^{n_x}$ is the system input and $y_k \in \mathbb{R}^{n_y}$
+    is the system output at discrete time $k \in \mathbb{N}^n$;
+    $e_k \in \mathbb{R}^{n_e}$ stands for uncertainties and possible noise
+    at discrete time $k$. In this case, $\mathcal{F}^\ell$ is some nonlinear function
+    of the input and output regressors with nonlinearity degree $\ell \in \mathbb{N}$
+    and $d$ is a time delay typically set to $d=1$.
 
     Parameters
     ----------
@@ -102,6 +99,7 @@ class AOLS(
     .. [1] Manuscript: Accelerated Orthogonal Least-Squares for Large-Scale
        Sparse Reconstruction
        https://www.sciencedirect.com/science/article/abs/pii/S1051200418305311
+
     .. [2] Code:
        https://github.com/realabolfazl/AOLS/
 
@@ -116,7 +114,7 @@ class AOLS(
         L=1,
         threshold=10e-10,
         model_type="NARMAX",
-        basis_function=None
+        basis_function=None,
     ):
         self.basis_function = basis_function
         self.model_type = model_type

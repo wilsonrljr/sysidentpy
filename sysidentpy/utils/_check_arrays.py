@@ -7,6 +7,7 @@
 import numpy as np
 import numbers
 
+
 # copy-pasted/adapted from scikit-learn utils/validation.py
 def check_random_state(seed):
     """Turn `seed` into a `np.random.RandomState` instance.
@@ -36,7 +37,7 @@ def check_random_state(seed):
         return seed
 
     raise ValueError(
-        "%r cannot be used to seed a numpy.random.RandomState" " instance" % seed
+        "%r cannot be used to seed a numpy.random.RandomState instance" % seed
     )
 
 
@@ -66,14 +67,14 @@ def check_infinity(X, y):
     """
     if np.isinf(X).any():
         msg_error = (
-            f"Input contains invalid values (e.g. NaN, Inf) on "
+            "Input contains invalid values (e.g. NaN, Inf) on "
             f"index {np.argwhere(np.isinf(X))}"
         )
         raise ValueError(msg_error)
 
     if np.isinf(y).any():
         msg_error = (
-            f"Output contains invalid values (e.g Inf) on "
+            "Output contains invalid values (e.g Inf) on "
             f"index {np.argwhere(np.isinf(y))}"
         )
         raise ValueError(msg_error)
@@ -94,14 +95,14 @@ def check_nan(X, y):
     """
     if np.isnan(X).any():
         msg_error = (
-            f"Input contains invalid values (e.g. NaN, Inf) on "
+            "Input contains invalid values (e.g. NaN, Inf) on "
             f"index {np.argwhere(np.isnan(X))}"
         )
         raise ValueError(msg_error)
 
     if not ~np.isnan(y).any():
         msg_error = (
-            f"Output contains invalid values (e.g. NaN, Inf) on "
+            "Output contains invalid values (e.g. NaN, Inf) on "
             f"index {np.argwhere(np.isnan(y))}"
         )
         raise ValueError(msg_error)
@@ -122,7 +123,7 @@ def check_length(X, y):
     """
     if X.shape[0] != y.shape[0]:
         msg_error = (
-            f"Input and output data must have the same number of "
+            "Input and output data must have the same number of "
             f"samples. X has dimension {X.shape} and "
             f"y has dimension {y.shape}"
         )
@@ -144,34 +145,26 @@ def check_dimension(X, y):
     """
     if X.ndim == 0:
         raise ValueError(
-            (
-                f"Input must be a 2d array, got scalar instead.\n"
-                f"Reshape your data using array.reshape(-1, 1)"
-            )
+            "Input must be a 2d array, got scalar instead. Reshape your data using"
+            " array.reshape(-1, 1)"
         )
 
     if X.ndim == 1:
         raise ValueError(
-            (
-                f"Input must be a 2d array, got 1d array instead.\n"
-                f"Reshape your data using array.reshape(-1, 1)"
-            )
+            "Input must be a 2d array, got 1d array instead. "
+            "Reshape your data using array.reshape(-1, 1)"
         )
 
     if y.ndim == 0:
         raise ValueError(
-            (
-                f"Output must be a 2d array, got scalar instead.\n"
-                f"Reshape your data using array.reshape(-1, 1)"
-            )
+            "Output must be a 2d array, got scalar instead. "
+            "Reshape your data using array.reshape(-1, 1)"
         )
 
     if y.ndim == 1:
         raise ValueError(
-            (
-                f"Output must be a 2d array, got 1d array instead.\n"
-                f"Reshape your data using array.reshape(-1, 1)"
-            )
+            "Output must be a 2d array, got 1d array instead. "
+            "Reshape your data using array.reshape(-1, 1)"
         )
 
 

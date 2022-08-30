@@ -5,7 +5,6 @@
 # License: BSD 3 clause
 
 
-import warnings
 from collections import Counter
 from itertools import chain, combinations_with_replacement
 
@@ -161,7 +160,8 @@ class HouseHolder:
         References
         ----------
         [1] Manuscript: Chen, S., Billings, S. A., & Luo, W. (1989).
-            Orthogonal least squares methods and their application to non-linear system identification.
+            Orthogonal least squares methods and their application to non-linear
+            system identification.
 
         """
         u = np.linalg.norm(x, 2)
@@ -684,7 +684,8 @@ class ModelPrediction:
             # self.max_lag = ModelInformation()._get_max_lag(xlag=self.xlag)
         elif self.model_type == "NARMAX":
             # check_X_y(X, y)
-            # self.max_lag = ModelInformation()._get_max_lag(ylag=self.ylag, xlag=self.xlag)
+            # self.max_lag = ModelInformation()._get_max_lag(
+            # ylag=self.ylag, xlag=self.xlag)
             lagged_data = self.build_input_output_matrix(X, y, self.xlag, self.ylag)
         else:
             raise ValueError(
@@ -918,7 +919,6 @@ class ModelPrediction:
         yhat[: self.max_lag] = y[: self.max_lag, 0]
 
         # Discard unnecessary initial values
-        analyzed_elements_number = self.max_lag + 1
         i = self.max_lag
 
         while i < len(y):
@@ -958,7 +958,6 @@ class ModelPrediction:
         yhat[: self.max_lag] = y[: self.max_lag, 0]
 
         # Discard unnecessary initial values
-        analyzed_elements_number = self.max_lag + 1
         i = self.max_lag
 
         while i < len(y):
@@ -988,10 +987,6 @@ class ModelPrediction:
                     "Unrecognized model type. The model_type should be NARMAX, NAR or"
                     " NFIR."
                 )
-
-            # yhat[i : i + steps_ahead] = self._basis_function_predict(
-            #     X[k : i + steps_ahead], y[k : i + steps_ahead], self.theta
-            # )[-steps_ahead:].ravel()
 
             i += steps_ahead
 

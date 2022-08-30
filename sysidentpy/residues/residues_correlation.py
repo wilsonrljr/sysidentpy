@@ -7,8 +7,6 @@
 
 
 import numpy as np
-import matplotlib.pyplot as plt
-from ..utils.deprecation import deprecated
 
 
 def compute_residues_autocorrelation(y, yhat):
@@ -22,7 +20,6 @@ def compute_residues_autocorrelation(y, yhat):
     )
 
     half_of_symmetry_autocorr = int(np.floor(unnormalized_e_acf.size / 2))
-    n = len(unnormalized_e_acf) - half_of_symmetry_autocorr
     upper_bound = 1.96 / np.sqrt(len(unnormalized_e_acf))
     lower_bound = upper_bound * (-1)
     return e_acf, upper_bound, lower_bound
@@ -68,7 +65,7 @@ def _normalized_correlation(a, b):
     u = (b - np.mean(b)).flatten()
     t = int(np.floor(len(a) / 2))
     ruy = np.array(np.zeros(t))
-    ruy[0] = np.sum(y * u) / (np.sqrt(np.sum(y ** 2)) * np.sqrt(np.sum(u ** 2)))
+    ruy[0] = np.sum(y * u) / (np.sqrt(np.sum(y**2)) * np.sqrt(np.sum(u**2)))
 
     for i in range(1, t):
         y = (a - np.mean(a[:i])).flatten()
