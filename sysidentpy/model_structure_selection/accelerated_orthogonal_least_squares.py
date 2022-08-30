@@ -96,11 +96,10 @@ class AOLS(
 
     References
     ----------
-    .. [1] Manuscript: Accelerated Orthogonal Least-Squares for Large-Scale
+    - Manuscript: Accelerated Orthogonal Least-Squares for Large-Scale
        Sparse Reconstruction
        https://www.sciencedirect.com/science/article/abs/pii/S1051200418305311
-
-    .. [2] Code:
+    - Code:
        https://github.com/realabolfazl/AOLS/
 
     """
@@ -174,7 +173,7 @@ class AOLS(
 
         References
         ----------
-        .. [1] Manuscript: Accelerated Orthogonal Least-Squares for Large-Scale
+        - Manuscript: Accelerated Orthogonal Least-Squares for Large-Scale
            Sparse Reconstruction
            https://www.sciencedirect.com/science/article/abs/pii/S1051200418305311
 

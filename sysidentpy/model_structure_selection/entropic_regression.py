@@ -132,17 +132,14 @@ class ER(
 
     References
     ----------
-    .. [1] Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
+    - Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
         Regression Beats the Outliers Problem in Nonlinear System
         Identification. Chaos 30, 013107 (2020).
-
-    .. [2] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+    - Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
         Estimating mutual information. Physical Review E, 69:066-138,2004
-
-    .. [3] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+    - Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
         Estimating mutual information. Physical Review E, 69:066-138,2004
-
-    .. [4] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+    - Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
         Estimating mutual information. Physical Review E, 69:066-138,2004
 
     """
@@ -262,17 +259,14 @@ class ER(
 
         References
         ----------
-        .. [1] Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
+        - Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
             Regression Beats the Outliers Problem in Nonlinear System
             Identification. Chaos 30, 013107 (2020).
-
-        .. [2] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+        - Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
-
-        .. [3] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+        - Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
-
-        .. [4] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+        - Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
 
         """
@@ -442,17 +436,14 @@ class ER(
 
         References
         ----------
-        .. [1] Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
+        - Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
             Regression Beats the Outliers Problem in Nonlinear System
             Identification. Chaos 30, 013107 (2020).
-
-        .. [2] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+        - Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
-
-        .. [3] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+        - Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
-
-        .. [4] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+        - Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
 
         """
@@ -511,17 +502,14 @@ class ER(
 
         References
         ----------
-        .. [1] Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
+        - Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
             Regression Beats the Outliers Problem in Nonlinear System
             Identification. Chaos 30, 013107 (2020).
-
-        .. [2] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+        - Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
-
-        .. [3] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+        - Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
-
-        .. [4] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+        - Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
 
         """
@@ -562,17 +550,14 @@ class ER(
 
         References
         ----------
-        .. [1] Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
+        - Abd AlRahman R. AlMomani, Jie Sun, and Erik Bollt. How Entropic
             Regression Beats the Outliers Problem in Nonlinear System
             Identification. Chaos 30, 013107 (2020).
-
-        .. [2] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+        - Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
-
-        .. [3] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+        - Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
-
-        .. [4] Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
+        - Alexander Kraskov, Harald St¨ogbauer, and Peter Grassberger.
             Estimating mutual information. Physical Review E, 69:066-138,2004
 
         """

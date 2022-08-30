@@ -44,7 +44,7 @@ def forecast_error(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the Forecast error
+    - Wikipedia entry on the Forecast error
        https://en.wikipedia.org/wiki/Forecast_error
 
     Examples
@@ -77,7 +77,7 @@ def mean_forecast_error(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the Forecast error
+    - Wikipedia entry on the Forecast error
        https://en.wikipedia.org/wiki/Forecast_error
 
     Examples
@@ -109,7 +109,7 @@ def mean_squared_error(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the Mean Squared Error
+    - Wikipedia entry on the Mean Squared Error
        https://en.wikipedia.org/wiki/Mean_squared_error
 
     Examples
@@ -142,7 +142,7 @@ def root_mean_squared_error(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the Root Mean Squared Error
+    - Wikipedia entry on the Root Mean Squared Error
        https://en.wikipedia.org/wiki/Root-mean-square_deviation
 
     Examples
@@ -174,7 +174,7 @@ def normalized_root_mean_squared_error(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the normalized Root Mean Squared Error
+    - Wikipedia entry on the normalized Root Mean Squared Error
        https://en.wikipedia.org/wiki/Root-mean-square_deviation
 
     Examples
@@ -235,7 +235,7 @@ def mean_absolute_error(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the Mean absolute error
+    - Wikipedia entry on the Mean absolute error
        https://en.wikipedia.org/wiki/Mean_absolute_error
 
     Examples
@@ -295,7 +295,7 @@ def median_absolute_error(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the Median absolute deviation
+    - Wikipedia entry on the Median absolute deviation
        https://en.wikipedia.org/wiki/Median_absolute_deviation
 
     Examples
@@ -328,7 +328,7 @@ def explained_variance_score(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the Explained Variance
+    - Wikipedia entry on the Explained Variance
        https://en.wikipedia.org/wiki/Explained_variation
 
     Examples
@@ -375,7 +375,7 @@ def r2_score(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the Coefficient of determination
+    - Wikipedia entry on the Coefficient of determination
        https://en.wikipedia.org/wiki/Coefficient_of_determination
 
     Examples
@@ -422,7 +422,7 @@ def symmetric_mean_absolute_percentage_error(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the Symmetric mean absolute percentage error
+    - Wikipedia entry on the Symmetric mean absolute percentage error
        https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error
 
     Examples

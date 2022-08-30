@@ -54,13 +54,13 @@ class BPSOGSA:
 
     References
     ----------
-    .. [1] A New Hybrid PSOGSA Algorithm for Function Optimization,
+    - A New Hybrid PSOGSA Algorithm for Function Optimization,
        https://www.mathworks.com/matlabcentral/fileexchange/35939-hybrid-particle-swarm-optimization-and-gravitational-search-algorithm-psogsa
-    .. [2] Manuscript: Particle swarm optimization: developments, applications and resources.
-    .. [3] Manuscript: S-shaped versus v-shaped transfer functions for binary
+    - Manuscript: Particle swarm optimization: developments, applications and resources.
+    - Manuscript: S-shaped versus v-shaped transfer functions for binary
        particle swarm optimization
-    .. [4] Manuscript: BGSA: Binary Gravitational Search Algorithm.
-    .. [5] Manuscript: A taxonomy of hybrid metaheuristics
+    - Manuscript: BGSA: Binary Gravitational Search Algorithm.
+    - Manuscript: A taxonomy of hybrid metaheuristics
 
     """
 
@@ -100,17 +100,17 @@ class BPSOGSA:
         """Run the BPSOGSA algorithm.
 
         This algorithm is based on the Matlab implementation provided by the
-        author of the BPSOGSA algorithm [1]_, [2]_, [3]_, [4]_, [5]_.
+        author of the BPSOGSA algorithm.
 
         References
         ----------
-        .. [1] A New Hybrid PSOGSA Algorithm for Function Optimization.
+        - A New Hybrid PSOGSA Algorithm for Function Optimization.
            https://www.mathworks.com/matlabcentral/fileexchange/35939-hybrid-particle-swarm-optimization-and-gravitational-search-algorithm-psogsa
-        .. [2] Manuscript: Particle swarm optimization: developments, applications and resources.
-        .. [3] Manuscript: S-shaped versus v-shaped transfer functions for binary.
+        - Manuscript: Particle swarm optimization: developments, applications and resources.
+        - Manuscript: S-shaped versus v-shaped transfer functions for binary.
            particle swarm optimization
-        .. [4] Manuscript: BGSA: Binary Gravitational Search Algorithm.
-        .. [5] Manuscript: A taxonomy of hybrid metaheuristics.
+        - Manuscript: BGSA: Binary Gravitational Search Algorithm.
+        - Manuscript: A taxonomy of hybrid metaheuristics.
 
         """
         velocity = np.zeros([self.dimension, self.n_agents])
