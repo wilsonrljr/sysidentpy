@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "sysidentpy"
 description = "A Python Package For System Identification Using NARMAX Models"
 readme = "README.md"
-requires-python = ">=3.7,<=3.10"
+requires-python = ">=3.7,<3.11"
 license = { file = "LICENSE" }
 keywords = ["NARMAX", "NARX", "system identification", "machine learning"]
 authors = [
