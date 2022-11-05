@@ -60,7 +60,7 @@ def test_validate_xlag():
 
 def test_k():
     assert_raises(ValueError, AOLS, k=-1, basis_function=Polynomial(degree=2))
-    assert_raises(TypeError, AOLS, k="True", basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, AOLS, k="True", basis_function=Polynomial(degree=2))
     assert_raises(ValueError, AOLS, k=1.3, basis_function=Polynomial(degree=2))
 
 
@@ -71,11 +71,11 @@ def test_n_terms():
 
 def test_threshold():
     assert_raises(ValueError, AOLS, threshold=-1.2, basis_function=Polynomial(degree=2))
-    assert_raises(TypeError, AOLS, threshold="-1", basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, AOLS, threshold="-1", basis_function=Polynomial(degree=2))
 
 
 def test_model_prediction():
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     train_percentage = 90
     split_data = int(len(x) * (train_percentage / 100))

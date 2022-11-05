@@ -5,6 +5,23 @@ File for tracking changes in SysIdentPy
 Changes in SysIdentPy
 =====================
 
+v0.2.2
+------
+
+CONTRIBUTORS
+~~~~~~~~~~~~
+
+- wilsonrljr
+
+CHANGES
+~~~~~~~
+
+- The update **v0.2.1**  has been released with additional feature, minor API changes and fixes. 
+
+- MAJOR: Estimators support in AOLS
+    - Now the user can build Neural NARX models with CUDA support. Just add `device='cuda'` to use the GPU benefits.
+    - Updated docs to show how to use the new feature.
+
 v0.2.1
 ------
 

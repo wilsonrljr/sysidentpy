@@ -66,7 +66,7 @@ def test_fit_without_information_criteria():
         n_terms=15, extended_least_squares=False, basis_function=basis_function
     )
     model.fit(X=x, y=y)
-    assert "info_values" not in dir(model)
+    assert model.info_values is None
 
 
 def test_default_values():

@@ -236,10 +236,8 @@ class ModelPrediction:
                 raw_regressor[init:final] = X[k:i, j]
 
             regressor_value = np.zeros(len(model_exponents))
-            for j in range(len(model_exponents)):
-                regressor_value[j] = np.prod(
-                    np.power(raw_regressor, model_exponents[j])
-                )
+            for j, model_exponent in enumerate(model_exponents):
+                regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
 
             y_output[i] = self.base_estimator.predict(regressor_value.reshape(1, -1))
         return y_output.reshape(-1, 1)
@@ -261,10 +259,8 @@ class ModelPrediction:
                 final += self.max_lag
 
             regressor_value = np.zeros(len(model_exponents))
-            for j in range(len(model_exponents)):
-                regressor_value[j] = np.prod(
-                    np.power(raw_regressor, model_exponents[j])
-                )
+            for j, model_exponent in enumerate(model_exponents):
+                regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
 
             y_output[i] = self.base_estimator.predict(regressor_value.reshape(1, -1))
         return y_output.reshape(-1, 1)
@@ -503,16 +499,16 @@ class NARX(GenerateRegressors, InformationMatrix, ModelInformation, ModelPredict
     def _validate_params(self):
         """Validate input params."""
         if isinstance(self.ylag, int) and self.ylag < 1:
-            raise ValueError("ylag must be integer and > zero. Got %f" % self.ylag)
+            raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
 
         if isinstance(self.xlag, int) and self.xlag < 1:
-            raise ValueError("xlag must be integer and > zero. Got %f" % self.xlag)
+            raise ValueError(f"xlag must be integer and > zero. Got {self.xlag}")
 
         if not isinstance(self.xlag, (int, list)):
-            raise ValueError("xlag must be integer and > zero. Got %f" % self.xlag)
+            raise ValueError(f"xlag must be integer and > zero. Got {self.xlag}")
 
         if not isinstance(self.ylag, (int, list)):
-            raise ValueError("ylag must be integer and > zero. Got %f" % self.ylag)
+            raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
 
     def fit(self, *, X=None, y=None):
         """Train a NARX Neural Network model.

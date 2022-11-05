@@ -1,3 +1,5 @@
+""" Basis Function for NARMAX models """
+
 from itertools import combinations_with_replacement
 
 import numpy as np
@@ -101,6 +103,7 @@ class Fourier:
         self.p = p
         self.degree = degree
         self.ensemble = ensemble
+        self.repetition = None
 
     def _fourier_expansion(self, data, n):
         base = np.column_stack(
