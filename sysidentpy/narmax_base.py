@@ -10,7 +10,7 @@ from itertools import chain, combinations_with_replacement
 
 import numpy as np
 
-from .utils._check_arrays import _check_positive_int, _num_features
+from .utils._check_arrays import _num_features
 
 
 class GenerateRegressors:
@@ -63,22 +63,20 @@ class GenerateRegressors:
 
         """
         if not isinstance(non_degree, int) or non_degree < 1:
-            raise ValueError(
-                "non_degree must be integer and > zero. Got %f" % non_degree
-            )
+            raise ValueError(f"non_degree must be integer and > zero. Got {non_degree}")
 
         if not isinstance(ylag, (int, list)) or np.min(np.minimum(ylag, 1)) < 1:
-            raise ValueError("ylag must be integer or list and > zero. Got %f" % ylag)
+            raise ValueError(f"ylag must be integer or list and > zero. Got {ylag}")
 
         if (
             not isinstance(xlag, (int, list))
             # or np.min(np.minimum(xlag, 1)) < 1):
             or np.min(np.min(list(chain.from_iterable([[xlag]])))) < 1
         ):
-            raise ValueError("xlag must be integer or list and > zero. Got %f" % xlag)
+            raise ValueError(f"xlag must be integer or list and > zero. Got {xlag}")
 
         if not isinstance(n_inputs, int) or n_inputs < 1:
-            raise ValueError("n_inputs must be integer and > zero. Got %f" % n_inputs)
+            raise ValueError(f"n_inputs must be integer and > zero. Got {n_inputs}")
 
         if isinstance(ylag, list):
             # create only the lags passed from list
@@ -120,6 +118,7 @@ class GenerateRegressors:
         return x_vec, y_vec
 
     def regressor_space(self, non_degree, xlag, ylag, n_inputs, model_type="NARMAX"):
+        """Create regressor code based on model type."""
         x_vec, y_vec = self.create_narmax_code(non_degree, xlag, ylag, n_inputs)
         reg_aux = np.array([0])
         if model_type == "NARMAX":
@@ -143,7 +142,7 @@ class GenerateRegressors:
 class HouseHolder:
     """Householder reflection and transformation."""
 
-    def _house(self, x):
+    def house(self, x):
         """Perform a Householder reflection of vector.
 
         Parameters
@@ -171,7 +170,7 @@ class HouseHolder:
             x = np.concatenate((np.array([1]), x))
         return x
 
-    def _rowhouse(self, RA, v):
+    def rowhouse(self, RA, v):
         """Perform a row Householder transformation.
 
         Parameters
@@ -369,9 +368,7 @@ class InformationMatrix:
         """
         n_inputs = _num_features(X)
         if isinstance(xlag, int) and n_inputs > 1:
-            raise ValueError(
-                "If n_inputs > 1, xlag must be a nested list. Got %f" % xlag
-            )
+            raise ValueError(f"If n_inputs > 1, xlag must be a nested list. Got {xlag}")
 
         if isinstance(xlag, int):
             xlag = range(1, xlag + 1)
@@ -586,45 +583,6 @@ class InformationMatrix:
 
 
 class ModelPrediction:
-    def predict(self, X, y, steps_ahead=None):
-        """Return the predicted values given an input.
-
-        The predict function allows a friendly usage by the user.
-        Given a previously trained model, predict values given
-        a new set of data.
-
-        This method accept y values mainly for prediction n-steps ahead
-        (to be implemented in the future)
-
-        Parameters
-        ----------
-        X : ndarray of floats
-            The input data to be used in the prediction process.
-        y : ndarray of floats
-            The output data to be used in the prediction process.
-        steps_ahead = int (default = None)
-            The forecast horizon.
-
-        Returns
-        -------
-        yhat : ndarray of floats
-            The predicted values of the model.
-
-        """
-        if self.basis_function.__class__.__name__ == "Polynomial":
-            if steps_ahead is None:
-                return self._model_prediction(X, y)
-            elif steps_ahead == 1:
-                return self._one_step_ahead_prediction(X, y)
-            else:
-                _check_positive_int(steps_ahead, "steps_ahead")
-                return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
-        else:
-            if steps_ahead is None:
-                return self._basis_function_predict(X, y)
-            elif steps_ahead == 1:
-                return self._one_step_ahead_prediction(X, y)
-
     def _code2exponents(self, code):
         """
         Convert regressor code to exponents array.

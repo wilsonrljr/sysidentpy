@@ -5,8 +5,10 @@
 # License: BSD 3 clause
 
 
-import numpy as np
 import warnings
+
+import numpy as np
+
 from ..narmax_base import InformationMatrix
 
 
@@ -33,6 +35,7 @@ class Estimators(InformationMatrix):
         self._delta = delta
         self._gama = gama
         self._weight = weight  # <0  e <1
+        self.xi = None
         self._validate_params()
 
     def _validate_params(self):
@@ -194,7 +197,7 @@ class Estimators(InformationMatrix):
         y = y[self.max_lag :, 0].reshape(-1, 1)
         full = np.hstack((psi, y))
         n = psi.shape[1]
-        u, s, v = np.linalg.svd(full, full_matrices=True)
+        _, _, v = np.linalg.svd(full, full_matrices=True)
         theta = -v.T[:n, n:] / v.T[n:, n:]
         return theta.reshape(-1, 1)
 

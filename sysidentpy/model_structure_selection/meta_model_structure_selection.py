@@ -18,13 +18,14 @@ from ..utils._check_arrays import (
 
 
 class MetaMSS(SimulateNARMAX, BPSOGSA):
-    """Meta-Model Structure Selection: Building Polynomial NARMAX model
+    r"""Meta-Model Structure Selection: Building Polynomial NARMAX model
 
     This class uses the MetaMSS ([1]_, [2]_, [3]_) algorithm to build NARMAX models.
     The NARMAX model is described as:
 
     $$
-        y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x}, e_{k-1}, \dotsc, e_{k-n_e}] + e_k
+        y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x},
+        e_{k-1}, \dotsc, e_{k-n_e}] + e_k
     $$
 
     where $n_y\in \mathbb{N}^*$, $n_x \in \mathbb{N}$, $n_e \in \mathbb{N}$,
@@ -218,20 +219,25 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self.loss_func = loss_func
         self.steps_ahead = steps_ahead
         self.random_state = random_state
+        self._n_inputs = None
+        self.regressor_code = None
+        self.best_model_history = None
+        self.tested_models = None
+        self.final_model = None
         self._validate_metamss_params()
 
     def _validate_metamss_params(self):
         if isinstance(self.ylag, int) and self.ylag < 1:
-            raise ValueError("ylag must be integer and > zero. Got %f" % self.ylag)
+            raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
 
         if isinstance(self.xlag, int) and self.xlag < 1:
-            raise ValueError("xlag must be integer and > zero. Got %f" % self.xlag)
+            raise ValueError(f"xlag must be integer and > zero. Got {self.xlag}")
 
         if not isinstance(self.xlag, (int, list)):
-            raise ValueError("xlag must be integer and > zero. Got %f" % self.xlag)
+            raise ValueError(f"xlag must be integer and > zero. Got {self.xlag}")
 
         if not isinstance(self.ylag, (int, list)):
-            raise ValueError("ylag must be integer and > zero. Got %f" % self.ylag)
+            raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
 
     def fit(self, X_train=None, y_train=None, X_test=None, y_test=None):
         """Fit the polynomial NARMAX model.
@@ -279,7 +285,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self.optimal_model = None
         self.best_model_history = []
         self.tested_models = []
-        for iter in range(self.maxiter):
+        for i in range(self.maxiter):
             fitness = self.evaluate_objective_function(
                 X_train, y_train, X_test, y_test, population
             )
@@ -294,19 +300,19 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             self.best_by_iter.append(self.optimal_fitness_value)
             self.mean_by_iter.append(np.mean(fitness))
             agent_mass = self.mass_calculation(fitness)
-            gravitational_constant = self.calculate_gravitational_constant(iter)
+            gravitational_constant = self.calculate_gravitational_constant(i)
             acceleration = self.calculate_acceleration(
-                population, agent_mass, gravitational_constant, iter
+                population, agent_mass, gravitational_constant, i
             )
             velocity, population = self.update_velocity_position(
                 population,
                 acceleration,
                 velocity,
-                iter,
+                i,
             )
 
         self.final_model = self.regressor_code[self.optimal_model == 1].copy()
-        yhat = self.simulate(
+        _ = self.simulate(
             X_train=X_train,
             y_train=y_train,
             X_test=X_test,
@@ -452,9 +458,9 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         pos_insignificant_terms = pos_insignificant_terms.reshape(-1, 1).T
         if pos_insignificant_terms.shape == 0:
             return np.array([]), t_test, tail2P
-        else:
-            # t_test and tail2P will be returned in future updates
-            return pos_insignificant_terms, t_test, tail2P
+
+        # t_test and tail2P will be returned in future updates
+        return pos_insignificant_terms, t_test, tail2P
 
     def aic(self, y_test, yhat, n_theta):
         """Calculate the Akaike Information Criterion
@@ -602,7 +608,6 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
                     X_test, y_test, steps_ahead=steps_ahead
                 )
         else:
-            raise (
-                NotImplementedError,
+            raise NotImplementedError(
                 "MetaMSS doesn't support basis functions other than polynomial yet.",
             )

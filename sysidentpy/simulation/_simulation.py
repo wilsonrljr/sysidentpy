@@ -20,17 +20,17 @@ from ..utils._check_arrays import _check_positive_int, _num_features
 class SimulateNARMAX(
     Estimators,
     GenerateRegressors,
-    HouseHolder,
     ModelInformation,
     InformationMatrix,
     ModelPrediction,
 ):
-    """Simulation of Polynomial NARMAX model
+    r"""Simulation of Polynomial NARMAX model
 
     The NARMAX model is described as:
 
     $$
-        y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x}, e_{k-1}, \dotsc, e_{k-n_e}] + e_k
+        y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1},
+        \dotsc, x_{k-d-n_x}, e_{k-1}, \dotsc, e_{k-n_e}] + e_k
     $$
 
     where $n_y\in \mathbb{N}^*$, $n_x \in \mathbb{N}$, $n_e \in \mathbb{N}$,
@@ -152,6 +152,15 @@ class SimulateNARMAX(
         self._extended_least_squares = extended_least_squares
         self.estimate_parameter = estimate_parameter
         self.calculate_err = calculate_err
+        self._n_inputs = None
+        self.xlag = None
+        self.ylag = None
+        self.n_terms = None
+        self.err = None
+        self.final_model = None
+        self.theta = None
+        self.pivv = None
+        self.non_degree = None
         self._validate_simulate_params()
 
     def _validate_simulate_params(self):
@@ -171,7 +180,7 @@ class SimulateNARMAX(
 
         if self.model_type not in ["NARMAX", "NAR", "NFIR"]:
             raise ValueError(
-                "model_type must be NARMAX, NAR, or NFIR. Got %s" % self.model_type
+                f"model_type must be NARMAX, NAR, or NFIR. Got {self.model_type}"
             )
 
     def simulate(
@@ -330,13 +339,14 @@ class SimulateNARMAX(
                 return self._model_prediction(
                     X_test, y_test, forecast_horizon=forecast_horizon
                 )
-            elif steps_ahead == 1:
+            if steps_ahead == 1:
                 return self._one_step_ahead_prediction(X_test, y_test)
-            else:
-                _check_positive_int(steps_ahead, "steps_ahead")
-                return self._n_step_ahead_prediction(
-                    X_test, y_test, steps_ahead=steps_ahead
-                )
+
+            _check_positive_int(steps_ahead, "steps_ahead")
+            return self._n_step_ahead_prediction(
+                X_test, y_test, steps_ahead=steps_ahead
+            )
+        return None
 
     def error_reduction_ratio(self, psi, y, process_term_number, regressor_code):
         """Perform the Error Reduction Ration algorithm.
@@ -395,11 +405,11 @@ class SimulateNARMAX(
             tmp_psi[:, [piv_index, i]] = tmp_psi[:, [i, piv_index]]
             piv[[piv_index, i]] = piv[[i, piv_index]]
 
-            v = self._house(tmp_psi[i:, i])
+            v = HouseHolder().house(tmp_psi[i:, i])
 
-            row_result = self._rowhouse(tmp_psi[i:, i:], v)
+            row_result = HouseHolder().rowhouse(tmp_psi[i:, i:], v)
 
-            tmp_y[i:] = self._rowhouse(tmp_y[i:], v)
+            tmp_y[i:] = HouseHolder().rowhouse(tmp_y[i:], v)
 
             tmp_psi[i:, i:] = np.copy(row_result)
 
