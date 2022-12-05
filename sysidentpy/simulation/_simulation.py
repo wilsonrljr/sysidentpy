@@ -3,27 +3,20 @@
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
+from typing import Union
 
 import numpy as np
 
+from ..base_mss import BaseMSS
+from ..basis_function import Fourier, Polynomial
 from ..narmax_base import (
-    GenerateRegressors,
     HouseHolder,
-    InformationMatrix,
-    ModelInformation,
-    ModelPrediction,
 )
 from ..parameter_estimation.estimators import Estimators
 from ..utils._check_arrays import _check_positive_int, _num_features
 
 
-class SimulateNARMAX(
-    Estimators,
-    GenerateRegressors,
-    ModelInformation,
-    InformationMatrix,
-    ModelPrediction,
-):
+class SimulateNARMAX(Estimators, BaseMSS):
     r"""Simulation of Polynomial NARMAX model
 
     The NARMAX model is described as:
@@ -120,20 +113,20 @@ class SimulateNARMAX(
     def __init__(
         self,
         *,
-        estimator="recursive_least_squares",
-        elag=2,
-        extended_least_squares=False,
-        lam=0.98,
-        delta=0.01,
-        offset_covariance=0.2,
-        mu=0.01,
-        eps=np.finfo(np.float64).eps,
-        gama=0.2,
-        weight=0.02,
-        estimate_parameter=True,
-        calculate_err=False,
-        model_type="NARMAX",
-        basis_function=None,
+        estimator: str = "recursive_least_squares",
+        elag: Union[int, list] = 2,
+        extended_least_squares: bool = False,
+        lam: float = 0.98,
+        delta: float = 0.01,
+        offset_covariance: float = 0.2,
+        mu: float = 0.01,
+        eps: float = np.finfo(np.float64).eps,
+        gama: float = 0.2,
+        weight: float = 0.02,
+        estimate_parameter: bool = True,
+        calculate_err: bool = False,
+        model_type: str = "NARMAX",
+        basis_function: Union[Polynomial, Fourier] = Polynomial(),
     ):
 
         super().__init__(
@@ -152,7 +145,7 @@ class SimulateNARMAX(
         self._extended_least_squares = extended_least_squares
         self.estimate_parameter = estimate_parameter
         self.calculate_err = calculate_err
-        self._n_inputs = None
+        self.n_inputs = None
         self.xlag = None
         self.ylag = None
         self.n_terms = None
@@ -182,6 +175,36 @@ class SimulateNARMAX(
             raise ValueError(
                 f"model_type must be NARMAX, NAR, or NFIR. Got {self.model_type}"
             )
+
+    def _check_simulate_params(self, y_train, y_test, model_code, steps_ahead, theta):
+        if self.basis_function.__class__.__name__ != "Polynomial":
+            raise NotImplementedError(
+                "Currently, SimulateNARMAX only works for polynomial models."
+            )
+
+        if y_test is None:
+            raise ValueError("y_test cannot be None")
+
+        if not isinstance(model_code, np.ndarray):
+            raise TypeError(f"model_code must be an np.np.ndarray. Got {model_code}")
+
+        if not isinstance(steps_ahead, (int, type(None))):
+            raise ValueError(
+                f"steps_ahead must be None or integer > zero. Got {steps_ahead}"
+            )
+
+        if not isinstance(theta, np.ndarray) and not self.estimate_parameter:
+            raise TypeError(
+                "If estimate_parameter is False, theta must be an np.ndarray. Got"
+                f" {theta}"
+            )
+
+        if self.estimate_parameter:
+            if not all(isinstance(i, np.ndarray) for i in [y_train]):
+                raise TypeError(
+                    "If estimate_parameter is True, X_train and y_train must be an"
+                    f" np.ndarray. Got {type(y_train)}"
+                )
 
     def simulate(
         self,
@@ -226,56 +249,27 @@ class SimulateNARMAX(
                 to each regressor.
 
         """
-        if self.basis_function.__class__.__name__ != "Polynomial":
-            raise NotImplementedError(
-                "Currently, SimulateNARMAX only works for polynomial models."
-            )
-
-        if y_test is None:
-            raise ValueError("y_test cannot be None")
-
-        if not isinstance(model_code, np.ndarray):
-            raise TypeError(f"model_code must be an np.np.ndarray. Got {model_code}")
-
-        if not isinstance(steps_ahead, (int, type(None))):
-            raise ValueError(
-                f"steps_ahead must be None or integer > zero. Got {steps_ahead}"
-            )
-
-        if not isinstance(theta, np.ndarray) and not self.estimate_parameter:
-            raise TypeError(
-                "If estimate_parameter is False, theta must be an np.ndarray. Got"
-                f" {theta}"
-            )
-
-        if self.estimate_parameter:
-            if not all(isinstance(i, np.ndarray) for i in [y_train]):
-                raise TypeError(
-                    "If estimate_parameter is True, X_train and y_train must be an"
-                    f" np.ndarray. Got {type(y_train)}"
-                )
+        self._check_simulate_params(y_train, y_test, model_code, steps_ahead, theta)
 
         if X_test is not None:
-            self._n_inputs = _num_features(X_test)
+            self.n_inputs = _num_features(X_test)
         else:
-            self._n_inputs = 1  # just to create the regressor space base
+            self.n_inputs = 1  # just to create the regressor space base
 
         xlag_code = self._list_input_regressor_code(model_code)
         ylag_code = self._list_output_regressor_code(model_code)
         self.xlag = self._get_lag_from_regressor_code(xlag_code)
         self.ylag = self._get_lag_from_regressor_code(ylag_code)
         self.max_lag = max(self.xlag, self.ylag)
-        if self._n_inputs != 1:
-            self.xlag = self._n_inputs * [list(range(1, self.max_lag + 1))]
+        if self.n_inputs != 1:
+            self.xlag = self.n_inputs * [list(range(1, self.max_lag + 1))]
 
         # for MetaMSS NAR modelling
         if self.model_type == "NAR" and forecast_horizon is None:
             forecast_horizon = y_test.shape[0] - self.max_lag
 
         self.non_degree = model_code.shape[1]
-        regressor_code = self.regressor_space(
-            self.non_degree, self.xlag, self.ylag, self._n_inputs, self.model_type
-        )
+        regressor_code = self.regressor_space(self.n_inputs)
 
         self.pivv = self._get_index_from_regressor_code(regressor_code, model_code)
         self.final_model = regressor_code[self.pivv]
@@ -283,16 +277,14 @@ class SimulateNARMAX(
         self.n_terms = self.final_model.shape[0]
         if self.estimate_parameter and not self.calculate_err:
             if self.model_type == "NARMAX":
-                self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
-                lagged_data = self.build_input_output_matrix(
-                    X_train, y_train, self.xlag, self.ylag
-                )
+                self.max_lag = self._get_max_lag()
+                lagged_data = self.build_input_output_matrix(X_train, y_train)
             elif self.model_type == "NAR":
-                lagged_data = self.build_output_matrix(y_train, self.ylag)
-                self.max_lag = self._get_max_lag(ylag=self.ylag)
+                lagged_data = self.build_output_matrix(y_train)
+                self.max_lag = self._get_max_lag()
             elif self.model_type == "NFIR":
-                lagged_data = self.build_input_matrix(X_train, self.xlag)
-                self.max_lag = self._get_max_lag(xlag=self.xlag)
+                lagged_data = self.build_input_matrix(X_train)
+                self.max_lag = self._get_max_lag()
 
             psi = self.basis_function.fit(
                 lagged_data, self.max_lag, predefined_regressors=self.pivv
@@ -310,22 +302,20 @@ class SimulateNARMAX(
             self.err = self.n_terms * [0]
         else:
             if self.model_type == "NARMAX":
-                self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
-                lagged_data = self.build_input_output_matrix(
-                    X_train, y_train, self.xlag, self.ylag
-                )
+                self.max_lag = self._get_max_lag()
+                lagged_data = self.build_input_output_matrix(X_train, y_train)
             elif self.model_type == "NAR":
-                lagged_data = self.build_output_matrix(y_train, self.ylag)
-                self.max_lag = self._get_max_lag(ylag=self.ylag)
+                lagged_data = self.build_output_matrix(y_train)
+                self.max_lag = self._get_max_lag()
             elif self.model_type == "NFIR":
-                lagged_data = self.build_input_matrix(X_train, self.xlag)
-                self.max_lag = self._get_max_lag(xlag=self.xlag)
+                lagged_data = self.build_input_matrix(X_train)
+                self.max_lag = self._get_max_lag()
 
             psi = self.basis_function.fit(
                 lagged_data, self.max_lag, predefined_regressors=self.pivv
             )
 
-            _, self.err, self.pivv, _ = self.error_reduction_ratio(
+            _, self.err, _, _ = self.error_reduction_ratio(
                 psi, y_train, self.n_terms, self.final_model
             )
             self.theta = getattr(self, self.estimator)(psi, y_train)
@@ -334,19 +324,12 @@ class SimulateNARMAX(
                     psi, y_train, self.theta, self.non_degree, self.elag, self.max_lag
                 )
 
-        if self.basis_function.__class__.__name__ == "Polynomial":
-            if steps_ahead is None:
-                return self._model_prediction(
-                    X_test, y_test, forecast_horizon=forecast_horizon
-                )
-            if steps_ahead == 1:
-                return self._one_step_ahead_prediction(X_test, y_test)
-
-            _check_positive_int(steps_ahead, "steps_ahead")
-            return self._n_step_ahead_prediction(
-                X_test, y_test, steps_ahead=steps_ahead
-            )
-        return None
+        return self.predict(
+            X=X_test,
+            y=y_test,
+            steps_ahead=steps_ahead,
+            forecast_horizon=forecast_horizon,
+        )
 
     def error_reduction_ratio(self, psi, y, process_term_number, regressor_code):
         """Perform the Error Reduction Ration algorithm.
@@ -417,3 +400,182 @@ class SimulateNARMAX(
         psi_orthogonal = psi[:, tmp_piv]
         model_code = regressor_code[tmp_piv, :].copy()
         return model_code, err, piv, psi_orthogonal
+
+    def predict(self, *, X=None, y=None, steps_ahead=None, forecast_horizon=None):
+        """Return the predicted values given an input.
+
+        The predict function allows a friendly usage by the user.
+        Given a previously trained model, predict values given
+        a new set of data.
+
+        This method accept y values mainly for prediction n-steps ahead
+        (to be implemented in the future)
+
+        Parameters
+        ----------
+        X : ndarray of floats
+            The input data to be used in the prediction process.
+        y : ndarray of floats
+            The output data to be used in the prediction process.
+        steps_ahead : int (default = None)
+            The user can use free run simulation, one-step ahead prediction
+            and n-step ahead prediction.
+        forecast_horizon : int, default=None
+            The number of predictions over the time.
+
+        Returns
+        -------
+        yhat : ndarray of floats
+            The predicted values of the model.
+
+        """
+        if self.basis_function.__class__.__name__ == "Polynomial":
+            if steps_ahead is None:
+                return self._model_prediction(X, y, forecast_horizon=forecast_horizon)
+            if steps_ahead == 1:
+                return self._one_step_ahead_prediction(X, y)
+
+            _check_positive_int(steps_ahead, "steps_ahead")
+            return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
+
+        if steps_ahead is None:
+            return self._basis_function_predict(X, y, forecast_horizon=forecast_horizon)
+        if steps_ahead == 1:
+            return self._one_step_ahead_prediction(X, y)
+
+        return self._basis_function_n_step_prediction(
+            X, y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
+        )
+
+    def _one_step_ahead_prediction(self, X, y):
+        """Perform the 1-step-ahead prediction of a model.
+
+        Parameters
+        ----------
+        y : array-like of shape = max_lag
+            Initial conditions values of the model
+            to start recursive process.
+        X : ndarray of floats of shape = n_samples
+            Vector with input values to be used in model simulation.
+
+        Returns
+        -------
+        yhat : ndarray of floats
+               The 1-step-ahead predicted values of the model.
+
+        """
+        if self.model_type == "NAR":
+            lagged_data = self.im.build_output_matrix(y, self.ylag)
+        elif self.model_type == "NFIR":
+            lagged_data = self.im.build_input_matrix(X, self.xlag)
+        elif self.model_type == "NARMAX":
+            lagged_data = self.im.build_input_output_matrix(X, y, self.xlag, self.ylag)
+        else:
+            raise ValueError(
+                "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+            )
+
+        if self.basis_function.__class__.__name__ == "Polynomial":
+            X_base = self.basis_function.transform(
+                lagged_data,
+                self.max_lag,
+                predefined_regressors=self.pivv[: len(self.final_model)],
+            )
+        else:
+            X_base, _ = self.basis_function.transform(
+                lagged_data,
+                self.max_lag,
+                predefined_regressors=self.pivv[: len(self.final_model)],
+            )
+
+        yhat = super()._one_step_ahead_prediction_test(X_base)
+        return yhat.reshape(-1, 1)
+
+    def _n_step_ahead_prediction(self, X, y, steps_ahead):
+        """Perform the n-steps-ahead prediction of a model.
+
+        Parameters
+        ----------
+        y : array-like of shape = max_lag
+            Initial conditions values of the model
+            to start recursive process.
+        X : ndarray of floats of shape = n_samples
+            Vector with input values to be used in model simulation.
+
+        Returns
+        -------
+        yhat : ndarray of floats
+               The n-steps-ahead predicted values of the model.
+
+        """
+        yhat = super()._n_step_ahead_prediction(X, y, steps_ahead)
+        return yhat
+
+    def _model_prediction(self, X, y_initial, forecast_horizon=None):
+        """Perform the infinity steps-ahead simulation of a model.
+
+        Parameters
+        ----------
+        y_initial : array-like of shape = max_lag
+            Number of initial conditions values of output
+            to start recursive process.
+        X : ndarray of floats of shape = n_samples
+            Vector with input values to be used in model simulation.
+
+        Returns
+        -------
+        yhat : ndarray of floats
+               The predicted values of the model.
+
+        """
+        if self.model_type in ["NARMAX", "NAR"]:
+            return self._narmax_predict(X, y_initial, forecast_horizon)
+        if self.model_type == "NFIR":
+            return self._nfir_predict(X, y_initial)
+
+        raise Exception(
+            "model_type do not exist! Model type must be NARMAX, NAR or NFIR"
+        )
+
+    def _narmax_predict(self, X, y_initial, forecast_horizon):
+        if len(y_initial) < self.max_lag:
+            raise Exception("Insufficient initial conditions elements!")
+
+        if X is not None:
+            forecast_horizon = X.shape[0]
+        else:
+            forecast_horizon = forecast_horizon + self.max_lag
+
+        if self.model_type == "NAR":
+            self.n_inputs = 0
+
+        y_output = super()._narmax_predict(X, y_initial, forecast_horizon)
+        return y_output
+
+    def _nfir_predict(self, X, y_initial):
+        y_output = super()._nfir_predict(X, y_initial)
+        return y_output
+
+    def _basis_function_predict(self, X, y_initial, forecast_horizon=None):
+        """not implemented"""
+        raise NotImplementedError(
+            "You can only use Polynomial Basis Function in SimulateNARMAX for now."
+        )
+
+    def _basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
+        """not implemented"""
+        raise NotImplementedError(
+            "You can only use Polynomial Basis Function in SimulateNARMAX for now."
+        )
+
+    def _basis_function_n_steps_horizon(self, X, y, steps_ahead, forecast_horizon):
+        """not implemented"""
+        raise NotImplementedError(
+            "You can only use Polynomial Basis Function in SimulateNARMAX for now."
+        )
+
+    def fit(self, *, X=None, y=None):
+        """not implemented"""
+        raise NotImplementedError(
+            "There is no fit method in Simulate because the model is predefined."
+        )

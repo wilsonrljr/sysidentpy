@@ -2,10 +2,12 @@
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
+from typing import Tuple, Union
 
 import numpy as np
 from scipy.stats import t
 
+from ..basis_function import Polynomial
 from ..metaheuristics import BPSOGSA
 from ..metrics import mean_squared_error, root_relative_squared_error
 from ..simulation import SimulateNARMAX
@@ -15,6 +17,7 @@ from ..utils._check_arrays import (
     check_random_state,
     check_X_y,
 )
+from ..utils.deprecation import deprecated
 
 
 class MetaMSS(SimulateNARMAX, BPSOGSA):
@@ -152,34 +155,34 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
     def __init__(
         self,
         *,
-        maxiter=30,
-        alpha=23,
-        g_zero=100,
-        k_agents_percent=2,
-        norm=-2,
-        power=2,
-        n_agents=10,
-        p_zeros=0.5,
-        p_ones=0.5,
-        p_value=0.05,
-        xlag=2,
-        ylag=2,
-        elag=2,
-        estimator="least_squares",
-        extended_least_squares=False,
-        lam=0.98,
-        delta=0.01,
-        offset_covariance=0.2,
-        mu=0.01,
-        eps=np.finfo(np.float64).eps,
-        gama=0.2,
-        weight=0.02,
-        estimate_parameter=True,
-        loss_func="metamss_loss",
-        model_type="NARMAX",
-        basis_function=None,
-        steps_ahead=None,
-        random_state=None,
+        maxiter: int = 30,
+        alpha: int = 23,
+        g_zero: int = 100,
+        k_agents_percent: int = 2,
+        norm: Union[int, float] = -2,
+        power: int = 2,
+        n_agents: int = 10,
+        p_zeros: float = 0.5,
+        p_ones: float = 0.5,
+        p_value: float = 0.05,
+        xlag: Union[int, list] = 1,
+        ylag: Union[int, list] = 1,
+        elag: Union[int, list] = 1,
+        estimator: str = "least_squares",
+        extended_least_squares: bool = False,
+        lam: float = 0.98,
+        delta: float = 0.01,
+        offset_covariance: float = 0.2,
+        mu: float = 0.01,
+        eps: float = np.finfo(np.float64).eps,
+        gama: float = 0.2,
+        weight: float = 0.02,
+        estimate_parameter: bool = True,
+        loss_func: str = "metamss_loss",
+        model_type: str = "NARMAX",
+        basis_function: Polynomial = Polynomial(),
+        steps_ahead: Union[int, None] = None,
+        random_state: Union[int, None] = None,
     ):
         super().__init__(
             estimator=estimator,
@@ -239,7 +242,12 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         if not isinstance(self.ylag, (int, list)):
             raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
 
-    def fit(self, X_train=None, y_train=None, X_test=None, y_test=None):
+    @deprecated(
+        version="v0.2.2",
+        future_version="v0.2.5",
+        alternative="fit(X=X, y=y, X_test=X_test, y_test=y_test)",
+    )
+    def fit(self, *, X_train=None, y_train=None, X_test=None, y_test=None):
         """Fit the polynomial NARMAX model.
 
         Parameters
@@ -272,9 +280,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             self._n_inputs = 1  # just to create the regressor space base
 
         #  self._n_inputs = _num_features(X_train)
-        self.regressor_code = self.regressor_space(
-            self.non_degree, self.xlag, self.ylag, self._n_inputs, self.model_type
-        )
+        self.regressor_code = self.regressor_space(self._n_inputs)
         self.dimension = self.regressor_code.shape[0]
         velocity = np.zeros([self.dimension, self.n_agents])
         self.random_state = check_random_state(self.random_state)
@@ -362,16 +368,14 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             residues = y_test - yhat
 
             if self.model_type == "NAR":
-                lagged_data = self.build_output_matrix(y_train, self.ylag)
-                self.max_lag = self._get_max_lag(ylag=self.ylag)
+                lagged_data = self.build_output_matrix(y_train)
+                self.max_lag = self._get_max_lag()
             elif self.model_type == "NFIR":
-                lagged_data = self.build_input_matrix(X_train, self.xlag)
-                self.max_lag = self._get_max_lag(xlag=self.xlag)
+                lagged_data = self.build_input_matrix(X_train)
+                self.max_lag = self._get_max_lag()
             elif self.model_type == "NARMAX":
-                self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
-                lagged_data = self.build_input_output_matrix(
-                    X_train, y_train, self.xlag, self.ylag
-                )
+                self.max_lag = self._get_max_lag()
+                lagged_data = self.build_input_output_matrix(X_train, y_train)
             else:
                 raise ValueError(
                     "Unrecognized model type. The model_type should be NARMAX, NAR or"
@@ -393,7 +397,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             m = self.regressor_code[agent == 1].copy()
 
             if np.all(agent == 0):
-                fitness.append(30)
+                fitness.append(1000)  # just a big number as penalty
                 continue
 
             yhat = self.simulate(
@@ -413,7 +417,9 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
         return fitness
 
-    def perform_t_test(self, psi, theta, residues):
+    def perform_t_test(
+        self, psi: np.ndarray, theta: np.ndarray, residues: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Perform the t-test given the p-value defined by the user
 
@@ -565,6 +571,11 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             * (1 + (a * (x - c)) * (1 - 1 / (1 + np.exp(-a * (x - c)))))
         )
 
+    @deprecated(
+        version="v0.2.2",
+        future_version="v0.2.5",
+        alternative="predict(X=X, y=y, steps_ahead=None, forecast_horizon=None)",
+    )
     def predict(
         self, *, X_test=None, y_test=None, steps_ahead=None, forecast_horizon=None
     ):
@@ -600,14 +611,141 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
                 return self._model_prediction(
                     X_test, y_test, forecast_horizon=forecast_horizon
                 )
-            elif steps_ahead == 1:
+            if steps_ahead == 1:
                 return self._one_step_ahead_prediction(X_test, y_test)
-            else:
-                _check_positive_int(steps_ahead, "steps_ahead")
-                return self._n_step_ahead_prediction(
-                    X_test, y_test, steps_ahead=steps_ahead
-                )
-        else:
-            raise NotImplementedError(
-                "MetaMSS doesn't support basis functions other than polynomial yet.",
+
+            _check_positive_int(steps_ahead, "steps_ahead")
+            return self._n_step_ahead_prediction(
+                X_test, y_test, steps_ahead=steps_ahead
             )
+
+        raise NotImplementedError(
+            "MetaMSS doesn't support basis functions other than polynomial yet.",
+        )
+
+    def _one_step_ahead_prediction(self, X, y):
+        """Perform the 1-step-ahead prediction of a model.
+
+        Parameters
+        ----------
+        y : array-like of shape = max_lag
+            Initial conditions values of the model
+            to start recursive process.
+        X : ndarray of floats of shape = n_samples
+            Vector with input values to be used in model simulation.
+
+        Returns
+        -------
+        yhat : ndarray of floats
+               The 1-step-ahead predicted values of the model.
+
+        """
+        if self.model_type == "NAR":
+            lagged_data = self.im.build_output_matrix(y, self.ylag)
+        elif self.model_type == "NFIR":
+            lagged_data = self.im.build_input_matrix(X, self.xlag)
+        elif self.model_type == "NARMAX":
+            lagged_data = self.im.build_input_output_matrix(X, y, self.xlag, self.ylag)
+        else:
+            raise ValueError(
+                "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+            )
+
+        if self.basis_function.__class__.__name__ == "Polynomial":
+            X_base = self.basis_function.transform(
+                lagged_data,
+                self.max_lag,
+                predefined_regressors=self.pivv[: len(self.final_model)],
+            )
+        else:
+            X_base, _ = self.basis_function.transform(
+                lagged_data,
+                self.max_lag,
+                predefined_regressors=self.pivv[: len(self.final_model)],
+            )
+
+        yhat = super()._one_step_ahead_prediction_test(X_base)
+        return yhat.reshape(-1, 1)
+
+    def _n_step_ahead_prediction(self, X, y, steps_ahead):
+        """Perform the n-steps-ahead prediction of a model.
+
+        Parameters
+        ----------
+        y : array-like of shape = max_lag
+            Initial conditions values of the model
+            to start recursive process.
+        X : ndarray of floats of shape = n_samples
+            Vector with input values to be used in model simulation.
+
+        Returns
+        -------
+        yhat : ndarray of floats
+               The n-steps-ahead predicted values of the model.
+
+        """
+        yhat = super()._n_step_ahead_prediction(X, y, steps_ahead)
+        return yhat
+
+    def _model_prediction(self, X, y_initial, forecast_horizon=None):
+        """Perform the infinity steps-ahead simulation of a model.
+
+        Parameters
+        ----------
+        y_initial : array-like of shape = max_lag
+            Number of initial conditions values of output
+            to start recursive process.
+        X : ndarray of floats of shape = n_samples
+            Vector with input values to be used in model simulation.
+
+        Returns
+        -------
+        yhat : ndarray of floats
+               The predicted values of the model.
+
+        """
+        if self.model_type in ["NARMAX", "NAR"]:
+            return self._narmax_predict(X, y_initial, forecast_horizon)
+        if self.model_type == "NFIR":
+            return self._nfir_predict(X, y_initial)
+
+        raise Exception(
+            "model_type do not exist! Model type must be NARMAX, NAR or NFIR"
+        )
+
+    def _narmax_predict(self, X, y_initial, forecast_horizon):
+        if len(y_initial) < self.max_lag:
+            raise Exception("Insufficient initial conditions elements!")
+
+        if X is not None:
+            forecast_horizon = X.shape[0]
+        else:
+            forecast_horizon = forecast_horizon + self.max_lag
+
+        if self.model_type == "NAR":
+            self.n_inputs = 0
+
+        y_output = super()._narmax_predict(X, y_initial, forecast_horizon)
+        return y_output
+
+    def _nfir_predict(self, X, y_initial):
+        y_output = super()._nfir_predict(X, y_initial)
+        return y_output
+
+    def _basis_function_predict(self, X, y_initial, forecast_horizon=None):
+        """not implemented"""
+        raise NotImplementedError(
+            "You can only use Polynomial Basis Function in MetaMSS for now."
+        )
+
+    def _basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
+        """not implemented"""
+        raise NotImplementedError(
+            "You can only use Polynomial Basis Function in MetaMSS for now."
+        )
+
+    def _basis_function_n_steps_horizon(self, X, y, steps_ahead, forecast_horizon):
+        """not implemented"""
+        raise NotImplementedError(
+            "You can only use Polynomial Basis Function in MetaMSS for now."
+        )

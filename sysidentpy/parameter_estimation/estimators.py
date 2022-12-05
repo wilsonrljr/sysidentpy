@@ -12,7 +12,7 @@ import numpy as np
 from ..narmax_base import InformationMatrix
 
 
-class Estimators(InformationMatrix):
+class Estimators:
     """Ordinary Least Squares for linear parameter estimation"""
 
     def __init__(
@@ -25,6 +25,7 @@ class Estimators(InformationMatrix):
         eps=np.finfo(np.float64).eps,
         gama=0.2,
         weight=0.02,
+        basis_function=None,
     ):
 
         self._eps = eps
@@ -36,6 +37,9 @@ class Estimators(InformationMatrix):
         self._gama = gama
         self._weight = weight  # <0  e <1
         self.xi = None
+        self.theta_evolution = None
+        self.basis_function = basis_function
+        self.im = InformationMatrix()
         self._validate_params()
 
     def _validate_params(self):
@@ -113,7 +117,7 @@ class Estimators(InformationMatrix):
         theta = np.linalg.lstsq(psi, y, rcond=None)[0]
         return theta
 
-    def _unbiased_estimator(self, psi, y, theta, non_degree, elag, max_lag):
+    def _unbiased_estimator(self, psi, y, theta, elag, max_lag, estimator):
         """Estimate the model parameters using Extended Least Squares method.
 
         Parameters
@@ -149,17 +153,17 @@ class Estimators(InformationMatrix):
 
         """
         e = y[max_lag:, 0].reshape(-1, 1) - np.dot(psi, theta)
-        for i in range(30):
+        for _ in range(30):
             e = np.concatenate([np.zeros([max_lag, 1]), e], axis=0)
 
-            lagged_data = self.build_output_matrix(e, elag)
+            lagged_data = self.im.build_output_matrix(e, elag)
 
             e_regressors = self.basis_function.fit(
                 lagged_data, max_lag, predefined_regressors=None
             )
 
             psi_extended = np.concatenate([psi, e_regressors], axis=1)
-            unbiased_theta = getattr(self, self.estimator)(psi_extended, y)
+            unbiased_theta = getattr(self, estimator)(psi_extended, y)
             e = y[max_lag:, 0].reshape(-1, 1) - np.dot(
                 psi_extended, unbiased_theta.reshape(-1, 1)
             )
