@@ -203,6 +203,8 @@ class HouseHolder:
 
 
 class ModelInformation:
+    """Methods to get model information"""
+
     def _get_index_from_regressor_code(self, regressor_code, model_code):
         """Get the index of user regressor in regressor space.
 
@@ -583,7 +585,30 @@ class InformationMatrix:
 
 
 class ModelPrediction:
-    def _code2exponents(self, code):
+    """Model prediction methods."""
+
+    def __init__(
+        self,
+        model_type="NARMAX",
+        basis_function=None,
+        max_lag=1,
+        xlag=1,
+        ylag=1,
+        final_model=None,
+        theta=None,
+        pivv=None,
+    ):
+        self.model_type = model_type
+        self.im = InformationMatrix()
+        self.basis_function = basis_function
+        self.max_lag = max_lag
+        self.xlag = xlag
+        self.ylag = ylag
+        self.final_model = final_model
+        self.theta = theta
+        self.pivv = pivv
+
+    def _code2exponents(self, *, code, max_lag, n_inputs):
         """
         Convert regressor code to exponents array.
 
@@ -596,28 +621,29 @@ class ModelPrediction:
         regressors_count = Counter(code)
 
         if np.all(regressors == 0):
-            return np.zeros(self.max_lag * (1 + self._n_inputs))
+            return np.zeros(max_lag * (1 + n_inputs))
 
-        else:
-            exponents = np.array([], dtype=float)
-            elements = np.round(np.divide(regressors, 1000), 0)[
-                (regressors > 0)
-            ].astype(int)
+        exponents = np.array([], dtype=float)
+        elements = np.round(np.divide(regressors, 1000), 0)[(regressors > 0)].astype(
+            int
+        )
 
-            for j in range(1, self._n_inputs + 2):
-                base_exponents = np.zeros(self.max_lag, dtype=float)
-                if j in elements:
-                    for i in range(1, self.max_lag + 1):
-                        regressor_code = int(j * 1000 + i)
-                        base_exponents[-i] = regressors_count[regressor_code]
-                    exponents = np.append(exponents, base_exponents)
+        for j in range(1, n_inputs + 2):
+            base_exponents = np.zeros(max_lag, dtype=float)
+            if j in elements:
+                for i in range(1, max_lag + 1):
+                    regressor_code = int(j * 1000 + i)
+                    base_exponents[-i] = regressors_count[regressor_code]
+                exponents = np.append(exponents, base_exponents)
 
-                else:
-                    exponents = np.append(exponents, base_exponents)
+            else:
+                exponents = np.append(exponents, base_exponents)
 
-            return exponents
+        return exponents
 
-    def _one_step_ahead_prediction(self, X, y):
+    def _one_step_ahead_prediction(
+        self, *, X, y, ylag, xlag, max_lag, final_model, theta, pivv
+    ):
         """Perform the 1-step-ahead prediction of a model.
 
         Parameters
@@ -635,16 +661,11 @@ class ModelPrediction:
 
         """
         if self.model_type == "NAR":
-            lagged_data = self.build_output_matrix(y, self.ylag)
-            # self.max_lag = ModelInformation()._get_max_lag(ylag=self.ylag)
+            lagged_data = self.im.build_output_matrix(y, ylag)
         elif self.model_type == "NFIR":
-            lagged_data = self.build_input_matrix(X, self.xlag)
-            # self.max_lag = ModelInformation()._get_max_lag(xlag=self.xlag)
+            lagged_data = self.im.build_input_matrix(X, xlag)
         elif self.model_type == "NARMAX":
-            # check_X_y(X, y)
-            # self.max_lag = ModelInformation()._get_max_lag(
-            # ylag=self.ylag, xlag=self.xlag)
-            lagged_data = self.build_input_output_matrix(X, y, self.xlag, self.ylag)
+            lagged_data = self.im.build_input_output_matrix(X, y, xlag, ylag)
         else:
             raise ValueError(
                 "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
@@ -653,23 +674,23 @@ class ModelPrediction:
         if self.basis_function.__class__.__name__ == "Polynomial":
             X_base = self.basis_function.transform(
                 lagged_data,
-                self.max_lag,
-                predefined_regressors=self.pivv[: len(self.final_model)],
+                max_lag,
+                predefined_regressors=pivv[: len(final_model)],
             )
         else:
             X_base, _ = self.basis_function.transform(
                 lagged_data,
-                self.max_lag,
-                predefined_regressors=self.pivv[: len(self.final_model)],
+                max_lag,
+                predefined_regressors=pivv[: len(final_model)],
             )
 
-        # piv_final_model = self.pivv[: len(self.final_model)]
-        # X_base = X_base[:, piv_final_model]
-        yhat = np.dot(X_base, self.theta.flatten())
-        yhat = np.concatenate([y[: self.max_lag].flatten(), yhat])
+        yhat = np.dot(X_base, theta.flatten())
+        yhat = np.concatenate([y[:max_lag].flatten(), yhat])
         return yhat.reshape(-1, 1)
 
-    def _n_step_ahead_prediction(self, X, y, steps_ahead):
+    def _n_step_ahead_prediction(
+        self, *, X, y, steps_ahead, theta, final_model, max_lag, n_inputs
+    ):
         """Perform the n-steps-ahead prediction of a model.
 
         Parameters
@@ -686,21 +707,26 @@ class ModelPrediction:
                The n-steps-ahead predicted values of the model.
 
         """
-        if len(y) < self.max_lag:
+        if len(y) < max_lag:
             raise Exception("Insufficient initial conditions elements!")
 
         yhat = np.zeros(X.shape[0], dtype=float)
         yhat.fill(np.nan)
-        yhat[: self.max_lag] = y[: self.max_lag, 0]
-        i = self.max_lag
-        X = X.reshape(-1, self._n_inputs)
+        yhat[:max_lag] = y[:max_lag, 0]
+        i = max_lag
+        X = X.reshape(-1, n_inputs)
         while i < len(y):
-            k = int(i - self.max_lag)
+            k = int(i - max_lag)
             if i + steps_ahead > len(y):
                 steps_ahead = len(y) - i  # predicts the remaining values
 
             yhat[i : i + steps_ahead] = self._model_prediction(
-                X[k : i + steps_ahead], y[k : i + steps_ahead]
+                X=X[k : i + steps_ahead],
+                y_initial=y[k : i + steps_ahead],
+                max_lag=max_lag,
+                theta=theta,
+                n_inputs=n_inputs,
+                final_model=final_model,
             )[-steps_ahead:].ravel()
 
             i += steps_ahead
@@ -708,7 +734,17 @@ class ModelPrediction:
         yhat = yhat.ravel()
         return yhat.reshape(-1, 1)
 
-    def _model_prediction(self, X, y_initial, forecast_horizon=None):
+    def _model_prediction(
+        self,
+        *,
+        X,
+        y_initial,
+        max_lag,
+        theta,
+        n_inputs,
+        final_model,
+        forecast_horizon=None,
+    ):
         """Perform the infinity steps-ahead simulation of a model.
 
         Parameters
@@ -726,109 +762,144 @@ class ModelPrediction:
 
         """
         if self.model_type in ["NARMAX", "NAR"]:
-            return self._narmax_predict(X, y_initial, forecast_horizon)
-        elif self.model_type == "NFIR":
-            return self._nfir_predict(X, y_initial)
-        else:
-            raise Exception(
-                "model_type do not exist! Model type must be NARMAX, NAR or NFIR"
+            return self._narmax_predict(
+                X=X,
+                y_initial=y_initial,
+                forecast_horizon=forecast_horizon,
+                max_lag=max_lag,
+                n_inputs=n_inputs,
+                final_model=final_model,
+                theta=theta,
+            )
+        if self.model_type == "NFIR":
+            return self._nfir_predict(
+                X=X,
+                y_initial=y_initial,
+                max_lag=max_lag,
+                n_inputs=n_inputs,
+                final_model=final_model,
+                theta=theta,
             )
 
-    def _narmax_predict(self, X, y_initial, forecast_horizon):
-        if len(y_initial) < self.max_lag:
+        raise Exception(
+            "model_type do not exist! Model type must be NARMAX, NAR or NFIR"
+        )
+
+    def _narmax_predict(
+        self,
+        *,
+        X,
+        y_initial,
+        forecast_horizon,
+        max_lag,
+        n_inputs,
+        final_model,
+        theta,
+    ):
+        if len(y_initial) < max_lag:
             raise Exception("Insufficient initial conditions elements!")
 
-        # X = X.reshape(-1, self._n_inputs)
         if X is not None:
             forecast_horizon = X.shape[0]
         else:
-            forecast_horizon = forecast_horizon + self.max_lag
+            forecast_horizon = forecast_horizon + max_lag
 
         if self.model_type == "NAR":
-            self._n_inputs = 0
+            n_inputs = 0
 
         y_output = np.zeros(forecast_horizon, dtype=float)
         y_output.fill(np.nan)
-        y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
+        y_output[:max_lag] = y_initial[:max_lag, 0]
 
-        model_exponents = [self._code2exponents(model) for model in self.final_model]
+        model_exponents = [
+            self._code2exponents(code=model, max_lag=max_lag, n_inputs=n_inputs)
+            for model in final_model
+        ]
         raw_regressor = np.zeros(len(model_exponents[0]), dtype=float)
-        for i in range(self.max_lag, forecast_horizon):
+        for i in range(max_lag, forecast_horizon):
             init = 0
-            final = self.max_lag
-            k = int(i - self.max_lag)
+            final = max_lag
+            k = int(i - max_lag)
             raw_regressor[:final] = y_output[k:i]
-            for j in range(self._n_inputs):
-                init += self.max_lag
-                final += self.max_lag
+            for j in range(n_inputs):
+                init += max_lag
+                final += max_lag
                 raw_regressor[init:final] = X[k:i, j]
 
             regressor_value = np.zeros(len(model_exponents))
-            for j in range(len(model_exponents)):
-                regressor_value[j] = np.prod(
-                    np.power(raw_regressor, model_exponents[j])
-                )
+            for j, model_exponent in enumerate(model_exponents):
+                regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
 
-            y_output[i] = np.dot(regressor_value, self.theta.flatten())
+            y_output[i] = np.dot(regressor_value, theta.flatten())
         return y_output.reshape(-1, 1)
 
-    def _nfir_predict(self, X, y_initial):
+    def _nfir_predict(self, *, X, y_initial, max_lag, n_inputs, final_model, theta):
         y_output = np.zeros(X.shape[0], dtype=float)
         y_output.fill(np.nan)
-        y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
-        X = X.reshape(-1, self._n_inputs)
-        model_exponents = [self._code2exponents(model) for model in self.final_model]
+        y_output[:max_lag] = y_initial[:max_lag, 0]
+        X = X.reshape(-1, n_inputs)
+        model_exponents = [
+            self._code2exponents(code=model, max_lag=max_lag, n_inputs=n_inputs)
+            for model in final_model
+        ]
         raw_regressor = np.zeros(len(model_exponents[0]), dtype=float)
-        for i in range(self.max_lag, X.shape[0]):
+        for i in range(max_lag, X.shape[0]):
             init = 0
-            final = self.max_lag
-            k = int(i - self.max_lag)
-            for j in range(self._n_inputs):
+            final = max_lag
+            k = int(i - max_lag)
+            for j in range(n_inputs):
                 raw_regressor[init:final] = X[k:i, j]
-                init += self.max_lag
-                final += self.max_lag
+                init += max_lag
+                final += max_lag
 
             regressor_value = np.zeros(len(model_exponents))
-            for j in range(len(model_exponents)):
-                regressor_value[j] = np.prod(
-                    np.power(raw_regressor, model_exponents[j])
-                )
+            for j, model_exponent in enumerate(model_exponents):
+                regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
 
-            y_output[i] = np.dot(regressor_value, self.theta.flatten())
+            y_output[i] = np.dot(regressor_value, theta.flatten())
         return y_output.reshape(-1, 1)
 
-    def _basis_function_predict(self, X, y_initial, theta, forecast_horizon=None):
+    def _basis_function_predict(
+        self,
+        X,
+        y_initial,
+        xlag,
+        ylag,
+        theta,
+        max_lag,
+        final_model,
+        pivv,
+        forecast_horizon=None,
+    ):
         if X is not None:
             forecast_horizon = X.shape[0]
         else:
-            forecast_horizon = forecast_horizon + self.max_lag
+            forecast_horizon = forecast_horizon + max_lag
 
         if self.model_type == "NAR":
-            self._n_inputs = 0
+            n_inputs = 0
 
         yhat = np.zeros(forecast_horizon, dtype=float)
         yhat.fill(np.nan)
-        yhat[: self.max_lag] = y_initial[: self.max_lag, 0]
+        yhat[:max_lag] = y_initial[:max_lag, 0]
 
-        # Discard unnecessary initial values
-        # yhat[0:self.max_lag] = y_initial[0:self.max_lag]
-        analyzed_elements_number = self.max_lag + 1
+        analyzed_elements_number = max_lag + 1
 
-        for i in range(0, forecast_horizon - self.max_lag):
+        for i in range(0, forecast_horizon - max_lag):
             if self.model_type == "NARMAX":
-                lagged_data = self.build_input_output_matrix(
+                lagged_data = self.im.build_input_output_matrix(
                     X[i : i + analyzed_elements_number],
                     yhat[i : i + analyzed_elements_number].reshape(-1, 1),
-                    self.xlag,
-                    self.ylag,
+                    xlag,
+                    ylag,
                 )
             elif self.model_type == "NAR":
-                lagged_data = self.build_output_matrix(
-                    yhat[i : i + analyzed_elements_number].reshape(-1, 1), self.ylag
+                lagged_data = self.im.build_output_matrix(
+                    yhat[i : i + analyzed_elements_number].reshape(-1, 1), ylag
                 )
             elif self.model_type == "NFIR":
-                lagged_data = self.build_input_matrix(
-                    X[i : i + analyzed_elements_number], self.xlag
+                lagged_data = self.im.build_input_matrix(
+                    X[i : i + analyzed_elements_number], xlag
                 )
             else:
                 raise ValueError(
@@ -838,16 +909,29 @@ class ModelPrediction:
 
             X_tmp, _ = self.basis_function.transform(
                 lagged_data,
-                self.max_lag,
-                predefined_regressors=self.pivv[: len(self.final_model)],
+                max_lag,
+                predefined_regressors=pivv[: len(final_model)],
             )
 
             a = X_tmp @ theta
-            yhat[i + self.max_lag] = a[:, 0]
+            yhat[i + max_lag] = a[:, 0]
 
         return yhat.reshape(-1, 1)
 
-    def basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
+    def basis_function_n_step_prediction(
+        self,
+        *,
+        X,
+        y,
+        xlag,
+        ylag,
+        max_lag,
+        steps_ahead,
+        theta,
+        pivv,
+        final_model,
+        forecast_horizon,
+    ):
         """Perform the n-steps-ahead prediction of a model.
 
         Parameters
@@ -864,42 +948,59 @@ class ModelPrediction:
                The n-steps-ahead predicted values of the model.
 
         """
-        if len(y) < self.max_lag:
+        if len(y) < max_lag:
             raise Exception("Insufficient initial conditions elements!")
 
         if X is not None:
             forecast_horizon = X.shape[0]
         else:
-            forecast_horizon = forecast_horizon + self.max_lag
+            forecast_horizon = forecast_horizon + max_lag
 
         yhat = np.zeros(forecast_horizon, dtype=float)
         yhat.fill(np.nan)
-        yhat[: self.max_lag] = y[: self.max_lag, 0]
+        yhat[:max_lag] = y[:max_lag, 0]
 
         # Discard unnecessary initial values
-        i = self.max_lag
+        i = max_lag
 
         while i < len(y):
-            k = int(i - self.max_lag)
+            k = int(i - max_lag)
             if i + steps_ahead > len(y):
                 steps_ahead = len(y) - i  # predicts the remaining values
 
             if self.model_type == "NARMAX":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
-                    X[k : i + steps_ahead], y[k : i + steps_ahead], self.theta
+                    X=X[k : i + steps_ahead],
+                    y_initial=y[k : i + steps_ahead],
+                    theta=theta,
+                    max_lag=max_lag,
+                    final_model=final_model,
+                    xlag=xlag,
+                    ylag=ylag,
+                    pivv=pivv,
                 )[-steps_ahead:].ravel()
             elif self.model_type == "NAR":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
                     X=None,
                     y_initial=y[k : i + steps_ahead],
-                    theta=self.theta,
+                    theta=theta,
                     forecast_horizon=forecast_horizon,
+                    max_lag=max_lag,
+                    xlag=xlag,
+                    ylag=ylag,
+                    pivv=pivv,
+                    final_model=final_model,
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
             elif self.model_type == "NFIR":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
                     X=X[k : i + steps_ahead],
                     y_initial=y[k : i + steps_ahead],
-                    theta=self.theta,
+                    theta=theta,
+                    max_lag=max_lag,
+                    xlag=xlag,
+                    ylag=ylag,
+                    pivv=pivv,
+                    final_model=final_model,
                 )[-steps_ahead:].ravel()
             else:
                 raise ValueError(
@@ -910,35 +1011,65 @@ class ModelPrediction:
             i += steps_ahead
         return yhat.reshape(-1, 1)
 
-    def _basis_function_n_steps_horizon(self, X, y, steps_ahead, forecast_horizon):
+    def _basis_function_n_steps_horizon(
+        self,
+        *,
+        X,
+        y,
+        xlag,
+        ylag,
+        pivv,
+        final_model,
+        max_lag,
+        theta,
+        steps_ahead,
+        forecast_horizon,
+    ):
         yhat = np.zeros(forecast_horizon, dtype=float)
         yhat.fill(np.nan)
-        yhat[: self.max_lag] = y[: self.max_lag, 0]
+        yhat[:max_lag] = y[:max_lag, 0]
 
         # Discard unnecessary initial values
-        i = self.max_lag
+        i = max_lag
 
         while i < len(y):
-            k = int(i - self.max_lag)
+            k = int(i - max_lag)
             if i + steps_ahead > len(y):
                 steps_ahead = len(y) - i  # predicts the remaining values
 
             if self.model_type == "NARMAX":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
-                    X[k : i + steps_ahead], y[k : i + steps_ahead], self.theta
+                    X=X[k : i + steps_ahead],
+                    y_initial=y[k : i + steps_ahead],
+                    theta=theta,
+                    max_lag=max_lag,
+                    xlag=xlag,
+                    ylag=ylag,
+                    pivv=pivv,
+                    final_model=final_model,
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
             elif self.model_type == "NAR":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
                     X=None,
                     y_initial=y[k : i + steps_ahead],
-                    theta=self.theta,
+                    theta=theta,
                     forecast_horizon=forecast_horizon,
+                    max_lag=max_lag,
+                    xlag=xlag,
+                    ylag=ylag,
+                    pivv=pivv,
+                    final_model=final_model,
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
             elif self.model_type == "NFIR":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
                     X=X[k : i + steps_ahead],
                     y_initial=y[k : i + steps_ahead],
-                    theta=self.theta,
+                    theta=theta,
+                    max_lag=max_lag,
+                    xlag=xlag,
+                    ylag=ylag,
+                    pivv=pivv,
+                    final_model=final_model,
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
             else:
                 raise ValueError(
