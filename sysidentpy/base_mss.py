@@ -705,7 +705,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         to_remove = int(
             np.ceil((len(y) - self.max_lag) / steps_ahead)  #  - len(y) % steps_ahead
         )
-        yhat = np.zeros(len(y), dtype=float)
+        yhat = np.zeros(len(y) + steps_ahead, dtype=float)
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
         i = self.max_lag
@@ -725,7 +725,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             )[-steps_ahead:].ravel()
         else:
             yhat[i : i + steps_ahead] = self._model_prediction(
-                X=None, y_initial=y[steps[0] : i], forecast_horizon=steps_ahead
+                X=None, y_initial=y[0:i], forecast_horizon=steps_ahead
             )[-steps_ahead:].ravel()
 
         yhat = yhat.ravel()[self.max_lag : :]
@@ -736,7 +736,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             raise Exception("Insufficient initial conditions elements!")
 
         to_remove = int(
-            np.ceil(len(y) / steps_ahead) - len(y) % steps_ahead
+            np.ceil(len(y) / steps_ahead)  # - len(y) % steps_ahead
         )  # self.max_lag % steps_ahead)
         X = X.reshape(-1, self.n_inputs)
         yhat = np.zeros(to_remove * steps_ahead + steps_ahead, dtype=float)
