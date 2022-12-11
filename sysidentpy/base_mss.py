@@ -644,7 +644,9 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         forecast_horizon,
     ):
         """narmax_predict method"""
-        y_output = np.zeros(X.shape[0], dtype=float)
+        y_output = np.zeros(
+            forecast_horizon, dtype=float
+        )  # np.zeros(X.shape[0], dtype=float)
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
 
@@ -667,7 +669,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
                 regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
 
             y_output[i] = np.dot(regressor_value, self.theta.flatten())
-        return y_output.reshape(-1, 1)
+        return y_output[self.max_lag : :].reshape(-1, 1)
 
     @abstractmethod
     def _nfir_predict(self, X, y_initial):
@@ -700,29 +702,31 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         if len(y) < self.max_lag:
             raise Exception("Insufficient initial conditions elements!")
 
-        to_remove = np.ceil(len(y) / steps_ahead) - self.max_lag % steps_ahead
-        yhat = np.zeros(len(y) + steps_ahead, dtype=float)
+        to_remove = int(
+            np.ceil((len(y) - self.max_lag) / steps_ahead)  #  - len(y) % steps_ahead
+        )
+        yhat = np.zeros(len(y), dtype=float)
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
         i = self.max_lag
-        condition = True
-        while condition:
-            k = int(i - self.max_lag)
-            print(
-                f"k = {k}, i = {i}, to_remove = {to_remove} e {len(y) - to_remove},"
-                f" condicao = {i == len(y) - to_remove}"
-            )
+
+        steps = [step for step in range(0, to_remove * steps_ahead, steps_ahead)]
+        if len(steps) > 1:
+            for step in steps[:-1]:
+                # i += steps_ahead
+                yhat[i : i + steps_ahead] = self._model_prediction(
+                    X=None, y_initial=y[step:i], forecast_horizon=steps_ahead
+                )[-steps_ahead:].ravel()
+                i += steps_ahead
+
+            steps_ahead = np.sum(np.isnan(yhat))
             yhat[i : i + steps_ahead] = self._model_prediction(
-                X=None, y_initial=y[k : i + steps_ahead]
+                X=None, y_initial=y[steps[-1] : i]
             )[-steps_ahead:].ravel()
-
-            if i >= steps_ahead * to_remove:  # i + steps_ahead > len(y):
-                condition = False
-                break
-
-            i += steps_ahead
-            if i + steps_ahead > len(y) - self.max_lag:
-                steps_ahead = len(y) - i  # int(steps_ahead - to_remove)
+        else:
+            yhat[i : i + steps_ahead] = self._model_prediction(
+                X=None, y_initial=y[steps[0] : i], forecast_horizon=steps_ahead
+            )[-steps_ahead:].ravel()
 
         yhat = yhat.ravel()[self.max_lag : :]
         return yhat.reshape(-1, 1)
@@ -731,25 +735,21 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         if len(y) < self.max_lag:
             raise Exception("Insufficient initial conditions elements!")
 
-        to_remove = np.ceil(len(y) / steps_ahead) - self.max_lag % steps_ahead
+        to_remove = int(
+            np.ceil(len(y) / steps_ahead) - len(y) % steps_ahead
+        )  # self.max_lag % steps_ahead)
         X = X.reshape(-1, self.n_inputs)
-        yhat = np.zeros(X.shape[0], dtype=float)
+        yhat = np.zeros(to_remove * steps_ahead + steps_ahead, dtype=float)
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
         i = self.max_lag
-        condition = True
-        while condition:
-            k = int(i - self.max_lag)
-            yhat[i : i + steps_ahead] = self._model_prediction(
-                X=X[k : i + steps_ahead], y_initial=y[k : i + steps_ahead]
-            )[-steps_ahead:].ravel()
-            if i >= steps_ahead * to_remove:  # i + steps_ahead > len(y):
-                condition = False
-                # break
+        steps = [step for step in range(0, to_remove * steps_ahead, self.max_lag)]
 
+        for step in steps:
+            yhat[i : i + steps_ahead] = self._model_prediction(
+                X=X[step : i + steps_ahead], y_initial=y[step : i + steps_ahead]
+            )[-steps_ahead:].ravel()
             i += steps_ahead
-            if i + steps_ahead > len(X) - self.max_lag:
-                steps_ahead = len(X) - i  # int(steps_ahead - to_remove)
 
         yhat = yhat.ravel()[self.max_lag : :]
         return yhat.reshape(-1, 1)
