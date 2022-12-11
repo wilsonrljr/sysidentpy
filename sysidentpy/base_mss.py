@@ -735,21 +735,39 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         if len(y) < self.max_lag:
             raise Exception("Insufficient initial conditions elements!")
 
-        to_remove = int(
-            np.ceil(len(y) / steps_ahead)  # - len(y) % steps_ahead
-        )  # self.max_lag % steps_ahead)
+        to_remove = int(np.ceil((len(y) - self.max_lag) / steps_ahead))
         X = X.reshape(-1, self.n_inputs)
-        yhat = np.zeros(to_remove * steps_ahead + steps_ahead, dtype=float)
+        yhat = np.zeros(X.shape[0], dtype=float)
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
         i = self.max_lag
-        steps = [step for step in range(0, to_remove * steps_ahead, self.max_lag)]
+        steps = [step for step in range(0, to_remove * steps_ahead, steps_ahead)]
 
-        for step in steps:
+        # for step in steps:
+        #     yhat[i : i + steps_ahead] = self._model_prediction(
+        #         X=X[step : i + steps_ahead], y_initial=y[step : i + steps_ahead]
+        #     )[-steps_ahead:].ravel()
+        #     i += steps_ahead
+        # yhat = yhat.ravel()[self.max_lag : :]
+        # return yhat.reshape(-1, 1)
+        if len(steps) > 1:
+            for step in steps[:-1]:
+                yhat[i : i + steps_ahead] = self._model_prediction(
+                    X=X[step : i + steps_ahead],
+                    y_initial=y[step:i],
+                )[-steps_ahead:].ravel()
+                i += steps_ahead
+
+            steps_ahead = np.sum(np.isnan(yhat))
             yhat[i : i + steps_ahead] = self._model_prediction(
-                X=X[step : i + steps_ahead], y_initial=y[step : i + steps_ahead]
+                X=X[steps[-1] : i + steps_ahead],
+                y_initial=y[steps[-1] : i],
             )[-steps_ahead:].ravel()
-            i += steps_ahead
+        else:
+            yhat[i : i + steps_ahead] = self._model_prediction(
+                X=X[0:i],
+                y_initial=y[0:i],
+            )[-steps_ahead:].ravel()
 
         yhat = yhat.ravel()[self.max_lag : :]
         return yhat.reshape(-1, 1)
