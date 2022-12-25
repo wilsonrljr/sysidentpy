@@ -3,15 +3,13 @@
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
+
 from typing import Union
 
 import numpy as np
 
-from ..base_mss import BaseMSS
 from ..basis_function import Fourier, Polynomial
-from ..narmax_base import (
-    HouseHolder,
-)
+from ..narmax_base import BaseMSS, Orthogonalization
 from ..parameter_estimation.estimators import Estimators
 from ..utils._check_arrays import _check_positive_int, _num_features
 
@@ -120,7 +118,7 @@ class SimulateNARMAX(Estimators, BaseMSS):
         delta: float = 0.01,
         offset_covariance: float = 0.2,
         mu: float = 0.01,
-        eps: float = np.finfo(np.float64).eps,
+        eps: np.float64 = np.finfo(np.float64).eps,
         gama: float = 0.2,
         weight: float = 0.02,
         estimate_parameter: bool = True,
@@ -128,7 +126,6 @@ class SimulateNARMAX(Estimators, BaseMSS):
         model_type: str = "NARMAX",
         basis_function: Union[Polynomial, Fourier] = Polynomial(),
     ):
-
         super().__init__(
             lam=lam,
             delta=delta,
@@ -142,7 +139,7 @@ class SimulateNARMAX(Estimators, BaseMSS):
         self.model_type = model_type
         self.basis_function = basis_function
         self.estimator = estimator
-        self._extended_least_squares = extended_least_squares
+        self.extended_least_squares = extended_least_squares
         self.estimate_parameter = estimate_parameter
         self.calculate_err = calculate_err
         self.n_inputs = None
@@ -291,9 +288,9 @@ class SimulateNARMAX(Estimators, BaseMSS):
             )
 
             self.theta = getattr(self, self.estimator)(psi, y_train)
-            if self._extended_least_squares is True:
+            if self.extended_least_squares is True:
                 self.theta = self._unbiased_estimator(
-                    psi, y_train, self.theta, self.non_degree, self.elag, self.max_lag
+                    psi, y_train, self.theta, self.elag, self.max_lag, self.estimator
                 )
 
             self.err = self.n_terms * [0]
@@ -319,7 +316,7 @@ class SimulateNARMAX(Estimators, BaseMSS):
                 psi, y_train, self.n_terms, self.final_model
             )
             self.theta = getattr(self, self.estimator)(psi, y_train)
-            if self._extended_least_squares is True:
+            if self.extended_least_squares is True:
                 self.theta = self._unbiased_estimator(
                     psi, y_train, self.theta, self.non_degree, self.elag, self.max_lag
                 )
@@ -377,7 +374,7 @@ class SimulateNARMAX(Estimators, BaseMSS):
                 # Add `eps` in the denominator to omit division by zero if
                 # denominator is zero
                 tmp_err[j] = (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2) / (
-                    np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) * squared_y + self._eps
+                    np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) * squared_y + self.eps
                 )
 
             if i == process_term_number:
@@ -388,11 +385,11 @@ class SimulateNARMAX(Estimators, BaseMSS):
             tmp_psi[:, [piv_index, i]] = tmp_psi[:, [i, piv_index]]
             piv[[piv_index, i]] = piv[[i, piv_index]]
 
-            v = HouseHolder().house(tmp_psi[i:, i])
+            v = Orthogonalization().house(tmp_psi[i:, i])
 
-            row_result = HouseHolder().rowhouse(tmp_psi[i:, i:], v)
+            row_result = Orthogonalization().rowhouse(tmp_psi[i:, i:], v)
 
-            tmp_y[i:] = HouseHolder().rowhouse(tmp_y[i:], v)
+            tmp_y[i:] = Orthogonalization().rowhouse(tmp_y[i:], v)
 
             tmp_psi[i:, i:] = np.copy(row_result)
 
@@ -465,11 +462,11 @@ class SimulateNARMAX(Estimators, BaseMSS):
 
         """
         if self.model_type == "NAR":
-            lagged_data = self.im.build_output_matrix(y, self.ylag)
+            lagged_data = self.build_output_matrix(y)
         elif self.model_type == "NFIR":
-            lagged_data = self.im.build_input_matrix(X, self.xlag)
+            lagged_data = self.build_input_matrix(X)
         elif self.model_type == "NARMAX":
-            lagged_data = self.im.build_input_output_matrix(X, y, self.xlag, self.ylag)
+            lagged_data = self.build_input_output_matrix(X, y)
         else:
             raise ValueError(
                 "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
