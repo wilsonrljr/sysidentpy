@@ -14,11 +14,8 @@ import numpy as np
 
 from sysidentpy.utils._check_arrays import _check_positive_int, _num_features, check_X_y
 
-from ..base_mss import BaseMSS
 from ..basis_function import Fourier, Polynomial
-from ..narmax_base import (
-    HouseHolder,
-)
+from ..narmax_base import BaseMSS, Orthogonalization
 from ..parameter_estimation.estimators import Estimators
 
 
@@ -153,14 +150,14 @@ class FROLS(Estimators, BaseMSS):
         delta: float = 0.01,
         offset_covariance: float = 0.2,
         mu: float = 0.01,
-        eps: float = np.finfo(np.float64).eps,
+        eps: np.float64 = np.finfo(np.float64).eps,
         gama: float = 0.2,
         weight: float = 0.02,
         basis_function: Union[Polynomial, Fourier] = Polynomial(),
         model_type: str = "NARMAX",
     ):
         self.non_degree = basis_function.degree
-        self._order_selection = order_selection
+        self.order_selection = order_selection
         self.ylag = ylag
         self.xlag = xlag
         self.max_lag = self._get_max_lag()
@@ -168,7 +165,7 @@ class FROLS(Estimators, BaseMSS):
         self.n_info_values = n_info_values
         self.n_terms = n_terms
         self.estimator = estimator
-        self._extended_least_squares = extended_least_squares
+        self.extended_least_squares = extended_least_squares
         self.elag = elag
         self.model_type = model_type
         self._validate_params()
@@ -211,15 +208,15 @@ class FROLS(Estimators, BaseMSS):
         if not isinstance(self.ylag, (int, list)):
             raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
 
-        if not isinstance(self._order_selection, bool):
+        if not isinstance(self.order_selection, bool):
             raise TypeError(
-                f"order_selection must be False or True. Got {self._order_selection}"
+                f"order_selection must be False or True. Got {self.order_selection}"
             )
 
-        if not isinstance(self._extended_least_squares, bool):
+        if not isinstance(self.extended_least_squares, bool):
             raise TypeError(
                 "extended_least_squares must be False or True. Got"
-                f" {self._extended_least_squares}"
+                f" {self.extended_least_squares}"
             )
 
         if self.info_criteria not in ["aic", "bic", "fpe", "lilc"]:
@@ -283,7 +280,7 @@ class FROLS(Estimators, BaseMSS):
                 # Add `eps` in the denominator to omit division by zero if
                 # denominator is zero
                 tmp_err[j] = (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2) / (
-                    np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) * squared_y + self._eps
+                    np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) * squared_y + self.eps
                 )
 
             if i == process_term_number:
@@ -294,11 +291,11 @@ class FROLS(Estimators, BaseMSS):
             tmp_psi[:, [piv_index, i]] = tmp_psi[:, [i, piv_index]]
             piv[[piv_index, i]] = piv[[i, piv_index]]
 
-            v = HouseHolder().house(tmp_psi[i:, i])
+            v = Orthogonalization().house(tmp_psi[i:, i])
 
-            row_result = HouseHolder().rowhouse(tmp_psi[i:, i:], v)
+            row_result = Orthogonalization().rowhouse(tmp_psi[i:, i:], v)
 
-            tmp_y[i:] = HouseHolder().rowhouse(tmp_y[i:], v)
+            tmp_y[i:] = Orthogonalization().rowhouse(tmp_y[i:], v)
 
             tmp_psi[i:, i:] = np.copy(row_result)
 
@@ -463,14 +460,14 @@ class FROLS(Estimators, BaseMSS):
 
         self.regressor_code = self.regressor_space(self.n_inputs)
 
-        if self._order_selection is True:
+        if self.order_selection is True:
             self.info_values = self.information_criterion(reg_matrix, y)
 
-        if self.n_terms is None and self._order_selection is True:
+        if self.n_terms is None and self.order_selection is True:
             model_length = np.where(self.info_values == np.amin(self.info_values))
             model_length = int(model_length[0] + 1)
             self.n_terms = model_length
-        elif self.n_terms is None and self._order_selection is not True:
+        elif self.n_terms is None and self.order_selection is not True:
             raise ValueError(
                 "If order_selection is False, you must define n_terms value."
             )
@@ -503,8 +500,7 @@ class FROLS(Estimators, BaseMSS):
             self.final_model = self.regressor_code[tmp_piv, :].copy()
 
         self.theta = getattr(self, self.estimator)(psi, y)
-        # self.max_lag = self._get_max_lag_from_model_code(self.final_model)
-        if self._extended_least_squares is True:
+        if self.extended_least_squares is True:
             self.theta = self._unbiased_estimator(
                 psi, y, self.theta, self.elag, self.max_lag, self.estimator
             )
@@ -676,7 +672,7 @@ class FROLS(Estimators, BaseMSS):
             self.n_inputs = 0
 
         yhat = super()._basis_function_predict(X, y_initial, forecast_horizon)
-        return yhat.reshape(-1, 1)
+        return yhat[self.max_lag::].reshape(-1, 1)
 
     def _basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
         """Perform the n-steps-ahead prediction of a model.
