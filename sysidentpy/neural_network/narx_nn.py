@@ -8,7 +8,6 @@
 import logging
 import sys
 import warnings
-from collections import Counter
 
 import numpy as np
 import torch
@@ -16,7 +15,7 @@ import torch.nn.functional as F
 from torch import optim
 from torch.utils.data import DataLoader, TensorDataset
 
-from ..narmax_base import GenerateRegressors, InformationMatrix, ModelInformation
+from ..narmax_base import BaseMSS
 from ..utils._check_arrays import _check_positive_int, _num_features, check_X_y
 
 logging.basicConfig(
@@ -27,11 +26,7 @@ logging.basicConfig(
 )
 
 
-class NARXNN(
-    GenerateRegressors,
-    InformationMatrix,
-    ModelInformation,
-):
+class NARXNN(BaseMSS):
     """NARX Neural Network model build on top of Pytorch
 
     Currently we support a Series-Parallel (open-loop) Feedforward Network training
@@ -126,8 +121,8 @@ class NARXNN(
     def __init__(
         self,
         *,
-        ylag=2,
-        xlag=2,
+        ylag=1,
+        xlag=1,
         model_type="NARMAX",
         basis_function=None,
         batch_size=100,  # batch size
@@ -146,7 +141,7 @@ class NARXNN(
         self.basis_function = basis_function
         self.model_type = model_type
         self.non_degree = basis_function.degree
-        self.max_lag = self._get_max_lag(ylag, xlag)
+        self.max_lag = self._get_max_lag()
         self.batch_size = batch_size
         self.learning_rate = learning_rate
         self.epochs = epochs
@@ -254,16 +249,14 @@ class NARXNN(
         if y is None:
             raise ValueError("y cannot be None")
 
+        self.max_lag = self._get_max_lag()
         if self.model_type == "NAR":
-            lagged_data = self.build_output_matrix(y, self.ylag)
-            self.max_lag = self._get_max_lag(ylag=self.ylag)
+            lagged_data = self.build_output_matrix(y)
         elif self.model_type == "NFIR":
-            lagged_data = self.build_input_matrix(X, self.xlag)
-            self.max_lag = self._get_max_lag(xlag=self.xlag)
+            lagged_data = self.build_input_matrix(X)
         elif self.model_type == "NARMAX":
             check_X_y(X, y)
-            self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
-            lagged_data = self.build_input_output_matrix(X, y, self.xlag, self.ylag)
+            lagged_data = self.build_input_output_matrix(X, y)
         else:
             raise ValueError(
                 "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
@@ -285,14 +278,7 @@ class NARXNN(
         else:
             self._n_inputs = 1  # only used to create the regressor space base
 
-        self.regressor_code = self.regressor_space(
-            self.non_degree, self.xlag, self.ylag, self._n_inputs, self.model_type
-        )
-        # [:, 1] and [1:] removes the column of the constant
-        # reg_matrix = reg_matrix[:, 1:]
-        # self.regressor_code = self.regressor_code[1:]
-        # self.final_model = self.regressor_code
-
+        self.regressor_code = self.regressor_space(self._n_inputs)
         if basis_name != "Polynomial" and self.basis_function.ensemble:
             basis_code = np.sort(
                 np.tile(
@@ -490,56 +476,20 @@ class NARXNN(
         if self.basis_function.__class__.__name__ == "Polynomial":
             if steps_ahead is None:
                 return self._model_prediction(X, y, forecast_horizon=forecast_horizon)
-            elif steps_ahead == 1:
+            if steps_ahead == 1:
                 return self._one_step_ahead_prediction(X, y)
-            else:
-                _check_positive_int(steps_ahead, "steps_ahead")
-                return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
-        else:
-            if steps_ahead is None:
-                return self._basis_function_predict(
-                    X, y, forecast_horizon=forecast_horizon
-                )
-            elif steps_ahead == 1:
-                return self._one_step_ahead_prediction(X, y)
-            else:
-                return self.basis_function_n_step_prediction(
-                    X, y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
-                )
 
-    def _code2exponents(self, code):
-        """
-        Convert regressor code to exponents array.
+            _check_positive_int(steps_ahead, "steps_ahead")
+            return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
 
-        Parameters
-        ----------
-        code : 1D-array of int
-            Codification of one regressor.
+        if steps_ahead is None:
+            return self._basis_function_predict(X, y, forecast_horizon=forecast_horizon)
+        if steps_ahead == 1:
+            return self._one_step_ahead_prediction(X, y)
 
-        """
-        regressors = np.array(list(set(code)))
-        regressors_count = Counter(code)
-
-        if np.all(regressors == 0):
-            return np.zeros(self.max_lag * (1 + self._n_inputs))
-
-        exponents = np.array([], dtype=float)
-        elements = np.round(np.divide(regressors, 1000), 0)[(regressors > 0)].astype(
-            int
+        return self._basis_function_n_step_prediction(
+            X, y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
         )
-
-        for j in range(1, self._n_inputs + 2):
-            base_exponents = np.zeros(self.max_lag, dtype=float)
-            if j in elements:
-                for i in range(1, self.max_lag + 1):
-                    regressor_code = int(j * 1000 + i)
-                    base_exponents[-i] = regressors_count[regressor_code]
-                exponents = np.append(exponents, base_exponents)
-
-            else:
-                exponents = np.append(exponents, base_exponents)
-
-        return exponents
 
     def _one_step_ahead_prediction(self, X, y):
         """Perform the 1-step-ahead prediction of a model.
@@ -559,11 +509,11 @@ class NARXNN(
 
         """
         if self.model_type == "NAR":
-            lagged_data = self.build_output_matrix(y, self.ylag)
+            lagged_data = self.build_output_matrix(y)
         elif self.model_type == "NFIR":
-            lagged_data = self.build_input_matrix(X, self.xlag)
+            lagged_data = self.build_input_matrix(X)
         elif self.model_type == "NARMAX":
-            lagged_data = self.build_input_output_matrix(X, y, self.xlag, self.ylag)
+            lagged_data = self.build_input_output_matrix(X, y)
         else:
             raise ValueError(
                 "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
@@ -671,7 +621,9 @@ class NARXNN(
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
 
-        model_exponents = [self._code2exponents(model) for model in self.final_model]
+        model_exponents = [
+            self._code2exponents(code=model) for model in self.final_model
+        ]
         raw_regressor = np.zeros(len(model_exponents[0]), dtype=float)
         for i in range(self.max_lag, forecast_horizon):
             init = 0
@@ -698,7 +650,9 @@ class NARXNN(
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
         X = X.reshape(-1, self._n_inputs)
-        model_exponents = [self._code2exponents(model) for model in self.final_model]
+        model_exponents = [
+            self._code2exponents(code=model) for model in self.final_model
+        ]
         raw_regressor = np.zeros(len(model_exponents[0]), dtype=float)
         for i in range(self.max_lag, X.shape[0]):
             init = 0
@@ -739,16 +693,14 @@ class NARXNN(
                 lagged_data = self.build_input_output_matrix(
                     X[i : i + analyzed_elements_number],
                     yhat[i : i + analyzed_elements_number].reshape(-1, 1),
-                    self.xlag,
-                    self.ylag,
                 )
             elif self.model_type == "NAR":
                 lagged_data = self.build_output_matrix(
-                    yhat[i : i + analyzed_elements_number].reshape(-1, 1), self.ylag
+                    yhat[i : i + analyzed_elements_number].reshape(-1, 1)
                 )
             elif self.model_type == "NFIR":
                 lagged_data = self.build_input_matrix(
-                    X[i : i + analyzed_elements_number], self.xlag
+                    X[i : i + analyzed_elements_number]
                 )
             else:
                 raise ValueError(
@@ -760,7 +712,6 @@ class NARXNN(
                 lagged_data,
                 self.max_lag,
             )
-
             X_tmp = np.atleast_1d(X_tmp).astype(np.float32)
             yhat = yhat.astype(np.float32)
             x_valid, _ = map(torch.tensor, (X_tmp, yhat))
@@ -769,7 +720,7 @@ class NARXNN(
             )
         return yhat.reshape(-1, 1)
 
-    def basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
+    def _basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
         """Perform the n-steps-ahead prediction of a model.
 
         Parameters
