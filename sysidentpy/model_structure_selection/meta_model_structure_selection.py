@@ -2,6 +2,7 @@
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
+import warnings
 from typing import Tuple, Union
 
 import numpy as np
@@ -222,7 +223,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self.loss_func = loss_func
         self.steps_ahead = steps_ahead
         self.random_state = random_state
-        self._n_inputs = None
+        self.n_inputs = None
         self.regressor_code = None
         self.best_model_history = None
         self.tested_models = None
@@ -242,12 +243,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         if not isinstance(self.ylag, (int, list)):
             raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
 
-    @deprecated(
-        version="v0.2.2",
-        future_version="v0.2.5",
-        alternative="fit(X=X, y=y, X_test=X_test, y_test=y_test)",
-    )
-    def fit(self, *, X_train=None, y_train=None, X_test=None, y_test=None):
+    def fit(self, *, X=None, y=None, X_test=None, y_test=None):
         """Fit the polynomial NARMAX model.
 
         Parameters
@@ -270,17 +266,17 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             raise NotImplementedError(
                 "Currently MetaMSS only supports polynomial models."
             )
-        if y_train is None:
+        if y is None:
             raise ValueError("y cannot be None")
 
-        if X_train is not None:
-            check_X_y(X_train, y_train)
-            self._n_inputs = _num_features(X_train)
+        if X is not None:
+            check_X_y(X, y)
+            self.n_inputs = _num_features(X)
         else:
-            self._n_inputs = 1  # just to create the regressor space base
+            self.n_inputs = 1  # just to create the regressor space base
 
-        #  self._n_inputs = _num_features(X_train)
-        self.regressor_code = self.regressor_space(self._n_inputs)
+        #  self.n_inputs = _num_features(X_train)
+        self.regressor_code = self.regressor_space(self.n_inputs)
         self.dimension = self.regressor_code.shape[0]
         velocity = np.zeros([self.dimension, self.n_agents])
         self.random_state = check_random_state(self.random_state)
@@ -292,9 +288,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self.best_model_history = []
         self.tested_models = []
         for i in range(self.maxiter):
-            fitness = self.evaluate_objective_function(
-                X_train, y_train, X_test, y_test, population
-            )
+            fitness = self.evaluate_objective_function(X, y, X_test, y_test, population)
             column_of_best_solution = np.nanargmin(fitness)
             current_best_fitness = fitness[column_of_best_solution]
 
@@ -319,8 +313,8 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
         self.final_model = self.regressor_code[self.optimal_model == 1].copy()
         _ = self.simulate(
-            X_train=X_train,
-            y_train=y_train,
+            X_train=X,
+            y_train=y,
             X_test=X_test,
             y_test=y_test,
             model_code=self.final_model,
@@ -365,7 +359,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
                 steps_ahead=self.steps_ahead,
             )
 
-            residues = y_test - yhat
+            residues = y_test[self.max_lag : :] - yhat
 
             if self.model_type == "NAR":
                 lagged_data = self.build_output_matrix(y_train)
@@ -412,7 +406,9 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             self.final_model = m.copy()
             self.tested_models.append(m)
 
-            d = getattr(self, self.loss_func)(y_test, yhat, len(self.theta))
+            d = getattr(self, self.loss_func)(
+                y_test[self.max_lag : :].reshape(-1, 1), yhat, len(self.theta)
+            )
             fitness.append(d)
 
         return fitness
@@ -571,14 +567,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             * (1 + (a * (x - c)) * (1 - 1 / (1 + np.exp(-a * (x - c)))))
         )
 
-    @deprecated(
-        version="v0.2.2",
-        future_version="v0.2.5",
-        alternative="predict(X=X, y=y, steps_ahead=None, forecast_horizon=None)",
-    )
-    def predict(
-        self, *, X_test=None, y_test=None, steps_ahead=None, forecast_horizon=None
-    ):
+    def predict(self, *, X=None, y=None, steps_ahead=None, forecast_horizon=None):
         """Return the predicted values given an input.
 
         The predict function allows a friendly usage by the user.
@@ -608,16 +597,12 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         """
         if self.basis_function.__class__.__name__ == "Polynomial":
             if steps_ahead is None:
-                return self._model_prediction(
-                    X_test, y_test, forecast_horizon=forecast_horizon
-                )
+                return self._model_prediction(X, y, forecast_horizon=forecast_horizon)
             if steps_ahead == 1:
-                return self._one_step_ahead_prediction(X_test, y_test)
+                return self._one_step_ahead_prediction(X, y)
 
             _check_positive_int(steps_ahead, "steps_ahead")
-            return self._n_step_ahead_prediction(
-                X_test, y_test, steps_ahead=steps_ahead
-            )
+            return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
 
         raise NotImplementedError(
             "MetaMSS doesn't support basis functions other than polynomial yet.",
@@ -641,11 +626,11 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
         """
         if self.model_type == "NAR":
-            lagged_data = self.im.build_output_matrix(y, self.ylag)
+            lagged_data = self.build_output_matrix(y)
         elif self.model_type == "NFIR":
-            lagged_data = self.im.build_input_matrix(X, self.xlag)
+            lagged_data = self.build_input_matrix(X)
         elif self.model_type == "NARMAX":
-            lagged_data = self.im.build_input_output_matrix(X, y, self.xlag, self.ylag)
+            lagged_data = self.build_input_output_matrix(X, y)
         else:
             raise ValueError(
                 "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
