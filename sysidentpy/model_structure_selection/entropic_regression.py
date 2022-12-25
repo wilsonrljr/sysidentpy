@@ -12,7 +12,7 @@ from numpy import linalg as LA
 from scipy.spatial.distance import cdist
 from scipy.special import psi
 
-from ..base_mss import BaseMSS
+from ..narmax_base import BaseMSS
 from ..basis_function import Fourier, Polynomial
 from ..parameter_estimation.estimators import Estimators
 from ..utils._check_arrays import (
@@ -137,8 +137,8 @@ class ER(Estimators, BaseMSS):
     def __init__(
         self,
         *,
-        ylag: Union[int, list] = 2,
-        xlag: Union[int, list] = 2,
+        ylag: Union[int, list] = 1,
+        xlag: Union[int, list] = 1,
         q: float = 0.99,
         estimator: str = "least_squares",
         extended_least_squares: bool = False,
@@ -167,7 +167,7 @@ class ER(Estimators, BaseMSS):
         self.max_lag = self._get_max_lag()
         self.k = k
         self.estimator = estimator
-        self._extended_least_squares = extended_least_squares
+        self.extended_least_squares = extended_least_squares
         self.q = q
         self.h = h
         self.mutual_information_estimator = mutual_information_estimator
@@ -186,6 +186,7 @@ class ER(Estimators, BaseMSS):
         self.n_terms = None
         self.err = None
         self.pivv = None
+        self._validate_params()
         super().__init__(
             lam=lam,
             delta=delta,
@@ -196,6 +197,47 @@ class ER(Estimators, BaseMSS):
             weight=weight,
             basis_function=basis_function,
         )
+
+    def _validate_params(self):
+        """Validate input params."""
+        if isinstance(self.ylag, int) and self.ylag < 1:
+            raise ValueError("ylag must be integer and > zero. Got %f" % self.ylag)
+
+        if isinstance(self.xlag, int) and self.xlag < 1:
+            raise ValueError("xlag must be integer and > zero. Got %f" % self.xlag)
+
+        if not isinstance(self.xlag, (int, list)):
+            raise ValueError("xlag must be integer and > zero. Got %f" % self.xlag)
+
+        if not isinstance(self.ylag, (int, list)):
+            raise ValueError("ylag must be integer and > zero. Got %f" % self.ylag)
+
+        if not isinstance(self.k, int) or self.k < 1:
+            raise ValueError("k must be integer and > zero. Got %f" % self.k)
+
+        if not isinstance(self.n_perm, int) or self.n_perm < 1:
+            raise ValueError("n_perm must be integer and > zero. Got %f" % self.n_perm)
+
+        if not isinstance(self.q, float) or self.q > 1 or self.q <= 0:
+            raise ValueError(
+                "q must be float and must be between 0 and 1 inclusive. Got %f" % self.q
+            )
+
+        if not isinstance(self.skip_forward, bool):
+            raise TypeError(
+                "skip_forward must be False or True. Got %f" % self.skip_forward
+            )
+
+        if not isinstance(self.extended_least_squares, bool):
+            raise TypeError(
+                "extended_least_squares must be False or True. Got %f"
+                % self.extended_least_squares
+            )
+
+        if self.model_type not in ["NARMAX", "NAR", "NFIR"]:
+            raise ValueError(
+                "model_type must be NARMAX, NAR or NFIR. Got %s" % self.model_type
+            )
 
     def mutual_information_knn(self, y, y_perm):
         """Finds the mutual information.
