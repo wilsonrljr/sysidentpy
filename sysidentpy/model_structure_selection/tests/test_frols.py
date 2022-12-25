@@ -30,7 +30,7 @@ def test_error_reduction_ratio():
         [[2002, 0], [1002, 0], [2001, 1001], [2002, 1002], [1001, 1001]]
     )
     basis_function = Polynomial(degree=2)
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     model = FROLS(
         n_terms=5,
         order_selection=True,
@@ -47,7 +47,7 @@ def test_error_reduction_ratio():
 
 
 def test_fit_with_information_criteria():
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=15,
@@ -60,7 +60,7 @@ def test_fit_with_information_criteria():
 
 
 def test_fit_without_information_criteria():
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=15, extended_least_squares=False, basis_function=basis_function
@@ -92,19 +92,19 @@ def test_default_values():
     model_values = [
         model.ylag,
         model.xlag,
-        model._order_selection,
+        model.order_selection,
         model.info_criteria,
         model.n_terms,
         model.n_info_values,
         model.estimator,
-        model._extended_least_squares,
-        model._lam,
-        model._delta,
-        model._offset_covariance,
-        model._mu,
-        model._eps,
-        model._gama,
-        model._weight,
+        model.extended_least_squares,
+        model.lam,
+        model.delta,
+        model.offset_covariance,
+        model.mu,
+        model.eps,
+        model.gama,
+        model.weight,
         model.model_type,
     ]
     assert list(default.values()) == model_values
@@ -171,7 +171,7 @@ def test_info_criteria():
 
 
 def test_predict():
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     train_percentage = 90
     split_data = int(len(x) * (train_percentage / 100))
@@ -198,11 +198,11 @@ def test_predict():
     )
     model.fit(X=X_train, y=y_train)
     yhat = model.predict(X=X_test, y=y_test)
-    assert_almost_equal(yhat, y_test, decimal=10)
+    assert_almost_equal(yhat, y_test[model.max_lag : :], decimal=10)
 
 
 def test_model_prediction():
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     train_percentage = 90
     split_data = int(len(x) * (train_percentage / 100))
@@ -232,7 +232,7 @@ def test_model_prediction():
 
 
 def test_information_criteria_bic():
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
@@ -251,7 +251,7 @@ def test_information_criteria_bic():
 
 
 def test_information_criteria_fpe():
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
@@ -272,7 +272,7 @@ def test_information_criteria_fpe():
 
 
 def test_information_criteria_lilc():
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
