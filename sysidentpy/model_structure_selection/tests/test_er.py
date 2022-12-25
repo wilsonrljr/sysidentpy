@@ -23,8 +23,8 @@ def create_test_data(n=1000):
 
 def test_default_values():
     default = {
-        "ylag": 2,
-        "xlag": 2,
+        "ylag": 1,
+        "xlag": 1,
         "estimator": "least_squares",
         "extended_least_squares": False,
         "q": 0.99,
@@ -49,7 +49,7 @@ def test_default_values():
         model.ylag,
         model.xlag,
         model.estimator,
-        model._extended_least_squares,
+        model.extended_least_squares,
         model.q,
         model.h,
         model.k,
@@ -57,13 +57,13 @@ def test_default_values():
         model.n_perm,
         model.p,
         model.skip_forward,
-        model._lam,
-        model._delta,
-        model._offset_covariance,
-        model._mu,
-        model._eps,
-        model._gama,
-        model._weight,
+        model.lam,
+        model.delta,
+        model.offset_covariance,
+        model.mu,
+        model.eps,
+        model.gama,
+        model.weight,
         model.model_type,
         model.random_state,
     ]
@@ -122,7 +122,7 @@ def test_extended_least_squares():
 
 
 def test_model_prediction():
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     train_percentage = 90
     split_data = int(len(x) * (train_percentage / 100))
