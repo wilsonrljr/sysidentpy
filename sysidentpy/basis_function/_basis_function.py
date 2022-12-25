@@ -4,10 +4,8 @@ from itertools import combinations_with_replacement
 
 import numpy as np
 
-from sysidentpy.narmax_base import InformationMatrix
 
-
-class Polynomial(InformationMatrix):
+class Polynomial:
     r"""Build polynomial basis function.
     Generate a new feature matrix consisting of all polynomial combinations
     of the features with degree less than or equal to the specified degree.
@@ -156,7 +154,6 @@ class Fourier:
 
         self.repetition = self.n * 2
         if self.ensemble:
-
             psi = psi[:, 1:]
             psi = np.column_stack([data, psi])
         else:
@@ -164,8 +161,8 @@ class Fourier:
 
         if predefined_regressors is None:
             return psi, self.ensemble
-        else:
-            return psi[:, predefined_regressors], self.ensemble
+
+        return psi[:, predefined_regressors], self.ensemble
 
     def transform(self, data, max_lag, predefined_regressors=None):
         return self.fit(data, max_lag, predefined_regressors)
