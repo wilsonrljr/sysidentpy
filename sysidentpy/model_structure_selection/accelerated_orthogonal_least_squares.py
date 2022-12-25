@@ -8,7 +8,7 @@ from typing import Tuple, Union
 import numpy as np
 from numpy import linalg as LA
 
-from ..base_mss import BaseMSS
+from ..narmax_base import BaseMSS
 from ..basis_function import Fourier, Polynomial
 from ..parameter_estimation.estimators import Estimators
 from ..utils._check_arrays import _check_positive_int, _num_features, check_X_y
@@ -109,7 +109,7 @@ class AOLS(Estimators, BaseMSS):
         delta: float = 0.01,
         offset_covariance: float = 0.2,
         mu: float = 0.01,
-        eps: float = np.finfo(np.float64).eps,
+        eps: np.float64 = np.finfo(np.float64).eps,
         gama: float = 0.2,
         weight: float = 0.02,
     ):
@@ -142,6 +142,32 @@ class AOLS(Estimators, BaseMSS):
         self.final_model = None
         self.n_terms = None
         self.err = None
+        self._validate_params()
+
+    def _validate_params(self):
+        """Validate input params."""
+        if isinstance(self.ylag, int) and self.ylag < 1:
+            raise ValueError("ylag must be integer and > zero. Got %f" % self.ylag)
+
+        if isinstance(self.xlag, int) and self.xlag < 1:
+            raise ValueError("xlag must be integer and > zero. Got %f" % self.xlag)
+
+        if not isinstance(self.xlag, (int, list)):
+            raise ValueError("xlag must be integer and > zero. Got %f" % self.xlag)
+
+        if not isinstance(self.ylag, (int, list)):
+            raise ValueError("ylag must be integer and > zero. Got %f" % self.ylag)
+
+        if not isinstance(self.k, int) or self.k < 1:
+            raise ValueError("k must be integer and > zero. Got %f" % self.k)
+
+        if not isinstance(self.L, int) or self.L < 1:
+            raise ValueError("k must be integer and > zero. Got %f" % self.L)
+
+        if not isinstance(self.threshold, (int, float)) or self.threshold < 0:
+            raise ValueError(
+                "threshold must be integer and > zero. Got %f" % self.threshold
+            )
 
     def aols(
         self, psi: np.ndarray, y: np.ndarray
@@ -379,11 +405,11 @@ class AOLS(Estimators, BaseMSS):
 
         """
         if self.model_type == "NAR":
-            lagged_data = self.im.build_output_matrix(y, self.ylag)
+            lagged_data = self.build_output_matrix(y)
         elif self.model_type == "NFIR":
-            lagged_data = self.im.build_input_matrix(X, self.xlag)
+            lagged_data = self.build_input_matrix(X)
         elif self.model_type == "NARMAX":
-            lagged_data = self.im.build_input_output_matrix(X, y, self.xlag, self.ylag)
+            lagged_data = self.build_input_output_matrix(X, y)
         else:
             raise ValueError(
                 "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
