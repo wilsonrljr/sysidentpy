@@ -12,10 +12,6 @@ from sysidentpy.utils.generate_data import get_siso_data
 
 base_estimator = LinearRegression()
 
-x_train, x_valid, y_train, y_valid = get_siso_data(
-    n=1000, colored_noise=False, sigma=0.001, train_percentage=90
-)
-
 
 def create_test_data(n=1000):
     # np.random.seed(42)
@@ -34,6 +30,24 @@ def create_test_data(n=1000):
     x = data[:, 0].reshape(-1, 1)
     y = data[:, 1].reshape(-1, 1)
     return x, y, theta
+
+
+x, y, _ = create_test_data()
+train_percentage = 90
+split_data = int(len(x) * (train_percentage / 100))
+
+X_train = x[0:split_data, 0]
+X_test = x[split_data::, 0]
+
+y1 = y[0:split_data, 0]
+y_test = y[split_data::, 0]
+y_train = y1.copy()
+
+y_train = np.reshape(y_train, (len(y_train), 1))
+X_train = np.reshape(X_train, (len(X_train), 1))
+
+y_test = np.reshape(y_test, (len(y_test), 1))
+X_test = np.reshape(X_test, (len(X_test), 1))
 
 
 def test_default_values():
@@ -88,13 +102,17 @@ def test_validate():
 
 
 def test_fit_raise():
-    model = NARX(basis_function=Polynomial(degree=2), model_type="NARARMAX")
-    assert_raises(ValueError, model.fit, X=x_train, y=y_train)
+    model = NARX(
+        basis_function=Polynomial(degree=2),
+        base_estimator=LinearRegression(),
+        model_type="NARARMAX",
+    )
+    assert_raises(ValueError, model.fit, X=X_train, y=y_train)
 
 
 def test_fit_raise_y():
-    model = NARX(basis_function=Polynomial(degree=2))
-    assert_raises(ValueError, model.fit, X=x_train, y=None)
+    model = NARX(basis_function=Polynomial(degree=2), base_estimator=base_estimator)
+    assert_raises(ValueError, model.fit, X=X_train, y=None)
 
 
 def test_fit_lag_nar():
@@ -105,7 +123,7 @@ def test_fit_lag_nar():
         xlag=2,
         ylag=2,
     )
-    model.fit(X=x_train, y=y_train)
+    model.fit(X=X_train, y=y_train)
     assert_equal(model.max_lag, 2)
 
 
@@ -117,7 +135,7 @@ def test_fit_lag_nfir():
         xlag=2,
         ylag=2,
     )
-    model.fit(X=x_train, y=y_train)
+    model.fit(X=X_train, y=y_train)
     assert_equal(model.max_lag, 2)
 
 
@@ -128,7 +146,7 @@ def test_fit_lag_narmax():
         xlag=2,
         ylag=2,
     )
-    model.fit(X=x_train, y=y_train)
+    model.fit(X=X_train, y=y_train)
     assert_equal(model.max_lag, 2)
 
 
@@ -136,7 +154,7 @@ def test_fit_lag_narmax_fourier():
     model = NARX(
         basis_function=Fourier(degree=2), base_estimator=base_estimator, xlag=2, ylag=2
     )
-    model.fit(X=x_train, y=y_train)
+    model.fit(X=X_train, y=y_train)
     assert_equal(model.max_lag, 2)
 
 
@@ -431,7 +449,7 @@ def test_model_predict_nfir_cat():
         model_type="NFIR",
     )
 
-    model.fit(X=x_train, y=y_train)
+    model.fit(X=X_train, y=y_train)
     # yhat = model.predict(X=x_valid, y=y_valid)
     assert_equal(model.max_lag, 10)
 
@@ -446,7 +464,7 @@ def test_model_predict_steps_1():
         model_type="NARMAX",
     )
 
-    model.fit(X=x_train, y=y_train)
+    model.fit(X=X_train, y=y_train)
     # yhat = model.predict(X=x_valid, y=y_valid, steps_ahead=1)
     assert_equal(model.max_lag, 2)
 
@@ -461,7 +479,7 @@ def test_model_predict_fourier_none():
         model_type="NARMAX",
     )
 
-    model.fit(X=x_train, y=y_train)
+    model.fit(X=X_train, y=y_train)
     # yhat = model.predict(X=x_valid, y=y_valid)
     assert_equal(model.max_lag, 10)
 
@@ -476,7 +494,7 @@ def test_model_predict_fourier_1():
         model_type="NARMAX",
     )
 
-    model.fit(X=x_train, y=y_train)
+    model.fit(X=X_train, y=y_train)
     # yhat = model.predict(X=x_valid, y=y_valid, steps_ahead=1)
     assert_equal(model.max_lag, 10)
 
@@ -491,6 +509,6 @@ def test_model_predict_fourier_n():
         model_type="NARMAX",
     )
 
-    model.fit(X=x_train, y=y_train)
+    model.fit(X=X_train, y=y_train)
     # yhat = model.predict(X=x_valid, y=y_valid, steps_ahead=3)
     assert_equal(model.max_lag, 10)
