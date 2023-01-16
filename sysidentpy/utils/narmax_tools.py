@@ -1,4 +1,4 @@
-from ..narmax_base import GenerateRegressors
+from ..narmax_base import RegressorDictionary
 from ._check_arrays import _num_features
 
 import numpy as np
@@ -18,9 +18,9 @@ def regressor_code(
     else:
         n_inputs = 1  # only used to create the regressor space base
 
-    regressor_code = GenerateRegressors().regressor_space(
-        basis_function.degree, xlag, ylag, n_inputs, model_type
-    )
+    regressor_code = RegressorDictionary(
+        xlag=xlag, ylag=ylag, model_type=model_type, basis_function=basis_function
+    ).regressor_space(n_inputs)
 
     basis_name = basis_function.__class__.__name__
     if basis_name != "Polynomial" and basis_function.ensemble:
