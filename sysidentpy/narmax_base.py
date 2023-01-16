@@ -614,7 +614,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
         return exponents
 
-    def _one_step_ahead_prediction_test(self, X_base: np.ndarray) -> np.ndarray:
+    def _one_step_ahead_prediction(self, X_base: np.ndarray) -> np.ndarray:
         """Perform the 1-step-ahead prediction of a model.
 
         Parameters
@@ -761,7 +761,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             )[-steps_ahead:].ravel()
         else:
             yhat[i : i + steps_ahead] = self._model_prediction(
-                X=X[0:i],
+                X=X[0 : i + steps_ahead],
                 y_initial=y[0:i],
             )[-steps_ahead:].ravel()
 
