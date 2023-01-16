@@ -761,7 +761,7 @@ class ER(Estimators, BaseMSS):
                 predefined_regressors=self.pivv[: len(self.final_model)],
             )
 
-        yhat = super()._one_step_ahead_prediction_test(X_base)
+        yhat = super()._one_step_ahead_prediction(X_base)
         return yhat.reshape(-1, 1)
 
     def _n_step_ahead_prediction(self, X, y, steps_ahead):
