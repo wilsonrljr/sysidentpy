@@ -156,7 +156,7 @@ class NARXNN(BaseMSS):
         self.train_loss = None
         self.val_loss = None
         self.ensemble = None
-        self._n_inputs = None
+        self.n_inputs = None
         self.final_model = None
         self._validate_params()
 
@@ -274,11 +274,11 @@ class NARXNN(BaseMSS):
             )
 
         if X is not None:
-            self._n_inputs = _num_features(X)
+            self.n_inputs = _num_features(X)
         else:
-            self._n_inputs = 1  # only used to create the regressor space base
+            self.n_inputs = 1  # only used to create the regressor space base
 
-        self.regressor_code = self.regressor_space(self._n_inputs)
+        self.regressor_code = self.regressor_space(self.n_inputs)
         if basis_name != "Polynomial" and self.basis_function.ensemble:
             basis_code = np.sort(
                 np.tile(
@@ -564,7 +564,7 @@ class NARXNN(BaseMSS):
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
         i = self.max_lag
-        X = X.reshape(-1, self._n_inputs)
+        X = X.reshape(-1, self.n_inputs)
         while i < len(y):
             k = int(i - self.max_lag)
             if i + steps_ahead > len(y):
@@ -615,7 +615,7 @@ class NARXNN(BaseMSS):
             forecast_horizon = forecast_horizon + self.max_lag
 
         if self.model_type == "NAR":
-            self._n_inputs = 0
+            self.n_inputs = 0
 
         y_output = np.zeros(forecast_horizon, dtype=float)
         y_output.fill(np.nan)
@@ -630,7 +630,7 @@ class NARXNN(BaseMSS):
             final = self.max_lag
             k = int(i - self.max_lag)
             raw_regressor[:final] = y_output[k:i]
-            for j in range(self._n_inputs):
+            for j in range(self.n_inputs):
                 init += self.max_lag
                 final += self.max_lag
                 raw_regressor[init:final] = X[k:i, j]
@@ -649,7 +649,7 @@ class NARXNN(BaseMSS):
         y_output = np.zeros(X.shape[0], dtype=float)
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
-        X = X.reshape(-1, self._n_inputs)
+        X = X.reshape(-1, self.n_inputs)
         model_exponents = [
             self._code2exponents(code=model) for model in self.final_model
         ]
@@ -658,7 +658,7 @@ class NARXNN(BaseMSS):
             init = 0
             final = self.max_lag
             k = int(i - self.max_lag)
-            for j in range(self._n_inputs):
+            for j in range(self.n_inputs):
                 raw_regressor[init:final] = X[k:i, j]
                 init += self.max_lag
                 final += self.max_lag
@@ -680,7 +680,7 @@ class NARXNN(BaseMSS):
             forecast_horizon = forecast_horizon + self.max_lag
 
         if self.model_type == "NAR":
-            self._n_inputs = 0
+            self.n_inputs = 0
 
         yhat = np.zeros(forecast_horizon, dtype=float)
         yhat.fill(np.nan)
