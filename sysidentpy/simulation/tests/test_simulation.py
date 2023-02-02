@@ -25,7 +25,7 @@ def test_simulate():
     theta = np.array([[0.2, 0.9, 0.1]]).T
 
     yhat = s.simulate(X_test=x_valid, y_test=y_valid, model_code=model, theta=theta)
-    assert yhat.shape == (98, 1)
+    assert yhat.shape == (100, 1)
 
 
 def test_simulate_theta():

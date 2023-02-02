@@ -198,7 +198,7 @@ def test_predict():
     )
     model.fit(X=X_train, y=y_train)
     yhat = model.predict(X=X_test, y=y_test)
-    assert_almost_equal(yhat, y_test[model.max_lag : :], decimal=10)
+    assert_almost_equal(yhat, y_test, decimal=10)
 
 
 def test_model_prediction():
