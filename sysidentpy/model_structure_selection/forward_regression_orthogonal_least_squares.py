@@ -536,21 +536,33 @@ class FROLS(Estimators, BaseMSS):
         """
         if self.basis_function.__class__.__name__ == "Polynomial":
             if steps_ahead is None:
-                return self._model_prediction(X, y, forecast_horizon=forecast_horizon)
+                yhat = self._model_prediction(X, y, forecast_horizon=forecast_horizon)
+                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+                return yhat
             if steps_ahead == 1:
-                return self._one_step_ahead_prediction(X, y)
+                yhat = self._one_step_ahead_prediction(X, y)
+                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+                return yhat
 
             _check_positive_int(steps_ahead, "steps_ahead")
-            return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
+            yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
+            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+            return yhat
 
         if steps_ahead is None:
-            return self._basis_function_predict(X, y, forecast_horizon)
+            yhat = self._basis_function_predict(X, y, forecast_horizon)
+            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+            return yhat
         if steps_ahead == 1:
-            return self._one_step_ahead_prediction(X, y)
+            yhat = self._one_step_ahead_prediction(X, y)
+            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+            return yhat
 
-        return self._basis_function_n_step_prediction(
+        yhat = self._basis_function_n_step_prediction(
             X, y, steps_ahead, forecast_horizon
         )
+        yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+        return yhat
 
     def _one_step_ahead_prediction(self, X, y):
         """Perform the 1-step-ahead prediction of a model.
@@ -672,7 +684,7 @@ class FROLS(Estimators, BaseMSS):
             self.n_inputs = 0
 
         yhat = super()._basis_function_predict(X, y_initial, forecast_horizon)
-        return yhat[self.max_lag::].reshape(-1, 1)
+        return yhat.reshape(-1, 1)
 
     def _basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
         """Perform the n-steps-ahead prediction of a model.

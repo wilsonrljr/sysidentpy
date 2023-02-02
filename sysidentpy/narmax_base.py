@@ -736,6 +736,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         return yhat.reshape(-1, 1)
 
     def narmax_n_step_ahead(self, X, y, steps_ahead):
+        """ n_steps ahead prediction method for NARMAX model"""
         if len(y) < self.max_lag:
             raise Exception("Insufficient initial conditions elements!")
 

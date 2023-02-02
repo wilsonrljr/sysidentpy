@@ -512,7 +512,7 @@ def test_model_predict():
     )
     model.fit(X=X_train, y=y_train)
     yhat = model.predict(X=X_test, y=y_test)
-    assert_almost_equal(yhat, y_test[model.max_lag : :], decimal=10)
+    assert_almost_equal(yhat, y_test, decimal=10)
 
 
 def test_model_nfir():
@@ -539,11 +539,11 @@ def test_model_nfir():
         xlag=2,
         estimator="least_squares",
         basis_function=basis_function,
-        model_type="NFIR"
+        model_type="NFIR",
     )
     model.fit(X=X_train, y=y_train)
     yhat = model.predict(X=X_test, y=y_test)
-    assert_almost_equal(yhat.mean(), y_test[model.max_lag : :].mean(), decimal=2)
+    assert_almost_equal(yhat.mean(), y_test.mean(), decimal=2)
 
 
 def test_model_predict_steps_none():
@@ -574,7 +574,7 @@ def test_model_predict_steps_none():
     )
     model.fit(X=X_train, y=y_train)
     yhat = model.predict(X=X_test, y=y_test, steps_ahead=1)
-    assert_almost_equal(yhat, y_test[model.max_lag : :], decimal=10)
+    assert_almost_equal(yhat, y_test, decimal=10)
 
 
 def test_model_predict_steps_3():
@@ -605,7 +605,7 @@ def test_model_predict_steps_3():
     )
     model.fit(X=X_train, y=y_train)
     yhat = model.predict(X=X_test, y=y_test, steps_ahead=3)
-    assert_almost_equal(yhat, y_test[model.max_lag : :], decimal=10)
+    assert_almost_equal(yhat, y_test, decimal=10)
 
 
 def test_model_predict_fourier_steps_none():
@@ -636,8 +636,8 @@ def test_model_predict_fourier_steps_none():
     )
     model.fit(X=X_train, y=y_train)
     yhat = model._basis_function_predict(X=X_test, y_initial=y_test)
-    print(yhat.mean())
-    assert_almost_equal(yhat.mean(), y_test[model.max_lag : :].mean(), decimal=6)
+    print(yhat.mean(), y_test[model.max_lag : :].mean(), yhat.shape, y_test.shape)
+    assert_almost_equal(yhat.mean(), y_test.mean(), decimal=6)
 
 
 def test_model_predict_fourier_steps_1():
@@ -668,7 +668,7 @@ def test_model_predict_fourier_steps_1():
     )
     model.fit(X=X_train, y=y_train)
     yhat = model.predict(X=X_test, y=y_test, steps_ahead=1)
-    assert_almost_equal(yhat.mean(), y_test[model.max_lag : :].mean(), decimal=6)
+    assert_almost_equal(yhat.mean(), y_test.mean(), decimal=6)
 
 
 def test_model_predict_fourier_nar_inputs():

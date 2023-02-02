@@ -359,7 +359,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
                 steps_ahead=self.steps_ahead,
             )
 
-            residues = y_test[self.max_lag : :] - yhat
+            residues = y_test - yhat
 
             if self.model_type == "NAR":
                 lagged_data = self.build_output_matrix(y_train)
@@ -407,7 +407,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             self.tested_models.append(m)
 
             d = getattr(self, self.loss_func)(
-                y_test[self.max_lag : :].reshape(-1, 1), yhat, len(self.theta)
+                y_test, yhat, len(self.theta)
             )
             fitness.append(d)
 
@@ -597,12 +597,18 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         """
         if self.basis_function.__class__.__name__ == "Polynomial":
             if steps_ahead is None:
-                return self._model_prediction(X, y, forecast_horizon=forecast_horizon)
+                yhat = self._model_prediction(X, y, forecast_horizon=forecast_horizon)
+                yhat = np.concatenate([y[:self.max_lag], yhat], axis=0)
+                return yhat
             if steps_ahead == 1:
-                return self._one_step_ahead_prediction(X, y)
+                yhat = self._one_step_ahead_prediction(X, y)
+                yhat = np.concatenate([y[:self.max_lag], yhat], axis=0)
+                return yhat
 
             _check_positive_int(steps_ahead, "steps_ahead")
-            return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
+            yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
+            yhat = np.concatenate([y[:self.max_lag], yhat], axis=0)
+            return yhat
 
         raise NotImplementedError(
             "MetaMSS doesn't support basis functions other than polynomial yet.",

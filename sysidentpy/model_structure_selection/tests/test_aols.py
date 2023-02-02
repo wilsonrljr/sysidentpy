@@ -126,7 +126,7 @@ def test_model_predict_fourier_steps_none():
     )
     model.fit(X=X_train, y=y_train)
     yhat = model._basis_function_predict(X=X_test, y_initial=y_test)
-    assert_almost_equal(yhat.mean(), y_test[model.max_lag : :].mean(), decimal=1)
+    assert_almost_equal(yhat.mean(), y_test.mean(), decimal=1)
 
 
 def test_model_predict_fourier_steps_1():
@@ -154,7 +154,7 @@ def test_model_predict_fourier_steps_1():
     )
     model.fit(X=X_train, y=y_train)
     yhat = model.predict(X=X_test, y=y_test, steps_ahead=1)
-    assert_almost_equal(yhat.mean(), y_test[model.max_lag : :].mean(), decimal=1)
+    assert_almost_equal(yhat.mean(), y_test.mean(), decimal=1)
 
 
 def test_model_predict_fourier_nar_inputs():
