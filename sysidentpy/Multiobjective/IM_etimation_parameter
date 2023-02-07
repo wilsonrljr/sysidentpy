@@ -1,2 +1,89 @@
-def (X_static=None, Y_static=None):
-    break
+from sysidentpy.metrics import root_relative_squared_error
+import numpy as np
+class IM():
+    def PA(self, X_static, Y_static, y_train, number, x_valid, y_valid):
+        """
+        Parameters
+        ----------
+        X_static : ndarray of floats
+            The static input data used in the identification process.
+        Y_static : ndarray of floats
+            The static output data used in the identification process.
+        y_train : ndarray of floats
+            The output data to be used in the training process.
+        number : int
+            Number of fixed points desired on the optimal pareto chart.
+        x_valid : ndarray of floats
+            Represent the input data for validation.
+        y_valid : ndarray of floats
+            Represent the output data for validation.
+
+        Returns
+        -------
+        W1 : ndarray of floats
+            Array column content the dynamic weights.
+        W2 : ndarray of floats
+            Column array content the static weights.
+        rrse : ndarray of floats
+            Array column content the values of dynamic relative squared error.
+        rre : ndarray of floats
+            Column array content the values of static relative squared error.
+
+        """
+        # (34, 39) -> Obtendo o vetor q_{it}^T
+        N = []
+        for i in range(0, self._n_inputs):
+           N.append(1)
+        qit = self.regressor_space(
+            self.non_degree, N, 1, self._n_inputs, self.model_type
+        )//1000
+        # (41, 50) -> Gerando a matriz de mapeamento linear
+        model = self.final_model//1000
+        R = np.zeros((np.shape(qit)[0], np.shape(model)[0]))            
+        b = []
+        for i in range (0, np.shape(qit)[0]):
+           for j in range (0, np.shape(model)[0]):
+               if (qit[i, :]== model[j, :]).all():
+                   R[i, j] = 1
+           if sum(R[i, :])==0:
+               b.append(i)
+        R = np.delete(R,(b), axis = 0) 
+        # (52, 67) -> é montada a matriz dos regressores estáticos
+        qit = np.delete(qit,(b), axis = 0)
+        a = np.shape(qit)[0]
+        #print(int(np.max(qit)))
+        N_aux = np.zeros((a, int(np.max(qit))))
+        for k in range(0, int(np.max(qit))):
+           for i in range(0, np.shape(qit)[0]):
+               for j in range(0, np.shape(qit)[1]):
+                   if k + 1 == qit[i, j]:
+                       N_aux[i, k] = 1 + N_aux[i, k]
+        qit = N_aux
+        Q = np.zeros((len(Y_static), len(qit)))
+        for i in range(0, len(Y_static)):
+           for j in range(0, len(qit)):
+               Q[i, j] = Y_static[i, 0]**(qit[j, 0])
+               for k in range(0, self._n_inputs):
+                   Q[i,j] = Q[i, j]*X_static[i, k]**(qit[j, 1+k])
+
+        # Cáculo de theta
+        psi = self.psi
+        D1 = (psi.T).dot(psi)
+        self.Array_theta = np.zeros((number, np.shape(model)[0])) 
+        D2 = (psi.T).dot(y_train[2:])
+        E1 = ((Q.dot(R)).T).dot(Q.dot(R))
+        E2 = (((Q.dot(R)).T).dot(Y_static)).reshape(-1,1)
+        w1 = np.logspace(0, -5, num=number, base = np.exp(1))
+        w2 = np.ones(number) - w1
+        rrse = np.zeros(number)
+        rre = np.zeros(number)
+        for i in range(0, number):
+            self.theta = (np.linalg.inv(w1[i]*(D1)+w2[i]*(E1))).dot(w1[i]*D2+w2[i]*E2)
+            yhat = self.predict(X=x_valid, y=y_valid)
+            self.Array_theta[i, :] = self.theta.T
+            rrse[i] = root_relative_squared_error(y_valid, yhat)
+            C_S = (Q.dot(R)).dot(self.theta)
+            rre[i] = root_relative_squared_error(Y_static, C_S)
+        return w1.T, w2.T, rrse.T, rre.T
+                    
+    

@@ -355,9 +355,8 @@ class FROLS(
         for i in range(0, self.n_info_values):
             n_theta = i + 1
             regressor_matrix = self.error_reduction_ratio(X_base, y, n_theta)[2]
-
             tmp_theta = getattr(self, self.estimator)(regressor_matrix, y)
-
+            self.psi = regressor_matrix
             tmp_yhat = np.dot(regressor_matrix, tmp_theta)
             tmp_residual = y[self.max_lag :] - tmp_yhat
             e_var = np.var(tmp_residual, ddof=1)
@@ -512,6 +511,7 @@ class FROLS(
             self.final_model = self.regressor_code[tmp_piv, :].copy()
 
         self.theta = getattr(self, self.estimator)(psi, y)
+        self.psi = psi
         # self.max_lag = self._get_max_lag_from_model_code(self.final_model)
         if self._extended_least_squares is True:
             self.theta = self._unbiased_estimator(
