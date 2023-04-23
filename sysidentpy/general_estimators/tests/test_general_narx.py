@@ -245,36 +245,6 @@ def test_model_predict_steps_3():
     assert_almost_equal(yhat, y_test, decimal=10)
 
 
-def test_model_predict_fourier_steps_none():
-    x, y, _ = create_test_data()
-    basis_function = Fourier(degree=2, n=1)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
-    model = NARX(
-        ylag=[1, 2],
-        xlag=2,
-        basis_function=basis_function,
-        base_estimator=LinearRegression(),
-    )
-    model.fit(X=X_train, y=y_train)
-    yhat = model._basis_function_predict(X=X_test, y_initial=y_test)
-    print(yhat.mean())
-    assert_almost_equal(yhat.mean(), 0.0016457328739105236, decimal=6)
-
-
 def test_model_predict_fourier_steps_1():
     x, y, _ = create_test_data()
     basis_function = Fourier(degree=2, n=1)

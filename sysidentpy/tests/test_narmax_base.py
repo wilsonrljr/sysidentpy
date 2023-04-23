@@ -636,8 +636,7 @@ def test_model_predict_fourier_steps_none():
     )
     model.fit(X=X_train, y=y_train)
     yhat = model._basis_function_predict(X=X_test, y_initial=y_test)
-    print(yhat.mean(), y_test[model.max_lag : :].mean(), yhat.shape, y_test.shape)
-    assert_almost_equal(yhat.mean(), y_test.mean(), decimal=6)
+    assert_almost_equal(yhat.mean(), y_test[model.max_lag : :].mean(), decimal=6)
 
 
 def test_model_predict_fourier_steps_1():

@@ -527,7 +527,7 @@ class NARX(BaseMSS):
             a = self.base_estimator.predict(X_tmp)
             yhat[i + self.max_lag] = a[0]
 
-        return yhat.reshape(-1, 1)
+        return yhat[self.max_lag :].reshape(-1, 1)
 
     def _basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
         """Perform the n-steps-ahead prediction of a model.
