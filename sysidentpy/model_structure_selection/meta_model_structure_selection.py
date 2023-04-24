@@ -705,17 +705,6 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         )
 
     def _narmax_predict(self, X, y_initial, forecast_horizon):
-        if len(y_initial) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
-
-        if X is not None:
-            forecast_horizon = X.shape[0]
-        else:
-            forecast_horizon = forecast_horizon + self.max_lag
-
-        if self.model_type == "NAR":
-            self.n_inputs = 0
-
         y_output = super()._narmax_predict(X, y_initial, forecast_horizon)
         return y_output
 
