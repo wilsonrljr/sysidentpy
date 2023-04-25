@@ -405,10 +405,9 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
             self.final_model = m.copy()
             self.tested_models.append(m)
-
-            d = getattr(self, self.loss_func)(
-                y_test, yhat, len(self.theta)
-            )
+            if len(self.theta) == 0:
+                print(m)
+            d = getattr(self, self.loss_func)(y_test, yhat, len(self.theta))
             fitness.append(d)
 
         return fitness
@@ -598,16 +597,16 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         if self.basis_function.__class__.__name__ == "Polynomial":
             if steps_ahead is None:
                 yhat = self._model_prediction(X, y, forecast_horizon=forecast_horizon)
-                yhat = np.concatenate([y[:self.max_lag], yhat], axis=0)
+                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
                 return yhat
             if steps_ahead == 1:
                 yhat = self._one_step_ahead_prediction(X, y)
-                yhat = np.concatenate([y[:self.max_lag], yhat], axis=0)
+                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
                 return yhat
 
             _check_positive_int(steps_ahead, "steps_ahead")
             yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
-            yhat = np.concatenate([y[:self.max_lag], yhat], axis=0)
+            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
             return yhat
 
         raise NotImplementedError(
@@ -631,31 +630,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
                The 1-step-ahead predicted values of the model.
 
         """
-        if self.model_type == "NAR":
-            lagged_data = self.build_output_matrix(y)
-        elif self.model_type == "NFIR":
-            lagged_data = self.build_input_matrix(X)
-        elif self.model_type == "NARMAX":
-            lagged_data = self.build_input_output_matrix(X, y)
-        else:
-            raise ValueError(
-                "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
-            )
-
-        if self.basis_function.__class__.__name__ == "Polynomial":
-            X_base = self.basis_function.transform(
-                lagged_data,
-                self.max_lag,
-                predefined_regressors=self.pivv[: len(self.final_model)],
-            )
-        else:
-            X_base, _ = self.basis_function.transform(
-                lagged_data,
-                self.max_lag,
-                predefined_regressors=self.pivv[: len(self.final_model)],
-            )
-
-        yhat = super()._one_step_ahead_prediction(X_base)
+        yhat = super()._one_step_ahead_prediction(X, y)
         return yhat.reshape(-1, 1)
 
     def _n_step_ahead_prediction(self, X, y, steps_ahead):
