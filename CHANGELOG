@@ -28,7 +28,10 @@ CHANGES
 - FIX: Fix error in selecting the correct regressors in AOLS.
 - FIX: Fix one step ahead prediction error in SimulateNARMAX class (thanks Lalith).
 - Fix: Fix n step ahead prediction method not returning all values of the defined steps-ahead value when passing only the initial condition.
- 
+- DATASET: Added air passengers dataset to SysIdentPy repository. 
+- DATASET: Added San Francisco Hospital Load dataset to SysIdentPy repository. 
+- DATASET: Added San Francisco PV GHI dataset to SysIdentPy repository.
+
 
 v0.2.1
 ------
