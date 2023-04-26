@@ -175,7 +175,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         delta: float = 0.01,
         offset_covariance: float = 0.2,
         mu: float = 0.01,
-        eps: float = np.finfo(np.float64).eps,
+        eps: np.float64 = np.finfo(np.float64).eps,
         gama: float = 0.2,
         weight: float = 0.02,
         estimate_parameter: bool = True,
