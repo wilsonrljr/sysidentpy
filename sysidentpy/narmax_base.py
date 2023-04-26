@@ -550,7 +550,7 @@ class RegressorDictionary(InformationMatrix):
             The max lag value defined by the user.
         """
         ny = np.max(list(chain.from_iterable([[self.ylag]])))
-        nx = np.max(list(chain.from_iterable([[self.xlag]])))
+        nx = np.max(list(chain.from_iterable([[np.array(self.xlag, dtype=object)]])))
         return np.max([ny, np.max(nx)])
 
 
