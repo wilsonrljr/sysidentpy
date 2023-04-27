@@ -331,9 +331,11 @@ class FROLS(Estimators, BaseMSS):
         if self.n_info_values is not None and self.n_info_values > X_base.shape[1]:
             self.n_info_values = X_base.shape[1]
             warnings.warn(
-                "n_info_values is greater than the maximum number of all regressors"
-                " space considering the chosen y_lag, u_lag, and non_degree. We set as"
-                f" {X_base.shape[1]}",
+                (
+                    "n_info_values is greater than the maximum number of all"
+                    " regressors space considering the chosen y_lag, u_lag, and"
+                    f" non_degree. We set as {X_base.shape[1]}"
+                ),
                 stacklevel=2,
             )
 
