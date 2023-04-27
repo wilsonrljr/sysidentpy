@@ -354,7 +354,7 @@ def explained_variance_score(y, yhat):
 
 
 def r2_score(y, yhat):
-    """Calculate the R2 score.
+    """Calculate the R2 score. Based on sklearn solution.
 
     Parameters
     ----------
