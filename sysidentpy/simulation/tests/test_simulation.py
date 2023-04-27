@@ -7,7 +7,7 @@ from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
 
 
 def test_simulate():
-    x_train, x_valid, y_train, y_valid = get_siso_data(
+    _, x_valid, _, y_valid = get_siso_data(
         n=1000, colored_noise=False, sigma=0.001, train_percentage=90
     )
 
@@ -56,7 +56,7 @@ def test_simulate_theta():
 
 
 def test_estimate_parameter():
-    x_train, x_valid, y_train, y_valid = get_siso_data(
+    x_train, _, y_train, _ = get_siso_data(
         n=1000, colored_noise=False, sigma=0.001, train_percentage=90
     )
     assert_raises(
@@ -87,14 +87,14 @@ def test_default_values():
     model = SimulateNARMAX(basis_function=Polynomial())
     model_values = [
         model.estimator,
-        model._extended_least_squares,
-        model._lam,
-        model._delta,
-        model._offset_covariance,
-        model._mu,
-        model._eps,
-        model._gama,
-        model._weight,
+        model.extended_least_squares,
+        model.lam,
+        model.delta,
+        model.offset_covariance,
+        model.mu,
+        model.eps,
+        model.gama,
+        model.weight,
         model.model_type,
         model.estimate_parameter,
         model.calculate_err,
@@ -127,7 +127,7 @@ def test_model_type_error():
 
 
 def test_model_order_selection():
-    x_train, x_valid, y_train, y_valid = get_siso_data(
+    _, x_valid, _, y_valid = get_siso_data(
         n=1000, colored_noise=False, sigma=0.001, train_percentage=90
     )
 
@@ -158,7 +158,7 @@ def test_basis_function_error():
 
 
 def test_raises():
-    x_train, x_valid, y_train, y_valid = get_siso_data(
+    _, x_valid, _, y_valid = get_siso_data(
         n=1000, colored_noise=False, sigma=0.001, train_percentage=90
     )
 
@@ -259,11 +259,11 @@ def test_input_dimension():
     yhat = s.simulate(
         X_test=None, y_test=y_valid, model_code=model, theta=theta, forecast_horizon=1
     )
-    assert s._n_inputs == 0
+    assert s.n_inputs == 0
 
 
 def test_miso_dimension():
-    x_train, x_valid, y_train, y_valid = get_miso_data(
+    _, x_valid, _, y_valid = get_miso_data(
         n=100, colored_noise=False, sigma=0.001, train_percentage=90
     )
 
@@ -285,7 +285,7 @@ def test_miso_dimension():
 
 
 def test_forecast_horizon():
-    x_train, x_valid, y_train, y_valid = get_siso_data(
+    _, _, _, y_valid = get_siso_data(
         n=1000, colored_noise=False, sigma=0.001, train_percentage=90
     )
 

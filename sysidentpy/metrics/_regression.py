@@ -8,6 +8,7 @@
 # License: BSD 3 clause
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 
 __ALL__ = [
@@ -26,14 +27,14 @@ __ALL__ = [
 ]
 
 
-def forecast_error(y, y_predicted):
+def forecast_error(y, yhat):
     """Calculate the forecast error in a regression model.
 
     Parameters
     ----------
     y : array-like of shape = number_of_outputs
         Represent the target values.
-    y_predicted : array-like of shape = number_of_outputs
+    yhat : array-like of shape = number_of_outputs
         Target values predicted by the model.
 
     Returns
@@ -44,28 +45,28 @@ def forecast_error(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the Forecast error
+    - Wikipedia entry on the Forecast error
        https://en.wikipedia.org/wiki/Forecast_error
 
     Examples
     --------
     >>> y = [3, -0.5, 2, 7]
-    >>> y_predicted = [2.5, 0.0, 2, 8]
-    >>> forecast_error(y, y_predicted)
+    >>> yhat = [2.5, 0.0, 2, 8]
+    >>> forecast_error(y, yhat)
     [0.5, -0.5, 0, -1]
 
     """
-    return y - y_predicted
+    return np.array(y - yhat)
 
 
-def mean_forecast_error(y, y_predicted):
+def mean_forecast_error(y, yhat):
     """Calculate the mean of forecast error of a regression model.
 
     Parameters
     ----------
     y : array-like of shape = number_of_outputs
         Represent the target values.
-    y_predicted : array-like of shape = number_of_outputs
+    yhat : array-like of shape = number_of_outputs
         Target values predicted by the model.
 
     Returns
@@ -77,28 +78,28 @@ def mean_forecast_error(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the Forecast error
+    - Wikipedia entry on the Forecast error
        https://en.wikipedia.org/wiki/Forecast_error
 
     Examples
     --------
     >>> y = [3, -0.5, 2, 7]
-    >>> y_predicted = [2.5, 0.0, 2, 8]
-    >>> mean_forecast_error(y, y_predicted)
+    >>> yhat = [2.5, 0.0, 2, 8]
+    >>> mean_forecast_error(y, yhat)
     -0.25
 
     """
-    return np.average(y - y_predicted)
+    return np.average(y - yhat)
 
 
-def mean_squared_error(y, y_predicted):
+def mean_squared_error(y, yhat):
     """Calculate the Mean Squared Error.
 
     Parameters
     ----------
     y : array-like of shape = number_of_outputs
         Represent the target values.
-    y_predicted : array-like of shape = number_of_outputs
+    yhat : array-like of shape = number_of_outputs
         Target values predicted by the model.
 
     Returns
@@ -109,29 +110,29 @@ def mean_squared_error(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the Mean Squared Error
+    - Wikipedia entry on the Mean Squared Error
        https://en.wikipedia.org/wiki/Mean_squared_error
 
     Examples
     --------
     >>> y = [3, -0.5, 2, 7]
-    >>> y_predicted = [2.5, 0.0, 2, 8]
-    >>> mean_squared_error(y, y_predicted)
+    >>> yhat = [2.5, 0.0, 2, 8]
+    >>> mean_squared_error(y, yhat)
     0.375
 
     """
-    output_error = np.average((y - y_predicted) ** 2)
+    output_error = np.average((y - yhat) ** 2)
     return np.average(output_error)
 
 
-def root_mean_squared_error(y, y_predicted):
+def root_mean_squared_error(y: ArrayLike, yhat: ArrayLike) -> np.ndarray:
     """Calculate the Root Mean Squared Error.
 
     Parameters
     ----------
     y : array-like of shape = number_of_outputs
         Represent the target values.
-    y_predicted : array-like of shape = number_of_outputs
+    yhat : array-like of shape = number_of_outputs
         Target values predicted by the model.
 
     Returns
@@ -142,28 +143,28 @@ def root_mean_squared_error(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the Root Mean Squared Error
+    - Wikipedia entry on the Root Mean Squared Error
        https://en.wikipedia.org/wiki/Root-mean-square_deviation
 
     Examples
     --------
     >>> y = [3, -0.5, 2, 7]
-    >>> y_predicted = [2.5, 0.0, 2, 8]
-    >>> root_mean_squared_error(y, y_predicted)
+    >>> yhat = [2.5, 0.0, 2, 8]
+    >>> root_mean_squared_error(y, yhat)
     0.612
 
     """
-    return np.sqrt(mean_squared_error(y, y_predicted))
+    return np.sqrt(mean_squared_error(y, yhat))
 
 
-def normalized_root_mean_squared_error(y, y_predicted):
+def normalized_root_mean_squared_error(y, yhat):
     """Calculate the normalized Root Mean Squared Error.
 
     Parameters
     ----------
     y : array-like of shape = number_of_outputs
         Represent the target values.
-    y_predicted : array-like of shape = number_of_outputs
+    yhat : array-like of shape = number_of_outputs
         Target values predicted by the model.
 
     Returns
@@ -174,28 +175,28 @@ def normalized_root_mean_squared_error(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the normalized Root Mean Squared Error
+    - Wikipedia entry on the normalized Root Mean Squared Error
        https://en.wikipedia.org/wiki/Root-mean-square_deviation
 
     Examples
     --------
     >>> y = [3, -0.5, 2, 7]
-    >>> y_predicted = [2.5, 0.0, 2, 8]
-    >>> normalized_root_mean_squared_error(y, y_predicted)
+    >>> yhat = [2.5, 0.0, 2, 8]
+    >>> normalized_root_mean_squared_error(y, yhat)
     0.081
 
     """
-    return root_mean_squared_error(y, y_predicted) / (y.max() - y.min())
+    return root_mean_squared_error(y, yhat) / (y.max() - y.min())
 
 
-def root_relative_squared_error(y, y_predicted):
+def root_relative_squared_error(y, yhat):
     """Calculate the Root Relative Mean Squared Error.
 
     Parameters
     ----------
     y : array-like of shape = number_of_outputs
         Represent the target values.
-    y_predicted : array-like of shape = number_of_outputs
+    yhat : array-like of shape = number_of_outputs
         Target values predicted by the model.
 
     Returns
@@ -207,24 +208,24 @@ def root_relative_squared_error(y, y_predicted):
     Examples
     --------
     >>> y = [3, -0.5, 2, 7]
-    >>> y_predicted = [2.5, 0.0, 2, 8]
-    >>> root_relative_mean_squared_error(y, y_predicted)
+    >>> yhat = [2.5, 0.0, 2, 8]
+    >>> root_relative_mean_squared_error(y, yhat)
     0.206
 
     """
-    numerator = np.sum(np.square((y_predicted - y)))
-    denominator = np.sum(np.square((y_predicted - np.mean(y, axis=0))))
+    numerator = np.sum(np.square((yhat - y)))
+    denominator = np.sum(np.square((yhat - np.mean(y, axis=0))))
     return np.sqrt(np.divide(numerator, denominator))
 
 
-def mean_absolute_error(y, y_predicted):
+def mean_absolute_error(y, yhat):
     """Calculate the Mean absolute error.
 
     Parameters
     ----------
     y : array-like of shape = number_of_outputs
         Represent the target values.
-    y_predicted : array-like of shape = number_of_outputs
+    yhat : array-like of shape = number_of_outputs
         Target values predicted by the model.
 
     Returns
@@ -235,29 +236,29 @@ def mean_absolute_error(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the Mean absolute error
+    - Wikipedia entry on the Mean absolute error
        https://en.wikipedia.org/wiki/Mean_absolute_error
 
     Examples
     --------
     >>> y = [3, -0.5, 2, 7]
-    >>> y_predicted = [2.5, 0.0, 2, 8]
-    >>> mean_absolute_error(y, y_predicted)
+    >>> yhat = [2.5, 0.0, 2, 8]
+    >>> mean_absolute_error(y, yhat)
     0.5
 
     """
-    output_errors = np.average(np.abs(y - y_predicted))
+    output_errors = np.average(np.abs(y - yhat))
     return np.average(output_errors)
 
 
-def mean_squared_log_error(y, y_predicted):
+def mean_squared_log_error(y: ArrayLike, yhat: ArrayLike) -> np.ndarray:
     """Calculate the Mean Squared Logarithmic Error.
 
     Parameters
     ----------
     y : array-like of shape = number_of_outputs
         Represent the target values.
-    y_predicted : array-like of shape = number_of_outputs
+    yhat : array-like of shape = number_of_outputs
         Target values predicted by the model.
 
     Returns
@@ -269,22 +270,22 @@ def mean_squared_log_error(y, y_predicted):
     Examples
     --------
     >>> y = [3, 5, 2.5, 7]
-    >>> y_predicted = [2.5, 5, 4, 8]
-    >>> mean_squared_log_error(y, y_predicted)
+    >>> yhat = [2.5, 5, 4, 8]
+    >>> mean_squared_log_error(y, yhat)
     0.039
 
     """
-    return mean_squared_error(np.log1p(y), np.log1p(y_predicted))
+    return mean_squared_error(np.log1p(y), np.log1p(yhat))
 
 
-def median_absolute_error(y, y_predicted):
+def median_absolute_error(y, yhat):
     """Calculate the Median Absolute Error.
 
     Parameters
     ----------
     y : array-like of shape = number_of_outputs
         Represent the target values.
-    y_predicted : array-like of shape = number_of_outputs
+    yhat : array-like of shape = number_of_outputs
         Target values predicted by the model.
 
     Returns
@@ -295,28 +296,28 @@ def median_absolute_error(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the Median absolute deviation
+    - Wikipedia entry on the Median absolute deviation
        https://en.wikipedia.org/wiki/Median_absolute_deviation
 
     Examples
     --------
     >>> y = [3, -0.5, 2, 7]
-    >>> y_predicted = [2.5, 0.0, 2, 8]
-    >>> median_absolute_error(y, y_predicted)
+    >>> yhat = [2.5, 0.0, 2, 8]
+    >>> median_absolute_error(y, yhat)
     0.5
 
     """
-    return np.median(np.abs(y - y_predicted))
+    return np.median(np.abs(y - yhat))
 
 
-def explained_variance_score(y, y_predicted):
+def explained_variance_score(y, yhat):
     """Calculate the Explained Variance Score.
 
     Parameters
     ----------
     y : array-like of shape = number_of_outputs
         Represent the target values.
-    y_predicted : array-like of shape = number_of_outputs
+    yhat : array-like of shape = number_of_outputs
         Target values predicted by the model.
 
     Returns
@@ -328,19 +329,19 @@ def explained_variance_score(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the Explained Variance
+    - Wikipedia entry on the Explained Variance
        https://en.wikipedia.org/wiki/Explained_variation
 
     Examples
     --------
     >>> y = [3, -0.5, 2, 7]
-    >>> y_predicted = [2.5, 0.0, 2, 8]
-    >>> explained_variance_score(y, y_predicted)
+    >>> yhat = [2.5, 0.0, 2, 8]
+    >>> explained_variance_score(y, yhat)
     0.957
 
     """
-    y_diff_avg = np.average(y - y_predicted)
-    numerator = np.average((y - y_predicted - y_diff_avg) ** 2)
+    y_diff_avg = np.average(y - yhat)
+    numerator = np.average((y - yhat - y_diff_avg) ** 2)
     y_avg = np.average(y)
     denominator = np.average((y - y_avg) ** 2)
     nonzero_numerator = numerator != 0
@@ -352,14 +353,14 @@ def explained_variance_score(y, y_predicted):
     return np.average(output_scores)
 
 
-def r2_score(y, y_predicted):
+def r2_score(y, yhat):
     """Calculate the R2 score.
 
     Parameters
     ----------
     y : array-like of shape = number_of_outputs
         Represent the target values.
-    y_predicted : array-like of shape = number_of_outputs
+    yhat : array-like of shape = number_of_outputs
         Target values predicted by the model.
 
     Returns
@@ -375,18 +376,18 @@ def r2_score(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the Coefficient of determination
+    - Wikipedia entry on the Coefficient of determination
        https://en.wikipedia.org/wiki/Coefficient_of_determination
 
     Examples
     --------
     >>> y = [3, -0.5, 2, 7]
-    >>> y_predicted = [2.5, 0.0, 2, 8]
-    >>> explained_variance_score(y, y_predicted)
+    >>> yhat = [2.5, 0.0, 2, 8]
+    >>> explained_variance_score(y, yhat)
     0.948
 
     """
-    numerator = ((y - y_predicted) ** 2).sum(axis=0, dtype=np.float64)
+    numerator = ((y - yhat) ** 2).sum(axis=0, dtype=np.float64)
     denominator = ((y - np.average(y, axis=0)) ** 2).sum(axis=0, dtype=np.float64)
     nonzero_denominator = denominator != 0
     nonzero_numerator = numerator != 0
@@ -399,14 +400,14 @@ def r2_score(y, y_predicted):
     return np.average(output_scores)
 
 
-def symmetric_mean_absolute_percentage_error(y, y_predicted):
+def symmetric_mean_absolute_percentage_error(y, yhat):
     """Calculate the SMAPE score.
 
     Parameters
     ----------
     y : array-like of shape = number_of_outputs
         Represent the target values.
-    y_predicted : array-like of shape = number_of_outputs
+    yhat : array-like of shape = number_of_outputs
         Target values predicted by the model.
 
     Returns
@@ -422,19 +423,15 @@ def symmetric_mean_absolute_percentage_error(y, y_predicted):
 
     References
     ----------
-    .. [1] Wikipedia entry on the Symmetric mean absolute percentage error
+    - Wikipedia entry on the Symmetric mean absolute percentage error
        https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error
 
     Examples
     --------
     >>> y = [3, -0.5, 2, 7]
-    >>> y_predicted = [2.5, 0.0, 2, 8]
-    >>> symmetric_mean_absolute_percentage_error(y, y_predicted)
+    >>> yhat = [2.5, 0.0, 2, 8]
+    >>> symmetric_mean_absolute_percentage_error(y, yhat)
     57.87
 
     """
-    return (
-        100
-        / len(y)
-        * np.sum(2 * np.abs(y_predicted - y) / (np.abs(y) + np.abs(y_predicted)))
-    )
+    return 100 / len(y) * np.sum(2 * np.abs(yhat - y) / (np.abs(y) + np.abs(yhat)))

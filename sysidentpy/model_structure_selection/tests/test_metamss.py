@@ -15,7 +15,7 @@ def create_test_data(n=1000):
 
 
 def test_metamss():
-    piv = np.array([4, 2, 7, 11, 5])
+    # piv = np.array([4, 2, 7, 11, 5])
     model_code = np.array(
         [[1001, 0], [2002, 0], [2001, 1001]]  # y(k-1)  # x1(k-2)  # x1(k-1)y(k-1)
     )
@@ -32,14 +32,14 @@ def test_metamss():
         basis_function=basis_function,
         random_state=42,
     )
-    model.fit(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test)
+    model.fit(X=X_train, y=y_train, X_test=X_test, y_test=y_test)
     assert_array_equal(model.final_model, model_code)
 
 
 def test_default_values():
     default = {
-        "ylag": 2,
-        "xlag": 2,
+        "ylag": 1,
+        "xlag": 1,
         "model_type": "NARMAX",
         "maxiter": 30,
         "alpha": 23,
@@ -81,14 +81,14 @@ def test_default_values():
         model.p_ones,
         model.p_value,
         model.estimator,
-        model._extended_least_squares,
-        model._lam,
-        model._delta,
-        model._offset_covariance,
-        model._mu,
-        model._eps,
-        model._gama,
-        model._weight,
+        model.extended_least_squares,
+        model.lam,
+        model.delta,
+        model.offset_covariance,
+        model.mu,
+        model.eps,
+        model.gama,
+        model.weight,
         model.steps_ahead,
         model.estimate_parameter,
         model.loss_func,
@@ -120,13 +120,13 @@ def test_predict():
         basis_function=basis_function,
         random_state=42,
     )
-    model.fit(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test)
-    yhat = model.predict(X_test=X_test, y_test=y_test)
+    model.fit(X=X_train, y=y_train, X_test=X_test, y_test=y_test)
+    yhat = model.predict(X=X_test, y=y_test)
     assert_almost_equal(yhat, y_test, decimal=2)
 
 
 def test_model_prediction():
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     train_percentage = 90
     split_data = int(len(x) * (train_percentage / 100))
@@ -151,5 +151,5 @@ def test_model_prediction():
         basis_function=basis_function,
         random_state=42,
     )
-    model.fit(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test)
-    assert_raises(Exception, model.predict, X_test=X_test, y_test=y_test[:1])
+    model.fit(X=X_train, y=y_train, X_test=X_test, y_test=y_test)
+    assert_raises(Exception, model.predict, X=X_test, y=y_test[:1])

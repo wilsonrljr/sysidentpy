@@ -7,48 +7,37 @@
 #           Samir Angelo Milani Martins <martins@ufsj.edu.br>
 # License: BSD 3 clause
 
-
 import warnings
+from typing import Union
 
 import numpy as np
 
 from sysidentpy.utils._check_arrays import _check_positive_int, _num_features, check_X_y
 
-from ..narmax_base import (
-    GenerateRegressors,
-    HouseHolder,
-    InformationMatrix,
-    ModelInformation,
-    ModelPrediction,
-)
+from ..basis_function import Fourier, Polynomial
+from ..narmax_base import BaseMSS, Orthogonalization
 from ..parameter_estimation.estimators import Estimators
 
 
-class FROLS(
-    Estimators,
-    GenerateRegressors,
-    HouseHolder,
-    ModelInformation,
-    InformationMatrix,
-    ModelPrediction,
-):
-    """Forward Regression Orthogonal Least Squares algorithm.
+class FROLS(Estimators, BaseMSS):
+    r"""Forward Regression Orthogonal Least Squares algorithm.
 
     This class uses the FROLS algorithm ([1]_, [2]_) to build NARMAX models.
     The NARMAX model is described as:
 
-    .. math::
+    $$
+        y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1},
+        \dotsc, x_{k-d-n_x}, e_{k-1}, \dotsc, e_{k-n_e}] + e_k
+    $$
 
-        y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1}, \dotsc, x_{k-d-n_x}, e_{k-1}, \dotsc, e_{k-n_e}] + e_k
-
-    where :math:`n_y\in \mathbb{N}^*`, :math:`n_x \in \mathbb{N}`, :math:`n_e \in \mathbb{N}`,
+    where $n_y\in \mathbb{N}^*$, $n_x \in \mathbb{N}$, $n_e \in \mathbb{N}$,
     are the maximum lags for the system output and input respectively;
-    :math:`x_k \in \mathbb{R}^{n_x}` is the system input and :math:`y_k \in \mathbb{R}^{n_y}`
-    is the system output at discrete time :math:`k \in \mathbb{N}^n`;
-    :math:`e_k \in \mathbb{R}^{n_e}` stands for uncertainties and possible noise
-    at discrete time :math:`k`. In this case, :math:`\mathcal{F}^\ell` is some nonlinear function
-    of the input and output regressors with nonlinearity degree :math:`\ell \in \mathbb{N}`
-    and :math:`d` is a time delay typically set to :math:`d=1`.
+    $x_k \in \mathbb{R}^{n_x}$ is the system input and $y_k \in \mathbb{R}^{n_y}$
+    is the system output at discrete time $k \in \mathbb{N}^n$;
+    $e_k \in \mathbb{R}^{n_e}4 stands for uncertainties and possible noise
+    at discrete time $k$. In this case, $\mathcal{F}^\ell$ is some nonlinear function
+    of the input and output regressors with nonlinearity degree $\ell \in \mathbb{N}$
+    and $d$ is a time delay typically set to $d=1$.
 
     Parameters
     ----------
@@ -136,10 +125,10 @@ class FROLS(
 
     References
     ----------
-    .. [1] Manuscript: Orthogonal least squares methods and their application
+    - Manuscript: Orthogonal least squares methods and their application
        to non-linear system identification
        https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
-    .. [2] Manuscript (portuguese): Identificação de Sistemas não Lineares
+    - Manuscript (portuguese): Identificação de Sistemas não Lineares
        Utilizando Modelos NARMAX Polinomiais – Uma Revisão
        e Novos Resultados
 
@@ -148,35 +137,35 @@ class FROLS(
     def __init__(
         self,
         *,
-        ylag=2,
-        xlag=2,
-        elag=2,
-        order_selection=False,
-        info_criteria="aic",
-        n_terms=None,
-        n_info_values=10,
-        estimator="recursive_least_squares",
-        extended_least_squares=False,
-        lam=0.98,
-        delta=0.01,
-        offset_covariance=0.2,
-        mu=0.01,
-        eps=np.finfo(np.float64).eps,
-        gama=0.2,
-        weight=0.02,
-        basis_function=None,
-        model_type="NARMAX"
+        ylag: Union[int, list] = 2,
+        xlag: Union[int, list] = 2,
+        elag: Union[int, list] = 2,
+        order_selection: bool = False,
+        info_criteria: str = "aic",
+        n_terms: Union[int, None] = None,
+        n_info_values: int = 10,
+        estimator: str = "recursive_least_squares",
+        extended_least_squares: bool = False,
+        lam: float = 0.98,
+        delta: float = 0.01,
+        offset_covariance: float = 0.2,
+        mu: float = 0.01,
+        eps: np.float64 = np.finfo(np.float64).eps,
+        gama: float = 0.2,
+        weight: float = 0.02,
+        basis_function: Union[Polynomial, Fourier] = Polynomial(),
+        model_type: str = "NARMAX",
     ):
         self.non_degree = basis_function.degree
-        self._order_selection = order_selection
+        self.order_selection = order_selection
         self.ylag = ylag
         self.xlag = xlag
-        self.max_lag = self._get_max_lag(ylag, xlag)
+        self.max_lag = self._get_max_lag()
         self.info_criteria = info_criteria
         self.n_info_values = n_info_values
         self.n_terms = n_terms
         self.estimator = estimator
-        self._extended_least_squares = extended_least_squares
+        self.extended_least_squares = extended_least_squares
         self.elag = elag
         self.model_type = model_type
         self._validate_params()
@@ -189,58 +178,64 @@ class FROLS(
             eps=eps,
             gama=gama,
             weight=weight,
+            basis_function=basis_function,
         )
+        self.ensemble = None
+        self.n_inputs = None
+        self.regressor_code = None
+        self.info_values = None
+        self.err = None
+        self.final_model = None
+        self.theta = None
+        self.pivv = None
 
     def _validate_params(self):
         """Validate input params."""
         if not isinstance(self.n_info_values, int) or self.n_info_values < 1:
             raise ValueError(
-                "n_info_values must be integer and > zero. Got %f" % self.n_info_values
+                f"n_info_values must be integer and > zero. Got {self.n_info_values}"
             )
 
         if isinstance(self.ylag, int) and self.ylag < 1:
-            raise ValueError("ylag must be integer and > zero. Got %f" % self.ylag)
+            raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
 
         if isinstance(self.xlag, int) and self.xlag < 1:
-            raise ValueError("xlag must be integer and > zero. Got %f" % self.xlag)
+            raise ValueError(f"xlag must be integer and > zero. Got {self.xlag}")
 
         if not isinstance(self.xlag, (int, list)):
-            raise ValueError("xlag must be integer and > zero. Got %f" % self.xlag)
+            raise ValueError(f"xlag must be integer and > zero. Got {self.xlag}")
 
         if not isinstance(self.ylag, (int, list)):
-            raise ValueError("ylag must be integer and > zero. Got %f" % self.ylag)
+            raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
 
-        if not isinstance(self._order_selection, bool):
+        if not isinstance(self.order_selection, bool):
             raise TypeError(
-                "order_selection must be False or True. Got %f" % self._order_selection
+                f"order_selection must be False or True. Got {self.order_selection}"
             )
 
-        if not isinstance(self._extended_least_squares, bool):
+        if not isinstance(self.extended_least_squares, bool):
             raise TypeError(
-                "extended_least_squares must be False or True. Got %f"
-                % self._extended_least_squares
+                "extended_least_squares must be False or True. Got"
+                f" {self.extended_least_squares}"
             )
 
         if self.info_criteria not in ["aic", "bic", "fpe", "lilc"]:
             raise ValueError(
-                "info_criteria must be aic, bic, fpe or lilc. Got %s"
-                % self.info_criteria
+                f"info_criteria must be aic, bic, fpe or lilc. Got {self.info_criteria}"
             )
 
         if self.model_type not in ["NARMAX", "NAR", "NFIR"]:
             raise ValueError(
-                "model_type must be NARMAX, NAR or NFIR. Got %s" % self.model_type
+                f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
             )
 
         if (
             not isinstance(self.n_terms, int) or self.n_terms < 1
         ) and self.n_terms is not None:
-            raise ValueError(
-                "n_terms must be integer and > zero. Got %f" % self.n_terms
-            )
+            raise ValueError(f"n_terms must be integer and > zero. Got {self.n_terms}")
 
     def error_reduction_ratio(self, psi, y, process_term_number):
-        """Perform the Error Reduction Ration algorithm [1]_, [2]_.
+        """Perform the Error Reduction Ration algorithm.
 
         Parameters
         ----------
@@ -263,11 +258,10 @@ class FROLS(
 
         References
         ----------
-        .. [1] Manuscript: Orthogonal least squares methods and their application
+        - Manuscript: Orthogonal least squares methods and their application
            to non-linear system identification
            https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
-
-        .. [2] Manuscript (portuguese): Identificação de Sistemas não Lineares
+        - Manuscript (portuguese): Identificação de Sistemas não Lineares
            Utilizando Modelos NARMAX Polinomiais – Uma Revisão
            e Novos Resultados
 
@@ -286,7 +280,7 @@ class FROLS(
                 # Add `eps` in the denominator to omit division by zero if
                 # denominator is zero
                 tmp_err[j] = (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2) / (
-                    np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) * squared_y + self._eps
+                    np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) * squared_y + self.eps
                 )
 
             if i == process_term_number:
@@ -297,11 +291,11 @@ class FROLS(
             tmp_psi[:, [piv_index, i]] = tmp_psi[:, [i, piv_index]]
             piv[[piv_index, i]] = piv[[i, piv_index]]
 
-            v = self._house(tmp_psi[i:, i])
+            v = Orthogonalization().house(tmp_psi[i:, i])
 
-            row_result = self._rowhouse(tmp_psi[i:, i:], v)
+            row_result = Orthogonalization().rowhouse(tmp_psi[i:, i:], v)
 
-            tmp_y[i:] = self._rowhouse(tmp_y[i:], v)
+            tmp_y[i:] = Orthogonalization().rowhouse(tmp_y[i:], v)
 
             tmp_psi[i:, i:] = np.copy(row_result)
 
@@ -338,12 +332,10 @@ class FROLS(
             self.n_info_values = X_base.shape[1]
             warnings.warn(
                 (
-                    "n_info_values is greater than the maximum number "
-                    "of all regressors space considering the chosen "
-                    "y_lag, u_lag, and non_degree. We set as "
-                    "%d "
-                )
-                % X_base.shape[1],
+                    "n_info_values is greater than the maximum number of all"
+                    " regressors space considering the chosen y_lag, u_lag, and"
+                    f" non_degree. We set as {X_base.shape[1]}"
+                ),
                 stacklevel=2,
             )
 
@@ -441,14 +433,14 @@ class FROLS(
 
         if self.model_type == "NARMAX":
             check_X_y(X, y)
-            self.max_lag = self._get_max_lag(ylag=self.ylag, xlag=self.xlag)
-            lagged_data = self.build_input_output_matrix(X, y, self.xlag, self.ylag)
+            self.max_lag = self._get_max_lag()
+            lagged_data = self.build_input_output_matrix(X, y)
         elif self.model_type == "NAR":
-            lagged_data = self.build_output_matrix(y, self.ylag)
-            self.max_lag = self._get_max_lag(ylag=self.ylag)
+            lagged_data = self.build_output_matrix(y)
+            self.max_lag = self._get_max_lag()
         elif self.model_type == "NFIR":
-            lagged_data = self.build_input_matrix(X, self.xlag)
-            self.max_lag = self._get_max_lag(xlag=self.xlag)
+            lagged_data = self.build_input_matrix(X)
+            self.max_lag = self._get_max_lag()
         else:
             raise ValueError(
                 "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
@@ -464,22 +456,20 @@ class FROLS(
             )
 
         if X is not None:
-            self._n_inputs = _num_features(X)
+            self.n_inputs = _num_features(X)
         else:
-            self._n_inputs = 1  # just to create the regressor space base
+            self.n_inputs = 1  # just to create the regressor space base
 
-        self.regressor_code = self.regressor_space(
-            self.non_degree, self.xlag, self.ylag, self._n_inputs, self.model_type
-        )
+        self.regressor_code = self.regressor_space(self.n_inputs)
 
-        if self._order_selection is True:
+        if self.order_selection is True:
             self.info_values = self.information_criterion(reg_matrix, y)
 
-        if self.n_terms is None and self._order_selection is True:
+        if self.n_terms is None and self.order_selection is True:
             model_length = np.where(self.info_values == np.amin(self.info_values))
             model_length = int(model_length[0] + 1)
             self.n_terms = model_length
-        elif self.n_terms is None and self._order_selection is not True:
+        elif self.n_terms is None and self.order_selection is not True:
             raise ValueError(
                 "If order_selection is False, you must define n_terms value."
             )
@@ -512,14 +502,13 @@ class FROLS(
             self.final_model = self.regressor_code[tmp_piv, :].copy()
 
         self.theta = getattr(self, self.estimator)(psi, y)
-        # self.max_lag = self._get_max_lag_from_model_code(self.final_model)
-        if self._extended_least_squares is True:
+        if self.extended_least_squares is True:
             self.theta = self._unbiased_estimator(
-                psi, y, self.theta, self.non_degree, self.elag, self.max_lag
+                psi, y, self.theta, self.elag, self.max_lag, self.estimator
             )
         return self
 
-    def predict(self, X=None, y=None, steps_ahead=None, forecast_horizon=None):
+    def predict(self, *, X=None, y=None, steps_ahead=None, forecast_horizon=None):
         """Return the predicted values given an input.
 
         The predict function allows a friendly usage by the user.
@@ -549,20 +538,188 @@ class FROLS(
         """
         if self.basis_function.__class__.__name__ == "Polynomial":
             if steps_ahead is None:
-                return self._model_prediction(X, y, forecast_horizon=forecast_horizon)
-            elif steps_ahead == 1:
-                return self._one_step_ahead_prediction(X, y)
-            else:
-                _check_positive_int(steps_ahead, "steps_ahead")
-                return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
+                yhat = self._model_prediction(X, y, forecast_horizon=forecast_horizon)
+                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+                return yhat
+            if steps_ahead == 1:
+                yhat = self._one_step_ahead_prediction(X, y)
+                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+                return yhat
+
+            _check_positive_int(steps_ahead, "steps_ahead")
+            yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
+            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+            return yhat
+
+        if steps_ahead is None:
+            yhat = self._basis_function_predict(X, y, forecast_horizon)
+            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+            return yhat
+        if steps_ahead == 1:
+            yhat = self._one_step_ahead_prediction(X, y)
+            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+            return yhat
+
+        yhat = self._basis_function_n_step_prediction(
+            X, y, steps_ahead, forecast_horizon
+        )
+        yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+        return yhat
+
+    def _one_step_ahead_prediction(self, X, y):
+        """Perform the 1-step-ahead prediction of a model.
+
+        Parameters
+        ----------
+        y : array-like of shape = max_lag
+            Initial conditions values of the model
+            to start recursive process.
+        X : ndarray of floats of shape = n_samples
+            Vector with input values to be used in model simulation.
+
+        Returns
+        -------
+        yhat : ndarray of floats
+               The 1-step-ahead predicted values of the model.
+
+        """
+        if self.model_type == "NAR":
+            lagged_data = self.build_output_matrix(y)
+        elif self.model_type == "NFIR":
+            lagged_data = self.build_input_matrix(X)
+        elif self.model_type == "NARMAX":
+            lagged_data = self.build_input_output_matrix(X, y)
         else:
-            if steps_ahead is None:
-                return self._basis_function_predict(
-                    X, y, self.theta, forecast_horizon=forecast_horizon
-                )
-            elif steps_ahead == 1:
-                return self._one_step_ahead_prediction(X, y)
-            else:
-                return self.basis_function_n_step_prediction(
-                    X, y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
-                )
+            raise ValueError(
+                "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
+            )
+
+        if self.basis_function.__class__.__name__ == "Polynomial":
+            X_base = self.basis_function.transform(
+                lagged_data,
+                self.max_lag,
+                predefined_regressors=self.pivv[: len(self.final_model)],
+            )
+        else:
+            X_base, _ = self.basis_function.transform(
+                lagged_data,
+                self.max_lag,
+                predefined_regressors=self.pivv[: len(self.final_model)],
+            )
+
+        yhat = super()._one_step_ahead_prediction(X_base)
+        return yhat.reshape(-1, 1)
+
+    def _n_step_ahead_prediction(self, X, y, steps_ahead):
+        """Perform the n-steps-ahead prediction of a model.
+
+        Parameters
+        ----------
+        y : array-like of shape = max_lag
+            Initial conditions values of the model
+            to start recursive process.
+        X : ndarray of floats of shape = n_samples
+            Vector with input values to be used in model simulation.
+
+        Returns
+        -------
+        yhat : ndarray of floats
+               The n-steps-ahead predicted values of the model.
+
+        """
+        yhat = super()._n_step_ahead_prediction(X, y, steps_ahead)
+        return yhat
+
+    def _model_prediction(self, X, y_initial, forecast_horizon=0):
+        """Perform the infinity steps-ahead simulation of a model.
+
+        Parameters
+        ----------
+        y_initial : array-like of shape = max_lag
+            Number of initial conditions values of output
+            to start recursive process.
+        X : ndarray of floats of shape = n_samples
+            Vector with input values to be used in model simulation.
+
+        Returns
+        -------
+        yhat : ndarray of floats
+               The predicted values of the model.
+
+        """
+        if self.model_type in ["NARMAX", "NAR"]:
+            return self._narmax_predict(X, y_initial, forecast_horizon)
+
+        if self.model_type == "NFIR":
+            return self._nfir_predict(X, y_initial)
+
+        raise Exception(
+            "model_type do not exist! Model type must be NARMAX, NAR or NFIR"
+        )
+
+    def _narmax_predict(self, X, y_initial, forecast_horizon=0):
+        if len(y_initial) < self.max_lag:
+            raise Exception("Insufficient initial conditions elements!")
+
+        if X is not None:
+            forecast_horizon = X.shape[0]
+        else:
+            forecast_horizon = forecast_horizon + self.max_lag
+
+        if self.model_type == "NAR":
+            self.n_inputs = 0
+
+        y_output = super()._narmax_predict(X, y_initial, forecast_horizon)
+        return y_output
+
+    def _nfir_predict(self, X, y_initial):
+        y_output = super()._nfir_predict(X, y_initial)
+        return y_output
+
+    def _basis_function_predict(self, X, y_initial, forecast_horizon=None):
+        if X is not None:
+            forecast_horizon = X.shape[0]
+        else:
+            forecast_horizon = forecast_horizon + self.max_lag
+
+        if self.model_type == "NAR":
+            self.n_inputs = 0
+
+        yhat = super()._basis_function_predict(X, y_initial, forecast_horizon)
+        return yhat.reshape(-1, 1)
+
+    def _basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
+        """Perform the n-steps-ahead prediction of a model.
+
+        Parameters
+        ----------
+        y : array-like of shape = max_lag
+            Initial conditions values of the model
+            to start recursive process.
+        X : ndarray of floats of shape = n_samples
+            Vector with input values to be used in model simulation.
+
+        Returns
+        -------
+        yhat : ndarray of floats
+               The n-steps-ahead predicted values of the model.
+
+        """
+        if len(y) < self.max_lag:
+            raise Exception("Insufficient initial conditions elements!")
+
+        if X is not None:
+            forecast_horizon = X.shape[0]
+        else:
+            forecast_horizon = forecast_horizon + self.max_lag
+
+        yhat = super()._basis_function_n_step_prediction(
+            X, y, steps_ahead, forecast_horizon
+        )
+        return yhat.reshape(-1, 1)
+
+    def _basis_function_n_steps_horizon(self, X, y, steps_ahead, forecast_horizon):
+        yhat = super()._basis_function_n_steps_horizon(
+            X, y, steps_ahead, forecast_horizon
+        )
+        return yhat.reshape(-1, 1)

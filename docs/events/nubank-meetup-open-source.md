@@ -13,4 +13,3 @@ Wilson Rocha, the maintainer of SysIdentPy, joined Bruno Rocha (software enginee
     [Talk: Painel sobre desenvolvimento de bibliotecas em Data Science | Nubank DS & ML Meetup](https://www.youtube.com/watch?v=92NyD9_i7e0)
 
 Just click in the link above to watch the video.
-

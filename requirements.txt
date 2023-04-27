@@ -1,4 +1,4 @@
 matplotlib
-numpy
+numpy<=1.23.5
 scipy
 torch>=1.7.1

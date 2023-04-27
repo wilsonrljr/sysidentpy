@@ -61,7 +61,7 @@ def test_check_X_y():
     assert_raises(ValueError, check_X_y, X, y)
 
 
-def test_get_miso_data():
+def test_get_siso_data():
     x_train, x_valid, y_train, y_valid = get_siso_data(
         n=1000, colored_noise=False, sigma=0.001, train_percentage=90
     )

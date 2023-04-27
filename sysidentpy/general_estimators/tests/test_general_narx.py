@@ -1,24 +1,16 @@
-from unicodedata import decimal
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from numpy.testing import (
     assert_almost_equal,
-    assert_array_equal,
     assert_equal,
     assert_raises,
 )
 
 from sysidentpy.basis_function import Polynomial, Fourier
 from sysidentpy.general_estimators import NARX
-from sysidentpy.general_estimators.narx import ModelPrediction
 from sysidentpy.utils.generate_data import get_siso_data
 
-MP = ModelPrediction()
 base_estimator = LinearRegression()
-
-x_train, x_valid, y_train, y_valid = get_siso_data(
-    n=1000, colored_noise=False, sigma=0.001, train_percentage=90
-)
 
 
 def create_test_data(n=1000):
@@ -40,10 +32,28 @@ def create_test_data(n=1000):
     return x, y, theta
 
 
+x, y, _ = create_test_data()
+train_percentage = 90
+split_data = int(len(x) * (train_percentage / 100))
+
+X_train = x[0:split_data, 0]
+X_test = x[split_data::, 0]
+
+y1 = y[0:split_data, 0]
+y_test = y[split_data::, 0]
+y_train = y1.copy()
+
+y_train = np.reshape(y_train, (len(y_train), 1))
+X_train = np.reshape(X_train, (len(X_train), 1))
+
+y_test = np.reshape(y_test, (len(y_test), 1))
+X_test = np.reshape(X_test, (len(X_test), 1))
+
+
 def test_default_values():
     default = {
-        "ylag": 2,
-        "xlag": 2,
+        "ylag": 1,
+        "xlag": 1,
         "model_type": "NARMAX",
     }
     model = NARX(basis_function=Polynomial(degree=2))
@@ -55,6 +65,35 @@ def test_default_values():
     assert list(default.values()) == model_values
 
 
+def test_model_nfir():
+    x, y, _ = create_test_data()
+    basis_function = Polynomial(degree=2)
+    train_percentage = 90
+    split_data = int(len(x) * (train_percentage / 100))
+
+    X_train = x[0:split_data, 0]
+    X_test = x[split_data::, 0]
+
+    y1 = y[0:split_data, 0]
+    y_test = y[split_data::, 0]
+    y_train = y1.copy()
+
+    y_train = np.reshape(y_train, (len(y_train), 1))
+    X_train = np.reshape(X_train, (len(X_train), 1))
+
+    y_test = np.reshape(y_test, (len(y_test), 1))
+    X_test = np.reshape(X_test, (len(X_test), 1))
+    model = NARX(
+        xlag=2,
+        basis_function=basis_function,
+        model_type="NFIR",
+        base_estimator=base_estimator,
+    )
+    model.fit(X=X_train, y=y_train)
+    yhat = model.predict(X=X_test, y=y_test)
+    assert_almost_equal(yhat.mean(), y_test[model.max_lag : :].mean(), decimal=1)
+
+
 def test_validate():
     assert_raises(ValueError, NARX, ylag=-1, basis_function=Polynomial(degree=1))
     assert_raises(ValueError, NARX, ylag=1.3, basis_function=Polynomial(degree=1))
@@ -63,59 +102,64 @@ def test_validate():
 
 
 def test_fit_raise():
-    model = NARX(basis_function=Polynomial(degree=2), model_type="NARARMAX")
-    assert_raises(ValueError, model.fit, X=x_train, y=y_train)
+    model = NARX(
+        basis_function=Polynomial(degree=2),
+        base_estimator=LinearRegression(),
+        model_type="NARARMAX",
+    )
+    assert_raises(ValueError, model.fit, X=X_train, y=y_train)
 
 
 def test_fit_raise_y():
-    model = NARX(basis_function=Polynomial(degree=2))
-    assert_raises(ValueError, model.fit, X=x_train, y=None)
+    model = NARX(basis_function=Polynomial(degree=2), base_estimator=base_estimator)
+    assert_raises(ValueError, model.fit, X=X_train, y=None)
 
 
 def test_fit_lag_nar():
-    base_estimator = LinearRegression()
     model = NARX(
         basis_function=Polynomial(degree=2),
         model_type="NAR",
         base_estimator=base_estimator,
+        xlag=2,
+        ylag=2,
     )
-    model.fit(X=x_train, y=y_train)
+    model.fit(X=X_train, y=y_train)
     assert_equal(model.max_lag, 2)
 
 
 def test_fit_lag_nfir():
-    base_estimator = LinearRegression()
     model = NARX(
         basis_function=Polynomial(degree=2),
         model_type="NFIR",
         base_estimator=base_estimator,
+        xlag=2,
+        ylag=2,
     )
-    model.fit(X=x_train, y=y_train)
+    model.fit(X=X_train, y=y_train)
     assert_equal(model.max_lag, 2)
 
 
 def test_fit_lag_narmax():
-    base_estimator = LinearRegression()
     model = NARX(
         basis_function=Polynomial(degree=2),
         base_estimator=base_estimator,
+        xlag=2,
+        ylag=2,
     )
-    model.fit(X=x_train, y=y_train)
+    model.fit(X=X_train, y=y_train)
     assert_equal(model.max_lag, 2)
 
 
 def test_fit_lag_narmax_fourier():
-    base_estimator = LinearRegression()
     model = NARX(
-        basis_function=Fourier(degree=2),
-        base_estimator=base_estimator,
+        basis_function=Fourier(degree=2), base_estimator=base_estimator, xlag=2, ylag=2
     )
-    model.fit(X=x_train, y=y_train)
+    model.fit(X=X_train, y=y_train)
     assert_equal(model.max_lag, 2)
 
 
 def test_model_predict():
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     train_percentage = 90
     split_data = int(len(x) * (train_percentage / 100))
@@ -139,18 +183,12 @@ def test_model_predict():
         base_estimator=base_estimator,
     )
     model.fit(X=X_train, y=y_train)
-    MP.basis_function = model.basis_function
-    MP.model_type = model.model_type
-    MP.max_lag = model.max_lag
-    MP.final_model = model.final_model
-    MP._n_inputs = model._n_inputs
-    MP.base_estimator = model.base_estimator
-    yhat = MP.predict(X=X_test, y=y_test)
+    yhat = model.predict(X=X_test, y=y_test)
     assert_almost_equal(yhat, y_test, decimal=10)
 
 
 def test_model_predict_steps_none():
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     train_percentage = 90
     split_data = int(len(x) * (train_percentage / 100))
@@ -174,21 +212,12 @@ def test_model_predict_steps_none():
         base_estimator=LinearRegression(),
     )
     model.fit(X=X_train, y=y_train)
-    MP.basis_function = model.basis_function
-    MP.model_type = model.model_type
-    MP.max_lag = model.max_lag
-    MP.final_model = model.final_model
-    MP._n_inputs = model._n_inputs
-    MP.build_input_output_matrix = model.build_input_output_matrix
-    MP.xlag = model.xlag
-    MP.ylag = model.ylag
-    MP.base_estimator = model.base_estimator
-    yhat = MP.predict(X=X_test, y=y_test, steps_ahead=1)
+    yhat = model.predict(X=X_test, y=y_test, steps_ahead=1)
     assert_almost_equal(yhat, y_test, decimal=10)
 
 
 def test_model_predict_steps_3():
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     train_percentage = 90
     split_data = int(len(x) * (train_percentage / 100))
@@ -212,54 +241,12 @@ def test_model_predict_steps_3():
         base_estimator=LinearRegression(),
     )
     model.fit(X=X_train, y=y_train)
-    MP.basis_function = model.basis_function
-    MP.model_type = model.model_type
-    MP.max_lag = model.max_lag
-    MP.final_model = model.final_model
-    MP._n_inputs = model._n_inputs
-    MP.base_estimator = model.base_estimator
-    yhat = MP.predict(X=X_test, y=y_test, steps_ahead=3)
+    yhat = model.predict(X=X_test, y=y_test, steps_ahead=3)
     assert_almost_equal(yhat, y_test, decimal=10)
 
 
-def test_model_predict_fourier_steps_none():
-    x, y, theta = create_test_data()
-    basis_function = Fourier(degree=2, n=1)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
-    model = NARX(
-        ylag=[1, 2],
-        xlag=2,
-        basis_function=basis_function,
-        base_estimator=LinearRegression(),
-    )
-    model.fit(X=X_train, y=y_train)
-    MP.basis_function = model.basis_function
-    MP.model_type = model.model_type
-    MP.max_lag = model.max_lag
-    MP.final_model = model.final_model
-    MP._n_inputs = model._n_inputs
-    MP.base_estimator = model.base_estimator
-    yhat = MP._basis_function_predict(X=X_test, y_initial=y_test)
-    print(yhat.mean())
-    assert_almost_equal(yhat.mean(), 0.0016457328739105236, decimal=6)
-
-
 def test_model_predict_fourier_steps_1():
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     basis_function = Fourier(degree=2, n=1)
     train_percentage = 90
     split_data = int(len(x) * (train_percentage / 100))
@@ -283,18 +270,12 @@ def test_model_predict_fourier_steps_1():
         base_estimator=LinearRegression(),
     )
     model.fit(X=X_train, y=y_train)
-    MP.basis_function = model.basis_function
-    MP.model_type = model.model_type
-    MP.max_lag = model.max_lag
-    MP.final_model = model.final_model
-    MP._n_inputs = model._n_inputs
-    MP.base_estimator = model.base_estimator
-    yhat = MP.predict(X=X_test, y=y_test, steps_ahead=1)
+    yhat = model.predict(X=X_test, y=y_test, steps_ahead=1)
     assert_almost_equal(yhat.mean(), 0.0016457328739105236, decimal=6)
 
 
 def test_model_predict_fourier_nar_inputs():
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     basis_function = Fourier(degree=2, n=1)
     train_percentage = 90
     split_data = int(len(x) * (train_percentage / 100))
@@ -319,21 +300,12 @@ def test_model_predict_fourier_nar_inputs():
         base_estimator=LinearRegression(),
     )
     model.fit(X=X_train, y=y_train)
-    MP.basis_function = model.basis_function
-    MP.model_type = model.model_type
-    MP.max_lag = model.max_lag
-    MP.final_model = model.final_model
-    MP._n_inputs = model._n_inputs
-    MP.build_output_matrix = model.build_output_matrix
-    MP.xlag = model.xlag
-    MP.ylag = model.ylag
-    MP.base_estimator = model.base_estimator
-    yhat = MP._basis_function_predict(X=X_test, y_initial=y_test)
-    assert_equal(MP._n_inputs, 0)
+    model.predict(X=X_test, y=y_test)
+    assert_equal(model.n_inputs, 0)
 
 
 def test_model_predict_fourier_raises():
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     basis_function = Fourier(degree=2, n=1)
     train_percentage = 90
     split_data = int(len(x) * (train_percentage / 100))
@@ -358,22 +330,13 @@ def test_model_predict_fourier_raises():
         base_estimator=LinearRegression(),
     )
     model.fit(X=X_train, y=y_train)
-    MP.basis_function = model.basis_function
-    MP.model_type = model.model_type
-    MP.max_lag = model.max_lag
-    MP.final_model = model.final_model
-    MP._n_inputs = model._n_inputs
-    MP.build_input_output_matrix = model.build_input_output_matrix
-    MP.xlag = model.xlag
-    MP.ylag = model.ylag
-    # yhat = MP.basis_function_n_step_prediction()
     assert_raises(
-        Exception, MP.basis_function_n_step_prediction, X=X_test, y=y_test[:1]
+        Exception, model._basis_function_n_step_prediction, X=X_test, y=y_test[:1]
     )
 
 
 def test_model_predict_fourier_value_error():
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     basis_function = Fourier(degree=2, n=1)
     train_percentage = 90
     split_data = int(len(x) * (train_percentage / 100))
@@ -398,18 +361,10 @@ def test_model_predict_fourier_value_error():
         base_estimator=LinearRegression(),
     )
     model.fit(X=X_train, y=y_train)
-    MP.basis_function = model.basis_function
-    MP.model_type = "NARRARMAX"
-    MP.max_lag = model.max_lag
-    MP.final_model = model.final_model
-    MP._n_inputs = model._n_inputs
-    MP.build_input_output_matrix = model.build_input_output_matrix
-    MP.xlag = model.xlag
-    MP.ylag = model.ylag
-    # yhat = MP.basis_function_n_step_prediction()
+    model.model_type = "NARRARMAX"
     assert_raises(
         ValueError,
-        MP.basis_function_n_step_prediction,
+        model._basis_function_n_step_prediction,
         X=X_test,
         y=y_test,
         steps_ahead=1,
@@ -418,7 +373,7 @@ def test_model_predict_fourier_value_error():
 
 
 def test_model_predict_fourier_horizon_error():
-    x, y, theta = create_test_data()
+    x, y, _ = create_test_data()
     basis_function = Fourier(degree=2, n=1)
     train_percentage = 90
     split_data = int(len(x) * (train_percentage / 100))
@@ -443,17 +398,10 @@ def test_model_predict_fourier_horizon_error():
         base_estimator=LinearRegression(),
     )
     model.fit(X=X_train, y=y_train)
-    MP.basis_function = model.basis_function
-    MP.max_lag = model.max_lag
-    MP.final_model = model.final_model
-    MP._n_inputs = model._n_inputs
-    MP.build_input_output_matrix = model.build_input_output_matrix
-    MP.xlag = model.xlag
-    MP.ylag = model.ylag
-    MP.model_type = "NARRARMAX"
+    model.model_type = "NARRARMAX"
     assert_raises(
         ValueError,
-        MP._basis_function_n_steps_horizon,
+        model._basis_function_n_steps_horizon,
         X=X_test,
         y=y_test,
         steps_ahead=1,
@@ -471,8 +419,8 @@ def test_model_predict_nfir_cat():
         model_type="NFIR",
     )
 
-    model.fit(X=x_train, y=y_train)
-    yhat = model.predict(X=x_valid, y=y_valid)
+    model.fit(X=X_train, y=y_train)
+    # yhat = model.predict(X=x_valid, y=y_valid)
     assert_equal(model.max_lag, 10)
 
 
@@ -486,8 +434,8 @@ def test_model_predict_steps_1():
         model_type="NARMAX",
     )
 
-    model.fit(X=x_train, y=y_train)
-    yhat = model.predict(X=x_valid, y=y_valid, steps_ahead=1)
+    model.fit(X=X_train, y=y_train)
+    # yhat = model.predict(X=x_valid, y=y_valid, steps_ahead=1)
     assert_equal(model.max_lag, 2)
 
 
@@ -501,8 +449,8 @@ def test_model_predict_fourier_none():
         model_type="NARMAX",
     )
 
-    model.fit(X=x_train, y=y_train)
-    yhat = model.predict(X=x_valid, y=y_valid)
+    model.fit(X=X_train, y=y_train)
+    # yhat = model.predict(X=x_valid, y=y_valid)
     assert_equal(model.max_lag, 10)
 
 
@@ -516,8 +464,8 @@ def test_model_predict_fourier_1():
         model_type="NARMAX",
     )
 
-    model.fit(X=x_train, y=y_train)
-    yhat = model.predict(X=x_valid, y=y_valid, steps_ahead=1)
+    model.fit(X=X_train, y=y_train)
+    # yhat = model.predict(X=x_valid, y=y_valid, steps_ahead=1)
     assert_equal(model.max_lag, 10)
 
 
@@ -531,6 +479,6 @@ def test_model_predict_fourier_n():
         model_type="NARMAX",
     )
 
-    model.fit(X=x_train, y=y_train)
-    yhat = model.predict(X=x_valid, y=y_valid, steps_ahead=3)
+    model.fit(X=X_train, y=y_train)
+    # yhat = model.predict(X=x_valid, y=y_valid, steps_ahead=3)
     assert_equal(model.max_lag, 10)

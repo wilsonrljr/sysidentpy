@@ -22,14 +22,14 @@ def deprecated(version, future_version=None, message=None, alternative=None, **k
             message = f"Function {func.__name__} has been deprecated since {version}."
             if alternative is not None:
                 message += (
-                    f"\n Use {alternative} instead."
-                    f"This module was deprecated in favor of "
+                    f"\n You'll have to use {alternative} instead."
+                    "This module was deprecated in favor of "
                     f"{alternative} module into which all the refactored "
-                    f"classes and functions are moved."
+                    "classes and functions are moved."
                 )
             if future_version is not None:
                 message += (
-                    f"\n This feature will be removed in version {future_version}."
+                    f"\n This change will be applied in version {future_version}."
                 )
 
         @functools.wraps(func)
@@ -51,9 +51,9 @@ def deprecated(version, future_version=None, message=None, alternative=None, **k
             if alternative is not None:
                 message += (
                     f"\n Use {alternative} instead."
-                    f"This module was deprecated in favor of "
+                    "This module was deprecated in favor of "
                     f"{alternative} module into which all the refactored "
-                    f"classes and functions are moved."
+                    "classes and functions are moved."
                 )
             if future_version is not None:
                 message += (
@@ -67,7 +67,7 @@ def deprecated(version, future_version=None, message=None, alternative=None, **k
     def deprecate_warning(obj):
         if isinstance(obj, type):
             return deprecate_class(obj)
-        else:
-            return deprecate_function(obj)
+
+        return deprecate_function(obj)
 
     return deprecate_warning

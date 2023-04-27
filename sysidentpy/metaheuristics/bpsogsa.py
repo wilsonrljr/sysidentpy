@@ -9,7 +9,7 @@ from sysidentpy.utils._check_arrays import check_random_state
 
 
 class BPSOGSA:
-    """Binary Hybrid Particle Swarm Optimization and Gravitational Search Algorithm [1]_, [2]_, [3]_, [4]_, [5]_
+    """Binary Hybrid Particle Swarm Optimization and Gravitational Search Algorithm
 
     Parameters
     ----------
@@ -54,13 +54,13 @@ class BPSOGSA:
 
     References
     ----------
-    .. [1] A New Hybrid PSOGSA Algorithm for Function Optimization
+    - A New Hybrid PSOGSA Algorithm for Function Optimization,
        https://www.mathworks.com/matlabcentral/fileexchange/35939-hybrid-particle-swarm-optimization-and-gravitational-search-algorithm-psogsa
-    .. [2] Manuscript: Particle swarm optimization: developments, applications and resources.
-    .. [3] Manuscript: S-shaped versus v-shaped transfer functions for binary
+    - Manuscript: Particle swarm optimization: developments, applications and resources.
+    - Manuscript: S-shaped versus v-shaped transfer functions for binary
        particle swarm optimization
-    .. [4] Manuscript: BGSA: Binary Gravitational Search Algorithm.
-    .. [5] Manuscript: A taxonomy of hybrid metaheuristics
+    - Manuscript: BGSA: Binary Gravitational Search Algorithm.
+    - Manuscript: A taxonomy of hybrid metaheuristics
 
     """
 
@@ -88,29 +88,35 @@ class BPSOGSA:
         self._power = power
         self.p_zeros = p_zeros
         self.p_ones = p_ones
+        self.best_by_iter = None
+        self.mean_by_iter = None
+        self.optimal_fitness_value = None
+        self.optimal_model = None
         super(BPSOGSA, self).__init__()
 
     def evaluate_objective_function(self, candidate_solution):
+        """Function to be optimized"""
         total = 0
-        for i in range(len(candidate_solution)):
-            total += candidate_solution[i] ** 2
+        for candidate in candidate_solution:
+            total += candidate**2
         return total
 
     def optimize(self):
         """Run the BPSOGSA algorithm.
 
         This algorithm is based on the Matlab implementation provided by the
-        author of the BPSOGSA algorithm [1]_, [2]_, [3]_, [4]_, [5]_.
+        author of the BPSOGSA algorithm.
 
         References
         ----------
-        .. [1] A New Hybrid PSOGSA Algorithm for Function Optimization.
+        - A New Hybrid PSOGSA Algorithm for Function Optimization.
            https://www.mathworks.com/matlabcentral/fileexchange/35939-hybrid-particle-swarm-optimization-and-gravitational-search-algorithm-psogsa
-        .. [2] Manuscript: Particle swarm optimization: developments, applications and resources.
-        .. [3] Manuscript: S-shaped versus v-shaped transfer functions for binary.
+        - Manuscript: Particle swarm optimization: developments, applications and
+            resources.
+        - Manuscript: S-shaped versus v-shaped transfer functions for binary.
            particle swarm optimization
-        .. [4] Manuscript: BGSA: Binary Gravitational Search Algorithm.
-        .. [5] Manuscript: A taxonomy of hybrid metaheuristics.
+        - Manuscript: BGSA: Binary Gravitational Search Algorithm.
+        - Manuscript: A taxonomy of hybrid metaheuristics.
 
         """
         velocity = np.zeros([self.dimension, self.n_agents])
@@ -120,7 +126,7 @@ class BPSOGSA:
         self.optimal_fitness_value = np.inf
         self.optimal_model = None
 
-        for iter in range(self.maxiter):
+        for i in range(self.maxiter):
             fitness = self.evaluate_objective_function(population)
 
             column_of_best_solution = np.argmin(fitness)
@@ -133,15 +139,15 @@ class BPSOGSA:
             self.best_by_iter.append(self.optimal_fitness_value)
             self.mean_by_iter.append(np.mean(fitness))
             agent_mass = self.mass_calculation(fitness)
-            gravitational_constant = self.calculate_gravitational_constant(iter)
+            gravitational_constant = self.calculate_gravitational_constant(i)
             acceleration = self.calculate_acceleration(
-                population, agent_mass, gravitational_constant, iter
+                population, agent_mass, gravitational_constant, i
             )
             velocity, population = self.update_velocity_position(
                 population,
                 acceleration,
                 velocity,
-                iter,
+                i,
             )
 
         return self

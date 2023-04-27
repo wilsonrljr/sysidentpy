@@ -52,3 +52,9 @@ The documentation and structure (even this section) is openly inspired by sklear
 
 ## Future
 SysIdentPy is already useful for many researchers and companies to build models for dynamical systems.But still, there are many improvements and features to come. **SysIdentPy** has a great future ahead, and [your help](/landing-page/contribute){.internal-link target=_blank} is greatly appreciated.
+
+## Contributors
+
+<a href="https://github.com/wilsonrljr/sysidentpy/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=wilsonrljr/sysidentpy" width = 500/>
+</a>

@@ -2,7 +2,6 @@
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
 
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
@@ -18,7 +17,7 @@ def plot_results(
     n=100,
     style="seaborn-white",
     facecolor="white",
-    title="Free run simulation"
+    title="Free run simulation",
 ):
     plt.style.use(style)
     plt.rcParams["axes.facecolor"] = facecolor
@@ -42,7 +41,7 @@ def plot_residues_correlation(
     style="seaborn-white",
     facecolor="white",
     title="Residual Analysis",
-    ylabel="Correlation"
+    ylabel="Correlation",
 ):
     plt.style.use(style)
     plt.rcParams["axes.facecolor"] = facecolor
