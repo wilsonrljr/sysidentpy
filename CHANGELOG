@@ -5,7 +5,7 @@ File for tracking changes in SysIdentPy
 Changes in SysIdentPy
 =====================
 
-v0.2.2
+v0.3.0
 ------
 
 CONTRIBUTORS
@@ -16,17 +16,22 @@ CONTRIBUTORS
 CHANGES
 ~~~~~~~
 
-- The update **v0.2.2**  has been released with additional feature, minor API changes and fixes. 
+- The update **v0.3.0**  has been released with additional features, minor API changes and fixes. 
 
 - MAJOR: Estimators support in AOLS
+    - Now you can use any SysIdentPy estimator in AOLS model structure selection. 
 - MAJOR: 
-    - Refactored base class for model structure selection.
+    - Refactored base class for model structure selection. A refactored base class for model structure selection has been introduced in SysIdentPy. This update aims to enhance the system identification process by preparing the package for new features that are currently in development, like multiobjective parameter estimation, new basis functions and more.
+
+    Several methods within the base class have undergone significant restructuring to improve their functionality and optimize their performance. This reorganization will facilitate the incorporation of advanced model selection techniques in the future, which will enable users to obtain dynamic models with robust static performance.
     - Avoid unnecessary inheritance in every MSS method and improve the readability with better structured classes.
     - Rewritten methods to avoid code duplication.
     - Improve overall code readability by rewriting if/elif/else clauses.
-
+- Breaking Change: `X_train` and `y_train` were replaced respectively by `X` and `y` in `fit` method in MetaMSS model structure selection algorithm.  `X_test` and `y_test` were replaced by `X` and `y` in `predict` method in MetaMSS. Check the MetaMSS example in docs if you have any question of how to define those arguments. 
+- FIX: Issue #96. Fix issue with numpy 1.24.* version. Thanks for the contribution @gamcorn.
+- FIX: Issue #91. Fix r2_score metric issue with 2 dimensional arrays.
+- FIX: Issue #88 .Fix one step ahead prediction error in SimulateNARMAX class (thanks for pointing out, Lalith).
 - FIX: Fix error in selecting the correct regressors in AOLS.
-- FIX: Fix one step ahead prediction error in SimulateNARMAX class (thanks Lalith).
 - Fix: Fix n step ahead prediction method not returning all values of the defined steps-ahead value when passing only the initial condition.
 - FIX: Fix Visible Deprecation Warning raised in get_max_lag method.
 - FIX: Fix deprecation warning in Extended Least Squares Example
