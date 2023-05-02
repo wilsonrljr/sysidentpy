@@ -30,6 +30,7 @@ CHANGES
 - Breaking Change: `X_train` and `y_train` were replaced respectively by `X` and `y` in `fit` method in MetaMSS model structure selection algorithm.  `X_test` and `y_test` were replaced by `X` and `y` in `predict` method in MetaMSS. Check the MetaMSS example in docs if you have any question of how to define those arguments. 
 - FIX: Issue #96. Fix issue with numpy 1.24.* version. Thanks for the contribution @gamcorn.
 - FIX: Issue #91. Fix r2_score metric issue with 2 dimensional arrays.
+- FIX: Issue #90.
 - FIX: Issue #88 .Fix one step ahead prediction error in SimulateNARMAX class (thanks for pointing out, Lalith).
 - FIX: Fix error in selecting the correct regressors in AOLS.
 - Fix: Fix n step ahead prediction method not returning all values of the defined steps-ahead value when passing only the initial condition.
