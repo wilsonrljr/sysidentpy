@@ -95,8 +95,8 @@ def test_explained_variance_score():
 
 
 def test_r2_score():
-    y = np.array([3, -0.5, 2, 7])
-    y_predicted = np.array([2.5, 0.0, 2, 8])
+    y = np.array([3, -0.5, 2, 7]).reshape(-1, 1)
+    y_predicted = np.array([2.5, 0.0, 2, 8]).reshape(-1, 1)
     metric = 0.948608
     result = r2_score(y, y_predicted)
     assert_almost_equal(metric, result, decimal=6)
