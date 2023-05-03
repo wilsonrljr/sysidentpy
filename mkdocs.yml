@@ -148,29 +148,30 @@ nav:
     - How to contribute: landing-page/contribute.md
     - License: landing-page/license.md
   - Tutorials:
-        - Features:
-          - basic-steps: examples/basic_steps.ipynb
-          - defining-lags: examples/defining_lags.ipynb
-          - miso: examples/multiple_inputs_example.ipynb
-          - parameter-estimation: examples/parameter_estimation.ipynb
-          - els: examples/extended_least_squares.ipynb
-          - n-steps-prediction: examples/n_steps_ahead_prediction.ipynb
-          - simulating: examples/simulating_a_predefined_model.ipynb
-          - save-load: examples/save_and_load_models.ipynb
-          - information-criteria: examples/information_criteria_examples.ipynb
-          - general-estimators: examples/general_estimators.ipynb
-          - fourier-basis: examples/fourier_basis_function.ipynb
-          - metamss: examples/metamss.ipynb
-          - neural-narx: examples/narx_neural_network.ipynb
-          - aols: examples/aols.ipynb
-          - entropic: examples/entropic_regression.ipynb
-        - Cases:
-          - air-passenger: examples/air_passenger_benchmark.ipynb
-          - f16: examples/f_16_benchmark.ipynb
-          - electromechanical: examples/identification_of_an_electromechanical_system.ipynb
-          - load-forecasting: examples/load_forecasting_benchmark.ipynb
-          - pv-forecasting: examples/PV_forecasting_benchmark.ipynb
-      
+    - Features:
+      - basic-steps: examples/basic_steps.ipynb
+      - defining-lags: examples/defining_lags.ipynb
+      - miso: examples/multiple_inputs_example.ipynb
+      - parameter-estimation: examples/parameter_estimation.ipynb
+      - els: examples/extended_least_squares.ipynb
+      - n-steps-prediction: examples/n_steps_ahead_prediction.ipynb
+      - simulating: examples/simulating_a_predefined_model.ipynb
+      - save-load: examples/save_and_load_models.ipynb
+      - information-criteria: examples/information_criteria_examples.ipynb
+      - general-estimators: examples/general_estimators.ipynb
+      - fourier-basis: examples/fourier_basis_function.ipynb
+      - metamss: examples/metamss.ipynb
+      - neural-narx: examples/narx_neural_network.ipynb
+      - aols: examples/aols.ipynb
+      - entropic: examples/entropic_regression.ipynb
+    - Cases:
+      - air-passenger: examples/air_passenger_benchmark.ipynb
+      - f16: examples/f_16_benchmark.ipynb
+      - electromechanical: examples/identification_of_an_electromechanical_system.ipynb
+      - load-forecasting: examples/load_forecasting_benchmark.ipynb
+      - pv-forecasting: examples/PV_forecasting_benchmark.ipynb
+  - Companion Book:
+    - Preface: book/preface.md    
   - Blog:
     - Events: events/events.md
     - Meetups:
