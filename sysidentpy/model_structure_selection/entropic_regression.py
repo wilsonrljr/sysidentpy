@@ -21,8 +21,21 @@ from ..utils._check_arrays import (
     check_random_state,
     check_X_y,
 )
+from ..utils.deprecation import deprecated
 
 
+@deprecated(
+    version="v0.3.0",
+    future_version="v0.4.0",
+    message=(
+        "Passing a string to define the estimator will rise an error in v0.4.0."
+        " \n You'll have to use ER(estimator=LeastSquares()) instead. \n The"
+        " only change is that you'll have to define the estimator first instead"
+        " of passing a string like 'least_squares'. \n This change will make"
+        " easier to implement new estimators and it'll improve code"
+        " readability."
+    ),
+)
 class ER(Estimators, BaseMSS):
     r"""Entropic Regression Algorithm
 
@@ -604,10 +617,12 @@ class ER(Estimators, BaseMSS):
 
         if self.regressor_code.shape[0] > 90:
             warnings.warn(
-                "Given the higher number of possible regressors"
-                f" ({self.regressor_code.shape[0]}), the Entropic Regression algorithm"
-                " may take long time to run. Consider reducing the number of"
-                " regressors ",
+                (
+                    "Given the higher number of possible regressors"
+                    f" ({self.regressor_code.shape[0]}), the Entropic Regression"
+                    " algorithm may take long time to run. Consider reducing the"
+                    " number of regressors "
+                ),
                 stacklevel=2,
             )
 
@@ -705,31 +720,31 @@ class ER(Estimators, BaseMSS):
         if self.basis_function.__class__.__name__ == "Polynomial":
             if steps_ahead is None:
                 yhat = self._model_prediction(X, y, forecast_horizon=forecast_horizon)
-                yhat = yhat = np.concatenate([y[:self.max_lag], yhat], axis=0)
+                yhat = yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
                 return yhat
             if steps_ahead == 1:
                 yhat = self._one_step_ahead_prediction(X, y)
-                yhat = np.concatenate([y[:self.max_lag], yhat], axis=0)
+                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
                 return yhat
 
             _check_positive_int(steps_ahead, "steps_ahead")
             yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
-            yhat = np.concatenate([y[:self.max_lag], yhat], axis=0)
+            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
             return yhat
 
         if steps_ahead is None:
             yhat = self._basis_function_predict(X, y, forecast_horizon=forecast_horizon)
-            yhat = np.concatenate([y[:self.max_lag], yhat], axis=0)
+            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
             return yhat
         if steps_ahead == 1:
             yhat = self._one_step_ahead_prediction(X, y)
-            yhat = np.concatenate([y[:self.max_lag], yhat], axis=0)
+            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
             return yhat
 
         yhat = self._basis_function_n_step_prediction(
             X, y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
         )
-        yhat = np.concatenate([y[:self.max_lag], yhat], axis=0)
+        yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
         return yhat
 
     def _one_step_ahead_prediction(self, X, y):

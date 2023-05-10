@@ -21,6 +21,18 @@ from ..utils._check_arrays import (
 from ..utils.deprecation import deprecated
 
 
+@deprecated(
+    version="v0.3.0",
+    future_version="v0.4.0",
+    message=(
+        "Passing a string to define the estimator will rise an error in v0.4.0."
+        " \n You'll have to use MetaMSS(estimator=LeastSquares()) instead. \n The"
+        " only change is that you'll have to define the estimator first instead"
+        " of passing a string like 'least_squares'. \n This change will make"
+        " easier to implement new estimators and it'll improve code"
+        " readability."
+    ),
+)
 class MetaMSS(SimulateNARMAX, BPSOGSA):
     r"""Meta-Model Structure Selection: Building Polynomial NARMAX model
 
