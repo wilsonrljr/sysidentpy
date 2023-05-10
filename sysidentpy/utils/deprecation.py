@@ -49,15 +49,10 @@ def deprecated(version, future_version=None, message=None, alternative=None, **k
         if message is None:
             message = f"Class {cls.__name__} has been deprecated since {version}."
             if alternative is not None:
-                message += (
-                    f"\n Use {alternative} instead."
-                    "This module was deprecated in favor of "
-                    f"{alternative} module into which all the refactored "
-                    "classes and functions are moved."
-                )
+                message += alternative
             if future_version is not None:
                 message += (
-                    f"\n This feature will be removed in version {future_version}."
+                    f"\n This change will be applied in version {future_version}."
                 )
 
         cls.__init__ = deprecate_function(cls.__init__, message=message)
