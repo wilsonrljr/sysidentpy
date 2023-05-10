@@ -17,8 +17,19 @@ from sysidentpy.utils._check_arrays import _check_positive_int, _num_features, c
 from ..basis_function import Fourier, Polynomial
 from ..narmax_base import BaseMSS, Orthogonalization
 from ..parameter_estimation.estimators import Estimators
+from ..utils.deprecation import deprecated
 
 
+@deprecated(
+    version="v0.3.0",
+    future_version="v0.4.0",
+    alternative=(
+        " \n You'll have to use FROLS(estimator=LeastSquares()) instead. \n The only"
+        " change is that you'll have to define the estimator first instead of passing a"
+        " string like 'least_squares'). \n This change will make easier to implement"
+        " new estimators and it'll improve code readability."
+    ),
+)
 class FROLS(Estimators, BaseMSS):
     r"""Forward Regression Orthogonal Least Squares algorithm.
 
