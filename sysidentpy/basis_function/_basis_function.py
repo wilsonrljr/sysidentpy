@@ -1,17 +1,21 @@
 """ Basis Function for NARMAX models """
 
 from itertools import combinations_with_replacement
+from typing import Union
 
 import numpy as np
 
+from .basis_function_base import BaseBasisFunction
 
-class Polynomial:
+
+class Polynomial(BaseBasisFunction):
     r"""Build polynomial basis function.
     Generate a new feature matrix consisting of all polynomial combinations
     of the features with degree less than or equal to the specified degree.
 
     $$
-        y_k = \sum_{i=1}^{p}\Theta_i \times \prod_{j=0}^{n_x}u_{k-j}^{b_i, j}\prod_{l=1}^{n_e}e_{k-l}^{d_i, l}\prod_{m=1}^{n_y}y_{k-m}^{a_i, m}
+        y_k = \sum_{i=1}^{p}\Theta_i \times \prod_{j=0}^{n_x}u_{k-j}^{b_i, j}
+        \prod_{l=1}^{n_e}e_{k-l}^{d_i, l}\prod_{m=1}^{n_y}y_{k-m}^{a_i, m}
     $$
 
     where $p$ is the number of regressors, $\Theta_i$ are the
@@ -37,7 +41,12 @@ class Polynomial:
     ):
         self.degree = degree
 
-    def fit(self, data, max_lag, predefined_regressors=None):
+    def fit(
+        self,
+        data: np.ndarray,
+        max_lag: int = 1,
+        predefined_regressors: Union[np.ndarray, None] = None,
+    ):
         """Build the Polynomial information matrix.
 
         Each columns of the information matrix represents a candidate
@@ -75,7 +84,12 @@ class Polynomial:
         psi = psi[max_lag:, :]
         return psi
 
-    def transform(self, data, max_lag, predefined_regressors=None):
+    def transform(
+        self,
+        data: np.ndarray,
+        max_lag: int = 1,
+        predefined_regressors: Union[np.ndarray, None] = None,
+    ):
         return self.fit(data, max_lag, predefined_regressors)
 
 
@@ -112,7 +126,12 @@ class Fourier:
         )
         return base
 
-    def fit(self, data, max_lag, predefined_regressors=None):
+    def fit(
+        self,
+        data: np.ndarray,
+        max_lag: int = 1,
+        predefined_regressors: Union[np.ndarray, None] = None,
+    ):
         """Build the Polynomial information matrix.
 
         Each columns of the information matrix represents a candidate
@@ -164,5 +183,10 @@ class Fourier:
 
         return psi[:, predefined_regressors], self.ensemble
 
-    def transform(self, data, max_lag, predefined_regressors=None):
+    def transform(
+        self,
+        data: np.ndarray,
+        max_lag: int = 1,
+        predefined_regressors: Union[np.ndarray, None] = None,
+    ):
         return self.fit(data, max_lag, predefined_regressors)
