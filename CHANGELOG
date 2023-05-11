@@ -12,18 +12,20 @@ CONTRIBUTORS
 ~~~~~~~~~~~~
 
 - wilsonrljr
+- gamcorn
+- Gabo-Tor
 
 CHANGES
 ~~~~~~~
 
-- The update **v0.3.0**  has been released with additional features, minor API changes and fixes. 
+- The update **v0.3.0**  has been released with additional features, API changes and fixes. 
 
 - MAJOR: Estimators support in AOLS
     - Now you can use any SysIdentPy estimator in AOLS model structure selection. 
 - API Change: 
     - Refactored base class for model structure selection. A refactored base class for model structure selection has been introduced in SysIdentPy. This update aims to enhance the system identification process by preparing the package for new features that are currently in development, like multiobjective parameter estimation, new basis functions and more.
 
-    Several methods within the base class have undergone significant restructuring to improve their functionality and optimize their performance. This reorganization will facilitate the incorporation of advanced model selection techniques in the future, which will enable users to obtain dynamic models with robust static performance.
+    Several methods within the base class have undergone significant restructuring to improve their functionality and optimize their performance. This reorganization will facilitate the incorporation of advanced model selection techniques in the future, which will enable users to obtain dynamic models with robust dynamic and static performance.
     - Avoid unnecessary inheritance in every MSS method and improve the readability with better structured classes.
     - Rewritten methods to avoid code duplication.
     - Improve overall code readability by rewriting if/elif/else clauses.
@@ -46,6 +48,8 @@ CHANGES
 - DOC: Minor additions and grammar fixes.
 - DOC: Improve image visualization using mkdocs-glightbox.
 - Update dev packages versions
+
+
 v0.2.1
 ------
 
