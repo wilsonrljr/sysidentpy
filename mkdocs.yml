@@ -171,7 +171,8 @@ nav:
       - load-forecasting: examples/load_forecasting_benchmark.ipynb
       - pv-forecasting: examples/PV_forecasting_benchmark.ipynb
   - Companion Book:
-    - Preface: book/preface.md    
+    - Preface: book/preface.md
+    - Contents: book/contents.md 
   - Blog:
     - Events: events/events.md
     - Meetups:
