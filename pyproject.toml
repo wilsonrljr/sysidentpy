@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "sysidentpy"
 description = "A Python Package For System Identification Using NARMAX Models"
 readme = "README.md"
-requires-python = ">=3.7,<3.11"
+requires-python = ">=3.7,<=3.11"
 license = { file = "LICENSE" }
 keywords = ["NARMAX", "NARX", "system identification", "machine learning"]
 authors = [
@@ -39,7 +39,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
-dependencies = ["numpy>=1.19.2,<=1.23.5", "scipy>=1.7.0", "matplotlib>=3.3.2"]
+dependencies = ["numpy>=1.19.2,<=1.24.3", "scipy>=1.7.0", "matplotlib>=3.3.2"]
 
 dynamic = ["version"]
 
@@ -54,18 +54,18 @@ dev = [
 ]
 doc = [
     "mkdocs >=1.1.2,<2.0.0",
-    "mkdocs-material >=8.1.4,<9.0.0",
+    "mkdocs-material >=8.1.4,<=9.1.11",
     "mdx-include >=1.4.1,<2.0.0",
-    "mkdocs-markdownextradata-plugin >=0.1.7,<0.3.0",
+    "mkdocs-markdownextradata-plugin >=0.1.7,<=0.2.5",
     # TODO: upgrade and enable typer-cli once it supports Click 8.x.x
     # "typer-cli >=0.0.12,<0.0.13",
     "typer >=0.4.1,<0.5.0",
     "pyyaml >=5.3.1,<7.0.0",
-    "mkdocstrings[python]",
+    "mkdocstrings[python]<=0.21.2",
     "mkdocs-redirects",
-    "mkdocs-minify-plugin",
-    "mkdocs-glightbox",
-    "mkdocs-jupyter",
+    "mkdocs-minify-plugin<=0.6.4",
+    "mkdocs-glightbox <= 0.3.2",
+    "mkdocs-jupyter<=0.24.1",
     # avoid jinja import error using 3.0.3 version
     "jinja2==3.0.3",
 ]
