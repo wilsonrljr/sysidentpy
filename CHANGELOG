@@ -22,6 +22,7 @@ CHANGES
 
 - MAJOR: Estimators support in AOLS
     - Now you can use any SysIdentPy estimator in AOLS model structure selection. 
+
 - API Change: 
     - Refactored base class for model structure selection. A refactored base class for model structure selection has been introduced in SysIdentPy. This update aims to enhance the system identification process by preparing the package for new features that are currently in development, like multiobjective parameter estimation, new basis functions and more.
 
@@ -29,24 +30,43 @@ CHANGES
     - Avoid unnecessary inheritance in every MSS method and improve the readability with better structured classes.
     - Rewritten methods to avoid code duplication.
     - Improve overall code readability by rewriting if/elif/else clauses.
+
+- Breaking Change: `X_train` and `y_train` were replaced respectively by `X` and `y` in `fit` method in MetaMSS model structure selection algorithm.  `X_test` and `y_test` were replaced by `X` and `y` in `predict` method in MetaMSS.
+
 - API Change: Added BaseBasisFunction class, an abstract base class for implementing basis functions. 
+
 - Enhancement: Added support for python 3.11.
-- Future Deprecation Warning: `X_train` and `y_train` will be replaced respectively by `X` and `y` in `fit` method in MetaMSS model structure selection algorithm.  `X_test` and `y_test` will be replaced by `X` and `y` in `predict` method in MetaMSS.
+
 - Future Deprecation Warning: The user will have to define the estimator and pass it to every model structure selection algorithm instead of using a string to define the Estimator. Currently the estimator is defined like "estimator='least_squares'". In version 0.4.0 the definition will be like "estimator=LeastSquares()"
+
 - FIX: Issue #96. Fix issue with numpy 1.24.* version. Thanks for the contribution @gamcorn.
+
 - FIX: Issue #91. Fix r2_score metric issue with 2 dimensional arrays.
+
 - FIX: Issue #90.
+
 - FIX: Issue #88 .Fix one step ahead prediction error in SimulateNARMAX class (thanks for pointing out, Lalith).
+
 - FIX: Fix error in selecting the correct regressors in AOLS.
+
 - Fix: Fix n step ahead prediction method not returning all values of the defined steps-ahead value when passing only the initial condition.
+
 - FIX: Fix Visible Deprecation Warning raised in get_max_lag method.
+
 - FIX: Fix deprecation warning in Extended Least Squares Example
+
 - DATASET: Added air passengers dataset to SysIdentPy repository. 
+
 - DATASET: Added San Francisco Hospital Load dataset to SysIdentPy repository. 
+
 - DATASET: Added San Francisco PV GHI dataset to SysIdentPy repository.
+
 - DOC: Improved documentation in Setting Specif Lags page. Now we bring an example of how to set specific lags for MISO models.
+
 - DOC: Minor additions and grammar fixes.
+
 - DOC: Improve image visualization using mkdocs-glightbox.
+
 - Update dev packages versions
 
 
