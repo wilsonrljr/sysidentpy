@@ -1,8 +1,8 @@
-# Dynamic Discoveries: A Journey Through System Identification and Forecasting
+# Nonlinear Dynamics: A Journey Through System Identification and Forecasting
 
 Welcome to our companion book on System Identification! This book is a comprehensive yet fun approach to learning about dynamic models and forecasting. We believe that learning doesn't have to be dull and boring, which is why we've made sure to infuse some humor into the material.
 
-Our book is specifically designed for those who are interested in learning system identification and forecasting.  We will guide you through the process step-by-step using Python and the SysIdentPy package. With SysIdentPy, you will be able to apply a range of techniques for modeling dynamic systems, making predictions, and exploring different design schemes.
+Our book is specifically designed for those who are interested in learning system identification and forecasting.  We will guide you through the process step-by-step using Python and the SysIdentPy package. With `SysIdentPy`, you will be able to apply a range of techniques for modeling dynamic systems, making predictions, and exploring different design schemes.
 
 Our approach to teaching is centered around a rigorous curriculum that is designed to provide you with a deep understanding of the subject matter. Learning is an iterative process, which is why our book is organized in a way that allows you to build upon your knowledge gradually.
 
@@ -26,4 +26,4 @@ In addition to these resources, we will also reference Luis Antônio Aguirre `In
 
 ## Contribute
 
-The `Dynamic Discoveries: A Journey Through System Identification and Forecasting` is a comprehensive resource on the science of System Identification, offered as an open-source material. Our aim is to make this valuable resource accessible to all, both financially and intellectually. If you have found this book helpful and want to support our endeavor financially, you are referred to the Sponsor page. However, if you are not yet ready to contribute financially, you can still help us by pointing out typos, suggesting edits, or offering feedback on passages that you found difficult to comprehend. Simply navigate to the book's repository and open an issue. Lastly, if you enjoyed our content, please consider sharing it with others who may find it useful and leave us a star on GitHub.
+The `Nonlinear Dynamics: A Journey Through System Identification and Forecasting` is a comprehensive resource on the science of System Identification, offered as an open-source material. Our aim is to make this valuable resource accessible to all, both financially and intellectually. If you have found this book helpful and want to support our endeavor financially, you are referred to the Sponsor page. However, if you are not yet ready to contribute financially, you can still help us by pointing out typos, suggesting edits, or offering feedback on passages that you found difficult to comprehend. Simply navigate to the book's repository and open an issue. Lastly, if you enjoyed our content, please consider sharing it with others who may find it useful and leave us a star on GitHub.
