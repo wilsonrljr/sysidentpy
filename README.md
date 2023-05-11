@@ -294,6 +294,7 @@ The documentation and structure (even this section) is openly inspired by sklear
 
 # [Join our <span class="mdx-sponsorship-count" data-mdx-component="sponsorship-count"></span> awesome sponsors][wilsonrljr's sponsor profile]{ .md-button .md-button--primary .mdx-sponsorship-button }
 
+<!-- sponsors -->
 <hr />
 **Special thanks** to our **sponsors**:
 
@@ -312,3 +313,5 @@ The documentation and structure (even this section) is openly inspired by sklear
 <hr />
 
   [wilsonrljr's sponsor profile]: https://github.com/sponsors/wilsonrljr
+
+<!-- sponsors -->
