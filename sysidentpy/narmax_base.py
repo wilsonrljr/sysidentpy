@@ -62,8 +62,6 @@ class InformationMatrix:
         ----------
         X : array-like
             Input data used on training phase.
-        xlag : int
-            The maximum lag of input regressors.
 
         Returns
         -------
@@ -87,11 +85,6 @@ class InformationMatrix:
     def _process_ylag(self) -> List[int]:
         """Create the list of lags to be used for the outputs
 
-        Parameters
-        ----------
-        ylag : int, list
-            The maximum lag of input regressors.
-
         Returns
         -------
         y_lag : ndarray of int
@@ -112,8 +105,6 @@ class InformationMatrix:
         ----------
         X : array-like
             Input data used on training phase.
-        xlag : int
-            The maximum lag of input regressors.
         n_inputs : int
             Number of input variables.
 
@@ -151,8 +142,6 @@ class InformationMatrix:
         ----------
         y : array-like
             Output data used on training phase.
-        ylag : int
-            The maximum lag of output regressors.
 
         Returns
         -------
@@ -175,10 +164,6 @@ class InformationMatrix:
             Target data used on training phase.
         X : array-like
             Input data used on training phase.
-        ylag : int
-            The maximum lag of output regressors.
-        xlag : int
-            The maximum lag of input regressors.
 
         Returns
         -------
@@ -205,14 +190,12 @@ class InformationMatrix:
 
         Each columns of the information matrix represents a candidate
         regressor. The set of candidate regressors are based on xlag,
-        ylag, and non_degree entered by the user.
+        ylag, and degree entered by the user.
 
         Parameters
         ----------
         y : array-like
             Target data used on training phase.
-        ylag : int
-            The maximum lag of output regressors.
 
         Returns
         -------
@@ -235,14 +218,12 @@ class InformationMatrix:
 
         Each columns of the information matrix represents a candidate
         regressor. The set of candidate regressors are based on xlag,
-        ylag, and non_degree entered by the user.
+        ylag, and degree entered by the user.
 
         Parameters
         ----------
         X : array-like
             Input data used on training phase.
-        xlag : int
-            The maximum lag of input regressors.
 
         Returns
         -------
@@ -266,7 +247,7 @@ class InformationMatrix:
 
         Each columns of the information matrix represents a candidate
         regressor. The set of candidate regressors are based on xlag,
-        ylag, and non_degree entered by the user.
+        ylag, and degree entered by the user.
 
         Parameters
         ----------
@@ -274,10 +255,6 @@ class InformationMatrix:
             Target data used on training phase.
         X : array-like
             Input data used on training phase.
-        ylag : int
-            The maximum lag of output regressors.
-        xlag : int
-            The maximum lag of input regressors.
 
         Returns
         -------
@@ -321,12 +298,8 @@ class RegressorDictionary(InformationMatrix):
 
         Parameters
         ----------
-        non_degree : int
-            The desired maximum nonlinearity degree.
-        ylag : int
-            The maximum lag of output regressors.
-        xlag : int
-            The maximum lag of input regressors.
+        n_inputs : int
+            Number of input variables.
 
         Returns
         -------
@@ -353,8 +326,7 @@ class RegressorDictionary(InformationMatrix):
         """
         if self.basis_function.degree < 1:
             raise ValueError(
-                "non_degree must be integer and > zero. Got"
-                f" {self.basis_function.degree}"
+                f"degree must be integer and > zero. Got {self.basis_function.degree}"
             )
 
         if np.min(np.minimum(self.ylag, 1)) < 1:
@@ -377,7 +349,14 @@ class RegressorDictionary(InformationMatrix):
         return x_vec, y_vec
 
     def get_y_lag_list(self) -> np.ndarray:
-        """get y lag list"""
+        """Return y regressor code list.
+
+        Returns
+        -------
+        y_vec = ndarray of ints
+            The y regressor code list given the ylag.
+
+        """
         if isinstance(self.ylag, list):
             # create only the lags passed from list
             y_vec = []
@@ -388,7 +367,14 @@ class RegressorDictionary(InformationMatrix):
         return np.arange(1001, 1001 + self.ylag)
 
     def get_siso_x_lag_list(self) -> np.ndarray:
-        """get lag list of single input model"""
+        """Return x regressor code list for SISO models.
+
+        Returns
+        -------
+        x_vec_tmp = ndarray of ints
+            The x regressor code list given the xlag for a SISO model.
+
+        """
         if isinstance(self.xlag, list):
             # create only the lags passed from list
             x_vec_tmp = []
@@ -399,7 +385,14 @@ class RegressorDictionary(InformationMatrix):
         return np.arange(2001, 2001 + self.xlag)
 
     def get_miso_x_lag_list(self, n_inputs: int) -> np.ndarray:
-        """get miso x lag list"""
+        """Return x regressor code list for MISO models.
+
+        Returns
+        -------
+        x_vec = ndarray of ints
+            The x regressor code list given the xlag for a MISO model.
+
+        """
         # only list are allowed if n_inputs > 1
         # the user must entered list of the desired lags explicitly
         x_vec_tmp = []
@@ -417,7 +410,19 @@ class RegressorDictionary(InformationMatrix):
         return np.concatenate([i for i in all_arrays])
 
     def regressor_space(self, n_inputs):
-        """Create regressor code based on model type."""
+        """Create regressor code based on model type.
+
+        Parameters
+        ----------
+        n_inputs : int
+            Number of input variables.
+
+        Returns
+        -------
+        regressor_code = ndarray of ints
+            The regressor code list given the xlag and ylag for a MISO model.
+
+        """
         x_vec, y_vec = self.create_narmax_code(n_inputs)
         reg_aux = np.array([0])
         if self.model_type == "NARMAX":
@@ -528,6 +533,19 @@ class RegressorDictionary(InformationMatrix):
         return 1
 
     def _get_max_lag_from_model_code(self, model_code):
+        """Create a flattened array of input regressors.
+
+        Parameters
+        ----------
+        model_code : ndarray of int
+            Model defined by the user to simulate.
+
+        Returns
+        -------
+        max_lag : int
+            Maximum lag of list of regressors.
+
+        """
         xlag_code = self._list_input_regressor_code(model_code)
         ylag_code = self._list_output_regressor_code(model_code)
         xlag = self._get_lag_from_regressor_code(xlag_code)

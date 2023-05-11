@@ -8,7 +8,7 @@ title: About Us
 The project was started by Wilson R. L. Junior, Luan Pascoal and Samir A. M. Martins as a project for System Identification discipline. We have been working with System Identification for several years (Nonlinear Systems, Machine Learning, Chaotic Systems, Hysteretic models, etc) for several years. 
 
 <br> 
-Every work we did was using a great tool, but a **paid** one: Matlab. We started looking for some free alternatives to build NARMAX models using the methods known in System Identification community, but we didn't find any package written in Python with the features we needed to keep doing our research.   
+Every work we did was using a great tool, but a **paid** one: Matlab. We started looking for some free alternatives to build NARMAX and its variants (AR, ARX, ARMAX, NAR, NARX, NFIR, Neural NARX, etc.) models using the methods known in System Identification community, but we didn't find any package written in Python with the features we needed to keep doing our research.   
 <br> 
 Besides, it was always too difficult to find source code of the papers working with NARMAX models and reproduce results was a really hard thing to do.
 
@@ -51,7 +51,7 @@ If you use SysIdentPy on your scientific publication, we would appreciate citati
 The documentation and structure (even this section) is openly inspired by sklearn, einsteinpy, and many others as we used (and keep using) them to learn.
 
 ## Future
-SysIdentPy is already useful for many researchers and companies to build models for dynamical systems.But still, there are many improvements and features to come. **SysIdentPy** has a great future ahead, and [your help](/landing-page/contribute){.internal-link target=_blank} is greatly appreciated.
+SysIdentPy is already useful for many researchers and companies to build NARX models for dynamical systems. But still, there are many improvements and features to come. **SysIdentPy** has a great future ahead, and [your help](/landing-page/contribute){.internal-link target=_blank} is greatly appreciated.
 
 ## Contributors
 

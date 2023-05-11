@@ -69,7 +69,7 @@ Regressors     Parameters        ERR
 plot_results(y=y_valid, yhat=yhat, n=1000)
 ee = compute_residues_autocorrelation(y_valid, yhat)
 plot_residues_correlation(data=ee, title="Residues", ylabel="$e^2$")
-x1e = compute_cross_correlation(y_valid, yhat, x_valid)
+x1e = compute_cross_correlation(y_valid, yhat, x2_val)
 plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 ```
 
