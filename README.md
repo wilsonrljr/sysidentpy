@@ -292,19 +292,20 @@ The documentation and structure (even this section) is openly inspired by sklear
 </a>
 
 
-# [Join our <span class="mdx-sponsorship-count" data-mdx-component="sponsorship-count"></span> awesome sponsors][wilsonrljr's sponsor profile]{ .md-button .md-button--primary .mdx-sponsorship-button }
-
+## Sponsors
 <!-- sponsors -->
-<hr />
-**Special thanks** to our **sponsors**:
+**Special thanks** to our **sponsors**
 
-":medal: Gold Sponsors"
+<hr />
+
+
+### Gold Sponsors
 
 <a href="https://github.com/ml-technium">
     <img alt="Technium" src="https://avatars.githubusercontent.com/u/83768197?v=4" width="90" height="90">
 </a>
 
-":octicons-person-fill-16: Individual Sponsors"
+### Individual Sponsors
 
 <a href="https://github.com/nataliakeles">
     <img alt="Nath Keles" src="https://avatars.githubusercontent.com/u/61664158?v=4" width="90" height="90">
