@@ -9,7 +9,7 @@
 
 import warnings
 from typing import Union
-
+ 
 import numpy as np
 
 from sysidentpy.utils._check_arrays import _check_positive_int, _num_features, check_X_y
@@ -175,6 +175,7 @@ class FROLS(Estimators, BaseMSS):
         self.xlag = xlag
         self.max_lag = self._get_max_lag()
         self.info_criteria = info_criteria
+        self.info_criteria_function = self.get_info_criteria()
         self.n_info_values = n_info_values
         self.n_terms = n_terms
         self.estimator = estimator
@@ -367,7 +368,8 @@ class FROLS(Estimators, BaseMSS):
             tmp_residual = y[self.max_lag :] - tmp_yhat
             e_var = np.var(tmp_residual, ddof=1)
 
-            output_vector[i] = self.compute_info_value(n_theta, n_samples, e_var)
+            # output_vector[i] = self.compute_info_value(n_theta, n_samples, e_var)
+            output_vector[i] = self.info_criteria_function(n_theta, n_samples, e_var)
 
         return output_vector
 
@@ -405,6 +407,116 @@ class FROLS(Estimators, BaseMSS):
         else:  # AIC
             model_factor = +2 * n_theta
 
+        e_factor = n_samples * np.log(e_var)
+        info_criteria_value = e_factor + model_factor
+
+        return info_criteria_value
+
+    def get_info_criteria(self):
+        """get info criteria"""
+        info_criteria_options = {
+            "aic": self.aic,
+            "bic": self.bic,
+            "fpe": self.fpe,
+            "lilc": self.lilc,
+        }
+        return info_criteria_options.get(self.info_criteria)
+
+    def bic(self, n_theta, n_samples, e_var):
+        """Compute the Bayesian information criteria value.
+
+        Parameters
+        ----------
+        n_theta : int
+            Number of parameters of the model.
+        n_samples : int
+            Number of samples given the maximum lag.
+        e_var : float
+            Variance of the residues
+
+        Returns
+        -------
+        info_criteria_value : float
+            The computed value given the information criteria selected by the
+            user.
+
+        """
+        model_factor = n_theta * np.log(n_samples)
+        e_factor = n_samples * np.log(e_var)
+        info_criteria_value = e_factor + model_factor
+
+        return info_criteria_value
+
+    def aic(self, n_theta, n_samples, e_var):
+        """Compute the Akaike information criteria value.
+
+        Parameters
+        ----------
+        n_theta : int
+            Number of parameters of the model.
+        n_samples : int
+            Number of samples given the maximum lag.
+        e_var : float
+            Variance of the residues
+
+        Returns
+        -------
+        info_criteria_value : float
+            The computed value given the information criteria selected by the
+            user.
+
+        """
+        model_factor = 2 * n_theta
+        e_factor = n_samples * np.log(e_var)
+        info_criteria_value = e_factor + model_factor
+
+        return info_criteria_value
+
+    def fpe(self, n_theta, n_samples, e_var):
+        """Compute the Final Error Prediction value.
+
+        Parameters
+        ----------
+        n_theta : int
+            Number of parameters of the model.
+        n_samples : int
+            Number of samples given the maximum lag.
+        e_var : float
+            Variance of the residues
+
+        Returns
+        -------
+        info_criteria_value : float
+            The computed value given the information criteria selected by the
+            user.
+
+        """
+        model_factor = n_samples * np.log((n_samples + n_theta) / (n_samples - n_theta))
+        e_factor = n_samples * np.log(e_var)
+        info_criteria_value = e_factor + model_factor
+
+        return info_criteria_value
+
+    def lilc(self, n_theta, n_samples, e_var):
+        """Compute the Lilc information criteria value.
+
+        Parameters
+        ----------
+        n_theta : int
+            Number of parameters of the model.
+        n_samples : int
+            Number of samples given the maximum lag.
+        e_var : float
+            Variance of the residues
+
+        Returns
+        -------
+        info_criteria_value : float
+            The computed value given the information criteria selected by the
+            user.
+
+        """
+        model_factor = 2 * n_theta * np.log(np.log(n_samples))
         e_factor = n_samples * np.log(e_var)
         info_criteria_value = e_factor + model_factor
 
