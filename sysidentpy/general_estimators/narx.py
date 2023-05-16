@@ -12,7 +12,7 @@ import numpy as np
 
 from ..narmax_base import BaseMSS
 from ..basis_function import Polynomial
-from ..utils._check_arrays import _check_positive_int, _num_features, check_X_y
+from ..utils._check_arrays import _check_positive_int, _num_features
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -96,6 +96,7 @@ class NARX(BaseMSS):
     ):
         self.basis_function = basis_function
         self.model_type = model_type
+        self.build_matrix = self.get_build_io_method(model_type)
         self.non_degree = basis_function.degree
         self.ylag = ylag
         self.xlag = xlag
@@ -124,6 +125,11 @@ class NARX(BaseMSS):
         if not isinstance(self.ylag, (int, list)):
             raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
 
+        if self.model_type not in ["NARMAX", "NAR", "NFIR"]:
+            raise ValueError(
+                f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
+            )
+
     def fit(self, *, X=None, y=None):
         """Train a NARX Neural Network model.
 
@@ -148,21 +154,8 @@ class NARX(BaseMSS):
         if y is None:
             raise ValueError("y cannot be None")
 
-        if self.model_type == "NAR":
-            lagged_data = self.build_output_matrix(y)
-            self.max_lag = self._get_max_lag()
-        elif self.model_type == "NFIR":
-            lagged_data = self.build_input_matrix(X)
-            self.max_lag = self._get_max_lag()
-        elif self.model_type == "NARMAX":
-            check_X_y(X, y)
-            self.max_lag = self._get_max_lag()
-            lagged_data = self.build_input_output_matrix(X, y)
-        else:
-            raise ValueError(
-                "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
-            )
-
+        self.max_lag = self._get_max_lag()
+        lagged_data = self.build_matrix(X, y)
         if self.basis_function.__class__.__name__ == "Polynomial":
             reg_matrix = self.basis_function.fit(
                 lagged_data, self.max_lag, predefined_regressors=None
@@ -258,17 +251,7 @@ class NARX(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        if self.model_type == "NAR":
-            lagged_data = self.build_output_matrix(y)
-        elif self.model_type == "NFIR":
-            lagged_data = self.build_input_matrix(X)
-        elif self.model_type == "NARMAX":
-            lagged_data = self.build_input_output_matrix(X, y)
-        else:
-            raise ValueError(
-                "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
-            )
-
+        lagged_data = self.build_matrix(X, y)
         if self.basis_function.__class__.__name__ == "Polynomial":
             X_base = self.basis_function.transform(
                 lagged_data,
@@ -288,7 +271,10 @@ class NARX(BaseMSS):
 
     def _nar_step_ahead(self, y, steps_ahead):
         if len(y) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
+            raise ValueError(
+                "Insufficient initial condition elements! Expected at least"
+                f" {self.max_lag} elements."
+            )
 
         to_remove = int(np.ceil((len(y) - self.max_lag) / steps_ahead))
         yhat = np.zeros(len(y) + steps_ahead, dtype=float)
@@ -319,7 +305,10 @@ class NARX(BaseMSS):
     def narmax_n_step_ahead(self, X, y, steps_ahead):
         """n_steps ahead prediction method for NARMAX model"""
         if len(y) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
+            raise ValueError(
+                "Insufficient initial condition elements! Expected at least"
+                f" {self.max_lag} elements."
+            )
 
         to_remove = int(np.ceil((len(y) - self.max_lag) / steps_ahead))
         X = X.reshape(-1, self.n_inputs)
@@ -366,27 +355,6 @@ class NARX(BaseMSS):
         yhat : ndarray of floats
                The n-steps-ahead predicted values of the model.
 
-        if len(y) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
-
-        yhat = np.zeros(X.shape[0], dtype=float)
-        yhat.fill(np.nan)
-        yhat[: self.max_lag] = y[: self.max_lag, 0]
-        i = self.max_lag
-        X = X.reshape(-1, self.n_inputs)
-        while i < len(y):
-            k = int(i - self.max_lag)
-            if i + steps_ahead > len(y):
-                steps_ahead = len(y) - i  # predicts the remaining values
-
-            yhat[i : i + steps_ahead] = self._model_prediction(
-                X[k : i + steps_ahead], y[k : i + steps_ahead]
-            )[-steps_ahead:].ravel()
-
-            i += steps_ahead
-
-        yhat = yhat.ravel()
-        return yhat.reshape(-1, 1)
         """
         if self.model_type == "NARMAX":
             return self.narmax_n_step_ahead(X, y, steps_ahead)
@@ -416,13 +384,16 @@ class NARX(BaseMSS):
         if self.model_type == "NFIR":
             return self._nfir_predict(X, y_initial)
 
-        raise Exception(
-            "model_type do not exist! Model type must be NARMAX, NAR or NFIR"
+        raise ValueError(
+            f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
         )
 
     def _narmax_predict(self, X, y_initial, forecast_horizon):
         if len(y_initial) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
+            raise ValueError(
+                "Insufficient initial condition elements! Expected at least"
+                f" {self.max_lag} elements."
+            )
 
         if X is not None:
             forecast_horizon = X.shape[0]
@@ -499,25 +470,10 @@ class NARX(BaseMSS):
         analyzed_elements_number = self.max_lag + 1
 
         for i in range(0, forecast_horizon - self.max_lag):
-            if self.model_type == "NARMAX":
-                lagged_data = self.build_input_output_matrix(
-                    X[i : i + analyzed_elements_number],
-                    yhat[i : i + analyzed_elements_number].reshape(-1, 1),
-                )
-            elif self.model_type == "NAR":
-                lagged_data = self.build_output_matrix(
-                    yhat[i : i + analyzed_elements_number].reshape(-1, 1)
-                )
-            elif self.model_type == "NFIR":
-                lagged_data = self.build_input_matrix(
-                    X[i : i + analyzed_elements_number]
-                )
-            else:
-                raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
-                    " NFIR."
-                )
-
+            lagged_data = self.build_matrix(
+                X[i : i + analyzed_elements_number],
+                yhat[i : i + analyzed_elements_number].reshape(-1, 1),
+            )
             X_tmp, _ = self.basis_function.transform(
                 lagged_data,
                 self.max_lag,
@@ -547,7 +503,10 @@ class NARX(BaseMSS):
 
         """
         if len(y) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
+            raise ValueError(
+                "Insufficient initial condition elements! Expected at least"
+                f" {self.max_lag} elements."
+            )
 
         if X is not None:
             forecast_horizon = X.shape[0]
@@ -585,8 +544,7 @@ class NARX(BaseMSS):
                 )[-steps_ahead:].ravel()
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
-                    " NFIR."
+                    f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
                 )
 
             i += steps_ahead
@@ -625,8 +583,7 @@ class NARX(BaseMSS):
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
-                    " NFIR."
+                    f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
                 )
 
             i += steps_ahead
