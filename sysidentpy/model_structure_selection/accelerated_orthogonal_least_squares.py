@@ -11,7 +11,7 @@ from numpy import linalg as LA
 from ..narmax_base import BaseMSS
 from ..basis_function import Fourier, Polynomial
 from ..parameter_estimation.estimators import Estimators
-from ..utils._check_arrays import _check_positive_int, _num_features, check_X_y
+from ..utils._check_arrays import _check_positive_int, _num_features
 from ..utils.deprecation import deprecated
 
 
@@ -129,6 +129,7 @@ class AOLS(Estimators, BaseMSS):
         self.basis_function = basis_function
         self.non_degree = basis_function.degree
         self.model_type = model_type
+        self.build_matrix = self.get_build_io_method(model_type)
         self.xlag = xlag
         self.ylag = ylag
         self.max_lag = self._get_max_lag()
@@ -160,26 +161,26 @@ class AOLS(Estimators, BaseMSS):
     def _validate_params(self):
         """Validate input params."""
         if isinstance(self.ylag, int) and self.ylag < 1:
-            raise ValueError("ylag must be integer and > zero. Got %f" % self.ylag)
+            raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
 
         if isinstance(self.xlag, int) and self.xlag < 1:
-            raise ValueError("xlag must be integer and > zero. Got %f" % self.xlag)
+            raise ValueError(f"xlag must be integer and > zero. Got {self.xlag}")
 
         if not isinstance(self.xlag, (int, list)):
-            raise ValueError("xlag must be integer and > zero. Got %f" % self.xlag)
+            raise ValueError(f"xlag must be integer and > zero. Got {self.xlag}")
 
         if not isinstance(self.ylag, (int, list)):
-            raise ValueError("ylag must be integer and > zero. Got %f" % self.ylag)
+            raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
 
         if not isinstance(self.k, int) or self.k < 1:
-            raise ValueError("k must be integer and > zero. Got %f" % self.k)
+            raise ValueError(f"k must be integer and > zero. Got {self.k}")
 
         if not isinstance(self.L, int) or self.L < 1:
-            raise ValueError("k must be integer and > zero. Got %f" % self.L)
+            raise ValueError(f"k must be integer and > zero. Got {self.L}")
 
         if not isinstance(self.threshold, (int, float)) or self.threshold < 0:
             raise ValueError(
-                "threshold must be integer and > zero. Got %f" % self.threshold
+                f"threshold must be integer and > zero. Got {self.threshold}"
             )
 
     def aols(
@@ -294,20 +295,8 @@ class AOLS(Estimators, BaseMSS):
         if y is None:
             raise ValueError("y cannot be None")
 
-        if self.model_type == "NAR":
-            lagged_data = self.build_output_matrix(y)
-            self.max_lag = self._get_max_lag()
-        elif self.model_type == "NFIR":
-            lagged_data = self.build_input_matrix(X)
-            self.max_lag = self._get_max_lag()
-        elif self.model_type == "NARMAX":
-            check_X_y(X, y)
-            self.max_lag = self._get_max_lag()
-            lagged_data = self.build_input_output_matrix(X, y)
-        else:
-            raise ValueError(
-                "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
-            )
+        self.max_lag = self._get_max_lag()
+        lagged_data = self.build_matrix(X, y)
 
         if self.basis_function.__class__.__name__ == "Polynomial":
             reg_matrix = self.basis_function.fit(
@@ -429,17 +418,7 @@ class AOLS(Estimators, BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        if self.model_type == "NAR":
-            lagged_data = self.build_output_matrix(y)
-        elif self.model_type == "NFIR":
-            lagged_data = self.build_input_matrix(X)
-        elif self.model_type == "NARMAX":
-            lagged_data = self.build_input_output_matrix(X, y)
-        else:
-            raise ValueError(
-                "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
-            )
-
+        lagged_data = self.build_matrix(X, y)
         if self.basis_function.__class__.__name__ == "Polynomial":
             X_base = self.basis_function.transform(
                 lagged_data,
@@ -498,13 +477,16 @@ class AOLS(Estimators, BaseMSS):
         if self.model_type == "NFIR":
             return self._nfir_predict(X, y_initial)
 
-        raise Exception(
-            "model_type do not exist! Model type must be NARMAX, NAR or NFIR"
+        raise ValueError(
+            f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
         )
 
     def _narmax_predict(self, X, y_initial, forecast_horizon):
         if len(y_initial) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
+            raise ValueError(
+                "Insufficient initial condition elements! Expected at least"
+                f" {self.max_lag} elements."
+            )
 
         if X is not None:
             forecast_horizon = X.shape[0]
@@ -551,7 +533,10 @@ class AOLS(Estimators, BaseMSS):
 
         """
         if len(y) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
+            raise ValueError(
+                "Insufficient initial condition elements! Expected at least"
+                f" {self.max_lag} elements."
+            )
 
         if X is not None:
             forecast_horizon = X.shape[0]
