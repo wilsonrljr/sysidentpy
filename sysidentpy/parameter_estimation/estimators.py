@@ -157,7 +157,7 @@ class Estimators:
         for _ in range(30):
             e = np.concatenate([np.zeros([max_lag, 1]), e], axis=0)
 
-            lagged_data = im.build_output_matrix(e)
+            lagged_data = im.build_output_matrix(None, e)
 
             e_regressors = self.basis_function.fit(
                 lagged_data, max_lag, predefined_regressors=None
