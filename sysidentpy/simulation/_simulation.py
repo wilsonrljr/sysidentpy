@@ -137,6 +137,7 @@ class SimulateNARMAX(Estimators, BaseMSS):
         )
         self.elag = elag
         self.model_type = model_type
+        self.build_matrix = self.get_build_io_method(model_type)
         self.basis_function = basis_function
         self.estimator = estimator
         self.extended_least_squares = extended_least_squares
@@ -273,16 +274,8 @@ class SimulateNARMAX(Estimators, BaseMSS):
         # to use in the predict function
         self.n_terms = self.final_model.shape[0]
         if self.estimate_parameter and not self.calculate_err:
-            if self.model_type == "NARMAX":
-                self.max_lag = self._get_max_lag()
-                lagged_data = self.build_input_output_matrix(X_train, y_train)
-            elif self.model_type == "NAR":
-                lagged_data = self.build_output_matrix(y_train)
-                self.max_lag = self._get_max_lag()
-            elif self.model_type == "NFIR":
-                lagged_data = self.build_input_matrix(X_train)
-                self.max_lag = self._get_max_lag()
-
+            self.max_lag = self._get_max_lag()
+            lagged_data = self.build_matrix(X_train, y_train)
             psi = self.basis_function.fit(
                 lagged_data, self.max_lag, predefined_regressors=self.pivv
             )
@@ -298,16 +291,8 @@ class SimulateNARMAX(Estimators, BaseMSS):
             self.theta = theta
             self.err = self.n_terms * [0]
         else:
-            if self.model_type == "NARMAX":
-                self.max_lag = self._get_max_lag()
-                lagged_data = self.build_input_output_matrix(X_train, y_train)
-            elif self.model_type == "NAR":
-                lagged_data = self.build_output_matrix(y_train)
-                self.max_lag = self._get_max_lag()
-            elif self.model_type == "NFIR":
-                lagged_data = self.build_input_matrix(X_train)
-                self.max_lag = self._get_max_lag()
-
+            self.max_lag = self._get_max_lag()
+            lagged_data = self.build_matrix(X_train, y_train)
             psi = self.basis_function.fit(
                 lagged_data, self.max_lag, predefined_regressors=self.pivv
             )
@@ -429,31 +414,31 @@ class SimulateNARMAX(Estimators, BaseMSS):
         if self.basis_function.__class__.__name__ == "Polynomial":
             if steps_ahead is None:
                 yhat = self._model_prediction(X, y, forecast_horizon=forecast_horizon)
-                yhat = np.concatenate([y[:self.max_lag], yhat], axis=0)
+                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
                 return yhat
             if steps_ahead == 1:
                 yhat = self._one_step_ahead_prediction(X, y)
-                yhat = np.concatenate([y[:self.max_lag], yhat], axis=0)
+                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
                 return yhat
 
             _check_positive_int(steps_ahead, "steps_ahead")
             yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
-            yhat = np.concatenate([y[:self.max_lag], yhat], axis=0)
+            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
             return yhat
 
         if steps_ahead is None:
             yhat = self._basis_function_predict(X, y, forecast_horizon=forecast_horizon)
-            yhat = np.concatenate([y[:self.max_lag], yhat], axis=0)
+            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
             return yhat
         if steps_ahead == 1:
             yhat = self._one_step_ahead_prediction(X, y)
-            yhat = np.concatenate([y[:self.max_lag], yhat], axis=0)
+            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
             return yhat
 
         yhat = self._basis_function_n_step_prediction(
             X, y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
         )
-        yhat = np.concatenate([y[:self.max_lag], yhat], axis=0)
+        yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
         return yhat
 
     def _one_step_ahead_prediction(self, X, y):
@@ -473,17 +458,7 @@ class SimulateNARMAX(Estimators, BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        if self.model_type == "NAR":
-            lagged_data = self.build_output_matrix(y)
-        elif self.model_type == "NFIR":
-            lagged_data = self.build_input_matrix(X)
-        elif self.model_type == "NARMAX":
-            lagged_data = self.build_input_output_matrix(X, y)
-        else:
-            raise ValueError(
-                "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
-            )
-
+        lagged_data = self.build_matrix(X, y)
         if self.basis_function.__class__.__name__ == "Polynomial":
             X_base = self.basis_function.transform(
                 lagged_data,
@@ -542,13 +517,16 @@ class SimulateNARMAX(Estimators, BaseMSS):
         if self.model_type == "NFIR":
             return self._nfir_predict(X, y_initial)
 
-        raise Exception(
-            "model_type do not exist! Model type must be NARMAX, NAR or NFIR"
+        raise ValueError(
+            f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
         )
 
     def _narmax_predict(self, X, y_initial, forecast_horizon):
         if len(y_initial) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
+            raise ValueError(
+                "Insufficient initial condition elements! Expected at least"
+                f" {self.max_lag} elements."
+            )
 
         if X is not None:
             forecast_horizon = X.shape[0]
