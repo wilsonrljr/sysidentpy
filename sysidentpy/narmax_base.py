@@ -185,7 +185,7 @@ class InformationMatrix:
         lagged_data = np.concatenate([y_lagged, x_lagged], axis=1)
         return lagged_data
 
-    def build_output_matrix(self, y: np.ndarray) -> np.ndarray:
+    def build_output_matrix(self, *args: np.ndarray) -> np.ndarray:
         """Build the information matrix of output values.
 
         Each columns of the information matrix represents a candidate
@@ -207,13 +207,14 @@ class InformationMatrix:
         # related to its respective lags. With this approach we can create
         # the information matrix by using all possible combination of
         # the columns as a product in the iterations
+        y = args[1]  # args[0] is X=None in NAR scenario
         self.ylag = self._process_ylag()
         y_lagged = self._create_lagged_y(y)
         constant = np.ones([y_lagged.shape[0], 1])
         data = np.concatenate([constant, y_lagged], axis=1)
         return data
 
-    def build_input_matrix(self, X: np.ndarray) -> np.ndarray:
+    def build_input_matrix(self, *args: np.ndarray) -> np.ndarray:
         """Build the information matrix of input values.
 
         Each columns of the information matrix represents a candidate
@@ -236,6 +237,7 @@ class InformationMatrix:
         # the information matrix by using all possible combination of
         # the columns as a product in the iterations
 
+        X = args[0]  # args[1] is y=None in NFIR scenario
         n_inputs, self.xlag = self._process_xlag(X)
         x_lagged = self._create_lagged_X(X, n_inputs)
         constant = np.ones([x_lagged.shape[0], 1])
@@ -571,6 +573,15 @@ class RegressorDictionary(InformationMatrix):
         nx = np.max(list(chain.from_iterable([[np.array(self.xlag, dtype=object)]])))
         return np.max([ny, np.max(nx)])
 
+    def get_build_io_method(self, model_type):
+        """get info criteria"""
+        build_matrix_options = {
+            "NARMAX": self.build_input_output_matrix,
+            "NFIR": self.build_input_matrix,
+            "NAR": self.build_output_matrix,
+        }
+        return build_matrix_options.get(model_type, None)
+
 
 class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
     """Base class for Model Structure Selection"""
@@ -725,7 +736,10 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
     def _nar_step_ahead(self, y, steps_ahead):
         if len(y) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
+            raise ValueError(
+                "Insufficient initial condition elements! Expected at least"
+                f" {self.max_lag} elements."
+            )
 
         to_remove = int(np.ceil((len(y) - self.max_lag) / steps_ahead))
         yhat = np.zeros(len(y) + steps_ahead, dtype=float)
@@ -756,7 +770,10 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
     def narmax_n_step_ahead(self, X, y, steps_ahead):
         """n_steps ahead prediction method for NARMAX model"""
         if len(y) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
+            raise ValueError(
+                "Insufficient initial condition elements! Expected at least"
+                f" {self.max_lag} elements."
+            )
 
         to_remove = int(np.ceil((len(y) - self.max_lag) / steps_ahead))
         X = X.reshape(-1, self.n_inputs)
@@ -801,30 +818,6 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
         Returns
         -------
-        yhat : ndarray of floats
-               The n-steps-ahead predicted values of the model.
-
-
-        if len(y) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
-
-        yhat = np.zeros(X.shape[0], dtype=float)
-        yhat.fill(np.nan)
-        yhat[: self.max_lag] = y[: self.max_lag, 0]
-        i = self.max_lag
-        X = X.reshape(-1, self.n_inputs)
-        while i < len(y):
-            k = int(i - self.max_lag)
-            # if i + steps_ahead > len(y):
-            #     steps_ahead = len(y) - i  # predicts the remaining values
-
-            yhat[i : i + steps_ahead] = self._model_prediction(
-                X=X[k : i + steps_ahead], y_initial=y[k : i + steps_ahead]
-            )[-steps_ahead:].ravel()
-
-            i += steps_ahead
-
-        yhat = yhat.ravel()[self.max_lag : :]
         """
         if self.model_type == "NARMAX":
             return self.narmax_n_step_ahead(X, y, steps_ahead)
@@ -851,16 +844,15 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
                 )
             elif self.model_type == "NAR":
                 lagged_data = self.build_output_matrix(
-                    yhat[i : i + analyzed_elements_number].reshape(-1, 1)
+                    None, yhat[i : i + analyzed_elements_number].reshape(-1, 1)
                 )
             elif self.model_type == "NFIR":
                 lagged_data = self.build_input_matrix(
-                    X[i : i + analyzed_elements_number]
+                    X[i : i + analyzed_elements_number], None
                 )
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
-                    " NFIR."
+                    f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
                 )
 
             X_tmp, _ = self.basis_function.transform(
@@ -909,8 +901,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
                 )[-steps_ahead:].ravel()
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
-                    " NFIR."
+                    f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
                 )
 
             i += steps_ahead
@@ -950,8 +941,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
-                    " NFIR."
+                    f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
                 )
 
             i += steps_ahead
