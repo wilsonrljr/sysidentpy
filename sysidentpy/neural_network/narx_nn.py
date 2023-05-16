@@ -16,7 +16,7 @@ from torch import optim
 from torch.utils.data import DataLoader, TensorDataset
 
 from ..narmax_base import BaseMSS
-from ..utils._check_arrays import _check_positive_int, _num_features, check_X_y
+from ..utils._check_arrays import _check_positive_int, _num_features
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -140,6 +140,7 @@ class NARXNN(BaseMSS):
         self.xlag = xlag
         self.basis_function = basis_function
         self.model_type = model_type
+        self.build_matrix = self.get_build_io_method(model_type)
         self.non_degree = basis_function.degree
         self.max_lag = self._get_max_lag()
         self.batch_size = batch_size
@@ -250,17 +251,7 @@ class NARXNN(BaseMSS):
             raise ValueError("y cannot be None")
 
         self.max_lag = self._get_max_lag()
-        if self.model_type == "NAR":
-            lagged_data = self.build_output_matrix(y)
-        elif self.model_type == "NFIR":
-            lagged_data = self.build_input_matrix(X)
-        elif self.model_type == "NARMAX":
-            check_X_y(X, y)
-            lagged_data = self.build_input_output_matrix(X, y)
-        else:
-            raise ValueError(
-                "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
-            )
+        lagged_data = self.build_matrix(X, y)
 
         basis_name = self.basis_function.__class__.__name__
         if basis_name == "Polynomial":
@@ -508,16 +499,7 @@ class NARXNN(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        if self.model_type == "NAR":
-            lagged_data = self.build_output_matrix(y)
-        elif self.model_type == "NFIR":
-            lagged_data = self.build_input_matrix(X)
-        elif self.model_type == "NARMAX":
-            lagged_data = self.build_input_output_matrix(X, y)
-        else:
-            raise ValueError(
-                "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
-            )
+        lagged_data = self.build_matrix(X, y)
 
         basis_name = self.basis_function.__class__.__name__
         if basis_name == "Polynomial":
@@ -558,7 +540,10 @@ class NARXNN(BaseMSS):
 
         """
         if len(y) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
+            raise ValueError(
+                "Insufficient initial condition elements! Expected at least"
+                f" {self.max_lag} elements."
+            )
 
         yhat = np.zeros(X.shape[0], dtype=float)
         yhat.fill(np.nan)
@@ -598,16 +583,20 @@ class NARXNN(BaseMSS):
         """
         if self.model_type in ["NARMAX", "NAR"]:
             return self._narmax_predict(X, y_initial, forecast_horizon)
-        elif self.model_type == "NFIR":
+
+        if self.model_type == "NFIR":
             return self._nfir_predict(X, y_initial)
-        else:
-            raise Exception(
-                "model_type do not exist! Model type must be NARMAX, NAR or NFIR"
-            )
+
+        raise ValueError(
+            f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
+        )
 
     def _narmax_predict(self, X, y_initial, forecast_horizon):
         if len(y_initial) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
+            raise ValueError(
+                "Insufficient initial condition elements! Expected at least"
+                f" {self.max_lag} elements."
+            )
 
         if X is not None:
             forecast_horizon = X.shape[0]
@@ -738,7 +727,10 @@ class NARXNN(BaseMSS):
 
         """
         if len(y) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
+            raise ValueError(
+                "Insufficient initial condition elements! Expected at least"
+                f" {self.max_lag} elements."
+            )
 
         if X is not None:
             forecast_horizon = X.shape[0]
@@ -773,8 +765,7 @@ class NARXNN(BaseMSS):
                 )[-steps_ahead:].ravel()
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
-                    " NFIR."
+                    f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
                 )
 
             i += steps_ahead
@@ -810,8 +801,7 @@ class NARXNN(BaseMSS):
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
             else:
                 raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
-                    " NFIR."
+                    f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
                 )
 
             i += steps_ahead
