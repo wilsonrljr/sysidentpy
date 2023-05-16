@@ -9,10 +9,10 @@
 
 import warnings
 from typing import Union
- 
+
 import numpy as np
 
-from sysidentpy.utils._check_arrays import _check_positive_int, _num_features, check_X_y
+from sysidentpy.utils._check_arrays import _check_positive_int, _num_features
 
 from ..basis_function import Fourier, Polynomial
 from ..narmax_base import BaseMSS, Orthogonalization
@@ -175,13 +175,14 @@ class FROLS(Estimators, BaseMSS):
         self.xlag = xlag
         self.max_lag = self._get_max_lag()
         self.info_criteria = info_criteria
-        self.info_criteria_function = self.get_info_criteria()
+        self.info_criteria_function = self.get_info_criteria(info_criteria)
         self.n_info_values = n_info_values
         self.n_terms = n_terms
         self.estimator = estimator
         self.extended_least_squares = extended_least_squares
         self.elag = elag
         self.model_type = model_type
+        self.build_matrix = self.get_build_io_method(model_type)
         self._validate_params()
         self.basis_function = basis_function
         super().__init__(
@@ -373,46 +374,7 @@ class FROLS(Estimators, BaseMSS):
 
         return output_vector
 
-    def compute_info_value(self, n_theta, n_samples, e_var):
-        """Compute the information criteria value.
-
-        This function returns the information criteria concerning each
-        number of regressor. The information criteria can be AIC, BIC,
-        LILC and FPE.
-
-        Parameters
-        ----------
-        n_theta : int
-            Number of parameters of the model.
-        n_samples : int
-            Number of samples given the maximum lag.
-        e_var : float
-            Variance of the residues
-
-        Returns
-        -------
-        info_criteria_value : float
-            The computed value given the information criteria selected by the
-            user.
-
-        """
-        if self.info_criteria == "bic":
-            model_factor = n_theta * np.log(n_samples)
-        elif self.info_criteria == "fpe":
-            model_factor = n_samples * np.log(
-                (n_samples + n_theta) / (n_samples - n_theta)
-            )
-        elif self.info_criteria == "lilc":
-            model_factor = 2 * n_theta * np.log(np.log(n_samples))
-        else:  # AIC
-            model_factor = +2 * n_theta
-
-        e_factor = n_samples * np.log(e_var)
-        info_criteria_value = e_factor + model_factor
-
-        return info_criteria_value
-
-    def get_info_criteria(self):
+    def get_info_criteria(self, info_criteria):
         """get info criteria"""
         info_criteria_options = {
             "aic": self.aic,
@@ -420,7 +382,7 @@ class FROLS(Estimators, BaseMSS):
             "fpe": self.fpe,
             "lilc": self.lilc,
         }
-        return info_criteria_options.get(self.info_criteria)
+        return info_criteria_options.get(info_criteria)
 
     def bic(self, n_theta, n_samples, e_var):
         """Compute the Bayesian information criteria value.
@@ -556,20 +518,8 @@ class FROLS(Estimators, BaseMSS):
         if y is None:
             raise ValueError("y cannot be None")
 
-        if self.model_type == "NARMAX":
-            check_X_y(X, y)
-            self.max_lag = self._get_max_lag()
-            lagged_data = self.build_input_output_matrix(X, y)
-        elif self.model_type == "NAR":
-            lagged_data = self.build_output_matrix(y)
-            self.max_lag = self._get_max_lag()
-        elif self.model_type == "NFIR":
-            lagged_data = self.build_input_matrix(X)
-            self.max_lag = self._get_max_lag()
-        else:
-            raise ValueError(
-                "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
-            )
+        self.max_lag = self._get_max_lag()
+        lagged_data = self.build_matrix(X, y)
 
         if self.basis_function.__class__.__name__ == "Polynomial":
             reg_matrix = self.basis_function.fit(
@@ -708,16 +658,7 @@ class FROLS(Estimators, BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        if self.model_type == "NAR":
-            lagged_data = self.build_output_matrix(y)
-        elif self.model_type == "NFIR":
-            lagged_data = self.build_input_matrix(X)
-        elif self.model_type == "NARMAX":
-            lagged_data = self.build_input_output_matrix(X, y)
-        else:
-            raise ValueError(
-                "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
-            )
+        lagged_data = self.build_matrix(X, y)
 
         if self.basis_function.__class__.__name__ == "Polynomial":
             X_base = self.basis_function.transform(
@@ -778,13 +719,16 @@ class FROLS(Estimators, BaseMSS):
         if self.model_type == "NFIR":
             return self._nfir_predict(X, y_initial)
 
-        raise Exception(
-            "model_type do not exist! Model type must be NARMAX, NAR or NFIR"
+        raise ValueError(
+            f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
         )
 
     def _narmax_predict(self, X, y_initial, forecast_horizon=0):
         if len(y_initial) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
+            raise ValueError(
+                "Insufficient initial condition elements! Expected at least"
+                f" {self.max_lag} elements."
+            )
 
         if X is not None:
             forecast_horizon = X.shape[0]
@@ -831,7 +775,10 @@ class FROLS(Estimators, BaseMSS):
 
         """
         if len(y) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
+            raise ValueError(
+                "Insufficient initial condition elements! Expected at least"
+                f" {self.max_lag} elements."
+            )
 
         if X is not None:
             forecast_horizon = X.shape[0]
