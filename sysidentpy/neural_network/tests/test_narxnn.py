@@ -1,10 +1,29 @@
 import numpy as np
 import torch
 from numpy.testing import assert_almost_equal, assert_equal, assert_raises
+from torch import nn
 
 from sysidentpy.basis_function import Fourier, Polynomial
 from sysidentpy.neural_network import NARXNN
 from sysidentpy.utils.generate_data import get_siso_data
+from sysidentpy.utils.narmax_tools import regressor_code
+
+
+class NARX(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.lin = nn.Linear(4, 30)
+        self.lin2 = nn.Linear(30, 30)
+        self.lin3 = nn.Linear(30, 1)
+        self.tanh = nn.Tanh()
+
+    def forward(self, xb):
+        z = self.lin(xb)
+        z = self.tanh(z)
+        z = self.lin2(z)
+        z = self.tanh(z)
+        z = self.lin3(z)
+        return z
 
 
 def create_test_data(n=1000):
@@ -52,13 +71,11 @@ def test_default_values():
         "batch_size": 100,
         "learning_rate": 0.01,
         "epochs": 200,
-        # "loss_func": "mse_loss",
         "optimizer": "Adam",
         "net": None,
         "train_percentage": 80,
         "verbose": False,
         "optim_params": None,
-        # "device": "cpu",
     }
     model = NARXNN(basis_function=Polynomial())
     model_values = [
@@ -68,13 +85,11 @@ def test_default_values():
         model.batch_size,
         model.learning_rate,
         model.epochs,
-        # model.loss_func,
         model.optimizer,
         model.net,
         model.train_percentage,
         model.verbose,
         model.optim_params,
-        # model.device,
     ]
     assert list(default.values()) == model_values
 
@@ -98,3 +113,474 @@ def test_fit_raise():
 def test_fit_raise_y():
     model = NARXNN(basis_function=Polynomial(degree=2))
     assert_raises(ValueError, model.fit, X=X_train, y=None)
+
+
+def test_fit_lag_nar():
+    basis_function = Polynomial(degree=1)
+
+    regressors = regressor_code(
+        X=X_train,
+        xlag=2,
+        ylag=2,
+        model_type="NAR",
+        model_representation="neural_network",
+        basis_function=basis_function,
+    )
+    n_features = regressors.shape[0]
+
+    class NARX(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.lin = nn.Linear(n_features, 30)
+            self.lin2 = nn.Linear(30, 30)
+            self.lin3 = nn.Linear(30, 1)
+            self.tanh = nn.Tanh()
+
+        def forward(self, xb):
+            z = self.lin(xb)
+            z = self.tanh(z)
+            z = self.lin2(z)
+            z = self.tanh(z)
+            z = self.lin3(z)
+            return z
+
+    model = NARXNN(
+        net=NARX(),
+        ylag=2,
+        xlag=2,
+        basis_function=basis_function,
+        model_type="NAR",
+        loss_func="mse_loss",
+        optimizer="Adam",
+        epochs=10,
+        verbose=False,
+        optim_params={
+            "betas": (0.9, 0.999),
+            "eps": 1e-05,
+        },  # optional parameters of the optimizer
+    )
+
+    model.fit(X=X_train, y=y_train)
+    assert_equal(model.max_lag, 2)
+
+
+def test_fit_lag_nfir():
+    basis_function = Polynomial(degree=1)
+    regressors = regressor_code(
+        X=X_train,
+        xlag=2,
+        ylag=2,
+        model_type="NFIR",
+        model_representation="neural_network",
+        basis_function=basis_function,
+    )
+    n_features = regressors.shape[0]
+
+    class NARX(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.lin = nn.Linear(n_features, 30)
+            self.lin2 = nn.Linear(30, 30)
+            self.lin3 = nn.Linear(30, 1)
+            self.tanh = nn.Tanh()
+
+        def forward(self, xb):
+            z = self.lin(xb)
+            z = self.tanh(z)
+            z = self.lin2(z)
+            z = self.tanh(z)
+            z = self.lin3(z)
+            return z
+
+    model = NARXNN(
+        net=NARX(),
+        ylag=2,
+        xlag=2,
+        basis_function=basis_function,
+        model_type="NFIR",
+        loss_func="mse_loss",
+        optimizer="Adam",
+        epochs=10,
+        verbose=False,
+        optim_params={
+            "betas": (0.9, 0.999),
+            "eps": 1e-05,
+        },  # optional parameters of the optimizer
+    )
+
+    model.fit(X=X_train, y=y_train)
+    model.fit(X=X_train, y=y_train)
+    assert_equal(model.max_lag, 2)
+
+
+def test_fit_lag_narmax():
+    basis_function = Polynomial(degree=1)
+
+    regressors = regressor_code(
+        X=X_train,
+        xlag=2,
+        ylag=2,
+        model_type="NARMAX",
+        model_representation="neural_network",
+        basis_function=basis_function,
+    )
+    n_features = regressors.shape[0]
+
+    class NARX(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.lin = nn.Linear(n_features, 30)
+            self.lin2 = nn.Linear(30, 30)
+            self.lin3 = nn.Linear(30, 1)
+            self.tanh = nn.Tanh()
+
+        def forward(self, xb):
+            z = self.lin(xb)
+            z = self.tanh(z)
+            z = self.lin2(z)
+            z = self.tanh(z)
+            z = self.lin3(z)
+            return z
+
+    model = NARXNN(
+        net=NARX(),
+        ylag=2,
+        xlag=2,
+        basis_function=basis_function,
+        model_type="NARMAX",
+        loss_func="mse_loss",
+        optimizer="Adam",
+        epochs=10,
+        verbose=False,
+        optim_params={
+            "betas": (0.9, 0.999),
+            "eps": 1e-05,
+        },  # optional parameters of the optimizer
+    )
+
+    model.fit(X=X_train, y=y_train)
+    assert_equal(model.max_lag, 2)
+
+
+def test_fit_lag_narmax_fourier():
+    basis_function = Fourier(degree=1)
+
+    regressors = regressor_code(
+        X=X_train,
+        xlag=2,
+        ylag=2,
+        model_type="NARMAX",
+        model_representation="neural_network",
+        basis_function=basis_function,
+    )
+    n_features = regressors.shape[0]
+
+    class NARX(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.lin = nn.Linear(n_features, 30)
+            self.lin2 = nn.Linear(30, 30)
+            self.lin3 = nn.Linear(30, 1)
+            self.tanh = nn.Tanh()
+
+        def forward(self, xb):
+            z = self.lin(xb)
+            z = self.tanh(z)
+            z = self.lin2(z)
+            z = self.tanh(z)
+            z = self.lin3(z)
+            return z
+
+    model = NARXNN(
+        net=NARX(),
+        ylag=2,
+        xlag=2,
+        epochs=10,
+        basis_function=basis_function,
+        optim_params={
+            "betas": (0.9, 0.999),
+            "eps": 1e-05,
+        },  # optional parameters of the optimizer
+    )
+
+    model.fit(X=X_train, y=y_train)
+    assert_equal(model.max_lag, 2)
+
+
+def test_model_predict():
+    basis_function = Polynomial(degree=2)
+
+    regressors = regressor_code(
+        X=X_train,
+        xlag=2,
+        ylag=2,
+        model_type="NARMAX",
+        model_representation="neural_network",
+        basis_function=basis_function,
+    )
+    n_features = regressors.shape[0]
+
+    class NARX(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.lin = nn.Linear(n_features, 30)
+            self.lin2 = nn.Linear(30, 30)
+            self.lin3 = nn.Linear(30, 1)
+            self.tanh = nn.Tanh()
+
+        def forward(self, xb):
+            z = self.lin(xb)
+            z = self.tanh(z)
+            z = self.lin2(z)
+            z = self.tanh(z)
+            z = self.lin3(z)
+            return z
+
+    model = NARXNN(
+        net=NARX(),
+        ylag=2,
+        xlag=2,
+        epochs=2000,
+        basis_function=basis_function,
+        optim_params={
+            "betas": (0.9, 0.999),
+            "eps": 1e-05,
+        },  # optional parameters of the optimizer
+    )
+
+    model.fit(X=X_train, y=y_train)
+    yhat = model.predict(X=X_test, y=y_test)
+    assert_almost_equal(yhat.mean(), y_test.mean(), decimal=2)
+
+
+def test_steps_1():
+    basis_function = Polynomial(degree=1)
+
+    regressors = regressor_code(
+        X=X_train,
+        xlag=2,
+        ylag=2,
+        model_type="NARMAX",
+        model_representation="neural_network",
+        basis_function=basis_function,
+    )
+    n_features = regressors.shape[0]
+
+    class NARX(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.lin = nn.Linear(n_features, 30)
+            self.lin2 = nn.Linear(30, 30)
+            self.lin3 = nn.Linear(30, 1)
+            self.tanh = nn.Tanh()
+
+        def forward(self, xb):
+            z = self.lin(xb)
+            z = self.tanh(z)
+            z = self.lin2(z)
+            z = self.tanh(z)
+            z = self.lin3(z)
+            return z
+
+    model = NARXNN(
+        net=NARX(),
+        ylag=2,
+        xlag=2,
+        epochs=2000,
+        basis_function=basis_function,
+        optim_params={
+            "betas": (0.9, 0.999),
+            "eps": 1e-05,
+        },  # optional parameters of the optimizer
+    )
+
+    model.fit(X=X_train, y=y_train)
+    yhat = model.predict(X=X_test, y=y_test, steps_ahead=1)
+    assert_almost_equal(yhat.mean(), y_test.mean(), decimal=2)
+
+
+def test_steps_3():
+    basis_function = Polynomial(degree=1)
+
+    regressors = regressor_code(
+        X=X_train,
+        xlag=2,
+        ylag=2,
+        model_type="NARMAX",
+        model_representation="neural_network",
+        basis_function=basis_function,
+    )
+    n_features = regressors.shape[0]
+
+    class NARX(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.lin = nn.Linear(n_features, 30)
+            self.lin2 = nn.Linear(30, 30)
+            self.lin3 = nn.Linear(30, 1)
+            self.tanh = nn.Tanh()
+
+        def forward(self, xb):
+            z = self.lin(xb)
+            z = self.tanh(z)
+            z = self.lin2(z)
+            z = self.tanh(z)
+            z = self.lin3(z)
+            return z
+
+    model = NARXNN(
+        net=NARX(),
+        ylag=2,
+        xlag=2,
+        epochs=2000,
+        basis_function=basis_function,
+        optim_params={
+            "betas": (0.9, 0.999),
+            "eps": 1e-05,
+        },  # optional parameters of the optimizer
+    )
+
+    model.fit(X=X_train, y=y_train)
+    yhat = model.predict(X=X_test, y=y_test, steps_ahead=3)
+    assert_almost_equal(yhat.mean(), y_test.mean(), decimal=2)
+
+
+#####
+
+
+def test_model_predict_fourier():
+    basis_function = Fourier(degree=1)
+
+    regressors = regressor_code(
+        X=X_train,
+        xlag=2,
+        ylag=2,
+        model_type="NARMAX",
+        model_representation="neural_network",
+        basis_function=basis_function,
+    )
+    n_features = regressors.shape[0]
+
+    class NARX(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.lin = nn.Linear(n_features, 30)
+            self.lin2 = nn.Linear(30, 30)
+            self.lin3 = nn.Linear(30, 1)
+            self.tanh = nn.Tanh()
+
+        def forward(self, xb):
+            z = self.lin(xb)
+            z = self.tanh(z)
+            z = self.lin2(z)
+            z = self.tanh(z)
+            z = self.lin3(z)
+            return z
+
+    model = NARXNN(
+        net=NARX(),
+        ylag=2,
+        xlag=2,
+        epochs=2000,
+        basis_function=basis_function,
+        optim_params={
+            "betas": (0.9, 0.999),
+            "eps": 1e-05,
+        },  # optional parameters of the optimizer
+    )
+
+    model.fit(X=X_train, y=y_train)
+    yhat = model.predict(X=X_test, y=y_test)
+    assert_almost_equal(yhat.mean(), y_test.mean(), decimal=2)
+
+
+def test_steps_1_fourier():
+    basis_function = Fourier(degree=1)
+
+    regressors = regressor_code(
+        X=X_train,
+        xlag=2,
+        ylag=2,
+        model_type="NARMAX",
+        model_representation="neural_network",
+        basis_function=basis_function,
+    )
+    n_features = regressors.shape[0]
+
+    class NARX(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.lin = nn.Linear(n_features, 30)
+            self.lin2 = nn.Linear(30, 30)
+            self.lin3 = nn.Linear(30, 1)
+            self.tanh = nn.Tanh()
+
+        def forward(self, xb):
+            z = self.lin(xb)
+            z = self.tanh(z)
+            z = self.lin2(z)
+            z = self.tanh(z)
+            z = self.lin3(z)
+            return z
+
+    model = NARXNN(
+        net=NARX(),
+        ylag=2,
+        xlag=2,
+        epochs=2000,
+        basis_function=basis_function,
+        optim_params={
+            "betas": (0.9, 0.999),
+            "eps": 1e-05,
+        },  # optional parameters of the optimizer
+    )
+
+    model.fit(X=X_train, y=y_train)
+    yhat = model.predict(X=X_test, y=y_test, steps_ahead=1)
+    assert_almost_equal(yhat.mean(), y_test.mean(), decimal=2)
+
+
+def test_steps_3_fourier():
+    basis_function = Fourier(degree=1)
+
+    regressors = regressor_code(
+        X=X_train,
+        xlag=2,
+        ylag=2,
+        model_type="NARMAX",
+        model_representation="neural_network",
+        basis_function=basis_function,
+    )
+    n_features = regressors.shape[0]
+
+    class NARX(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.lin = nn.Linear(n_features, 30)
+            self.lin2 = nn.Linear(30, 30)
+            self.lin3 = nn.Linear(30, 1)
+            self.tanh = nn.Tanh()
+
+        def forward(self, xb):
+            z = self.lin(xb)
+            z = self.tanh(z)
+            z = self.lin2(z)
+            z = self.tanh(z)
+            z = self.lin3(z)
+            return z
+
+    model = NARXNN(
+        net=NARX(),
+        ylag=2,
+        xlag=2,
+        epochs=2000,
+        basis_function=basis_function,
+        optim_params={
+            "betas": (0.9, 0.999),
+            "eps": 1e-05,
+        },  # optional parameters of the optimizer
+    )
+
+    model.fit(X=X_train, y=y_train)
+    yhat = model.predict(X=X_test, y=y_test, steps_ahead=3)
+    assert_almost_equal(yhat.mean(), y_test.mean(), decimal=2)
