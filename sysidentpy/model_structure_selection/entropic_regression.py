@@ -15,12 +15,7 @@ from scipy.special import psi
 from ..narmax_base import BaseMSS
 from ..basis_function import Fourier, Polynomial
 from ..parameter_estimation.estimators import Estimators
-from ..utils._check_arrays import (
-    _check_positive_int,
-    _num_features,
-    check_random_state,
-    check_X_y,
-)
+from ..utils._check_arrays import _check_positive_int, _num_features, check_random_state
 from ..utils.deprecation import deprecated
 
 
@@ -174,6 +169,7 @@ class ER(Estimators, BaseMSS):
     ):
         self.basis_function = basis_function
         self.model_type = model_type
+        self.build_matrix = self.get_build_io_method(model_type)
         self.xlag = xlag
         self.ylag = ylag
         self.non_degree = basis_function.degree
@@ -214,42 +210,42 @@ class ER(Estimators, BaseMSS):
     def _validate_params(self):
         """Validate input params."""
         if isinstance(self.ylag, int) and self.ylag < 1:
-            raise ValueError("ylag must be integer and > zero. Got %f" % self.ylag)
+            raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
 
         if isinstance(self.xlag, int) and self.xlag < 1:
-            raise ValueError("xlag must be integer and > zero. Got %f" % self.xlag)
+            raise ValueError(f"xlag must be integer and > zero. Got {self.xlag}")
 
         if not isinstance(self.xlag, (int, list)):
-            raise ValueError("xlag must be integer and > zero. Got %f" % self.xlag)
+            raise ValueError(f"xlag must be integer and > zero. Got {self.xlag}")
 
         if not isinstance(self.ylag, (int, list)):
-            raise ValueError("ylag must be integer and > zero. Got %f" % self.ylag)
+            raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
 
         if not isinstance(self.k, int) or self.k < 1:
-            raise ValueError("k must be integer and > zero. Got %f" % self.k)
+            raise ValueError(f"k must be integer and > zero. Got {self.k}")
 
         if not isinstance(self.n_perm, int) or self.n_perm < 1:
-            raise ValueError("n_perm must be integer and > zero. Got %f" % self.n_perm)
+            raise ValueError(f"n_perm must be integer and > zero. Got {self.n_perm}")
 
         if not isinstance(self.q, float) or self.q > 1 or self.q <= 0:
             raise ValueError(
-                "q must be float and must be between 0 and 1 inclusive. Got %f" % self.q
+                f"q must be float and must be between 0 and 1 inclusive. Got {self.q}"
             )
 
         if not isinstance(self.skip_forward, bool):
             raise TypeError(
-                "skip_forward must be False or True. Got %f" % self.skip_forward
+                f"skip_forward must be False or True. Got {self.skip_forward}"
             )
 
         if not isinstance(self.extended_least_squares, bool):
             raise TypeError(
-                "extended_least_squares must be False or True. Got %f"
-                % self.extended_least_squares
+                "extended_least_squares must be False or True. Got"
+                f" {self.extended_least_squares}"
             )
 
         if self.model_type not in ["NARMAX", "NAR", "NFIR"]:
             raise ValueError(
-                "model_type must be NARMAX, NAR or NFIR. Got %s" % self.model_type
+                f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
             )
 
     def mutual_information_knn(self, y, y_perm):
@@ -584,20 +580,8 @@ class ER(Estimators, BaseMSS):
         if y is None:
             raise ValueError("y cannot be None")
 
-        if self.model_type == "NAR":
-            lagged_data = self.build_output_matrix(y)
-            self.max_lag = self._get_max_lag()
-        elif self.model_type == "NFIR":
-            lagged_data = self.build_input_matrix(X)
-            self.max_lag = self._get_max_lag()
-        elif self.model_type == "NARMAX":
-            check_X_y(X, y)
-            self.max_lag = self._get_max_lag()
-            lagged_data = self.build_input_output_matrix(X, y)
-        else:
-            raise ValueError(
-                "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
-            )
+        self.max_lag = self._get_max_lag()
+        lagged_data = self.build_matrix(X, y)
 
         if self.basis_function.__class__.__name__ == "Polynomial":
             reg_matrix = self.basis_function.fit(
@@ -764,16 +748,7 @@ class ER(Estimators, BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        if self.model_type == "NAR":
-            lagged_data = self.build_output_matrix(y)
-        elif self.model_type == "NFIR":
-            lagged_data = self.build_input_matrix(X)
-        elif self.model_type == "NARMAX":
-            lagged_data = self.build_input_output_matrix(X, y)
-        else:
-            raise ValueError(
-                "Unrecognized model type. The model_type should be NARMAX, NAR or NFIR."
-            )
+        lagged_data = self.build_matrix(X, y)
 
         if self.basis_function.__class__.__name__ == "Polynomial":
             X_base = self.basis_function.transform(
@@ -833,13 +808,16 @@ class ER(Estimators, BaseMSS):
         elif self.model_type == "NFIR":
             return self._nfir_predict(X, y_initial)
         else:
-            raise Exception(
-                "model_type do not exist! Model type must be NARMAX, NAR or NFIR"
+            raise ValueError(
+                f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
             )
 
     def _narmax_predict(self, X, y_initial, forecast_horizon):
         if len(y_initial) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
+            raise ValueError(
+                "Insufficient initial condition elements! Expected at least"
+                f" {self.max_lag} elements."
+            )
 
         if X is not None:
             forecast_horizon = X.shape[0]
@@ -886,7 +864,10 @@ class ER(Estimators, BaseMSS):
 
         """
         if len(y) < self.max_lag:
-            raise Exception("Insufficient initial conditions elements!")
+            raise ValueError(
+                "Insufficient initial condition elements! Expected at least"
+                f" {self.max_lag} elements."
+            )
 
         if X is not None:
             forecast_horizon = X.shape[0]
