@@ -125,9 +125,9 @@ class NARXNN(BaseMSS):
         xlag=1,
         model_type="NARMAX",
         basis_function=None,
-        batch_size=100,  # batch size
-        learning_rate=0.01,  # learning rate
-        epochs=200,  # how many epochs to train for
+        batch_size=100,
+        learning_rate=0.01,
+        epochs=200,
         loss_func="mse_loss",
         optimizer="Adam",
         net=None,
@@ -179,6 +179,23 @@ class NARXNN(BaseMSS):
 
         if not isinstance(self.verbose, bool):
             raise TypeError(f"verbose must be False or True. Got {self.verbose}")
+
+        if isinstance(self.ylag, int) and self.ylag < 1:
+            raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
+
+        if isinstance(self.xlag, int) and self.xlag < 1:
+            raise ValueError(f"xlag must be integer and > zero. Got {self.xlag}")
+
+        if not isinstance(self.xlag, (int, list)):
+            raise ValueError(f"xlag must be integer and > zero. Got {self.xlag}")
+
+        if not isinstance(self.ylag, (int, list)):
+            raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
+
+        if self.model_type not in ["NARMAX", "NAR", "NFIR"]:
+            raise ValueError(
+                f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
+            )
 
     def _check_cuda(self, device):
         if device not in ["cpu", "cuda"]:
