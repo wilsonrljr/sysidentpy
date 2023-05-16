@@ -102,12 +102,13 @@ def test_validate():
 
 
 def test_fit_raise():
-    model = NARX(
-        basis_function=Polynomial(degree=2),
+    assert_raises(
+        ValueError,
+        NARX,
         base_estimator=LinearRegression(),
+        basis_function=Polynomial(degree=1),
         model_type="NARARMAX",
     )
-    assert_raises(ValueError, model.fit, X=X_train, y=y_train)
 
 
 def test_fit_raise_y():
