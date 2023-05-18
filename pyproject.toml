@@ -8,7 +8,18 @@ description = "A Python Package For System Identification Using NARMAX Models"
 readme = "README.md"
 requires-python = ">=3.7,<3.12"
 license = { file = "LICENSE" }
-keywords = ["NARMAX", "NARX", "system identification", "machine learning"]
+keywords = [
+    "data-science",
+    "forecasting",
+    "NARMAX",
+    "NARX",
+    "system-identification",
+    "machine-learning",
+    "time-series",
+    "time-series-analysis",
+    "time-series-classification",
+    "time-series-regression",
+]
 authors = [
     { email = "wilsonrljr@outlook.com" },
     { name = "Wilson Rocha Lacerda Junior" },
