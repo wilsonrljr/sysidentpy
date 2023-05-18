@@ -16,6 +16,7 @@ from torch import optim
 from torch.utils.data import DataLoader, TensorDataset
 
 from ..narmax_base import BaseMSS
+from ..basis_function import Polynomial
 from ..utils._check_arrays import _check_positive_int, _num_features
 
 logging.basicConfig(
@@ -124,7 +125,7 @@ class NARXNN(BaseMSS):
         ylag=1,
         xlag=1,
         model_type="NARMAX",
-        basis_function=None,
+        basis_function=Polynomial(),
         batch_size=100,
         learning_rate=0.01,
         epochs=200,

@@ -527,11 +527,11 @@ def test_steps_1_fourier():
         net=NARX(),
         ylag=2,
         xlag=2,
-        epochs=2000,
+        epochs=1000,
         basis_function=basis_function,
         optim_params={
             "betas": (0.9, 0.999),
-            "eps": 1e-05,
+            "eps": 1e-03,
         },  # optional parameters of the optimizer
     )
 
