@@ -2,7 +2,6 @@
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
-import warnings
 from typing import Tuple, Union
 
 import numpy as np
@@ -211,7 +210,6 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             model_type=model_type,
             basis_function=basis_function,
         )
-
         BPSOGSA.__init__(
             self,
             n_agents=n_agents,
@@ -235,6 +233,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self.loss_func = loss_func
         self.steps_ahead = steps_ahead
         self.random_state = random_state
+        self.build_matrix = self.get_build_io_method(model_type)
         self.n_inputs = None
         self.regressor_code = None
         self.best_model_history = None
@@ -288,6 +287,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             self.n_inputs = 1  # just to create the regressor space base
 
         #  self.n_inputs = _num_features(X_train)
+        self.max_lag = self._get_max_lag()
         self.regressor_code = self.regressor_space(self.n_inputs)
         self.dimension = self.regressor_code.shape[0]
         velocity = np.zeros([self.dimension, self.n_agents])
@@ -332,6 +332,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             model_code=self.final_model,
             steps_ahead=self.steps_ahead,
         )
+        self.max_lag = self._get_max_lag()
         return self
 
     def evaluate_objective_function(self, X_train, y_train, X_test, y_test, population):
@@ -372,21 +373,8 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             )
 
             residues = y_test - yhat
-
-            if self.model_type == "NAR":
-                lagged_data = self.build_output_matrix(y_train)
-                self.max_lag = self._get_max_lag()
-            elif self.model_type == "NFIR":
-                lagged_data = self.build_input_matrix(X_train)
-                self.max_lag = self._get_max_lag()
-            elif self.model_type == "NARMAX":
-                self.max_lag = self._get_max_lag()
-                lagged_data = self.build_input_output_matrix(X_train, y_train)
-            else:
-                raise ValueError(
-                    "Unrecognized model type. The model_type should be NARMAX, NAR or"
-                    " NFIR."
-                )
+            self.max_lag = self._get_max_lag()
+            lagged_data = self.build_matrix(X_train, y_train)
 
             psi = self.basis_function.fit(
                 lagged_data, self.max_lag, predefined_regressors=self.pivv
@@ -687,8 +675,8 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         if self.model_type == "NFIR":
             return self._nfir_predict(X, y_initial)
 
-        raise Exception(
-            "model_type do not exist! Model type must be NARMAX, NAR or NFIR"
+        raise ValueError(
+            f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
         )
 
     def _narmax_predict(self, X, y_initial, forecast_horizon):

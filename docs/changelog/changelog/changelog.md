@@ -5,6 +5,28 @@ template: overrides/main.html
 
 # Changes in SysIdentPy
 
+## v0.3.1
+
+### CONTRIBUTORS
+
+- wilsonrljr
+
+### CHANGES
+
+- The update **v0.3.1**  has been released with API changes and fixes. 
+
+- API Change: 
+    - MetaMSS was returning the max lag of the final model instead of the maximum lag related to the xlag and ylag. This is not wrong (its related to the issue #55), but this change will be made for all methods at the same time. In this respect, I'm reverted this to return the maximum lag of the xlag and ylag.  
+
+- API Change: Added build_matrix method in BaseMSS. This change improved overall code readability by rewriting if/elif/else clauses in every model structure selection algorithm.
+
+- API Change: Added bic, aic, fpe, and lilc methods in FROLS. Now the method is selected by using a predefined dictionary with the available options. This change improved overall code readability by rewriting if/elif/else clauses in the FROLS algorithm. 
+
+- TESTS: Added tests for Neural NARX class. The issue with pytorch was fixed and now we have the tests for every model class.
+
+- Remove unused code and comments.
+
+
 ## v0.3.0
 
 ### CONTRIBUTORS
