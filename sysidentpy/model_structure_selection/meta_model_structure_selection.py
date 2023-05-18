@@ -210,7 +210,6 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             model_type=model_type,
             basis_function=basis_function,
         )
-
         BPSOGSA.__init__(
             self,
             n_agents=n_agents,
@@ -288,6 +287,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             self.n_inputs = 1  # just to create the regressor space base
 
         #  self.n_inputs = _num_features(X_train)
+        self.max_lag = self._get_max_lag()
         self.regressor_code = self.regressor_space(self.n_inputs)
         self.dimension = self.regressor_code.shape[0]
         velocity = np.zeros([self.dimension, self.n_agents])
@@ -332,6 +332,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             model_code=self.final_model,
             steps_ahead=self.steps_ahead,
         )
+        self.max_lag = self._get_max_lag()
         return self
 
     def evaluate_objective_function(self, X_train, y_train, X_test, y_test, population):
