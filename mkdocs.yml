@@ -27,6 +27,10 @@ theme:
   # Default values, taken from mkdocs_theme.yml
   language: en
   features:
+    - content.code.copy
+    - content.action.edit
+    - content.action.view
+    - navigation.footer
     - content.code.annotate
     - content.tabs.link
     - content.tooltips
