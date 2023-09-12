@@ -451,6 +451,10 @@ class FROLS(Estimators, BaseMSS):
         aicc : float
             The computed aicc value.
 
+        References
+        ----------
+        - https://www.mathworks.com/help/ident/ref/idmodel.aic.html
+
         """
         aic = self.aic(n_theta, n_samples, e_var)
         aicc = aic + (2 * n_theta * (n_theta + 1) / (n_samples - n_theta - 1))
