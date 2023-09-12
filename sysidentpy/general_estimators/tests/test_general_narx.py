@@ -8,7 +8,6 @@ from numpy.testing import (
 
 from sysidentpy.basis_function import Polynomial, Fourier
 from sysidentpy.general_estimators import NARX
-from sysidentpy.utils.generate_data import get_siso_data
 
 base_estimator = LinearRegression()
 
@@ -66,23 +65,7 @@ def test_default_values():
 
 
 def test_model_nfir():
-    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = NARX(
         xlag=2,
         basis_function=basis_function,
@@ -160,23 +143,7 @@ def test_fit_lag_narmax_fourier():
 
 
 def test_model_predict():
-    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = NARX(
         ylag=[1, 2],
         xlag=2,
@@ -189,23 +156,7 @@ def test_model_predict():
 
 
 def test_model_predict_steps_none():
-    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = NARX(
         ylag=[1, 2],
         xlag=2,
@@ -218,23 +169,7 @@ def test_model_predict_steps_none():
 
 
 def test_model_predict_steps_3():
-    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = NARX(
         ylag=[1, 2],
         xlag=2,
@@ -247,23 +182,7 @@ def test_model_predict_steps_3():
 
 
 def test_model_predict_fourier_steps_1():
-    x, y, _ = create_test_data()
     basis_function = Fourier(degree=2, n=1)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = NARX(
         ylag=[1, 2],
         xlag=2,
@@ -276,23 +195,7 @@ def test_model_predict_fourier_steps_1():
 
 
 def test_model_predict_fourier_nar_inputs():
-    x, y, _ = create_test_data()
     basis_function = Fourier(degree=2, n=1)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = NARX(
         ylag=[1, 2],
         xlag=2,
@@ -306,23 +209,7 @@ def test_model_predict_fourier_nar_inputs():
 
 
 def test_model_predict_fourier_raises():
-    x, y, _ = create_test_data()
     basis_function = Fourier(degree=2, n=1)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = NARX(
         ylag=[1, 2],
         xlag=2,
@@ -337,23 +224,7 @@ def test_model_predict_fourier_raises():
 
 
 def test_model_predict_fourier_value_error():
-    x, y, _ = create_test_data()
     basis_function = Fourier(degree=2, n=1)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = NARX(
         ylag=[1, 2],
         xlag=2,
@@ -374,23 +245,7 @@ def test_model_predict_fourier_value_error():
 
 
 def test_model_predict_fourier_horizon_error():
-    x, y, _ = create_test_data()
     basis_function = Fourier(degree=2, n=1)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = NARX(
         ylag=[1, 2],
         xlag=2,
