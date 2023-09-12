@@ -26,6 +26,24 @@ def create_test_data(n=1000):
     return x, y, theta
 
 
+x, y, _ = create_test_data()
+train_percentage = 90
+split_data = int(len(x) * (train_percentage / 100))
+
+X_train = x[0:split_data, 0]
+X_test = x[split_data::, 0]
+
+y1 = y[0:split_data, 0]
+y_test = y[split_data::, 0]
+y_train = y1.copy()
+
+y_train = np.reshape(y_train, (len(y_train), 1))
+X_train = np.reshape(X_train, (len(X_train), 1))
+
+y_test = np.reshape(y_test, (len(y_test), 1))
+X_test = np.reshape(X_test, (len(X_test), 1))
+
+
 def test_default_values():
     default = {
         "ylag": 2,
@@ -74,46 +92,14 @@ def test_threshold():
 
 
 def test_model_prediction():
-    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = AOLS(ylag=[1, 2], xlag=2, basis_function=basis_function)
     model.fit(X=X_train, y=y_train)
     assert_raises(Exception, model.predict, X=X_test, y=y_test[:1])
 
 
 def test_model_predict_fourier_steps_none():
-    x, y, _ = create_test_data()
     basis_function = Fourier(degree=2, n=1)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = AOLS(
         ylag=[1, 2],
         xlag=2,
@@ -125,23 +111,7 @@ def test_model_predict_fourier_steps_none():
 
 
 def test_model_predict_fourier_steps_1():
-    x, y, _ = create_test_data()
     basis_function = Fourier(degree=2, n=1)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = AOLS(
         ylag=[1, 2],
         xlag=2,
@@ -153,23 +123,7 @@ def test_model_predict_fourier_steps_1():
 
 
 def test_model_predict_fourier_nar_inputs():
-    x, y, _ = create_test_data()
     basis_function = Fourier(degree=2, n=1)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = AOLS(
         ylag=[1, 2],
         xlag=2,
@@ -182,23 +136,7 @@ def test_model_predict_fourier_nar_inputs():
 
 
 def test_model_predict_fourier_raises():
-    x, y, _ = create_test_data()
     basis_function = Fourier(degree=2, n=1)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = AOLS(
         ylag=[1, 2],
         xlag=2,

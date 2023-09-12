@@ -25,6 +25,17 @@ def create_test_data(n=1000):
 
 
 x, y, _ = create_test_data()
+train_percentage = 90
+split_data = int(len(x) * (train_percentage / 100))
+X_train = x[0:split_data, 0]
+X_test = x[split_data::, 0]
+y1 = y[0:split_data, 0]
+y_test = y[split_data::, 0]
+y_train = y1.copy()
+y_train = np.reshape(y_train, (len(y_train), 1))
+X_train = np.reshape(X_train, (len(X_train), 1))
+y_test = np.reshape(y_test, (len(y_test), 1))
+X_test = np.reshape(X_test, (len(X_test), 1))
 
 
 def test_error_reduction_ratio():
@@ -50,7 +61,6 @@ def test_error_reduction_ratio():
 
 
 def test_fit_with_information_criteria():
-    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=15,
@@ -63,7 +73,6 @@ def test_fit_with_information_criteria():
 
 
 def test_fit_without_information_criteria():
-    # x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=15, extended_least_squares=False, basis_function=basis_function
@@ -175,21 +184,6 @@ def test_info_criteria():
 
 def test_predict():
     basis_function = Polynomial(degree=2)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         n_terms=5,
         extended_least_squares=False,
@@ -205,21 +199,6 @@ def test_predict():
 
 def test_model_prediction():
     basis_function = Polynomial(degree=2)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         n_terms=5,
         extended_least_squares=False,
