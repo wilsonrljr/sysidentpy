@@ -234,7 +234,7 @@ class FROLS(Estimators, BaseMSS):
                 f" {self.extended_least_squares}"
             )
 
-        if self.info_criteria not in ["aic", "bic", "fpe", "lilc"]:
+        if self.info_criteria not in ["aic", "aicc", "bic", "fpe", "lilc"]:
             raise ValueError(
                 f"info_criteria must be aic, bic, fpe or lilc. Got {self.info_criteria}"
             )
