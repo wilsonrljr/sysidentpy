@@ -254,6 +254,16 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         if not isinstance(self.ylag, (int, list)):
             raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
 
+    @deprecated(
+        version="v0.3.0",
+        future_version="v0.4.0",
+        message=(
+            "You will not need to pass X_test and y_test in v0.4.0."
+            " \n You'll have to use MetaMSS(test_size=0.25) instead. \n This"
+            " change will make easier to use the MetaMSS model and will"
+            " follow the same structure of the other methods."
+        ),
+    )
     def fit(self, *, X=None, y=None, X_test=None, y_test=None):
         """Fit the polynomial NARMAX model.
 
