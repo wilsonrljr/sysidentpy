@@ -378,6 +378,7 @@ class FROLS(Estimators, BaseMSS):
         """get info criteria"""
         info_criteria_options = {
             "aic": self.aic,
+            "aicc": self.aicc,
             "bic": self.bic,
             "fpe": self.fpe,
             "lilc": self.lilc,
