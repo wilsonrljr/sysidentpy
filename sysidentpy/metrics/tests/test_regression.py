@@ -57,7 +57,7 @@ def test_normalized_root_mean_squared_error():
 def test_root_relative_squared_error():
     y = np.array([3, -0.5, 2, 7])
     y_predicted = np.array([2.5, 0.0, 2, 8])
-    metric = 0.205737
+    metric = 0.226697
     result = root_relative_squared_error(y, y_predicted)
     assert_almost_equal(metric, result, decimal=6)
 

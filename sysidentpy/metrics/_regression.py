@@ -214,7 +214,7 @@ def root_relative_squared_error(y, yhat):
 
     """
     numerator = np.sum(np.square((yhat - y)))
-    denominator = np.sum(np.square((yhat - np.mean(y, axis=0))))
+    denominator = np.sum(np.square((y - np.mean(y, axis=0))))
     return np.sqrt(np.divide(numerator, denominator))
 
 

@@ -234,7 +234,7 @@ class FROLS(Estimators, BaseMSS):
                 f" {self.extended_least_squares}"
             )
 
-        if self.info_criteria not in ["aic", "bic", "fpe", "lilc"]:
+        if self.info_criteria not in ["aic", "aicc", "bic", "fpe", "lilc"]:
             raise ValueError(
                 f"info_criteria must be aic, bic, fpe or lilc. Got {self.info_criteria}"
             )
@@ -378,6 +378,7 @@ class FROLS(Estimators, BaseMSS):
         """get info criteria"""
         info_criteria_options = {
             "aic": self.aic,
+            "aicc": self.aicc,
             "bic": self.bic,
             "fpe": self.fpe,
             "lilc": self.lilc,
@@ -433,6 +434,33 @@ class FROLS(Estimators, BaseMSS):
         info_criteria_value = e_factor + model_factor
 
         return info_criteria_value
+
+    def aicc(self, n_theta, n_samples, e_var):
+        """Compute the Akaike information Criteria corrected value.
+
+        Parameters
+        ----------
+        n_theta : int
+            Number of parameters of the model.
+        n_samples : int
+            Number of samples given the maximum lag.
+        e_var : float
+            Variance of the residues
+
+        Returns
+        -------
+        aicc : float
+            The computed aicc value.
+
+        References
+        ----------
+        - https://www.mathworks.com/help/ident/ref/idmodel.aic.html
+
+        """
+        aic = self.aic(n_theta, n_samples, e_var)
+        aicc = aic + (2 * n_theta * (n_theta + 1) / (n_samples - n_theta - 1))
+
+        return aicc
 
     def fpe(self, n_theta, n_samples, e_var):
         """Compute the Final Error Prediction value.

@@ -5,6 +5,27 @@ template: overrides/main.html
 
 # Changes in SysIdentPy
 
+## v0.3.2
+
+### CONTRIBUTORS
+
+- wilsonrljr
+
+### CHANGES
+
+- The update **v0.3.2**  has been released with API changes and fixes. 
+
+- Major: 
+    - Added Akaike Information Criteria corrected in FROLS. Now the user can use aicc as the information criteria to select the model order when using FROLS algorithm.  
+
+- FIX: Issue #114. Replace yhat with y in root relative squared error. Thanks @miroder
+
+- TESTS: Minor changes in tests by removing unnecessary data load.
+
+- Remove unused code and comments.
+
+- Docs: Minor changes in notebooks. Added AICc method in the information criteria example.
+
 ## v0.3.1
 
 ### CONTRIBUTORS

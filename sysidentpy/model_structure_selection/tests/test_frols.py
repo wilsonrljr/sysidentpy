@@ -24,6 +24,20 @@ def create_test_data(n=1000):
     return x, y, theta
 
 
+x, y, _ = create_test_data()
+train_percentage = 90
+split_data = int(len(x) * (train_percentage / 100))
+X_train = x[0:split_data, 0]
+X_test = x[split_data::, 0]
+y1 = y[0:split_data, 0]
+y_test = y[split_data::, 0]
+y_train = y1.copy()
+y_train = np.reshape(y_train, (len(y_train), 1))
+X_train = np.reshape(X_train, (len(X_train), 1))
+y_test = np.reshape(y_test, (len(y_test), 1))
+X_test = np.reshape(X_test, (len(X_test), 1))
+
+
 def test_error_reduction_ratio():
     # piv = np.array([4, 2, 7, 11, 5])
     model_code = np.array(
@@ -47,7 +61,6 @@ def test_error_reduction_ratio():
 
 
 def test_fit_with_information_criteria():
-    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=15,
@@ -60,7 +73,6 @@ def test_fit_with_information_criteria():
 
 
 def test_fit_without_information_criteria():
-    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=15, extended_least_squares=False, basis_function=basis_function
@@ -171,23 +183,7 @@ def test_info_criteria():
 
 
 def test_predict():
-    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         n_terms=5,
         extended_least_squares=False,
@@ -202,23 +198,7 @@ def test_predict():
 
 
 def test_model_prediction():
-    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         n_terms=5,
         extended_least_squares=False,
@@ -232,7 +212,6 @@ def test_model_prediction():
 
 
 def test_information_criteria_bic():
-    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
@@ -250,8 +229,25 @@ def test_information_criteria_bic():
     assert_almost_equal(model.info_values[:4], info_values[:4], decimal=3)
 
 
+def test_information_criteria_aicc():
+    basis_function = Polynomial(degree=2)
+    model = FROLS(
+        n_terms=5,
+        extended_least_squares=False,
+        order_selection=True,
+        info_criteria="aicc",
+        n_info_values=5,
+        ylag=[1, 2],
+        xlag=2,
+        estimator="least_squares",
+        basis_function=basis_function,
+    )
+    model.fit(X=x, y=y)
+    info_values = np.array([-1769.787, -2329.901, -2991.084, -4481.490])
+    assert_almost_equal(model.info_values[:4], info_values[:4], decimal=3)
+
+
 def test_information_criteria_fpe():
-    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
@@ -272,7 +268,6 @@ def test_information_criteria_fpe():
 
 
 def test_information_criteria_lilc():
-    x, y, _ = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
