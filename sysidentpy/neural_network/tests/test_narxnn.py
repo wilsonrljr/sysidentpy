@@ -5,8 +5,9 @@ from torch import nn
 
 from sysidentpy.basis_function import Fourier, Polynomial
 from sysidentpy.neural_network import NARXNN
-from sysidentpy.utils.generate_data import get_siso_data
 from sysidentpy.utils.narmax_tools import regressor_code
+
+torch.manual_seed(0)
 
 
 class NARX(nn.Module):
@@ -443,9 +444,6 @@ def test_steps_3():
     model.fit(X=X_train, y=y_train)
     yhat = model.predict(X=X_test, y=y_test, steps_ahead=3)
     assert_almost_equal(yhat.mean(), y_test.mean(), decimal=2)
-
-
-#####
 
 
 def test_model_predict_fourier():
