@@ -51,7 +51,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
-dependencies = ["numpy>=1.19.2,<=1.24.3", "scipy>=1.7.0", "matplotlib>=3.3.2"]
+dependencies = ["numpy>=1.19.2,<=1.26", "scipy>=1.7.0", "matplotlib>=3.3.2"]
 
 dynamic = ["version"]
 

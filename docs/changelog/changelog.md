@@ -5,6 +5,33 @@ template: overrides/main.html
 
 # Changes in SysIdentPy
 
+## v0.3.3
+
+### CONTRIBUTORS
+
+- wilsonrljr
+- GabrielBuenoLeandro
+- samirmartins
+
+### CHANGES
+
+- The update **v0.3.3**  has been released with additional features, API changes and fixes. 
+
+- MAJOR: Multiobjective Framework: Affine Information Least Squares Algorithm (AILS)
+    - Now you can use AILS to estimate parameters of NARMAX models (and variants) using a multiobjective approach.
+    - AILS can be accessed using `from sysidentpy.multiobjective_parameter_estimation import AILS`
+    - See the docs for a more in depth explanation of how to use AILS.
+    - This feature is related to Issue #101
+    - Several new methods were implemented to get the new feature and you can check all of it in sysidentpy -> multiobjective_parameter_estimation.
+
+- API Change: `regressor_code` variable was renamed as `enconding` to avoid using the same name as the method in `narmax_tool` `regressor_code` method.
+
+- DATASET: Added buck_id.csv and buck_valid.csv dataset to SysIdentPy repository.
+
+- DOC: Add a Multiobjetive Parameter Optimization Notebook showing how to use the new AILS method
+
+- DOC: Minor additions and grammar fixes.
+
 ## v0.3.2
 
 ### CONTRIBUTORS
