@@ -1,6 +1,5 @@
-<p align="center">
+<div align="center">
 <img src="images/sysidentpy-logo.svg" width="640" height="320" />
-</p>
 
 [![DOI](https://img.shields.io/badge/DOI-10.21105%2Fjoss.02384-%23FF7800)](https://joss.theoj.org/papers/10.21105/joss.02384)
 [![PyPI version](https://img.shields.io/pypi/v/sysidentpy?color=%23ff7800)](https://pypi.org/project/sysidentpy/)
@@ -12,9 +11,14 @@
 [![status](https://img.shields.io/pypi/status/sysidentpy?color=%23FF7800)](https://pypi.org/project/sysidentpy/)
 [![discord](https://img.shields.io/discord/711610087700955176?color=%23FF7800&label=discord)](https://discord.gg/7afBSzU4)
 [![contributors](https://img.shields.io/github/contributors/wilsonrljr/sysidentpy?color=%23FF7800)](https://github.com/wilsonrljr/sysidentpy/graphs/contributors)
-[![forks](https://img.shields.io/github/forks/wilsonrljr/sysidentpy?style=social)](https://github.com/wilsonrljr/sysidentpy/network/members)
 [![stars](https://img.shields.io/github/stars/wilsonrljr/sysidentpy?style=social)](https://github.com/wilsonrljr/sysidentpy/stargazers)
 
+<h1 align="center"> NARMAX Methods In The Time Domain </h1>
+<h3 align="center">From Classical Approaches to Neural Networks</h3>
+
+**SysIdentPy** offers State of the Art techniques to build your NARMAX models, including it's variants `NARX`, `NARMA`, `NAR`, `NFIR`, `ARMAX`, `ARX`, `ARMA` and others. It also includes tons of interesting examples to help you build nonlinear forecasting models using SysIdentPy.
+
+</div>
 
 ## What is SysIdentPy?
 
@@ -31,7 +35,7 @@ pip install sysidentpy
 
 ### Requirements
 
-SysIdentPy requires:
+`SysIdentPy` requires:
 
 - Python (>= 3.7)
 - NumPy (>= 1.9.2) for all numerical algorithms
@@ -54,6 +58,7 @@ A few examples require pandas >= 0.18.0. However, it is not required to use SysI
 | Model Structure Selection | Easy-to-use methods to select the best terms to build your models, including FROLS and MetaMSS and several combinations with parameter estimation techniques to select the model terms. |
 | Basis Function | You can use different basis functions to build your models. You can set linear and nonlinear basis functions and ensemble them to get custom NARMAX models. |
 | Parameter Estimation | More than 15 methods to estimate the model parameters and test different structure selection scenarios. |
+| Multiobjective Parameter Estimation | You can use affine information to estimate the model parameters minimizing different objective functions. |
 | Model Simulation | You can reproduce results from papers easily with SimulateNARMAX class. Moreover, you can test published models with different parameter estimation methods and compare the performance. |
 | Neural NARX | You can use SysIdentPy with Pytorch to create custom neural NARX models architectures which support all the optimizers and loss functions from Pytorch. |
 | General Estimators | You can use estimators from packages like scikit-learn, Catboost, and many other compatible interfaces and composition tools, to create NARMAX models. |
@@ -66,7 +71,7 @@ The project is actively maintained by Wilson R. L. Junior and looking for contri
 
 ## How do I use sysIdentPy?
 
-The [SysIdentPy documentation](https://sysidentpy.org) includes 20 examples to help get you started:
+The [SysIdentPy documentation](https://sysidentpy.org) includes more than 20 examples to help get you started:
 - Typical "Hello World" example, for an [entry-level description of the main SysIdentPy concepts](https://sysidentpy.org/examples/basic_steps/)
 - A dedicated section focusing on SysIdentPy features, like model structure selection algorithms, basis functions, parameter estimation, and more.
 - A dedicated section focusing on use cases using SysIdentPy with real world datasets. Besides, there is some brief comparisons and benchmarks against other time series tools, like Prophet, Neural Prophet, ARIMA, and more.  
