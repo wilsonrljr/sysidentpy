@@ -1,7 +1,8 @@
 """ Affine Information Least Squares for NARMAX models"""
 
 import numpy as np
-from sysidentpy.narmax_base import RegressorDictionary
+from sysidentpy.narmax_base import RegressorDictionary, InformationMatrix
+from sysidentpy.basis_function import Polynomial
 
 
 class AILS:
@@ -41,6 +42,9 @@ class AILS:
     ):
         self.n_inputs = np.max(final_model // 1000) - 1
         self.degree = np.shape(final_model)[1]
+        self.xlag = 1
+        self.ylag = 1
+        self.max_lag = 1
         self.final_model = final_model
         self.static_gain = static_gain
         self.static_function = static_function
@@ -91,7 +95,7 @@ class AILS:
         for k in range(1, max_value + 1):
             counts_matrix[:, k - 1] = np.sum(qit == k, axis=1)
 
-        return counts_matrix
+        return counts_matrix.astype(int)
 
     def build_linear_mapping(self):
         """
@@ -135,7 +139,7 @@ class AILS:
         qit = np.delete(qit, null_rows, axis=0)
         return R, self.get_term_clustering(qit)
 
-    def build_static_function_information(self, x_static, y_static):
+    def build_static_function_information(self, X_static, y_static):
         """
         Construct a matrix of static regressors for a NARMAX model.
 
@@ -143,7 +147,7 @@ class AILS:
         ----------
         y_static : array-like, shape (n_samples_static_function,)
             Output of the static function.
-        x_static : array-like, shape (n_samples_static_function,)
+        X_static : array-like, shape (n_samples_static_function,)
             Static function input.
 
         Returns
@@ -160,7 +164,7 @@ class AILS:
         Notes
         -----
         This function constructs a matrix of static regressors (Q) based on the provided
-        static function outputs (y_static) and inputs (x_static). The linear mapping
+        static function outputs (y_static) and inputs (X_static). The linear mapping
         matrix (R) should be precomputed before calling this function. The result
         Q_dot_R represents the static regressors for the NARMAX model.
 
@@ -168,7 +172,7 @@ class AILS:
         R, qit = self.build_linear_mapping()
         Q = y_static ** qit[:, 0]
         for k in range(self.n_inputs):
-            Q *= x_static ** qit[:, 1 + k]
+            Q *= X_static ** qit[:, 1 + k]
 
         Q = Q.reshape(len(y_static), len(qit))
 
@@ -177,7 +181,7 @@ class AILS:
         static_response = (QR.T).dot(y_static)
         return QR, static_covariance, static_response
 
-    def build_static_gain_information(self, x_static, y_static, gain):
+    def build_static_gain_information(self, X_static, y_static, gain):
         """
         Construct a matrix of static regressors referring to the derivative (gain).
 
@@ -185,7 +189,7 @@ class AILS:
         ----------
         y_static : array-like, shape (n_samples_static_function,)
             Output of the static function.
-        x_static : array-like, shape (n_samples_static_function,)
+        X_static : array-like, shape (n_samples_static_function,)
             Static function input.
         gain : array-like, shape (n_samples_static_gain,)
             Static gain input.
@@ -204,7 +208,7 @@ class AILS:
         -----
         This function constructs a matrix of static regressors (G+H) for the derivative
         (gain) based on the provided static function outputs (y_static), inputs
-        (x_static), and gain values. The linear mapping matrix (R) should be
+        (X_static), and gain values. The linear mapping matrix (R) should be
         precomputed before calling this function.
 
         """
@@ -221,50 +225,18 @@ class AILS:
                 else:
                     H[i, j] = gain[i] * qit[j, 0] * y_static[i, 0] ** (qit[j, 0] - 1)
                 for k in range(0, self.n_inputs):
-                    if x_static[i, k] == 0:
+                    if X_static[i, k] == 0:
                         if (qit[j, 1 + k]) == 1:
                             G[i, j] = 1
                         else:
                             G[i, j] = 0
                     else:
-                        G[i, j] = qit[j, 1 + k] * x_static[i, k] ** (qit[j, 1 + k] - 1)
+                        G[i, j] = qit[j, 1 + k] * X_static[i, k] ** (qit[j, 1 + k] - 1)
 
         HR = (G + H).dot(R)
         gain_covariance = (HR.T).dot(HR)
         gain_response = (HR.T).dot(gain)
         return HR, gain_covariance, gain_response
-
-    def set_weights(self):
-        """
-        Set weights assigned to each objective in the multi-objective optimization.
-
-        Returns
-        -------
-        weights : ndarray of floats
-            An array containing the weights for each objective.
-
-        Notes
-        -----
-        This method calculates the weights to be assigned to different objectives in
-        multi-objective optimization. The choice of weights depends on the presence
-        of static function and static gain data. If both are present, a set of weights
-        for dynamic, gain, and static objectives is computed. If either static function
-        or static gain is absent, a simplified set of weights is generated.
-
-        """
-        w1 = np.logspace(-0.01, -5, num=50, base=2.71)
-        if self.static_function is False or self.static_gain is False:
-            w2 = 1 - w1
-            return np.vstack([w1, w2])
-
-        w2 = w1[::-1]
-        w1_grid, w2_grid = np.meshgrid(w1, w2)
-        w3_grid = 1 - (w1_grid + w2_grid)
-        mask = w1_grid + w2_grid <= 1
-        dynamic_weight = np.flip(w1_grid[mask])
-        gain_weight = np.flip(w2_grid[mask])
-        static_weight = np.flip(w3_grid[mask])
-        return np.vstack([dynamic_weight, gain_weight, static_weight])
 
     def get_cost_function(self, y, psi, theta):
         """
@@ -365,13 +337,40 @@ class AILS:
 
         return [psi] + [HR] + [QR]
 
-    def affine_information_least_squares(
+    def build_psi(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
+        psi_builder = RegressorDictionary()
+        xlag_code = psi_builder._list_input_regressor_code(self.final_model)
+        ylag_code = psi_builder._list_output_regressor_code(self.final_model)
+        xlag = psi_builder._get_lag_from_regressor_code(xlag_code)
+        ylag = psi_builder._get_lag_from_regressor_code(ylag_code)
+        self.max_lag = psi_builder._get_max_lag_from_model_code(self.final_model)
+        if self.n_inputs != 1:
+            xlag = self.n_inputs * [list(range(1, self.max_lag + 1))]
+
+        psi_builder.xlag = xlag
+        psi_builder.ylag = ylag
+        regressor_code = psi_builder.regressor_space(self.n_inputs)
+        pivv = psi_builder._get_index_from_regressor_code(
+            regressor_code, self.final_model
+        )
+        self.final_model = regressor_code[pivv]
+
+        lagged_data = InformationMatrix(xlag=xlag, ylag=ylag).build_input_output_matrix(
+            X=X, y=y
+        )
+
+        psi = Polynomial(degree=self.degree).fit(
+            lagged_data, max_lag=self.max_lag, predefined_regressors=pivv
+        )
+        return psi
+
+    def estimate(
         self,
         y_static=np.zeros(1),
-        x_static=np.zeros(1),
+        X_static=np.zeros(1),
         gain=np.zeros(1),
-        y_train=np.zeros(1),
-        psi=np.zeros((1, 1)),
+        y=np.zeros(1),
+        X=np.zeros((1, 1)),
         weighing_matrix=np.zeros((1, 1)),
     ):
         """Calculation of parameters via multi-objective techniques.
@@ -380,11 +379,11 @@ class AILS:
         ----------
         y_static : array-like of shape = n_samples_static_function, default = ([0])
             Output of static function.
-        x_static : array-like of shape = n_samples_static_function, default = ([0])
+        X_static : array-like of shape = n_samples_static_function, default = ([0])
             Static function input.
         gain : array-like of shape = n_samples_static_gain, default = ([0])
             Static gain input.
-        y_train : array-like of shape = n_samples, default = ([0])
+        y : array-like of shape = n_samples, default = ([0])
             The target data used in the identification process.
         psi : ndarray of floats, default = ([[0],[0]])
             Matrix of static regressors.
@@ -393,40 +392,37 @@ class AILS:
         -------
         J : ndarray
             Matrix referring to the objectives.
-        weighing_matrix : ndarray
-            Matrix referring to weights.
         euclidean_norm : ndarray
             Matrix of the Euclidean norm.
-        Array_theta : ndarray
+        theta : ndarray
             Matrix with parameters for each weight.
         HR : ndarray
             H matrix multiplied by R.
         QR : ndarray
             Q matrix multiplied by R.
-        w : ndarray, default = ([[0],[0]])
-            Matrix with weights.
+        position : ndarray, default = ([[0],[0]])
+            Position of the best theta set.
         """
-        if np.round(sum(weighing_matrix[:, 0]), 5) != 1:
-            weighing_matrix = self.set_weights()
-
+        psi = self.build_psi(X, y)
+        y = y[self.max_lag :]
         HR, QR = None, None
         n_parameters = weighing_matrix.shape[1]
         num_objectives = self.static_function + self.static_gain + 1
         euclidean_norm = np.zeros(n_parameters)
         theta = np.zeros((n_parameters, self.final_model.shape[0]))
-        dynamic_covariance = (psi).T.dot(psi)
-        dynamic_response = (psi.T).dot(y_train)
+        dynamic_covariance = psi.T.dot(psi)
+        dynamic_response = psi.T.dot(y)
 
         if self.static_function:
             QR, static_covariance, static_response = (
-                self.build_static_function_information(x_static, y_static)
+                self.build_static_function_information(X_static, y_static)
             )
         if self.static_gain:
             HR, gain_covariance, gain_response = self.build_static_gain_information(
-                x_static, y_static, gain
+                X_static, y_static, gain
             )
         J = np.zeros((num_objectives, n_parameters))
-        system_data = self.build_system_data(y_train, gain, y_static)
+        system_data = self.build_system_data(y, gain, y_static)
         affine_information_data = self.build_affine_data(psi, HR, QR)
         for i in range(n_parameters):
             theta1 = weighing_matrix[0, i] * dynamic_covariance
@@ -463,7 +459,6 @@ class AILS:
         position = np.argmin(euclidean_norm)
         return (
             J,
-            weighing_matrix,
             euclidean_norm,
             theta,
             HR,
