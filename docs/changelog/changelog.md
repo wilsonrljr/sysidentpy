@@ -21,7 +21,7 @@ template: overrides/main.html
     - Now you can use AILS to estimate parameters of NARMAX models (and variants) using a multiobjective approach.
     - AILS can be accessed using `from sysidentpy.multiobjective_parameter_estimation import AILS`
     - See the docs for a more in depth explanation of how to use AILS.
-    - This feature is related to Issue #101
+    - This feature is related to Issue #101. This work is the result of an undergraduate research conducted by Gabriel Bueno Leandro under the supervision of Samir Milani Martins and Wilson Rocha Lacerda Junior.
     - Several new methods were implemented to get the new feature and you can check all of it in sysidentpy -> multiobjective_parameter_estimation.
 
 - API Change: `regressor_code` variable was renamed as `enconding` to avoid using the same name as the method in `narmax_tool` `regressor_code` method.
