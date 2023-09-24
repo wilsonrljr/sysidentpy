@@ -28,7 +28,7 @@ def plot_results(
     model_marker: str = "*",
     linewidth: float = 1.5,
     figsize: Tuple[int, int] = (10, 6),
-    style: str = "seaborn-white",
+    style: str = "default",
     facecolor: str = "white",
 ) -> None:
     """
@@ -98,7 +98,7 @@ def plot_residues_correlation(
     *,
     figsize=(10, 6),
     n=100,
-    style="seaborn-white",
+    style="default",
     facecolor="white",
     title="Residual Analysis",
     ylabel="Correlation",
