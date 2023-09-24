@@ -88,8 +88,8 @@ def test_build_linear_mapping():
     assert isinstance(qit, np.ndarray)
     assert R.shape == (5, 8)
     assert qit.shape == (5, 2)
-    assert R.dtype == np.int
-    assert qit.dtype == np.int
+    assert R.dtype == int
+    assert qit.dtype == int
 
 
 def test_build_static_function_information():
