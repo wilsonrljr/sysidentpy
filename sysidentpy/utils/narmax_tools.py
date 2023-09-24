@@ -1,7 +1,9 @@
-from ..narmax_base import RegressorDictionary
-from ._check_arrays import _num_features
+""" Utils methods for NARMAX modeling"""
 
 import numpy as np
+
+from ..narmax_base import RegressorDictionary
+from ._check_arrays import _num_features
 
 
 def regressor_code(
@@ -18,7 +20,7 @@ def regressor_code(
     else:
         n_inputs = 1  # only used to create the regressor space base
 
-    regressor_code = RegressorDictionary(
+    encoding = RegressorDictionary(
         xlag=xlag, ylag=ylag, model_type=model_type, basis_function=basis_function
     ).regressor_space(n_inputs)
 
@@ -26,23 +28,23 @@ def regressor_code(
     if basis_name != "Polynomial" and basis_function.ensemble:
         repetition = basis_function.n * 2
         basis_code = np.sort(
-            np.tile(regressor_code[1:, :], (repetition, 1)),
+            np.tile(encoding[1:, :], (repetition, 1)),
             axis=0,
         )
-        regressor_code = np.concatenate([regressor_code[1:], basis_code])
+        encoding = np.concatenate([encoding[1:], basis_code])
     elif basis_name != "Polynomial" and basis_function.ensemble is False:
         repetition = basis_function.n * 2
-        regressor_code = np.sort(
-            np.tile(regressor_code[1:, :], (repetition, 1)),
+        encoding = np.sort(
+            np.tile(encoding[1:, :], (repetition, 1)),
             axis=0,
         )
 
     if basis_name == "Polynomial" and model_representation == "neural_network":
-        return regressor_code[1:]
+        return encoding[1:]
     elif basis_name == "Polynomial" and model_representation is None:
-        return regressor_code
+        return encoding
     else:
-        return regressor_code
+        return encoding
 
 
 def set_weights(
@@ -55,7 +57,8 @@ def set_weights(
     base: float = 2.71,
 ) -> np.ndarray:
     """
-    Set log-spaced weights assigned to each objective in the multi-objective optimization.
+    Set log-spaced weights assigned to each objective in the multi-objective
+    optimization.
 
     Returns
     -------
