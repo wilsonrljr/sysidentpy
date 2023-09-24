@@ -1,8 +1,11 @@
 """ Affine Information Least Squares for NARMAX models"""
 
+from typing import Tuple, List
+
 import numpy as np
-from sysidentpy.narmax_base import RegressorDictionary, InformationMatrix
+
 from sysidentpy.basis_function import Polynomial
+from sysidentpy.narmax_base import InformationMatrix, RegressorDictionary
 
 
 class AILS:
@@ -35,22 +38,20 @@ class AILS:
 
     def __init__(
         self,
-        static_gain=True,
-        static_function=True,
-        final_model=np.zeros((1, 1)),
-        normalize=True,
+        static_gain: bool = True,
+        static_function: bool = True,
+        final_model: np.ndarray = np.zeros((1, 1)),
+        normalize: bool = True,
     ):
         self.n_inputs = np.max(final_model // 1000) - 1
         self.degree = np.shape(final_model)[1]
-        self.xlag = 1
-        self.ylag = 1
         self.max_lag = 1
         self.final_model = final_model
         self.static_gain = static_gain
         self.static_function = static_function
         self.normalize = normalize
 
-    def get_term_clustering(self, qit):
+    def get_term_clustering(self, qit: np.ndarray) -> np.ndarray:
         """
         Get the term clustering of the model.
 
@@ -139,7 +140,9 @@ class AILS:
         qit = np.delete(qit, null_rows, axis=0)
         return R, self.get_term_clustering(qit)
 
-    def build_static_function_information(self, X_static, y_static):
+    def build_static_function_information(
+        self, X_static: np.ndarray, y_static: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Construct a matrix of static regressors for a NARMAX model.
 
@@ -181,7 +184,9 @@ class AILS:
         static_response = (QR.T).dot(y_static)
         return QR, static_covariance, static_response
 
-    def build_static_gain_information(self, X_static, y_static, gain):
+    def build_static_gain_information(
+        self, X_static: np.ndarray, y_static: np.ndarray, gain: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Construct a matrix of static regressors referring to the derivative (gain).
 
@@ -238,7 +243,9 @@ class AILS:
         gain_response = (HR.T).dot(gain)
         return HR, gain_covariance, gain_response
 
-    def get_cost_function(self, y, psi, theta):
+    def get_cost_function(
+        self, y: np.ndarray, psi: np.ndarray, theta: np.ndarray
+    ) -> np.ndarray:
         """
         Calculate the cost function based on residuals.
 
@@ -267,7 +274,12 @@ class AILS:
         residuals = y - psi.dot(theta)
         return residuals.T.dot(residuals)
 
-    def build_system_data(self, y, static_gain, static_function):
+    def build_system_data(
+        self,
+        y: np.ndarray,
+        static_gain: np.ndarray,
+        static_function: np.ndarray,
+    ) -> List[np.ndarray]:
         """
         Construct a list of output data components for the NARMAX system.
 
@@ -301,7 +313,9 @@ class AILS:
 
         return [y] + [static_gain] + [static_function]
 
-    def build_affine_data(self, psi, HR, QR):
+    def build_affine_data(
+        self, psi: np.ndarray, HR: np.ndarray, QR: np.ndarray
+    ) -> List[np.ndarray]:
         """
         Construct a list of affine data components for NARMAX modeling.
 
@@ -338,6 +352,22 @@ class AILS:
         return [psi] + [HR] + [QR]
 
     def build_psi(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
+        """
+        Build the matrix of dynamic regressor for NARMAX modeling.
+
+        Parameters
+        ----------
+        X : ndarray of floats
+            The input data to be used in the training process.
+        y : ndarray of floats
+            The output data to be used in the training process.
+
+        Returns
+        -------
+        psi : ndarray of floats, shape (n_samples, n_parameters)
+            The matrix of dynamic regressors.
+
+        """
         psi_builder = RegressorDictionary()
         xlag_code = psi_builder._list_input_regressor_code(self.final_model)
         ylag_code = psi_builder._list_output_regressor_code(self.final_model)
@@ -366,13 +396,13 @@ class AILS:
 
     def estimate(
         self,
-        y_static=np.zeros(1),
-        X_static=np.zeros(1),
-        gain=np.zeros(1),
-        y=np.zeros(1),
-        X=np.zeros((1, 1)),
-        weighing_matrix=np.zeros((1, 1)),
-    ):
+        y_static: np.ndarray = np.zeros(1),
+        X_static: np.ndarray = np.zeros(1),
+        gain: np.ndarray = np.zeros(1),
+        y: np.ndarray = np.zeros(1),
+        X: np.ndarray = np.zeros((1, 1)),
+        weighing_matrix: np.ndarray = np.zeros((1, 1)),
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.int64]:
         """Calculation of parameters via multi-objective techniques.
 
         Parameters
@@ -405,7 +435,7 @@ class AILS:
         """
         psi = self.build_psi(X, y)
         y = y[self.max_lag :]
-        HR, QR = None, None
+        HR, QR = np.zeros((1, 1)), np.zeros((1, 1))
         n_parameters = weighing_matrix.shape[1]
         num_objectives = self.static_function + self.static_gain + 1
         euclidean_norm = np.zeros(n_parameters)
