@@ -94,6 +94,8 @@ class FROLS(Estimators, BaseMSS):
         Weight factor to control the proportions of the error norms
         and offers an extra degree of freedom within the adaptation
         of the LMS mixed norm method.
+    ridge_param : float, default=0.01
+        Constant parameter used in ridge regression (K = ridge_param*I).
     model_type: str, default="NARMAX"
         The user can choose "NARMAX", "NAR" and "NFIR" models
 
@@ -166,6 +168,7 @@ class FROLS(Estimators, BaseMSS):
         eps: np.float64 = np.finfo(np.float64).eps,
         gama: float = 0.2,
         weight: float = 0.02,
+        ridge_param: float = 0.01,
         basis_function: Union[Polynomial, Fourier] = Polynomial(),
         model_type: str = "NARMAX",
     ):
@@ -193,6 +196,7 @@ class FROLS(Estimators, BaseMSS):
             eps=eps,
             gama=gama,
             weight=weight,
+            ridge_param=ridge_param,
             basis_function=basis_function,
         )
         self.ensemble = None

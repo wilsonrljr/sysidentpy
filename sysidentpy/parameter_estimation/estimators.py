@@ -25,6 +25,7 @@ class Estimators:
         eps=np.finfo(np.float64).eps,
         gama=0.2,
         weight=0.02,
+        ridge_param: float=0.01,
         basis_function=None,
     ):
         self.eps = eps
@@ -35,6 +36,7 @@ class Estimators:
         self.delta = delta
         self.gama = gama
         self.weight = weight  # <0  e <1
+        self.ridge_param = ridge_param
         self.xi = None
         self.theta_evolution = None
         self.basis_function = basis_function
@@ -51,6 +53,7 @@ class Estimators:
             "eps": self.eps,
             "gama": self.gama,
             "weight": self.weight,
+            "ridge_param": self.ridge_param,
         }
         for attribute, value in attributes.items():
             if not isinstance(value, (np.integer, int, float)):
@@ -890,3 +893,41 @@ class Estimators:
             theta[:, i] = tmp_list.flatten()
 
         return theta[:, -1].reshape(-1, 1)
+
+    def ridge_regression(self, psi, y):
+        """Estimate the model parameters using SVD and Ridge Regression method.
+
+        Parameters
+        ----------
+        psi : ndarray of floats
+            The information matrix of the model.
+        y : array-like of shape = y_training
+            The data used to training the model.
+
+        Returns
+        -------
+        theta : array-like of shape = number_of_model_elements
+            The estimated parameters of the model.
+
+        References
+        ----------
+        - Manuscript: Hoerl, A. E.; Kennard, R. W. Ridge regression:
+                      applications to nonorthogonal problems. Technometrics,
+                      Taylor & Francis, v. 12, n. 1, p. 69-82, 1970.
+        
+        - StackExchange: whuber. The proof of shrinking coefficients using ridge
+                         regression through "spectral decomposition".
+                         Cross Validated, accessed 21 September 2023,
+                         https://stats.stackexchange.com/q/220324
+        """
+        self._check_linear_dependence_rows(psi)
+
+        y = y[self.max_lag :, 0].reshape(-1, 1)
+
+        U, d, Vt = np.linalg.svd(psi, full_matrices=False)
+        D = np.diag(d)
+        I = np.identity(len(D))
+        
+        theta = Vt.T @ np.linalg.inv(D**2 + self.ridge_param*I) @ D @ U.T @ y
+        
+        return theta
