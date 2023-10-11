@@ -88,6 +88,8 @@ class FROLS(Estimators, BaseMSS):
         The convergence coefficient (learning rate) of the filter.
     eps : float
         Normalization factor of the normalized filters.
+    ridge_param : float
+        Regularization prameter used in ridge regression
     gama : float, default=0.2
         The leakage factor of the Leaky LMS method.
     weight : float, default=0.02
@@ -164,6 +166,7 @@ class FROLS(Estimators, BaseMSS):
         offset_covariance: float = 0.2,
         mu: float = 0.01,
         eps: np.float64 = np.finfo(np.float64).eps,
+        ridge_param: np.float64 = np.finfo(np.float64).eps, # default is machine eps
         gama: float = 0.2,
         weight: float = 0.02,
         basis_function: Union[Polynomial, Fourier] = Polynomial(),
@@ -191,6 +194,7 @@ class FROLS(Estimators, BaseMSS):
             offset_covariance=offset_covariance,
             mu=mu,
             eps=eps,
+            ridge_param=ridge_param, # ridge regression parameter
             gama=gama,
             weight=weight,
             basis_function=basis_function,
@@ -294,9 +298,16 @@ class FROLS(Estimators, BaseMSS):
             for j in np.arange(i, dimension):
                 # Add `eps` in the denominator to omit division by zero if
                 # denominator is zero
+                # To implement regularized regression (ridge regression), add 
+                # ridgePparam to psi.T @ psi.   See S. Chen, Local regularization assisted
+                # orthogonal least squares regression, Neurocomputing 69 (2006) 559–585.
+                # The version implemeted below uses the same regularization for every feature,
+                # What Chen refers to Uniform regularized orthogonal least squares (UROLS)
+                # Set to tiny (self.eps) when you are not regularizing.  ridge_param = eps is
+                # the default.
                 tmp_err[j] = (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2) / (
-                    np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) * squared_y + self.eps
-                )
+                    (np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) + self.ridge_param) * squared_y 
+                ) + self.eps
 
             if i == process_term_number:
                 break
