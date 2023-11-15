@@ -89,7 +89,7 @@ class FROLS(Estimators, BaseMSS):
     eps : float
         Normalization factor of the normalized filters.
     ridge_param : float
-        Regularization prameter used in ridge regression
+        Regularization parameter used in ridge regression
     gama : float, default=0.2
         The leakage factor of the Leaky LMS method.
     weight : float, default=0.02
@@ -166,7 +166,7 @@ class FROLS(Estimators, BaseMSS):
         offset_covariance: float = 0.2,
         mu: float = 0.01,
         eps: np.float64 = np.finfo(np.float64).eps,
-        ridge_param: np.float64 = np.finfo(np.float64).eps, # default is machine eps
+        ridge_param: np.float64 = np.finfo(np.float64).eps,  # default is machine eps
         gama: float = 0.2,
         weight: float = 0.02,
         basis_function: Union[Polynomial, Fourier] = Polynomial(),
@@ -194,7 +194,7 @@ class FROLS(Estimators, BaseMSS):
             offset_covariance=offset_covariance,
             mu=mu,
             eps=eps,
-            ridge_param=ridge_param, # ridge regression parameter
+            ridge_param=ridge_param,  # ridge regression parameter
             gama=gama,
             weight=weight,
             basis_function=basis_function,
@@ -298,15 +298,16 @@ class FROLS(Estimators, BaseMSS):
             for j in np.arange(i, dimension):
                 # Add `eps` in the denominator to omit division by zero if
                 # denominator is zero
-                # To implement regularized regression (ridge regression), add 
-                # ridgePparam to psi.T @ psi.   See S. Chen, Local regularization assisted
+                # To implement regularized regression (ridge regression), add
+                # ridgeParam to psi.T @ psi.   See S. Chen, Local regularization assisted
                 # orthogonal least squares regression, Neurocomputing 69 (2006) 559–585.
-                # The version implemeted below uses the same regularization for every feature,
+                # The version implemented below uses the same regularization for every feature,
                 # What Chen refers to Uniform regularized orthogonal least squares (UROLS)
                 # Set to tiny (self.eps) when you are not regularizing.  ridge_param = eps is
                 # the default.
                 tmp_err[j] = (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2) / (
-                    (np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) + self.ridge_param) * squared_y 
+                    (np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) + self.ridge_param)
+                    * squared_y
                 ) + self.eps
 
             if i == process_term_number:
@@ -329,7 +330,7 @@ class FROLS(Estimators, BaseMSS):
         psi_orthogonal = psi[:, tmp_piv]
         return err, piv, psi_orthogonal
 
-    def information_criterion(self, X_base, y):
+    def information_criterion(self, X, y):
         """Determine the model order.
 
         This function uses a information criterion to determine the model size.
@@ -343,7 +344,7 @@ class FROLS(Estimators, BaseMSS):
         ----------
         y : array-like of shape = n_samples
             Target values of the system.
-        X_base : array-like of shape = n_samples
+        X : array-like of shape = n_samples
             Input system values measured by the user.
 
         Returns
@@ -354,14 +355,12 @@ class FROLS(Estimators, BaseMSS):
             vector position + 1).
 
         """
-        if self.n_info_values is not None and self.n_info_values > X_base.shape[1]:
-            self.n_info_values = X_base.shape[1]
+        if self.n_info_values is not None and self.n_info_values > X.shape[1]:
+            self.n_info_values = X.shape[1]
             warnings.warn(
-                (
-                    "n_info_values is greater than the maximum number of all"
-                    " regressors space considering the chosen y_lag, u_lag, and"
-                    f" non_degree. We set as {X_base.shape[1]}"
-                ),
+                "n_info_values is greater than the maximum number of all"
+                " regressors space considering the chosen y_lag, u_lag, and"
+                f" non_degree. We set as {X.shape[1]}",
                 stacklevel=2,
             )
 
@@ -372,7 +371,7 @@ class FROLS(Estimators, BaseMSS):
 
         for i in range(0, self.n_info_values):
             n_theta = i + 1
-            regressor_matrix = self.error_reduction_ratio(X_base, y, n_theta)[2]
+            regressor_matrix = self.error_reduction_ratio(X, y, n_theta)[2]
 
             tmp_theta = getattr(self, self.estimator)(regressor_matrix, y)
 

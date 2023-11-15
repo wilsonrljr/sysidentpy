@@ -23,13 +23,13 @@ class Estimators:
         offset_covariance=0.2,
         mu=0.01,
         eps=np.finfo(np.float64).eps,
-        ridge_param = np.finfo(np.float64).eps, # for regularized ridge regression
+        ridge_param=np.finfo(np.float64).eps,  # for regularized ridge regression
         gama=0.2,
         weight=0.02,
         basis_function=None,
     ):
         self.eps = eps
-        self.ridge_param = ridge_param # for regularized ridge regression
+        self.ridge_param = ridge_param  # for regularized ridge regression
         self.mu = mu
         self.offset_covariance = offset_covariance
         self.max_lag = max_lag
@@ -51,7 +51,7 @@ class Estimators:
             "offset_covariance": self.offset_covariance,
             "mu": self.mu,
             "eps": self.eps,
-            "ridge_param": self.ridge_param, # for regularized ridge regression
+            "ridge_param": self.ridge_param,  # for regularized ridge regression
             "gama": self.gama,
             "weight": self.weight,
         }
@@ -76,10 +76,8 @@ class Estimators:
     def _check_linear_dependence_rows(self, psi):
         if np.linalg.matrix_rank(psi) != psi.shape[1]:
             warnings.warn(
-                (
-                    "Psi matrix might have linearly dependent rows."
-                    "Be careful and check your data"
-                ),
+                "Psi matrix might have linearly dependent rows."
+                "Be careful and check your data",
                 stacklevel=2,
             )
 
@@ -119,7 +117,7 @@ class Estimators:
         y = y[self.max_lag :, 0].reshape(-1, 1)
         theta = np.linalg.lstsq(psi, y, rcond=None)[0]
         return theta
-    
+
     def ridge_regression(self, psi, y):
         """Estimate the model parameters using the regularized least squares method
            known as ridge regression.  Based on the least_squares module and uses
@@ -146,19 +144,23 @@ class Estimators:
         ----------
         - Wikipedia entry on ridge regression
           https://en.wikipedia.org/wiki/Ridge_regression
-          
+
         ridge_parm multiplied by the identity matrix (np.eye) favors models (theta) that
         have small size using an L2 norm.  This prevents over fitting of the model.
         For applications where preventing overfitting is important, see, for example,
         D. J. Gauthier, E. Bollt, A. Griffith, W. A. S. Barbosa, ‘Next generation
         reservoir computing,’ Nat. Commun. 12, 5564 (2021).
         https://www.nature.com/articles/s41467-021-25801-2
-          
+
         """
         self._check_linear_dependence_rows(psi)
 
         y = y[self.max_lag :, 0].reshape(-1, 1)
-        theta = (np.linalg.pinv(psi.T @ psi + self.ridge_param * np.eye(psi.shape[1])) @ psi.T @ y)
+        theta = (
+            np.linalg.pinv(psi.T @ psi + self.ridge_param * np.eye(psi.shape[1]))
+            @ psi.T
+            @ y
+        )
         return theta
 
     def _unbiased_estimator(self, psi, y, theta, elag, max_lag, estimator):
