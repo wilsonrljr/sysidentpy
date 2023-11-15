@@ -446,6 +446,30 @@ def test_steps_3():
     assert_almost_equal(yhat.mean(), y_test.mean(), decimal=2)
 
 
+def test_raise_batch_size():
+    assert_raises(
+        ValueError, NARXNN, batch_size=0.3, basis_function=Polynomial(degree=2)
+    )
+
+
+def test_raise_epochs():
+    assert_raises(ValueError, NARXNN, epochs=0.3, basis_function=Polynomial(degree=2))
+
+
+def test_raise_train_percentage():
+    assert_raises(
+        ValueError, NARXNN, train_percentage=-1, basis_function=Polynomial(degree=2)
+    )
+
+
+def test_raise_verbose():
+    assert_raises(TypeError, NARXNN, verbose=None, basis_function=Polynomial(degree=2))
+
+
+def test_raise_device():
+    assert_raises(ValueError, NARXNN, device="CPU", basis_function=Polynomial(degree=2))
+
+
 def test_model_predict_fourier():
     basis_function = Fourier(degree=1)
 

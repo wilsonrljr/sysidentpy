@@ -41,10 +41,10 @@ def regressor_code(
 
     if basis_name == "Polynomial" and model_representation == "neural_network":
         return encoding[1:]
-    elif basis_name == "Polynomial" and model_representation is None:
+    if basis_name == "Polynomial" and model_representation is None:
         return encoding
-    else:
-        return encoding
+
+    return encoding
 
 
 def set_weights(
