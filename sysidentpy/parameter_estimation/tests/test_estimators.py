@@ -42,6 +42,38 @@ def test_least_squares():
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
+def test_ridge_regression():
+    x, y, theta = create_test_data()
+    basis_function = Polynomial(degree=2)
+    model = FROLS(
+        n_terms=5,
+        extended_least_squares=False,
+        ylag=[1, 2],
+        xlag=2,
+        estimator="ridge_regression",
+        ridge_param=np.finfo(np.float64).eps,
+        basis_function=basis_function,
+    )
+    model.fit(X=x, y=y)
+    assert_almost_equal(model.theta, theta, decimal=2)
+
+
+def test_raise_ridge_regression():
+    assert_raises(
+        ValueError, Estimators, ridge_param=-0.3, basis_function=Polynomial(degree=2)
+    )
+
+
+def test_raise():
+    assert_raises(
+        ValueError, Estimators, lam="0.97", basis_function=Polynomial(degree=2)
+    )
+
+
+def test_lam_raise():
+    assert_raises(ValueError, Estimators, lam=1.01, basis_function=Polynomial(degree=2))
+
+
 def test_total_least_squares():
     x, y, theta = create_test_data()
     model = FROLS(

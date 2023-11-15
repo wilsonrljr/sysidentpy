@@ -51,7 +51,7 @@ class Estimators:
             "offset_covariance": self.offset_covariance,
             "mu": self.mu,
             "eps": self.eps,
-            "ridge_param": self.ridge_param,  # for regularized ridge regression
+            "ridge_param": self.ridge_param,
             "gama": self.gama,
             "weight": self.weight,
         }

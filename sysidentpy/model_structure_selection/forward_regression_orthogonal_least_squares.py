@@ -86,9 +86,9 @@ class FROLS(Estimators, BaseMSS):
         filter.
     mu : float, default=0.01
         The convergence coefficient (learning rate) of the filter.
-    eps : float
+    eps : float, default=np.finfo(np.float64).eps
         Normalization factor of the normalized filters.
-    ridge_param : float
+    ridge_param : float, default=np.finfo(np.float64).eps
         Regularization parameter used in ridge regression
     gama : float, default=0.2
         The leakage factor of the Leaky LMS method.
