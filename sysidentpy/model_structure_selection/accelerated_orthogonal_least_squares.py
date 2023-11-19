@@ -3,7 +3,7 @@
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
-from typing import Tuple, Union
+from typing import Tuple, Union, Optional
 
 import numpy as np
 from numpy import linalg as LA
@@ -262,7 +262,7 @@ class AOLS(Estimators, BaseMSS):
         theta = theta[theta != 0]
         return theta.reshape(-1, 1), pivv, residual_norm
 
-    def fit(self, *, X=None, y=None):
+    def fit(self, *, X: Optional[np.ndarray] = None, y: Optional[np.ndarray] = None):
         """Fit polynomial NARMAX model using AOLS algorithm.
 
         The 'fit' function allows a friendly usage by the user.
@@ -343,7 +343,14 @@ class AOLS(Estimators, BaseMSS):
         ]  # just to use the `results` method. Will be changed in next update.
         return self
 
-    def predict(self, *, X=None, y=None, steps_ahead=None, forecast_horizon=None):
+    def predict(
+        self,
+        *,
+        X: Optional[np.ndarray] = None,
+        y: Optional[np.ndarray] = None,
+        steps_ahead: Optional[int] = None,
+        forecast_horizon: int = 0,
+    ) -> np.ndarray:
         """Return the predicted values given an input.
 
         The predict function allows a friendly usage by the user.
@@ -401,7 +408,9 @@ class AOLS(Estimators, BaseMSS):
         yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
         return yhat
 
-    def _one_step_ahead_prediction(self, X, y):
+    def _one_step_ahead_prediction(
+        self, X: Optional[np.ndarray], y: Optional[np.ndarray]
+    ) -> np.ndarray:
         """Perform the 1-step-ahead prediction of a model.
 
         Parameters
@@ -435,7 +444,12 @@ class AOLS(Estimators, BaseMSS):
         yhat = super()._one_step_ahead_prediction(X_base)
         return yhat.reshape(-1, 1)
 
-    def _n_step_ahead_prediction(self, X, y, steps_ahead):
+    def _n_step_ahead_prediction(
+        self,
+        X: Optional[np.ndarray],
+        y: Optional[np.ndarray],
+        steps_ahead: Optional[int],
+    ) -> np.ndarray:
         """Perform the n-steps-ahead prediction of a model.
 
         Parameters
@@ -455,7 +469,12 @@ class AOLS(Estimators, BaseMSS):
         yhat = super()._n_step_ahead_prediction(X, y, steps_ahead)
         return yhat
 
-    def _model_prediction(self, X, y_initial, forecast_horizon=None):
+    def _model_prediction(
+        self,
+        X: Optional[np.ndarray],
+        y_initial: Optional[np.ndarray],
+        forecast_horizon: int = 1,
+    ) -> np.ndarray:
         """Perform the infinity steps-ahead simulation of a model.
 
         Parameters
@@ -481,7 +500,12 @@ class AOLS(Estimators, BaseMSS):
             f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
         )
 
-    def _narmax_predict(self, X, y_initial, forecast_horizon):
+    def _narmax_predict(
+        self,
+        X: Optional[np.ndarray],
+        y_initial: Optional[np.ndarray],
+        forecast_horizon: int = 1,
+    ) -> np.ndarray:
         if len(y_initial) < self.max_lag:
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
@@ -499,11 +523,18 @@ class AOLS(Estimators, BaseMSS):
         y_output = super()._narmax_predict(X, y_initial, forecast_horizon)
         return y_output
 
-    def _nfir_predict(self, X, y_initial):
+    def _nfir_predict(
+        self, X: Optional[np.ndarray], y_initial: Optional[np.ndarray]
+    ) -> np.ndarray:
         y_output = super()._nfir_predict(X, y_initial)
         return y_output
 
-    def _basis_function_predict(self, X, y_initial, forecast_horizon=None):
+    def _basis_function_predict(
+        self,
+        X: Optional[np.ndarray],
+        y_initial: Optional[np.ndarray],
+        forecast_horizon: int = 1,
+    ) -> np.ndarray:
         if X is not None:
             forecast_horizon = X.shape[0]
         else:
@@ -515,7 +546,13 @@ class AOLS(Estimators, BaseMSS):
         yhat = super()._basis_function_predict(X, y_initial, forecast_horizon)
         return yhat.reshape(-1, 1)
 
-    def _basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
+    def _basis_function_n_step_prediction(
+        self,
+        X: Optional[np.ndarray],
+        y: Optional[np.ndarray],
+        steps_ahead: Optional[int],
+        forecast_horizon: int,
+    ) -> np.ndarray:
         """Perform the n-steps-ahead prediction of a model.
 
         Parameters
@@ -548,7 +585,13 @@ class AOLS(Estimators, BaseMSS):
         )
         return yhat.reshape(-1, 1)
 
-    def _basis_function_n_steps_horizon(self, X, y, steps_ahead, forecast_horizon):
+    def _basis_function_n_steps_horizon(
+        self,
+        X: Optional[np.ndarray],
+        y: Optional[np.ndarray],
+        steps_ahead: Optional[int],
+        forecast_horizon: int,
+    ) -> np.ndarray:
         yhat = super()._basis_function_n_steps_horizon(
             X, y, steps_ahead, forecast_horizon
         )
