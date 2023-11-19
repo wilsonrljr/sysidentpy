@@ -459,6 +459,9 @@ class AOLS(Estimators, BaseMSS):
             to start recursive process.
         X : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
+        steps_ahead : int (default = None)
+            The user can use free run simulation, one-step ahead prediction
+            and n-step ahead prediction.
 
         Returns
         -------

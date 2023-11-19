@@ -1,8 +1,9 @@
 """ Meta Model Structure Selection"""
+
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
-from typing import Tuple, Union
+from typing import Tuple, Union, Optional
 
 import numpy as np
 from scipy.stats import t
@@ -193,8 +194,8 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         loss_func: str = "metamss_loss",
         model_type: str = "NARMAX",
         basis_function: Polynomial = Polynomial(),
-        steps_ahead: Union[int, None] = None,
-        random_state: Union[int, None] = None,
+        steps_ahead: Optional[int] = None,
+        random_state: Optional[int] = None,
     ):
         super().__init__(
             estimator=estimator,
@@ -264,14 +265,21 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             " follow the same structure of the other methods."
         ),
     )
-    def fit(self, *, X=None, y=None, X_test=None, y_test=None):
+    def fit(
+        self,
+        *,
+        X: Optional[np.ndarray] = None,
+        y: Optional[np.ndarray] = None,
+        X_test: Optional[np.ndarray] = None,
+        y_test: Optional[np.ndarray] = None,
+    ):
         """Fit the polynomial NARMAX model.
 
         Parameters
         ----------
-        X_train : ndarray of floats
+        X : ndarray of floats
             The input data to be used in the training process.
-        y_train : ndarray of floats
+        y : ndarray of floats
             The output data to be used in the training process.
         X_test : ndarray of floats
             The input data to be used in the prediction process.
@@ -345,7 +353,14 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self.max_lag = self._get_max_lag()
         return self
 
-    def evaluate_objective_function(self, X_train, y_train, X_test, y_test, population):
+    def evaluate_objective_function(
+        self,
+        X_train: Optional[np.ndarray],
+        y_train: Optional[np.ndarray],
+        X_test: Optional[np.ndarray],
+        y_test: Optional[np.ndarray],
+        population: np.ndarray,
+    ) -> list[float]:
         """Fit the polynomial NARMAX model.
 
         Parameters
@@ -425,8 +440,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
     def perform_t_test(
         self, psi: np.ndarray, theta: np.ndarray, residues: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """
-        Perform the t-test given the p-value defined by the user
+        """Perform the t-test given the p-value defined by the user.
 
         Arguments:
         ----------
@@ -473,7 +487,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         # t_test and tail2P will be returned in future updates
         return pos_insignificant_terms, t_test, tail2P
 
-    def aic(self, y_test, yhat, n_theta):
+    def aic(self, y_test: np.ndarray, yhat: np.ndarray, n_theta: int) -> float:
         """Calculate the Akaike Information Criterion
 
         Parameters
@@ -495,7 +509,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         n = y_test.shape[0]
         return n * np.log(mse) + 2 * n_theta
 
-    def bic(self, y_test, yhat, n_theta):
+    def bic(self, y_test: np.ndarray, yhat: np.ndarray, n_theta: int) -> float:
         """Calculate the Bayesian Information Criterion
 
         Parameters
@@ -517,7 +531,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         n = y_test.shape[0]
         return n * np.log(mse) + n_theta + np.log(n)
 
-    def metamss_loss(self, y_test, yhat, n_terms):
+    def metamss_loss(self, y_test: np.ndarray, yhat: np.ndarray, n_terms: int) -> float:
         """Calculate the MetaMSS loss function
 
         Parameters
@@ -576,7 +590,14 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             * (1 + (a * (x - c)) * (1 - 1 / (1 + np.exp(-a * (x - c)))))
         )
 
-    def predict(self, *, X=None, y=None, steps_ahead=None, forecast_horizon=None):
+    def predict(
+        self,
+        *,
+        X: Optional[np.ndarray] = None,
+        y: Optional[np.ndarray] = None,
+        steps_ahead: Optional[int] = None,
+        forecast_horizon: int = 1,
+    ) -> np.ndarray:
         """Return the predicted values given an input.
 
         The predict function allows a friendly usage by the user.
@@ -588,9 +609,9 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
         Parameters
         ----------
-        X_test : ndarray of floats
+        X : ndarray of floats
             The input data to be used in the prediction process.
-        y_test : ndarray of floats
+        y : ndarray of floats
             The output data to be used in the prediction process.
         steps_ahead : int (default = None)
             The user can use free run simulation, one-step ahead prediction
@@ -623,7 +644,9 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             "MetaMSS doesn't support basis functions other than polynomial yet.",
         )
 
-    def _one_step_ahead_prediction(self, X, y):
+    def _one_step_ahead_prediction(
+        self, X: Optional[np.ndarray], y: Optional[np.ndarray]
+    ) -> np.ndarray:
         """Perform the 1-step-ahead prediction of a model.
 
         Parameters
@@ -643,7 +666,12 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         yhat = super()._one_step_ahead_prediction(X, y)
         return yhat.reshape(-1, 1)
 
-    def _n_step_ahead_prediction(self, X, y, steps_ahead):
+    def _n_step_ahead_prediction(
+        self,
+        X: Optional[np.ndarray],
+        y: Optional[np.ndarray],
+        steps_ahead: Optional[int],
+    ) -> np.ndarray:
         """Perform the n-steps-ahead prediction of a model.
 
         Parameters
@@ -663,7 +691,12 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         yhat = super()._n_step_ahead_prediction(X, y, steps_ahead)
         return yhat
 
-    def _model_prediction(self, X, y_initial, forecast_horizon=None):
+    def _model_prediction(
+        self,
+        X: Optional[np.ndarray],
+        y_initial: Optional[np.ndarray],
+        forecast_horizon: int = 1,
+    ):
         """Perform the infinity steps-ahead simulation of a model.
 
         Parameters
@@ -689,11 +722,18 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
         )
 
-    def _narmax_predict(self, X, y_initial, forecast_horizon):
+    def _narmax_predict(
+        self,
+        X: Optional[np.ndarray],
+        y_initial: Optional[np.ndarray],
+        forecast_horizon: int = 1,
+    ) -> np.ndarray:
         y_output = super()._narmax_predict(X, y_initial, forecast_horizon)
         return y_output
 
-    def _nfir_predict(self, X, y_initial):
+    def _nfir_predict(
+        self, X: Optional[np.ndarray], y_initial: Optional[np.ndarray]
+    ) -> np.ndarray:
         y_output = super()._nfir_predict(X, y_initial)
         return y_output
 

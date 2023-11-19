@@ -31,8 +31,7 @@ def plot_results(
     style: str = "default",
     facecolor: str = "white",
 ) -> None:
-    """
-    Plot the results of a simulation.
+    """Plot the results of a simulation.
 
     Parameters:
     -----------

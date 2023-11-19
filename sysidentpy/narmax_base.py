@@ -67,6 +67,8 @@ class InformationMatrix:
         -------
         x_lag : ndarray of int
             The range of lags according to user definition.
+        n_inputs : int
+            Number of input variables.
 
         """
         n_inputs = _num_features(X)
@@ -194,12 +196,13 @@ class InformationMatrix:
 
         Parameters
         ----------
-        y : array-like
+        args : array-like
             Target data used on training phase.
+            args[0] is X=None in NAR scenario
 
         Returns
         -------
-        lagged_data = ndarray of floats
+        data = ndarray of floats
             The lagged matrix built in respect with each lag and column.
 
         """
@@ -223,12 +226,13 @@ class InformationMatrix:
 
         Parameters
         ----------
-        X : array-like
-            Input data used on training phase.
+        *args : array-like
+            Input data (X) used on training phase.
+            args[0] is X=None in NAR scenario
 
         Returns
         -------
-        lagged_data = ndarray of floats
+        data = ndarray of floats
             The lagged matrix built in respect with each lag and column.
 
         """
@@ -260,7 +264,7 @@ class InformationMatrix:
 
         Returns
         -------
-        lagged_data = ndarray of floats
+        data = ndarray of floats
             The lagged matrix built in respect with each lag and column.
 
         """
@@ -305,10 +309,10 @@ class RegressorDictionary(InformationMatrix):
 
         Returns
         -------
-        max_lag : int
-            This value can be used by another functions.
-        regressor_code : ndarray of int
-            Matrix codification of all possible regressors.
+        x_vec : ndarray of int
+            List of the input lags.
+        y_vec : ndarray of int
+            List of the output lags.
 
         Examples
         --------
@@ -388,6 +392,11 @@ class RegressorDictionary(InformationMatrix):
 
     def get_miso_x_lag_list(self, n_inputs: int) -> np.ndarray:
         """Return x regressor code list for MISO models.
+
+        Parameters
+        ----------
+        n_inputs : int
+            Number of input variables.
 
         Returns
         -------
@@ -485,7 +494,7 @@ class RegressorDictionary(InformationMatrix):
 
         Returns
         -------
-        model_code : ndarray of int
+        regressor_code : ndarray of int
             Flattened list of output regressors.
 
         """
@@ -505,7 +514,7 @@ class RegressorDictionary(InformationMatrix):
 
         Returns
         -------
-        model_code : ndarray of int
+        regressor_code : ndarray of int
             Flattened list of output regressors.
 
         """
@@ -559,13 +568,6 @@ class RegressorDictionary(InformationMatrix):
     def _get_max_lag(self):
         """Get the max lag defined by the user.
 
-        Parameters
-        ----------
-        ylag : int
-            The maximum lag of output regressors.
-        xlag : int
-            The maximum lag of input regressors.
-
         Returns
         -------
         max_lag = int
@@ -576,7 +578,18 @@ class RegressorDictionary(InformationMatrix):
         return np.max([ny, np.max(nx)])
 
     def get_build_io_method(self, model_type):
-        """get info criteria"""
+        """Get info criteria method.
+
+        Parameters
+        ----------
+        model_type = str
+            The type of the model (NARMAX, NAR or NFIR)
+
+        Returns
+        -------
+        build_method = Self
+            Method to build the input-output matrix
+        """
         build_matrix_options = {
             "NARMAX": self.build_input_output_matrix,
             "NFIR": self.build_input_matrix,
@@ -613,13 +626,16 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         """abstract methods"""
 
     def _code2exponents(self, *, code: np.ndarray) -> np.ndarray:
-        """
-        Convert regressor code to exponents array.
+        """Convert regressor code to exponents array.
 
         Parameters
         ----------
         code : 1D-array of int
             Codification of one regressor.
+
+        Returns
+        -------
+        exponents = ndarray of ints
         """
         regressors = np.array(list(set(code)))
         regressors_count = Counter(code)
@@ -650,11 +666,8 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
         Parameters
         ----------
-        y : array-like of shape = max_lag
-            Initial conditions values of the model
-            to start recursive process.
-        X : ndarray of floats of shape = n_samples
-            Vector with input values to be used in model simulation.
+        X_base : ndarray of floats of shape = n_samples
+            Regressor matrix with input-output arrays.
 
         Returns
         -------
@@ -672,7 +685,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         y_initial: Optional[np.ndarray],
         forecast_horizon: int = 1,
     ) -> np.ndarray:
-        """model prediction wrapper"""
+        """Model prediction wrapper"""
 
     def _narmax_predict(
         self,
@@ -831,6 +844,9 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             to start recursive process.
         X : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
+        steps_ahead : int (default = None)
+            The user can use free run simulation, one-step ahead prediction
+            and n-step ahead prediction.
 
         Returns
         -------
@@ -840,6 +856,11 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
         if self.model_type == "NAR":
             return self._nar_step_ahead(y, steps_ahead)
+
+        if self.model_type == "NFIR":
+            raise ValueError(
+                "n_steps_ahead prediction will be implemented for NFIR models in v0.4.*"
+            )
 
     @abstractmethod
     def _basis_function_predict(
