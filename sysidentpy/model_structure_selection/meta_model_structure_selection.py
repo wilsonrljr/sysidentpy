@@ -360,7 +360,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         X_test: Optional[np.ndarray],
         y_test: Optional[np.ndarray],
         population: np.ndarray,
-    ) -> list[float]:
+    ):
         """Fit the polynomial NARMAX model.
 
         Parameters
