@@ -103,6 +103,7 @@ def plot_residues_correlation(
     title: str = "Residual Analysis",
     ylabel: str = "Correlation",
 ) -> None:
+    """Plot the residual validation."""
     plt.style.use(style)
     plt.rcParams["axes.facecolor"] = facecolor
     _, ax = plt.subplots(figsize=figsize, facecolor=facecolor)
