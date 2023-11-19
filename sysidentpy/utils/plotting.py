@@ -96,17 +96,17 @@ def plot_results(
 def plot_residues_correlation(
     data=None,
     *,
-    figsize=(10, 6),
-    n=100,
-    style="default",
-    facecolor="white",
-    title="Residual Analysis",
-    ylabel="Correlation",
-):
+    figsize: Tuple[int, int] = (10, 6),
+    n: int = 100,
+    style: str = "default",
+    facecolor: str = "white",
+    title: str = "Residual Analysis",
+    ylabel: str = "Correlation",
+) -> None:
     plt.style.use(style)
     plt.rcParams["axes.facecolor"] = facecolor
     _, ax = plt.subplots(figsize=figsize, facecolor=facecolor)
-    ax.plot(data[0], color="#1f77b4")
+    ax.plot(data[0][:n], color="#1f77b4")
     ax.axhspan(data[1], data[2], color="#ccd9ff", alpha=0.5, lw=0)
     ax.set_xlabel("Lag", fontsize=14)
     ax.set_ylabel(ylabel, fontsize=14)
