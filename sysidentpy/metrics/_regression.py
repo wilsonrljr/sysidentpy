@@ -27,7 +27,7 @@ __ALL__ = [
 ]
 
 
-def forecast_error(y, yhat):
+def forecast_error(y: ArrayLike, yhat: ArrayLike) -> ArrayLike:
     """Calculate the forecast error in a regression model.
 
     Parameters
@@ -59,7 +59,7 @@ def forecast_error(y, yhat):
     return np.array(y - yhat)
 
 
-def mean_forecast_error(y, yhat):
+def mean_forecast_error(y: ArrayLike, yhat: ArrayLike) -> ArrayLike:
     """Calculate the mean of forecast error of a regression model.
 
     Parameters
@@ -92,7 +92,7 @@ def mean_forecast_error(y, yhat):
     return np.average(y - yhat)
 
 
-def mean_squared_error(y, yhat):
+def mean_squared_error(y: ArrayLike, yhat: ArrayLike) -> ArrayLike:
     """Calculate the Mean Squared Error.
 
     Parameters
@@ -157,7 +157,7 @@ def root_mean_squared_error(y: ArrayLike, yhat: ArrayLike) -> np.ndarray:
     return np.sqrt(mean_squared_error(y, yhat))
 
 
-def normalized_root_mean_squared_error(y, yhat):
+def normalized_root_mean_squared_error(y: ArrayLike, yhat: ArrayLike) -> ArrayLike:
     """Calculate the normalized Root Mean Squared Error.
 
     Parameters
@@ -189,7 +189,7 @@ def normalized_root_mean_squared_error(y, yhat):
     return root_mean_squared_error(y, yhat) / (y.max() - y.min())
 
 
-def root_relative_squared_error(y, yhat):
+def root_relative_squared_error(y: ArrayLike, yhat: ArrayLike) -> ArrayLike:
     """Calculate the Root Relative Mean Squared Error.
 
     Parameters
@@ -218,7 +218,7 @@ def root_relative_squared_error(y, yhat):
     return np.sqrt(np.divide(numerator, denominator))
 
 
-def mean_absolute_error(y, yhat):
+def mean_absolute_error(y: ArrayLike, yhat: ArrayLike) -> ArrayLike:
     """Calculate the Mean absolute error.
 
     Parameters
@@ -251,7 +251,7 @@ def mean_absolute_error(y, yhat):
     return np.average(output_errors)
 
 
-def mean_squared_log_error(y: ArrayLike, yhat: ArrayLike) -> np.ndarray:
+def mean_squared_log_error(y: ArrayLike, yhat: ArrayLike) -> ArrayLike:
     """Calculate the Mean Squared Logarithmic Error.
 
     Parameters
@@ -278,7 +278,7 @@ def mean_squared_log_error(y: ArrayLike, yhat: ArrayLike) -> np.ndarray:
     return mean_squared_error(np.log1p(y), np.log1p(yhat))
 
 
-def median_absolute_error(y, yhat):
+def median_absolute_error(y: ArrayLike, yhat: ArrayLike) -> ArrayLike:
     """Calculate the Median Absolute Error.
 
     Parameters
@@ -310,7 +310,7 @@ def median_absolute_error(y, yhat):
     return np.median(np.abs(y - yhat))
 
 
-def explained_variance_score(y, yhat):
+def explained_variance_score(y: ArrayLike, yhat: ArrayLike) -> ArrayLike:
     """Calculate the Explained Variance Score.
 
     Parameters
@@ -353,7 +353,7 @@ def explained_variance_score(y, yhat):
     return np.average(output_scores)
 
 
-def r2_score(y, yhat):
+def r2_score(y: ArrayLike, yhat: ArrayLike) -> ArrayLike:
     """Calculate the R2 score. Based on sklearn solution.
 
     Parameters
@@ -400,7 +400,9 @@ def r2_score(y, yhat):
     return np.average(output_scores)
 
 
-def symmetric_mean_absolute_percentage_error(y, yhat):
+def symmetric_mean_absolute_percentage_error(
+    y: ArrayLike, yhat: ArrayLike
+) -> ArrayLike:
     """Calculate the SMAPE score.
 
     Parameters

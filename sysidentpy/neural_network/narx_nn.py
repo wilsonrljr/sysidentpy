@@ -230,6 +230,8 @@ class NARXNN(BaseMSS):
             The regressor matrix.
         y : ndarray of floats
             The output data.
+        opt: Torch optimizer
+            Torch optimizer chosen by the user
 
         Returns
         -------
@@ -475,6 +477,11 @@ class NARXNN(BaseMSS):
             The input data to be used in the prediction process.
         y : ndarray of floats
             The output data to be used in the prediction process.
+        steps_ahead : int (default = None)
+            The user can use free run simulation, one-step ahead prediction
+            and n-step ahead prediction.
+        forecast_horizon : int, default=None
+            The number of predictions over the time.
 
         Returns
         -------
