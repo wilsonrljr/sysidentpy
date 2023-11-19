@@ -8,7 +8,7 @@
 from abc import ABCMeta, abstractmethod
 from collections import Counter
 from itertools import chain, combinations_with_replacement
-from typing import Any, List, Tuple, Union
+from typing import Any, List, Tuple, Union, Optional
 
 import numpy as np
 
@@ -411,7 +411,7 @@ class RegressorDictionary(InformationMatrix):
         all_arrays = [np.array([i]) if isinstance(i, int) else i for i in x_vec_tmp]
         return np.concatenate([i for i in all_arrays])
 
-    def regressor_space(self, n_inputs):
+    def regressor_space(self, n_inputs: int) -> np.ndarray:
         """Create regressor code based on model type.
 
         Parameters
@@ -446,7 +446,9 @@ class RegressorDictionary(InformationMatrix):
         regressor_code = regressor_code[:, regressor_code.shape[1] :: -1]
         return regressor_code
 
-    def _get_index_from_regressor_code(self, regressor_code, model_code):
+    def _get_index_from_regressor_code(
+        self, regressor_code: np.ndarray, model_code: List[int]
+    ):
         """Get the index of user regressor in regressor space.
 
         Took from: https://stackoverflow.com/questions/38674027/find-the-row-indexes-of-several-values-in-a-numpy-array/38674038#38674038
@@ -473,7 +475,7 @@ class RegressorDictionary(InformationMatrix):
         )[0]
         return model_index
 
-    def _list_output_regressor_code(self, model_code):
+    def _list_output_regressor_code(self, model_code: List[int]) -> np.ndarray:
         """Create a flattened array of output regressors.
 
         Parameters
@@ -493,7 +495,7 @@ class RegressorDictionary(InformationMatrix):
 
         return np.asarray(regressor_code)
 
-    def _list_input_regressor_code(self, model_code):
+    def _list_input_regressor_code(self, model_code: List[int]) -> np.ndarray:
         """Create a flattened array of input regressors.
 
         Parameters
@@ -534,7 +536,7 @@ class RegressorDictionary(InformationMatrix):
 
         return 1
 
-    def _get_max_lag_from_model_code(self, model_code):
+    def _get_max_lag_from_model_code(self, model_code: List[int]) -> int:
         """Create a flattened array of input regressors.
 
         Parameters
@@ -603,14 +605,14 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
     def predict(
         self,
         *,
-        X: Union[np.ndarray, None] = None,
-        y: Union[np.ndarray, None] = None,
-        steps_ahead: Union[int, None] = None,
-        forecast_horizon: Union[int, None] = None,
+        X: Optional[np.ndarray] = None,
+        y: Optional[np.ndarray] = None,
+        steps_ahead: Optional[int] = None,
+        forecast_horizon: int = 1,
     ) -> np.ndarray:
         """abstract methods"""
 
-    def _code2exponents(self, *, code):
+    def _code2exponents(self, *, code: np.ndarray) -> np.ndarray:
         """
         Convert regressor code to exponents array.
 
@@ -666,18 +668,18 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
     @abstractmethod
     def _model_prediction(
         self,
-        X,
-        y_initial,
-        forecast_horizon=None,
-    ):
+        X: Optional[np.ndarray],
+        y_initial: Optional[np.ndarray],
+        forecast_horizon: int = 1,
+    ) -> np.ndarray:
         """model prediction wrapper"""
 
     def _narmax_predict(
         self,
-        X,
-        y_initial,
-        forecast_horizon,
-    ):
+        X: Optional[np.ndarray],
+        y_initial: Optional[np.ndarray],
+        forecast_horizon: int = 1,
+    ) -> np.ndarray:
         """narmax_predict method"""
         y_output = np.zeros(
             forecast_horizon, dtype=float
@@ -707,7 +709,9 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         return y_output[self.max_lag : :].reshape(-1, 1)
 
     @abstractmethod
-    def _nfir_predict(self, X, y_initial):
+    def _nfir_predict(
+        self, X: Optional[np.ndarray], y_initial: Optional[np.ndarray]
+    ) -> np.ndarray:
         """nfir predict method"""
         y_output = np.zeros(X.shape[0], dtype=float)
         y_output.fill(np.nan)
@@ -734,7 +738,9 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             y_output[i] = np.dot(regressor_value, self.theta.flatten())
         return y_output[self.max_lag : :].reshape(-1, 1)
 
-    def _nar_step_ahead(self, y, steps_ahead):
+    def _nar_step_ahead(
+        self, y: Optional[np.ndarray], steps_ahead: Optional[int]
+    ) -> np.ndarray:
         if len(y) < self.max_lag:
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
@@ -767,7 +773,12 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         yhat = yhat.ravel()[self.max_lag : :]
         return yhat.reshape(-1, 1)
 
-    def narmax_n_step_ahead(self, X, y, steps_ahead):
+    def narmax_n_step_ahead(
+        self,
+        X: Optional[np.ndarray],
+        y: Optional[np.ndarray],
+        steps_ahead: Optional[int],
+    ) -> np.ndarray:
         """n_steps ahead prediction method for NARMAX model"""
         if len(y) < self.max_lag:
             raise ValueError(
@@ -805,7 +816,12 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         return yhat.reshape(-1, 1)
 
     @abstractmethod
-    def _n_step_ahead_prediction(self, X, y, steps_ahead):
+    def _n_step_ahead_prediction(
+        self,
+        X: Optional[np.ndarray],
+        y: Optional[np.ndarray],
+        steps_ahead: Optional[int],
+    ) -> np.ndarray:
         """Perform the n-steps-ahead prediction of a model.
 
         Parameters
@@ -826,7 +842,12 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             return self._nar_step_ahead(y, steps_ahead)
 
     @abstractmethod
-    def _basis_function_predict(self, X, y_initial, forecast_horizon=None):
+    def _basis_function_predict(
+        self,
+        X: Optional[np.ndarray],
+        y_initial: Optional[np.ndarray],
+        forecast_horizon: int = 1,
+    ) -> np.ndarray:
         """basis function prediction"""
         yhat = np.zeros(forecast_horizon, dtype=float)
         yhat.fill(np.nan)
@@ -867,7 +888,13 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         return yhat[self.max_lag :].reshape(-1, 1)
 
     @abstractmethod
-    def _basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
+    def _basis_function_n_step_prediction(
+        self,
+        X: Optional[np.ndarray],
+        y: Optional[np.ndarray],
+        steps_ahead: Optional[int],
+        forecast_horizon: int,
+    ) -> np.ndarray:
         """basis function n step ahead"""
         yhat = np.zeros(forecast_horizon, dtype=float)
         yhat.fill(np.nan)
@@ -909,7 +936,13 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         return yhat[self.max_lag :].reshape(-1, 1)
 
     @abstractmethod
-    def _basis_function_n_steps_horizon(self, X, y, steps_ahead, forecast_horizon):
+    def _basis_function_n_steps_horizon(
+        self,
+        X: Optional[np.ndarray],
+        y: Optional[np.ndarray],
+        steps_ahead: Optional[int],
+        forecast_horizon: int,
+    ) -> np.ndarray:
         """basis n steps horizon"""
         yhat = np.zeros(forecast_horizon, dtype=float)
         yhat.fill(np.nan)
@@ -953,7 +986,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 class Orthogonalization:
     """Householder reflection and transformation."""
 
-    def house(self, x):
+    def house(self, x: np.ndarray) -> np.ndarray:
         """Perform a Householder reflection of vector.
 
         Parameters
@@ -981,7 +1014,7 @@ class Orthogonalization:
             x = np.concatenate((np.array([1]), x))
         return x
 
-    def rowhouse(self, RA, v):
+    def rowhouse(self, RA: np.ndarray, v: np.ndarray) -> np.ndarray:
         """Perform a row Householder transformation.
 
         Parameters
