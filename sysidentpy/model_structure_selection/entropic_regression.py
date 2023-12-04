@@ -5,7 +5,7 @@
 # License: BSD 3 clause
 
 import warnings
-from typing import Union
+from typing import Union, Optional
 
 import numpy as np
 from numpy import linalg as LA
@@ -165,7 +165,7 @@ class ER(Estimators, BaseMSS):
         weight: float = 0.02,
         model_type: str = "NARMAX",
         basis_function: Union[Polynomial, Fourier] = Polynomial(),
-        random_state: Union[int, None] = None,
+        random_state: Optional[int] = None,
     ):
         self.basis_function = basis_function
         self.model_type = model_type
@@ -524,12 +524,6 @@ class ER(Estimators, BaseMSS):
 
         """
         ksg_estimation = []
-        # ksg_estimation = [
-        #     getattr(self, self.mutual_information_estimator)(y,
-        # self.rng.permutation(y))
-        #     for i in range(self.n_perm)
-        # ]
-
         for _ in range(self.n_perm):
             mutual_information_output = getattr(
                 self, self.mutual_information_estimator
@@ -601,12 +595,10 @@ class ER(Estimators, BaseMSS):
 
         if self.regressor_code.shape[0] > 90:
             warnings.warn(
-                (
-                    "Given the higher number of possible regressors"
-                    f" ({self.regressor_code.shape[0]}), the Entropic Regression"
-                    " algorithm may take long time to run. Consider reducing the"
-                    " number of regressors "
-                ),
+                "Given the higher number of possible regressors"
+                f" ({self.regressor_code.shape[0]}), the Entropic Regression"
+                " algorithm may take long time to run. Consider reducing the"
+                " number of regressors ",
                 stacklevel=2,
             )
 

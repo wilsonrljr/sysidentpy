@@ -1,4 +1,5 @@
 """ Binary Hybrid Particle Swarm Optimization and Gravitational Search Algorithm"""
+
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
@@ -77,7 +78,6 @@ class BPSOGSA:
         p_zeros=0.5,
         p_ones=0.5,
     ):
-
         self.dimension = dimension
         self.n_agents = n_agents
         self.maxiter = maxiter
@@ -251,7 +251,7 @@ class BPSOGSA:
         for i in range(self.n_agents):
             for j in range(k_best_agents):
                 if maximum_value_index[j] != i:
-                    euclidian_distance = np.linalg.norm(
+                    euclidean_distance = np.linalg.norm(
                         population[:, i] - population[:, maximum_value_index[j]],
                         self._norm,
                     )
@@ -262,7 +262,7 @@ class BPSOGSA:
                     ] * (
                         population[:, maximum_value_index[j]] - population[:, i]
                     ) / (
-                        euclidian_distance**self._power + np.finfo(np.float64).eps
+                        euclidean_distance**self._power + np.finfo(np.float64).eps
                     )
 
         acceleration = gravitational_force * gravitational_constant

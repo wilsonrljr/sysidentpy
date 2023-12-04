@@ -196,6 +196,11 @@ class NARX(BaseMSS):
             The input data to be used in the prediction process.
         y : ndarray of floats
             The output data to be used in the prediction process.
+        steps_ahead : int (default = None)
+            The user can use free run simulation, one-step ahead prediction
+            and n-step ahead prediction.
+        forecast_horizon : int, default=None
+            The number of predictions over the time.
 
         Returns
         -------
@@ -349,6 +354,9 @@ class NARX(BaseMSS):
             to start recursive process.
         X : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
+        steps_ahead : int (default = None)
+            The user can use free run simulation, one-step ahead prediction
+            and n-step ahead prediction.
 
         Returns
         -------
@@ -372,6 +380,8 @@ class NARX(BaseMSS):
             to start recursive process.
         X : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
+        forecast_horizon : int, default=None
+            The number of predictions over the time.
 
         Returns
         -------
@@ -495,6 +505,11 @@ class NARX(BaseMSS):
             to start recursive process.
         X : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
+        steps_ahead : int (default = None)
+            The user can use free run simulation, one-step ahead prediction
+            and n-step ahead prediction.
+        forecast_horizon : int, default=None
+            The number of predictions over the time.
 
         Returns
         -------

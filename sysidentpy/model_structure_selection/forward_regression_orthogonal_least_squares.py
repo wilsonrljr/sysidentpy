@@ -8,7 +8,7 @@
 # License: BSD 3 clause
 
 import warnings
-from typing import Union
+from typing import Union, Tuple, Optional
 
 import numpy as np
 
@@ -86,8 +86,10 @@ class FROLS(Estimators, BaseMSS):
         filter.
     mu : float, default=0.01
         The convergence coefficient (learning rate) of the filter.
-    eps : float
+    eps : float, default=np.finfo(np.float64).eps
         Normalization factor of the normalized filters.
+    ridge_param : float, default=np.finfo(np.float64).eps
+        Regularization parameter used in ridge regression
     gama : float, default=0.2
         The leakage factor of the Leaky LMS method.
     weight : float, default=0.02
@@ -166,6 +168,7 @@ class FROLS(Estimators, BaseMSS):
         offset_covariance: float = 0.2,
         mu: float = 0.01,
         eps: np.float64 = np.finfo(np.float64).eps,
+        ridge_param: np.float64 = np.finfo(np.float64).eps,  # default is machine eps
         gama: float = 0.2,
         weight: float = 0.02,
         ridge_param: float = 0.01,
@@ -194,6 +197,7 @@ class FROLS(Estimators, BaseMSS):
             offset_covariance=offset_covariance,
             mu=mu,
             eps=eps,
+            ridge_param=ridge_param,  # ridge regression parameter
             gama=gama,
             weight=weight,
             ridge_param=ridge_param,
@@ -253,7 +257,9 @@ class FROLS(Estimators, BaseMSS):
         ) and self.n_terms is not None:
             raise ValueError(f"n_terms must be integer and > zero. Got {self.n_terms}")
 
-    def error_reduction_ratio(self, psi, y, process_term_number):
+    def error_reduction_ratio(
+        self, psi: np.ndarray, y: np.ndarray, process_term_number: int
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Perform the Error Reduction Ration algorithm.
 
         Parameters
@@ -298,9 +304,17 @@ class FROLS(Estimators, BaseMSS):
             for j in np.arange(i, dimension):
                 # Add `eps` in the denominator to omit division by zero if
                 # denominator is zero
+                # To implement regularized regression (ridge regression), add
+                # ridgeParam to psi.T @ psi.   See S. Chen, Local regularization assisted
+                # orthogonal least squares regression, Neurocomputing 69 (2006) 559–585.
+                # The version implemented below uses the same regularization for every feature,
+                # What Chen refers to Uniform regularized orthogonal least squares (UROLS)
+                # Set to tiny (self.eps) when you are not regularizing.  ridge_param = eps is
+                # the default.
                 tmp_err[j] = (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2) / (
-                    np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) * squared_y + self.eps
-                )
+                    (np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) + self.ridge_param)
+                    * squared_y
+                ) + self.eps
 
             if i == process_term_number:
                 break
@@ -322,7 +336,7 @@ class FROLS(Estimators, BaseMSS):
         psi_orthogonal = psi[:, tmp_piv]
         return err, piv, psi_orthogonal
 
-    def information_criterion(self, X_base, y):
+    def information_criterion(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Determine the model order.
 
         This function uses a information criterion to determine the model size.
@@ -336,7 +350,7 @@ class FROLS(Estimators, BaseMSS):
         ----------
         y : array-like of shape = n_samples
             Target values of the system.
-        X_base : array-like of shape = n_samples
+        X : array-like of shape = n_samples
             Input system values measured by the user.
 
         Returns
@@ -347,14 +361,12 @@ class FROLS(Estimators, BaseMSS):
             vector position + 1).
 
         """
-        if self.n_info_values is not None and self.n_info_values > X_base.shape[1]:
-            self.n_info_values = X_base.shape[1]
+        if self.n_info_values is not None and self.n_info_values > X.shape[1]:
+            self.n_info_values = X.shape[1]
             warnings.warn(
-                (
-                    "n_info_values is greater than the maximum number of all"
-                    " regressors space considering the chosen y_lag, u_lag, and"
-                    f" non_degree. We set as {X_base.shape[1]}"
-                ),
+                "n_info_values is greater than the maximum number of all"
+                " regressors space considering the chosen y_lag, u_lag, and"
+                f" non_degree. We set as {X.shape[1]}",
                 stacklevel=2,
             )
 
@@ -365,7 +377,7 @@ class FROLS(Estimators, BaseMSS):
 
         for i in range(0, self.n_info_values):
             n_theta = i + 1
-            regressor_matrix = self.error_reduction_ratio(X_base, y, n_theta)[2]
+            regressor_matrix = self.error_reduction_ratio(X, y, n_theta)[2]
 
             tmp_theta = getattr(self, self.estimator)(regressor_matrix, y)
 
@@ -378,7 +390,7 @@ class FROLS(Estimators, BaseMSS):
 
         return output_vector
 
-    def get_info_criteria(self, info_criteria):
+    def get_info_criteria(self, info_criteria: str):
         """get info criteria"""
         info_criteria_options = {
             "aic": self.aic,
@@ -389,7 +401,7 @@ class FROLS(Estimators, BaseMSS):
         }
         return info_criteria_options.get(info_criteria)
 
-    def bic(self, n_theta, n_samples, e_var):
+    def bic(self, n_theta: int, n_samples: int, e_var: float) -> float:
         """Compute the Bayesian information criteria value.
 
         Parameters
@@ -414,7 +426,7 @@ class FROLS(Estimators, BaseMSS):
 
         return info_criteria_value
 
-    def aic(self, n_theta, n_samples, e_var):
+    def aic(self, n_theta: int, n_samples: int, e_var: float) -> float:
         """Compute the Akaike information criteria value.
 
         Parameters
@@ -439,7 +451,7 @@ class FROLS(Estimators, BaseMSS):
 
         return info_criteria_value
 
-    def aicc(self, n_theta, n_samples, e_var):
+    def aicc(self, n_theta: int, n_samples: int, e_var: float) -> float:
         """Compute the Akaike information Criteria corrected value.
 
         Parameters
@@ -466,7 +478,7 @@ class FROLS(Estimators, BaseMSS):
 
         return aicc
 
-    def fpe(self, n_theta, n_samples, e_var):
+    def fpe(self, n_theta: int, n_samples: int, e_var: float) -> float:
         """Compute the Final Error Prediction value.
 
         Parameters
@@ -491,7 +503,7 @@ class FROLS(Estimators, BaseMSS):
 
         return info_criteria_value
 
-    def lilc(self, n_theta, n_samples, e_var):
+    def lilc(self, n_theta: int, n_samples: int, e_var: float) -> float:
         """Compute the Lilc information criteria value.
 
         Parameters
@@ -516,7 +528,7 @@ class FROLS(Estimators, BaseMSS):
 
         return info_criteria_value
 
-    def fit(self, *, X=None, y=None):
+    def fit(self, *, X: Optional[np.ndarray] = None, y: Optional[np.ndarray] = None):
         """Fit polynomial NARMAX model.
 
         This is an 'alpha' version of the 'fit' function which allows
@@ -615,7 +627,14 @@ class FROLS(Estimators, BaseMSS):
             )
         return self
 
-    def predict(self, *, X=None, y=None, steps_ahead=None, forecast_horizon=None):
+    def predict(
+        self,
+        *,
+        X: Optional[np.ndarray] = None,
+        y: Optional[np.ndarray] = None,
+        steps_ahead: int = None,
+        forecast_horizon: int = None,
+    ) -> float:
         """Return the predicted values given an input.
 
         The predict function allows a friendly usage by the user.
@@ -673,7 +692,9 @@ class FROLS(Estimators, BaseMSS):
         yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
         return yhat
 
-    def _one_step_ahead_prediction(self, X, y):
+    def _one_step_ahead_prediction(
+        self, X: Optional[np.ndarray], y: Optional[np.ndarray]
+    ) -> np.ndarray:
         """Perform the 1-step-ahead prediction of a model.
 
         Parameters
@@ -708,7 +729,9 @@ class FROLS(Estimators, BaseMSS):
         yhat = super()._one_step_ahead_prediction(X_base)
         return yhat.reshape(-1, 1)
 
-    def _n_step_ahead_prediction(self, X, y, steps_ahead):
+    def _n_step_ahead_prediction(
+        self, X: Optional[np.ndarray], y: Optional[np.ndarray], steps_ahead: int
+    ) -> float:
         """Perform the n-steps-ahead prediction of a model.
 
         Parameters
@@ -728,7 +751,12 @@ class FROLS(Estimators, BaseMSS):
         yhat = super()._n_step_ahead_prediction(X, y, steps_ahead)
         return yhat
 
-    def _model_prediction(self, X, y_initial, forecast_horizon=0):
+    def _model_prediction(
+        self,
+        X: Optional[np.ndarray],
+        y_initial: Optional[np.ndarray],
+        forecast_horizon: int = 0,
+    ) -> np.ndarray:
         """Perform the infinity steps-ahead simulation of a model.
 
         Parameters
@@ -755,7 +783,12 @@ class FROLS(Estimators, BaseMSS):
             f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
         )
 
-    def _narmax_predict(self, X, y_initial, forecast_horizon=0):
+    def _narmax_predict(
+        self,
+        X: Optional[np.ndarray],
+        y_initial: Optional[np.ndarray],
+        forecast_horizon: int = 0,
+    ) -> np.ndarray:
         if len(y_initial) < self.max_lag:
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
@@ -773,11 +806,18 @@ class FROLS(Estimators, BaseMSS):
         y_output = super()._narmax_predict(X, y_initial, forecast_horizon)
         return y_output
 
-    def _nfir_predict(self, X, y_initial):
+    def _nfir_predict(
+        self, X: Optional[np.ndarray], y_initial: Optional[np.ndarray]
+    ) -> np.ndarray:
         y_output = super()._nfir_predict(X, y_initial)
         return y_output
 
-    def _basis_function_predict(self, X, y_initial, forecast_horizon=None):
+    def _basis_function_predict(
+        self,
+        X: Optional[np.ndarray],
+        y_initial: Optional[np.ndarray],
+        forecast_horizon: int = 0,
+    ) -> np.ndarray:
         if X is not None:
             forecast_horizon = X.shape[0]
         else:
@@ -789,7 +829,13 @@ class FROLS(Estimators, BaseMSS):
         yhat = super()._basis_function_predict(X, y_initial, forecast_horizon)
         return yhat.reshape(-1, 1)
 
-    def _basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
+    def _basis_function_n_step_prediction(
+        self,
+        X: Optional[np.ndarray],
+        y: Optional[np.ndarray],
+        steps_ahead: Optional[int],
+        forecast_horizon: int,
+    ) -> np.ndarray:
         """Perform the n-steps-ahead prediction of a model.
 
         Parameters
@@ -822,7 +868,13 @@ class FROLS(Estimators, BaseMSS):
         )
         return yhat.reshape(-1, 1)
 
-    def _basis_function_n_steps_horizon(self, X, y, steps_ahead, forecast_horizon):
+    def _basis_function_n_steps_horizon(
+        self,
+        X: Optional[np.ndarray],
+        y: Optional[np.ndarray],
+        steps_ahead: Optional[int],
+        forecast_horizon: int,
+    ) -> np.ndarray:
         yhat = super()._basis_function_n_steps_horizon(
             X, y, steps_ahead, forecast_horizon
         )

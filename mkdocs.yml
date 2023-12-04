@@ -157,6 +157,7 @@ nav:
       - defining-lags: examples/defining_lags.ipynb
       - miso: examples/multiple_inputs_example.ipynb
       - parameter-estimation: examples/parameter_estimation.ipynb
+      - multiobjective-parameter-estimation: examples/multiobjective_parameter_estimation.ipynb
       - els: examples/extended_least_squares.ipynb
       - n-steps-prediction: examples/n_steps_ahead_prediction.ipynb
       - simulating: examples/simulating_a_predefined_model.ipynb
@@ -200,6 +201,7 @@ nav:
     - Neural NARX: code/neural-narx.md
     - General Estimators: code/general-estimators.md
     - Parameter Estimation: code/parameter-estimation.md
+    - Multiobjective Parameter Estimation: code/multiobjective-parameter-estimation.md
     - Simulation: code/simulation.md
     - Residual Analysis: code/residues.md
     - Metaheuristics: code/metaheuristics.md

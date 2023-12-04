@@ -27,3 +27,7 @@ In addition to these resources, we will also reference Luis Antônio Aguirre `In
 ## Contribute
 
 The `Nonlinear Dynamics: A Journey Through System Identification and Forecasting` is a comprehensive resource on the science of System Identification, offered as an open-source material. Our aim is to make this valuable resource accessible to all, both financially and intellectually. If you have found this book helpful and want to support our endeavor financially, you are referred to the Sponsor page. However, if you are not yet ready to contribute financially, you can still help us by pointing out typos, suggesting edits, or offering feedback on passages that you found difficult to comprehend. Simply navigate to the book's repository and open an issue. Lastly, if you enjoyed our content, please consider sharing it with others who may find it useful and leave us a star on GitHub.
+
+## Note
+
+The chapters will be released one by one until the book is complete.
