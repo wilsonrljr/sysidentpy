@@ -23,14 +23,13 @@ class Estimators:
         offset_covariance=0.2,
         mu=0.01,
         eps=np.finfo(np.float64).eps,
-        ridge_param=np.finfo(np.float64).eps,  # for regularized ridge regression
+        ridge_param=np.finfo(np.float64).eps,
         gama=0.2,
         weight=0.02,
-        ridge_param: float=0.01,
         basis_function=None,
     ):
         self.eps = eps
-        self.ridge_param = ridge_param  # for regularized ridge regression
+        self.ridge_param = ridge_param
         self.mu = mu
         self.offset_covariance = offset_covariance
         self.max_lag = max_lag
@@ -38,7 +37,6 @@ class Estimators:
         self.delta = delta
         self.gama = gama
         self.weight = weight  # <0  e <1
-        self.ridge_param = ridge_param
         self.xi = None
         self.theta_evolution = None
         self.basis_function = basis_function
@@ -121,7 +119,7 @@ class Estimators:
         theta = np.linalg.lstsq(psi, y, rcond=None)[0]
         return theta
 
-    def ridge_regression(self, psi, y):
+    def ridge_regression_classic(self, psi, y):
         """Estimate the model parameters using the regularized least squares method
            known as ridge regression.  Based on the least_squares module and uses
            the same data format but you need to pass ridge_param in the call to
@@ -970,10 +968,16 @@ class Estimators:
 
         y = y[self.max_lag :, 0].reshape(-1, 1)
 
-        U, d, Vt = np.linalg.svd(psi, full_matrices=False)
-        D = np.diag(d)
-        I = np.identity(len(D))
-        
-        theta = Vt.T @ np.linalg.inv(D**2 + self.ridge_param*I) @ D @ U.T @ y
+        try:
+            U, d, Vt = np.linalg.svd(psi, full_matrices=False)
+            D = np.diag(d)
+            I = np.identity(len(D))
+            
+            theta = Vt.T @ np.linalg.inv(D**2 + self.ridge_param*I) @ D @ U.T @ y
+        except:
+            warnings.warn("The SVD computation does not converge. Value calculated with the classic algorithm",
+                           stacklevel=2)
+
+            theta = self.ridge_regression_classic(psi, y)
         
         return theta

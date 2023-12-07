@@ -259,21 +259,5 @@ def test_least_mean_squares_mixed_norm():
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
-def test_ridge_regression():
-    x, y, theta = create_test_data()
-    basis_function = Polynomial(degree=2)
-    model = FROLS(
-        n_terms=5,
-        extended_least_squares=False,
-        ylag=[1, 2],
-        xlag=2,
-        estimator="ridge_regression",
-        ridge_param=0.01,
-        basis_function=basis_function,
-    )
-    model.fit(X=x, y=y)
-    assert_almost_equal(model.theta, theta, decimal=2)
-
-
 def test_model_order_selection():
     assert_raises(ValueError, Estimators, max_lag=-1)

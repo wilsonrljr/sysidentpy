@@ -89,15 +89,13 @@ class FROLS(Estimators, BaseMSS):
     eps : float, default=np.finfo(np.float64).eps
         Normalization factor of the normalized filters.
     ridge_param : float, default=np.finfo(np.float64).eps
-        Regularization parameter used in ridge regression
+        Regularization parameter used in ridge regression.
     gama : float, default=0.2
         The leakage factor of the Leaky LMS method.
     weight : float, default=0.02
         Weight factor to control the proportions of the error norms
         and offers an extra degree of freedom within the adaptation
         of the LMS mixed norm method.
-    ridge_param : float, default=0.01
-        Constant parameter used in ridge regression (K = ridge_param*I).
     model_type: str, default="NARMAX"
         The user can choose "NARMAX", "NAR" and "NFIR" models
 
@@ -171,7 +169,6 @@ class FROLS(Estimators, BaseMSS):
         ridge_param: np.float64 = np.finfo(np.float64).eps,  # default is machine eps
         gama: float = 0.2,
         weight: float = 0.02,
-        ridge_param: float = 0.01,
         basis_function: Union[Polynomial, Fourier] = Polynomial(),
         model_type: str = "NARMAX",
     ):
@@ -200,7 +197,6 @@ class FROLS(Estimators, BaseMSS):
             ridge_param=ridge_param,  # ridge regression parameter
             gama=gama,
             weight=weight,
-            ridge_param=ridge_param,
             basis_function=basis_function,
         )
         self.ensemble = None
