@@ -23,13 +23,13 @@ class Estimators:
         offset_covariance=0.2,
         mu=0.01,
         eps=np.finfo(np.float64).eps,
-        ridge_param=np.finfo(np.float64).eps,  # for regularized ridge regression
+        ridge_param=np.finfo(np.float64).eps,
         gama=0.2,
         weight=0.02,
         basis_function=None,
     ):
         self.eps = eps
-        self.ridge_param = ridge_param  # for regularized ridge regression
+        self.ridge_param = ridge_param
         self.mu = mu
         self.offset_covariance = offset_covariance
         self.max_lag = max_lag
@@ -54,6 +54,7 @@ class Estimators:
             "ridge_param": self.ridge_param,
             "gama": self.gama,
             "weight": self.weight,
+            "ridge_param": self.ridge_param,
         }
         for attribute, value in attributes.items():
             if not isinstance(value, (np.integer, int, float)):
@@ -118,7 +119,7 @@ class Estimators:
         theta = np.linalg.lstsq(psi, y, rcond=None)[0]
         return theta
 
-    def ridge_regression(self, psi, y):
+    def ridge_regression_classic(self, psi, y):
         """Estimate the model parameters using the regularized least squares method
            known as ridge regression.  Based on the least_squares module and uses
            the same data format but you need to pass ridge_param in the call to
@@ -936,3 +937,47 @@ class Estimators:
             theta[:, i] = tmp_list.flatten()
 
         return theta[:, -1].reshape(-1, 1)
+
+    def ridge_regression(self, psi, y):
+        """Estimate the model parameters using SVD and Ridge Regression method.
+
+        Parameters
+        ----------
+        psi : ndarray of floats
+            The information matrix of the model.
+        y : array-like of shape = y_training
+            The data used to training the model.
+
+        Returns
+        -------
+        theta : array-like of shape = number_of_model_elements
+            The estimated parameters of the model.
+
+        References
+        ----------
+        - Manuscript: Hoerl, A. E.; Kennard, R. W. Ridge regression:
+                      applications to nonorthogonal problems. Technometrics,
+                      Taylor & Francis, v. 12, n. 1, p. 69-82, 1970.
+        
+        - StackExchange: whuber. The proof of shrinking coefficients using ridge
+                         regression through "spectral decomposition".
+                         Cross Validated, accessed 21 September 2023,
+                         https://stats.stackexchange.com/q/220324
+        """
+        self._check_linear_dependence_rows(psi)
+
+        y = y[self.max_lag :, 0].reshape(-1, 1)
+
+        try:
+            U, d, Vt = np.linalg.svd(psi, full_matrices=False)
+            D = np.diag(d)
+            I = np.identity(len(D))
+            
+            theta = Vt.T @ np.linalg.inv(D**2 + self.ridge_param*I) @ D @ U.T @ y
+        except:
+            warnings.warn("The SVD computation does not converge. Value calculated with the classic algorithm",
+                           stacklevel=2)
+
+            theta = self.ridge_regression_classic(psi, y)
+        
+        return theta

@@ -89,7 +89,7 @@ class FROLS(Estimators, BaseMSS):
     eps : float, default=np.finfo(np.float64).eps
         Normalization factor of the normalized filters.
     ridge_param : float, default=np.finfo(np.float64).eps
-        Regularization parameter used in ridge regression
+        Regularization parameter used in ridge regression.
     gama : float, default=0.2
         The leakage factor of the Leaky LMS method.
     weight : float, default=0.02
