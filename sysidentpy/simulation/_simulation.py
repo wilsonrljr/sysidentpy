@@ -1,4 +1,4 @@
-""" Simulation methods for NARMAX models """
+"""Simulation methods for NARMAX models"""
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
@@ -358,9 +358,10 @@ class SimulateNARMAX(Estimators, BaseMSS):
             for j in np.arange(i, dimension):
                 # Add `eps` in the denominator to omit division by zero if
                 # denominator is zero
-                tmp_err[j] = (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2) / (
-                    np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) * squared_y + self.eps
-                )
+                tmp_err[j] = (
+                    (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2)
+                    / (np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) * squared_y + self.eps)
+                )[0, 0]
 
             if i == process_term_number:
                 break

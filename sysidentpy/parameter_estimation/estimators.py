@@ -1,4 +1,4 @@
-""" Least Squares Methods for parameter estimation """
+"""Least Squares Methods for parameter estimation"""
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
@@ -299,7 +299,7 @@ class Estimators:
             k_numerator = self.lam ** (-1) * p.dot(psi_tmp)
             k_denominator = 1 + self.lam ** (-1) * psi_tmp.T.dot(p).dot(psi_tmp)
             k = np.divide(k_numerator, k_denominator)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])
+            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
             tmp_list = theta[:, i - 1].reshape(-1, 1) + k.dot(self.xi[i, 0])
             theta[:, i] = tmp_list.flatten()
 
@@ -392,7 +392,7 @@ class Estimators:
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])
+            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
             tmp_list = (
                 theta[:, i - 1].reshape(-1, 1) + 2 * self.mu * self.xi[i, 0] * psi_tmp
             )
@@ -439,7 +439,7 @@ class Estimators:
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])
+            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
             tmp_list = (
                 theta[:, i - 1].reshape(-1, 1)
                 + self.mu * np.sign(self.xi[i, 0]) * psi_tmp
@@ -487,7 +487,7 @@ class Estimators:
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])
+            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
             tmp_list = theta[:, i - 1].reshape(-1, 1) + 2 * self.mu * self.xi[i, 0] * (
                 psi_tmp / (self.eps + np.dot(psi_tmp.T, psi_tmp))
             )
@@ -535,7 +535,7 @@ class Estimators:
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])
+            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
             tmp_list = theta[:, i - 1].reshape(-1, 1) + 2 * self.mu * np.sign(
                 self.xi[i, 0]
             ) * (psi_tmp / (self.eps + np.dot(psi_tmp.T, psi_tmp)))
@@ -582,7 +582,7 @@ class Estimators:
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])
+            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
             tmp_list = theta[:, i - 1].reshape(-1, 1) + self.mu * self.xi[
                 i, 0
             ] * np.sign(psi_tmp)
@@ -630,7 +630,7 @@ class Estimators:
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])
+            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
             tmp_list = theta[:, i - 1].reshape(-1, 1) + self.mu * self.xi[i, 0] * (
                 np.sign(psi_tmp) / (self.eps + np.dot(psi_tmp.T, psi_tmp))
             )
@@ -678,7 +678,7 @@ class Estimators:
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])
+            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
             tmp_list = theta[:, i - 1].reshape(-1, 1) + 2 * self.mu * np.sign(
                 self.xi[i, 0]
             ) * np.sign(psi_tmp)
@@ -727,7 +727,7 @@ class Estimators:
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])
+            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
             tmp_list = theta[:, i - 1].reshape(-1, 1) + 2 * self.mu * np.sign(
                 self.xi[i, 0]
             ) * (np.sign(psi_tmp) / (self.eps + np.dot(psi_tmp.T, psi_tmp)))
@@ -774,7 +774,7 @@ class Estimators:
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])
+            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
             tmp_list = theta[:, i - 1].reshape(-1, 1) * (
                 1 - self.mu * self.gama
             ) + self.mu * self.xi[i, 0] * psi_tmp / (
@@ -823,7 +823,7 @@ class Estimators:
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])
+            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
             tmp_list = (
                 theta[:, i - 1].reshape(-1, 1) * (1 - self.mu * self.gama)
                 + self.mu * self.xi[i, 0] * psi_tmp
@@ -881,7 +881,7 @@ class Estimators:
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])
+            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
             tmp_list = (
                 theta[:, i - 1].reshape(-1, 1) + self.mu * psi_tmp * self.xi[i, 0] ** 3
             )
@@ -930,7 +930,7 @@ class Estimators:
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])
+            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
             tmp_list = theta[:, i - 1].reshape(-1, 1) + self.mu * psi_tmp * self.xi[
                 i, 0
             ] * (self.weight + (1 - self.weight) * self.xi[i, 0] ** 2)
@@ -958,26 +958,25 @@ class Estimators:
         - Manuscript: Hoerl, A. E.; Kennard, R. W. Ridge regression:
                       applications to nonorthogonal problems. Technometrics,
                       Taylor & Francis, v. 12, n. 1, p. 69-82, 1970.
-        
+
         - StackExchange: whuber. The proof of shrinking coefficients using ridge
                          regression through "spectral decomposition".
                          Cross Validated, accessed 21 September 2023,
                          https://stats.stackexchange.com/q/220324
         """
         self._check_linear_dependence_rows(psi)
-
         y = y[self.max_lag :, 0].reshape(-1, 1)
-
         try:
             U, d, Vt = np.linalg.svd(psi, full_matrices=False)
             D = np.diag(d)
             I = np.identity(len(D))
-            
-            theta = Vt.T @ np.linalg.inv(D**2 + self.ridge_param*I) @ D @ U.T @ y
+            theta = Vt.T @ np.linalg.inv(D**2 + self.ridge_param * I) @ D @ U.T @ y
         except:
-            warnings.warn("The SVD computation does not converge. Value calculated with the classic algorithm",
-                           stacklevel=2)
+            warnings.warn(
+                "The SVD computation does not converge. Value calculated with the classic algorithm",
+                stacklevel=2,
+            )
 
             theta = self.ridge_regression_classic(psi, y)
-        
+
         return theta

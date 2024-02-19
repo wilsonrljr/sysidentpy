@@ -1,4 +1,4 @@
-""" Build Polynomial NARMAX Models using FROLS algorithm """
+"""Build Polynomial NARMAX Models using FROLS algorithm"""
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
@@ -307,10 +307,14 @@ class FROLS(Estimators, BaseMSS):
                 # What Chen refers to Uniform regularized orthogonal least squares (UROLS)
                 # Set to tiny (self.eps) when you are not regularizing.  ridge_param = eps is
                 # the default.
-                tmp_err[j] = (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2) / (
-                    (np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) + self.ridge_param)
-                    * squared_y
-                ) + self.eps
+                tmp_err[j] = (
+                    (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2)
+                    / (
+                        (np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) + self.ridge_param)
+                        * squared_y
+                    )
+                    + self.eps
+                )[0, 0]
 
             if i == process_term_number:
                 break
@@ -582,7 +586,7 @@ class FROLS(Estimators, BaseMSS):
 
         if self.n_terms is None and self.order_selection is True:
             model_length = np.where(self.info_values == np.amin(self.info_values))
-            model_length = int(model_length[0] + 1)
+            model_length = model_length[0].item() + 1  # int(model_length[0] + 1)
             self.n_terms = model_length
         elif self.n_terms is None and self.order_selection is not True:
             raise ValueError(

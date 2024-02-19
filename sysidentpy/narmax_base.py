@@ -340,7 +340,14 @@ class RegressorDictionary(InformationMatrix):
                 f"ylag must be integer or list and > zero. Got {self.ylag}"
             )
 
-        if np.min(np.min(list(chain.from_iterable([[self.xlag]])))) < 1:
+        if (
+            np.min(
+                np.min(
+                    np.array(list(chain.from_iterable([[self.xlag]])), dtype="object")
+                )
+            )
+            < 1
+        ):
             raise ValueError(
                 f"xlag must be integer or list and > zero. Got {self.xlag}"
             )
@@ -904,7 +911,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             )
 
             a = X_tmp @ self.theta
-            yhat[i + self.max_lag] = a[:, 0]
+            yhat[i + self.max_lag] = a.item()
 
         return yhat[self.max_lag :].reshape(-1, 1)
 

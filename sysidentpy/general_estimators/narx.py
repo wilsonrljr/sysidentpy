@@ -435,7 +435,7 @@ class NARX(BaseMSS):
             for j, model_exponent in enumerate(model_exponents):
                 regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
 
-            y_output[i] = self.base_estimator.predict(regressor_value.reshape(1, -1))
+            y_output[i] = self.base_estimator.predict(regressor_value.reshape(1, -1))[0]
         return y_output[self.max_lag : :].reshape(-1, 1)
 
     def _nfir_predict(self, X, y_initial):
@@ -461,7 +461,7 @@ class NARX(BaseMSS):
             for j, model_exponent in enumerate(model_exponents):
                 regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
 
-            y_output[i] = self.base_estimator.predict(regressor_value.reshape(1, -1))
+            y_output[i] = self.base_estimator.predict(regressor_value.reshape(1, -1))[0]
         return y_output[self.max_lag : :].reshape(-1, 1)
 
     def _basis_function_predict(self, X, y_initial, forecast_horizon=None):

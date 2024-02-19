@@ -1,4 +1,4 @@
-""" Affine Information Least Squares for NARMAX models"""
+"""Affine Information Least Squares for NARMAX models"""
 
 from typing import Tuple, List
 
@@ -224,11 +224,13 @@ class AILS:
             for j in range(1, len(qit)):
                 if y_static[i, 0] == 0:
                     if (qit[j, 0]) == 1:
-                        H[i, j] = gain[i]
+                        H[i, j] = gain[i][0]
                     else:
                         H[i, j] = 0
                 else:
-                    H[i, j] = gain[i] * qit[j, 0] * y_static[i, 0] ** (qit[j, 0] - 1)
+                    H[i, j] = (gain[i] * qit[j, 0] * y_static[i, 0] ** (qit[j, 0] - 1))[
+                        0
+                    ]
                 for k in range(0, self.n_inputs):
                     if X_static[i, k] == 0:
                         if (qit[j, 1 + k]) == 1:
@@ -476,7 +478,7 @@ class AILS:
                 residuals = self.get_cost_function(
                     system_data[j], affine_information_data[j], tmp_theta
                 )
-                J[j, i] = residuals
+                J[j, i] = residuals[0]
 
             euclidean_norm[i] = np.linalg.norm(J[:, i])
 

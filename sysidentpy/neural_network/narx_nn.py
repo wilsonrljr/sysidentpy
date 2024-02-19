@@ -1,4 +1,4 @@
-""" Build Polynomial NARMAX Models """
+"""Build Polynomial NARMAX Models"""
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
@@ -731,7 +731,7 @@ class NARXNN(BaseMSS):
             x_valid, _ = map(torch.tensor, (X_tmp, yhat))
             yhat[i + self.max_lag] = (
                 self.net(x_valid.to(self.device))[0].detach().cpu().numpy()
-            )
+            )[0]
         return yhat.reshape(-1, 1)
 
     def _basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
