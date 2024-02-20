@@ -1,4 +1,4 @@
-""" NARMAX Models using the Accelerated Orthogonal Least-Squares algorithm"""
+"""NARMAX Models using the Accelerated Orthogonal Least-Squares algorithm."""
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
@@ -28,7 +28,7 @@ from ..utils.deprecation import deprecated
     ),
 )
 class AOLS(Estimators, BaseMSS):
-    r"""Accelerated Orthogonal Least Squares Algorithm
+    r"""Accelerated Orthogonal Least Squares Algorithm.
 
     Build Polynomial NARMAX model using the Accelerated Orthogonal Least-Squares ([1]_).
     This algorithm is based on the Matlab code available on:

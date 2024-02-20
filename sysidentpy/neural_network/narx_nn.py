@@ -1,4 +1,4 @@
-"""Build Polynomial NARMAX Models"""
+"""Build Polynomial NARMAX Models."""
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
@@ -28,7 +28,7 @@ logging.basicConfig(
 
 
 class NARXNN(BaseMSS):
-    """NARX Neural Network model build on top of Pytorch
+    """NARX Neural Network model build on top of Pytorch.
 
     Currently we support a Series-Parallel (open-loop) Feedforward Network training
     process, which make the training process easier, and we convert the
@@ -164,7 +164,6 @@ class NARXNN(BaseMSS):
 
     def _validate_params(self):
         """Validate input params."""
-
         if not isinstance(self.batch_size, int) or self.batch_size < 1:
             raise ValueError(
                 f"bacth_size must be integer and > zero. Got {self.batch_size}"
@@ -217,7 +216,7 @@ class NARXNN(BaseMSS):
         return torch.device("cpu")
 
     def define_opt(self):
-        """Defines the optimizer using the user parameters."""
+        """Define the optimizer using the user parameters."""
         opt = getattr(optim, self.optimizer)
         return opt(self.net.parameters(), lr=self.learning_rate, **self.optim_params)
 
@@ -231,7 +230,7 @@ class NARXNN(BaseMSS):
         y : ndarray of floats
             The output data.
         opt: Torch optimizer
-            Torch optimizer chosen by the user
+            Torch optimizer chosen by the user.
 
         Returns
         -------
@@ -266,7 +265,6 @@ class NARXNN(BaseMSS):
             The information matrix of the model.
 
         """
-
         if y is None:
             raise ValueError("y cannot be None")
 
@@ -449,12 +447,10 @@ class NARXNN(BaseMSS):
                         ]
                     )
                 self.val_loss.append(np.sum(np.multiply(losses, nums)) / np.sum(nums))
-
                 logging.info(
-                    "Train metrics: "
-                    + str(self.train_loss[epoch])
-                    + " | Validation metrics: "
-                    + str(self.val_loss[epoch])
+                    "Train metrics: %s | Validation metrics: %s",
+                    self.train_loss[epoch],
+                    self.val_loss[epoch],
                 )
         return self
 
@@ -702,7 +698,7 @@ class NARXNN(BaseMSS):
 
         analyzed_elements_number = self.max_lag + 1
 
-        for i in range(0, forecast_horizon - self.max_lag):
+        for i in range(forecast_horizon - self.max_lag):
             if self.model_type == "NARMAX":
                 lagged_data = self.build_input_output_matrix(
                     X[i : i + analyzed_elements_number],

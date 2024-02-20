@@ -1,4 +1,4 @@
-""" Utils methods for NARMAX modeling"""
+"""Utils methods for NARMAX modeling."""
 
 import numpy as np
 
@@ -56,9 +56,7 @@ def set_weights(
     num: int = 50,
     base: float = 2.71,
 ) -> np.ndarray:
-    """
-    Set log-spaced weights assigned to each objective in the multi-objective
-    optimization.
+    """Set log-spaced weights assigned to each objective in the MO optimization.
 
     Returns
     -------

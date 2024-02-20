@@ -1,4 +1,4 @@
-""" Plotting methods"""
+"""Plotting methods."""
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
@@ -33,8 +33,8 @@ def plot_results(
 ) -> None:
     """Plot the results of a simulation.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     y : np.ndarray
         True data values.
     yhat : np.ndarray
@@ -64,8 +64,8 @@ def plot_results(
     facecolor : str
         Figure facecolor.
 
-    Returns:
-    --------
+    Returns
+    -------
         None
 
     """

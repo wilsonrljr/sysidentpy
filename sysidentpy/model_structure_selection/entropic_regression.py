@@ -1,4 +1,4 @@
-""" Build Polynomial NARMAX Models using the Entropic Regression algorithm """
+"""Build Polynomial NARMAX Models using the Entropic Regression algorithm."""
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
@@ -32,7 +32,7 @@ from ..utils.deprecation import deprecated
     ),
 )
 class ER(Estimators, BaseMSS):
-    r"""Entropic Regression Algorithm
+    r"""Entropic Regression Algorithm.
 
     Build Polynomial NARMAX model using the Entropic Regression Algorithm ([1]_).
     This algorithm is based on the Matlab package available on:
@@ -154,7 +154,7 @@ class ER(Estimators, BaseMSS):
         k: int = 2,
         mutual_information_estimator: str = "mutual_information_knn",
         n_perm: int = 200,
-        p: Union[float, int] = np.inf,
+        p: float = np.inf,
         skip_forward: bool = False,
         lam: float = 0.98,
         delta: float = 0.01,
@@ -249,7 +249,7 @@ class ER(Estimators, BaseMSS):
             )
 
     def mutual_information_knn(self, y, y_perm):
-        """Finds the mutual information.
+        """Find the mutual information.
 
         Finds the mutual information between $x$ and $y$ given $z$.
 
@@ -424,7 +424,8 @@ class ER(Estimators, BaseMSS):
         return selected_terms, success
 
     def conditional_mutual_information(self, y, f1, f2):
-        """Finds the conditional mutual information.
+        """Find the conditional mutual information.
+
         Finds the conditioned mutual information between $y$ and $f1$ given $f2$.
 
         This code is based on Matlab Entropic Regression package.
@@ -495,6 +496,7 @@ class ER(Estimators, BaseMSS):
 
     def tolerance_estimator(self, y):
         """Tolerance Estimation for mutual independence test.
+
         Finds the conditioned mutual information between $y$ and $f1$ given $f2$.
 
         This code is based on Matlab Entropic Regression package.
@@ -696,7 +698,7 @@ class ER(Estimators, BaseMSS):
         if self.basis_function.__class__.__name__ == "Polynomial":
             if steps_ahead is None:
                 yhat = self._model_prediction(X, y, forecast_horizon=forecast_horizon)
-                yhat = yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
                 return yhat
             if steps_ahead == 1:
                 yhat = self._one_step_ahead_prediction(X, y)

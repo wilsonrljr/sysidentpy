@@ -1,4 +1,4 @@
-""" Basis Function for NARMAX models """
+"""Basis Function for NARMAX models."""
 
 from itertools import combinations_with_replacement
 from typing import Union
@@ -10,6 +10,7 @@ from .basis_function_base import BaseBasisFunction
 
 class Polynomial(BaseBasisFunction):
     r"""Build polynomial basis function.
+
     Generate a new feature matrix consisting of all polynomial combinations
     of the features with degree less than or equal to the specified degree.
 
@@ -32,7 +33,6 @@ class Polynomial(BaseBasisFunction):
     Be aware that the number of features in the output array scales
     significantly as the number of inputs, the max lag of the input and output, and
     degree increases. High degrees can cause overfitting.
-
     """
 
     def __init__(
@@ -90,11 +90,29 @@ class Polynomial(BaseBasisFunction):
         max_lag: int = 1,
         predefined_regressors: Union[np.ndarray, None] = None,
     ):
+        """Build Polynomial Basis Functions.
+
+        Parameters
+        ----------
+        data : ndarray of floats
+            The lagged matrix built with respect to each lag and column.
+        max_lag : int
+            Maximum lag of list of regressors.
+        predefined_regressors: ndarray
+            Regressors to be filtered in the transformation.
+
+        Returns
+        -------
+        X_tr : {ndarray, sparse matrix} of shape (n_samples, n_features)
+            Transformed array.
+
+        """
         return self.fit(data, max_lag, predefined_regressors)
 
 
 class Fourier:
     """Build Fourier basis function.
+
     Generate a new feature matrix consisting of all Fourier features
     with respect to the number of harmonics.
 
@@ -189,4 +207,21 @@ class Fourier:
         max_lag: int = 1,
         predefined_regressors: Union[np.ndarray, None] = None,
     ):
+        """Build Fourier Basis Functions.
+
+        Parameters
+        ----------
+        data : ndarray of floats
+            The lagged matrix built with respect to each lag and column.
+        max_lag : int
+            Maximum lag of list of regressors.
+        predefined_regressors: ndarray
+            Regressors to be filtered in the transformation.
+
+        Returns
+        -------
+        X_tr : {ndarray, sparse matrix} of shape (n_samples, n_features)
+            Transformed array.
+
+        """
         return self.fit(data, max_lag, predefined_regressors)

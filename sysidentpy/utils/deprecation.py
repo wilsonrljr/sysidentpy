@@ -7,8 +7,11 @@ import warnings
 
 
 def deprecated(version, future_version=None, message=None, alternative=None, **kwargs):
-    """This decorator is adapted from astroML decorator:
+    """Decorate deprecated methods.
+
+    This decorator is adapted from astroML decorator:
     https://github.com/astroML/astroML/blob/f66558232f6d33cb34ecd1bed8a80b9db7ae1c30/astroML/utils/decorators.py#L120
+
     """
 
     def deprecate_function(

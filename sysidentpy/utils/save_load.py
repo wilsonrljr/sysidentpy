@@ -12,7 +12,7 @@ def save_model(
     file_name="model",
     path=None,
 ):
-    """This method saves the model "model" in folder "folder" using an extension .syspy
+    """Save the model "model" in folder "folder" using an extension .syspy.
 
     Parameters
     ----------
@@ -21,11 +21,10 @@ def save_model(
     path: location where the model will be saved (optional)
 
     Returns
-    ----------
+    -------
     file file_name.syspy located at "path", containing the estimated model.
 
     """
-
     if model is None:
         raise TypeError("model cannot be None.")
 
@@ -45,8 +44,7 @@ def load_model(
     file_name="model",
     path=None,
 ):
-
-    """This method loads the model from file "file_name.syspy" located at path "path"
+    """Load the model from file "file_name.syspy" located at path "path".
 
     Parameters
     ----------

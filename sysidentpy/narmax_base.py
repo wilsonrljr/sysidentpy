@@ -17,7 +17,7 @@ from .utils._check_arrays import _num_features
 
 
 class InformationMatrix:
-    """Class for methods regarding preprocessing of columns"""
+    """Class for methods regarding preprocessing of columns."""
 
     def __init__(
         self,
@@ -56,7 +56,7 @@ class InformationMatrix:
         return tmp_column
 
     def _process_xlag(self, X: np.ndarray) -> Tuple[int, List[int]]:
-        """Create the list of lags to be used for the inputs
+        """Create the list of lags to be used for the inputs.
 
         Parameters
         ----------
@@ -85,7 +85,7 @@ class InformationMatrix:
         return n_inputs, xlag
 
     def _process_ylag(self) -> List[int]:
-        """Create the list of lags to be used for the outputs
+        """Create the list of lags to be used for the outputs.
 
         Returns
         -------
@@ -279,7 +279,7 @@ class InformationMatrix:
 
 
 class RegressorDictionary(InformationMatrix):
-    """Base class for Model Structure Selection"""
+    """Base class for Model Structure Selection."""
 
     def __init__(
         self,
@@ -606,7 +606,7 @@ class RegressorDictionary(InformationMatrix):
 
 
 class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
-    """Base class for Model Structure Selection"""
+    """Base class for Model Structure Selection."""
 
     @abstractmethod
     def __init__(self):
@@ -619,7 +619,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
     @abstractmethod
     def fit(self, *, X, y):
-        """abstract method"""
+        """Abstract method."""
 
     @abstractmethod
     def predict(
@@ -630,7 +630,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         steps_ahead: Optional[int] = None,
         forecast_horizon: int = 1,
     ) -> np.ndarray:
-        """abstract methods"""
+        """Abstract method."""
 
     def _code2exponents(self, *, code: np.ndarray) -> np.ndarray:
         """Convert regressor code to exponents array.
@@ -692,7 +692,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         y_initial: Optional[np.ndarray],
         forecast_horizon: int = 1,
     ) -> np.ndarray:
-        """Model prediction wrapper"""
+        """Model prediction wrapper."""
 
     def _narmax_predict(
         self,
@@ -700,7 +700,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         y_initial: Optional[np.ndarray],
         forecast_horizon: int = 1,
     ) -> np.ndarray:
-        """narmax_predict method"""
+        """narmax_predict method."""
         y_output = np.zeros(
             forecast_horizon, dtype=float
         )  # np.zeros(X.shape[0], dtype=float)
@@ -732,7 +732,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
     def _nfir_predict(
         self, X: Optional[np.ndarray], y_initial: Optional[np.ndarray]
     ) -> np.ndarray:
-        """nfir predict method"""
+        """Nfir predict method."""
         y_output = np.zeros(X.shape[0], dtype=float)
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
@@ -799,7 +799,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         y: Optional[np.ndarray],
         steps_ahead: Optional[int],
     ) -> np.ndarray:
-        """n_steps ahead prediction method for NARMAX model"""
+        """n_steps ahead prediction method for NARMAX model."""
         if len(y) < self.max_lag:
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
@@ -857,6 +857,8 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
         Returns
         -------
+        yhat : ndarray of floats
+            Predicted values for NARMAX and NAR models.
         """
         if self.model_type == "NARMAX":
             return self.narmax_n_step_ahead(X, y, steps_ahead)
@@ -876,7 +878,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         y_initial: Optional[np.ndarray],
         forecast_horizon: int = 1,
     ) -> np.ndarray:
-        """basis function prediction"""
+        """Basis function prediction."""
         yhat = np.zeros(forecast_horizon, dtype=float)
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y_initial[: self.max_lag, 0]
@@ -885,7 +887,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         # yhat[0:self.max_lag] = y_initial[0:self.max_lag]
         analyzed_elements_number = self.max_lag + 1
 
-        for i in range(0, forecast_horizon - self.max_lag):
+        for i in range(forecast_horizon - self.max_lag):
             if self.model_type == "NARMAX":
                 lagged_data = self.build_input_output_matrix(
                     X[i : i + analyzed_elements_number],
@@ -923,7 +925,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         steps_ahead: Optional[int],
         forecast_horizon: int,
     ) -> np.ndarray:
-        """basis function n step ahead"""
+        """Basis function n step ahead."""
         yhat = np.zeros(forecast_horizon, dtype=float)
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
@@ -971,7 +973,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         steps_ahead: Optional[int],
         forecast_horizon: int,
     ) -> np.ndarray:
-        """basis n steps horizon"""
+        """Basis n steps horizon."""
         yhat = np.zeros(forecast_horizon, dtype=float)
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]

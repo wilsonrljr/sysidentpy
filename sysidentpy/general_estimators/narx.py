@@ -1,4 +1,4 @@
-""" Build NARX Models Using general estimators """
+"""Build NARX Models Using general estimators."""
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
@@ -23,7 +23,7 @@ logging.basicConfig(
 
 
 class NARX(BaseMSS):
-    """NARX model build on top of general estimators
+    """NARX model build on top of general estimators.
 
     Currently is possible to use any estimator that have a fit/predict
     as an Autoregressive Model. We use our GenerateRegressors and
@@ -308,7 +308,7 @@ class NARX(BaseMSS):
         return yhat.reshape(-1, 1)
 
     def narmax_n_step_ahead(self, X, y, steps_ahead):
-        """n_steps ahead prediction method for NARMAX model"""
+        """N steps ahead prediction method for NARMAX model."""
         if len(y) < self.max_lag:
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
@@ -479,7 +479,7 @@ class NARX(BaseMSS):
 
         analyzed_elements_number = self.max_lag + 1
 
-        for i in range(0, forecast_horizon - self.max_lag):
+        for i in range(forecast_horizon - self.max_lag):
             lagged_data = self.build_matrix(
                 X[i : i + analyzed_elements_number],
                 yhat[i : i + analyzed_elements_number].reshape(-1, 1),

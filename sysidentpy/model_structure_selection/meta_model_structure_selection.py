@@ -1,4 +1,4 @@
-""" Meta Model Structure Selection"""
+"""Meta Model Structure Selection."""
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
@@ -34,7 +34,7 @@ from ..utils.deprecation import deprecated
     ),
 )
 class MetaMSS(SimulateNARMAX, BPSOGSA):
-    r"""Meta-Model Structure Selection: Building Polynomial NARMAX model
+    r"""Meta-Model Structure Selection: Building Polynomial NARMAX model.
 
     This class uses the MetaMSS ([1]_, [2]_, [3]_) algorithm to build NARMAX models.
     The NARMAX model is described as:
@@ -172,7 +172,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         alpha: int = 23,
         g_zero: int = 100,
         k_agents_percent: int = 2,
-        norm: Union[int, float] = -2,
+        norm: float = -2,
         power: int = 2,
         n_agents: int = 10,
         p_zeros: float = 0.5,
@@ -442,24 +442,24 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Perform the t-test given the p-value defined by the user.
 
-        Arguments:
+        Parameters
         ----------
-            psi : array
-                the data matrix of regressors
-            theta : array
-                the parameters estimated via least squares algorithm
-            residues : array
-                the identification residues of the solution
-            p_value_confidence : double
-                parameter selected by the user to perform the statistical t-test
+        psi : array
+            the data matrix of regressors
+        theta : array
+            the parameters estimated via least squares algorithm
+        residues : array
+            the identification residues of the solution
 
-        Returns:
-        --------
-            pos_insignificant_terms : array
-                these regressors in the actual candidate solution are removed
-                from the population since they are insignificant
-            t_test : array
-                the values of the p_value of each regressor of the model
+        Returns
+        -------
+        pos_insignificant_terms : array
+            these regressors in the actual candidate solution are removed
+            from the population since they are insignificant
+        t_test : array
+            the values of the p_value of each regressor of the model
+        tail2P: array
+            The calculated two-tailed p-value.
 
         """
         sum_of_squared_residues = np.sum(residues**2)
@@ -488,7 +488,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         return pos_insignificant_terms, t_test, tail2P
 
     def aic(self, y_test: np.ndarray, yhat: np.ndarray, n_theta: int) -> float:
-        """Calculate the Akaike Information Criterion
+        """Calculate the Akaike Information Criterion.
 
         Parameters
         ----------
@@ -510,7 +510,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         return n * np.log(mse) + 2 * n_theta
 
     def bic(self, y_test: np.ndarray, yhat: np.ndarray, n_theta: int) -> float:
-        """Calculate the Bayesian Information Criterion
+        """Calculate the Bayesian Information Criterion.
 
         Parameters
         ----------
@@ -532,7 +532,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         return n * np.log(mse) + n_theta + np.log(n)
 
     def metamss_loss(self, y_test: np.ndarray, yhat: np.ndarray, n_terms: int) -> float:
-        """Calculate the MetaMSS loss function
+        """Calculate the MetaMSS loss function.
 
         Parameters
         ----------
@@ -738,19 +738,19 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         return y_output
 
     def _basis_function_predict(self, X, y_initial, forecast_horizon=None):
-        """not implemented"""
+        """Not implemented."""
         raise NotImplementedError(
             "You can only use Polynomial Basis Function in MetaMSS for now."
         )
 
     def _basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
-        """not implemented"""
+        """Not implemented."""
         raise NotImplementedError(
             "You can only use Polynomial Basis Function in MetaMSS for now."
         )
 
     def _basis_function_n_steps_horizon(self, X, y, steps_ahead, forecast_horizon):
-        """not implemented"""
+        """Not implemented."""
         raise NotImplementedError(
             "You can only use Polynomial Basis Function in MetaMSS for now."
         )

@@ -60,9 +60,11 @@ dev = [
     "pytest >=6.2.4,<7.0.0",
     "pytest-cov >=2.12.0,<4.0.0",
     "flake8 >=3.8.3,<4.0.0",
-    "black == 22.3.0",
+    "black == 23.12.1",
     "isort >=5.0.6,<6.0.0",
     "scikit-learn",
+    "pre-commit",
+    "ruff",
 ]
 doc = [
     "mkdocs >=1.1.2,<2.0.0",
@@ -154,3 +156,61 @@ exclude = '''
   | docs/*
 )/
 '''
+
+[tool.ruff]
+line-length = 88
+unfixable = []
+
+select = [
+    "D",      # docstring conventions
+    "F",      # pyflakes
+    "E",      # pycodestyle erros
+    "W",      # pycodestyle warnings
+    "YTT",    # flake8-2020
+    "B",      # flake8-bugbear
+    "Q",      # flake8-quotes
+    "T10",    # flake8-debugger
+    "INT",    # flake8-gettext
+    "PL",     # pylint
+    "PT",     # flake8-pytest-style
+    "PIE",    # misc lints
+    "PYI",    # flake8-pyi
+    "TID",    # tidy imports
+    "ISC",    # implicit string concatenation
+    "TCH",    # type-checking imports
+    "C4",     # comprehensions
+    "PGH",    # pygrep-hooks
+    "RUF",    # Ruff-specific rules
+    "S102",   # flake8-bandit: exec-builtin
+    "NPY002", # numpy-legacy-random
+    "PERF",   # Perflint
+    "FLY",    # flynt
+    "G",      # flake8-logging-format
+    "FA",     # flake8-future-annotations
+]
+extend-ignore = [
+    "B008",    # do not perform function calls in argument defaults
+    "W191",    # indentation contains tabs
+    "TID252",  # Prefer absolute imports over relative imports from parent modules
+    "PLR0913", # too many arguments in function
+    "G004",    # logging statement uses f-string (to be defined)
+    "PERF203", # try-except within a loop
+    "RUF010",  # use explicit conversion flag
+    "PLR2004", # magic value used in comparison
+    "D100",    # Missing docstring in public module
+    "D103",    # Missing docstring in public function
+    "D101",    # Missing docstring in public class
+    "D102",    # Missing docstring in public method
+]
+# D100, D101, D102 e D103 são recomendadas durante o desenvolvimento para lembrar
+# os usuários de comentar o código!
+
+[tool.ruff.pyupgrade]
+# Preserve types, even if a file imports `from __future__ import annotations`.
+keep-runtime-typing = true
+
+[tool.ruff.lint.pycodestyle]
+max-doc-length = 120
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"

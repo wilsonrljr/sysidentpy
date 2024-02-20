@@ -1,4 +1,4 @@
-"""Least Squares Methods for parameter estimation"""
+"""Least Squares Methods for parameter estimation."""
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
@@ -27,7 +27,7 @@ class EstimatorError(Exception):
 
 
 class Estimators:
-    """Ordinary Least Squares for linear parameter estimation"""
+    """Ordinary Least Squares for linear parameter estimation."""
 
     def __init__(
         self,
@@ -133,10 +133,10 @@ class Estimators:
         return theta
 
     def ridge_regression_classic(self, psi, y):
-        """Estimate the model parameters using the regularized least squares method
-           known as ridge regression.  Based on the least_squares module and uses
-           the same data format but you need to pass alpha in the call to
-           FROLS
+        """Estimate the model parameters using ridge regression.
+
+           Based on the least_squares module and uses the same data format but you need
+           to pass alpha in the call to FROLS.
 
         Parameters
         ----------
@@ -144,10 +144,6 @@ class Estimators:
             The information matrix of the model.
         y : array-like of shape = y_training
             The data used to training the model.
-        alpha : ridge regression parameter that regularizes the algorithm
-            to prevent over fitting.  If the input is a noisy signal, the ridge
-            parameter is likely to be set close to the noise level, at least
-            as a starting point.  Entered through the self data structure.
 
         Returns
         -------
@@ -162,8 +158,8 @@ class Estimators:
         alpha multiplied by the identity matrix (np.eye) favors models (theta) that
         have small size using an L2 norm.  This prevents over fitting of the model.
         For applications where preventing overfitting is important, see, for example,
-        D. J. Gauthier, E. Bollt, A. Griffith, W. A. S. Barbosa, ‘Next generation
-        reservoir computing,’ Nat. Commun. 12, 5564 (2021).
+        D. J. Gauthier, E. Bollt, A. Griffith, W. A. S. Barbosa, 'Next generation
+        reservoir computing,' Nat. Commun. 12, 5564 (2021).
         https://www.nature.com/articles/s41467-021-25801-2
 
         """
@@ -276,6 +272,7 @@ class Estimators:
         """Estimate the model parameters using the Recursive Least Squares method.
 
         The implementation consider the forgetting factor.
+
         Parameters
         ----------
         psi : ndarray of floats

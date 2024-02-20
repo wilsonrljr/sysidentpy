@@ -1,4 +1,5 @@
-"""Utilities for data generation """
+"""Utilities for data generation."""
+
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
