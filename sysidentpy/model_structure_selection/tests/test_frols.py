@@ -116,7 +116,7 @@ def test_default_values():
         model.offset_covariance,
         model.mu,
         model.eps,
-        model.ridge_param,
+        model.alpha,
         model.gama,
         model.weight,
         model.model_type,

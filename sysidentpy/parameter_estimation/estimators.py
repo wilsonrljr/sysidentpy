@@ -12,6 +12,20 @@ import numpy as np
 from ..narmax_base import InformationMatrix
 
 
+class EstimatorError(Exception):
+    """Generic Python-exception-derived object raised by estimator functions.
+
+    General purpose exception class, derived from Python's ValueError
+    class, programmatically raised in estimators functions when a Estimator-related
+    condition would prevent further correct execution of the function.
+
+    Parameters
+    ----------
+    None
+
+    """
+
+
 class Estimators:
     """Ordinary Least Squares for linear parameter estimation"""
 
@@ -23,13 +37,13 @@ class Estimators:
         offset_covariance=0.2,
         mu=0.01,
         eps=np.finfo(np.float64).eps,
-        ridge_param=np.finfo(np.float64).eps,
+        alpha=np.finfo(np.float64).eps,
         gama=0.2,
         weight=0.02,
         basis_function=None,
     ):
         self.eps = eps
-        self.ridge_param = ridge_param
+        self.alpha = alpha
         self.mu = mu
         self.offset_covariance = offset_covariance
         self.max_lag = max_lag
@@ -51,10 +65,9 @@ class Estimators:
             "offset_covariance": self.offset_covariance,
             "mu": self.mu,
             "eps": self.eps,
-            "ridge_param": self.ridge_param,
+            "alpha": self.alpha,
             "gama": self.gama,
             "weight": self.weight,
-            "ridge_param": self.ridge_param,
         }
         for attribute, value in attributes.items():
             if not isinstance(value, (np.integer, int, float)):
@@ -122,7 +135,7 @@ class Estimators:
     def ridge_regression_classic(self, psi, y):
         """Estimate the model parameters using the regularized least squares method
            known as ridge regression.  Based on the least_squares module and uses
-           the same data format but you need to pass ridge_param in the call to
+           the same data format but you need to pass alpha in the call to
            FROLS
 
         Parameters
@@ -131,7 +144,7 @@ class Estimators:
             The information matrix of the model.
         y : array-like of shape = y_training
             The data used to training the model.
-        ridge_param : ridge regression parameter that regularizes the algorithm
+        alpha : ridge regression parameter that regularizes the algorithm
             to prevent over fitting.  If the input is a noisy signal, the ridge
             parameter is likely to be set close to the noise level, at least
             as a starting point.  Entered through the self data structure.
@@ -146,7 +159,7 @@ class Estimators:
         - Wikipedia entry on ridge regression
           https://en.wikipedia.org/wiki/Ridge_regression
 
-        ridge_parm multiplied by the identity matrix (np.eye) favors models (theta) that
+        alpha multiplied by the identity matrix (np.eye) favors models (theta) that
         have small size using an L2 norm.  This prevents over fitting of the model.
         For applications where preventing overfitting is important, see, for example,
         D. J. Gauthier, E. Bollt, A. Griffith, W. A. S. Barbosa, ‘Next generation
@@ -158,9 +171,7 @@ class Estimators:
 
         y = y[self.max_lag :, 0].reshape(-1, 1)
         theta = (
-            np.linalg.pinv(psi.T @ psi + self.ridge_param * np.eye(psi.shape[1]))
-            @ psi.T
-            @ y
+            np.linalg.pinv(psi.T @ psi + self.alpha * np.eye(psi.shape[1])) @ psi.T @ y
         )
         return theta
 
@@ -967,13 +978,14 @@ class Estimators:
         self._check_linear_dependence_rows(psi)
         y = y[self.max_lag :, 0].reshape(-1, 1)
         try:
-            U, d, Vt = np.linalg.svd(psi, full_matrices=False)
-            D = np.diag(d)
-            I = np.identity(len(D))
-            theta = Vt.T @ np.linalg.inv(D**2 + self.ridge_param * I) @ D @ U.T @ y
-        except:
+            U, S, Vh = np.linalg.svd(psi, full_matrices=False)
+            S = np.diag(S)
+            i = np.identity(len(S))
+            theta = Vh.T @ np.linalg.inv(S**2 + self.alpha * i) @ S @ U.T @ y
+        except EstimatorError:
             warnings.warn(
-                "The SVD computation does not converge. Value calculated with the classic algorithm",
+                "The SVD computation did not converge."
+                "Theta values will be calculated with the classic algorithm.",
                 stacklevel=2,
             )
 
