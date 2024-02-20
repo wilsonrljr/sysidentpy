@@ -423,29 +423,25 @@ class NARXNN(BaseMSS):
         self.train_loss = []
         for epoch in range(self.epochs):
             self.net.train()
-            for X, y in train_dl:
-                X, y = X.to(self.device), y.to(self.device)
+            for input_data, output_data in train_dl:
+                X, y = input_data.to(self.device), output_data.to(self.device)
                 self.loss_batch(X, y, opt=opt)
 
             if self.verbose:
-                train_losses, train_nums = zip(
-                    *[
-                        self.loss_batch(X.to(self.device), y.to(self.device))
-                        for X, y in train_dl
-                    ]
-                )
+                train_losses, train_nums = zip(*[
+                    self.loss_batch(X.to(self.device), y.to(self.device))
+                    for X, y in train_dl
+                ])
                 self.train_loss.append(
                     np.sum(np.multiply(train_losses, train_nums)) / np.sum(train_nums)
                 )
 
                 self.net.eval()
                 with torch.no_grad():
-                    losses, nums = zip(
-                        *[
-                            self.loss_batch(X.to(self.device), y.to(self.device))
-                            for X, y in valid_dl
-                        ]
-                    )
+                    losses, nums = zip(*[
+                        self.loss_batch(X.to(self.device), y.to(self.device))
+                        for X, y in valid_dl
+                    ])
                 self.val_loss.append(np.sum(np.multiply(losses, nums)) / np.sum(nums))
                 logging.info(
                     "Train metrics: %s | Validation metrics: %s",

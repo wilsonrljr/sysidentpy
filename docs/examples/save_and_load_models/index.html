@@ -4,7 +4,7 @@
             .gslide-title { margin-top: 0px; user-select: text; }
             .gslide-desc { color: #666; user-select: text; }
             .gslide-image img { background: white; }
-            
+
                 .gscrollbar-fixer { padding-right: 15px; }
                 .gdesc-inner { font-size: 0.75rem; }
                 body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
@@ -170,7 +170,7 @@
         }, 1000)
       })
 </script> <style type="text/css">
-    
+
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
 span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -1096,13 +1096,13 @@ Licensed under the Apache License, Version 2.0.
 <span class="c1"># Ploting results</span>
 <span class="n">plot_results</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">yhat</span><span class="o">=</span><span class="n">yhat_loaded</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 </pre></div> <div class="clipboard-copy-txt" id="cell-3"># load_model(file_name.syspy, path (optional)) loaded_model = load_model(file_name="model_name.syspy") # Predicting output with loaded_model yhat_loaded = loaded_model.predict(X=x_valid, y=y_valid) r_loaded = pd.DataFrame( results( loaded_model.final_model, loaded_model.theta, loaded_model.err, loaded_model.n_terms, err_precision=8, dtype="sci", ), columns=["Regressors", "Parameters", "ERR"], ) # Printing both: original model and model loaded from file print("\n Original model \n", r) print("\n Model Loaded from file \n", r_loaded) # Checking predictions from both: original model and model loaded from file if (yhat == yhat_loaded).all(): print("\n Predictions are the same!") # Ploting results plot_results(y=y_valid, yhat=yhat_loaded, n=1000)</div> </div> </div> </div> </div> <div class="jp-Cell-outputWrapper"> <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser"> </div> <div class="jp-OutputArea jp-Cell-outputArea"> <div class="jp-OutputArea-child"> <div class="jp-OutputPrompt jp-OutputArea-prompt"></div> <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain"> <pre>
- Original model 
+ Original model
        Regressors  Parameters             ERR
 0        x1(k-2)  9.0000E-01  9.57022506E-01
 1         y(k-1)  1.9999E-01  3.96079210E-02
 2  x1(k-1)y(k-1)  1.0001E-01  3.36953837E-03
 
- Model Loaded from file 
+ Model Loaded from file
        Regressors  Parameters             ERR
 0        x1(k-2)  9.0000E-01  9.57022506E-01
 1         y(k-1)  1.9999E-01  3.96079210E-02

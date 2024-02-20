@@ -4,7 +4,7 @@
             .gslide-title { margin-top: 0px; user-select: text; }
             .gslide-desc { color: #666; user-select: text; }
             .gslide-image img { background: white; }
-            
+
                 .gscrollbar-fixer { padding-right: 15px; }
                 .gdesc-inner { font-size: 0.75rem; }
                 body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
@@ -170,7 +170,7 @@
         }, 1000)
       })
 </script> <style type="text/css">
-    
+
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
 span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -1084,9 +1084,9 @@ Licensed under the Apache License, Version 2.0.
     <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"Regressors"</span><span class="p">,</span> <span class="s2">"Parameters"</span><span class="p">,</span> <span class="s2">"ERR"</span><span class="p">],</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-</pre></div> <div class="clipboard-copy-txt" id="cell-9">basis_function = Polynomial(degree=1) model = FROLS( order_selection=True, n_info_values=39, extended_least_squares=False, ylag=20, xlag=[x1lag, x2lag], info_criteria="bic", estimator="least_squares", basis_function=basis_function, ) model.fit(X=x_id, y=y_id) y_hat = model.predict(X=x_val, y=y_val) rrse = root_relative_squared_error(y_val, y_hat) print(rrse) r = pd.DataFrame( results( model.final_model, model.theta, model.err, model.n_terms, err_precision=8, dtype="sci", ), columns=["Regressors", "Parameters", "ERR"], ) print(r)</div> </div> </div> </div> </div> <div class="jp-Cell-outputWrapper"> <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser"> </div> <div class="jp-OutputArea jp-Cell-outputArea"> <div class="jp-OutputArea-child"> <div class="jp-OutputPrompt jp-OutputArea-prompt"></div> <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr"> <pre>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\utils\deprecation.py:37: FutureWarning: Passing a string to define the estimator will rise an error in v0.4.0. 
- You'll have to use FROLS(estimator=LeastSquares()) instead. 
- The only change is that you'll have to define the estimator first instead of passing a string like 'least_squares'. 
+</pre></div> <div class="clipboard-copy-txt" id="cell-9">basis_function = Polynomial(degree=1) model = FROLS( order_selection=True, n_info_values=39, extended_least_squares=False, ylag=20, xlag=[x1lag, x2lag], info_criteria="bic", estimator="least_squares", basis_function=basis_function, ) model.fit(X=x_id, y=y_id) y_hat = model.predict(X=x_val, y=y_val) rrse = root_relative_squared_error(y_val, y_hat) print(rrse) r = pd.DataFrame( results( model.final_model, model.theta, model.err, model.n_terms, err_precision=8, dtype="sci", ), columns=["Regressors", "Parameters", "ERR"], ) print(r)</div> </div> </div> </div> </div> <div class="jp-Cell-outputWrapper"> <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser"> </div> <div class="jp-OutputArea jp-Cell-outputArea"> <div class="jp-OutputArea-child"> <div class="jp-OutputPrompt jp-OutputArea-prompt"></div> <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr"> <pre>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\utils\deprecation.py:37: FutureWarning: Passing a string to define the estimator will rise an error in v0.4.0.
+ You'll have to use FROLS(estimator=LeastSquares()) instead.
+ The only change is that you'll have to define the estimator first instead of passing a string like 'least_squares'.
  This change will make easier to implement new estimators and it'll improve code readability.
   warnings.warn(message, FutureWarning)
 </pre> </div> </div> <div class="jp-OutputArea-child"> <div class="jp-OutputPrompt jp-OutputArea-prompt"></div> <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain"> <pre>0.2910089654603829

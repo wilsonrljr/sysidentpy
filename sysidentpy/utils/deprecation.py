@@ -37,7 +37,7 @@ def deprecated(version, future_version=None, message=None, alternative=None, **k
 
         @functools.wraps(func)
         def deprecated_func(*args, **kwargs):
-            warnings.warn(message, FutureWarning)
+            warnings.warn(message, FutureWarning, stacklevel=1)
             return func(*args, **kwargs)
 
         return deprecated_func

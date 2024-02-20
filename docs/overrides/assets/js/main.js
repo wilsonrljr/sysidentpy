@@ -55,8 +55,8 @@ $(function () {
 
     $(".navbar-nav a").on('click', function () {
         $(".navbar-toggler").removeClass('active');
-    });    
-    
+    });
+
 
     //====== Magnific Popup
 

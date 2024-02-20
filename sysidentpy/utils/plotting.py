@@ -21,7 +21,7 @@ def plot_results(
     n: int = 100,
     title: str = "Free run simulation",
     xlabel: str = "Samples",
-    ylabel: str = "y, $\hat{y}$",
+    ylabel: str = r"y, $\hat{y}$",
     data_color: str = "#1f77b4",
     model_color: str = "#ff7f0e",
     marker: str = "o",
@@ -64,12 +64,9 @@ def plot_results(
     facecolor : str
         Figure facecolor.
 
-    Returns
-    -------
-        None
-
     """
-    assert len(y) >= 1 and len(yhat) >= 1, "Arrays must have at least 1 samples."
+    if len(y) == 0 or len(yhat) == 0:
+        raise ValueError("Arrays must have at least 1 samples.")
 
     # Set Matplotlib style and figure properties
     plt.style.use(style)

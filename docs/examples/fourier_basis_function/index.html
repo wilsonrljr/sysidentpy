@@ -4,7 +4,7 @@
             .gslide-title { margin-top: 0px; user-select: text; }
             .gslide-desc { color: #666; user-select: text; }
             .gslide-image img { background: white; }
-            
+
                 .gscrollbar-fixer { padding-right: 15px; }
                 .gdesc-inner { font-size: 0.75rem; }
                 body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
@@ -170,7 +170,7 @@
         }, 1000)
       })
 </script> <style type="text/css">
-    
+
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
 span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -1122,9 +1122,9 @@ Licensed under the Apache License, Version 2.0.
 <span class="nb">print</span><span class="p">(</span><span class="n">frols_loss</span><span class="p">)</span>
 
 <span class="n">plot_results</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_test</span><span class="p">[</span><span class="n">sysidentpy</span><span class="o">.</span><span class="n">max_lag</span> <span class="p">:],</span> <span class="n">yhat</span><span class="o">=</span><span class="n">yhat</span><span class="p">[</span><span class="n">sysidentpy</span><span class="o">.</span><span class="n">max_lag</span> <span class="p">:])</span>
-</pre></div> <div class="clipboard-copy-txt" id="cell-6">basis_function = Polynomial(degree=2) sysidentpy = FROLS( order_selection=True, n_info_values=70, xlag=2, ylag=2, basis_function=basis_function, model_type="NARMAX", ) sysidentpy.fit(X=x_train, y=y_train) yhat = sysidentpy.predict(X=x_test, y=y_test) frols_loss = root_relative_squared_error( y_test[sysidentpy.max_lag :], yhat[sysidentpy.max_lag :] ) print(frols_loss) plot_results(y=y_test[sysidentpy.max_lag :], yhat=yhat[sysidentpy.max_lag :])</div> </div> </div> </div> </div> <div class="jp-Cell-outputWrapper"> <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser"> </div> <div class="jp-OutputArea jp-Cell-outputArea"> <div class="jp-OutputArea-child"> <div class="jp-OutputPrompt jp-OutputArea-prompt"></div> <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr"> <pre>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\utils\deprecation.py:37: FutureWarning: Passing a string to define the estimator will rise an error in v0.4.0. 
- You'll have to use FROLS(estimator=LeastSquares()) instead. 
- The only change is that you'll have to define the estimator first instead of passing a string like 'least_squares'. 
+</pre></div> <div class="clipboard-copy-txt" id="cell-6">basis_function = Polynomial(degree=2) sysidentpy = FROLS( order_selection=True, n_info_values=70, xlag=2, ylag=2, basis_function=basis_function, model_type="NARMAX", ) sysidentpy.fit(X=x_train, y=y_train) yhat = sysidentpy.predict(X=x_test, y=y_test) frols_loss = root_relative_squared_error( y_test[sysidentpy.max_lag :], yhat[sysidentpy.max_lag :] ) print(frols_loss) plot_results(y=y_test[sysidentpy.max_lag :], yhat=yhat[sysidentpy.max_lag :])</div> </div> </div> </div> </div> <div class="jp-Cell-outputWrapper"> <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser"> </div> <div class="jp-OutputArea jp-Cell-outputArea"> <div class="jp-OutputArea-child"> <div class="jp-OutputPrompt jp-OutputArea-prompt"></div> <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr"> <pre>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\utils\deprecation.py:37: FutureWarning: Passing a string to define the estimator will rise an error in v0.4.0.
+ You'll have to use FROLS(estimator=LeastSquares()) instead.
+ The only change is that you'll have to define the estimator first instead of passing a string like 'least_squares'.
  This change will make easier to implement new estimators and it'll improve code readability.
   warnings.warn(message, FutureWarning)
 c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\model_structure_selection\forward_regression_orthogonal_least_squares.py:569: UserWarning: n_info_values is greater than the maximum number of all regressors space considering the chosen y_lag, u_lag, and non_degree. We set as 15
@@ -1148,9 +1148,9 @@ c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\model_structure_sel
 <span class="nb">print</span><span class="p">(</span><span class="n">frols_loss</span><span class="p">)</span>
 
 <span class="n">plot_results</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_test</span><span class="p">[</span><span class="n">sysidentpy</span><span class="o">.</span><span class="n">max_lag</span> <span class="p">:],</span> <span class="n">yhat</span><span class="o">=</span><span class="n">yhat</span><span class="p">[</span><span class="n">sysidentpy</span><span class="o">.</span><span class="n">max_lag</span> <span class="p">:])</span>
-</pre></div> <div class="clipboard-copy-txt" id="cell-7">basis_function = Fourier(degree=2, n=2, p=2 * np.pi, ensemble=True) sysidentpy = FROLS( order_selection=True, n_info_values=70, xlag=2, ylag=2, # the lags for all models will be 13 basis_function=basis_function, model_type="NARMAX", ) sysidentpy.fit(X=x_train, y=y_train) yhat = sysidentpy.predict(X=x_test, y=y_test) frols_loss = root_relative_squared_error( y_test[sysidentpy.max_lag :], yhat[sysidentpy.max_lag :] ) print(frols_loss) plot_results(y=y_test[sysidentpy.max_lag :], yhat=yhat[sysidentpy.max_lag :])</div> </div> </div> </div> </div> <div class="jp-Cell-outputWrapper"> <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser"> </div> <div class="jp-OutputArea jp-Cell-outputArea"> <div class="jp-OutputArea-child"> <div class="jp-OutputPrompt jp-OutputArea-prompt"></div> <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr"> <pre>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\utils\deprecation.py:37: FutureWarning: Passing a string to define the estimator will rise an error in v0.4.0. 
- You'll have to use FROLS(estimator=LeastSquares()) instead. 
- The only change is that you'll have to define the estimator first instead of passing a string like 'least_squares'. 
+</pre></div> <div class="clipboard-copy-txt" id="cell-7">basis_function = Fourier(degree=2, n=2, p=2 * np.pi, ensemble=True) sysidentpy = FROLS( order_selection=True, n_info_values=70, xlag=2, ylag=2, # the lags for all models will be 13 basis_function=basis_function, model_type="NARMAX", ) sysidentpy.fit(X=x_train, y=y_train) yhat = sysidentpy.predict(X=x_test, y=y_test) frols_loss = root_relative_squared_error( y_test[sysidentpy.max_lag :], yhat[sysidentpy.max_lag :] ) print(frols_loss) plot_results(y=y_test[sysidentpy.max_lag :], yhat=yhat[sysidentpy.max_lag :])</div> </div> </div> </div> </div> <div class="jp-Cell-outputWrapper"> <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser"> </div> <div class="jp-OutputArea jp-Cell-outputArea"> <div class="jp-OutputArea-child"> <div class="jp-OutputPrompt jp-OutputArea-prompt"></div> <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr"> <pre>c:\Users\wilso\Desktop\projects\GitHub\sysidentpy\sysidentpy\utils\deprecation.py:37: FutureWarning: Passing a string to define the estimator will rise an error in v0.4.0.
+ You'll have to use FROLS(estimator=LeastSquares()) instead.
+ The only change is that you'll have to define the estimator first instead of passing a string like 'least_squares'.
  This change will make easier to implement new estimators and it'll improve code readability.
   warnings.warn(message, FutureWarning)
 </pre> </div> </div> <div class="jp-OutputArea-child"> <div class="jp-OutputPrompt jp-OutputArea-prompt"></div> <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain"> <pre>0.3742244715879481

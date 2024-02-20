@@ -61,7 +61,7 @@ theme:
   font:
     text: Roboto
     code: Roboto Mono
-  
+
 
 ## Custom theme additions
 extra_javascript:
@@ -177,7 +177,7 @@ nav:
       - pv-forecasting: examples/PV_forecasting_benchmark.ipynb
   - Companion Book:
     - Preface: book/preface.md
-    - Contents: book/contents.md 
+    - Contents: book/contents.md
   - Blog:
     - Events: events/events.md
     - Meetups:

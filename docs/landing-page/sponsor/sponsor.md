@@ -12,7 +12,7 @@ SysIdentPy __does not__ follow the __sponsorware__ release strategy, which means
 that all features are released to the public at the same time. SysIdentPy is a community driven project, however sponsorships will help to assure its sustainability.
 
 
-The main goal of sponsorships it to make this project sustainable. Your donation goes to support a variety of services and development as they buy the maintainers of this project time to work on the development of new features, bug fixing, stability improvement, issue triage and general support. 
+The main goal of sponsorships it to make this project sustainable. Your donation goes to support a variety of services and development as they buy the maintainers of this project time to work on the development of new features, bug fixing, stability improvement, issue triage and general support.
 
 
 Read on to learn [how to become a sponsor]!
@@ -62,7 +62,7 @@ organization GitHub account for sponsoring.
 
 The following section lists all funding goals. Each goal contains a list of
 features prefixed with a checkmark symbol, denoting whether a feature is
-:octicons-check-circle-fill-24:{ style="color: #00e676" } already available or 
+:octicons-check-circle-fill-24:{ style="color: #00e676" } already available or
 :octicons-check-circle-fill-24:{ style="color: var(--md-default-fg-color--lightest)" } planned, but not yet implemented. When the funding goal is hit, the features
 are released for general availability.
 
@@ -72,7 +72,7 @@ are released for general availability.
 ??? question "I don't want to sponsor anymore. Can I cancel my sponsorship?"
 
     Yes, you can cancel your sponsorship anytime! If you no longer want to sponsor SysIdentPy in GitHub Sponsors, you can request a cancellation which will become effective at the end of the billing cycle. Just remember: sponsorships are non-refundable!
-    
+
     If you have any problems or further questions, please reach out to
     wilsonrljr@outlook.com.
 

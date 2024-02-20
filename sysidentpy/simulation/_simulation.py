@@ -1,4 +1,4 @@
-"""Simulation methods for NARMAX models"""
+"""Simulation methods for NARMAX models."""
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
@@ -15,7 +15,7 @@ from ..utils._check_arrays import _check_positive_int, _num_features
 
 
 class SimulateNARMAX(Estimators, BaseMSS):
-    r"""Simulation of Polynomial NARMAX model
+    r"""Simulation of Polynomial NARMAX model.
 
     The NARMAX model is described as:
 
@@ -341,7 +341,7 @@ class SimulateNARMAX(Estimators, BaseMSS):
            to non-linear system identification
            https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
         - Manuscript (portuguese): Identificação de Sistemas não Lineares
-           Utilizando Modelos NARMAX Polinomiais – Uma Revisão
+           Utilizando Modelos NARMAX Polinomiais - Uma Revisão
            e Novos Resultados
 
         """
@@ -545,25 +545,25 @@ class SimulateNARMAX(Estimators, BaseMSS):
         return y_output
 
     def _basis_function_predict(self, X, y_initial, forecast_horizon=None):
-        """not implemented"""
+        """Not implemented."""
         raise NotImplementedError(
             "You can only use Polynomial Basis Function in SimulateNARMAX for now."
         )
 
     def _basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
-        """not implemented"""
+        """Not implemented."""
         raise NotImplementedError(
             "You can only use Polynomial Basis Function in SimulateNARMAX for now."
         )
 
     def _basis_function_n_steps_horizon(self, X, y, steps_ahead, forecast_horizon):
-        """not implemented"""
+        """Not implemented."""
         raise NotImplementedError(
             "You can only use Polynomial Basis Function in SimulateNARMAX for now."
         )
 
     def fit(self, *, X=None, y=None):
-        """not implemented"""
+        """Not implemented."""
         raise NotImplementedError(
             "There is no fit method in Simulate because the model is predefined."
         )

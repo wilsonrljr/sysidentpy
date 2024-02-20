@@ -75,12 +75,9 @@ class Polynomial(BaseBasisFunction):
         if predefined_regressors is not None:
             combinations = [combinations[index] for index in predefined_regressors]
 
-        psi = np.column_stack(
-            [
-                np.prod(data[:, combinations[i]], axis=1)
-                for i in range(len(combinations))
-            ]
-        )
+        psi = np.column_stack([
+            np.prod(data[:, combinations[i]], axis=1) for i in range(len(combinations))
+        ])
         psi = psi[max_lag:, :]
         return psi
 
@@ -136,12 +133,10 @@ class Fourier:
         self.repetition = None
 
     def _fourier_expansion(self, data, n):
-        base = np.column_stack(
-            [
-                np.cos(2 * np.pi * data * n / self.p),
-                np.sin(2 * np.pi * data * n / self.p),
-            ]
-        )
+        base = np.column_stack([
+            np.cos(2 * np.pi * data * n / self.p),
+            np.sin(2 * np.pi * data * n / self.p),
+        ])
         return base
 
     def fit(

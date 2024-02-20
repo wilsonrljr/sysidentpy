@@ -5,7 +5,7 @@ title: Contribute
 
 # Nubank Meetup
 
-Estatidados is a big statistic and data science community in Brazil. They host an online meetup that brings together leading researchers and developers from the Statistics and Data science community to join a multiple set of talks covering current trends in the Data Science field. 
+Estatidados is a big statistic and data science community in Brazil. They host an online meetup that brings together leading researchers and developers from the Statistics and Data science community to join a multiple set of talks covering current trends in the Data Science field.
 
 Wilson Rocha, the maintainer of SysIdentPy, gave a meetup talk about SysIdentPy and the video is available bellow:
 

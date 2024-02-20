@@ -98,13 +98,11 @@ def test_load_model():
 
 
 def test_results():
-    model = np.array(
-        [
-            [1001, 0],  # y(k-1)
-            [2001, 1001],  # x1(k-1)y(k-1)
-            [2002, 0],  # x1(k-2)
-        ]
-    )
+    model = np.array([
+        [1001, 0],  # y(k-1)
+        [2001, 1001],  # x1(k-1)y(k-1)
+        [2002, 0],  # x1(k-2)
+    ])
     theta = np.array([[0.19999698], [0.90011667], [0.10080975]])
     err = np.array([0.98, 0.01, 0.01])
     table = results(
