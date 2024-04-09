@@ -1,7 +1,7 @@
 """Base class for Basis Function."""
 
 from abc import ABCMeta, abstractmethod
-from typing import Union
+from typing import Optional
 
 import numpy as np
 
@@ -18,7 +18,7 @@ class BaseBasisFunction(metaclass=ABCMeta):
         self,
         data: np.ndarray,
         max_lag: int = 1,
-        predefined_regressors: Union[np.ndarray, None] = None,
+        predefined_regressors: Optional[np.ndarray] = None,
     ):
         """Abstract method."""
 
@@ -27,6 +27,6 @@ class BaseBasisFunction(metaclass=ABCMeta):
         self,
         data: np.ndarray,
         max_lag: int = 1,
-        predefined_regressors: Union[np.ndarray, None] = None,
+        predefined_regressors: Optional[np.ndarray] = None,
     ) -> np.ndarray:
         """Abstract methods."""

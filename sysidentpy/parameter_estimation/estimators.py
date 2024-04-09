@@ -95,7 +95,7 @@ class Estimators:
                 stacklevel=2,
             )
 
-    def least_squares(self, psi, y):
+    def least_squares(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Estimate the model parameters using Least Squares method.
 
         Parameters
@@ -132,7 +132,7 @@ class Estimators:
         theta = np.linalg.lstsq(psi, y, rcond=None)[0]
         return theta
 
-    def ridge_regression_classic(self, psi, y):
+    def ridge_regression_classic(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Estimate the model parameters using ridge regression.
 
            Based on the least_squares module and uses the same data format but you need
@@ -225,7 +225,7 @@ class Estimators:
 
         return unbiased_theta[0 : theta.shape[0], 0].reshape(-1, 1)
 
-    def total_least_squares(self, psi, y):
+    def total_least_squares(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Estimate the model parameters using Total Least Squares method.
 
         Parameters
@@ -268,7 +268,7 @@ class Estimators:
         xi = np.zeros([n, 1])
         return y, n_theta, n, theta, xi
 
-    def recursive_least_squares(self, psi, y):
+    def recursive_least_squares(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Estimate the model parameters using the Recursive Least Squares method.
 
         The implementation consider the forgetting factor.
@@ -323,7 +323,7 @@ class Estimators:
         self.theta_evolution = theta.copy()
         return theta[:, -1].reshape(-1, 1)
 
-    def affine_least_mean_squares(self, psi, y):
+    def affine_least_mean_squares(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Estimate the model parameters using the Affine Least Mean Squares.
 
         Parameters
@@ -364,7 +364,7 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares(self, psi, y):
+    def least_mean_squares(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Estimate the model parameters using the Least Mean Squares filter.
 
         Parameters
@@ -408,7 +408,9 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_sign_error(self, psi, y):
+    def least_mean_squares_sign_error(
+        self, psi: np.ndarray, y: np.ndarray
+    ) -> np.ndarray:
         """Parameter estimation using the Sign-Error  Least Mean Squares filter.
 
         The sign-error LMS algorithm uses the sign of the error vector
@@ -456,7 +458,9 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def normalized_least_mean_squares(self, psi, y):
+    def normalized_least_mean_squares(
+        self, psi: np.ndarray, y: np.ndarray
+    ) -> np.ndarray:
         """Parameter estimation using the Normalized Least Mean Squares filter.
 
         The normalization is used to avoid numerical instability when updating
@@ -503,7 +507,9 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_normalized_sign_error(self, psi, y):
+    def least_mean_squares_normalized_sign_error(
+        self, psi: np.ndarray, y: np.ndarray
+    ) -> np.ndarray:
         """Parameter estimation using the Normalized Sign-Error LMS filter.
 
         The normalization is used to avoid numerical instability when updating
@@ -551,7 +557,9 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_sign_regressor(self, psi, y):
+    def least_mean_squares_sign_regressor(
+        self, psi: np.ndarray, y: np.ndarray
+    ) -> np.ndarray:
         """Parameter estimation using the  Sign-Regressor LMS filter.
 
         The sign-regressor LMS algorithm uses the sign of the matrix
@@ -598,7 +606,9 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_normalized_sign_regressor(self, psi, y):
+    def least_mean_squares_normalized_sign_regressor(
+        self, psi: np.ndarray, y: np.ndarray
+    ) -> np.ndarray:
         """Parameter estimation using the Normalized Sign-Regressor LMS filter.
 
         The normalization is used to avoid numerical instability when updating
@@ -646,7 +656,9 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_sign_sign(self, psi, y):
+    def least_mean_squares_sign_sign(
+        self, psi: np.ndarray, y: np.ndarray
+    ) -> np.ndarray:
         """Parameter estimation using the  Sign-Sign LMS filter.
 
         The sign-regressor LMS algorithm uses both the sign of the matrix
@@ -694,7 +706,9 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_normalized_sign_sign(self, psi, y):
+    def least_mean_squares_normalized_sign_sign(
+        self, psi: np.ndarray, y: np.ndarray
+    ) -> np.ndarray:
         """Parameter estimation using the Normalized Sign-Sign LMS filter.
 
         The normalization is used to avoid numerical instability when updating
@@ -743,7 +757,9 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_normalized_leaky(self, psi, y):
+    def least_mean_squares_normalized_leaky(
+        self, psi: np.ndarray, y: np.ndarray
+    ) -> np.ndarray:
         """Parameter estimation using the  Normalized Leaky LMS filter.
 
         When the leakage factor, gama, is set to 0 then there is no
@@ -792,7 +808,7 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_leaky(self, psi, y):
+    def least_mean_squares_leaky(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the  Leaky LMS filter.
 
         When the leakage factor, gama, is set to 0 then there is no
@@ -840,7 +856,7 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_fourth(self, psi, y):
+    def least_mean_squares_fourth(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the  LMS Fourth filter.
 
         When the leakage factor, gama, is set to 0 then there is no
@@ -850,12 +866,12 @@ class Estimators:
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
+        y : ndarray of floats of shape = y_training
             The data used to training the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : ndarray of floats of shape = number_of_model_elements
             The estimated parameters of the model.
 
         Notes
@@ -897,7 +913,9 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_mixed_norm(self, psi, y):
+    def least_mean_squares_mixed_norm(
+        self, psi: np.ndarray, y: np.ndarray
+    ) -> np.ndarray:
         """Parameter estimation using the Mixed-norm LMS filter.
 
         The weight factor controls the proportions of the error norms
@@ -946,7 +964,7 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def ridge_regression(self, psi, y):
+    def ridge_regression(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Estimate the model parameters using SVD and Ridge Regression method.
 
         Parameters

@@ -60,7 +60,7 @@ dev = [
     "pytest >=6.2.4,<7.0.0",
     "pytest-cov >=2.12.0,<4.0.0",
     "flake8 >=3.8.3,<4.0.0",
-    "black == 23.12.1",
+    "black >= 23.12.1",
     "isort >=5.0.6,<6.0.0",
     "scikit-learn",
     "pre-commit",
@@ -140,7 +140,7 @@ exclude_lines = [
 
 [tool.black]
 line-length = 88
-target_version = ['py37', 'py38', 'py39', 'py310', 'py311']
+target_version = ["py37", "py38", "py39", "py310", "py311"]
 preview = true
 exclude = '''
 /(

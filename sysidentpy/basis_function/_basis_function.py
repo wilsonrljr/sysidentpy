@@ -1,7 +1,7 @@
 """Basis Function for NARMAX models."""
 
 from itertools import combinations_with_replacement
-from typing import Union
+from typing import Optional
 
 import numpy as np
 
@@ -37,7 +37,7 @@ class Polynomial(BaseBasisFunction):
 
     def __init__(
         self,
-        degree=2,
+        degree: int = 2,
     ):
         self.degree = degree
 
@@ -45,7 +45,7 @@ class Polynomial(BaseBasisFunction):
         self,
         data: np.ndarray,
         max_lag: int = 1,
-        predefined_regressors: Union[np.ndarray, None] = None,
+        predefined_regressors: Optional[np.ndarray] = None,
     ):
         """Build the Polynomial information matrix.
 
@@ -75,9 +75,12 @@ class Polynomial(BaseBasisFunction):
         if predefined_regressors is not None:
             combinations = [combinations[index] for index in predefined_regressors]
 
-        psi = np.column_stack([
-            np.prod(data[:, combinations[i]], axis=1) for i in range(len(combinations))
-        ])
+        psi = np.column_stack(
+            [
+                np.prod(data[:, combinations[i]], axis=1)
+                for i in range(len(combinations))
+            ]
+        )
         psi = psi[max_lag:, :]
         return psi
 
@@ -85,7 +88,7 @@ class Polynomial(BaseBasisFunction):
         self,
         data: np.ndarray,
         max_lag: int = 1,
-        predefined_regressors: Union[np.ndarray, None] = None,
+        predefined_regressors: Optional[np.ndarray] = None,
     ):
         """Build Polynomial Basis Functions.
 
@@ -125,25 +128,29 @@ class Fourier:
 
     """
 
-    def __init__(self, n=1, p=2 * np.pi, degree=1, ensemble=True):
+    def __init__(
+        self, n: int = 1, p: float = 2 * np.pi, degree: int = 1, ensemble: bool = True
+    ):
         self.n = n
         self.p = p
         self.degree = degree
         self.ensemble = ensemble
         self.repetition = None
 
-    def _fourier_expansion(self, data, n):
-        base = np.column_stack([
-            np.cos(2 * np.pi * data * n / self.p),
-            np.sin(2 * np.pi * data * n / self.p),
-        ])
+    def _fourier_expansion(self, data: np.ndarray, n: int):
+        base = np.column_stack(
+            [
+                np.cos(2 * np.pi * data * n / self.p),
+                np.sin(2 * np.pi * data * n / self.p),
+            ]
+        )
         return base
 
     def fit(
         self,
         data: np.ndarray,
         max_lag: int = 1,
-        predefined_regressors: Union[np.ndarray, None] = None,
+        predefined_regressors: Optional[np.ndarray] = None,
     ):
         """Build the Polynomial information matrix.
 
@@ -200,7 +207,7 @@ class Fourier:
         self,
         data: np.ndarray,
         max_lag: int = 1,
-        predefined_regressors: Union[np.ndarray, None] = None,
+        predefined_regressors: Optional[np.ndarray] = None,
     ):
         """Build Fourier Basis Functions.
 
