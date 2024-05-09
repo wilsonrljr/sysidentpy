@@ -169,6 +169,7 @@ nav:
       - neural-narx: examples/narx_neural_network.ipynb
       - aols: examples/aols.ipynb
       - entropic: examples/entropic_regression.ipynb
+      - nfir: examples/NFIR.ipynb
     - Cases:
       - air-passenger: examples/air_passenger_benchmark.ipynb
       - f16: examples/f_16_benchmark.ipynb
