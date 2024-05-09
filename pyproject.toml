@@ -70,7 +70,7 @@ examples = ["scikit-learn", "catboost"]
 
 doc = [
     "mkdocs >=1.1.2,<2.0.0",
-    "mkdocs-material >=8.1.4,<=9.1.11",
+    "mkdocs-material >=8.1.4,<=9.5.21",
     "mdx-include >=1.4.1,<2.0.0",
     "mkdocs-markdownextradata-plugin >=0.1.7,<=0.2.5",
     # TODO: upgrade and enable typer-cli once it supports Click 8.x.x
@@ -81,7 +81,7 @@ doc = [
     "mkdocs-redirects",
     "mkdocs-minify-plugin<=0.6.4",
     "mkdocs-glightbox <= 0.3.2",
-    "mkdocs-jupyter<=0.24.1",
+    "mkdocs-jupyter<=0.25.0",
     # avoid jinja import error using 3.0.3 version
     "jinja2==3.0.3",
 ]

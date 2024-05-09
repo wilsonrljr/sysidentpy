@@ -5,6 +5,41 @@ template: overrides/main.html
 
 # Changes in SysIdentPy
 
+## v0.3.4
+
+### CONTRIBUTORS
+
+- wilsonrljr
+- dj-gauthier
+- mtsousa
+
+### CHANGES
+
+- **New Features:**
+  - **MAJOR**: Ridge Regression Parameter Estimation:
+    - Introducing Ridge algorithm for model parameter estimation (Issue #104). Set `estimator="ridge_regression"` and control regularization with the `alpha` parameter. Special thanks to @dj-gauthier and @mtsousa for their contribution. Users are encouraged to visit https://www.researchgate.net/publication/380429918_Controlling_chaos_using_edge_computing_hardware to explore how @dj-gauthier used SysIdentPy in his research.
+
+- **API Changes:**
+  - Improved `plotting.py` code with type hints and new options for plotting results.
+  - Refactored methods to resolve future warnings from numpy.
+  - Code refactoring following PEP8 guidelines.
+  - Set "default" as the default style for plotting to avoid errors in new versions of matplotlib.
+
+- **Datasets:**
+  - Added `buck_id.csv` and `buck_valid.csv` datasets to the SysIdentPy repository.
+
+- **Documentation:**
+  - Add NFIR example (Issue #103). The notebook show how to build models without past output regressors (using only input regressors).
+  - Enhanced usage example for MetaMSS.
+  - Continued adding type hints to methods.
+  - Improved docstrings throughout the codebase.
+  - Minor additions and grammar fixes in documentation.
+  - @dj-gauthier provided valuable suggestions for enhancing the documentation, which are currently undergoing refinement and will soon be accessible.
+
+- **Development Tools:**
+  - Added pre-commit hooks to the repository.
+  - Enhanced `pyproject.toml` to assist contributors in setting up their own environment.
+
 ## v0.3.3
 
 ### CONTRIBUTORS
@@ -43,7 +78,7 @@ template: overrides/main.html
 - The update **v0.3.2**  has been released with API changes and fixes.
 
 - Major:
-    - Added Akaike Information Criteria corrected in FROLS. Now the user can use aicc as the information criteria to select the model order when using FROLS algorithm.  
+    - Added Akaike Information Criteria corrected in FROLS. Now the user can use aicc as the information criteria to select the model order when using FROLS algorithm.
 
 - FIX: Issue #114. Replace yhat with y in root relative squared error. Thanks @miroder
 
@@ -64,7 +99,7 @@ template: overrides/main.html
 - The update **v0.3.1**  has been released with API changes and fixes.
 
 - API Change:
-    - MetaMSS was returning the max lag of the final model instead of the maximum lag related to the xlag and ylag. This is not wrong (its related to the issue #55), but this change will be made for all methods at the same time. In this respect, I'm reverted this to return the maximum lag of the xlag and ylag.  
+    - MetaMSS was returning the max lag of the final model instead of the maximum lag related to the xlag and ylag. This is not wrong (its related to the issue #55), but this change will be made for all methods at the same time. In this respect, I'm reverted this to return the maximum lag of the xlag and ylag.
 
 - API Change: Added build_matrix method in BaseMSS. This change improved overall code readability by rewriting if/elif/else clauses in every model structure selection algorithm.
 
