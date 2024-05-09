@@ -1,4 +1,4 @@
-""" Build Polynomial NARMAX Models using FROLS algorithm """
+"""Build Polynomial NARMAX Models using FROLS algorithm."""
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
@@ -88,8 +88,12 @@ class FROLS(Estimators, BaseMSS):
         The convergence coefficient (learning rate) of the filter.
     eps : float, default=np.finfo(np.float64).eps
         Normalization factor of the normalized filters.
-    ridge_param : float, default=np.finfo(np.float64).eps
+    alpha : float, default=np.finfo(np.float64).eps
         Regularization parameter used in ridge regression.
+        Ridge regression parameter that regularizes the algorithm to prevent over
+        fitting. If the input is a noisy signal, the ridge parameter is likely to be
+        set close to the noise level, at least as a starting point.
+        Entered through the self data structure.
     gama : float, default=0.2
         The leakage factor of the Leaky LMS method.
     weight : float, default=0.02
@@ -144,7 +148,7 @@ class FROLS(Estimators, BaseMSS):
        to non-linear system identification
        https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
     - Manuscript (portuguese): Identificação de Sistemas não Lineares
-       Utilizando Modelos NARMAX Polinomiais – Uma Revisão
+       Utilizando Modelos NARMAX Polinomiais - Uma Revisão
        e Novos Resultados
 
     """
@@ -166,7 +170,7 @@ class FROLS(Estimators, BaseMSS):
         offset_covariance: float = 0.2,
         mu: float = 0.01,
         eps: np.float64 = np.finfo(np.float64).eps,
-        ridge_param: np.float64 = np.finfo(np.float64).eps,  # default is machine eps
+        alpha: np.float64 = np.finfo(np.float64).eps,  # default is machine eps
         gama: float = 0.2,
         weight: float = 0.02,
         basis_function: Union[Polynomial, Fourier] = Polynomial(),
@@ -194,7 +198,7 @@ class FROLS(Estimators, BaseMSS):
             offset_covariance=offset_covariance,
             mu=mu,
             eps=eps,
-            ridge_param=ridge_param,  # ridge regression parameter
+            alpha=alpha,  # ridge regression parameter
             gama=gama,
             weight=weight,
             basis_function=basis_function,
@@ -283,7 +287,7 @@ class FROLS(Estimators, BaseMSS):
            to non-linear system identification
            https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
         - Manuscript (portuguese): Identificação de Sistemas não Lineares
-           Utilizando Modelos NARMAX Polinomiais – Uma Revisão
+           Utilizando Modelos NARMAX Polinomiais - Uma Revisão
            e Novos Resultados
 
         """
@@ -301,16 +305,20 @@ class FROLS(Estimators, BaseMSS):
                 # Add `eps` in the denominator to omit division by zero if
                 # denominator is zero
                 # To implement regularized regression (ridge regression), add
-                # ridgeParam to psi.T @ psi.   See S. Chen, Local regularization assisted
-                # orthogonal least squares regression, Neurocomputing 69 (2006) 559–585.
-                # The version implemented below uses the same regularization for every feature,
-                # What Chen refers to Uniform regularized orthogonal least squares (UROLS)
-                # Set to tiny (self.eps) when you are not regularizing.  ridge_param = eps is
-                # the default.
-                tmp_err[j] = (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2) / (
-                    (np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) + self.ridge_param)
-                    * squared_y
-                ) + self.eps
+                # alpha to psi.T @ psi.   See S. Chen, Local regularization assisted
+                # orthogonal least squares regression, Neurocomputing 69 (2006) 559-585.
+                # The version implemented below uses the same regularization for every
+                # feature, # What Chen refers to Uniform regularized orthogonal least
+                # squares (UROLS) Set to tiny (self.eps) when you are not regularizing.
+                # alpha = eps is the default.
+                tmp_err[j] = (
+                    (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2)
+                    / (
+                        (np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) + self.alpha)
+                        * squared_y
+                    )
+                    + self.eps
+                )[0, 0]
 
             if i == process_term_number:
                 break
@@ -340,7 +348,7 @@ class FROLS(Estimators, BaseMSS):
                    critical value 2 (AIC) (default).
         'Bayes' -  Bayes Information Criterion (BIC).
         'FPE'   -  Final Prediction Error (FPE).
-        'LILC'  -  Khundrin’s law ofiterated logarithm criterion (LILC).
+        'LILC'  -  Khundrin's law ofiterated logarithm criterion (LILC).
 
         Parameters
         ----------
@@ -371,7 +379,7 @@ class FROLS(Estimators, BaseMSS):
 
         n_samples = len(y) - self.max_lag
 
-        for i in range(0, self.n_info_values):
+        for i in range(self.n_info_values):
             n_theta = i + 1
             regressor_matrix = self.error_reduction_ratio(X, y, n_theta)[2]
 
@@ -387,7 +395,7 @@ class FROLS(Estimators, BaseMSS):
         return output_vector
 
     def get_info_criteria(self, info_criteria: str):
-        """get info criteria"""
+        """Get info criteria."""
         info_criteria_options = {
             "aic": self.aic,
             "aicc": self.aicc,
@@ -582,7 +590,7 @@ class FROLS(Estimators, BaseMSS):
 
         if self.n_terms is None and self.order_selection is True:
             model_length = np.where(self.info_values == np.amin(self.info_values))
-            model_length = int(model_length[0] + 1)
+            model_length = model_length[0].item() + 1  # int(model_length[0] + 1)
             self.n_terms = model_length
         elif self.n_terms is None and self.order_selection is not True:
             raise ValueError(
@@ -628,8 +636,8 @@ class FROLS(Estimators, BaseMSS):
         *,
         X: Optional[np.ndarray] = None,
         y: Optional[np.ndarray] = None,
-        steps_ahead: int = None,
-        forecast_horizon: int = None,
+        steps_ahead: Optional[int] = None,
+        forecast_horizon: Optional[int] = None,
     ) -> float:
         """Return the predicted values given an input.
 

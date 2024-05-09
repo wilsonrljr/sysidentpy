@@ -1,4 +1,5 @@
-""" Utilities fo data validation """
+"""Utilities fo data validation."""
+
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause

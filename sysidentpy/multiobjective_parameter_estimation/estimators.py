@@ -1,4 +1,4 @@
-""" Affine Information Least Squares for NARMAX models"""
+"""Affine Information Least Squares for NARMAX models."""
 
 from typing import Tuple, List
 
@@ -52,8 +52,7 @@ class AILS:
         self.normalize = normalize
 
     def get_term_clustering(self, qit: np.ndarray) -> np.ndarray:
-        """
-        Get the term clustering of the model.
+        """Get the term clustering of the model.
 
         This function takes a matrix `qit` and compute the term clustering based
         on their values. It calculates the number of occurrences of each value
@@ -99,8 +98,7 @@ class AILS:
         return counts_matrix.astype(int)
 
     def build_linear_mapping(self):
-        """
-        Assemble the linear mapping matrix R using the regressor-space method.
+        """Assemble the linear mapping matrix R using the regressor-space method.
 
         This function constructs the linear mapping matrix R, which plays a key role in
         mapping the parameter vector to the cluster coefficients. It also generates a
@@ -143,8 +141,7 @@ class AILS:
     def build_static_function_information(
         self, X_static: np.ndarray, y_static: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """
-        Construct a matrix of static regressors for a NARMAX model.
+        """Construct a matrix of static regressors for a NARMAX model.
 
         Parameters
         ----------
@@ -187,8 +184,7 @@ class AILS:
     def build_static_gain_information(
         self, X_static: np.ndarray, y_static: np.ndarray, gain: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """
-        Construct a matrix of static regressors referring to the derivative (gain).
+        """Construct a matrix of static regressors referring to the derivative (gain).
 
         Parameters
         ----------
@@ -220,16 +216,18 @@ class AILS:
         R, qit = self.build_linear_mapping()
         H = np.zeros((len(y_static), len(qit)))
         G = np.zeros((len(y_static), len(qit)))
-        for i in range(0, len(y_static)):
+        for i in range(len(y_static)):
             for j in range(1, len(qit)):
                 if y_static[i, 0] == 0:
                     if (qit[j, 0]) == 1:
-                        H[i, j] = gain[i]
+                        H[i, j] = gain[i][0]
                     else:
                         H[i, j] = 0
                 else:
-                    H[i, j] = gain[i] * qit[j, 0] * y_static[i, 0] ** (qit[j, 0] - 1)
-                for k in range(0, self.n_inputs):
+                    H[i, j] = (gain[i] * qit[j, 0] * y_static[i, 0] ** (qit[j, 0] - 1))[
+                        0
+                    ]
+                for k in range(self.n_inputs):
                     if X_static[i, k] == 0:
                         if (qit[j, 1 + k]) == 1:
                             G[i, j] = 1
@@ -246,8 +244,7 @@ class AILS:
     def get_cost_function(
         self, y: np.ndarray, psi: np.ndarray, theta: np.ndarray
     ) -> np.ndarray:
-        """
-        Calculate the cost function based on residuals.
+        """Calculate the cost function based on residuals.
 
         Parameters
         ----------
@@ -280,8 +277,7 @@ class AILS:
         static_gain: np.ndarray,
         static_function: np.ndarray,
     ) -> List[np.ndarray]:
-        """
-        Construct a list of output data components for the NARMAX system.
+        """Construct a list of output data components for the NARMAX system.
 
         Parameters
         ----------
@@ -316,8 +312,7 @@ class AILS:
     def build_affine_data(
         self, psi: np.ndarray, HR: np.ndarray, QR: np.ndarray
     ) -> List[np.ndarray]:
-        """
-        Construct a list of affine data components for NARMAX modeling.
+        """Construct a list of affine data components for NARMAX modeling.
 
         Parameters
         ----------
@@ -352,8 +347,7 @@ class AILS:
         return [psi] + [HR] + [QR]
 
     def build_psi(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """
-        Build the matrix of dynamic regressor for NARMAX modeling.
+        """Build the matrix of dynamic regressor for NARMAX modeling.
 
         Parameters
         ----------
@@ -403,7 +397,7 @@ class AILS:
         X: np.ndarray = np.zeros((1, 1)),
         weighing_matrix: np.ndarray = np.zeros((1, 1)),
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.int64]:
-        """Calculation of parameters via multi-objective techniques.
+        """Estimate the parameters via multi-objective techniques.
 
         Parameters
         ----------
@@ -415,8 +409,10 @@ class AILS:
             Static gain input.
         y : array-like of shape = n_samples, default = ([0])
             The target data used in the identification process.
-        psi : ndarray of floats, default = ([[0],[0]])
+        X : ndarray of floats, default = ([[0],[0]])
             Matrix of static regressors.
+        weighing_matrix: ndarray
+            Weighing matrix for defining the weight of each objective.
 
         Returns
         -------
@@ -432,6 +428,7 @@ class AILS:
             Q matrix multiplied by R.
         position : ndarray, default = ([[0],[0]])
             Position of the best theta set.
+
         """
         psi = self.build_psi(X, y)
         y = y[self.max_lag :]
@@ -476,7 +473,7 @@ class AILS:
                 residuals = self.get_cost_function(
                     system_data[j], affine_information_data[j], tmp_theta
                 )
-                J[j, i] = residuals
+                J[j, i] = residuals[0]
 
             euclidean_norm[i] = np.linalg.norm(J[:, i])
 

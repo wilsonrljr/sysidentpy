@@ -1,4 +1,4 @@
-""" Build NARX Models Using general estimators """
+"""Build NARX Models Using general estimators."""
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
@@ -7,11 +7,14 @@
 
 import logging
 import sys
+from typing import Any, List, Union, Optional
+
 
 import numpy as np
+from numpy.typing import NDArray
 
 from ..narmax_base import BaseMSS
-from ..basis_function import Polynomial
+from ..basis_function import Polynomial, Fourier
 from ..utils._check_arrays import _check_positive_int, _num_features
 
 logging.basicConfig(
@@ -23,7 +26,7 @@ logging.basicConfig(
 
 
 class NARX(BaseMSS):
-    """NARX model build on top of general estimators
+    """NARX model build on top of general estimators.
 
     Currently is possible to use any estimator that have a fit/predict
     as an Autoregressive Model. We use our GenerateRegressors and
@@ -87,10 +90,10 @@ class NARX(BaseMSS):
     def __init__(
         self,
         *,
-        ylag=1,
-        xlag=1,
-        model_type="NARMAX",
-        basis_function=Polynomial(),
+        ylag: Union[List[Any], Any] = 1,
+        xlag: Union[List[Any], Any] = 1,
+        model_type: str = "NARMAX",
+        basis_function: Union[Polynomial, Fourier] = Polynomial(),
         base_estimator=None,
         fit_params=None,
     ):
@@ -177,7 +180,14 @@ class NARX(BaseMSS):
         self.base_estimator.fit(reg_matrix, y, **self.fit_params)
         return self
 
-    def predict(self, *, X=None, y=None, steps_ahead=None, forecast_horizon=None):
+    def predict(
+        self,
+        *,
+        X: Optional[NDArray] = None,
+        y: Optional[NDArray] = None,
+        steps_ahead: Optional[int] = None,
+        forecast_horizon: Optional[int] = 1,
+    ) -> NDArray:
         """Return the predicted given an input and initial values.
 
         The predict function allows a friendly usage by the user.
@@ -308,7 +318,7 @@ class NARX(BaseMSS):
         return yhat.reshape(-1, 1)
 
     def narmax_n_step_ahead(self, X, y, steps_ahead):
-        """n_steps ahead prediction method for NARMAX model"""
+        """N steps ahead prediction method for NARMAX model."""
         if len(y) < self.max_lag:
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
@@ -435,7 +445,7 @@ class NARX(BaseMSS):
             for j, model_exponent in enumerate(model_exponents):
                 regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
 
-            y_output[i] = self.base_estimator.predict(regressor_value.reshape(1, -1))
+            y_output[i] = self.base_estimator.predict(regressor_value.reshape(1, -1))[0]
         return y_output[self.max_lag : :].reshape(-1, 1)
 
     def _nfir_predict(self, X, y_initial):
@@ -461,7 +471,7 @@ class NARX(BaseMSS):
             for j, model_exponent in enumerate(model_exponents):
                 regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
 
-            y_output[i] = self.base_estimator.predict(regressor_value.reshape(1, -1))
+            y_output[i] = self.base_estimator.predict(regressor_value.reshape(1, -1))[0]
         return y_output[self.max_lag : :].reshape(-1, 1)
 
     def _basis_function_predict(self, X, y_initial, forecast_horizon=None):
@@ -479,7 +489,7 @@ class NARX(BaseMSS):
 
         analyzed_elements_number = self.max_lag + 1
 
-        for i in range(0, forecast_horizon - self.max_lag):
+        for i in range(forecast_horizon - self.max_lag):
             lagged_data = self.build_matrix(
                 X[i : i + analyzed_elements_number],
                 yhat[i : i + analyzed_elements_number].reshape(-1, 1),

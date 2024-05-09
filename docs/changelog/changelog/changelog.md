@@ -5,6 +5,41 @@ template: overrides/main.html
 
 # Changes in SysIdentPy
 
+## v0.3.4
+
+### CONTRIBUTORS
+
+- wilsonrljr
+- dj-gauthier
+- mtsousa
+
+### CHANGES
+
+- **New Features:**
+  - **MAJOR**: Ridge Regression Parameter Estimation:
+    - Introducing Ridge algorithm for model parameter estimation (Issue #104). Set `estimator="ridge_regression"` and control regularization with the `alpha` parameter. Special thanks to @dj-gauthier and @mtsousa for their contribution. Users are encouraged to visit https://www.researchgate.net/publication/380429918_Controlling_chaos_using_edge_computing_hardware to explore how @dj-gauthier used SysIdentPy in his research.
+
+- **API Changes:**
+  - Improved `plotting.py` code with type hints and new options for plotting results.
+  - Refactored methods to resolve future warnings from numpy.
+  - Code refactoring following PEP8 guidelines.
+  - Set "default" as the default style for plotting to avoid errors in new versions of matplotlib.
+
+- **Datasets:**
+  - Added `buck_id.csv` and `buck_valid.csv` datasets to the SysIdentPy repository.
+
+- **Documentation:**
+  - Add NFIR example (Issue #103). The notebook show how to build models without past output regressors (using only input regressors).
+  - Enhanced usage example for MetaMSS.
+  - Continued adding type hints to methods.
+  - Improved docstrings throughout the codebase.
+  - Minor additions and grammar fixes in documentation.
+  - @dj-gauthier provided valuable suggestions for enhancing the documentation, which are currently undergoing refinement and will soon be accessible.
+
+- **Development Tools:**
+  - Added pre-commit hooks to the repository.
+  - Enhanced `pyproject.toml` to assist contributors in setting up their own environment.
+
 ## v0.3.3
 
 ### CONTRIBUTORS
@@ -15,7 +50,7 @@ template: overrides/main.html
 
 ### CHANGES
 
-- The update **v0.3.3**  has been released with additional features, API changes and fixes. 
+- The update **v0.3.3**  has been released with additional features, API changes and fixes.
 
 - MAJOR: Multiobjective Framework: Affine Information Least Squares Algorithm (AILS)
     - Now you can use AILS to estimate parameters of NARMAX models (and variants) using a multiobjective approach.
@@ -40,10 +75,10 @@ template: overrides/main.html
 
 ### CHANGES
 
-- The update **v0.3.2**  has been released with API changes and fixes. 
+- The update **v0.3.2**  has been released with API changes and fixes.
 
-- Major: 
-    - Added Akaike Information Criteria corrected in FROLS. Now the user can use aicc as the information criteria to select the model order when using FROLS algorithm.  
+- Major:
+    - Added Akaike Information Criteria corrected in FROLS. Now the user can use aicc as the information criteria to select the model order when using FROLS algorithm.
 
 - FIX: Issue #114. Replace yhat with y in root relative squared error. Thanks @miroder
 
@@ -61,14 +96,14 @@ template: overrides/main.html
 
 ### CHANGES
 
-- The update **v0.3.1**  has been released with API changes and fixes. 
+- The update **v0.3.1**  has been released with API changes and fixes.
 
-- API Change: 
-    - MetaMSS was returning the max lag of the final model instead of the maximum lag related to the xlag and ylag. This is not wrong (its related to the issue #55), but this change will be made for all methods at the same time. In this respect, I'm reverted this to return the maximum lag of the xlag and ylag.  
+- API Change:
+    - MetaMSS was returning the max lag of the final model instead of the maximum lag related to the xlag and ylag. This is not wrong (its related to the issue #55), but this change will be made for all methods at the same time. In this respect, I'm reverted this to return the maximum lag of the xlag and ylag.
 
 - API Change: Added build_matrix method in BaseMSS. This change improved overall code readability by rewriting if/elif/else clauses in every model structure selection algorithm.
 
-- API Change: Added bic, aic, fpe, and lilc methods in FROLS. Now the method is selected by using a predefined dictionary with the available options. This change improved overall code readability by rewriting if/elif/else clauses in the FROLS algorithm. 
+- API Change: Added bic, aic, fpe, and lilc methods in FROLS. Now the method is selected by using a predefined dictionary with the available options. This change improved overall code readability by rewriting if/elif/else clauses in the FROLS algorithm.
 
 - TESTS: Added tests for Neural NARX class. The issue with pytorch was fixed and now we have the tests for every model class.
 
@@ -85,12 +120,12 @@ template: overrides/main.html
 
 ### CHANGES
 
-- The update **v0.3.0**  has been released with additional features, API changes and fixes. 
+- The update **v0.3.0**  has been released with additional features, API changes and fixes.
 
 - MAJOR: Estimators support in AOLS
-    - Now you can use any SysIdentPy estimator in AOLS model structure selection. 
+    - Now you can use any SysIdentPy estimator in AOLS model structure selection.
 
-- API Change: 
+- API Change:
     - Refactored base class for model structure selection. A refactored base class for model structure selection has been introduced in SysIdentPy. This update aims to enhance the system identification process by preparing the package for new features that are currently in development, like multiobjective parameter estimation, new basis functions and more.
 
     Several methods within the base class have undergone significant restructuring to improve their functionality and optimize their performance. This reorganization will facilitate the incorporation of advanced model selection techniques in the future, which will enable users to obtain dynamic models with robust dynamic and static performance.
@@ -100,7 +135,7 @@ template: overrides/main.html
 
 - Breaking Change: `X_train` and `y_train` were replaced respectively by `X` and `y` in `fit` method in MetaMSS model structure selection algorithm.  `X_test` and `y_test` were replaced by `X` and `y` in `predict` method in MetaMSS.
 
-- API Change: Added BaseBasisFunction class, an abstract base class for implementing basis functions. 
+- API Change: Added BaseBasisFunction class, an abstract base class for implementing basis functions.
 
 - Enhancement: Added support for python 3.11.
 
@@ -122,9 +157,9 @@ template: overrides/main.html
 
 - FIX: Fix deprecation warning in Extended Least Squares Example
 
-- DATASET: Added air passengers dataset to SysIdentPy repository. 
+- DATASET: Added air passengers dataset to SysIdentPy repository.
 
-- DATASET: Added San Francisco Hospital Load dataset to SysIdentPy repository. 
+- DATASET: Added San Francisco Hospital Load dataset to SysIdentPy repository.
 
 - DATASET: Added San Francisco PV GHI dataset to SysIdentPy repository.
 
@@ -144,7 +179,7 @@ template: overrides/main.html
 
 ### CHANGES
 
-- The update **v0.2.1**  has been released with additional feature, minor API changes and fixes. 
+- The update **v0.2.1**  has been released with additional feature, minor API changes and fixes.
 
 - MAJOR: Neural NARX now support CUDA
     - Now the user can build Neural NARX models with CUDA support. Just add `device='cuda'` to use the GPU benefits.
@@ -162,14 +197,14 @@ template: overrides/main.html
 - MAJOR: Github Sponsor
     - Now you can support SysIdentPy by becoming a Sponsor! Details: https://github.com/sponsors/wilsonrljr
 
-- Tests: 
+- Tests:
     - Now there are test for almost every function.
     - Neural NARX tests are raising numpy issues. It'll be fixed til next update.
 
 - FIX: NFIR models in General Estimators
     - Fix support for NFIR models using sklearn estimators.
 
-- The setup is now handled by the pyproject.toml file.    
+- The setup is now handled by the pyproject.toml file.  
 
 - Remove unused code.
 
@@ -192,7 +227,7 @@ template: overrides/main.html
 
 ### CHANGES
 
-- The update **v0.2.0**  has been released with additional feature, minor API changes and fixes. 
+- The update **v0.2.0**  has been released with additional feature, minor API changes and fixes.
 
 - MAJOR: Many new features for General Estimators
     - Now the user can build General NARX models with Fourier basis function.
@@ -268,7 +303,7 @@ API Change: Keyword and positional arguments
 
 ### CHANGES
 
-- The update **v0.1.9**  has been released with additional feature, minor API changes and fixes of the new features added in v0.1.7. 
+- The update **v0.1.9**  has been released with additional feature, minor API changes and fixes of the new features added in v0.1.7.
 
 - MAJOR: Entropic Regression Algorithm
     - Added the new class ER to build NARX models using the Entropic Regression algorithm.
@@ -284,10 +319,10 @@ API Change: Keyword and positional arguments
 - DOC: Save and Load models
     - Added a notebook showing how to use the save_load method.
 
-- DOC: Entropic Regression example 
+- DOC: Entropic Regression example
     - Added notebook with a simple example of how to use AOLS
 
-- DOC: Fourier Basis Function Example 
+- DOC: Fourier Basis Function Example
     - Added notebook with a simple example of how to use Fourier Basis Function
 
 - DOC: PV forecasting benchmark
@@ -306,10 +341,10 @@ API Change: Keyword and positional arguments
 
 ### CHANGES
 
-- The update **v0.1.8**  has been released with additional feature, minor API changes and fixes of the new features added in v0.1.7. 
+- The update **v0.1.8**  has been released with additional feature, minor API changes and fixes of the new features added in v0.1.7.
 
 - MAJOR: Ensemble Basis Functions
-    - Now you can use different basis function together. For now we allow to use Fourier combined with Polynomial of different degrees. 
+    - Now you can use different basis function together. For now we allow to use Fourier combined with Polynomial of different degrees.
 
 - API change: Add "ensemble" parameter in basis function to combine the features of different basis function.
 
@@ -382,7 +417,7 @@ API Change: Keyword and positional arguments
 - API Change: sysidentpy.polynomial_basis.SimulatePolynomialNarmax is deprecated. Use sysidentpy.simulation.SimulateNARMAX instead.
 
 - API Change: Introducing sysidentpy.basis_function. Because NARMAX models can be built on different basis function, a new module is added to make easier to implement new basis functions in future updates `Issue64 <https://github.com/wilsonrljr/sysidentpy/issues/64>`__.
-    - Each basis function class must have a fit and predict method to be used in training and prediction respectively. 
+    - Each basis function class must have a fit and predict method to be used in training and prediction respectively.
 
 - API Change: unbiased_estimator method moved to Estimators class.
     - added elag option
@@ -430,7 +465,7 @@ API Change: Keyword and positional arguments
     - Fixed minor grammatical and spelling mistakes.
     - New prediction method.
     - many under the hood changes.
- 
+
 - API Change (new): sysidentpy.model_structure_selection.MetaMSS `Issue64 <https://github.com/wilsonrljr/sysidentpy/issues/64>`__
     - Based on the old sysidentpy.polynomial_basis.MetaMSS. The class has been rebuilt with new functions and optimized code.
     - Enforcing keyword-only arguments. This is an effort to promote clear and non-ambiguous use of the library.
@@ -585,7 +620,7 @@ API Change: Keyword and positional arguments
 
 - Minor performance improvement: added the argument "predefined_regressors" in build_information_matrix function on base.py to improve the performance of the Simulation method.
 
-- Pytorch is now an optional dependency. Use pip install sysidentpy['full'] 
+- Pytorch is now an optional dependency. Use pip install sysidentpy['full']
 
 - Fix code format issues.
 

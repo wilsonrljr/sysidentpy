@@ -1,4 +1,4 @@
-""" Binary Hybrid Particle Swarm Optimization and Gravitational Search Algorithm"""
+"""Binary Hybrid Particle Swarm Optimization and Gravitational Search Algorithm."""
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
@@ -10,7 +10,7 @@ from sysidentpy.utils._check_arrays import check_random_state
 
 
 class BPSOGSA:
-    """Binary Hybrid Particle Swarm Optimization and Gravitational Search Algorithm
+    """Binary Hybrid Particle Swarm Optimization and Gravitational Search Algorithm.
 
     Parameters
     ----------
@@ -95,7 +95,7 @@ class BPSOGSA:
         super(BPSOGSA, self).__init__()
 
     def evaluate_objective_function(self, candidate_solution):
-        """Function to be optimized"""
+        """Define a function to be optimized."""
         total = 0
         for candidate in candidate_solution:
             total += candidate**2
@@ -153,7 +153,7 @@ class BPSOGSA:
         return self
 
     def generate_random_population(self, random_state=None):
-        """Generate the initial population of agents randomly
+        """Generate the initial population of agents randomly.
 
         Returns
         -------
@@ -181,7 +181,6 @@ class BPSOGSA:
             The mass of each agent.
 
         """
-
         highest_fitness_value = np.nanmax(fitness_value)
         lowest_fitness_value = np.nanmin(fitness_value)
 
@@ -240,7 +239,6 @@ class BPSOGSA:
             The acceleration of each agent.
 
         """
-
         k_best_agents = self.k_agents_percent + (1 - iteration / self.maxiter) * (
             100 - self.k_agents_percent
         )

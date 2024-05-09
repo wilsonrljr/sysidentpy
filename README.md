@@ -128,7 +128,7 @@ r = pd.DataFrame(
 		),
 	columns=['Regressors', 'Parameters', 'ERR'])
 print(r)
-	
+
 Regressors     Parameters        ERR
 0        x1(k-2)     0.9000  0.95556574
 1         y(k-1)     0.1999  0.04107943

@@ -1,0 +1,42 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+default_language_version:
+    python: python3.11
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+    -   id: check-added-large-files
+        args: ['--maxkb=5000']
+    -   id: check-toml
+    -   id: check-yaml
+        args:
+        -   --unsafe
+    -   id: end-of-file-fixer
+        exclude: ^(docs/|examples/|images/)
+    -   id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+-   repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 24.2.0
+    hooks:
+    -   id: black  # use black-jupyter to run in notebooks too
+        args: [--config=./pyproject.toml]
+        # It is recommended to specify the latest version of Python
+        # supported by your project here, or alternatively use
+        # pre-commit's default_language_version, see
+        # https://pre-commit.com/#top_level-default_language_version
+-   repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 24.2.0
+    hooks:
+      - id: black-jupyter
+        args: [--config=./pyproject.toml]
+        # It is recommended to specify the latest version of Python
+        # supported by your project here, or alternatively use
+        # pre-commit's default_language_version, see
+        # https://pre-commit.com/#top_level-default_language_version
+        language_version: python3.11
+-   repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.1.13
+    hooks:
+    -   id: ruff
+        types_or: [ python ] # you can add notebook and other files using pyi, jupyter

@@ -51,7 +51,7 @@ def test_ridge_regression():
         ylag=[1, 2],
         xlag=2,
         estimator="ridge_regression",
-        ridge_param=np.finfo(np.float64).eps,
+        alpha=np.finfo(np.float64).eps,
         basis_function=basis_function,
     )
     model.fit(X=x, y=y)
@@ -60,7 +60,7 @@ def test_ridge_regression():
 
 def test_raise_ridge_regression():
     assert_raises(
-        ValueError, Estimators, ridge_param=-0.3, basis_function=Polynomial(degree=2)
+        ValueError, Estimators, alpha=-0.3, basis_function=Polynomial(degree=2)
     )
 
 

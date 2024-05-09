@@ -1,3 +1,5 @@
+"""Display results formatted for the user."""
+
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
@@ -44,16 +46,16 @@ def results(
     """
     if not isinstance(theta_precision, int) or theta_precision < 1:
         raise ValueError(
-            "theta_precision must be integer and > zero. Got %f" % theta_precision
+            f"theta_precision must be integer and > zero. Got {theta_precision}."
         )
 
     if not isinstance(err_precision, int) or err_precision < 1:
         raise ValueError(
-            "err_precision must be integer and > zero. Got %f" % err_precision
+            f"err_precision must be integer and > zero. Got {err_precision}."
         )
 
     if dtype not in ("dec", "sci"):
-        raise ValueError("dtype must be dec or sci. Got %s" % dtype)
+        raise ValueError(f"dtype must be dec or sci. Got {dtype}.")
 
     output_matrix = []
     theta_output_format = "{:." + str(theta_precision)
@@ -66,13 +68,13 @@ def results(
         theta_output_format = theta_output_format + "E}"
         err_output_format = err_output_format + "E}"
 
-    for i in range(0, n_terms):
+    for i in range(n_terms):
         if np.max(final_model[i]) < 1:
             tmp_regressor = str(1)
         else:
             regressor_dic = Counter(final_model[i])
             regressor_string = []
-            for j in range(0, len(list(regressor_dic.keys()))):
+            for j in range(len(list(regressor_dic.keys()))):
                 regressor_key = list(regressor_dic.keys())[j]
                 if regressor_key < 1:
                     translated_key = ""

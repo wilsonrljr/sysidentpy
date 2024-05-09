@@ -23,14 +23,14 @@ Although there are many things related with Machine Learning, Statistical Learni
 
 ### So, what is a NARMAX model?
 
-You may have noticed the similarity between the acronym NARMAX with the well-known models ARX, ARMAX, etc., which are widely used for forecasting time series. And this resemblance is not by chance. The Autoregressive models with Moving Average and Exogenous Input (ARMAX) and their variations AR, ARX, ARMA (to name just a few) are one of the most used mathematical representations for identifying linear systems.  
+You may have noticed the similarity between the acronym NARMAX with the well-known models ARX, ARMAX, etc., which are widely used for forecasting time series. And this resemblance is not by chance. The Autoregressive models with Moving Average and Exogenous Input (ARMAX) and their variations AR, ARX, ARMA (to name just a few) are one of the most used mathematical representations for identifying linear systems.
 
 <br>
 Let's go back to the model. I said that the **ARX** family of models is commonly used to model linear systems. Linear is the key word here. For nonlinear scenarios we have the **NARMAX** class. As reported by Billings (one of the creators of NARMAX model) in the book [Nonlinear System Identification: NARMAX Methods in the Time, Frequency, and Spatio-Temporal Domains],  NARMAX started out as a model name, but soon became a philosophy when it comes to identifying nonlinear systems. Obtaining NARMAX models consists of performing the following steps:
-  
+
   [^1]:
     Non-linear Autoregressive Models with Moving Average and Exogenous Input.
-  
+
   [Nonlinear System Identification: NARMAX Methods in the Time, Frequency, and Spatio-Temporal Domains]: https://www.wiley.com/en-us/Nonlinear+System+Identification:+NARMAX+Methods+in+the+Time,+Frequency,+and+Spatio+Temporal+Domains-p-9781119943594
 
 - Dynamical tests and collecting data;

@@ -14,13 +14,11 @@ def test_simulate():
     s = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
 
     # the model must be a numpy array
-    model = np.array(
-        [
-            [1001, 0],  # y(k-1)
-            [2001, 1001],  # x1(k-1)y(k-1)
-            [2002, 0],  # x1(k-2)
-        ]
-    )
+    model = np.array([
+        [1001, 0],  # y(k-1)
+        [2001, 1001],  # x1(k-1)y(k-1)
+        [2002, 0],  # x1(k-2)
+    ])
     # theta must be a numpy array of shape (n, 1) where n is the number of regressors
     theta = np.array([[0.2, 0.9, 0.1]]).T
 
@@ -36,15 +34,13 @@ def test_simulate_theta():
     s = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=True)
 
     # the model must be a numpy array
-    model = np.array(
-        [
-            [1001, 0],  # y(k-1)
-            [2001, 1001],  # x1(k-1)y(k-1)
-            [2002, 0],  # x1(k-2)
-        ]
-    )
+    model = np.array([
+        [1001, 0],  # y(k-1)
+        [2001, 1001],  # x1(k-1)y(k-1)
+        [2002, 0],  # x1(k-2)
+    ])
 
-    yhat = s.simulate(
+    _ = s.simulate(
         X_train=x_train,
         y_train=y_train,
         X_test=x_valid,
@@ -134,13 +130,11 @@ def test_model_order_selection():
     s = SimulateNARMAX(basis_function=Fourier(), estimate_parameter=False)
 
     # the model must be a numpy array
-    model = np.array(
-        [
-            [1001, 0],  # y(k-1)
-            [2001, 1001],  # x1(k-1)y(k-1)
-            [2002, 0],  # x1(k-2)
-        ]
-    )
+    model = np.array([
+        [1001, 0],  # y(k-1)
+        [2001, 1001],  # x1(k-1)y(k-1)
+        [2002, 0],  # x1(k-2)
+    ])
     # theta must be a numpy array of shape (n, 1) where n is the number of regressors
     theta = np.array([[0.2, 0.9, 0.1]]).T
     assert_raises(
@@ -165,13 +159,11 @@ def test_raises():
     s = SimulateNARMAX(basis_function=Polynomial(degree=2), estimate_parameter=False)
 
     # the model must be a numpy array
-    model = np.array(
-        [
-            [1001, 0],  # y(k-1)
-            [2001, 1001],  # x1(k-1)y(k-1)
-            [2002, 0],  # x1(k-2)
-        ]
-    )
+    model = np.array([
+        [1001, 0],  # y(k-1)
+        [2001, 1001],  # x1(k-1)y(k-1)
+        [2002, 0],  # x1(k-2)
+    ])
     # theta must be a numpy array of shape (n, 1) where n is the number of regressors
     theta = np.array([[0.2, 0.9, 0.1]]).T
     assert_raises(
@@ -217,13 +209,11 @@ def test_estimate_parameter_conditions():
     s = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=True)
 
     # the model must be a numpy array
-    model = np.array(
-        [
-            [1001, 0],  # y(k-1)
-            [2001, 1001],  # x1(k-1)y(k-1)
-            [2002, 0],  # x1(k-2)
-        ]
-    )
+    model = np.array([
+        [1001, 0],  # y(k-1)
+        [2001, 1001],  # x1(k-1)y(k-1)
+        [2002, 0],  # x1(k-2)
+    ])
 
     assert_raises(
         TypeError,
@@ -246,17 +236,15 @@ def test_input_dimension():
     )
 
     # the model must be a numpy array
-    model = np.array(
-        [
-            [1001, 0],  # y(k-1)
-            [1001, 1001],  # x1(k-1)y(k-1)
-            [1002, 0],  # x1(k-2)
-        ]
-    )
+    model = np.array([
+        [1001, 0],  # y(k-1)
+        [1001, 1001],  # x1(k-1)y(k-1)
+        [1002, 0],  # x1(k-2)
+    ])
     # theta must be a numpy array of shape (n, 1) where n is the number of regressors
     theta = np.array([[0.2, 0.9, 0.1]]).T
 
-    yhat = s.simulate(
+    _ = s.simulate(
         X_test=None, y_test=y_valid, model_code=model, theta=theta, forecast_horizon=1
     )
     assert s.n_inputs == 0
@@ -270,17 +258,15 @@ def test_miso_dimension():
     s = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
 
     # the model must be a numpy array
-    model = np.array(
-        [
-            [1001, 0],  # y(k-1)
-            [2001, 1001],  # x1(k-1)y(k-1)
-            [3002, 0],  # x1(k-2)
-        ]
-    )
+    model = np.array([
+        [1001, 0],  # y(k-1)
+        [2001, 1001],  # x1(k-1)y(k-1)
+        [3002, 0],  # x1(k-2)
+    ])
     # theta must be a numpy array of shape (n, 1) where n is the number of regressors
     theta = np.array([[0.2, 0.9, 0.1]]).T
 
-    yhat = s.simulate(X_test=x_valid, y_test=y_valid, model_code=model, theta=theta)
+    _ = s.simulate(X_test=x_valid, y_test=y_valid, model_code=model, theta=theta)
     assert s.xlag == [[1, 2], [1, 2]]
 
 
@@ -294,17 +280,15 @@ def test_forecast_horizon():
     )
 
     # the model must be a numpy array
-    model = np.array(
-        [
-            [1001, 0],  # y(k-1)
-            [1001, 1001],  # x1(k-1)y(k-1)
-            [1002, 0],  # x1(k-2)
-        ]
-    )
+    model = np.array([
+        [1001, 0],  # y(k-1)
+        [1001, 1001],  # x1(k-1)y(k-1)
+        [1002, 0],  # x1(k-2)
+    ])
     # theta must be a numpy array of shape (n, 1) where n is the number of regressors
     theta = np.array([[0.2, 0.9, 0.1]]).T
 
-    yhat = s.simulate(
+    _ = s.simulate(
         X_test=None,
         y_test=y_valid,
         model_code=model,
@@ -324,15 +308,13 @@ def test_estimate_parameter_narmax():
     s = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=True)
 
     # the model must be a numpy array
-    model = np.array(
-        [
-            [1001, 0],  # y(k-1)
-            [2001, 1001],  # x1(k-1)y(k-1)
-            [2002, 0],  # x1(k-2)
-        ]
-    )
+    model = np.array([
+        [1001, 0],  # y(k-1)
+        [2001, 1001],  # x1(k-1)y(k-1)
+        [2002, 0],  # x1(k-2)
+    ])
 
-    yhat = s.simulate(
+    _ = s.simulate(
         X_train=x_train,
         y_train=y_train,
         X_test=x_valid,
@@ -353,15 +335,13 @@ def test_estimate_parameter_nar():
     )
 
     # the model must be a numpy array
-    model = np.array(
-        [
-            [1001, 0],  # y(k-1)
-            [1001, 1001],  # x1(k-1)y(k-1)
-            [1002, 0],  # x1(k-2)
-        ]
-    )
+    model = np.array([
+        [1001, 0],  # y(k-1)
+        [1001, 1001],  # x1(k-1)y(k-1)
+        [1002, 0],  # x1(k-2)
+    ])
 
-    yhat = s.simulate(
+    _ = s.simulate(
         X_train=x_train,
         y_train=y_train,
         X_test=x_valid,
@@ -382,15 +362,13 @@ def test_estimate_parameter_nfir():
     )
 
     # the model must be a numpy array
-    model = np.array(
-        [
-            [2001, 0],  # y(k-1)
-            [2001, 2001],  # x1(k-1)y(k-1)
-            [2003, 0],  # x1(k-2)
-        ]
-    )
+    model = np.array([
+        [2001, 0],  # y(k-1)
+        [2001, 2001],  # x1(k-1)y(k-1)
+        [2003, 0],  # x1(k-2)
+    ])
 
-    yhat = s.simulate(
+    _ = s.simulate(
         X_train=x_train,
         y_train=y_train,
         X_test=x_valid,
@@ -414,15 +392,13 @@ def test_err_narmax():
     )
 
     # the model must be a numpy array
-    model = np.array(
-        [
-            [1001, 0],  # y(k-1)
-            [2001, 1001],  # x1(k-1)y(k-1)
-            [2002, 0],  # x1(k-2)
-        ]
-    )
+    model = np.array([
+        [1001, 0],  # y(k-1)
+        [2001, 1001],  # x1(k-1)y(k-1)
+        [2002, 0],  # x1(k-2)
+    ])
 
-    yhat = s.simulate(
+    _ = s.simulate(
         X_train=x_train,
         y_train=y_train,
         X_test=x_valid,
@@ -446,15 +422,13 @@ def test_err_nar():
     )
 
     # the model must be a numpy array
-    model = np.array(
-        [
-            [1001, 0],  # y(k-1)
-            [1001, 1001],  # x1(k-1)y(k-1)
-            [1002, 0],  # x1(k-2)
-        ]
-    )
+    model = np.array([
+        [1001, 0],  # y(k-1)
+        [1001, 1001],  # x1(k-1)y(k-1)
+        [1002, 0],  # x1(k-2)
+    ])
 
-    yhat = s.simulate(
+    _ = s.simulate(
         X_train=x_train,
         y_train=y_train,
         X_test=x_valid,
@@ -478,15 +452,13 @@ def test_err_nfir():
     )
 
     # the model must be a numpy array
-    model = np.array(
-        [
-            [2001, 0],  # y(k-1)
-            [2001, 2001],  # x1(k-1)y(k-1)
-            [2003, 0],  # x1(k-2)
-        ]
-    )
+    model = np.array([
+        [2001, 0],  # y(k-1)
+        [2001, 2001],  # x1(k-1)y(k-1)
+        [2003, 0],  # x1(k-2)
+    ])
 
-    yhat = s.simulate(
+    _ = s.simulate(
         X_train=x_train,
         y_train=y_train,
         X_test=x_valid,
@@ -509,15 +481,13 @@ def test_estimate_parameter_els():
     )
 
     # the model must be a numpy array
-    model = np.array(
-        [
-            [1001, 0],  # y(k-1)
-            [2001, 1001],  # x1(k-1)y(k-1)
-            [2002, 0],  # x1(k-2)
-        ]
-    )
+    model = np.array([
+        [1001, 0],  # y(k-1)
+        [2001, 1001],  # x1(k-1)y(k-1)
+        [2002, 0],  # x1(k-2)
+    ])
 
-    yhat = s.simulate(
+    _ = s.simulate(
         X_train=x_train,
         y_train=y_train,
         X_test=x_valid,
