@@ -62,10 +62,12 @@ dev = [
     "flake8 >=3.8.3,<4.0.0",
     "black >= 23.12.1",
     "isort >=5.0.6,<6.0.0",
-    "scikit-learn",
     "pre-commit",
-    "ruff >=0.22,<3.0.0",
+    "ruff >=0.2.2,<3.0.0",
 ]
+
+examples = ["scikit-learn", "catboost"]
+
 doc = [
     "mkdocs >=1.1.2,<2.0.0",
     "mkdocs-material >=8.1.4,<=9.1.11",
