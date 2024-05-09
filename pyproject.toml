@@ -161,8 +161,9 @@ exclude = '''
 
 [tool.ruff]
 line-length = 88
-unfixable = []
 
+[tool.ruff.lint]
+unfixable = []
 select = [
     "D",      # docstring conventions
     "F",      # pyflakes
@@ -245,7 +246,7 @@ exclude = [
 
 ignore-init-module-imports = true
 
-[tool.ruff.pyupgrade]
+[tool.ruff.lint.pyupgrade]
 # Preserve types, even if a file imports `from __future__ import annotations`.
 keep-runtime-typing = true
 
