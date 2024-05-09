@@ -13,34 +13,35 @@ CONTRIBUTORS
 
 - wilsonrljr
 - dj-gauthier
+- mtsousa
 
 CHANGES
 ~~~~~~~
 
-- The update **v0.3.4**  has been released with additional features, API changes and fixes.
+- **New Features:**
+  - **MAJOR**: Ridge Regression Parameter Estimation:
+    - Introducing Ridge algorithm for model parameter estimation. Set `estimator="ridge_regression"` and control regularization with the `alpha` parameter. Special thanks to @dj-gauthier and @mtsousa for their contribution. Users are encouraged to visit https://www.researchgate.net/publication/380429918_Controlling_chaos_using_edge_computing_hardware to explore how @dj-gauthier used SysIdentPy in his research.
 
-- MAJOR: Ridge Regression Parameter Estimation:
-    - Now you can use Ridge algorithm for model parameter estimation. Just set `estimator="ridge_regression"`.
-        Note: You can control the regularization by setting `alpha` parameter. Thanks @dj-gauthier and @mtsousa for the contribution.
+- **API Changes:**
+  - Improved `plotting.py` code with type hints and new options for plotting results.
+  - Refactored methods to resolve future warnings from numpy.
+  - Code refactoring following PEP8 guidelines.
+  - Set "default" as the default style for plotting to avoid errors in new versions of matplotlib.
 
+- **Datasets:**
+  - Added `buck_id.csv` and `buck_valid.csv` datasets to the SysIdentPy repository.
 
-- API Change: plotting.py code was improved. Added type hints and added new options for plotting results.
+- **Documentation:**
+  - Add NFIR example. The notebook show how to build models without past output regressors (using only input regressors).
+  - Enhanced usage example for MetaMSS.
+  - Continued adding type hints to methods.
+  - Improved docstrings throughout the codebase.
+  - Minor additions and grammar fixes in documentation.
+  - @dj-gauthier provided valuable suggestions for enhancing the documentation, which are currently undergoing refinement and will soon be accessible.
 
-- API Change: refactor methods to fix future warning from numpy.
-
-- API Change: Code refactoring following PEP8.
-
-- DATASET: Added buck_id.csv and buck_valid.csv dataset to SysIdentPy repository.
-
-- DOC: Improve MetaMSS usage example.
-
-- DOC: Continue adding type hints to methods.
-
-- DOC: Improved docstring along the methods.
-
-- DOC: Minor additions and grammar fixes.
-
-- Add pre-commit to repository.
+- **Development Tools:**
+  - Added pre-commit hooks to the repository.
+  - Enhanced `pyproject.toml` to assist contributors in setting up their own environment.
 
 
 v0.3.3
