@@ -27,6 +27,10 @@ logging.basicConfig(
 )
 
 
+FLAG : Dict = {}
+'flag(id:branch) will be added once the branch is reached'
+
+
 class NARXNN(BaseMSS):
     """NARX Neural Network model build on top of Pytorch.
 
@@ -609,19 +613,24 @@ class NARXNN(BaseMSS):
         )
 
     def _narmax_predict(self, X, y_initial, forecast_horizon):
+        reached_branch = [1]
         if len(y_initial) < self.max_lag:
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
                 f" {self.max_lag} elements."
             )
+            reached_branch.append[2]
 
         if X is not None:
             forecast_horizon = X.shape[0]
+            reached_branch.append[3]
         else:
             forecast_horizon = forecast_horizon + self.max_lag
+            reached_branch.append[4]
 
         if self.model_type == "NAR":
             self.n_inputs = 0
+            reached_branch.append[5]
 
         y_output = np.zeros(forecast_horizon, dtype=float)
         y_output.fill(np.nan)
@@ -649,9 +658,11 @@ class NARXNN(BaseMSS):
             y_output = y_output.astype(np.float32)
             x_valid, _ = map(torch.tensor, (regressor_value, y_output))
             y_output[i] = self.net(x_valid.to(self.device))[0].detach().cpu().numpy()
+        FLAG['NP'] = reached_branch
         return y_output.reshape(-1, 1)
 
     def _nfir_predict(self, X, y_initial):
+        reached_branch = [1]
         y_output = np.zeros(X.shape[0], dtype=float)
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
@@ -677,6 +688,7 @@ class NARXNN(BaseMSS):
             y_output = y_output.astype(np.float32)
             x_valid, _ = map(torch.tensor, (regressor_value, y_output))
             y_output[i] = self.net(x_valid.to(self.device))[0].detach().cpu().numpy()
+        FLAG['NFP']=reached_branch
         return y_output.reshape(-1, 1)
 
     def _basis_function_predict(self, X, y_initial, forecast_horizon=None):
