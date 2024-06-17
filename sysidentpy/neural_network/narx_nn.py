@@ -8,6 +8,7 @@
 import logging
 import sys
 import warnings
+from typing import Dict
 
 import numpy as np
 import torch
@@ -15,9 +16,9 @@ import torch.nn.functional as F
 from torch import optim
 from torch.utils.data import DataLoader, TensorDataset
 
-from ..narmax_base import BaseMSS
-from ..basis_function import Polynomial
-from ..utils._check_arrays import _check_positive_int, _num_features
+from sysidentpy.narmax_base import BaseMSS
+from sysidentpy.basis_function import Polynomial
+from sysidentpy.utils._check_arrays import _check_positive_int, _num_features
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -755,7 +756,9 @@ class NARXNN(BaseMSS):
                The n-steps-ahead predicted values of the model.
 
         """
+        FLAG["BFNSP.START"] = True
         if len(y) < self.max_lag:
+            FLAG["BFNSP.1"] = True
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
                 f" {self.max_lag} elements."
@@ -763,9 +766,10 @@ class NARXNN(BaseMSS):
 
         if X is not None:
             forecast_horizon = X.shape[0]
+            FLAG["BFNSP.2"] = True
         else:
             forecast_horizon = forecast_horizon + self.max_lag
-
+            FLAG["BFNSP.3"] = True
         yhat = np.zeros(forecast_horizon, dtype=float)
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
@@ -776,64 +780,74 @@ class NARXNN(BaseMSS):
             k = int(i - self.max_lag)
             if i + steps_ahead > len(y):
                 steps_ahead = len(y) - i  # predicts the remaining values
-
+                FLAG["BFNSP.4"] = True
             if self.model_type == "NARMAX":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
                     X[k : i + steps_ahead], y[k : i + steps_ahead]
                 )[-steps_ahead:].ravel()
+                FLAG["BFNSP.5"] = True
             elif self.model_type == "NAR":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
                     X=None,
                     y_initial=y[k : i + steps_ahead],
                     forecast_horizon=forecast_horizon,
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
+                FLAG["BFNSP.6"] = True
             elif self.model_type == "NFIR":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
                     X=X[k : i + steps_ahead],
                     y_initial=y[k : i + steps_ahead],
                 )[-steps_ahead:].ravel()
+                FLAG["BFNSP.7"] = True
             else:
+                FLAG["BFNSP.8"] = True
                 raise ValueError(
                     f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
                 )
 
             i += steps_ahead
-
+        FLAG["BFNSP.END"] = True
         return yhat.reshape(-1, 1)
 
     def _basis_function_n_steps_horizon(self, X, y, steps_ahead, forecast_horizon):
+        FLAG["BFNSH.START"] = True
         yhat = np.zeros(forecast_horizon, dtype=float)
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
-
         i = self.max_lag
 
         while i < len(y):
+            print("HELLO")
             k = int(i - self.max_lag)
             if i + steps_ahead > len(y):
                 steps_ahead = len(y) - i  # predicts the remaining values
-
+                FLAG["BFNSH.1"] = True
             if self.model_type == "NARMAX":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
                     X[k : i + steps_ahead], y[k : i + steps_ahead]
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
+                FLAG["BFNSH.2"] = True
             elif self.model_type == "NAR":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
                     X=None,
                     y_initial=y[k : i + steps_ahead],
                     forecast_horizon=forecast_horizon,
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
+                FLAG["BFNSH.3"] = True
             elif self.model_type == "NFIR":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
                     X=X[k : i + steps_ahead],
                     y_initial=y[k : i + steps_ahead],
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
+                FLAG["BFNSH.4"] = True
             else:
+                FLAG["BFNSH.5"] = True
                 raise ValueError(
                     f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
                 )
-
+                
+                
             i += steps_ahead
-
+        FLAG["BFNSH.END"] = True
         yhat = yhat.ravel()
         return yhat.reshape(-1, 1)
