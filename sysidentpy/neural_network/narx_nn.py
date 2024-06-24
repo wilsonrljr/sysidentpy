@@ -28,30 +28,89 @@ logging.basicConfig(
 )
 
 
-FLAG : Dict = {}
+FLAG : Dict[str, list] = {}
 'flag(id:branch) will be added once the branch is reached'
 
-def print_coverage():
+# def print_coverage():
+#     total_branches = 0
+#     covered_branches = 0
+#     print('in print coverage')
+
+#     for func, flags in FLAG.items():
+#         print(f"Coverage for {func}:")
+#         func_total_branches = len(flags)
+#         func_covered_branches = sum(flags)
+
+#         total_branches += func_total_branches
+#         covered_branches += func_covered_branches
+
+#         for i, flag in enumerate(flags):
+#             print(f"  Branch {i + 1}: {'Reached' if flag else 'Not Reached'}")
+
+#         func_coverage_percentage = (func_covered_branches / func_total_branches) * 100
+#         print(f"  Function Coverage: {func_covered_branches}/{func_total_branches} ({func_coverage_percentage:.2f}%)")
+#     if total_branches != 0:
+#         overall_coverage_percentage = (covered_branches / total_branches) * 100
+#         print(f"\nOverall Coverage: {covered_branches}/{total_branches} ({overall_coverage_percentage:.2f}%)")
+
+
+def generate_html_coverage_report():
     total_branches = 0
     covered_branches = 0
+    html_content = """
+    <html>
+        <head>
+            <title>Coverage Report</title>
+            <style>
+                body { font-family: Arial, sans-serif; }
+                .coverage-summary { margin-bottom: 20px; }
+                .coverage-summary p { font-weight: bold; }
+                .function-coverage { margin-bottom: 10px; }
+                .branch { margin-left: 20px; }
+                .reached { color: green; }
+                .not-reached { color: red; }
+            </style>
+        </head>
+        <body>
+            <h1>Coverage Report</h1>
+    """
 
     for func, flags in FLAG.items():
-        print(f"Coverage for {func}:")
         func_total_branches = len(flags)
         func_covered_branches = sum(flags)
 
         total_branches += func_total_branches
         covered_branches += func_covered_branches
 
+        html_content += f"<div class='function-coverage'><h2>Coverage for {func}:</h2>"
+        
         for i, flag in enumerate(flags):
-            print(f"  Branch {i + 1}: {'Reached' if flag else 'Not Reached'}")
+            status = 'Reached' if flag else 'Not Reached'
+            status_class = 'reached' if flag else 'not-reached'
+            html_content += f"<div class='branch {status_class}'>Branch {i + 1}: {status}</div>"
 
         func_coverage_percentage = (func_covered_branches / func_total_branches) * 100
-        print(f"  Function Coverage: {func_covered_branches}/{func_total_branches} ({func_coverage_percentage:.2f}%)")
+        html_content += f"<p>Function Coverage: {func_covered_branches}/{func_total_branches} ({func_coverage_percentage:.2f}%)</p>"
+        html_content += "</div>"
 
-    overall_coverage_percentage = (covered_branches / total_branches) * 100
-    print(f"\nOverall Coverage: {covered_branches}/{total_branches} ({overall_coverage_percentage:.2f}%)")
+    if total_branches != 0:
+        overall_coverage_percentage = (covered_branches / total_branches) * 100
+        html_content += f"""
+        <div class='coverage-summary'>
+            <p>Overall Coverage: {covered_branches}/{total_branches} ({overall_coverage_percentage:.2f}%)</p>
+        </div>
+        """
     
+    html_content += """
+        </body>
+    </html>
+    """
+
+    with open('coverage_report.html', 'w') as file:
+        file.write(html_content)
+
+
+        
 class NARXNN(BaseMSS):
     """NARX Neural Network model build on top of Pytorch.
 
@@ -508,10 +567,11 @@ class NARXNN(BaseMSS):
         """
         if self.basis_function.__class__.__name__ == "Polynomial":
             if steps_ahead is None:
+                generate_html_coverage_report()
                 return self._model_prediction(X, y, forecast_horizon=forecast_horizon)
             if steps_ahead == 1:
                 return self._one_step_ahead_prediction(X, y)
-
+            generate_html_coverage_report()
             _check_positive_int(steps_ahead, "steps_ahead")
             return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
 
@@ -623,38 +683,60 @@ class NARXNN(BaseMSS):
                The predicted values of the model.
 
         """
+        if 'model_prediction' not in FLAG:
+            FLAG['model_prediction'] = [0] * 3
+            print('model_prediction: branch 0')
         if self.model_type in ["NARMAX", "NAR"]:
+            FLAG['model_prediction'][0]= 1
+            print('model_prediction: branch 1')
             return self._narmax_predict(X, y_initial, forecast_horizon)
+        # hidden else
 
         if self.model_type == "NFIR":
+            FLAG['model_prediction'][1]= 1
+            print('model_prediction: branch 2')
             return self._nfir_predict(X, y_initial)
-
+        
+        #hidden else
+        FLAG['model_prediction'][2]= 1
+        print('model_prediction: branch 3')
         raise ValueError(
             f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
         )
 
     def _narmax_predict(self, X, y_initial, forecast_horizon):
-        print('start')
-        reached_branch = [1]
+        if 'narmax_predict' not in FLAG:
+            FLAG['narmax_predict'] = [0] * 4
+            print('narmax_predict: branch 0')
         if len(y_initial) < self.max_lag:
-            print('branch1')
+            FLAG['narmax_predict'][0] = 1
+            print('narmax_predict: branch 1')
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
                 f" {self.max_lag} elements."
             )
-            reached_branch.append[2]
-
+        # hidden else
+        # else:
+        #     FLAG['narmax_predict'][1] = 1
+        #     print('narmax_predict: branch 2')
+            
         if X is not None:
-            print('branch2')
+            FLAG['narmax_predict'][1] = 1
+            print('narmax_predict: branch 2')
             forecast_horizon = X.shape[0]
-            reached_branch.append[3]
         else:
+            FLAG['narmax_predict'][2] = 1
+            print('narmax_predict: branch 3')
             forecast_horizon = forecast_horizon + self.max_lag
-            reached_branch.append[4]
 
         if self.model_type == "NAR":
+            FLAG['narmax_predict'][3] = 1
+            print('narmax_predict: branch 4')
             self.n_inputs = 0
-            reached_branch.append[5]
+        #hidden else
+        # else:
+        #     FLAG['narmax_predict'][5] = 1
+        #     print('narmax_predict: branch 6')
 
         y_output = np.zeros(forecast_horizon, dtype=float)
         y_output.fill(np.nan)
@@ -682,11 +764,9 @@ class NARXNN(BaseMSS):
             y_output = y_output.astype(np.float32)
             x_valid, _ = map(torch.tensor, (regressor_value, y_output))
             y_output[i] = self.net(x_valid.to(self.device))[0].detach().cpu().numpy()
-        FLAG['NP'] = reached_branch
         return y_output.reshape(-1, 1)
 
     def _nfir_predict(self, X, y_initial):
-        reached_branch = [1]
         y_output = np.zeros(X.shape[0], dtype=float)
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
@@ -712,7 +792,6 @@ class NARXNN(BaseMSS):
             y_output = y_output.astype(np.float32)
             x_valid, _ = map(torch.tensor, (regressor_value, y_output))
             y_output[i] = self.net(x_valid.to(self.device))[0].detach().cpu().numpy()
-        FLAG['NFP']=reached_branch
         return y_output.reshape(-1, 1)
 
     def _basis_function_predict(self, X, y_initial, forecast_horizon=None):
@@ -779,9 +858,7 @@ class NARXNN(BaseMSS):
                The n-steps-ahead predicted values of the model.
 
         """
-        FLAG["BFNSP.START"] = True
         if len(y) < self.max_lag:
-            FLAG["BFNSP.1"] = True
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
                 f" {self.max_lag} elements."
@@ -789,10 +866,8 @@ class NARXNN(BaseMSS):
 
         if X is not None:
             forecast_horizon = X.shape[0]
-            FLAG["BFNSP.2"] = True
         else:
             forecast_horizon = forecast_horizon + self.max_lag
-            FLAG["BFNSP.3"] = True
         yhat = np.zeros(forecast_horizon, dtype=float)
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
@@ -803,75 +878,61 @@ class NARXNN(BaseMSS):
             k = int(i - self.max_lag)
             if i + steps_ahead > len(y):
                 steps_ahead = len(y) - i  # predicts the remaining values
-                FLAG["BFNSP.4"] = True
             if self.model_type == "NARMAX":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
                     X[k : i + steps_ahead], y[k : i + steps_ahead]
                 )[-steps_ahead:].ravel()
-                FLAG["BFNSP.5"] = True
             elif self.model_type == "NAR":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
                     X=None,
                     y_initial=y[k : i + steps_ahead],
                     forecast_horizon=forecast_horizon,
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
-                FLAG["BFNSP.6"] = True
             elif self.model_type == "NFIR":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
                     X=X[k : i + steps_ahead],
                     y_initial=y[k : i + steps_ahead],
                 )[-steps_ahead:].ravel()
-                FLAG["BFNSP.7"] = True
             else:
-                FLAG["BFNSP.8"] = True
                 raise ValueError(
                     f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
                 )
 
             i += steps_ahead
-        FLAG["BFNSP.END"] = True
         return yhat.reshape(-1, 1)
 
     def _basis_function_n_steps_horizon(self, X, y, steps_ahead, forecast_horizon):
-        FLAG["BFNSH.START"] = True
         yhat = np.zeros(forecast_horizon, dtype=float)
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
         i = self.max_lag
 
         while i < len(y):
-            print("HELLO")
             k = int(i - self.max_lag)
             if i + steps_ahead > len(y):
                 steps_ahead = len(y) - i  # predicts the remaining values
-                FLAG["BFNSH.1"] = True
             if self.model_type == "NARMAX":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
                     X[k : i + steps_ahead], y[k : i + steps_ahead]
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
-                FLAG["BFNSH.2"] = True
             elif self.model_type == "NAR":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
                     X=None,
                     y_initial=y[k : i + steps_ahead],
                     forecast_horizon=forecast_horizon,
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
-                FLAG["BFNSH.3"] = True
             elif self.model_type == "NFIR":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
                     X=X[k : i + steps_ahead],
                     y_initial=y[k : i + steps_ahead],
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
-                FLAG["BFNSH.4"] = True
             else:
-                FLAG["BFNSH.5"] = True
                 raise ValueError(
                     f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
                 )
                 
                 
             i += steps_ahead
-        FLAG["BFNSH.END"] = True
         yhat = yhat.ravel()
         return yhat.reshape(-1, 1)
     
@@ -908,6 +969,4 @@ if __name__ == "__main__":
     except ValueError as e:
         print(f"fit raised ValueError: {e}")
 
-    # Call print_coverage to print the branch coverage information
     
-    print_coverage()

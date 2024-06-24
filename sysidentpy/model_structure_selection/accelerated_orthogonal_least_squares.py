@@ -494,14 +494,19 @@ class AOLS(Estimators, BaseMSS):
                The predicted values of the model.
 
         """
+        print("hello, model prediction")
         if self.model_type in ["NARMAX", "NAR"]:
+            print('Model prediction, 1')
             return self._narmax_predict(X, y_initial, forecast_horizon)
         if self.model_type == "NFIR":
+            print('Model prediction, 2')
             return self._nfir_predict(X, y_initial)
 
         raise ValueError(
             f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
         )
+        print('Model prediction, 3')
+
 
     def _narmax_predict(
         self,
@@ -509,20 +514,25 @@ class AOLS(Estimators, BaseMSS):
         y_initial: Optional[np.ndarray],
         forecast_horizon: int = 1,
     ) -> np.ndarray:
+        print('Hellow, narmax predict')
         if len(y_initial) < self.max_lag:
+            print('narmax predict, 1')
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
                 f" {self.max_lag} elements."
             )
 
         if X is not None:
+            print('narmax predict, 2')
             forecast_horizon = X.shape[0]
         else:
+            print('narmax predict, 3')
             forecast_horizon = forecast_horizon + self.max_lag
 
         if self.model_type == "NAR":
+            print('narmax predict, 4')
             self.n_inputs = 0
-
+        print('narmax predict, 5')
         y_output = super()._narmax_predict(X, y_initial, forecast_horizon)
         return y_output
 
