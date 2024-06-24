@@ -716,10 +716,6 @@ class NARXNN(BaseMSS):
                 f" {self.max_lag} elements."
             )
         # hidden else
-        # else:
-        #     FLAG['narmax_predict'][1] = 1
-        #     print('narmax_predict: branch 2')
-            
         if X is not None:
             FLAG['narmax_predict'][1] = 1
             print('narmax_predict: branch 2')
@@ -734,10 +730,6 @@ class NARXNN(BaseMSS):
             print('narmax_predict: branch 4')
             self.n_inputs = 0
         #hidden else
-        # else:
-        #     FLAG['narmax_predict'][5] = 1
-        #     print('narmax_predict: branch 6')
-
         y_output = np.zeros(forecast_horizon, dtype=float)
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
