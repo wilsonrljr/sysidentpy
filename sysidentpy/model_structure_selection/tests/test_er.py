@@ -3,6 +3,7 @@ from numpy.testing import assert_almost_equal
 from numpy.testing import assert_raises
 from sysidentpy.model_structure_selection import ER
 from sysidentpy.basis_function import Polynomial
+from sysidentpy.parameter_estimation.estimators import LeastSquares
 
 
 def create_test_data(n=1000):
@@ -25,7 +26,7 @@ def test_default_values():
     default = {
         "ylag": 1,
         "xlag": 1,
-        "estimator": "least_squares",
+        "estimator": LeastSquares(),
         "extended_least_squares": False,
         "q": 0.99,
         "h": 0.01,
@@ -34,13 +35,6 @@ def test_default_values():
         "n_perm": 200,
         "p": np.inf,
         "skip_forward": False,
-        "lam": 0.98,
-        "delta": 0.01,
-        "offset_covariance": 0.2,
-        "mu": 0.01,
-        "eps": np.finfo(np.float64).eps,
-        "gama": 0.2,
-        "weight": 0.02,
         "model_type": "NARMAX",
         "random_state": None,
     }
@@ -57,13 +51,6 @@ def test_default_values():
         model.n_perm,
         model.p,
         model.skip_forward,
-        model.lam,
-        model.delta,
-        model.offset_covariance,
-        model.mu,
-        model.eps,
-        model.gama,
-        model.weight,
         model.model_type,
         model.random_state,
     ]
@@ -142,7 +129,7 @@ def test_model_prediction():
     model = ER(
         ylag=2,
         xlag=2,
-        estimator="least_squares",
+        estimator=LeastSquares(),
         basis_function=basis_function,
     )
     model.fit(X=X_train, y=y_train)
@@ -154,7 +141,7 @@ def test_mutual_information_knn():
     model = ER(
         ylag=2,
         xlag=2,
-        estimator="least_squares",
+        estimator=LeastSquares(),
         basis_function=basis_function,
     )
     x = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)
@@ -169,7 +156,7 @@ def test_conditional_mutual_information_knn():
     model = ER(
         ylag=2,
         xlag=2,
-        estimator="least_squares",
+        estimator=LeastSquares(),
         basis_function=basis_function,
     )
     x = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)
@@ -185,7 +172,7 @@ def test_tolerance_estimator():
     model = ER(
         ylag=2,
         xlag=2,
-        estimator="least_squares",
+        estimator=LeastSquares(),
         basis_function=basis_function,
         random_state=42,
     )

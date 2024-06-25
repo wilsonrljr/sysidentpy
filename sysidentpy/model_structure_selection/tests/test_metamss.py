@@ -4,6 +4,7 @@ from numpy.testing import assert_raises
 from sysidentpy.model_structure_selection import MetaMSS
 from sysidentpy.basis_function import Polynomial
 from sysidentpy.utils.generate_data import get_siso_data
+from sysidentpy.parameter_estimation.estimators import LeastSquares
 
 
 def create_test_data(n=1000):
@@ -31,8 +32,9 @@ def test_metamss():
         n_agents=20,
         basis_function=basis_function,
         random_state=42,
+        test_size=0.1,
     )
-    model.fit(X=X_train, y=y_train, X_test=X_test, y_test=y_test)
+    model.fit(X=X_train, y=y_train)
     assert_array_equal(model.final_model, model_code)
 
 
@@ -51,15 +53,9 @@ def test_default_values():
         "p_zeros": 0.5,
         "p_ones": 0.5,
         "p_value": 0.05,
-        "estimator": "least_squares",
-        "extended_least_squares": False,
-        "lam": 0.98,
-        "delta": 0.01,
-        "offset_covariance": 0.2,
-        "mu": 0.01,
+        "estimator": LeastSquares(),
+        # "extended_least_squares": False,
         "eps": np.finfo(np.float64).eps,
-        "gama": 0.2,
-        "weight": 0.02,
         "steps_ahead": None,
         "estimate_parameter": True,
         "loss_func": "metamss_loss",
@@ -81,14 +77,8 @@ def test_default_values():
         model.p_ones,
         model.p_value,
         model.estimator,
-        model.extended_least_squares,
-        model.lam,
-        model.delta,
-        model.offset_covariance,
-        model.mu,
+        # model.extended_least_squares,
         model.eps,
-        model.gama,
-        model.weight,
         model.steps_ahead,
         model.estimate_parameter,
         model.loss_func,
@@ -119,8 +109,9 @@ def test_predict():
         n_agents=10,
         basis_function=basis_function,
         random_state=42,
+        test_size=0.1,
     )
-    model.fit(X=X_train, y=y_train, X_test=X_test, y_test=y_test)
+    model.fit(X=X_train, y=y_train)
     yhat = model.predict(X=X_test, y=y_test)
     assert_almost_equal(yhat, y_test, decimal=2)
 
@@ -150,6 +141,7 @@ def test_model_prediction():
         n_agents=20,
         basis_function=basis_function,
         random_state=42,
+        test_size=0.1,
     )
-    model.fit(X=X_train, y=y_train, X_test=X_test, y_test=y_test)
+    model.fit(X=X_train, y=y_train)
     assert_raises(Exception, model.predict, X=X_test, y=y_test[:1])
