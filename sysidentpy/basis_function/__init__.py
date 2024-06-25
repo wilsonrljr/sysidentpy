@@ -1,1 +1,1 @@
-from ._basis_function import Polynomial, Fourier
+from ._basis_function import Polynomial, Fourier, Bersntein
