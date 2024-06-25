@@ -14,9 +14,47 @@ from scipy.special import psi
 
 from ..narmax_base import BaseMSS
 from ..basis_function import Fourier, Polynomial
-from ..parameter_estimation.estimators import Estimators
 from ..utils._check_arrays import _check_positive_int, _num_features, check_random_state
 from ..utils.deprecation import deprecated
+from ..parameter_estimation.estimators import (
+    LeastSquares,
+    RidgeRegression,
+    RecursiveLeastSquares,
+    TotalLeastSquares,
+    LeastMeanSquareMixedNorm,
+    LeastMeanSquares,
+    LeastMeanSquaresFourth,
+    LeastMeanSquaresLeaky,
+    LeastMeanSquaresNormalizedLeaky,
+    LeastMeanSquaresNormalizedSignRegressor,
+    LeastMeanSquaresNormalizedSignSign,
+    LeastMeanSquaresSignError,
+    LeastMeanSquaresSignSign,
+    AffineLeastMeanSquares,
+    NormalizedLeastMeanSquares,
+    NormalizedLeastMeanSquaresSignError,
+    LeastMeanSquaresSignRegressor,
+)
+
+Estimators_Union = Union[
+    LeastSquares,
+    RidgeRegression,
+    RecursiveLeastSquares,
+    TotalLeastSquares,
+    LeastMeanSquareMixedNorm,
+    LeastMeanSquares,
+    LeastMeanSquaresFourth,
+    LeastMeanSquaresLeaky,
+    LeastMeanSquaresNormalizedLeaky,
+    LeastMeanSquaresNormalizedSignRegressor,
+    LeastMeanSquaresNormalizedSignSign,
+    LeastMeanSquaresSignError,
+    LeastMeanSquaresSignSign,
+    AffineLeastMeanSquares,
+    NormalizedLeastMeanSquares,
+    NormalizedLeastMeanSquaresSignError,
+    LeastMeanSquaresSignRegressor,
+]
 
 
 @deprecated(
@@ -31,7 +69,7 @@ from ..utils.deprecation import deprecated
         " readability."
     ),
 )
-class ER(Estimators, BaseMSS):
+class ER(BaseMSS):
     r"""Entropic Regression Algorithm.
 
     Build Polynomial NARMAX model using the Entropic Regression Algorithm ([1]_).
@@ -74,23 +112,6 @@ class ER(Estimators, BaseMSS):
         To be used for difficult and highly uncertain problems.
         Skipping the forward selection results in more accurate solution,
         but comes with higher computational cost.
-    lam : float, default=0.98
-        Forgetting factor of the Recursive Least Squares method.
-    delta : float, default=0.01
-        Normalization factor of the P matrix.
-    offset_covariance : float, default=0.2
-        The offset covariance factor of the affine least mean squares
-        filter.
-    mu : float, default=0.01
-        The convergence coefficient (learning rate) of the filter.
-    eps : float
-        Normalization factor of the normalized filters.
-    gama : float, default=0.2
-        The leakage factor of the Leaky LMS method.
-    weight : float, default=0.02
-        Weight factor to control the proportions of the error norms
-        and offers an extra degree of freedom within the adaptation
-        of the LMS mixed norm method.
     model_type: str, default="NARMAX"
         The user can choose "NARMAX", "NAR" and "NFIR" models
 
@@ -148,7 +169,7 @@ class ER(Estimators, BaseMSS):
         ylag: Union[int, list] = 1,
         xlag: Union[int, list] = 1,
         q: float = 0.99,
-        estimator: str = "least_squares",
+        estimator: Estimators_Union = LeastSquares(),
         extended_least_squares: bool = False,
         h: float = 0.01,
         k: int = 2,
@@ -156,13 +177,6 @@ class ER(Estimators, BaseMSS):
         n_perm: int = 200,
         p: float = np.inf,
         skip_forward: bool = False,
-        lam: float = 0.98,
-        delta: float = 0.01,
-        offset_covariance: float = 0.2,
-        mu: float = 0.01,
-        eps: float = np.finfo(np.float64).eps,
-        gama: float = 0.2,
-        weight: float = 0.02,
         model_type: str = "NARMAX",
         basis_function: Union[Polynomial, Fourier] = Polynomial(),
         random_state: Optional[int] = None,
@@ -196,16 +210,6 @@ class ER(Estimators, BaseMSS):
         self.err = None
         self.pivv = None
         self._validate_params()
-        super().__init__(
-            lam=lam,
-            delta=delta,
-            offset_covariance=offset_covariance,
-            mu=mu,
-            eps=eps,
-            gama=gama,
-            weight=weight,
-            basis_function=basis_function,
-        )
 
     def _validate_params(self):
         """Validate input params."""
@@ -653,7 +657,10 @@ class ER(Estimators, BaseMSS):
             )
             self.final_model = self.regressor_code[final_model, :].copy()
 
-        self.theta = getattr(self, self.estimator)(reg_matrix[:, final_model], y_full)
+        # self.theta = getattr(self, self.estimator)(reg_matrix[:, final_model], y_full)
+        self.theta = self.estimator.optimize(
+            reg_matrix[:, final_model], y_full[self.max_lag :, 0].reshape(-1, 1)
+        )
         if (np.abs(self.theta[0]) < self.h) and (
             np.sum((self.theta != 0).astype(int)) > 1
         ):
