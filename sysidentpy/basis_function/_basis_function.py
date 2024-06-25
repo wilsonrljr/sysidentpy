@@ -2,8 +2,9 @@
 
 from itertools import combinations_with_replacement
 from typing import Optional
-
+from math import comb
 import numpy as np
+from scipy.stats import binom
 
 from .basis_function_base import BaseBasisFunction
 
@@ -226,4 +227,68 @@ class Fourier:
             Transformed array.
 
         """
+        return self.fit(data, max_lag, predefined_regressors)
+
+
+class Bersntein(BaseBasisFunction):
+    def __init__(
+        self, degree: int = 1, n: int = 1, bias: bool = True, ensemble: bool = False
+    ):
+        self.degree = degree
+        self.n = n
+        self.bias = bias
+        self.ensemble = ensemble
+        self.repetition = None
+
+    def _bernstein_expansion(self, data: np.ndarray):
+        k = np.arange(1 + self.n)
+        base = binom.pmf(k, self.n, data[:, None])
+        return base
+
+    def fit(
+        self,
+        data: np.ndarray,
+        max_lag: int = 1,
+        predefined_regressors: Optional[np.ndarray] = None,
+    ):
+        # remove intercept (because the data always have the intercept)
+        if self.degree > 1:
+            data = Polynomial().fit(data, max_lag, predefined_regressors=None)
+            data = data[:, 1:]
+        else:
+            data = data[max_lag:, 1:]
+
+        n_features = data.shape[1]
+        psi = [self._bernstein_expansion(data[:, col]) for col in range(n_features)]
+        if not self.bias:
+            psi = [basis[:, 1:] for basis in psi]
+
+        psi = np.hstack(psi)
+        bias_column = np.ones((psi.shape[0], 1))
+        psi = np.hstack((bias_column, psi))
+        psi = np.nan_to_num(psi, 0)
+        s = psi.shape[1]
+        self.repetition = (
+            (comb(psi.shape[1], self.degree) + s ** (self.degree - 1) - 1) * (self.n)
+            + self.degree * self.n
+            - self.n
+            - (self.n - self.degree)
+            - (self.degree - 1)
+        )
+        if self.ensemble:
+            psi = psi[:, 1:]
+            psi = np.column_stack([data, psi])
+            self.repetition = self.repetition + data.shape[1]
+
+        if predefined_regressors is None:
+            return psi, self.ensemble
+
+        return psi[:, predefined_regressors], self.ensemble
+
+    def transform(
+        self,
+        data: np.ndarray,
+        max_lag: int = 1,
+        predefined_regressors: Optional[np.ndarray] = None,
+    ):
         return self.fit(data, max_lag, predefined_regressors)
