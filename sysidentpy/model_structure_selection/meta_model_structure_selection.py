@@ -20,6 +20,46 @@ from ..utils._check_arrays import (
 )
 from ..utils.narmax_tools import train_test_split
 
+from ..parameter_estimation.estimators import (
+    LeastSquares,
+    RidgeRegression,
+    RecursiveLeastSquares,
+    TotalLeastSquares,
+    LeastMeanSquareMixedNorm,
+    LeastMeanSquares,
+    LeastMeanSquaresFourth,
+    LeastMeanSquaresLeaky,
+    LeastMeanSquaresNormalizedLeaky,
+    LeastMeanSquaresNormalizedSignRegressor,
+    LeastMeanSquaresNormalizedSignSign,
+    LeastMeanSquaresSignError,
+    LeastMeanSquaresSignSign,
+    AffineLeastMeanSquares,
+    NormalizedLeastMeanSquares,
+    NormalizedLeastMeanSquaresSignError,
+    LeastMeanSquaresSignRegressor,
+)
+
+Estimators = Union[
+    LeastSquares,
+    RidgeRegression,
+    RecursiveLeastSquares,
+    TotalLeastSquares,
+    LeastMeanSquareMixedNorm,
+    LeastMeanSquares,
+    LeastMeanSquaresFourth,
+    LeastMeanSquaresLeaky,
+    LeastMeanSquaresNormalizedLeaky,
+    LeastMeanSquaresNormalizedSignRegressor,
+    LeastMeanSquaresNormalizedSignSign,
+    LeastMeanSquaresSignError,
+    LeastMeanSquaresSignSign,
+    AffineLeastMeanSquares,
+    NormalizedLeastMeanSquares,
+    NormalizedLeastMeanSquaresSignError,
+    LeastMeanSquaresSignRegressor,
+]
+
 
 class MetaMSS(SimulateNARMAX, BPSOGSA):
     r"""Meta-Model Structure Selection: Building Polynomial NARMAX model.
@@ -154,7 +194,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         xlag: Union[int, list] = 1,
         ylag: Union[int, list] = 1,
         elag: Union[int, list] = 1,
-        estimator: str = "least_squares",
+        estimator: Estimators = LeastSquares(),
         extended_least_squares: bool = False,
         eps: np.float64 = np.finfo(np.float64).eps,
         estimate_parameter: bool = True,
@@ -163,6 +203,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         basis_function: Polynomial = Polynomial(),
         steps_ahead: Optional[int] = None,
         random_state: Optional[int] = None,
+        test_size: float = 0.25,
     ):
         super().__init__(
             estimator=estimator,
@@ -196,6 +237,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self.loss_func = loss_func
         self.steps_ahead = steps_ahead
         self.random_state = random_state
+        self.test_size = test_size
         self.build_matrix = self.get_build_io_method(model_type)
         self.n_inputs = None
         self.regressor_code = None
@@ -263,7 +305,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self.best_model_history = []
         self.tested_models = []
 
-        X, X_test, y, y_test = train_test_split(X, y)
+        X, X_test, y, y_test = train_test_split(X, y, test_size=self.test_size)
 
         for i in range(self.maxiter):
             fitness = self.evaluate_objective_function(X, y, X_test, y_test, population)
