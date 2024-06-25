@@ -16,8 +16,7 @@ def regressor_code(
     model_representation: Optional[str] = None,
     basis_function: Optional[Any] = None,
 ) -> np.ndarray:
-    """
-    Generate a regressor code based on the provided parameters.
+    """Generate a regressor code based on the provided parameters.
 
     Parameters
     ----------
