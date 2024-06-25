@@ -19,7 +19,6 @@ from ..utils._check_arrays import (
     check_X_y,
 )
 from ..utils.narmax_tools import train_test_split
-from ..utils.deprecation import deprecated
 
 
 class MetaMSS(SimulateNARMAX, BPSOGSA):

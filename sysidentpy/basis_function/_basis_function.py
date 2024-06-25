@@ -2,7 +2,6 @@
 
 from itertools import combinations_with_replacement
 from typing import Optional
-from math import comb
 import numpy as np
 from scipy.stats import binom
 
@@ -136,7 +135,6 @@ class Fourier:
         self.p = p
         self.degree = degree
         self.ensemble = ensemble
-        self.repetition = None
 
     def _fourier_expansion(self, data: np.ndarray, n: int):
         base = np.column_stack(
@@ -192,7 +190,6 @@ class Fourier:
             )
             psi = np.column_stack([psi, base_col])
 
-        self.repetition = self.n * 2
         if self.ensemble:
             psi = psi[:, 1:]
             psi = np.column_stack([data, psi])
@@ -200,9 +197,9 @@ class Fourier:
             psi = psi[:, 1:]
 
         if predefined_regressors is None:
-            return psi, self.ensemble
+            return psi
 
-        return psi[:, predefined_regressors], self.ensemble
+        return psi[:, predefined_regressors]
 
     def transform(
         self,
@@ -238,7 +235,6 @@ class Bersntein(BaseBasisFunction):
         self.n = n
         self.bias = bias
         self.ensemble = ensemble
-        self.repetition = None
 
     def _bernstein_expansion(self, data: np.ndarray):
         k = np.arange(1 + self.n)
@@ -267,18 +263,9 @@ class Bersntein(BaseBasisFunction):
         bias_column = np.ones((psi.shape[0], 1))
         psi = np.hstack((bias_column, psi))
         psi = np.nan_to_num(psi, 0)
-        s = psi.shape[1]
-        self.repetition = (
-            (comb(psi.shape[1], self.degree) + s ** (self.degree - 1) - 1) * (self.n)
-            + self.degree * self.n
-            - self.n
-            - (self.n - self.degree)
-            - (self.degree - 1)
-        )
         if self.ensemble:
             psi = psi[:, 1:]
             psi = np.column_stack([data, psi])
-            self.repetition = self.repetition + data.shape[1]
 
         if predefined_regressors is None:
             return psi, self.ensemble

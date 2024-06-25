@@ -202,7 +202,7 @@ class FROLS(BaseMSS):
             self.alpha = self.estimator.alpha
         else:
             self.alpha = alpha
-        self.ensemble = None
+        # self.ensemble = None
         self.n_inputs = None
         self.regressor_code = None
         self.info_values = None
@@ -572,7 +572,7 @@ class FROLS(BaseMSS):
                 lagged_data, self.max_lag, predefined_regressors=None
             )
         else:
-            reg_matrix, self.ensemble = self.basis_function.fit(
+            reg_matrix = self.basis_function.fit(
                 lagged_data, self.max_lag, predefined_regressors=None
             )
 
@@ -604,7 +604,10 @@ class FROLS(BaseMSS):
         tmp_piv = self.pivv[0:model_length]
         if self.basis_function.__class__.__name__ == "Polynomial":
             self.final_model = self.regressor_code[tmp_piv, :].copy()
-        elif self.basis_function.__class__.__name__ != "Polynomial" and self.ensemble:
+        elif (
+            self.basis_function.__class__.__name__ != "Polynomial"
+            and self.basis_function.ensemble
+        ):
             basis_code = np.sort(
                 np.tile(
                     self.regressor_code[1:, :], (self.basis_function.repetition, 1)

@@ -155,7 +155,7 @@ class AOLS(BaseMSS):
         self.L = L
         self.estimator = estimator
         self.threshold = threshold
-        self.ensemble = None
+        # self.ensemble = None
         self.res = None
         self.n_inputs = None
         self.theta = None
@@ -315,7 +315,7 @@ class AOLS(BaseMSS):
                 lagged_data, self.max_lag, predefined_regressors=None
             )
         else:
-            reg_matrix, self.ensemble = self.basis_function.fit(
+            reg_matrix = self.basis_function.fit(
                 lagged_data, self.max_lag, predefined_regressors=None
             )
 
@@ -329,7 +329,10 @@ class AOLS(BaseMSS):
         (self.theta, self.pivv, self.res) = self.aols(reg_matrix, y)
         if self.basis_function.__class__.__name__ == "Polynomial":
             self.final_model = self.regressor_code[self.pivv, :].copy()
-        elif self.basis_function.__class__.__name__ != "Polynomial" and self.ensemble:
+        elif (
+            self.basis_function.__class__.__name__ != "Polynomial"
+            and self.basis_function.ensemble
+        ):
             basis_code = np.sort(
                 np.tile(
                     self.regressor_code[1:, :], (self.basis_function.repetition, 1)

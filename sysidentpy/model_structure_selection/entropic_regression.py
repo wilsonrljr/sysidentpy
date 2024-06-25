@@ -200,7 +200,7 @@ class ER(BaseMSS):
         self.random_state = random_state
         self.rng = check_random_state(random_state)
         self.tol = None
-        self.ensemble = None
+        # self.ensemble = None
         self.n_inputs = None
         self.estimated_tolerance = None
         self.regressor_code = None
@@ -588,7 +588,7 @@ class ER(BaseMSS):
                 lagged_data, self.max_lag, predefined_regressors=None
             )
         else:
-            reg_matrix, self.ensemble = self.basis_function.fit(
+            reg_matrix = self.basis_function.fit(
                 lagged_data, self.max_lag, predefined_regressors=None
             )
 
@@ -639,7 +639,10 @@ class ER(BaseMSS):
 
         if self.basis_function.__class__.__name__ == "Polynomial":
             self.final_model = self.regressor_code[final_model, :].copy()
-        elif self.basis_function.__class__.__name__ != "Polynomial" and self.ensemble:
+        elif (
+            self.basis_function.__class__.__name__ != "Polynomial"
+            and self.basis_function.ensemble
+        ):
             basis_code = np.sort(
                 np.tile(
                     self.regressor_code[1:, :], (self.basis_function.repetition, 1)
