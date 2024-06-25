@@ -179,7 +179,7 @@ class FROLS(BaseMSS):
         basis_function: Union[Polynomial, Fourier] = Polynomial(),
         model_type: str = "NARMAX",
         eps: np.float64 = np.finfo(np.float64).eps,
-        alpha: float = 0,  # default is machine eps
+        alpha: float = 0,
     ):
         # self.non_degree = basis_function.degree
         self.order_selection = order_selection
