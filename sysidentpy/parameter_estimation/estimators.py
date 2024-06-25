@@ -1,4 +1,4 @@
-"""Least Squares Methods for parameter estimation."""
+"""Methods for parameter estimation."""
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
@@ -9,7 +9,7 @@ import warnings
 
 import numpy as np
 
-from ..narmax_base import InformationMatrix
+from .estimators_base import BaseEstimator
 
 
 class EstimatorError(Exception):
@@ -27,75 +27,34 @@ class EstimatorError(Exception):
 
 
 class Estimators:
-    """Ordinary Least Squares for linear parameter estimation."""
+    pass
 
-    def __init__(
-        self,
-        max_lag=1,
-        lam=0.98,
-        delta=0.01,
-        offset_covariance=0.2,
-        mu=0.01,
-        eps=np.finfo(np.float64).eps,
-        alpha=np.finfo(np.float64).eps,
-        gama=0.2,
-        weight=0.02,
-        basis_function=None,
-    ):
-        self.eps = eps
-        self.alpha = alpha
-        self.mu = mu
-        self.offset_covariance = offset_covariance
-        self.max_lag = max_lag
-        self.lam = lam
-        self.delta = delta
-        self.gama = gama
-        self.weight = weight  # <0  e <1
-        self.xi = None
-        self.theta_evolution = None
-        self.basis_function = basis_function
-        self._validate_params()
 
-    def _validate_params(self):
-        """Validate input params."""
-        attributes = {
-            "max_lag": self.max_lag,
-            "lam": self.lam,
-            "delta": self.delta,
-            "offset_covariance": self.offset_covariance,
-            "mu": self.mu,
-            "eps": self.eps,
-            "alpha": self.alpha,
-            "gama": self.gama,
-            "weight": self.weight,
-        }
-        for attribute, value in attributes.items():
-            if not isinstance(value, (np.integer, int, float)):
-                raise ValueError(
-                    f"{attribute} must be int or float (positive).Got {type(attribute)}"
-                )
+class LeastSquares(BaseEstimator):
+    """Ordinary Least Squares for linear parameter estimation.
 
-            if attribute in ["lam", "weight", "offset_covariance"]:
-                if value > 1 or value < 0:
-                    raise ValueError(
-                        f"{attribute} must lies on [0 1] range. Got {value}"
-                    )
+    References
+    ----------
+    - Manuscript: Sorenson, H. W. (1970). Least-squares estimation:
+        from Gauss to Kalman. IEEE spectrum, 7(7), 63-68.
+        http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf
+    - Book (Portuguese): Aguirre, L. A. (2007). Introdução identificação
+        de sistemas: técnicas lineares e não-lineares aplicadas a sistemas
+        reais. Editora da UFMG. 3a edição.
+    - Manuscript: Markovsky, I., & Van Huffel, S. (2007).
+        Overview of total least-squares methods.
+        Signal processing, 87(10), 2283-2302.
+        https://eprints.soton.ac.uk/263855/1/tls_overview.pdf
+    - Wikipedia entry on Least Squares
+        https://en.wikipedia.org/wiki/Least_squares
+    """
 
-            if value < 0:
-                raise ValueError(
-                    f"{attribute} must be positive. Got {value}"
-                    "Check the documentation for allowed values"
-                )
+    def __init__(self, *, unbiased: bool = False, uiter: int = 20):
+        self.unbiased = unbiased
+        self.uiter = uiter
+        self._validate_params(vars(self))
 
-    def _check_linear_dependence_rows(self, psi):
-        if np.linalg.matrix_rank(psi) != psi.shape[1]:
-            warnings.warn(
-                "Psi matrix might have linearly dependent rows."
-                "Be careful and check your data",
-                stacklevel=2,
-            )
-
-    def least_squares(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Estimate the model parameters using Least Squares method.
 
         Parameters
@@ -110,27 +69,68 @@ class Estimators:
         theta : array-like of shape = number_of_model_elements
             The estimated parameters of the model.
 
-        References
-        ----------
-        - Manuscript: Sorenson, H. W. (1970). Least-squares estimation:
-           from Gauss to Kalman. IEEE spectrum, 7(7), 63-68.
-           http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf
-        - Book (Portuguese): Aguirre, L. A. (2007). Introdução identificação
-           de sistemas: técnicas lineares e não-lineares aplicadas a sistemas
-           reais. Editora da UFMG. 3a edição.
-        - Manuscript: Markovsky, I., & Van Huffel, S. (2007).
-           Overview of total least-squares methods.
-           Signal processing, 87(10), 2283-2302.
-           https://eprints.soton.ac.uk/263855/1/tls_overview.pdf
-        - Wikipedia entry on Least Squares
-           https://en.wikipedia.org/wiki/Least_squares
-
         """
         self._check_linear_dependence_rows(psi)
-
-        y = y[self.max_lag :, 0].reshape(-1, 1)
         theta = np.linalg.lstsq(psi, y, rcond=None)[0]
         return theta
+
+
+class RidgeRegression(BaseEstimator):
+    """Ridge Regression estimator using classic and SVD methods.
+
+    This class implements Ridge Regression, a type of linear regression that includes
+    an L2 penalty to prevent overfitting. The implementation offers two methods for
+    parameter estimation: a classic approach and an approach based on Singular Value
+    Decomposition (SVD).
+
+    Parameters
+    ----------
+    alpha : np.float64, optional (default=np.finfo(np.float64).eps)
+        Regularization strength; must be a positive float. Regularization improves the
+        conditioning of the problem and reduces the variance of the estimates. Larger
+        values specify stronger regularization. If the input is a noisy signal,
+        the ridge parameter is likely to be set close to the noise level, at least as
+        a starting point. Entered through the self data structure.
+    solver : str, optional (default="svd")
+        Solver to use in the parameter estimation procedure.
+
+    Methods
+    -------
+    ridge_regression_classic(psi, y)
+        Estimate the model parameters using the classic ridge regression method.
+    ridge_regression(psi, y)
+        Estimate the model parameters using the SVD-based ridge regression method.
+    optimize(psi, y)
+        Optimize the model parameters using the chosen method (SVD or classic).
+
+    References
+    ----------
+    - Wikipedia entry on ridge regression
+      https://en.wikipedia.org/wiki/Ridge_regression
+    - D. J. Gauthier, E. Bollt, A. Griffith, W. A. S. Barbosa, 'Next generation
+      reservoir computing,' Nat. Commun. 12, 5564 (2021).
+      https://www.nature.com/articles/s41467-021-25801-2
+    - Hoerl, A. E.; Kennard, R. W. Ridge regression: applications to nonorthogonal
+      problems. Technometrics, Taylor & Francis, v. 12, n. 1, p. 69-82, 1970.
+    - StackExchange: whuber. The proof of shrinking coefficients using ridge regression
+      through "spectral decomposition".
+      Cross Validated, accessed 21 September 2023,
+      https://stats.stackexchange.com/q/220324
+    """
+
+    def __init__(
+        self,
+        *,
+        alpha: np.float64 = np.finfo(np.float64).eps,
+        solver: str = "svd",
+        unbiased: bool = False,
+        uiter: int = 30,
+    ):
+        self.alpha = alpha
+        self.solver = solver
+        self.uiter = uiter
+        self.unbiased = unbiased
+        self._validate_params(vars(self))
 
     def ridge_regression_classic(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Estimate the model parameters using ridge regression.
@@ -165,68 +165,13 @@ class Estimators:
         """
         self._check_linear_dependence_rows(psi)
 
-        y = y[self.max_lag :, 0].reshape(-1, 1)
         theta = (
             np.linalg.pinv(psi.T @ psi + self.alpha * np.eye(psi.shape[1])) @ psi.T @ y
         )
         return theta
 
-    def _unbiased_estimator(self, psi, y, theta, elag, max_lag, estimator):
-        """Estimate the model parameters using Extended Least Squares method.
-
-        Parameters
-        ----------
-        psi : ndarray of floats
-            The information matrix of the model.
-        X : ndarray of floats
-            The input data to be used in the training process.
-        y : array-like of shape = y_training
-            The data used to training the model.
-        biased_theta : array-like of shape = number_of_model_elements
-            The estimated biased parameters of the model.
-
-        Returns
-        -------
-        theta : array-like of shape = number_of_model_elements
-            The estimated unbiased parameters of the model.
-
-        References
-        ----------
-        - Manuscript: Sorenson, H. W. (1970). Least-squares estimation:
-           from Gauss to Kalman. IEEE spectrum, 7(7), 63-68.
-           http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf
-        - Book (Portuguese): Aguirre, L. A. (2007). Introdução a identificação
-           de sistemas: técnicas lineares e não-lineares aplicadas a sistemas
-           reais. Editora da UFMG. 3a edição.
-        - Manuscript: Markovsky, I., & Van Huffel, S. (2007).
-           Overview of total least-squares methods.
-           Signal processing, 87(10), 2283-2302.
-            https://eprints.soton.ac.uk/263855/1/tls_overview.pdf
-        - Wikipedia entry on Least Squares
-           https://en.wikipedia.org/wiki/Least_squares
-
-        """
-        e = y[max_lag:, 0].reshape(-1, 1) - np.dot(psi, theta)
-        im = InformationMatrix(ylag=elag)
-        for _ in range(30):
-            e = np.concatenate([np.zeros([max_lag, 1]), e], axis=0)
-
-            lagged_data = im.build_output_matrix(None, e)
-
-            e_regressors = self.basis_function.fit(
-                lagged_data, max_lag, predefined_regressors=None
-            )
-
-            psi_extended = np.concatenate([psi, e_regressors], axis=1)
-            unbiased_theta = getattr(self, estimator)(psi_extended, y)
-            e = y[max_lag:, 0].reshape(-1, 1) - np.dot(
-                psi_extended, unbiased_theta.reshape(-1, 1)
-            )
-
-        return unbiased_theta[0 : theta.shape[0], 0].reshape(-1, 1)
-
-    def total_least_squares(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Estimate the model parameters using Total Least Squares method.
+    def ridge_regression(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
+        """Estimate the model parameters using SVD and Ridge Regression method.
 
         Parameters
         ----------
@@ -242,33 +187,121 @@ class Estimators:
 
         References
         ----------
-        - Manuscript: Golub, G. H., & Van Loan, C. F. (1980).
-           An analysis of the total least squares problem.
-           SIAM journal on numerical analysis, 17(6), 883-893.
-        - Manuscript: Markovsky, I., & Van Huffel, S. (2007).
-           Overview of total least-squares methods.
-           Signal processing, 87(10), 2283-2302.
-           https://eprints.soton.ac.uk/263855/1/tls_overview.pdf
-        - Wikipedia entry on Total Least Squares
-           https://en.wikipedia.org/wiki/Total_least_squares
+        - Manuscript: Hoerl, A. E.; Kennard, R. W. Ridge regression:
+                      applications to nonorthogonal problems. Technometrics,
+                      Taylor & Francis, v. 12, n. 1, p. 69-82, 1970.
+
+        - StackExchange: whuber. The proof of shrinking coefficients using ridge
+                         regression through "spectral decomposition".
+                         Cross Validated, accessed 21 September 2023,
+                         https://stats.stackexchange.com/q/220324
+        """
+        self._check_linear_dependence_rows(psi)
+        try:
+            U, S, Vh = np.linalg.svd(psi, full_matrices=False)
+            S = np.diag(S)
+            i = np.identity(len(S))
+            theta = Vh.T @ np.linalg.inv(S**2 + self.alpha * i) @ S @ U.T @ y
+        except EstimatorError:
+            warnings.warn(
+                "The SVD computation did not converge."
+                "Theta values will be calculated with the classic algorithm.",
+                stacklevel=2,
+            )
+
+            theta = self.ridge_regression_classic(psi, y)
+
+        return theta
+
+    def optimize(self, psi: np.ndarray, y):
+        if self.solver == "svd":
+            return self.ridge_regression(psi, y)
+
+        return self.ridge_regression_classic(psi, y)
+
+
+class TotalLeastSquares(BaseEstimator):
+    """Estimate the model parameters using Total Least Squares method.
+
+    _extended_summary_
+
+    Parameters
+    ----------
+    BaseEstimator : _type_
+        _description_
+
+    References
+    ----------
+    - Manuscript: Golub, G. H., & Van Loan, C. F. (1980).
+        An analysis of the total least squares problem.
+        SIAM journal on numerical analysis, 17(6), 883-893.
+    - Manuscript: Markovsky, I., & Van Huffel, S. (2007).
+        Overview of total least-squares methods.
+        Signal processing, 87(10), 2283-2302.
+        https://eprints.soton.ac.uk/263855/1/tls_overview.pdf
+    - Wikipedia entry on Total Least Squares
+        https://en.wikipedia.org/wiki/Total_least_squares
+    """
+
+    def __init__(self, *, unbiased: bool = False, uiter: int = 30):
+        self.unbiased = unbiased
+        self.uiter = uiter
+        self._validate_params(vars(self))
+
+    def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
+        """Estimate the model parameters using Total Least Squares method.
+
+        Parameters
+        ----------
+        psi : ndarray of floats
+            The information matrix of the model.
+        y : array-like of shape = y_training
+            The data used to training the model.
+
+        Returns
+        -------
+        theta : array-like of shape = number_of_model_elements
+            The estimated parameters of the model.
 
         """
-        y = y[self.max_lag :, 0].reshape(-1, 1)
+        self._check_linear_dependence_rows(psi)
         full = np.hstack((psi, y))
         n = psi.shape[1]
         _, _, v = np.linalg.svd(full, full_matrices=True)
         theta = -v.T[:n, n:] / v.T[n:, n:]
         return theta.reshape(-1, 1)
 
-    def _initial_values(self, y, psi):
-        y = y[self.max_lag :, 0].reshape(-1, 1)
-        n_theta = psi.shape[1]
-        n = len(psi)
-        theta = np.zeros([n_theta, n])
-        xi = np.zeros([n, 1])
-        return y, n_theta, n, theta, xi
 
-    def recursive_least_squares(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
+class RecursiveLeastSquares(BaseEstimator):
+    """_summary_.
+
+    _extended_summary_
+
+    Parameters
+    ----------
+    lam : float, default=0.98
+        Forgetting factor of the Recursive Least Squares method.
+    delta : float, default=0.01
+        Normalization factor of the P matrix.
+    """
+
+    def __init__(
+        self,
+        *,
+        delta: float = 0.01,
+        lam: float = 0.98,
+        unbiased: bool = False,
+        uiter: int = 30,
+    ):
+        self.delta = delta
+        self.lam = lam
+        self.unbiased = unbiased
+        self.uiter = uiter
+        self._validate_params(vars(self))
+        self.xi = None
+        self.theta_evolution = None
+
+    def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Estimate the model parameters using the Recursive Least Squares method.
 
         The implementation consider the forgetting factor.
@@ -298,8 +331,7 @@ class Estimators:
            reais. Editora da UFMG. 3a edição.
 
         """
-        y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
-
+        n_theta, n, theta, self.xi = self._initial_values(psi)
         p = np.eye(n_theta) / self.delta
 
         for i in range(2, n):
@@ -323,7 +355,51 @@ class Estimators:
         self.theta_evolution = theta.copy()
         return theta[:, -1].reshape(-1, 1)
 
-    def affine_least_mean_squares(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
+
+class AffineLeastMeanSquares(BaseEstimator):
+    """Affine Least Mean Squares (ALMS) filter for parameter estimation.
+
+    Parameters
+    ----------
+    mu : float, default=0.01
+        The learning rate or step size for the LMS algorithm.
+    offset_covariance : float, default=0.2
+        The offset covariance factor of the affine least mean squares
+        filter.
+
+    Attributes
+    ----------
+    mu : float
+        The learning rate or step size for the LMS algorithm.
+    offset_covariance : float, default=0.2
+        The offset covariance factor of the affine least mean squares
+        filter.
+    xi : np.ndarray or None
+        The estimation error at each iteration. Initialized as None and updated during
+        optimization.
+
+    Methods
+    -------
+    optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
+        Estimate the model parameters using the LMS filter.
+    """
+
+    def __init__(
+        self,
+        *,
+        mu: float = 0.01,
+        offset_covariance: float = 0.2,
+        unbiased: bool = False,
+        uiter: int = 30,
+    ):
+        self.mu = mu
+        self.offset_covariance = offset_covariance
+        self.uiter = uiter
+        self.unbiased = unbiased
+        self._validate_params(vars(self))
+        self.xi = None
+
+    def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Estimate the model parameters using the Affine Least Mean Squares.
 
         Parameters
@@ -350,7 +426,7 @@ class Estimators:
            of least mean squares with MATLAB®. CRC Press.
 
         """
-        y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
+        n_theta, n, theta, self.xi = self._initial_values(psi)
 
         for i in range(n_theta, n):
             self.xi = y - psi.dot(theta[:, i - 1].reshape(-1, 1))
@@ -364,7 +440,37 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
+
+class LeastMeanSquares(BaseEstimator):
+    """Least Mean Squares (LMS) filter for parameter estimation in adaptive filtering.
+
+    Parameters
+    ----------
+    mu : float, default=0.01
+        The learning rate or step size for the LMS algorithm.
+
+    Attributes
+    ----------
+    mu : float
+        The learning rate or step size for the LMS algorithm.
+    xi : np.ndarray or None
+        The estimation error at each iteration. Initialized as None and updated during
+        optimization.
+
+    Methods
+    -------
+    optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
+        Estimate the model parameters using the LMS filter.
+    """
+
+    def __init__(self, *, mu: float = 0.01, unbiased: bool = False, uiter: int = 30):
+        self.mu = mu
+        self.unbiased = unbiased
+        self.uiter = uiter
+        self._validate_params(vars(self))
+        self.xi = None
+
+    def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Estimate the model parameters using the Least Mean Squares filter.
 
         Parameters
@@ -396,7 +502,7 @@ class Estimators:
            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
-        y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
+        n_theta, n, theta, self.xi = self._initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -408,9 +514,37 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_sign_error(
-        self, psi: np.ndarray, y: np.ndarray
-    ) -> np.ndarray:
+
+class LeastMeanSquaresSignError(BaseEstimator):
+    """Least Mean Squares (LMS) filter for parameter estimation.
+
+    Parameters
+    ----------
+    mu : float, default=0.01
+        The learning rate or step size for the LMS algorithm.
+
+    Attributes
+    ----------
+    mu : float
+        The learning rate or step size for the LMS algorithm.
+    xi : np.ndarray or None
+        The estimation error at each iteration. Initialized as None and updated during
+        optimization.
+
+    Methods
+    -------
+    optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
+        Estimate the model parameters using the LMS filter.
+    """
+
+    def __init__(self, *, mu: float = 0.01, unbiased: bool = False, uiter: int = 30):
+        self.mu = mu
+        self.uiter = uiter
+        self.unbiased = unbiased
+        self._validate_params(vars(self))
+        self.xi = None
+
+    def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the Sign-Error  Least Mean Squares filter.
 
         The sign-error LMS algorithm uses the sign of the error vector
@@ -445,7 +579,7 @@ class Estimators:
            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
-        y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
+        n_theta, n, theta, self.xi = self._initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -458,9 +592,49 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def normalized_least_mean_squares(
-        self, psi: np.ndarray, y: np.ndarray
-    ) -> np.ndarray:
+
+class NormalizedLeastMeanSquares(BaseEstimator):
+    """Normalized Least Mean Squares (ALMS) filter for parameter estimation.
+
+    Parameters
+    ----------
+    mu : float, default=0.01
+        The learning rate or step size for the LMS algorithm.
+    eps : float, default=np.finfo(np.float64).eps
+        Normalization factor of the normalized filters.
+
+    Attributes
+    ----------
+    mu : float
+        The learning rate or step size for the LMS algorithm.
+    eps : float, default=np.finfo(np.float64).eps
+        Normalization factor of the normalized filters.
+    xi : np.ndarray or None
+        The estimation error at each iteration. Initialized as None and updated during
+        optimization.
+
+    Methods
+    -------
+    optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
+        Estimate the model parameters using the LMS filter.
+    """
+
+    def __init__(
+        self,
+        *,
+        mu: float = 0.01,
+        eps: np.float64 = np.finfo(np.float64).eps,
+        unbiased: bool = False,
+        uiter: int = 30,
+    ):
+        self.mu = mu
+        self.eps = eps
+        self.unbiased = unbiased
+        self.uiter = uiter
+        self._validate_params(vars(self))
+        self.xi = None
+
+    def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the Normalized Least Mean Squares filter.
 
         The normalization is used to avoid numerical instability when updating
@@ -495,7 +669,7 @@ class Estimators:
            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
-        y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
+        n_theta, n, theta, self.xi = self._initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -507,9 +681,49 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_normalized_sign_error(
-        self, psi: np.ndarray, y: np.ndarray
-    ) -> np.ndarray:
+
+class NormalizedLeastMeanSquaresSignError(BaseEstimator):
+    """Normalized Least Mean Squares SignError(NLMSSE) filter for parameter estimation.
+
+    Parameters
+    ----------
+    mu : float, default=0.01
+        The learning rate or step size for the LMS algorithm.
+    eps : float, default=np.finfo(np.float64).eps
+        Normalization factor of the normalized filters.
+
+    Attributes
+    ----------
+    mu : float
+        The learning rate or step size for the LMS algorithm.
+    eps : float, default=np.finfo(np.float64).eps
+        Normalization factor of the normalized filters.
+    xi : np.ndarray or None
+        The estimation error at each iteration. Initialized as None and updated during
+        optimization.
+
+    Methods
+    -------
+    optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
+        Estimate the model parameters using the LMS filter.
+    """
+
+    def __init__(
+        self,
+        *,
+        mu: float = 0.01,
+        eps: np.float64 = np.finfo(np.float64).eps,
+        unbiased: bool = False,
+        uiter: int = 30,
+    ):
+        self.mu = mu
+        self.eps = eps
+        self.unbiased = unbiased
+        self.uiter = uiter
+        self._validate_params(vars(self))
+        self.xi = None
+
+    def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the Normalized Sign-Error LMS filter.
 
         The normalization is used to avoid numerical instability when updating
@@ -545,7 +759,7 @@ class Estimators:
            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
-        y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
+        n_theta, n, theta, self.xi = self._initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -557,9 +771,37 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_sign_regressor(
-        self, psi: np.ndarray, y: np.ndarray
-    ) -> np.ndarray:
+
+class LeastMeanSquaresSignRegressor(BaseEstimator):
+    """Least Mean Squares (LMSSR) filter for parameter estimation.
+
+    Parameters
+    ----------
+    mu : float, default=0.01
+        The learning rate or step size for the LMS algorithm.
+
+    Attributes
+    ----------
+    mu : float
+        The learning rate or step size for the LMS algorithm.
+    xi : np.ndarray or None
+        The estimation error at each iteration. Initialized as None and updated during
+        optimization.
+
+    Methods
+    -------
+    optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
+        Estimate the model parameters using the LMS filter.
+    """
+
+    def __init__(self, *, mu: float = 0.01, unbiased: bool = False, uiter: int = 30):
+        self.mu = mu
+        self.unbiased = unbiased
+        self.uiter = uiter
+        self._validate_params(vars(self))
+        self.xi = None
+
+    def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the  Sign-Regressor LMS filter.
 
         The sign-regressor LMS algorithm uses the sign of the matrix
@@ -594,7 +836,7 @@ class Estimators:
            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
-        y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
+        n_theta, n, theta, self.xi = self._initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -606,9 +848,49 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_normalized_sign_regressor(
-        self, psi: np.ndarray, y: np.ndarray
-    ) -> np.ndarray:
+
+class LeastMeanSquaresNormalizedSignRegressor(BaseEstimator):
+    """Normalized Least Mean Squares SignRegressor filter for parameter estimation.
+
+    Parameters
+    ----------
+    mu : float, default=0.01
+        The learning rate or step size for the LMS algorithm.
+    eps : float, default=np.finfo(np.float64).eps
+        Normalization factor of the normalized filters.
+
+    Attributes
+    ----------
+    mu : float
+        The learning rate or step size for the LMS algorithm.
+    eps : float, default=np.finfo(np.float64).eps
+        Normalization factor of the normalized filters.
+    xi : np.ndarray or None
+        The estimation error at each iteration. Initialized as None and updated during
+        optimization.
+
+    Methods
+    -------
+    optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
+        Estimate the model parameters using the LMS filter.
+    """
+
+    def __init__(
+        self,
+        *,
+        mu: float = 0.01,
+        eps: np.float64 = np.finfo(np.float64).eps,
+        unbiased: bool = False,
+        uiter: int = 30,
+    ):
+        self.mu = mu
+        self.eps = eps
+        self.unbiased = unbiased
+        self.uiter = uiter
+        self._validate_params(vars(self))
+        self.xi = None
+
+    def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the Normalized Sign-Regressor LMS filter.
 
         The normalization is used to avoid numerical instability when updating
@@ -644,7 +926,7 @@ class Estimators:
            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
-        y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
+        n_theta, n, theta, self.xi = self._initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -656,9 +938,37 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_sign_sign(
-        self, psi: np.ndarray, y: np.ndarray
-    ) -> np.ndarray:
+
+class LeastMeanSquaresSignSign(BaseEstimator):
+    """Least Mean Squares SignSign(LMSSS) filter for parameter estimation.
+
+    Parameters
+    ----------
+    mu : float, default=0.01
+        The learning rate or step size for the LMS algorithm.
+
+    Attributes
+    ----------
+    mu : float
+        The learning rate or step size for the LMS algorithm.
+    xi : np.ndarray or None
+        The estimation error at each iteration. Initialized as None and updated during
+        optimization.
+
+    Methods
+    -------
+    optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
+        Estimate the model parameters using the LMS filter.
+    """
+
+    def __init__(self, *, mu: float = 0.01, unbiased: bool = False, uiter: int = 30):
+        self.mu = mu
+        self.unbiased = unbiased
+        self.uiter = uiter
+        self._validate_params(vars(self))
+        self.xi = None
+
+    def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the  Sign-Sign LMS filter.
 
         The sign-regressor LMS algorithm uses both the sign of the matrix
@@ -694,7 +1004,7 @@ class Estimators:
            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
-        y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
+        n_theta, n, theta, self.xi = self._initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -706,9 +1016,49 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_normalized_sign_sign(
-        self, psi: np.ndarray, y: np.ndarray
-    ) -> np.ndarray:
+
+class LeastMeanSquaresNormalizedSignSign(BaseEstimator):
+    """Normalized Least Mean Squares SignSign(NLMSSS) filter for parameter estimation.
+
+    Parameters
+    ----------
+    mu : float, default=0.01
+        The learning rate or step size for the LMS algorithm.
+    eps : float, default=np.finfo(np.float64).eps
+        Normalization factor of the normalized filters.
+
+    Attributes
+    ----------
+    mu : float
+        The learning rate or step size for the LMS algorithm.
+    eps : float, default=np.finfo(np.float64).eps
+        Normalization factor of the normalized filters.
+    xi : np.ndarray or None
+        The estimation error at each iteration. Initialized as None and updated during
+        optimization.
+
+    Methods
+    -------
+    optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
+        Estimate the model parameters using the LMS filter.
+    """
+
+    def __init__(
+        self,
+        *,
+        mu: float = 0.01,
+        eps: np.float64 = np.finfo(np.float64).eps,
+        unbiased: bool = False,
+        uiter: int = 30,
+    ):
+        self.mu = mu
+        self.eps = eps
+        self.unbiased = unbiased
+        self.uiter = uiter
+        self._validate_params(vars(self))
+        self.xi = None
+
+    def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the Normalized Sign-Sign LMS filter.
 
         The normalization is used to avoid numerical instability when updating
@@ -745,7 +1095,7 @@ class Estimators:
            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
-        y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
+        n_theta, n, theta, self.xi = self._initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -757,9 +1107,55 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_normalized_leaky(
-        self, psi: np.ndarray, y: np.ndarray
-    ) -> np.ndarray:
+
+class LeastMeanSquaresNormalizedLeaky(BaseEstimator):
+    """Normalized Least Mean Squares Leaky(NLMSL) filter for parameter estimation.
+
+    Parameters
+    ----------
+    mu : float, default=0.01
+        The learning rate or step size for the LMS algorithm.
+    eps : float, default=np.finfo(np.float64).eps
+        Normalization factor of the normalized filters.
+    gama : float, default=0.2
+        The leakage factor of the Leaky LMS method.
+
+    Attributes
+    ----------
+    mu : float
+        The learning rate or step size for the LMS algorithm.
+    eps : float, default=np.finfo(np.float64).eps
+        Normalization factor of the normalized filters.
+    gama : float, default=0.2
+        The leakage factor of the Leaky LMS method.
+    xi : np.ndarray or None
+        The estimation error at each iteration. Initialized as None and updated during
+        optimization.
+
+    Methods
+    -------
+    optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
+        Estimate the model parameters using the LMS filter.
+    """
+
+    def __init__(
+        self,
+        *,
+        mu: float = 0.01,
+        gama: float = 0.2,
+        eps: np.float64 = np.finfo(np.float64).eps,
+        unbiased: bool = False,
+        uiter: int = 30,
+    ):
+        self.mu = mu
+        self.eps = eps
+        self.gama = gama
+        self.unbiased = unbiased
+        self.uiter = uiter
+        self._validate_params(vars(self))
+        self.xi = None
+
+    def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the  Normalized Leaky LMS filter.
 
         When the leakage factor, gama, is set to 0 then there is no
@@ -794,7 +1190,7 @@ class Estimators:
            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
-        y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
+        n_theta, n, theta, self.xi = self._initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -808,7 +1204,49 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_leaky(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
+
+class LeastMeanSquaresLeaky(BaseEstimator):
+    """Least Mean Squares Leaky(LMSL) filter for parameter estimation.
+
+    Parameters
+    ----------
+    mu : float, default=0.01
+        The learning rate or step size for the LMS algorithm.
+    gama : float, default=0.2
+        The leakage factor of the Leaky LMS method.
+
+    Attributes
+    ----------
+    mu : float
+        The learning rate or step size for the LMS algorithm.
+    gama : float, default=0.2
+        The leakage factor of the Leaky LMS method.
+    xi : np.ndarray or None
+        The estimation error at each iteration. Initialized as None and updated during
+        optimization.
+
+    Methods
+    -------
+    optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
+        Estimate the model parameters using the LMS filter.
+    """
+
+    def __init__(
+        self,
+        *,
+        mu: float = 0.01,
+        gama: float = 0.2,
+        unbiased: bool = False,
+        uiter: int = 30,
+    ):
+        self.mu = mu
+        self.gama = gama
+        self.unbiased = unbiased
+        self.uiter = uiter
+        self._validate_params(vars(self))
+        self.xi = None
+
+    def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the  Leaky LMS filter.
 
         When the leakage factor, gama, is set to 0 then there is no
@@ -843,7 +1281,7 @@ class Estimators:
            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
-        y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
+        n_theta, n, theta, self.xi = self._initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -856,7 +1294,37 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_fourth(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
+
+class LeastMeanSquaresFourth(BaseEstimator):
+    """Least Mean Squares Fourth(LMSF) filter for parameter estimation.
+
+    Parameters
+    ----------
+    mu : float, default=0.01
+        The learning rate or step size for the LMS algorithm.
+
+    Attributes
+    ----------
+    mu : float
+        The learning rate or step size for the LMS algorithm.
+    xi : np.ndarray or None
+        The estimation error at each iteration. Initialized as None and updated during
+        optimization.
+
+    Methods
+    -------
+    optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
+        Estimate the model parameters using the LMS filter.
+    """
+
+    def __init__(self, *, mu: float = 0.01, unbiased: bool = False, uiter: int = 30):
+        self.mu = mu
+        self.unbiased = unbiased
+        self.uiter = uiter
+        self._validate_params(vars(self))
+        self.xi = None
+
+    def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the  LMS Fourth filter.
 
         When the leakage factor, gama, is set to 0 then there is no
@@ -901,7 +1369,7 @@ class Estimators:
            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
-        y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
+        n_theta, n, theta, self.xi = self._initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -913,13 +1381,53 @@ class Estimators:
 
         return theta[:, -1].reshape(-1, 1)
 
-    def least_mean_squares_mixed_norm(
-        self, psi: np.ndarray, y: np.ndarray
-    ) -> np.ndarray:
-        """Parameter estimation using the Mixed-norm LMS filter.
 
-        The weight factor controls the proportions of the error norms
-        and offers an extra degree of freedom within the adaptation.
+class LeastMeanSquareMixedNorm(BaseEstimator):
+    """Least Mean Square Mixed Norm (LMS-MN) Adaptive Filter.
+
+    This class implements the Mixed-norm Least Mean Square (LMS) adaptive filter
+    algorithm, which incorporates an additional weight factor to control the
+    proportions of the error norms, thus providing an extra degree of freedom
+    in the adaptation process.
+
+    Parameters
+    ----------
+    mu : float, optional
+        The adaptation step size. Default is 0.01.
+    weight : float, optional
+        The weight factor for mixed-norm control. Weight factor to control the
+        proportions of the error norms and offers an extra degree of freedom within
+        the adaptation of the LMS mixed norm method.
+
+    Attributes
+    ----------
+    mu : float
+        The adaptation step size.
+    weight : float
+        The weight factor for mixed-norm control. Weight factor to control the
+        proportions of the error norms and offers an extra degree of freedom within
+        the adaptation of the LMS mixed norm method.
+    xi : ndarray or None
+        The error signal, initialized to None.
+    """
+
+    def __init__(
+        self,
+        *,
+        mu: float = 0.01,
+        weight: float = 0.02,
+        unbiased: bool = False,
+        uiter: int = 30,
+    ):
+        self.mu = mu
+        self.weight = weight
+        self.unbiased = unbiased
+        self.uiter = uiter
+        self._validate_params(vars(self))
+        self.xi = None
+
+    def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
+        """Parameter estimation using the Mixed-norm LMS filter.
 
         Parameters
         ----------
@@ -952,7 +1460,7 @@ class Estimators:
            https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
-        y, n_theta, n, theta, self.xi = self._initial_values(y, psi)
+        n_theta, n, theta, self.xi = self._initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -963,47 +1471,3 @@ class Estimators:
             theta[:, i] = tmp_list.flatten()
 
         return theta[:, -1].reshape(-1, 1)
-
-    def ridge_regression(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Estimate the model parameters using SVD and Ridge Regression method.
-
-        Parameters
-        ----------
-        psi : ndarray of floats
-            The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
-
-        Returns
-        -------
-        theta : array-like of shape = number_of_model_elements
-            The estimated parameters of the model.
-
-        References
-        ----------
-        - Manuscript: Hoerl, A. E.; Kennard, R. W. Ridge regression:
-                      applications to nonorthogonal problems. Technometrics,
-                      Taylor & Francis, v. 12, n. 1, p. 69-82, 1970.
-
-        - StackExchange: whuber. The proof of shrinking coefficients using ridge
-                         regression through "spectral decomposition".
-                         Cross Validated, accessed 21 September 2023,
-                         https://stats.stackexchange.com/q/220324
-        """
-        self._check_linear_dependence_rows(psi)
-        y = y[self.max_lag :, 0].reshape(-1, 1)
-        try:
-            U, S, Vh = np.linalg.svd(psi, full_matrices=False)
-            S = np.diag(S)
-            i = np.identity(len(S))
-            theta = Vh.T @ np.linalg.inv(S**2 + self.alpha * i) @ S @ U.T @ y
-        except EstimatorError:
-            warnings.warn(
-                "The SVD computation did not converge."
-                "Theta values will be calculated with the classic algorithm.",
-                stacklevel=2,
-            )
-
-            theta = self.ridge_regression_classic(psi, y)
-
-        return theta
