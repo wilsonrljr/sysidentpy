@@ -16,23 +16,49 @@ from sysidentpy.utils._check_arrays import _check_positive_int, _num_features
 
 from ..basis_function import Fourier, Polynomial
 from ..narmax_base import BaseMSS, Orthogonalization
-from ..parameter_estimation.estimators import Estimators
-from ..utils.deprecation import deprecated
 
-
-@deprecated(
-    version="v0.3.0",
-    future_version="v0.4.0",
-    message=(
-        "Passing a string to define the estimator will rise an error in v0.4.0."
-        " \n You'll have to use FROLS(estimator=LeastSquares()) instead. \n The"
-        " only change is that you'll have to define the estimator first instead"
-        " of passing a string like 'least_squares'. \n This change will make"
-        " easier to implement new estimators and it'll improve code"
-        " readability."
-    ),
+from ..parameter_estimation.estimators import (
+    LeastSquares,
+    RidgeRegression,
+    RecursiveLeastSquares,
+    TotalLeastSquares,
+    LeastMeanSquareMixedNorm,
+    LeastMeanSquares,
+    LeastMeanSquaresFourth,
+    LeastMeanSquaresLeaky,
+    LeastMeanSquaresNormalizedLeaky,
+    LeastMeanSquaresNormalizedSignRegressor,
+    LeastMeanSquaresNormalizedSignSign,
+    LeastMeanSquaresSignError,
+    LeastMeanSquaresSignSign,
+    AffineLeastMeanSquares,
+    NormalizedLeastMeanSquares,
+    NormalizedLeastMeanSquaresSignError,
+    LeastMeanSquaresSignRegressor,
 )
-class FROLS(Estimators, BaseMSS):
+
+Estimators = Union[
+    LeastSquares,
+    RidgeRegression,
+    RecursiveLeastSquares,
+    TotalLeastSquares,
+    LeastMeanSquareMixedNorm,
+    LeastMeanSquares,
+    LeastMeanSquaresFourth,
+    LeastMeanSquaresLeaky,
+    LeastMeanSquaresNormalizedLeaky,
+    LeastMeanSquaresNormalizedSignRegressor,
+    LeastMeanSquaresNormalizedSignSign,
+    LeastMeanSquaresSignError,
+    LeastMeanSquaresSignSign,
+    AffineLeastMeanSquares,
+    NormalizedLeastMeanSquares,
+    NormalizedLeastMeanSquaresSignError,
+    LeastMeanSquaresSignRegressor,
+]
+
+
+class FROLS(BaseMSS):
     r"""Forward Regression Orthogonal Least Squares algorithm.
 
     This class uses the FROLS algorithm ([1]_, [2]_) to build NARMAX models.
@@ -59,7 +85,7 @@ class FROLS(Estimators, BaseMSS):
     xlag : int, default=2
         The maximum lag of the input.
     elag : int, default=2
-        The maximum lag of the residues.
+        The maximum lag of the residues regressors.
     order_selection: bool, default=False
         Whether to use information criteria for order selection.
     info_criteria : str, default="aic"
@@ -77,15 +103,8 @@ class FROLS(Estimators, BaseMSS):
         Whether to use extended least squares method
         for parameter estimation.
         Note that we define a specific set of noise regressors.
-    lam : float, default=0.98
-        Forgetting factor of the Recursive Least Squares method.
-    delta : float, default=0.01
-        Normalization factor of the P matrix.
-    offset_covariance : float, default=0.2
-        The offset covariance factor of the affine least mean squares
-        filter.
-    mu : float, default=0.01
-        The convergence coefficient (learning rate) of the filter.
+    model_type: str, default="NARMAX"
+        The user can choose "NARMAX", "NAR" and "NFIR" models
     eps : float, default=np.finfo(np.float64).eps
         Normalization factor of the normalized filters.
     alpha : float, default=np.finfo(np.float64).eps
@@ -94,14 +113,6 @@ class FROLS(Estimators, BaseMSS):
         fitting. If the input is a noisy signal, the ridge parameter is likely to be
         set close to the noise level, at least as a starting point.
         Entered through the self data structure.
-    gama : float, default=0.2
-        The leakage factor of the Leaky LMS method.
-    weight : float, default=0.02
-        Weight factor to control the proportions of the error norms
-        and offers an extra degree of freedom within the adaptation
-        of the LMS mixed norm method.
-    model_type: str, default="NARMAX"
-        The user can choose "NARMAX", "NAR" and "NFIR" models
 
     Examples
     --------
@@ -159,24 +170,18 @@ class FROLS(Estimators, BaseMSS):
         ylag: Union[int, list] = 2,
         xlag: Union[int, list] = 2,
         elag: Union[int, list] = 2,
-        order_selection: bool = False,
+        order_selection: bool = True,
         info_criteria: str = "aic",
         n_terms: Union[int, None] = None,
         n_info_values: int = 10,
-        estimator: str = "recursive_least_squares",
-        extended_least_squares: bool = False,
-        lam: float = 0.98,
-        delta: float = 0.01,
-        offset_covariance: float = 0.2,
-        mu: float = 0.01,
-        eps: np.float64 = np.finfo(np.float64).eps,
-        alpha: np.float64 = np.finfo(np.float64).eps,  # default is machine eps
-        gama: float = 0.2,
-        weight: float = 0.02,
+        estimator: Estimators = RecursiveLeastSquares(),
+        # extended_least_squares: bool = False,
         basis_function: Union[Polynomial, Fourier] = Polynomial(),
         model_type: str = "NARMAX",
+        eps: np.float64 = np.finfo(np.float64).eps,
+        alpha: float = 0,  # default is machine eps
     ):
-        self.non_degree = basis_function.degree
+        # self.non_degree = basis_function.degree
         self.order_selection = order_selection
         self.ylag = ylag
         self.xlag = xlag
@@ -186,23 +191,17 @@ class FROLS(Estimators, BaseMSS):
         self.n_info_values = n_info_values
         self.n_terms = n_terms
         self.estimator = estimator
-        self.extended_least_squares = extended_least_squares
+        # self.extended_least_squares = extended_least_squares
         self.elag = elag
         self.model_type = model_type
         self.build_matrix = self.get_build_io_method(model_type)
         self._validate_params()
         self.basis_function = basis_function
-        super().__init__(
-            lam=lam,
-            delta=delta,
-            offset_covariance=offset_covariance,
-            mu=mu,
-            eps=eps,
-            alpha=alpha,  # ridge regression parameter
-            gama=gama,
-            weight=weight,
-            basis_function=basis_function,
-        )
+        self.eps = eps
+        if isinstance(self.estimator, RidgeRegression):
+            self.alpha = self.estimator.alpha
+        else:
+            self.alpha = alpha
         self.ensemble = None
         self.n_inputs = None
         self.regressor_code = None
@@ -236,11 +235,11 @@ class FROLS(Estimators, BaseMSS):
                 f"order_selection must be False or True. Got {self.order_selection}"
             )
 
-        if not isinstance(self.extended_least_squares, bool):
-            raise TypeError(
-                "extended_least_squares must be False or True. Got"
-                f" {self.extended_least_squares}"
-            )
+        # if not isinstance(self.extended_least_squares, bool):
+        #     raise TypeError(
+        #         "extended_least_squares must be False or True. Got"
+        #         f" {self.extended_least_squares}"
+        #     )
 
         if self.info_criteria not in ["aic", "aicc", "bic", "fpe", "lilc"]:
             raise ValueError(
@@ -327,13 +326,9 @@ class FROLS(Estimators, BaseMSS):
             err[i] = tmp_err[piv_index]
             tmp_psi[:, [piv_index, i]] = tmp_psi[:, [i, piv_index]]
             piv[[piv_index, i]] = piv[[i, piv_index]]
-
             v = Orthogonalization().house(tmp_psi[i:, i])
-
             row_result = Orthogonalization().rowhouse(tmp_psi[i:, i:], v)
-
             tmp_y[i:] = Orthogonalization().rowhouse(tmp_y[i:], v)
-
             tmp_psi[i:, i:] = np.copy(row_result)
 
         tmp_piv = piv[0:process_term_number]
@@ -383,7 +378,10 @@ class FROLS(Estimators, BaseMSS):
             n_theta = i + 1
             regressor_matrix = self.error_reduction_ratio(X, y, n_theta)[2]
 
-            tmp_theta = getattr(self, self.estimator)(regressor_matrix, y)
+            # tmp_theta = getattr(self, self.estimator)(regressor_matrix, y)
+            tmp_theta = self.estimator.optimize(
+                regressor_matrix, y[self.max_lag :, 0].reshape(-1, 1)
+            )
 
             tmp_yhat = np.dot(regressor_matrix, tmp_theta)
             tmp_residual = y[self.max_lag :] - tmp_yhat
@@ -624,10 +622,17 @@ class FROLS(Estimators, BaseMSS):
             )
             self.final_model = self.regressor_code[tmp_piv, :].copy()
 
-        self.theta = getattr(self, self.estimator)(psi, y)
-        if self.extended_least_squares is True:
-            self.theta = self._unbiased_estimator(
-                psi, y, self.theta, self.elag, self.max_lag, self.estimator
+        self.theta = self.estimator.optimize(psi, y[self.max_lag :, 0].reshape(-1, 1))
+        if self.estimator.unbiased is True:
+            self.theta = self.estimator.unbiased_estimator(
+                psi,
+                y[self.max_lag :, 0].reshape(-1, 1),
+                self.theta,
+                self.elag,
+                self.max_lag,
+                self.estimator,
+                self.basis_function,
+                self.estimator.u_iter,
             )
         return self
 
