@@ -1,6 +1,6 @@
 """Utils methods for NARMAX modeling."""
 
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Any
 import numpy as np
 
 from ..narmax_base import RegressorDictionary
@@ -9,13 +9,36 @@ from ._check_arrays import _num_features
 
 def regressor_code(
     *,
-    X=None,
-    xlag=2,
-    ylag=2,
-    model_type="NARMAX",
-    model_representation=None,
-    basis_function=None,
-):
+    X: Optional[np.ndarray] = None,
+    xlag: int = 2,
+    ylag: int = 2,
+    model_type: str = "NARMAX",
+    model_representation: Optional[str] = None,
+    basis_function: Optional[Any] = None,
+) -> np.ndarray:
+    """
+    Generate a regressor code based on the provided parameters.
+
+    Parameters
+    ----------
+    X : np.ndarray, optional
+        The input feature matrix.
+    xlag : int, optional
+        The number of lags for the input features.
+    ylag : int, optional
+        The number of lags for the target variable.
+    model_type : str, optional
+        The type of model to be used. Default is "NARMAX".
+    model_representation : str, optional
+        The model representation to be used.
+    basis_function : object, optional
+        The basis function object used to transform the regressor space.
+
+    Returns
+    -------
+    encoding : np.ndarray
+        The generated regressor encoding.
+    """
     if X is not None:
         n_inputs = _num_features(X)
     else:
@@ -58,6 +81,21 @@ def set_weights(
     base: float = 2.71,
 ) -> np.ndarray:
     """Set log-spaced weights assigned to each objective in the MO optimization.
+
+    Parameters
+    ----------
+    static_function : bool, optional
+        Indicator for the presence of static function data. Default is True.
+    static_gain : bool, optional
+        Indicator for the presence of static gain data. Default is True.
+    start : float, optional
+        The starting exponent for the log-spaced weights. Default is -0.01.
+    stop : float, optional
+        The stopping exponent for the log-spaced weights. Default is -5.
+    num : int, optional
+        The number of weights to generate. Default is 50.
+    base : float, optional
+        The base of the logarithm used to generate weights. Default is 2.71.
 
     Returns
     -------
