@@ -1,5 +1,6 @@
 """Utils methods for NARMAX modeling."""
 
+from typing import Tuple, Optional
 import numpy as np
 
 from ..narmax_base import RegressorDictionary
@@ -85,3 +86,44 @@ def set_weights(
     gain_weight = np.flip(w2_grid[mask])
     static_weight = np.flip(w3_grid[mask])
     return np.vstack([dynamic_weight, gain_weight, static_weight])
+
+
+def train_test_split(
+    X: Optional[np.ndarray], y: np.ndarray, test_size: float = 0.25
+) -> Tuple[Optional[np.ndarray], Optional[np.ndarray], np.ndarray, np.ndarray]:
+    """Split the time series dataset into training and testing sets.
+
+    Parameters
+    ----------
+    X : np.ndarray, optional
+        The feature matrix. Can be None if there are no features.
+    y : np.ndarray
+        The target vector.
+    test_size : float, optional
+        The proportion of the dataset to include in the test split. Default is 0.25.
+
+    Returns
+    -------
+    X_train : np.ndarray or None
+        The training set feature matrix, or None if X is None.
+    X_test : np.ndarray or None
+        The testing set feature matrix, or None if X is None.
+    y_train : np.ndarray
+        The training set target vector.
+    y_test : np.ndarray
+        The testing set target vector.
+    """
+    if not 0 < test_size < 1:
+        raise ValueError("test_size should be between 0 and 1")
+
+    # Determine the split index
+    split_index = int(len(y) * (1 - test_size))
+
+    y_train, y_test = y[:split_index], y[split_index:]
+
+    if X is None:
+        return None, None, y_train, y_test
+
+    X_train, X_test = X[:split_index], X[split_index:]
+
+    return X_train, X_test, y_train, y_test
