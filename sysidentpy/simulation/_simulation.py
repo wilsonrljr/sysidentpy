@@ -504,18 +504,11 @@ class SimulateNARMAX(BaseMSS):
 
         """
         lagged_data = self.build_matrix(X, y)
-        if self.basis_function.__class__.__name__ == "Polynomial":
-            X_base = self.basis_function.transform(
-                lagged_data,
-                self.max_lag,
-                predefined_regressors=self.pivv[: len(self.final_model)],
-            )
-        else:
-            X_base, _ = self.basis_function.transform(
-                lagged_data,
-                self.max_lag,
-                predefined_regressors=self.pivv[: len(self.final_model)],
-            )
+        X_base = self.basis_function.transform(
+            lagged_data,
+            self.max_lag,
+            predefined_regressors=self.pivv[: len(self.final_model)],
+        )
 
         yhat = super()._one_step_ahead_prediction(X_base)
         return yhat.reshape(-1, 1)

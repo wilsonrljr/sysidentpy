@@ -583,14 +583,9 @@ class ER(BaseMSS):
         self.max_lag = self._get_max_lag()
         lagged_data = self.build_matrix(X, y)
 
-        if self.basis_function.__class__.__name__ == "Polynomial":
-            reg_matrix = self.basis_function.fit(
-                lagged_data, self.max_lag, predefined_regressors=None
-            )
-        else:
-            reg_matrix = self.basis_function.fit(
-                lagged_data, self.max_lag, predefined_regressors=None
-            )
+        reg_matrix = self.basis_function.fit(
+            lagged_data, self.max_lag, predefined_regressors=None
+        )
 
         if X is not None:
             self.n_inputs = _num_features(X)
@@ -637,25 +632,12 @@ class ER(BaseMSS):
         if 0 not in final_model:
             final_model = np.array([0, *final_model])
 
-        if self.basis_function.__class__.__name__ == "Polynomial":
-            self.final_model = self.regressor_code[final_model, :].copy()
-        elif (
-            self.basis_function.__class__.__name__ != "Polynomial"
-            and self.basis_function.ensemble
-        ):
-            basis_code = np.sort(
-                np.tile(
-                    self.regressor_code[1:, :], (self.basis_function.repetition, 1)
-                ),
-                axis=0,
-            )
-            self.regressor_code = np.concatenate([self.regressor_code[1:], basis_code])
+        repetition = len(reg_matrix)
+        if isinstance(self.basis_function, Polynomial):
             self.final_model = self.regressor_code[final_model, :].copy()
         else:
             self.regressor_code = np.sort(
-                np.tile(
-                    self.regressor_code[1:, :], (self.basis_function.repetition, 1)
-                ),
+                np.tile(self.regressor_code[1:, :], (repetition, 1)),
                 axis=0,
             )
             self.final_model = self.regressor_code[final_model, :].copy()
@@ -754,18 +736,11 @@ class ER(BaseMSS):
         """
         lagged_data = self.build_matrix(X, y)
 
-        if self.basis_function.__class__.__name__ == "Polynomial":
-            X_base = self.basis_function.transform(
-                lagged_data,
-                self.max_lag,
-                predefined_regressors=self.pivv[: len(self.final_model)],
-            )
-        else:
-            X_base, _ = self.basis_function.transform(
-                lagged_data,
-                self.max_lag,
-                predefined_regressors=self.pivv[: len(self.final_model)],
-            )
+        X_base = self.basis_function.transform(
+            lagged_data,
+            self.max_lag,
+            predefined_regressors=self.pivv[: len(self.final_model)],
+        )
 
         yhat = super()._one_step_ahead_prediction(X_base)
         return yhat.reshape(-1, 1)

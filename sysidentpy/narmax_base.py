@@ -906,7 +906,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
                     f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
                 )
 
-            X_tmp, _ = self.basis_function.transform(
+            X_tmp = self.basis_function.transform(
                 lagged_data,
                 self.max_lag,
                 predefined_regressors=self.pivv[: len(self.final_model)],

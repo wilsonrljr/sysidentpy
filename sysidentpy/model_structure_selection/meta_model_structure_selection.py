@@ -279,7 +279,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self : returns an instance of self.
 
         """
-        if self.basis_function.__class__.__name__ != "Polynomial":
+        if not isinstance(self.basis_function, Polynomial):
             raise NotImplementedError(
                 "Currently MetaMSS only supports polynomial models."
             )
