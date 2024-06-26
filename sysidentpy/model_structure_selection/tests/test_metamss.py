@@ -53,7 +53,7 @@ def test_default_values():
         "p_zeros": 0.5,
         "p_ones": 0.5,
         "p_value": 0.05,
-        "estimator": LeastSquares(),
+        # "estimator": LeastSquares(),
         # "extended_least_squares": False,
         "eps": np.finfo(np.float64).eps,
         "steps_ahead": None,
@@ -76,7 +76,7 @@ def test_default_values():
         model.p_zeros,
         model.p_ones,
         model.p_value,
-        model.estimator,
+        # model.estimator,
         # model.extended_least_squares,
         model.eps,
         model.steps_ahead,
@@ -85,6 +85,8 @@ def test_default_values():
         model.random_state,
     ]
     assert list(default.values()) == model_values
+    assert isinstance(model.estimator, LeastSquares)
+    assert isinstance(model.basis_function, Polynomial)
 
 
 def test_validate_ylag():

@@ -26,7 +26,6 @@ def test_default_values():
     default = {
         "ylag": 1,
         "xlag": 1,
-        "estimator": LeastSquares(),
         "extended_least_squares": False,
         "q": 0.99,
         "h": 0.01,
@@ -42,7 +41,6 @@ def test_default_values():
     model_values = [
         model.ylag,
         model.xlag,
-        model.estimator,
         model.extended_least_squares,
         model.q,
         model.h,
@@ -55,6 +53,8 @@ def test_default_values():
         model.random_state,
     ]
     assert list(default.values()) == model_values
+    assert isinstance(model.estimator, LeastSquares)
+    assert isinstance(model.basis_function, Polynomial)
 
 
 def test_validate_ylag():

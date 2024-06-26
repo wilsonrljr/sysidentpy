@@ -78,7 +78,7 @@ def test_fit_with_information_criteria():
 
 def test_fit_without_information_criteria():
     basis_function = Polynomial(degree=2)
-    model = FROLS(n_terms=15, basis_function=basis_function)
+    model = FROLS(n_terms=15, basis_function=basis_function, order_selection=False)
     model.fit(X=x, y=y)
     assert model.info_values is None
 
@@ -87,12 +87,10 @@ def test_default_values():
     default = {
         "ylag": 2,
         "xlag": 2,
-        "order_selection": False,
+        "order_selection": True,
         "info_criteria": "aic",
         "n_terms": None,
         "n_info_values": 10,
-        # "estimator": "recursive_least_squares",
-        # "extended_least_squares": False,
         "eps": np.finfo(np.float64).eps,
         "alpha": 0,
         "model_type": "NARMAX",
@@ -105,12 +103,13 @@ def test_default_values():
         model.info_criteria,
         model.n_terms,
         model.n_info_values,
-        model.estimator,
         model.eps,
         model.alpha,
         model.model_type,
     ]
     assert list(default.values()) == model_values
+    assert isinstance(model.estimator, RecursiveLeastSquares)
+    assert isinstance(model.basis_function, Polynomial)
 
 
 def test_validate_ylag():

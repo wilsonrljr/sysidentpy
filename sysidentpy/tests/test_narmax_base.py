@@ -13,6 +13,10 @@ from sysidentpy.narmax_base import (
     Orthogonalization,
     InformationMatrix,
 )
+from sysidentpy.parameter_estimation.estimators import (
+    LeastSquares,
+    RecursiveLeastSquares,
+)
 from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
 
 IM = InformationMatrix()
@@ -53,57 +57,61 @@ def test_regressor_space():
         xlag=2, ylag=2, basis_function=Polynomial(degree=1)
     ).regressor_space(n_inputs=1)
     assert_array_equal(output1, r1)
-    output2 = np.array([
-        [0, 0],
-        [1001, 0],
-        [1002, 0],
-        [2001, 0],
-        [2002, 0],
-        [1001, 1001],
-        [1002, 1001],
-        [2001, 1001],
-        [2002, 1001],
-        [1002, 1002],
-        [2001, 1002],
-        [2002, 1002],
-        [2001, 2001],
-        [2002, 2001],
-        [2002, 2002],
-    ])
+    output2 = np.array(
+        [
+            [0, 0],
+            [1001, 0],
+            [1002, 0],
+            [2001, 0],
+            [2002, 0],
+            [1001, 1001],
+            [1002, 1001],
+            [2001, 1001],
+            [2002, 1001],
+            [1002, 1002],
+            [2001, 1002],
+            [2002, 1002],
+            [2001, 2001],
+            [2002, 2001],
+            [2002, 2002],
+        ]
+    )
     r2 = RegressorDictionary(
         xlag=2, ylag=2, basis_function=Polynomial(degree=2)
     ).regressor_space(n_inputs=1)
     assert_array_equal(output2, r2)
-    output3 = np.array([
-        [0, 0],
-        [1001, 0],
-        [1002, 0],
-        [2001, 0],
-        [2002, 0],
-        [3001, 0],
-        [3002, 0],
-        [1001, 1001],
-        [1002, 1001],
-        [2001, 1001],
-        [2002, 1001],
-        [3001, 1001],
-        [3002, 1001],
-        [1002, 1002],
-        [2001, 1002],
-        [2002, 1002],
-        [3001, 1002],
-        [3002, 1002],
-        [2001, 2001],
-        [2002, 2001],
-        [3001, 2001],
-        [3002, 2001],
-        [2002, 2002],
-        [3001, 2002],
-        [3002, 2002],
-        [3001, 3001],
-        [3002, 3001],
-        [3002, 3002],
-    ])
+    output3 = np.array(
+        [
+            [0, 0],
+            [1001, 0],
+            [1002, 0],
+            [2001, 0],
+            [2002, 0],
+            [3001, 0],
+            [3002, 0],
+            [1001, 1001],
+            [1002, 1001],
+            [2001, 1001],
+            [2002, 1001],
+            [3001, 1001],
+            [3002, 1001],
+            [1002, 1002],
+            [2001, 1002],
+            [2002, 1002],
+            [3001, 1002],
+            [3002, 1002],
+            [2001, 2001],
+            [2002, 2001],
+            [3001, 2001],
+            [3002, 2001],
+            [2002, 2002],
+            [3001, 2002],
+            [3002, 2002],
+            [3001, 3001],
+            [3002, 3001],
+            [3002, 3002],
+        ]
+    )
     r3 = RegressorDictionary(
         xlag=[[1, 2], [1, 2]], ylag=2, basis_function=Polynomial(degree=2)
     ).regressor_space(n_inputs=2)
@@ -111,95 +119,109 @@ def test_regressor_space():
 
 
 def test_house():
-    a = np.array([
-        0.42544384,
-        0.39365905,
-        0.22209413,
-        0.69760074,
-        0.88183369,
-        0.24818225,
-        0.78482346,
-        0.26967285,
-        0.53987842,
-        0.17367185,
-    ])
+    a = np.array(
+        [
+            0.42544384,
+            0.39365905,
+            0.22209413,
+            0.69760074,
+            0.88183369,
+            0.24818225,
+            0.78482346,
+            0.26967285,
+            0.53987842,
+            0.17367185,
+        ]
+    )
 
-    output = np.array([
-        1,
-        0.18970318,
-        0.10702653,
-        0.33617182,
-        0.42495315,
-        0.11959832,
-        0.3782042,
-        0.12995458,
-        0.26016588,
-        0.08369197,
-    ])
+    output = np.array(
+        [
+            1,
+            0.18970318,
+            0.10702653,
+            0.33617182,
+            0.42495315,
+            0.11959832,
+            0.3782042,
+            0.12995458,
+            0.26016588,
+            0.08369197,
+        ]
+    )
     assert_almost_equal(HH.house(a), output)
 
 
 def test_row_house():
-    a = np.array([
-        0.42544384,
-        0.39365905,
-        0.22209413,
-        0.69760074,
-        0.88183369,
-        0.24818225,
-        0.78482346,
-        0.26967285,
-        0.53987842,
-        0.17367185,
-    ]).reshape(-1, 1)
+    a = np.array(
+        [
+            0.42544384,
+            0.39365905,
+            0.22209413,
+            0.69760074,
+            0.88183369,
+            0.24818225,
+            0.78482346,
+            0.26967285,
+            0.53987842,
+            0.17367185,
+        ]
+    ).reshape(-1, 1)
 
-    b = np.array([
-        0.90009285,
-        0.21392929,
-        0.58429212,
-        0.55761456,
-        0.65178413,
-        0.4061564,
-        0.4353402,
-        0.02365408,
-        0.52291863,
-        0.185921,
-    ]).reshape(-1, 1)
+    b = np.array(
+        [
+            0.90009285,
+            0.21392929,
+            0.58429212,
+            0.55761456,
+            0.65178413,
+            0.4061564,
+            0.4353402,
+            0.02365408,
+            0.52291863,
+            0.185921,
+        ]
+    ).reshape(-1, 1)
 
-    output = np.array([
-        [-1.1861246],
-        [0.01063002],
-        [-0.82404988],
-        [-0.30077851],
-        [-0.28515117],
-        [-0.47901921],
-        [0.00536996],
-        [0.22732148],
-        [-0.39637961],
-        [-0.15920982],
-    ])
+    output = np.array(
+        [
+            [-1.1861246],
+            [0.01063002],
+            [-0.82404988],
+            [-0.30077851],
+            [-0.28515117],
+            [-0.47901921],
+            [0.00536996],
+            [0.22732148],
+            [-0.39637961],
+            [-0.15920982],
+        ]
+    )
     assert_almost_equal(HH.rowhouse(a, b), output)
 
 
 def test_get_index_from_regressor_code():
-    model = np.array([
-        [1001, 0],  # y(k-1)
-        [2001, 1001],  # x1(k-1)y(k-1)
-        [2002, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [2001, 1001],  # x1(k-1)y(k-1)
+            [2002, 0],  # x1(k-2)
+        ]
+    )
 
-    regressor_space = np.array([
-        [0, 0],
-        [1001, 0],
-        [2001, 0],
-        [2002, 0],
-        [1001, 1001],
-        [2001, 1001],
-        [2002, 1001],
-        [2001, 2001],
-        [2002, 2001],
-        [2002, 2002],
-    ])
+    regressor_space = np.array(
+        [
+            [0, 0],
+            [1001, 0],
+            [2001, 0],
+            [2002, 0],
+            [1001, 1001],
+            [2001, 1001],
+            [2002, 1001],
+            [2001, 2001],
+            [2002, 2001],
+            [2002, 2002],
+        ]
+    )
     index = RegressorDictionary(
         xlag=2, ylag=2, basis_function=Polynomial(degree=2)
     )._get_index_from_regressor_code(regressor_code=regressor_space, model_code=model)
@@ -208,11 +230,13 @@ def test_get_index_from_regressor_code():
 
 
 def test_list_output_regressor():
-    model = np.array([
-        [1001, 0],  # y(k-1)
-        [2001, 1001],  # x1(k-1)y(k-1)
-        [2002, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [2001, 1001],  # x1(k-1)y(k-1)
+            [2002, 0],  # x1(k-2)
+        ]
+    )
 
     y_code = RegressorDictionary(
         xlag=2, ylag=2, basis_function=Polynomial(degree=2)
@@ -221,11 +245,13 @@ def test_list_output_regressor():
 
 
 def test_list_input_regressor():
-    model = np.array([
-        [1001, 0],  # y(k-1)
-        [2001, 1001],  # x1(k-1)y(k-1)
-        [2002, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [2001, 1001],  # x1(k-1)y(k-1)
+            [2002, 0],  # x1(k-2)
+        ]
+    )
 
     x_code = RegressorDictionary(
         xlag=2, ylag=1, basis_function=Polynomial(degree=2)
@@ -261,48 +287,54 @@ def test_get_max_lag():
 
 
 def test_shift_column():
-    a = np.array([
-        0.42544384,
-        0.39365905,
-        0.22209413,
-        0.69760074,
-        0.88183369,
-        0.24818225,
-        0.78482346,
-        0.26967285,
-        0.53987842,
-        0.17367185,
-    ]).reshape(-1, 1)
+    a = np.array(
+        [
+            0.42544384,
+            0.39365905,
+            0.22209413,
+            0.69760074,
+            0.88183369,
+            0.24818225,
+            0.78482346,
+            0.26967285,
+            0.53987842,
+            0.17367185,
+        ]
+    ).reshape(-1, 1)
 
-    output = np.array([
-        [0.0],
-        [0.0],
-        [0.42544384],
-        [0.39365905],
-        [0.22209413],
-        [0.69760074],
-        [0.88183369],
-        [0.24818225],
-        [0.78482346],
-        [0.26967285],
-    ])
+    output = np.array(
+        [
+            [0.0],
+            [0.0],
+            [0.42544384],
+            [0.39365905],
+            [0.22209413],
+            [0.69760074],
+            [0.88183369],
+            [0.24818225],
+            [0.78482346],
+            [0.26967285],
+        ]
+    )
     r = IM.shift_column(a, 2)
     assert_almost_equal(output, r)
 
 
 def test_process_xlag():
-    a = np.array([
-        0.42544384,
-        0.39365905,
-        0.22209413,
-        0.69760074,
-        0.88183369,
-        0.24818225,
-        0.78482346,
-        0.26967285,
-        0.53987842,
-        0.17367185,
-    ]).reshape(-1, 1)
+    a = np.array(
+        [
+            0.42544384,
+            0.39365905,
+            0.22209413,
+            0.69760074,
+            0.88183369,
+            0.24818225,
+            0.78482346,
+            0.26967285,
+            0.53987842,
+            0.17367185,
+        ]
+    ).reshape(-1, 1)
 
     n_inputs, xlag = InformationMatrix(xlag=2)._process_xlag(a.reshape(-1, 1))
     output1 = 1
@@ -401,11 +433,13 @@ def test_model_information_empty_list():
 
 
 def test_get_max_lag_from_model_code():
-    model = np.array([
-        [1001, 0],  # y(k-1)
-        [2001, 1001],  # x1(k-1)y(k-1)
-        [2002, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [2001, 1001],  # x1(k-1)y(k-1)
+            [2002, 0],  # x1(k-2)
+        ]
+    )
     assert RegressorDictionary()._get_max_lag_from_model_code(model) == 2
 
 
@@ -441,14 +475,16 @@ def test_create_lagged_x_miso():
     r = InformationMatrix(xlag=[[1, 2], [1, 2]])._create_lagged_X(X=X, n_inputs=2)
     assert_equal(
         r,
-        np.array([
-            [0.0, 0.0, 0.0, 0.0],
-            [1.0, 0.0, 2.0, 0.0],
-            [3.0, 1.0, 4.0, 2.0],
-            [5.0, 3.0, 6.0, 4.0],
-            [7.0, 5.0, 8.0, 6.0],
-            [9.0, 7.0, 10.0, 8.0],
-        ]),
+        np.array(
+            [
+                [0.0, 0.0, 0.0, 0.0],
+                [1.0, 0.0, 2.0, 0.0],
+                [3.0, 1.0, 4.0, 2.0],
+                [5.0, 3.0, 6.0, 4.0],
+                [7.0, 5.0, 8.0, 6.0],
+                [9.0, 7.0, 10.0, 8.0],
+            ]
+        ),
     )
 
 
@@ -472,10 +508,10 @@ def test_model_predict():
     X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         n_terms=5,
-        extended_least_squares=False,
+        # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="least_squares",
+        estimator=LeastSquares(),
         basis_function=basis_function,
     )
     model.fit(X=X_train, y=y_train)
@@ -503,9 +539,9 @@ def test_model_nfir():
     X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         n_terms=5,
-        extended_least_squares=False,
+        # extended_least_squares=False,
         xlag=2,
-        estimator="least_squares",
+        estimator=LeastSquares(),
         basis_function=basis_function,
         model_type="NFIR",
     )
@@ -534,10 +570,10 @@ def test_model_predict_steps_none():
     X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         n_terms=5,
-        extended_least_squares=False,
+        # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="least_squares",
+        estimator=LeastSquares(),
         basis_function=basis_function,
     )
     model.fit(X=X_train, y=y_train)
@@ -565,10 +601,10 @@ def test_model_predict_steps_3():
     X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         n_terms=5,
-        extended_least_squares=False,
+        # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="least_squares",
+        estimator=LeastSquares(),
         basis_function=basis_function,
     )
     model.fit(X=X_train, y=y_train)
@@ -596,10 +632,10 @@ def test_model_predict_fourier_steps_none():
     X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         order_selection=True,
-        extended_least_squares=False,
+        # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="recursive_least_squares",
+        estimator=RecursiveLeastSquares(),
         basis_function=basis_function,
     )
     model.fit(X=X_train, y=y_train)
@@ -627,10 +663,10 @@ def test_model_predict_fourier_steps_1():
     X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         order_selection=True,
-        extended_least_squares=False,
+        # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="recursive_least_squares",
+        estimator=RecursiveLeastSquares(),
         basis_function=basis_function,
     )
     model.fit(X=X_train, y=y_train)
@@ -658,10 +694,10 @@ def test_model_predict_fourier_nar_inputs():
     X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         order_selection=True,
-        extended_least_squares=False,
+        # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="recursive_least_squares",
+        estimator=RecursiveLeastSquares(),
         basis_function=basis_function,
         model_type="NAR",
     )
@@ -690,10 +726,10 @@ def test_model_predict_fourier_raises():
     X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         order_selection=True,
-        extended_least_squares=False,
+        # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="recursive_least_squares",
+        estimator=RecursiveLeastSquares(),
         basis_function=basis_function,
         model_type="NARMAX",
     )
@@ -723,10 +759,10 @@ def test_model_predict_fourier_value_error():
     X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         order_selection=True,
-        extended_least_squares=False,
+        # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="recursive_least_squares",
+        estimator=RecursiveLeastSquares(),
         basis_function=basis_function,
         model_type="NARMAX",
     )
@@ -762,10 +798,10 @@ def test_model_predict_fourier_horizon_error():
     X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         order_selection=True,
-        extended_least_squares=False,
+        # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="recursive_least_squares",
+        estimator=RecursiveLeastSquares(),
         basis_function=basis_function,
         model_type="NARMAX",
     )
