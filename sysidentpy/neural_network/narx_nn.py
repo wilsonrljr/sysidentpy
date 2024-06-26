@@ -31,27 +31,27 @@ logging.basicConfig(
 FLAG : Dict[str, list] = {}
 'flag(id:branch) will be added once the branch is reached'
 
-# def print_coverage():
-#     total_branches = 0
-#     covered_branches = 0
-#     print('in print coverage')
+def print_coverage():
+    total_branches = 0
+    covered_branches = 0
+    print('in print coverage')
 
-#     for func, flags in FLAG.items():
-#         print(f"Coverage for {func}:")
-#         func_total_branches = len(flags)
-#         func_covered_branches = sum(flags)
+    for func, flags in FLAG.items():
+        print(f"Coverage for {func}:")
+        func_total_branches = len(flags)
+        func_covered_branches = sum(flags)
 
-#         total_branches += func_total_branches
-#         covered_branches += func_covered_branches
+        total_branches += func_total_branches
+        covered_branches += func_covered_branches
 
-#         for i, flag in enumerate(flags):
-#             print(f"  Branch {i + 1}: {'Reached' if flag else 'Not Reached'}")
+        for i, flag in enumerate(flags):
+            print(f"  Branch {i + 1}: {'Reached' if flag else 'Not Reached'}")
 
-#         func_coverage_percentage = (func_covered_branches / func_total_branches) * 100
-#         print(f"  Function Coverage: {func_covered_branches}/{func_total_branches} ({func_coverage_percentage:.2f}%)")
-#     if total_branches != 0:
-#         overall_coverage_percentage = (covered_branches / total_branches) * 100
-#         print(f"\nOverall Coverage: {covered_branches}/{total_branches} ({overall_coverage_percentage:.2f}%)")
+        func_coverage_percentage = (func_covered_branches / func_total_branches) * 100
+        print(f"  Function Coverage: {func_covered_branches}/{func_total_branches} ({func_coverage_percentage:.2f}%)")
+    if total_branches != 0:
+        overall_coverage_percentage = (covered_branches / total_branches) * 100
+        print(f"\nOverall Coverage: {covered_branches}/{total_branches} ({overall_coverage_percentage:.2f}%)")
 
 
 def generate_html_coverage_report():
@@ -567,11 +567,9 @@ class NARXNN(BaseMSS):
         """
         if self.basis_function.__class__.__name__ == "Polynomial":
             if steps_ahead is None:
-                generate_html_coverage_report()
                 return self._model_prediction(X, y, forecast_horizon=forecast_horizon)
             if steps_ahead == 1:
                 return self._one_step_ahead_prediction(X, y)
-            generate_html_coverage_report()
             _check_positive_int(steps_ahead, "steps_ahead")
             return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
 
@@ -684,52 +682,51 @@ class NARXNN(BaseMSS):
 
         """
         if 'model_prediction' not in FLAG:
-            FLAG['model_prediction'] = [0] * 3
-            print('model_prediction: branch 0')
+            FLAG['model_prediction'] = [0] * 4
         if self.model_type in ["NARMAX", "NAR"]:
             FLAG['model_prediction'][0]= 1
-            print('model_prediction: branch 1')
             return self._narmax_predict(X, y_initial, forecast_horizon)
-        # hidden else
-
-        if self.model_type == "NFIR":
+        else:
+            # invisible else:
             FLAG['model_prediction'][1]= 1
-            print('model_prediction: branch 2')
-            return self._nfir_predict(X, y_initial)
         
-        #hidden else
-        FLAG['model_prediction'][2]= 1
-        print('model_prediction: branch 3')
+        if self.model_type == "NFIR":
+            FLAG['model_prediction'][2]= 1
+            return self._nfir_predict(X, y_initial)
+        else:
+            # invisible else:
+            FLAG['model_prediction'][3]= 1
+        
         raise ValueError(
             f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
         )
 
     def _narmax_predict(self, X, y_initial, forecast_horizon):
         if 'narmax_predict' not in FLAG:
-            FLAG['narmax_predict'] = [0] * 4
-            print('narmax_predict: branch 0')
+            FLAG['narmax_predict'] = [0] * 6
         if len(y_initial) < self.max_lag:
             FLAG['narmax_predict'][0] = 1
-            print('narmax_predict: branch 1')
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
                 f" {self.max_lag} elements."
             )
-        # hidden else
-        if X is not None:
+        else:
+            # invisible else:
             FLAG['narmax_predict'][1] = 1
-            print('narmax_predict: branch 2')
+        
+        if X is not None:
+            FLAG['narmax_predict'][2] = 1
             forecast_horizon = X.shape[0]
         else:
-            FLAG['narmax_predict'][2] = 1
-            print('narmax_predict: branch 3')
+            FLAG['narmax_predict'][3] = 1
             forecast_horizon = forecast_horizon + self.max_lag
 
         if self.model_type == "NAR":
-            FLAG['narmax_predict'][3] = 1
-            print('narmax_predict: branch 4')
+            FLAG['narmax_predict'][4] = 1
             self.n_inputs = 0
-        #hidden else
+        else:
+            # invisible else:
+            FLAG['narmax_predict'][5] = 1
         y_output = np.zeros(forecast_horizon, dtype=float)
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
