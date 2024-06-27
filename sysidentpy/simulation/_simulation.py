@@ -151,7 +151,7 @@ class SimulateNARMAX(BaseMSS):
     def __init__(
         self,
         *,
-        estimator: Estimators = LeastSquares(),
+        estimator: Estimators = RecursiveLeastSquares(),
         elag: Union[int, list] = 2,
         extended_least_squares: bool = False,
         estimate_parameter: bool = True,
