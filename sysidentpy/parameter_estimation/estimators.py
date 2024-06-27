@@ -1235,7 +1235,7 @@ class LeastMeanSquaresLeaky(BaseEstimator):
         self,
         *,
         mu: float = 0.01,
-        gama: float = 0.2,
+        gama: float = 0.001,
         unbiased: bool = False,
         uiter: int = 30,
     ):
@@ -1317,7 +1317,7 @@ class LeastMeanSquaresFourth(BaseEstimator):
         Estimate the model parameters using the LMS filter.
     """
 
-    def __init__(self, *, mu: float = 0.01, unbiased: bool = False, uiter: int = 30):
+    def __init__(self, *, mu: float = 0.5, unbiased: bool = False, uiter: int = 30):
         self.mu = mu
         self.unbiased = unbiased
         self.uiter = uiter
