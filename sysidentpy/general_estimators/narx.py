@@ -159,14 +159,9 @@ class NARX(BaseMSS):
 
         self.max_lag = self._get_max_lag()
         lagged_data = self.build_matrix(X, y)
-        if self.basis_function.__class__.__name__ == "Polynomial":
-            reg_matrix = self.basis_function.fit(
-                lagged_data, self.max_lag, predefined_regressors=None
-            )
-        else:
-            reg_matrix, self.ensemble = self.basis_function.fit(
-                lagged_data, self.max_lag, predefined_regressors=None
-            )
+        reg_matrix = self.basis_function.fit(
+            lagged_data, self.max_lag, predefined_regressors=None
+        )
 
         if X is not None:
             self.n_inputs = _num_features(X)
@@ -267,18 +262,11 @@ class NARX(BaseMSS):
 
         """
         lagged_data = self.build_matrix(X, y)
-        if self.basis_function.__class__.__name__ == "Polynomial":
-            X_base = self.basis_function.transform(
-                lagged_data,
-                self.max_lag,
-                # predefined_regressors=self.pivv[: len(self.final_model)],
-            )
-        else:
-            X_base, _ = self.basis_function.transform(
-                lagged_data,
-                self.max_lag,
-                # predefined_regressors=self.pivv[: len(self.final_model)],
-            )
+        X_base = self.basis_function.transform(
+            lagged_data,
+            self.max_lag,
+            # predefined_regressors=self.pivv[: len(self.final_model)],
+        )
 
         yhat = self.base_estimator.predict(X_base)
         # yhat = np.concatenate([y[: self.max_lag].flatten(), yhat])  # delete this one
@@ -494,7 +482,7 @@ class NARX(BaseMSS):
                 X[i : i + analyzed_elements_number],
                 yhat[i : i + analyzed_elements_number].reshape(-1, 1),
             )
-            X_tmp, _ = self.basis_function.transform(
+            X_tmp = self.basis_function.transform(
                 lagged_data,
                 self.max_lag,
                 # predefined_regressors=self.pivv[: len(self.final_model)],
