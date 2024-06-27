@@ -2,7 +2,6 @@
 
 from warnings import warn
 from abc import ABCMeta, abstractmethod
-from typing import Optional
 
 import numpy as np
 
@@ -100,20 +99,41 @@ class BaseEstimator(metaclass=ABCMeta):
 
     def _validate_params(self, attributes):
         """Validate input params."""
+        # Define expected types and value ranges for each parameter
+        param_specs = {
+            "lam": (float, (0, 1)),
+            "weight": (float, (0, 1)),
+            "offset_covariance": (float, (0, 1)),
+            "mu": (float, (0, None)),
+            "eps": (float, (0, None)),
+            "gama": (float, (0, None)),
+            "uiter": (int, (0, None)),
+            "delta": (float, (0, None)),
+            "alpha": (float, (0, None)),
+            "unbiased": (bool, None),
+            "solver": (str, None),
+        }
+        valid_solvers = ["svd", "classic"]
         for attribute, value in attributes.items():
-            if not isinstance(value, (np.integer, int, float, bool)):
+            if attribute not in param_specs:
+                raise ValueError(f"Unexpected parameter: {attribute}")
+
+            expected_type, value_range = param_specs[attribute]
+
+            if not isinstance(value, expected_type):
                 raise ValueError(
-                    f"{attribute} must be int, float or bool (positive). ",
-                    f"Got {type(attribute)}",
-                )
-            if attribute != "unbiased" and value < 0:
-                raise ValueError(
-                    f"{attribute} must be positive. Got {value}"
-                    "Check the documentation for allowed values"
+                    f"{attribute} must be of type {expected_type.__name__}. "
+                    f"Got {type(value).__name__} instead."
                 )
 
-            if attribute in ["lam", "weight", "offset_covariance"]:
-                if not 0 <= value <= 1:
-                    raise ValueError(
-                        f"{attribute} must lies on [0 1] range. Got {value}"
-                    )
+            if value_range:
+                min_val, max_val = value_range
+                if min_val is not None and value < min_val:
+                    raise ValueError(f"{attribute} must be >= {min_val}. Got {value}.")
+                if max_val is not None and value > max_val:
+                    raise ValueError(f"{attribute} must be <= {max_val}. Got {value}.")
+
+            if attribute == "solver" and value not in valid_solvers:
+                raise ValueError(
+                    f"{attribute} must be one of {valid_solvers}. Got {value}."
+                )
