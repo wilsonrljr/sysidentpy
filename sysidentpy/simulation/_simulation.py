@@ -77,10 +77,6 @@ class SimulateNARMAX(BaseMSS):
     ----------
     estimator : str, default="least_squares"
         The parameter estimation method.
-    extended_least_squares : bool, default=False
-        Whether to use extended least squares method
-        for parameter estimation.
-        Note that we define a specific set of noise regressors.
     estimate_parameter : bool, default=False
         Whether to use a method for parameter estimation.
         Must be True if the user do not enter the pre-estimated parameters.
@@ -153,7 +149,6 @@ class SimulateNARMAX(BaseMSS):
         *,
         estimator: Estimators = RecursiveLeastSquares(),
         elag: Union[int, list] = 2,
-        extended_least_squares: bool = False,
         estimate_parameter: bool = True,
         calculate_err: bool = False,
         model_type: str = "NARMAX",
@@ -165,7 +160,6 @@ class SimulateNARMAX(BaseMSS):
         self.build_matrix = self.get_build_io_method(model_type)
         self.basis_function = basis_function
         self.estimator = estimator
-        self.extended_least_squares = extended_least_squares
         self.estimate_parameter = estimate_parameter
         self.calculate_err = calculate_err
         self.eps = eps
@@ -314,7 +308,7 @@ class SimulateNARMAX(BaseMSS):
                     self.max_lag,
                     self.estimator,
                     self.basis_function,
-                    self.estimator.u_iter,
+                    self.estimator.uiter,
                 )
 
             self.err = self.n_terms * [0]
@@ -343,7 +337,7 @@ class SimulateNARMAX(BaseMSS):
                     self.max_lag,
                     self.estimator,
                     self.basis_function,
-                    self.estimator.u_iter,
+                    self.estimator.uiter,
                 )
 
         return self.predict(
