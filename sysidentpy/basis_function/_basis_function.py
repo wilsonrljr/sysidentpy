@@ -265,6 +265,16 @@ class Bersntein(BaseBasisFunction):
     Be aware that the number of features in the output array scales
     significantly as the number of inputs, the max lag of the input and output.
 
+    References
+    ----------
+    - Blog: this method is based on the content provided by Alex Shtoff in his blog.
+        The content is easy to follow and every user is referred to is blog to check
+        not only the Bersntein method, but also different topics that Alex discuss
+        there!
+        https://alexshtf.github.io/2024/01/21/Bernstein.html
+    - Wikipedia: Bernstein polynomial
+        https://en.wikipedia.org/wiki/Bernstein_polynomial
+
     """
 
     def __init__(
