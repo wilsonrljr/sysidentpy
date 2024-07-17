@@ -173,15 +173,14 @@ class FROLS(BaseMSS):
         order_selection: bool = True,
         info_criteria: str = "aic",
         n_terms: Union[int, None] = None,
-        n_info_values: int = 10,
+        n_info_values: int = 15,
         estimator: Estimators = RecursiveLeastSquares(),
-        # extended_least_squares: bool = False,
         basis_function: Union[Polynomial, Fourier] = Polynomial(),
         model_type: str = "NARMAX",
         eps: np.float64 = np.finfo(np.float64).eps,
         alpha: float = 0,
+        err_tol: Optional[float] = None,
     ):
-        # self.non_degree = basis_function.degree
         self.order_selection = order_selection
         self.ylag = ylag
         self.xlag = xlag
@@ -191,18 +190,18 @@ class FROLS(BaseMSS):
         self.n_info_values = n_info_values
         self.n_terms = n_terms
         self.estimator = estimator
-        # self.extended_least_squares = extended_least_squares
         self.elag = elag
         self.model_type = model_type
         self.build_matrix = self.get_build_io_method(model_type)
-        self._validate_params()
         self.basis_function = basis_function
         self.eps = eps
         if isinstance(self.estimator, RidgeRegression):
             self.alpha = self.estimator.alpha
         else:
             self.alpha = alpha
-        # self.ensemble = None
+
+        self.err_tol = err_tol
+        self._validate_params()
         self.n_inputs = None
         self.regressor_code = None
         self.info_values = None
@@ -234,12 +233,6 @@ class FROLS(BaseMSS):
             raise TypeError(
                 f"order_selection must be False or True. Got {self.order_selection}"
             )
-
-        # if not isinstance(self.extended_least_squares, bool):
-        #     raise TypeError(
-        #         "extended_least_squares must be False or True. Got"
-        #         f" {self.extended_least_squares}"
-        #     )
 
         if self.info_criteria not in ["aic", "aicc", "bic", "fpe", "lilc"]:
             raise ValueError(
@@ -319,11 +312,15 @@ class FROLS(BaseMSS):
                     + self.eps
                 )[0, 0]
 
+            piv_index = np.argmax(tmp_err[i:]) + i
+            err[i] = tmp_err[piv_index]
             if i == process_term_number:
                 break
 
-            piv_index = np.argmax(tmp_err[i:]) + i
-            err[i] = tmp_err[piv_index]
+            if (self.err_tol is not None) and (err.cumsum()[i] >= self.err_tol):
+                self.n_terms = i + 1
+                break
+
             tmp_psi[:, [piv_index, i]] = tmp_psi[:, [i, piv_index]]
             piv[[piv_index, i]] = piv[[i, piv_index]]
             v = Orthogonalization().house(tmp_psi[i:, i])
@@ -378,7 +375,6 @@ class FROLS(BaseMSS):
             n_theta = i + 1
             regressor_matrix = self.error_reduction_ratio(X, y, n_theta)[2]
 
-            # tmp_theta = getattr(self, self.estimator)(regressor_matrix, y)
             tmp_theta = self.estimator.optimize(
                 regressor_matrix, y[self.max_lag :, 0].reshape(-1, 1)
             )
@@ -386,8 +382,6 @@ class FROLS(BaseMSS):
             tmp_yhat = np.dot(regressor_matrix, tmp_theta)
             tmp_residual = y[self.max_lag :] - tmp_yhat
             e_var = np.var(tmp_residual, ddof=1)
-
-            # output_vector[i] = self.compute_info_value(n_theta, n_samples, e_var)
             output_vector[i] = self.info_criteria_function(n_theta, n_samples, e_var)
 
         return output_vector
@@ -530,7 +524,50 @@ class FROLS(BaseMSS):
 
         return info_criteria_value
 
-    def fit(self, *, X: Optional[np.ndarray] = None, y: Optional[np.ndarray] = None):
+    def get_min_info_value(self, info_values):
+        """Find the index of the first increasing value in an array.
+
+        Parameters
+        ----------
+        info_values : array-like
+            A sequence of numeric values to be analyzed.
+
+        Returns
+        -------
+        int
+            The index of the first element where the values start to increase
+            monotonically. If no such element exists, the length of
+            `info_values` is returned.
+
+        Notes
+        -----
+        - The function assumes that `info_values` is a 1-dimensional array-like
+        structure.
+        - The function uses `np.diff` to compute the difference between consecutive
+        elements in the sequence.
+        - The function checks if any differences are positive, indicating an increase
+        in value.
+
+        Examples
+        --------
+        >>> class MyClass:
+        ...     def __init__(self, values):
+        ...         self.info_values = values
+        ...     def get_min_info_value(self):
+        ...         is_monotonique = np.diff(self.info_values) > 0
+        ...         if any(is_monotonique):
+        ...             return np.where(is_monotonique)[0][0] + 1
+        ...         return len(self.info_values)
+        >>> instance = MyClass([3, 2, 1, 4, 5])
+        >>> instance.get_min_info_value()
+        3
+        """
+        is_monotonique = np.diff(info_values) > 0
+        if any(is_monotonique):
+            return np.where(is_monotonique)[0][0] + 1
+        return len(info_values)
+
+    def fit(self, *, X: Optional[np.ndarray] = None, y: np.ndarray):
         """Fit polynomial NARMAX model.
 
         This is an 'alpha' version of the 'fit' function which allows
@@ -582,8 +619,7 @@ class FROLS(BaseMSS):
             self.info_values = self.information_criterion(reg_matrix, y)
 
         if self.n_terms is None and self.order_selection is True:
-            model_length = np.where(self.info_values == np.amin(self.info_values))
-            model_length = model_length[0].item() + 1  # int(model_length[0] + 1)
+            model_length = self.get_min_info_value(self.info_values)
             self.n_terms = model_length
         elif self.n_terms is None and self.order_selection is not True:
             raise ValueError(
@@ -617,7 +653,7 @@ class FROLS(BaseMSS):
                 self.max_lag,
                 self.estimator,
                 self.basis_function,
-                self.estimator.u_iter,
+                self.estimator.uiter,
             )
         return self
 
@@ -625,10 +661,10 @@ class FROLS(BaseMSS):
         self,
         *,
         X: Optional[np.ndarray] = None,
-        y: Optional[np.ndarray] = None,
+        y: np.ndarray,
         steps_ahead: Optional[int] = None,
         forecast_horizon: Optional[int] = None,
-    ) -> float:
+    ) -> np.ndarray:
         """Return the predicted values given an input.
 
         The predict function allows a friendly usage by the user.
@@ -741,7 +777,7 @@ class FROLS(BaseMSS):
     def _model_prediction(
         self,
         X: Optional[np.ndarray],
-        y_initial: Optional[np.ndarray],
+        y_initial: np.ndarray,
         forecast_horizon: int = 0,
     ) -> np.ndarray:
         """Perform the infinity steps-ahead simulation of a model.
@@ -773,7 +809,7 @@ class FROLS(BaseMSS):
     def _narmax_predict(
         self,
         X: Optional[np.ndarray],
-        y_initial: Optional[np.ndarray],
+        y_initial: np.ndarray,
         forecast_horizon: int = 0,
     ) -> np.ndarray:
         if len(y_initial) < self.max_lag:
@@ -819,7 +855,7 @@ class FROLS(BaseMSS):
     def _basis_function_n_step_prediction(
         self,
         X: Optional[np.ndarray],
-        y: Optional[np.ndarray],
+        y: np.ndarray,
         steps_ahead: Optional[int],
         forecast_horizon: int,
     ) -> np.ndarray:

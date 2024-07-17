@@ -93,10 +93,6 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         The parameter estimation method.
     estimate_parameter : bool, default=True
         Whether to estimate the model parameters.
-    extended_least_squares : bool, default=False
-        Whether to use extended least squares method
-        for parameter estimation.
-        Note that we define a specific set of noise regressors.
     eps : float
         Normalization factor of the normalized filters.
     maxiter : int, default=30
@@ -195,7 +191,6 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         ylag: Union[int, list] = 1,
         elag: Union[int, list] = 1,
         estimator: Estimators = LeastSquares(),
-        extended_least_squares: bool = False,
         eps: np.float64 = np.finfo(np.float64).eps,
         estimate_parameter: bool = True,
         loss_func: str = "metamss_loss",
@@ -207,7 +202,6 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
     ):
         super().__init__(
             estimator=estimator,
-            extended_least_squares=extended_least_squares,
             eps=eps,
             estimate_parameter=estimate_parameter,
             model_type=model_type,
@@ -230,7 +224,6 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self.xlag = xlag
         self.ylag = ylag
         self.elag = elag
-        self.non_degree = basis_function.degree
         self.p_value = p_value
         self.estimator = estimator
         self.estimate_parameter = estimate_parameter

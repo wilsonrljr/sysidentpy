@@ -145,7 +145,6 @@ class AOLS(BaseMSS):
         basis_function: Union[Polynomial, Fourier] = Polynomial(),
     ):
         self.basis_function = basis_function
-        # self.non_degree = basis_function.degree
         self.model_type = model_type
         self.build_matrix = self.get_build_io_method(model_type)
         self.xlag = xlag
@@ -155,7 +154,6 @@ class AOLS(BaseMSS):
         self.L = L
         self.estimator = estimator
         self.threshold = threshold
-        # self.ensemble = None
         self.res = None
         self.n_inputs = None
         self.theta = None

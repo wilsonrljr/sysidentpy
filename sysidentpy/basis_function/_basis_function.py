@@ -110,7 +110,7 @@ class Polynomial(BaseBasisFunction):
         return self.fit(data, max_lag, predefined_regressors)
 
 
-class Fourier:
+class Fourier(BaseBasisFunction):
     """Build Fourier basis function.
 
     Generate a new feature matrix consisting of all Fourier features
@@ -228,6 +228,45 @@ class Fourier:
 
 
 class Bersntein(BaseBasisFunction):
+    r"""Build Bersntein basis function.
+
+    Generate Bernstein basis functions.
+
+    This class constructs a new feature matrix consisting of Bernstein basis functions
+    for a given degree. Bernstein polynomials are useful in numerical analysis, curve
+    fitting, and approximation theory due to their smoothness and the ability to
+    approximate any continuous function on a closed interval.
+
+    The Bernstein polynomial of degree \(n\) for a variable \(x\) is defined as:
+
+    .. math::
+        B_{i,n}(x) = \binom{n}{i} x^i (1 - x)^{n - i} \quad \text{for} \quad i = 0, 1,
+        \ldots, n
+
+    where \(\binom{n}{i}\) is the binomial coefficient, given by:
+
+    .. math::
+        \binom{n}{i} = \frac{n!}{i! (n - i)!}
+
+    Bernstein polynomials form a basis for the space of polynomials of degree at most
+    \(n\). They are particularly useful in approximation theory because they can
+    approximate any continuous function on the interval \([0, 1]\) as \(n\) increases.
+
+    Be aware that the number of features in the output array scales significantly with
+    the number of inputs, the maximum lag of the input, and the polynomial degree.
+
+    Parameters
+    ----------
+    degree : int (max_degree), default=2
+        The maximum degree of the polynomial features.
+
+    Notes
+    -----
+    Be aware that the number of features in the output array scales
+    significantly as the number of inputs, the max lag of the input and output.
+
+    """
+
     def __init__(
         self, degree: int = 1, n: int = 1, bias: bool = True, ensemble: bool = False
     ):
@@ -268,9 +307,9 @@ class Bersntein(BaseBasisFunction):
             psi = np.column_stack([data, psi])
 
         if predefined_regressors is None:
-            return psi, self.ensemble
+            return psi
 
-        return psi[:, predefined_regressors], self.ensemble
+        return psi[:, predefined_regressors]
 
     def transform(
         self,

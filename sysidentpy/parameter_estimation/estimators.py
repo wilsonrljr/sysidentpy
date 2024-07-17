@@ -7,7 +7,13 @@
 
 import warnings
 
+from typing import Union
+
 import numpy as np
+
+from scipy.optimize import nnls
+from scipy.optimize import lsq_linear
+from scipy.sparse.linalg import lsmr
 
 from .estimators_base import BaseEstimator
 
@@ -24,10 +30,6 @@ class EstimatorError(Exception):
     None
 
     """
-
-
-class Estimators:
-    pass
 
 
 class LeastSquares(BaseEstimator):
@@ -298,8 +300,8 @@ class RecursiveLeastSquares(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi = None
-        self.theta_evolution = None
+        self.xi: np.ndarray
+        self.theta_evolution: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Estimate the model parameters using the Recursive Least Squares method.
@@ -397,7 +399,7 @@ class AffineLeastMeanSquares(BaseEstimator):
         self.uiter = uiter
         self.unbiased = unbiased
         self._validate_params(vars(self))
-        self.xi = None
+        self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Estimate the model parameters using the Affine Least Mean Squares.
@@ -468,7 +470,7 @@ class LeastMeanSquares(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi = None
+        self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Estimate the model parameters using the Least Mean Squares filter.
@@ -542,7 +544,7 @@ class LeastMeanSquaresSignError(BaseEstimator):
         self.uiter = uiter
         self.unbiased = unbiased
         self._validate_params(vars(self))
-        self.xi = None
+        self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the Sign-Error  Least Mean Squares filter.
@@ -632,7 +634,7 @@ class NormalizedLeastMeanSquares(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi = None
+        self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the Normalized Least Mean Squares filter.
@@ -721,7 +723,7 @@ class NormalizedLeastMeanSquaresSignError(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi = None
+        self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the Normalized Sign-Error LMS filter.
@@ -799,7 +801,7 @@ class LeastMeanSquaresSignRegressor(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi = None
+        self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the  Sign-Regressor LMS filter.
@@ -888,7 +890,7 @@ class LeastMeanSquaresNormalizedSignRegressor(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi = None
+        self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the Normalized Sign-Regressor LMS filter.
@@ -966,7 +968,7 @@ class LeastMeanSquaresSignSign(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi = None
+        self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the  Sign-Sign LMS filter.
@@ -1056,7 +1058,7 @@ class LeastMeanSquaresNormalizedSignSign(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi = None
+        self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the Normalized Sign-Sign LMS filter.
@@ -1153,7 +1155,7 @@ class LeastMeanSquaresNormalizedLeaky(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi = None
+        self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the  Normalized Leaky LMS filter.
@@ -1244,7 +1246,7 @@ class LeastMeanSquaresLeaky(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi = None
+        self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the  Leaky LMS filter.
@@ -1322,7 +1324,7 @@ class LeastMeanSquaresFourth(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi = None
+        self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the  LMS Fourth filter.
@@ -1424,7 +1426,7 @@ class LeastMeanSquareMixedNorm(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi = None
+        self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Parameter estimation using the Mixed-norm LMS filter.
@@ -1471,3 +1473,427 @@ class LeastMeanSquareMixedNorm(BaseEstimator):
             theta[:, i] = tmp_list.flatten()
 
         return theta[:, -1].reshape(-1, 1)
+
+
+class NonNegativeLeastSquares(BaseEstimator):
+    """Solve ``argmin_x || Ax - b ||_2`` for ``x >= 0``.
+
+    This is a wrapper class for the `scipy.optimize.nnls` method.
+
+    This problem, often called NonNegative Least Squares (NNLS), is a convex
+    optimization problem with convex constraints. It typically arises when
+    the ``x`` models quantities for which only nonnegative values are
+    attainable; such as weights of ingredients, component costs, and so on.
+
+    Parameters
+    ----------
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
+    maxiter : int, optional
+        Maximum number of iterations. Default value is ``3 * n`` where ``n``
+        is the number of features.
+    atol : float, optional
+        Tolerance value used in the algorithm to assess closeness to zero in
+        the projected residual ``(A.T @ (A x - b))`` entries. Increasing this
+        value relaxes the solution constraints. A typical relaxation value can
+        be selected as ``max(m, n) * np.linalg.norm(A, 1) * np.spacing(1.)``.
+        Default is None.
+
+    Attributes
+    ----------
+    unbiased : bool
+        Indicates whether an unbiased estimator is applied.
+    uiter : int
+        Number of iterations for the unbiased estimator.
+    maxiter : int
+        Maximum number of iterations.
+    atol : float
+        Tolerance value for the algorithm.
+
+    References
+    ----------
+    .. [1] Lawson C., Hanson R.J., "Solving Least Squares Problems", SIAM,
+       1995, :doi:`10.1137/1.9781611971217`
+    .. [2] Bro, Rasmus and de Jong, Sijmen, "A Fast Non-Negativity-Constrained Least
+    Squares Algorithm", Journal Of Chemometrics, 1997,
+    :doi:`10.1002/(SICI)1099-128X(199709/10)11:5<393::AID-CEM483>3.0.CO;2-L`
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from sysidentpy.parameter_estimation import NonNegativeLeastSquares
+    ...
+    >>> A = np.array([[1, 0], [1, 0], [0, 1]])
+    >>> b = np.array([2, 1, 1])
+    >>> nnls_solver = NonNegativeLeastSquares()
+    >>> x = nnls_solver.optimize(A, b)
+    >>> print(x)
+    [[1.5]
+     [1. ]]
+
+    >>> b = np.array([-1, -1, -1])
+    >>> x = nnls_solver.optimize(A, b)
+    >>> print(x)
+    [[0.]
+     [0.]]
+    """
+
+    def __init__(
+        self, unbiased: bool = False, uiter: int = 30, maxiter=None, atol=None
+    ):
+        self.unbiased = unbiased
+        self.uiter = uiter
+        self.maxiter = maxiter
+        self.atol = atol
+
+    def optimize(self, psi, y):
+        """Parameter estimation using the NonNegativeLeastSquares algorithm.
+
+        Parameters
+        ----------
+        psi : ndarray of floats
+            The information matrix of the model.
+        y : array-like
+            The data used to training the model.
+
+        Returns
+        -------
+        theta : array-like of shape = number_of_model_elements
+            The estimated parameters of the model.
+
+        Notes
+        -----
+        This is a wrapper class for the `scipy.optimize.nnls` method.
+
+        References
+        ----------
+        .. [1] scipy, https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.nnls.html
+        """
+        theta, _ = nnls(psi, y.ravel(), maxiter=self.maxiter, atol=self.atol)
+        return theta.reshape(-1, 1)
+
+
+class BoundedVariableLeastSquares(BaseEstimator):
+    """Solve a linear least-squares problem with bounds on the variables.
+
+    This is a wrapper class for the `scipy.optimize.lsq_linear` method.
+
+    Given a m-by-n design matrix A and a target vector b with m elements,
+    `lsq_linear` solves the following optimization problem::
+
+        minimize 0.5 * ||A x - b||**2
+        subject to lb <= x <= ub
+
+    This optimization problem is convex, hence a found minimum (if iterations
+    have converged) is guaranteed to be global.
+
+    Attributes
+    ----------
+    unbiased : bool
+        Indicates whether an unbiased estimator is applied.
+    uiter : int
+        Number of iterations for the unbiased estimator.
+    method : 'trf' or 'bvls', optional
+        Method to perform minimization.
+
+            * 'trf' : Trust Region Reflective algorithm adapted for a linear
+              least-squares problem. This is an interior-point-like method
+              and the required number of iterations is weakly correlated with
+              the number of variables.
+            * 'bvls' : Bounded-variable least-squares algorithm. This is
+              an active set method, which requires the number of iterations
+              comparable to the number of variables. Can't be used when `A` is
+              sparse or LinearOperator.
+
+        Default is 'trf'.
+    tol : float, optional
+        Tolerance parameter. The algorithm terminates if a relative change
+        of the cost function is less than `tol` on the last iteration.
+        Additionally, the first-order optimality measure is considered:
+
+            * ``method='trf'`` terminates if the uniform norm of the gradient,
+              scaled to account for the presence of the bounds, is less than
+              `tol`.
+            * ``method='bvls'`` terminates if Karush-Kuhn-Tucker conditions
+              are satisfied within `tol` tolerance.
+
+    lsq_solver : {None, 'exact', 'lsmr'}, optional
+        Method of solving unbounded least-squares problems throughout
+        iterations:
+
+            * 'exact' : Use dense QR or SVD decomposition approach. Can't be
+              used when `A` is sparse or LinearOperator.
+            * 'lsmr' : Use `scipy.sparse.linalg.lsmr` iterative procedure
+              which requires only matrix-vector product evaluations. Can't
+              be used with ``method='bvls'``.
+
+        If None (default), the solver is chosen based on type of `A`.
+    lsmr_tol : None, float or 'auto', optional
+        Tolerance parameters 'atol' and 'btol' for `scipy.sparse.linalg.lsmr`
+        If None (default), it is set to ``1e-2 * tol``. If 'auto', the
+        tolerance will be adjusted based on the optimality of the current
+        iterate, which can speed up the optimization process, but is not always
+        reliable.
+    max_iter : None or int, optional
+        Maximum number of iterations before termination. If None (default), it
+        is set to 100 for ``method='trf'`` or to the number of variables for
+        ``method='bvls'`` (not counting iterations for 'bvls' initialization).
+    verbose : {0, 1, 2}, optional
+        Level of algorithm's verbosity:
+
+            * 0 : work silently (default).
+            * 1 : display a termination report.
+            * 2 : display progress during iterations.
+    lsmr_maxiter : None or int, optional
+        Maximum number of iterations for the lsmr least squares solver,
+        if it is used (by setting ``lsq_solver='lsmr'``). If None (default), it
+        uses lsmr's default of ``min(m, n)`` where ``m`` and ``n`` are the
+        number of rows and columns of `A`, respectively. Has no effect if
+        ``lsq_solver='exact'``.
+
+    References
+    ----------
+    .. [STIR] M. A. Branch, T. F. Coleman, and Y. Li, "A Subspace, Interior,
+              and Conjugate Gradient Method for Large-Scale Bound-Constrained
+              Minimization Problems," SIAM Journal on Scientific Computing,
+              Vol. 21, Number 1, pp 1-23, 1999.
+    .. [BVLS] P. B. Start and R. L. Parker, "Bounded-Variable Least-Squares:
+              an Algorithm and Applications", Computational Statistics, 10,
+              129-141, 1995.
+
+
+    Notes
+    -----
+    This docstring is adapted from the `scipy.optimize.lsq_linear` method.
+
+    Examples
+    --------
+    In this example, a problem with a large sparse matrix and bounds on the
+    variables is solved.
+
+    >>> import numpy as np
+    >>> from scipy.sparse import rand
+    >>> from sysidentpy.parameter_estimation import BoundedVariableLeastSquares
+    >>> rng = np.random.default_rng()
+    ...
+    >>> m = 20000
+    >>> n = 10000
+    ...
+    >>> A = rand(m, n, density=1e-4, random_state=rng)
+    >>> b = rng.standard_normal(m)
+    ...
+    >>> lb = rng.standard_normal(n)
+    >>> ub = lb + 1
+    ...
+    >>> res = BoundedVariableLeastSquares(A, b, bounds=(lb, ub), lsmr_tol='auto',
+    verbose=1)
+    The relative change of the cost function is less than `tol`.
+    Number of iterations 16, initial cost 1.5039e+04, final cost 1.1112e+04,
+    first-order optimality 4.66e-08.
+    """
+
+    def __init__(
+        self,
+        *,
+        unbiased: bool = False,
+        uiter: int = 30,
+        bounds=(-np.inf, np.inf),
+        method="trf",
+        tol=1e-10,
+        lsq_solver=None,
+        lsmr_tol=None,
+        max_iter=None,
+        verbose=0,
+        lsmr_maxiter=None,
+    ):
+        self.unbiased = unbiased
+        self.uiter = uiter
+        self.max_iter = max_iter
+        self.bounds = bounds
+        self.method = method
+        self.tol = tol
+        self.lsq_solver = lsq_solver
+        self.lsmr_tol = lsmr_tol
+        self.verbose = verbose
+        self.lsmr_maxiter = lsmr_maxiter
+
+    def optimize(self, psi, y):
+        """Parameter estimation using the BoundedVariableLeastSquares algorithm.
+
+        Parameters
+        ----------
+        psi : ndarray of floats
+            The information matrix of the model.
+        y : array-like
+            The data used to training the model.
+
+        Returns
+        -------
+        theta : array-like of shape = number_of_model_elements
+            The estimated parameters of the model.
+
+        Notes
+        -----
+        This is a wrapper class for the `scipy.optimize.lsq_linear` method.
+
+        References
+        ----------
+        .. [1] scipy, https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.lsq_linear.html
+        """
+        theta = lsq_linear(
+            psi,
+            y.ravel(),
+            bounds=self.bounds,
+            method=self.method,
+            tol=self.tol,
+            lsq_solver=self.lsq_solver,
+            lsmr_tol=self.lsmr_tol,
+            max_iter=self.max_iter,
+            verbose=self.verbose,
+            lsmr_maxiter=self.lsmr_maxiter,
+        )
+        return theta.x.reshape(-1, 1)
+
+
+class LeastSquaresMinimalResidual(BaseEstimator):
+    """Iterative solver for least-squares minimal residual problems.
+
+    This is a wrapper class for the `scipy.sparse.linalg.lsmr` method.
+
+    lsmr solves the system of linear equations ``Ax = b``. If the system
+    is inconsistent, it solves the least-squares problem ``min ||b - Ax||_2``.
+    ``A`` is a rectangular matrix of dimension m-by-n, where all cases are
+    allowed: m = n, m > n, or m < n. ``b`` is a vector of length m.
+    The matrix A may be dense or sparse (usually sparse).
+
+    Parameters
+    ----------
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
+
+    Attributes
+    ----------
+    unbiased : bool
+        Indicates whether an unbiased estimator is applied.
+    uiter : int
+        Number of iterations for the unbiased estimator.
+    damp : float
+        Damping factor for regularized least-squares. `lsmr` solves
+        the regularized least-squares problem::
+
+         min ||(b) - (  A   )x||
+             ||(0)   (damp*I) ||_2
+
+        where damp is a scalar.  If damp is None or 0, the system
+        is solved without regularization. Default is 0.
+    atol, btol : float, optional
+        Stopping tolerances. `lsmr` continues iterations until a
+        certain backward error estimate is smaller than some quantity
+        depending on atol and btol.  Let ``r = b - Ax`` be the
+        residual vector for the current approximate solution ``x``.
+        If ``Ax = b`` seems to be consistent, `lsmr` terminates
+        when ``norm(r) <= atol * norm(A) * norm(x) + btol * norm(b)``.
+        Otherwise, `lsmr` terminates when ``norm(A^H r) <=
+        atol * norm(A) * norm(r)``.  If both tolerances are 1.0e-6 (default),
+        the final ``norm(r)`` should be accurate to about 6
+        digits. (The final ``x`` will usually have fewer correct digits,
+        depending on ``cond(A)`` and the size of LAMBDA.)  If `atol`
+        or `btol` is None, a default value of 1.0e-6 will be used.
+        Ideally, they should be estimates of the relative error in the
+        entries of ``A`` and ``b`` respectively.  For example, if the entries
+        of ``A`` have 7 correct digits, set ``atol = 1e-7``. This prevents
+        the algorithm from doing unnecessary work beyond the
+        uncertainty of the input data.
+    conlim : float, optional
+        `lsmr` terminates if an estimate of ``cond(A)`` exceeds
+        `conlim`.  For compatible systems ``Ax = b``, conlim could be
+        as large as 1.0e+12 (say).  For least-squares problems,
+        `conlim` should be less than 1.0e+8. If `conlim` is None, the
+        default value is 1e+8.  Maximum precision can be obtained by
+        setting ``atol = btol = conlim = 0``, but the number of
+        iterations may then be excessive. Default is 1e8.
+    maxiter : int, optional
+        `lsmr` terminates if the number of iterations reaches
+        `maxiter`.  The default is ``maxiter = min(m, n)``.  For
+        ill-conditioned systems, a larger value of `maxiter` may be
+        needed. Default is False.
+    show : bool, optional
+        Print iterations logs if ``show=True``. Default is False.
+    x0 : array_like, shape (n,), optional
+        Initial guess of ``x``, if None zeros are used. Default is None.
+
+    References
+    ----------
+    .. [1] D. C.-L. Fong and M. A. Saunders,
+           "LSMR: An iterative algorithm for sparse least-squares problems",
+           SIAM J. Sci. Comput., vol. 33, pp. 2950-2971, 2011.
+           :arxiv:`1006.0758`
+    .. [2] LSMR Software, https://web.stanford.edu/group/SOL/software/lsmr/
+
+    Notes
+    -----
+    This docstring is adapted from the `scipy.sparse.linalg.lsmr` method.
+    """
+
+    def __init__(
+        self,
+        *,
+        unbiased: bool = False,
+        uiter: int = 30,
+        damp=0.0,
+        atol=1e-6,
+        btol=1e-6,
+        conlim=1e8,
+        maxiter=None,
+        show=False,
+        x0=None,
+    ):
+        self.unbiased = unbiased
+        self.uiter = uiter
+        self.damp = damp
+        self.atol = atol
+        self.btol = btol
+        self.conlim = conlim
+        self.maxiter = maxiter
+        self.show = show
+        self.x0 = x0
+
+    def optimize(self, psi, y):
+        """Parameter estimation using the Mixed-norm LMS filter.
+
+        Parameters
+        ----------
+        psi : ndarray of floats
+            The information matrix of the model.
+        y : array-like
+            The data used to training the model.
+
+        Returns
+        -------
+        theta : array-like of shape = number_of_model_elements
+            The estimated parameters of the model.
+
+        Notes
+        -----
+        This is a wrapper class for the `scipy.sparse.linalg.lsmr` method.
+
+        References
+        ----------
+        .. [1] scipy, https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.lsmr.html
+        """
+        theta = lsmr(
+            psi,
+            y.ravel(),
+            damp=self.damp,
+            atol=self.atol,
+            btol=self.btol,
+            conlim=self.conlim,
+            maxiter=self.maxiter,
+            show=self.show,
+            x0=self.x0,
+        )[0]
+        return theta.reshape(-1, 1)
