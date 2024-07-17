@@ -508,13 +508,14 @@ def test_model_predict():
     X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         n_terms=5,
-        # extended_least_squares=False,
+        err_tol=None,
         ylag=[1, 2],
         xlag=2,
         estimator=LeastSquares(),
         basis_function=basis_function,
     )
     model.fit(X=X_train, y=y_train)
+    print(model.final_model, model.err.sum())
     yhat = model.predict(X=X_test, y=y_test)
     assert_almost_equal(yhat, y_test, decimal=10)
 
@@ -570,7 +571,7 @@ def test_model_predict_steps_none():
     X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         n_terms=5,
-        # extended_least_squares=False,
+        err_tol=None,
         ylag=[1, 2],
         xlag=2,
         estimator=LeastSquares(),
@@ -601,7 +602,7 @@ def test_model_predict_steps_3():
     X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         n_terms=5,
-        # extended_least_squares=False,
+        err_tol=None,
         ylag=[1, 2],
         xlag=2,
         estimator=LeastSquares(),
@@ -632,7 +633,7 @@ def test_model_predict_fourier_steps_none():
     X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         order_selection=True,
-        # extended_least_squares=False,
+        err_tol=None,
         ylag=[1, 2],
         xlag=2,
         estimator=RecursiveLeastSquares(),
@@ -663,7 +664,7 @@ def test_model_predict_fourier_steps_1():
     X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         order_selection=True,
-        # extended_least_squares=False,
+        err_tol=None,
         ylag=[1, 2],
         xlag=2,
         estimator=RecursiveLeastSquares(),
