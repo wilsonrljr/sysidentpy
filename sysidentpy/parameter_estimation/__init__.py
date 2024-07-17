@@ -16,4 +16,7 @@ from .estimators import (
     NormalizedLeastMeanSquares,
     NormalizedLeastMeanSquaresSignError,
     LeastMeanSquaresSignRegressor,
+    NonNegativeLeastSquares,
+    LeastSquaresMinimalResidual,
+    BoundedVariableLeastSquares,
 )

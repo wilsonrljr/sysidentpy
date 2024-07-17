@@ -84,8 +84,8 @@ class BPSOGSA:
         self.g_zero = g_zero
         self.alpha = alpha
         self.k_agents_percent = k_agents_percent
-        self._norm = norm
-        self._power = power
+        self.norm = norm
+        self.power = power
         self.p_zeros = p_zeros
         self.p_ones = p_ones
         self.best_by_iter = None
@@ -251,7 +251,7 @@ class BPSOGSA:
                 if maximum_value_index[j] != i:
                     euclidean_distance = np.linalg.norm(
                         population[:, i] - population[:, maximum_value_index[j]],
-                        self._norm,
+                        self.norm,
                     )
                     gravitational_force[:, i] = gravitational_force[
                         :, i
@@ -260,7 +260,7 @@ class BPSOGSA:
                     ] * (
                         population[:, maximum_value_index[j]] - population[:, i]
                     ) / (
-                        euclidean_distance**self._power + np.finfo(np.float64).eps
+                        euclidean_distance**self.power + np.finfo(np.float64).eps
                     )
 
         acceleration = gravitational_force * gravitational_constant

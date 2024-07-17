@@ -22,7 +22,6 @@ from sysidentpy.parameter_estimation.estimators import (
     LeastMeanSquaresSignRegressor,
 )
 
-from sysidentpy.parameter_estimation.estimators import EstimatorError
 
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_raises
@@ -68,6 +67,7 @@ def test_least_squares():
         xlag=2,
         estimator=LeastSquares(),
         basis_function=basis_function,
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
@@ -82,6 +82,7 @@ def test_ridge_regression():
         xlag=2,
         estimator=RidgeRegression(alpha=np.finfo(np.float64).eps),
         basis_function=basis_function,
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
@@ -96,6 +97,7 @@ def test_ridge_regression_classic():
         xlag=2,
         estimator=RidgeRegression(alpha=np.finfo(np.float64).eps, solver="classic"),
         basis_function=basis_function,
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
@@ -121,6 +123,7 @@ def test_total_least_squares():
         xlag=2,
         estimator=TotalLeastSquares(),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
@@ -134,6 +137,7 @@ def test_recursive_least_squares():
         xlag=2,
         estimator=RecursiveLeastSquares(delta=0.00001, lam=0.99),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
@@ -147,6 +151,7 @@ def test_affine_least_mean_squares():
         xlag=2,
         estimator=AffineLeastMeanSquares(mu=0.01, offset_covariance=0.2),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
@@ -160,6 +165,7 @@ def test_least_mean_squares():
         xlag=2,
         estimator=LeastMeanSquares(mu=0.1),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
@@ -173,6 +179,7 @@ def test_least_mean_squares_sign_error():
         xlag=2,
         estimator=LeastMeanSquaresSignError(mu=0.01),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=xl, y=yl)
     print(model.theta.shape, theta.shape)
@@ -187,6 +194,7 @@ def test_normalized_least_mean_squares():
         xlag=2,
         estimator=NormalizedLeastMeanSquares(mu=0.1),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
@@ -202,6 +210,7 @@ def test_least_mean_squares_normalized_sign_error():
         info_criteria="aic",
         estimator=NormalizedLeastMeanSquaresSignError(mu=0.005),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
@@ -215,6 +224,7 @@ def test_least_mean_squares_sign_regressor():
         xlag=2,
         estimator=LeastMeanSquaresSignRegressor(mu=0.1),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
@@ -228,6 +238,7 @@ def test_least_mean_squares_normalized_sign_regressor():
         xlag=2,
         estimator=LeastMeanSquaresNormalizedSignRegressor(mu=0.1),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
@@ -241,6 +252,7 @@ def test_least_mean_squares_sign_sign():
         xlag=2,
         estimator=LeastMeanSquaresSignSign(mu=0.001),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=xl, y=yl)
     assert_almost_equal(model.theta, theta, decimal=2)
@@ -254,6 +266,7 @@ def test_least_mean_squares_normalized_sign_sign():
         xlag=2,
         estimator=LeastMeanSquaresNormalizedSignSign(mu=0.0001),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=xl, y=yl)
     assert_almost_equal(model.theta, theta, decimal=2)
@@ -267,6 +280,7 @@ def test_least_mean_squares_mixed_norm():
         xlag=2,
         estimator=LeastMeanSquareMixedNorm(mu=0.05),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=xl, y=yl)
     assert_almost_equal(model.theta, theta, decimal=2)
@@ -280,6 +294,7 @@ def test_nlmsl():
         xlag=2,
         estimator=LeastMeanSquaresNormalizedLeaky(mu=0.05, gama=0.001),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=xl, y=yl)
     assert_almost_equal(model.theta, theta, decimal=2)
@@ -293,6 +308,7 @@ def test_lmsl():
         xlag=2,
         estimator=LeastMeanSquaresLeaky(mu=0.05, gama=0.001),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=xl, y=yl)
     assert_almost_equal(model.theta, theta, decimal=2)
@@ -306,6 +322,7 @@ def test_lmsf():
         xlag=2,
         estimator=LeastMeanSquaresFourth(mu=0.5),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=xl, y=yl)
     assert_almost_equal(model.theta, theta, decimal=2)

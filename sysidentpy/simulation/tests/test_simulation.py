@@ -73,7 +73,6 @@ def test_estimate_parameter():
 def test_default_values():
     default = {
         # "estimator": RecursiveLeastSquares(),
-        "extended_least_squares": False,
         "eps": np.finfo(np.float64).eps,
         "model_type": "NARMAX",
         "estimate_parameter": True,
@@ -82,7 +81,6 @@ def test_default_values():
     model = SimulateNARMAX(basis_function=Polynomial())
     model_values = [
         # model.estimator,
-        model.extended_least_squares,
         model.eps,
         model.model_type,
         model.estimate_parameter,
@@ -496,7 +494,6 @@ def test_estimate_parameter_els():
     s = SimulateNARMAX(
         basis_function=Polynomial(),
         estimate_parameter=True,
-        extended_least_squares=True,
     )
 
     # the model must be a numpy array

@@ -54,7 +54,7 @@ def test_error_reduction_ratio():
         order_selection=True,
         n_info_values=5,
         info_criteria="aic",
-        # extended_least_squares=False,
+        err_tol=None,
         ylag=[1, 2],
         xlag=2,
         estimator=LeastSquares(),
@@ -90,10 +90,11 @@ def test_default_values():
         "order_selection": True,
         "info_criteria": "aic",
         "n_terms": None,
-        "n_info_values": 10,
+        "n_info_values": 15,
         "eps": np.finfo(np.float64).eps,
         "alpha": 0,
         "model_type": "NARMAX",
+        "err_tol": None,
     }
     model = FROLS(basis_function=Polynomial(degree=2))
     model_values = [
@@ -106,6 +107,7 @@ def test_default_values():
         model.eps,
         model.alpha,
         model.model_type,
+        model.err_tol,
     ]
     assert list(default.values()) == model_values
     assert isinstance(model.estimator, RecursiveLeastSquares)
@@ -177,7 +179,7 @@ def test_predict():
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
-        # extended_least_squares=False,
+        err_tol=None,
         ylag=[1, 2],
         xlag=2,
         estimator=LeastSquares(),
