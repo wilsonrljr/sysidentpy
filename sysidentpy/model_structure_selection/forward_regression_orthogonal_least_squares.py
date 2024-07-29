@@ -319,6 +319,7 @@ class FROLS(BaseMSS):
 
             if (self.err_tol is not None) and (err.cumsum()[i] >= self.err_tol):
                 self.n_terms = i + 1
+                process_term_number = i + 1
                 break
 
             tmp_psi[:, [piv_index, i]] = tmp_psi[:, [i, piv_index]]
@@ -330,7 +331,7 @@ class FROLS(BaseMSS):
 
         tmp_piv = piv[0:process_term_number]
         psi_orthogonal = psi[:, tmp_piv]
-        return err, piv, psi_orthogonal
+        return err, tmp_piv, psi_orthogonal
 
     def information_criterion(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Determine the model order.
