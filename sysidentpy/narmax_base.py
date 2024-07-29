@@ -1033,7 +1033,7 @@ class Orthogonalization:
         u = np.linalg.norm(x, 2)
         if u != 0:
             aux_b = x[0] + np.sign(x[0]) * u
-            x = x[1:] / aux_b
+            x = x[1:] / (aux_b + np.finfo(np.float64).eps)
             x = np.concatenate((np.array([1]), x))
         return x
 
