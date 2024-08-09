@@ -20,3 +20,26 @@ from .estimators import (
     LeastSquaresMinimalResidual,
     BoundedVariableLeastSquares,
 )
+
+__all__ = [
+    "LeastSquares",
+    "RidgeRegression",
+    "RecursiveLeastSquares",
+    "TotalLeastSquares",
+    "LeastMeanSquareMixedNorm",
+    "LeastMeanSquares",
+    "LeastMeanSquaresFourth",
+    "LeastMeanSquaresLeaky",
+    "LeastMeanSquaresNormalizedLeaky",
+    "LeastMeanSquaresNormalizedSignRegressor",
+    "LeastMeanSquaresNormalizedSignSign",
+    "LeastMeanSquaresSignError",
+    "LeastMeanSquaresSignSign",
+    "AffineLeastMeanSquares",
+    "NormalizedLeastMeanSquares",
+    "NormalizedLeastMeanSquaresSignError",
+    "LeastMeanSquaresSignRegressor",
+    "NonNegativeLeastSquares",
+    "LeastSquaresMinimalResidual",
+    "BoundedVariableLeastSquares",
+]
