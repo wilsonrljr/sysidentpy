@@ -11,7 +11,6 @@ import numpy as np
 from ..basis_function import Fourier, Polynomial
 from ..narmax_base import BaseMSS, Orthogonalization
 
-# from ..parameter_estimation.estimators import Estimators
 from ..utils._check_arrays import _check_positive_int, _num_features
 from ..parameter_estimation.estimators import (
     LeastSquares,
@@ -83,23 +82,8 @@ class SimulateNARMAX(BaseMSS):
         Note that we define a specific set of noise regressors.
     calculate_err : bool, default=False
         Whether to use a ERR algorithm to the pre-defined regressors.
-    lam : float, default=0.98
-        Forgetting factor of the Recursive Least Squares method.
-    delta : float, default=0.01
-        Normalization factor of the P matrix.
-    offset_covariance : float, default=0.2
-        The offset covariance factor of the affine least mean squares
-        filter.
-    mu : float, default=0.01
-        The convergence coefficient (learning rate) of the filter.
     eps : float
         Normalization factor of the normalized filters.
-    gama : float, default=0.2
-        The leakage factor of the Leaky LMS method.
-    weight : float, default=0.02
-        Weight factor to control the proportions of the error norms
-        and offers an extra degree of freedom within the adaptation
-        of the LMS mixed norm method.
 
     Examples
     --------

@@ -99,10 +99,6 @@ class FROLS(BaseMSS):
         criteria method.
     estimator : str, default="least_squares"
         The parameter estimation method.
-    extended_least_squares : bool, default=False
-        Whether to use extended least squares method
-        for parameter estimation.
-        Note that we define a specific set of noise regressors.
     model_type: str, default="NARMAX"
         The user can choose "NARMAX", "NAR" and "NFIR" models
     eps : float, default=np.finfo(np.float64).eps
