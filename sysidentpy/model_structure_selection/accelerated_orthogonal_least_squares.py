@@ -10,24 +10,49 @@ from numpy import linalg as LA
 
 from ..narmax_base import BaseMSS
 from ..basis_function import Fourier, Polynomial
-from ..parameter_estimation.estimators import Estimators
-from ..utils._check_arrays import _check_positive_int, _num_features
-from ..utils.deprecation import deprecated
-
-
-@deprecated(
-    version="v0.3.0",
-    future_version="v0.4.0",
-    message=(
-        "Passing a string to define the estimator will rise an error in v0.4.0."
-        " \n You'll have to use AOLS(estimator=LeastSquares()) instead. \n The"
-        " only change is that you'll have to define the estimator first instead"
-        " of passing a string like 'least_squares'. \n This change will make"
-        " easier to implement new estimators and it'll improve code"
-        " readability."
-    ),
+from ..parameter_estimation.estimators import (
+    LeastSquares,
+    RidgeRegression,
+    RecursiveLeastSquares,
+    TotalLeastSquares,
+    LeastMeanSquareMixedNorm,
+    LeastMeanSquares,
+    LeastMeanSquaresFourth,
+    LeastMeanSquaresLeaky,
+    LeastMeanSquaresNormalizedLeaky,
+    LeastMeanSquaresNormalizedSignRegressor,
+    LeastMeanSquaresNormalizedSignSign,
+    LeastMeanSquaresSignError,
+    LeastMeanSquaresSignSign,
+    AffineLeastMeanSquares,
+    NormalizedLeastMeanSquares,
+    NormalizedLeastMeanSquaresSignError,
+    LeastMeanSquaresSignRegressor,
 )
-class AOLS(Estimators, BaseMSS):
+from ..utils._check_arrays import _check_positive_int, _num_features
+
+Estimators = Union[
+    LeastSquares,
+    RidgeRegression,
+    RecursiveLeastSquares,
+    TotalLeastSquares,
+    LeastMeanSquareMixedNorm,
+    LeastMeanSquares,
+    LeastMeanSquaresFourth,
+    LeastMeanSquaresLeaky,
+    LeastMeanSquaresNormalizedLeaky,
+    LeastMeanSquaresNormalizedSignRegressor,
+    LeastMeanSquaresNormalizedSignSign,
+    LeastMeanSquaresSignError,
+    LeastMeanSquaresSignSign,
+    AffineLeastMeanSquares,
+    NormalizedLeastMeanSquares,
+    NormalizedLeastMeanSquaresSignError,
+    LeastMeanSquaresSignRegressor,
+]
+
+
+class AOLS(BaseMSS):
     r"""Accelerated Orthogonal Least Squares Algorithm.
 
     Build Polynomial NARMAX model using the Accelerated Orthogonal Least-Squares ([1]_).
@@ -116,18 +141,10 @@ class AOLS(Estimators, BaseMSS):
         L: int = 1,
         threshold: float = 10e-10,
         model_type: str = "NARMAX",
-        estimator: str = "least_squares",
+        estimator: Estimators = LeastSquares(),
         basis_function: Union[Polynomial, Fourier] = Polynomial(),
-        lam: float = 0.98,
-        delta: float = 0.01,
-        offset_covariance: float = 0.2,
-        mu: float = 0.01,
-        eps: np.float64 = np.finfo(np.float64).eps,
-        gama: float = 0.2,
-        weight: float = 0.02,
     ):
         self.basis_function = basis_function
-        self.non_degree = basis_function.degree
         self.model_type = model_type
         self.build_matrix = self.get_build_io_method(model_type)
         self.xlag = xlag
@@ -137,17 +154,6 @@ class AOLS(Estimators, BaseMSS):
         self.L = L
         self.estimator = estimator
         self.threshold = threshold
-        super().__init__(
-            lam=lam,
-            delta=delta,
-            offset_covariance=offset_covariance,
-            mu=mu,
-            eps=eps,
-            gama=gama,
-            weight=weight,
-            basis_function=basis_function,
-        )
-        self.ensemble = None
         self.res = None
         self.n_inputs = None
         self.theta = None
@@ -190,10 +196,10 @@ class AOLS(Estimators, BaseMSS):
 
         Parameters
         ----------
-        y : array-like of shape = n_samples
-            The target data used in the identification process.
         psi : ndarray of floats
             The information matrix of the model.
+        y : array-like of shape = n_samples
+            The target data used in the identification process.
 
         Returns
         -------
@@ -248,11 +254,15 @@ class AOLS(Estimators, BaseMSS):
 
         aols_index = aols_index[aols_index > 0].ravel().astype(int)
         residual_norm = LA.norm(r)
-        theta[aols_index] = getattr(self, self.estimator)(psi[:, aols_index], y)
+        theta[aols_index] = self.estimator.optimize(
+            psi[:, aols_index], y[self.max_lag :, 0].reshape(-1, 1)
+        )
         if self.L > 1:
             sorting_indices = np.argsort(np.abs(theta))[::-1]
             aols_index = sorting_indices[: self.k].ravel().astype(int)
-            theta[aols_index] = getattr(self, self.estimator)(psi[:, aols_index], y)
+            theta[aols_index] = self.estimator.optimize(
+                psi[:, aols_index], y[self.max_lag :, 0].reshape(-1, 1)
+            )
             residual_norm = LA.norm(
                 y[self.max_lag :].reshape(-1, 1)
                 - psi[:, aols_index] @ theta[aols_index]
@@ -297,15 +307,9 @@ class AOLS(Estimators, BaseMSS):
 
         self.max_lag = self._get_max_lag()
         lagged_data = self.build_matrix(X, y)
-
-        if self.basis_function.__class__.__name__ == "Polynomial":
-            reg_matrix = self.basis_function.fit(
-                lagged_data, self.max_lag, predefined_regressors=None
-            )
-        else:
-            reg_matrix, self.ensemble = self.basis_function.fit(
-                lagged_data, self.max_lag, predefined_regressors=None
-            )
+        reg_matrix = self.basis_function.fit(
+            lagged_data, self.max_lag, predefined_regressors=None
+        )
 
         if X is not None:
             self.n_inputs = _num_features(X)
@@ -313,24 +317,13 @@ class AOLS(Estimators, BaseMSS):
             self.n_inputs = 1  # just to create the regressor space base
 
         self.regressor_code = self.regressor_space(self.n_inputs)
-
         (self.theta, self.pivv, self.res) = self.aols(reg_matrix, y)
-        if self.basis_function.__class__.__name__ == "Polynomial":
-            self.final_model = self.regressor_code[self.pivv, :].copy()
-        elif self.basis_function.__class__.__name__ != "Polynomial" and self.ensemble:
-            basis_code = np.sort(
-                np.tile(
-                    self.regressor_code[1:, :], (self.basis_function.repetition, 1)
-                ),
-                axis=0,
-            )
-            self.regressor_code = np.concatenate([self.regressor_code[1:], basis_code])
+        repetition = len(reg_matrix)
+        if isinstance(self.basis_function, Polynomial):
             self.final_model = self.regressor_code[self.pivv, :].copy()
         else:
             self.regressor_code = np.sort(
-                np.tile(
-                    self.regressor_code[1:, :], (self.basis_function.repetition, 1)
-                ),
+                np.tile(self.regressor_code[1:, :], (repetition, 1)),
                 axis=0,
             )
             self.final_model = self.regressor_code[self.pivv, :].copy()
@@ -428,18 +421,11 @@ class AOLS(Estimators, BaseMSS):
 
         """
         lagged_data = self.build_matrix(X, y)
-        if self.basis_function.__class__.__name__ == "Polynomial":
-            X_base = self.basis_function.transform(
-                lagged_data,
-                self.max_lag,
-                predefined_regressors=self.pivv[: len(self.final_model)],
-            )
-        else:
-            X_base, _ = self.basis_function.transform(
-                lagged_data,
-                self.max_lag,
-                predefined_regressors=self.pivv[: len(self.final_model)],
-            )
+        X_base = self.basis_function.transform(
+            lagged_data,
+            self.max_lag,
+            predefined_regressors=self.pivv[: len(self.final_model)],
+        )
 
         yhat = super()._one_step_ahead_prediction(X_base)
         return yhat.reshape(-1, 1)

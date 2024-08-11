@@ -626,7 +626,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         self,
         *,
         X: Optional[np.ndarray] = None,
-        y: Optional[np.ndarray] = None,
+        y: np.ndarray,
         steps_ahead: Optional[int] = None,
         forecast_horizon: int = 1,
     ) -> np.ndarray:
@@ -689,21 +689,19 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
     def _model_prediction(
         self,
         X: Optional[np.ndarray],
-        y_initial: Optional[np.ndarray],
+        y_initial: np.ndarray,
         forecast_horizon: int = 1,
     ) -> np.ndarray:
         """Model prediction wrapper."""
 
     def _narmax_predict(
         self,
-        X: Optional[np.ndarray],
-        y_initial: Optional[np.ndarray],
+        X: np.ndarray,
+        y_initial: np.ndarray,
         forecast_horizon: int = 1,
     ) -> np.ndarray:
         """narmax_predict method."""
-        y_output = np.zeros(
-            forecast_horizon, dtype=float
-        )  # np.zeros(X.shape[0], dtype=float)
+        y_output = np.zeros(forecast_horizon, dtype=float)
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
 
@@ -729,9 +727,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         return y_output[self.max_lag : :].reshape(-1, 1)
 
     @abstractmethod
-    def _nfir_predict(
-        self, X: Optional[np.ndarray], y_initial: Optional[np.ndarray]
-    ) -> np.ndarray:
+    def _nfir_predict(self, X: np.ndarray, y_initial: np.ndarray) -> np.ndarray:
         """Nfir predict method."""
         y_output = np.zeros(X.shape[0], dtype=float)
         y_output.fill(np.nan)
@@ -758,9 +754,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             y_output[i] = np.dot(regressor_value, self.theta.flatten())
         return y_output[self.max_lag : :].reshape(-1, 1)
 
-    def _nar_step_ahead(
-        self, y: Optional[np.ndarray], steps_ahead: Optional[int]
-    ) -> np.ndarray:
+    def _nar_step_ahead(self, y: np.ndarray, steps_ahead: int) -> np.ndarray:
         if len(y) < self.max_lag:
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
@@ -768,7 +762,8 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             )
 
         to_remove = int(np.ceil((len(y) - self.max_lag) / steps_ahead))
-        yhat = np.zeros(len(y) + steps_ahead, dtype=float)
+        yhat_length = len(y) + steps_ahead
+        yhat = np.zeros(yhat_length, dtype=float)
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
         i = self.max_lag
@@ -795,8 +790,8 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
     def narmax_n_step_ahead(
         self,
-        X: Optional[np.ndarray],
-        y: Optional[np.ndarray],
+        X: np.ndarray,
+        y: np.ndarray,
         steps_ahead: Optional[int],
     ) -> np.ndarray:
         """n_steps ahead prediction method for NARMAX model."""
@@ -866,16 +861,15 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         if self.model_type == "NAR":
             return self._nar_step_ahead(y, steps_ahead)
 
-        if self.model_type == "NFIR":
-            raise ValueError(
-                "n_steps_ahead prediction will be implemented for NFIR models in v0.4.*"
-            )
+        raise ValueError(
+            "n_steps_ahead prediction will be implemented for NFIR models in v0.4.*"
+        )
 
     @abstractmethod
     def _basis_function_predict(
         self,
         X: Optional[np.ndarray],
-        y_initial: Optional[np.ndarray],
+        y_initial: np.ndarray,
         forecast_horizon: int = 1,
     ) -> np.ndarray:
         """Basis function prediction."""
@@ -884,7 +878,6 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         yhat[: self.max_lag] = y_initial[: self.max_lag, 0]
 
         # Discard unnecessary initial values
-        # yhat[0:self.max_lag] = y_initial[0:self.max_lag]
         analyzed_elements_number = self.max_lag + 1
 
         for i in range(forecast_horizon - self.max_lag):
@@ -906,7 +899,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
                     f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
                 )
 
-            X_tmp, _ = self.basis_function.transform(
+            X_tmp = self.basis_function.transform(
                 lagged_data,
                 self.max_lag,
                 predefined_regressors=self.pivv[: len(self.final_model)],
@@ -921,8 +914,8 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
     def _basis_function_n_step_prediction(
         self,
         X: Optional[np.ndarray],
-        y: Optional[np.ndarray],
-        steps_ahead: Optional[int],
+        y: np.ndarray,
+        steps_ahead: int,
         forecast_horizon: int,
     ) -> np.ndarray:
         """Basis function n step ahead."""
@@ -969,8 +962,8 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
     def _basis_function_n_steps_horizon(
         self,
         X: Optional[np.ndarray],
-        y: Optional[np.ndarray],
-        steps_ahead: Optional[int],
+        y: np.ndarray,
+        steps_ahead: int,
         forecast_horizon: int,
     ) -> np.ndarray:
         """Basis n steps horizon."""
@@ -1040,7 +1033,7 @@ class Orthogonalization:
         u = np.linalg.norm(x, 2)
         if u != 0:
             aux_b = x[0] + np.sign(x[0]) * u
-            x = x[1:] / aux_b
+            x = x[1:] / (aux_b + np.finfo(np.float64).eps)
             x = np.concatenate((np.array([1]), x))
         return x
 

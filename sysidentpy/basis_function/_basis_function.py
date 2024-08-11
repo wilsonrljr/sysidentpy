@@ -2,8 +2,8 @@
 
 from itertools import combinations_with_replacement
 from typing import Optional
-
 import numpy as np
+from scipy.stats import binom
 
 from .basis_function_base import BaseBasisFunction
 
@@ -110,7 +110,7 @@ class Polynomial(BaseBasisFunction):
         return self.fit(data, max_lag, predefined_regressors)
 
 
-class Fourier:
+class Fourier(BaseBasisFunction):
     """Build Fourier basis function.
 
     Generate a new feature matrix consisting of all Fourier features
@@ -135,7 +135,6 @@ class Fourier:
         self.p = p
         self.degree = degree
         self.ensemble = ensemble
-        self.repetition = None
 
     def _fourier_expansion(self, data: np.ndarray, n: int):
         base = np.column_stack(
@@ -191,7 +190,6 @@ class Fourier:
             )
             psi = np.column_stack([psi, base_col])
 
-        self.repetition = self.n * 2
         if self.ensemble:
             psi = psi[:, 1:]
             psi = np.column_stack([data, psi])
@@ -199,9 +197,9 @@ class Fourier:
             psi = psi[:, 1:]
 
         if predefined_regressors is None:
-            return psi, self.ensemble
+            return psi
 
-        return psi[:, predefined_regressors], self.ensemble
+        return psi[:, predefined_regressors]
 
     def transform(
         self,
@@ -226,4 +224,107 @@ class Fourier:
             Transformed array.
 
         """
+        return self.fit(data, max_lag, predefined_regressors)
+
+
+class Bersntein(BaseBasisFunction):
+    r"""Build Bersntein basis function.
+
+    Generate Bernstein basis functions.
+
+    This class constructs a new feature matrix consisting of Bernstein basis functions
+    for a given degree. Bernstein polynomials are useful in numerical analysis, curve
+    fitting, and approximation theory due to their smoothness and the ability to
+    approximate any continuous function on a closed interval.
+
+    The Bernstein polynomial of degree \(n\) for a variable \(x\) is defined as:
+
+    .. math::
+        B_{i,n}(x) = \binom{n}{i} x^i (1 - x)^{n - i} \quad \text{for} \quad i = 0, 1,
+        \ldots, n
+
+    where \(\binom{n}{i}\) is the binomial coefficient, given by:
+
+    .. math::
+        \binom{n}{i} = \frac{n!}{i! (n - i)!}
+
+    Bernstein polynomials form a basis for the space of polynomials of degree at most
+    \(n\). They are particularly useful in approximation theory because they can
+    approximate any continuous function on the interval \([0, 1]\) as \(n\) increases.
+
+    Be aware that the number of features in the output array scales significantly with
+    the number of inputs, the maximum lag of the input, and the polynomial degree.
+
+    Parameters
+    ----------
+    degree : int (max_degree), default=2
+        The maximum degree of the polynomial features.
+
+    Notes
+    -----
+    Be aware that the number of features in the output array scales
+    significantly as the number of inputs, the max lag of the input and output.
+
+    References
+    ----------
+    - Blog: this method is based on the content provided by Alex Shtoff in his blog.
+        The content is easy to follow and every user is referred to is blog to check
+        not only the Bersntein method, but also different topics that Alex discuss
+        there!
+        https://alexshtf.github.io/2024/01/21/Bernstein.html
+    - Wikipedia: Bernstein polynomial
+        https://en.wikipedia.org/wiki/Bernstein_polynomial
+
+    """
+
+    def __init__(
+        self, degree: int = 1, n: int = 1, bias: bool = True, ensemble: bool = False
+    ):
+        self.degree = degree
+        self.n = n
+        self.bias = bias
+        self.ensemble = ensemble
+
+    def _bernstein_expansion(self, data: np.ndarray):
+        k = np.arange(1 + self.n)
+        base = binom.pmf(k, self.n, data[:, None])
+        return base
+
+    def fit(
+        self,
+        data: np.ndarray,
+        max_lag: int = 1,
+        predefined_regressors: Optional[np.ndarray] = None,
+    ):
+        # remove intercept (because the data always have the intercept)
+        if self.degree > 1:
+            data = Polynomial().fit(data, max_lag, predefined_regressors=None)
+            data = data[:, 1:]
+        else:
+            data = data[max_lag:, 1:]
+
+        n_features = data.shape[1]
+        psi = [self._bernstein_expansion(data[:, col]) for col in range(n_features)]
+        if not self.bias:
+            psi = [basis[:, 1:] for basis in psi]
+
+        psi = np.hstack(psi)
+        bias_column = np.ones((psi.shape[0], 1))
+        psi = np.hstack((bias_column, psi))
+        psi = np.nan_to_num(psi, 0)
+        if self.ensemble:
+            psi = psi[:, 1:]
+            psi = np.column_stack([data, psi])
+
+        if predefined_regressors is None:
+            return psi
+
+        return psi[:, predefined_regressors]
+
+    def transform(
+        self,
+        data: np.ndarray,
+        max_lag: int = 1,
+        predefined_regressors: Optional[np.ndarray] = None,
+    ):
         return self.fit(data, max_lag, predefined_regressors)

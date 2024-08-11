@@ -14,9 +14,47 @@ from scipy.special import psi
 
 from ..narmax_base import BaseMSS
 from ..basis_function import Fourier, Polynomial
-from ..parameter_estimation.estimators import Estimators
 from ..utils._check_arrays import _check_positive_int, _num_features, check_random_state
 from ..utils.deprecation import deprecated
+from ..parameter_estimation.estimators import (
+    LeastSquares,
+    RidgeRegression,
+    RecursiveLeastSquares,
+    TotalLeastSquares,
+    LeastMeanSquareMixedNorm,
+    LeastMeanSquares,
+    LeastMeanSquaresFourth,
+    LeastMeanSquaresLeaky,
+    LeastMeanSquaresNormalizedLeaky,
+    LeastMeanSquaresNormalizedSignRegressor,
+    LeastMeanSquaresNormalizedSignSign,
+    LeastMeanSquaresSignError,
+    LeastMeanSquaresSignSign,
+    AffineLeastMeanSquares,
+    NormalizedLeastMeanSquares,
+    NormalizedLeastMeanSquaresSignError,
+    LeastMeanSquaresSignRegressor,
+)
+
+Estimators_Union = Union[
+    LeastSquares,
+    RidgeRegression,
+    RecursiveLeastSquares,
+    TotalLeastSquares,
+    LeastMeanSquareMixedNorm,
+    LeastMeanSquares,
+    LeastMeanSquaresFourth,
+    LeastMeanSquaresLeaky,
+    LeastMeanSquaresNormalizedLeaky,
+    LeastMeanSquaresNormalizedSignRegressor,
+    LeastMeanSquaresNormalizedSignSign,
+    LeastMeanSquaresSignError,
+    LeastMeanSquaresSignSign,
+    AffineLeastMeanSquares,
+    NormalizedLeastMeanSquares,
+    NormalizedLeastMeanSquaresSignError,
+    LeastMeanSquaresSignRegressor,
+]
 
 
 @deprecated(
@@ -31,7 +69,7 @@ from ..utils.deprecation import deprecated
         " readability."
     ),
 )
-class ER(Estimators, BaseMSS):
+class ER(BaseMSS):
     r"""Entropic Regression Algorithm.
 
     Build Polynomial NARMAX model using the Entropic Regression Algorithm ([1]_).
@@ -74,23 +112,6 @@ class ER(Estimators, BaseMSS):
         To be used for difficult and highly uncertain problems.
         Skipping the forward selection results in more accurate solution,
         but comes with higher computational cost.
-    lam : float, default=0.98
-        Forgetting factor of the Recursive Least Squares method.
-    delta : float, default=0.01
-        Normalization factor of the P matrix.
-    offset_covariance : float, default=0.2
-        The offset covariance factor of the affine least mean squares
-        filter.
-    mu : float, default=0.01
-        The convergence coefficient (learning rate) of the filter.
-    eps : float
-        Normalization factor of the normalized filters.
-    gama : float, default=0.2
-        The leakage factor of the Leaky LMS method.
-    weight : float, default=0.02
-        Weight factor to control the proportions of the error norms
-        and offers an extra degree of freedom within the adaptation
-        of the LMS mixed norm method.
     model_type: str, default="NARMAX"
         The user can choose "NARMAX", "NAR" and "NFIR" models
 
@@ -148,7 +169,7 @@ class ER(Estimators, BaseMSS):
         ylag: Union[int, list] = 1,
         xlag: Union[int, list] = 1,
         q: float = 0.99,
-        estimator: str = "least_squares",
+        estimator: Estimators_Union = LeastSquares(),
         extended_least_squares: bool = False,
         h: float = 0.01,
         k: int = 2,
@@ -156,13 +177,6 @@ class ER(Estimators, BaseMSS):
         n_perm: int = 200,
         p: float = np.inf,
         skip_forward: bool = False,
-        lam: float = 0.98,
-        delta: float = 0.01,
-        offset_covariance: float = 0.2,
-        mu: float = 0.01,
-        eps: float = np.finfo(np.float64).eps,
-        gama: float = 0.2,
-        weight: float = 0.02,
         model_type: str = "NARMAX",
         basis_function: Union[Polynomial, Fourier] = Polynomial(),
         random_state: Optional[int] = None,
@@ -186,7 +200,7 @@ class ER(Estimators, BaseMSS):
         self.random_state = random_state
         self.rng = check_random_state(random_state)
         self.tol = None
-        self.ensemble = None
+        # self.ensemble = None
         self.n_inputs = None
         self.estimated_tolerance = None
         self.regressor_code = None
@@ -196,16 +210,6 @@ class ER(Estimators, BaseMSS):
         self.err = None
         self.pivv = None
         self._validate_params()
-        super().__init__(
-            lam=lam,
-            delta=delta,
-            offset_covariance=offset_covariance,
-            mu=mu,
-            eps=eps,
-            gama=gama,
-            weight=weight,
-            basis_function=basis_function,
-        )
 
     def _validate_params(self):
         """Validate input params."""
@@ -579,14 +583,9 @@ class ER(Estimators, BaseMSS):
         self.max_lag = self._get_max_lag()
         lagged_data = self.build_matrix(X, y)
 
-        if self.basis_function.__class__.__name__ == "Polynomial":
-            reg_matrix = self.basis_function.fit(
-                lagged_data, self.max_lag, predefined_regressors=None
-            )
-        else:
-            reg_matrix, self.ensemble = self.basis_function.fit(
-                lagged_data, self.max_lag, predefined_regressors=None
-            )
+        reg_matrix = self.basis_function.fit(
+            lagged_data, self.max_lag, predefined_regressors=None
+        )
 
         if X is not None:
             self.n_inputs = _num_features(X)
@@ -633,27 +632,20 @@ class ER(Estimators, BaseMSS):
         if 0 not in final_model:
             final_model = np.array([0, *final_model])
 
-        if self.basis_function.__class__.__name__ == "Polynomial":
-            self.final_model = self.regressor_code[final_model, :].copy()
-        elif self.basis_function.__class__.__name__ != "Polynomial" and self.ensemble:
-            basis_code = np.sort(
-                np.tile(
-                    self.regressor_code[1:, :], (self.basis_function.repetition, 1)
-                ),
-                axis=0,
-            )
-            self.regressor_code = np.concatenate([self.regressor_code[1:], basis_code])
+        repetition = len(reg_matrix)
+        if isinstance(self.basis_function, Polynomial):
             self.final_model = self.regressor_code[final_model, :].copy()
         else:
             self.regressor_code = np.sort(
-                np.tile(
-                    self.regressor_code[1:, :], (self.basis_function.repetition, 1)
-                ),
+                np.tile(self.regressor_code[1:, :], (repetition, 1)),
                 axis=0,
             )
             self.final_model = self.regressor_code[final_model, :].copy()
 
-        self.theta = getattr(self, self.estimator)(reg_matrix[:, final_model], y_full)
+        # self.theta = getattr(self, self.estimator)(reg_matrix[:, final_model], y_full)
+        self.theta = self.estimator.optimize(
+            reg_matrix[:, final_model], y_full[self.max_lag :, 0].reshape(-1, 1)
+        )
         if (np.abs(self.theta[0]) < self.h) and (
             np.sum((self.theta != 0).astype(int)) > 1
         ):
@@ -744,18 +736,11 @@ class ER(Estimators, BaseMSS):
         """
         lagged_data = self.build_matrix(X, y)
 
-        if self.basis_function.__class__.__name__ == "Polynomial":
-            X_base = self.basis_function.transform(
-                lagged_data,
-                self.max_lag,
-                predefined_regressors=self.pivv[: len(self.final_model)],
-            )
-        else:
-            X_base, _ = self.basis_function.transform(
-                lagged_data,
-                self.max_lag,
-                predefined_regressors=self.pivv[: len(self.final_model)],
-            )
+        X_base = self.basis_function.transform(
+            lagged_data,
+            self.max_lag,
+            predefined_regressors=self.pivv[: len(self.final_model)],
+        )
 
         yhat = super()._one_step_ahead_prediction(X_base)
         return yhat.reshape(-1, 1)

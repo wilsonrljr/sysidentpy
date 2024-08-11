@@ -278,7 +278,7 @@ class NARXNN(BaseMSS):
             )
             reg_matrix = reg_matrix[:, 1:]
         else:
-            reg_matrix, self.ensemble = self.basis_function.fit(
+            reg_matrix = self.basis_function.fit(
                 lagged_data, self.max_lag, predefined_regressors=None
             )
 
@@ -288,23 +288,14 @@ class NARXNN(BaseMSS):
             self.n_inputs = 1  # only used to create the regressor space base
 
         self.regressor_code = self.regressor_space(self.n_inputs)
-        if basis_name != "Polynomial" and self.basis_function.ensemble:
-            basis_code = np.sort(
-                np.tile(
-                    self.regressor_code[1:, :], (self.basis_function.repetition, 1)
-                ),
+        repetition = len(reg_matrix)
+        if not isinstance(self.basis_function, Polynomial):
+            tmp_code = np.sort(
+                np.tile(self.regressor_code[1:, :], (repetition, 1)),
                 axis=0,
             )
-            self.regressor_code = np.concatenate([self.regressor_code[1:], basis_code])
-        elif basis_name != "Polynomial" and self.basis_function.ensemble is False:
-            self.regressor_code = np.sort(
-                np.tile(
-                    self.regressor_code[1:, :], (self.basis_function.repetition, 1)
-                ),
-                axis=0,
-            )
-
-        if basis_name == "Polynomial":
+            self.regressor_code = tmp_code[list(range(len(reg_matrix))), :].copy()
+        else:
             self.regressor_code = self.regressor_code[
                 1:
             ]  # removes the column of the constant
@@ -428,20 +419,24 @@ class NARXNN(BaseMSS):
                 self.loss_batch(X, y, opt=opt)
 
             if self.verbose:
-                train_losses, train_nums = zip(*[
-                    self.loss_batch(X.to(self.device), y.to(self.device))
-                    for X, y in train_dl
-                ])
+                train_losses, train_nums = zip(
+                    *[
+                        self.loss_batch(X.to(self.device), y.to(self.device))
+                        for X, y in train_dl
+                    ]
+                )
                 self.train_loss.append(
                     np.sum(np.multiply(train_losses, train_nums)) / np.sum(train_nums)
                 )
 
                 self.net.eval()
                 with torch.no_grad():
-                    losses, nums = zip(*[
-                        self.loss_batch(X.to(self.device), y.to(self.device))
-                        for X, y in valid_dl
-                    ])
+                    losses, nums = zip(
+                        *[
+                            self.loss_batch(X.to(self.device), y.to(self.device))
+                            for X, y in valid_dl
+                        ]
+                    )
                 self.val_loss.append(np.sum(np.multiply(losses, nums)) / np.sum(nums))
                 logging.info(
                     "Train metrics: %s | Validation metrics: %s",
@@ -526,7 +521,7 @@ class NARXNN(BaseMSS):
             )
             X_base = X_base[:, 1:]
         else:
-            X_base, _ = self.basis_function.transform(
+            X_base = self.basis_function.transform(
                 lagged_data,
                 self.max_lag,
             )
@@ -714,7 +709,7 @@ class NARXNN(BaseMSS):
                     " NFIR."
                 )
 
-            X_tmp, _ = self.basis_function.transform(
+            X_tmp = self.basis_function.transform(
                 lagged_data,
                 self.max_lag,
             )

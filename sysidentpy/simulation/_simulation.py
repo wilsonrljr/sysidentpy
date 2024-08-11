@@ -10,11 +10,50 @@ import numpy as np
 
 from ..basis_function import Fourier, Polynomial
 from ..narmax_base import BaseMSS, Orthogonalization
-from ..parameter_estimation.estimators import Estimators
+
 from ..utils._check_arrays import _check_positive_int, _num_features
+from ..parameter_estimation.estimators import (
+    LeastSquares,
+    RidgeRegression,
+    RecursiveLeastSquares,
+    TotalLeastSquares,
+    LeastMeanSquareMixedNorm,
+    LeastMeanSquares,
+    LeastMeanSquaresFourth,
+    LeastMeanSquaresLeaky,
+    LeastMeanSquaresNormalizedLeaky,
+    LeastMeanSquaresNormalizedSignRegressor,
+    LeastMeanSquaresNormalizedSignSign,
+    LeastMeanSquaresSignError,
+    LeastMeanSquaresSignSign,
+    AffineLeastMeanSquares,
+    NormalizedLeastMeanSquares,
+    NormalizedLeastMeanSquaresSignError,
+    LeastMeanSquaresSignRegressor,
+)
+
+Estimators = Union[
+    LeastSquares,
+    RidgeRegression,
+    RecursiveLeastSquares,
+    TotalLeastSquares,
+    LeastMeanSquareMixedNorm,
+    LeastMeanSquares,
+    LeastMeanSquaresFourth,
+    LeastMeanSquaresLeaky,
+    LeastMeanSquaresNormalizedLeaky,
+    LeastMeanSquaresNormalizedSignRegressor,
+    LeastMeanSquaresNormalizedSignSign,
+    LeastMeanSquaresSignError,
+    LeastMeanSquaresSignSign,
+    AffineLeastMeanSquares,
+    NormalizedLeastMeanSquares,
+    NormalizedLeastMeanSquaresSignError,
+    LeastMeanSquaresSignRegressor,
+]
 
 
-class SimulateNARMAX(Estimators, BaseMSS):
+class SimulateNARMAX(BaseMSS):
     r"""Simulation of Polynomial NARMAX model.
 
     The NARMAX model is described as:
@@ -37,33 +76,14 @@ class SimulateNARMAX(Estimators, BaseMSS):
     ----------
     estimator : str, default="least_squares"
         The parameter estimation method.
-    extended_least_squares : bool, default=False
-        Whether to use extended least squares method
-        for parameter estimation.
-        Note that we define a specific set of noise regressors.
     estimate_parameter : bool, default=False
         Whether to use a method for parameter estimation.
         Must be True if the user do not enter the pre-estimated parameters.
         Note that we define a specific set of noise regressors.
     calculate_err : bool, default=False
         Whether to use a ERR algorithm to the pre-defined regressors.
-    lam : float, default=0.98
-        Forgetting factor of the Recursive Least Squares method.
-    delta : float, default=0.01
-        Normalization factor of the P matrix.
-    offset_covariance : float, default=0.2
-        The offset covariance factor of the affine least mean squares
-        filter.
-    mu : float, default=0.01
-        The convergence coefficient (learning rate) of the filter.
     eps : float
         Normalization factor of the normalized filters.
-    gama : float, default=0.2
-        The leakage factor of the Leaky LMS method.
-    weight : float, default=0.02
-        Weight factor to control the proportions of the error norms
-        and offers an extra degree of freedom within the adaptation
-        of the LMS mixed norm method.
 
     Examples
     --------
@@ -111,38 +131,22 @@ class SimulateNARMAX(Estimators, BaseMSS):
     def __init__(
         self,
         *,
-        estimator: str = "recursive_least_squares",
+        estimator: Estimators = RecursiveLeastSquares(),
         elag: Union[int, list] = 2,
-        extended_least_squares: bool = False,
-        lam: float = 0.98,
-        delta: float = 0.01,
-        offset_covariance: float = 0.2,
-        mu: float = 0.01,
-        eps: np.float64 = np.finfo(np.float64).eps,
-        gama: float = 0.2,
-        weight: float = 0.02,
         estimate_parameter: bool = True,
         calculate_err: bool = False,
         model_type: str = "NARMAX",
         basis_function: Union[Polynomial, Fourier] = Polynomial(),
+        eps: np.float64 = np.finfo(np.float64).eps,
     ):
-        super().__init__(
-            lam=lam,
-            delta=delta,
-            offset_covariance=offset_covariance,
-            mu=mu,
-            eps=eps,
-            gama=gama,
-            weight=weight,
-        )
         self.elag = elag
         self.model_type = model_type
         self.build_matrix = self.get_build_io_method(model_type)
         self.basis_function = basis_function
         self.estimator = estimator
-        self.extended_least_squares = extended_least_squares
         self.estimate_parameter = estimate_parameter
         self.calculate_err = calculate_err
+        self.eps = eps
         self.n_inputs = None
         self.xlag = None
         self.ylag = None
@@ -220,31 +224,27 @@ class SimulateNARMAX(Estimators, BaseMSS):
 
         Parameters
         ----------
-        X_train : ndarray of floats
+        X_train : array_like
             The input data to be used in the training process.
-        y_train : ndarray of floats
+        y_train : array_like
             The output data to be used in the training process.
-        X_test : ndarray of floats
+        X_test : array_like
             The input data to be used in the prediction process.
-        y_test : ndarray of floats
+        y_test : array_like
             The output data (initial conditions) to be used in the prediction process.
-        model_code : ndarray of int
+        model_code : array_like
             Flattened list of input or output regressors.
-        steps_ahead = int, default = None
-            The forecast horizon.
-        theta : array-like of shape = number_of_model_elements
+        steps_ahead : int or None, optional
+            The forecast horizon. Default is None
+        theta : array-like
             The parameters of the model.
+        forecast_horizon : int or None, optional
+            The forecast horizon used in NARMA models and variants.
 
         Returns
         -------
-        yhat : ndarray of floats
+        yhat : array_like
             The predicted values of the model.
-        results : string
-            Where:
-                First column represents each regressor element;
-                Second column represents associated parameter;
-                Third column represents the error reduction ratio associated
-                to each regressor.
 
         """
         self._check_simulate_params(y_train, y_test, model_code, steps_ahead, theta)
@@ -280,10 +280,19 @@ class SimulateNARMAX(Estimators, BaseMSS):
                 lagged_data, self.max_lag, predefined_regressors=self.pivv
             )
 
-            self.theta = getattr(self, self.estimator)(psi, y_train)
-            if self.extended_least_squares is True:
-                self.theta = self._unbiased_estimator(
-                    psi, y_train, self.theta, self.elag, self.max_lag, self.estimator
+            self.theta = self.estimator.optimize(
+                psi, y_train[self.max_lag :, 0].reshape(-1, 1)
+            )
+            if self.estimator.unbiased is True:
+                self.theta = self.estimator.unbiased_estimator(
+                    psi,
+                    y_train[self.max_lag :, 0].reshape(-1, 1),
+                    self.theta,
+                    self.elag,
+                    self.max_lag,
+                    self.estimator,
+                    self.basis_function,
+                    self.estimator.uiter,
                 )
 
             self.err = self.n_terms * [0]
@@ -300,10 +309,19 @@ class SimulateNARMAX(Estimators, BaseMSS):
             _, self.err, _, _ = self.error_reduction_ratio(
                 psi, y_train, self.n_terms, self.final_model
             )
-            self.theta = getattr(self, self.estimator)(psi, y_train)
-            if self.extended_least_squares is True:
-                self.theta = self._unbiased_estimator(
-                    psi, y_train, self.theta, self.non_degree, self.elag, self.max_lag
+            self.theta = self.estimator.optimize(
+                psi, y_train[self.max_lag :, 0].reshape(-1, 1)
+            )
+            if self.estimator.unbiased is True:
+                self.theta = self.estimator.unbiased_estimator(
+                    psi,
+                    y_train[self.max_lag :, 0].reshape(-1, 1),
+                    self.theta,
+                    self.elag,
+                    self.max_lag,
+                    self.estimator,
+                    self.basis_function,
+                    self.estimator.uiter,
                 )
 
         return self.predict(
@@ -318,21 +336,25 @@ class SimulateNARMAX(Estimators, BaseMSS):
 
         Parameters
         ----------
-        y : array-like of shape = n_samples
-            The target data used in the identification process.
-        psi : ndarray of floats
+        psi : array_like
             The information matrix of the model.
+        y : array-like
+            The target data used in the identification process.
         process_term_number : int
             Number of Process Terms defined by the user.
+        regressor_code : array_like
+            The regressor code list given the xlag and ylag for a MISO model.
 
         Returns
         -------
-        err : array-like of shape = number_of_model_elements
+        model_code : array_like
+            Model defined by the user to simulate.
+        err : array-like
             The respective ERR calculated for each regressor.
-        piv : array-like of shape = number_of_model_elements
+        piv : array-like
             Contains the index to put the regressors in the correct order
             based on err values.
-        psi_orthogonal : ndarray of floats
+        psi_orthogonal : array_like
             The updated and orthogonal information matrix.
 
         References
@@ -396,19 +418,19 @@ class SimulateNARMAX(Estimators, BaseMSS):
 
         Parameters
         ----------
-        X : ndarray of floats
+        X : array_like
             The input data to be used in the prediction process.
-        y : ndarray of floats
+        y : array_like
             The output data to be used in the prediction process.
-        steps_ahead : int (default = None)
+        steps_ahead : int
             The user can use free run simulation, one-step ahead prediction
-            and n-step ahead prediction.
-        forecast_horizon : int, default=None
-            The number of predictions over the time.
+            and n-step ahead prediction. The default is None
+        forecast_horizon : int
+            The number of predictions over the time. The default is None
 
         Returns
         -------
-        yhat : ndarray of floats
+        yhat : array_like
             The predicted values of the model.
 
         """
@@ -450,28 +472,21 @@ class SimulateNARMAX(Estimators, BaseMSS):
         y : array-like of shape = max_lag
             Initial conditions values of the model
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        X : array_like of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
         -------
-        yhat : ndarray of floats
+        yhat : array_like
                The 1-step-ahead predicted values of the model.
 
         """
         lagged_data = self.build_matrix(X, y)
-        if self.basis_function.__class__.__name__ == "Polynomial":
-            X_base = self.basis_function.transform(
-                lagged_data,
-                self.max_lag,
-                predefined_regressors=self.pivv[: len(self.final_model)],
-            )
-        else:
-            X_base, _ = self.basis_function.transform(
-                lagged_data,
-                self.max_lag,
-                predefined_regressors=self.pivv[: len(self.final_model)],
-            )
+        X_base = self.basis_function.transform(
+            lagged_data,
+            self.max_lag,
+            predefined_regressors=self.pivv[: len(self.final_model)],
+        )
 
         yhat = super()._one_step_ahead_prediction(X_base)
         return yhat.reshape(-1, 1)
@@ -484,12 +499,12 @@ class SimulateNARMAX(Estimators, BaseMSS):
         y : array-like of shape = max_lag
             Initial conditions values of the model
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        X : array_like of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
         -------
-        yhat : ndarray of floats
+        yhat : array_like
                The n-steps-ahead predicted values of the model.
 
         """
@@ -504,12 +519,12 @@ class SimulateNARMAX(Estimators, BaseMSS):
         y_initial : array-like of shape = max_lag
             Number of initial conditions values of output
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        X : array_like of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
         -------
-        yhat : ndarray of floats
+        yhat : array_like
                The predicted values of the model.
 
         """

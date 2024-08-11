@@ -18,21 +18,49 @@ from ..utils._check_arrays import (
     check_random_state,
     check_X_y,
 )
-from ..utils.deprecation import deprecated
+from ..utils.narmax_tools import train_test_split
 
-
-@deprecated(
-    version="v0.3.0",
-    future_version="v0.4.0",
-    message=(
-        "Passing a string to define the estimator will rise an error in v0.4.0."
-        " \n You'll have to use MetaMSS(estimator=LeastSquares()) instead. \n The"
-        " only change is that you'll have to define the estimator first instead"
-        " of passing a string like 'least_squares'. \n This change will make"
-        " easier to implement new estimators and it'll improve code"
-        " readability."
-    ),
+from ..parameter_estimation.estimators import (
+    LeastSquares,
+    RidgeRegression,
+    RecursiveLeastSquares,
+    TotalLeastSquares,
+    LeastMeanSquareMixedNorm,
+    LeastMeanSquares,
+    LeastMeanSquaresFourth,
+    LeastMeanSquaresLeaky,
+    LeastMeanSquaresNormalizedLeaky,
+    LeastMeanSquaresNormalizedSignRegressor,
+    LeastMeanSquaresNormalizedSignSign,
+    LeastMeanSquaresSignError,
+    LeastMeanSquaresSignSign,
+    AffineLeastMeanSquares,
+    NormalizedLeastMeanSquares,
+    NormalizedLeastMeanSquaresSignError,
+    LeastMeanSquaresSignRegressor,
 )
+
+Estimators = Union[
+    LeastSquares,
+    RidgeRegression,
+    RecursiveLeastSquares,
+    TotalLeastSquares,
+    LeastMeanSquareMixedNorm,
+    LeastMeanSquares,
+    LeastMeanSquaresFourth,
+    LeastMeanSquaresLeaky,
+    LeastMeanSquaresNormalizedLeaky,
+    LeastMeanSquaresNormalizedSignRegressor,
+    LeastMeanSquaresNormalizedSignSign,
+    LeastMeanSquaresSignError,
+    LeastMeanSquaresSignSign,
+    AffineLeastMeanSquares,
+    NormalizedLeastMeanSquares,
+    NormalizedLeastMeanSquaresSignError,
+    LeastMeanSquaresSignRegressor,
+]
+
+
 class MetaMSS(SimulateNARMAX, BPSOGSA):
     r"""Meta-Model Structure Selection: Building Polynomial NARMAX model.
 
@@ -65,27 +93,8 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         The parameter estimation method.
     estimate_parameter : bool, default=True
         Whether to estimate the model parameters.
-    extended_least_squares : bool, default=False
-        Whether to use extended least squares method
-        for parameter estimation.
-        Note that we define a specific set of noise regressors.
-    lam : float, default=0.98
-        Forgetting factor of the Recursive Least Squares method.
-    delta : float, default=0.01
-        Normalization factor of the P matrix.
-    offset_covariance : float, default=0.2
-        The offset covariance factor of the affine least mean squares
-        filter.
-    mu : float, default=0.01
-        The convergence coefficient (learning rate) of the filter.
     eps : float
         Normalization factor of the normalized filters.
-    gama : float, default=0.2
-        The leakage factor of the Leaky LMS method.
-    weight : float, default=0.02
-        Weight factor to control the proportions of the error norms
-        and offers an extra degree of freedom within the adaptation
-        of the LMS mixed norm method.
     maxiter : int, default=30
         The maximum number of iterations.
     alpha : int, default=23
@@ -181,36 +190,24 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         xlag: Union[int, list] = 1,
         ylag: Union[int, list] = 1,
         elag: Union[int, list] = 1,
-        estimator: str = "least_squares",
-        extended_least_squares: bool = False,
-        lam: float = 0.98,
-        delta: float = 0.01,
-        offset_covariance: float = 0.2,
-        mu: float = 0.01,
+        estimator: Estimators = LeastSquares(),
         eps: np.float64 = np.finfo(np.float64).eps,
-        gama: float = 0.2,
-        weight: float = 0.02,
         estimate_parameter: bool = True,
         loss_func: str = "metamss_loss",
         model_type: str = "NARMAX",
         basis_function: Polynomial = Polynomial(),
         steps_ahead: Optional[int] = None,
         random_state: Optional[int] = None,
+        test_size: float = 0.25,
     ):
         super().__init__(
             estimator=estimator,
-            extended_least_squares=extended_least_squares,
-            lam=lam,
-            delta=delta,
-            offset_covariance=offset_covariance,
-            mu=mu,
             eps=eps,
-            gama=gama,
-            weight=weight,
             estimate_parameter=estimate_parameter,
             model_type=model_type,
             basis_function=basis_function,
         )
+
         BPSOGSA.__init__(
             self,
             n_agents=n_agents,
@@ -227,13 +224,13 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self.xlag = xlag
         self.ylag = ylag
         self.elag = elag
-        self.non_degree = basis_function.degree
         self.p_value = p_value
         self.estimator = estimator
         self.estimate_parameter = estimate_parameter
         self.loss_func = loss_func
         self.steps_ahead = steps_ahead
         self.random_state = random_state
+        self.test_size = test_size
         self.build_matrix = self.get_build_io_method(model_type)
         self.n_inputs = None
         self.regressor_code = None
@@ -255,43 +252,27 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         if not isinstance(self.ylag, (int, list)):
             raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
 
-    @deprecated(
-        version="v0.3.0",
-        future_version="v0.4.0",
-        message=(
-            "You will not need to pass X_test and y_test in v0.4.0."
-            " \n You'll have to use MetaMSS(test_size=0.25) instead. \n This"
-            " change will make easier to use the MetaMSS model and will"
-            " follow the same structure of the other methods."
-        ),
-    )
     def fit(
         self,
         *,
         X: Optional[np.ndarray] = None,
         y: Optional[np.ndarray] = None,
-        X_test: Optional[np.ndarray] = None,
-        y_test: Optional[np.ndarray] = None,
     ):
         """Fit the polynomial NARMAX model.
 
         Parameters
         ----------
-        X : ndarray of floats
+        X : ndarray, optional
             The input data to be used in the training process.
-        y : ndarray of floats
+        y : ndarray
             The output data to be used in the training process.
-        X_test : ndarray of floats
-            The input data to be used in the prediction process.
-        y_test : ndarray of floats
-            The output data (initial conditions) to be used in the prediction process.
 
         Returns
         -------
         self : returns an instance of self.
 
         """
-        if self.basis_function.__class__.__name__ != "Polynomial":
+        if not isinstance(self.basis_function, Polynomial):
             raise NotImplementedError(
                 "Currently MetaMSS only supports polynomial models."
             )
@@ -304,7 +285,6 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         else:
             self.n_inputs = 1  # just to create the regressor space base
 
-        #  self.n_inputs = _num_features(X_train)
         self.max_lag = self._get_max_lag()
         self.regressor_code = self.regressor_space(self.n_inputs)
         self.dimension = self.regressor_code.shape[0]
@@ -317,6 +297,9 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self.optimal_model = None
         self.best_model_history = []
         self.tested_models = []
+
+        X, X_test, y, y_test = train_test_split(X, y, test_size=self.test_size)
+
         for i in range(self.maxiter):
             fitness = self.evaluate_objective_function(X, y, X_test, y_test, population)
             column_of_best_solution = np.nanargmin(fitness)
@@ -458,7 +441,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             from the population since they are insignificant
         t_test : array
             the values of the p_value of each regressor of the model
-        tail2P: array
+        tail2p: array
             The calculated two-tailed p-value.
 
         """
@@ -477,15 +460,14 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         t_test = theta / se_theta
         degree_of_freedom = psi.shape[0] - psi.shape[1]
 
-        tail2P = 2 * t.cdf(-np.abs(t_test), degree_of_freedom)
+        tail2p = 2 * t.cdf(-np.abs(t_test), degree_of_freedom)
 
-        pos_insignificant_terms = np.where(tail2P > self.p_value)[0]
+        pos_insignificant_terms = np.where(tail2p > self.p_value)[0]
         pos_insignificant_terms = pos_insignificant_terms.reshape(-1, 1).T
         if pos_insignificant_terms.shape == 0:
-            return np.array([]), t_test, tail2P
+            return np.array([]), t_test, tail2p
 
-        # t_test and tail2P will be returned in future updates
-        return pos_insignificant_terms, t_test, tail2P
+        return pos_insignificant_terms, t_test, tail2p
 
     def aic(self, y_test: np.ndarray, yhat: np.ndarray, n_theta: int) -> float:
         """Calculate the Akaike Information Criterion.

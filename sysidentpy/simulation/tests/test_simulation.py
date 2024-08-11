@@ -3,6 +3,7 @@ from numpy.testing import assert_almost_equal, assert_raises
 
 from sysidentpy.basis_function import Fourier, Polynomial
 from sysidentpy.simulation import SimulateNARMAX
+from sysidentpy.parameter_estimation.estimators import RecursiveLeastSquares
 from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
 
 
@@ -14,11 +15,13 @@ def test_simulate():
     s = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
 
     # the model must be a numpy array
-    model = np.array([
-        [1001, 0],  # y(k-1)
-        [2001, 1001],  # x1(k-1)y(k-1)
-        [2002, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [2001, 1001],  # x1(k-1)y(k-1)
+            [2002, 0],  # x1(k-2)
+        ]
+    )
     # theta must be a numpy array of shape (n, 1) where n is the number of regressors
     theta = np.array([[0.2, 0.9, 0.1]]).T
 
@@ -34,11 +37,13 @@ def test_simulate_theta():
     s = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=True)
 
     # the model must be a numpy array
-    model = np.array([
-        [1001, 0],  # y(k-1)
-        [2001, 1001],  # x1(k-1)y(k-1)
-        [2002, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [2001, 1001],  # x1(k-1)y(k-1)
+            [2002, 0],  # x1(k-2)
+        ]
+    )
 
     _ = s.simulate(
         X_train=x_train,
@@ -67,35 +72,23 @@ def test_estimate_parameter():
 
 def test_default_values():
     default = {
-        "estimator": "recursive_least_squares",
-        "extended_least_squares": False,
-        "lam": 0.98,
-        "delta": 0.01,
-        "offset_covariance": 0.2,
-        "mu": 0.01,
+        # "estimator": RecursiveLeastSquares(),
         "eps": np.finfo(np.float64).eps,
-        "gama": 0.2,
-        "weight": 0.02,
         "model_type": "NARMAX",
         "estimate_parameter": True,
         "calculate_err": False,
     }
     model = SimulateNARMAX(basis_function=Polynomial())
     model_values = [
-        model.estimator,
-        model.extended_least_squares,
-        model.lam,
-        model.delta,
-        model.offset_covariance,
-        model.mu,
+        # model.estimator,
         model.eps,
-        model.gama,
-        model.weight,
         model.model_type,
         model.estimate_parameter,
         model.calculate_err,
     ]
     assert list(default.values()) == model_values
+    assert isinstance(model.estimator, RecursiveLeastSquares)
+    assert isinstance(model.basis_function, Polynomial)
 
 
 def test_estimate_parameter_error():
@@ -130,11 +123,13 @@ def test_model_order_selection():
     s = SimulateNARMAX(basis_function=Fourier(), estimate_parameter=False)
 
     # the model must be a numpy array
-    model = np.array([
-        [1001, 0],  # y(k-1)
-        [2001, 1001],  # x1(k-1)y(k-1)
-        [2002, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [2001, 1001],  # x1(k-1)y(k-1)
+            [2002, 0],  # x1(k-2)
+        ]
+    )
     # theta must be a numpy array of shape (n, 1) where n is the number of regressors
     theta = np.array([[0.2, 0.9, 0.1]]).T
     assert_raises(
@@ -159,11 +154,13 @@ def test_raises():
     s = SimulateNARMAX(basis_function=Polynomial(degree=2), estimate_parameter=False)
 
     # the model must be a numpy array
-    model = np.array([
-        [1001, 0],  # y(k-1)
-        [2001, 1001],  # x1(k-1)y(k-1)
-        [2002, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [2001, 1001],  # x1(k-1)y(k-1)
+            [2002, 0],  # x1(k-2)
+        ]
+    )
     # theta must be a numpy array of shape (n, 1) where n is the number of regressors
     theta = np.array([[0.2, 0.9, 0.1]]).T
     assert_raises(
@@ -209,11 +206,13 @@ def test_estimate_parameter_conditions():
     s = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=True)
 
     # the model must be a numpy array
-    model = np.array([
-        [1001, 0],  # y(k-1)
-        [2001, 1001],  # x1(k-1)y(k-1)
-        [2002, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [2001, 1001],  # x1(k-1)y(k-1)
+            [2002, 0],  # x1(k-2)
+        ]
+    )
 
     assert_raises(
         TypeError,
@@ -236,11 +235,13 @@ def test_input_dimension():
     )
 
     # the model must be a numpy array
-    model = np.array([
-        [1001, 0],  # y(k-1)
-        [1001, 1001],  # x1(k-1)y(k-1)
-        [1002, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [1001, 1001],  # x1(k-1)y(k-1)
+            [1002, 0],  # x1(k-2)
+        ]
+    )
     # theta must be a numpy array of shape (n, 1) where n is the number of regressors
     theta = np.array([[0.2, 0.9, 0.1]]).T
 
@@ -258,11 +259,13 @@ def test_miso_dimension():
     s = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
 
     # the model must be a numpy array
-    model = np.array([
-        [1001, 0],  # y(k-1)
-        [2001, 1001],  # x1(k-1)y(k-1)
-        [3002, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [2001, 1001],  # x1(k-1)y(k-1)
+            [3002, 0],  # x1(k-2)
+        ]
+    )
     # theta must be a numpy array of shape (n, 1) where n is the number of regressors
     theta = np.array([[0.2, 0.9, 0.1]]).T
 
@@ -280,11 +283,13 @@ def test_forecast_horizon():
     )
 
     # the model must be a numpy array
-    model = np.array([
-        [1001, 0],  # y(k-1)
-        [1001, 1001],  # x1(k-1)y(k-1)
-        [1002, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [1001, 1001],  # x1(k-1)y(k-1)
+            [1002, 0],  # x1(k-2)
+        ]
+    )
     # theta must be a numpy array of shape (n, 1) where n is the number of regressors
     theta = np.array([[0.2, 0.9, 0.1]]).T
 
@@ -308,11 +313,13 @@ def test_estimate_parameter_narmax():
     s = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=True)
 
     # the model must be a numpy array
-    model = np.array([
-        [1001, 0],  # y(k-1)
-        [2001, 1001],  # x1(k-1)y(k-1)
-        [2002, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [2001, 1001],  # x1(k-1)y(k-1)
+            [2002, 0],  # x1(k-2)
+        ]
+    )
 
     _ = s.simulate(
         X_train=x_train,
@@ -335,11 +342,13 @@ def test_estimate_parameter_nar():
     )
 
     # the model must be a numpy array
-    model = np.array([
-        [1001, 0],  # y(k-1)
-        [1001, 1001],  # x1(k-1)y(k-1)
-        [1002, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [1001, 1001],  # x1(k-1)y(k-1)
+            [1002, 0],  # x1(k-2)
+        ]
+    )
 
     _ = s.simulate(
         X_train=x_train,
@@ -362,11 +371,13 @@ def test_estimate_parameter_nfir():
     )
 
     # the model must be a numpy array
-    model = np.array([
-        [2001, 0],  # y(k-1)
-        [2001, 2001],  # x1(k-1)y(k-1)
-        [2003, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [2001, 0],  # y(k-1)
+            [2001, 2001],  # x1(k-1)y(k-1)
+            [2003, 0],  # x1(k-2)
+        ]
+    )
 
     _ = s.simulate(
         X_train=x_train,
@@ -392,11 +403,13 @@ def test_err_narmax():
     )
 
     # the model must be a numpy array
-    model = np.array([
-        [1001, 0],  # y(k-1)
-        [2001, 1001],  # x1(k-1)y(k-1)
-        [2002, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [2001, 1001],  # x1(k-1)y(k-1)
+            [2002, 0],  # x1(k-2)
+        ]
+    )
 
     _ = s.simulate(
         X_train=x_train,
@@ -422,11 +435,13 @@ def test_err_nar():
     )
 
     # the model must be a numpy array
-    model = np.array([
-        [1001, 0],  # y(k-1)
-        [1001, 1001],  # x1(k-1)y(k-1)
-        [1002, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [1001, 1001],  # x1(k-1)y(k-1)
+            [1002, 0],  # x1(k-2)
+        ]
+    )
 
     _ = s.simulate(
         X_train=x_train,
@@ -452,11 +467,13 @@ def test_err_nfir():
     )
 
     # the model must be a numpy array
-    model = np.array([
-        [2001, 0],  # y(k-1)
-        [2001, 2001],  # x1(k-1)y(k-1)
-        [2003, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [2001, 0],  # y(k-1)
+            [2001, 2001],  # x1(k-1)y(k-1)
+            [2003, 0],  # x1(k-2)
+        ]
+    )
 
     _ = s.simulate(
         X_train=x_train,
@@ -477,15 +494,16 @@ def test_estimate_parameter_els():
     s = SimulateNARMAX(
         basis_function=Polynomial(),
         estimate_parameter=True,
-        extended_least_squares=True,
     )
 
     # the model must be a numpy array
-    model = np.array([
-        [1001, 0],  # y(k-1)
-        [2001, 1001],  # x1(k-1)y(k-1)
-        [2002, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [2001, 1001],  # x1(k-1)y(k-1)
+            [2002, 0],  # x1(k-2)
+        ]
+    )
 
     _ = s.simulate(
         X_train=x_train,

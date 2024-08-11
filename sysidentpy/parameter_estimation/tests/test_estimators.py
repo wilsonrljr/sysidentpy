@@ -1,9 +1,30 @@
 from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.basis_function._basis_function import Polynomial
+from sysidentpy.narmax_base import InformationMatrix
+
+from sysidentpy.parameter_estimation.estimators import (
+    LeastSquares,
+    RidgeRegression,
+    RecursiveLeastSquares,
+    TotalLeastSquares,
+    LeastMeanSquareMixedNorm,
+    LeastMeanSquares,
+    LeastMeanSquaresFourth,
+    LeastMeanSquaresLeaky,
+    LeastMeanSquaresNormalizedLeaky,
+    LeastMeanSquaresNormalizedSignRegressor,
+    LeastMeanSquaresNormalizedSignSign,
+    LeastMeanSquaresSignError,
+    LeastMeanSquaresSignSign,
+    AffineLeastMeanSquares,
+    NormalizedLeastMeanSquares,
+    NormalizedLeastMeanSquaresSignError,
+    LeastMeanSquaresSignRegressor,
+)
+
 
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_raises
-from .. import Estimators
 
 
 def create_test_data(n=1000):
@@ -27,237 +48,285 @@ def create_test_data(n=1000):
     return x, y, theta
 
 
+x, y, theta = create_test_data()
+max_lag = 2
+lagged_data = InformationMatrix(xlag=2, ylag=2).build_input_output_matrix(X=x, y=y)[
+    :, :
+]
+
+psi = Polynomial(degree=2).fit(lagged_data, max_lag, predefined_regressors=None)
+# optimize(psi, y_train[max_lag:, :], 0.01)
+
+
 def test_least_squares():
-    x, y, theta = create_test_data()
+    # x, y, theta = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
-        extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="least_squares",
+        estimator=LeastSquares(),
         basis_function=basis_function,
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_ridge_regression():
-    x, y, theta = create_test_data()
+    # x, y, theta = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
-        extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="ridge_regression",
-        alpha=np.finfo(np.float64).eps,
+        estimator=RidgeRegression(alpha=np.finfo(np.float64).eps),
         basis_function=basis_function,
+        err_tol=None,
+    )
+    model.fit(X=x, y=y)
+    assert_almost_equal(model.theta, theta, decimal=2)
+
+
+def test_ridge_regression_classic():
+    # x, y, theta = create_test_data()
+    basis_function = Polynomial(degree=2)
+    model = FROLS(
+        n_terms=5,
+        ylag=[1, 2],
+        xlag=2,
+        estimator=RidgeRegression(alpha=np.finfo(np.float64).eps, solver="classic"),
+        basis_function=basis_function,
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_raise_ridge_regression():
-    assert_raises(
-        ValueError, Estimators, alpha=-0.3, basis_function=Polynomial(degree=2)
-    )
+    assert_raises(ValueError, RidgeRegression, alpha=-0.3)
 
 
 def test_raise():
-    assert_raises(
-        ValueError, Estimators, lam="0.97", basis_function=Polynomial(degree=2)
-    )
+    assert_raises(ValueError, RecursiveLeastSquares, lam="0.97")
 
 
 def test_lam_raise():
-    assert_raises(ValueError, Estimators, lam=1.01, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, RecursiveLeastSquares, lam=1.01)
 
 
 def test_total_least_squares():
-    x, y, theta = create_test_data()
+    # x, y, theta = create_test_data()
     model = FROLS(
         n_terms=5,
-        extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="total_least_squares",
+        estimator=TotalLeastSquares(),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=x, y=y)
-    print(model.theta)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_recursive_least_squares():
-    x, y, theta = create_test_data()
+    # x, y, theta = create_test_data()
     model = FROLS(
         n_terms=5,
-        delta=0.00001,
-        lam=0.99,
-        extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="recursive_least_squares",
+        estimator=RecursiveLeastSquares(delta=0.00001, lam=0.99),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_affine_least_mean_squares():
-    x, y, theta = create_test_data()
+    # x, y, theta = create_test_data()
     model = FROLS(
         n_terms=5,
-        mu=0.01,
-        offset_covariance=0.2,
-        extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="affine_least_mean_squares",
+        estimator=AffineLeastMeanSquares(mu=0.01, offset_covariance=0.2),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_least_mean_squares():
-    x, y, theta = create_test_data()
+    # x, y, theta = create_test_data()
     model = FROLS(
         n_terms=5,
-        mu=0.1,
-        extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="least_mean_squares",
+        estimator=LeastMeanSquares(mu=0.1),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_least_mean_squares_sign_error():
-    x, y, theta = create_test_data(n=5000)
+    xl, yl, _ = create_test_data(n=5000)
     model = FROLS(
         n_terms=5,
-        mu=0.01,
-        extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="least_mean_squares_sign_error",
+        estimator=LeastMeanSquaresSignError(mu=0.01),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
-    model.fit(X=x, y=y)
+    model.fit(X=xl, y=yl)
+    print(model.theta.shape, theta.shape)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_normalized_least_mean_squares():
-    x, y, theta = create_test_data()
+    # x, y, theta = create_test_data()
     model = FROLS(
         n_terms=5,
-        mu=0.1,
-        extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="normalized_least_mean_squares",
+        estimator=NormalizedLeastMeanSquares(mu=0.1),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_least_mean_squares_normalized_sign_error():
-    x, y, theta = create_test_data()
+    # x, y, theta = create_test_data()
     model = FROLS(
         n_terms=5,
         n_info_values=6,
-        extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
         info_criteria="aic",
-        estimator="least_mean_squares_normalized_sign_error",
-        mu=0.005,
+        estimator=NormalizedLeastMeanSquaresSignError(mu=0.005),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_least_mean_squares_sign_regressor():
-    x, y, theta = create_test_data()
+    # x, y, theta = create_test_data()
     model = FROLS(
         n_terms=5,
-        mu=0.1,
-        extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="least_mean_squares_sign_regressor",
+        estimator=LeastMeanSquaresSignRegressor(mu=0.1),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_least_mean_squares_normalized_sign_regressor():
-    x, y, theta = create_test_data()
+    # x, y, theta = create_test_data()
     model = FROLS(
         n_terms=5,
-        mu=0.1,
-        extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="least_mean_squares_normalized_sign_regressor",
+        estimator=LeastMeanSquaresNormalizedSignRegressor(mu=0.1),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_least_mean_squares_sign_sign():
-    x, y, theta = create_test_data(n=5000)
+    xl, yl, _ = create_test_data(n=5000)
     model = FROLS(
         n_terms=5,
-        mu=0.001,
-        extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="least_mean_squares_sign_sign",
+        estimator=LeastMeanSquaresSignSign(mu=0.001),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
-    model.fit(X=x, y=y)
+    model.fit(X=xl, y=yl)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_least_mean_squares_normalized_sign_sign():
-    x, y, theta = create_test_data(n=30000)
+    xl, yl, _ = create_test_data(n=30000)
     model = FROLS(
         n_terms=5,
-        mu=0.0001,
-        # eps=0.05,
-        extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="least_mean_squares_normalized_sign_sign",
+        estimator=LeastMeanSquaresNormalizedSignSign(mu=0.0001),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
-    model.fit(X=x, y=y)
+    model.fit(X=xl, y=yl)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
 def test_least_mean_squares_mixed_norm():
-    x, y, theta = create_test_data(n=30000)
+    xl, yl, _ = create_test_data(n=30000)
     model = FROLS(
         n_terms=5,
-        mu=0.05,
-        extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="least_mean_squares_mixed_norm",
+        estimator=LeastMeanSquareMixedNorm(mu=0.05),
         basis_function=Polynomial(degree=2),
+        err_tol=None,
     )
-    model.fit(X=x, y=y)
+    model.fit(X=xl, y=yl)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
-def test_model_order_selection():
-    assert_raises(ValueError, Estimators, max_lag=-1)
+def test_nlmsl():
+    xl, yl, _ = create_test_data(n=30000)
+    model = FROLS(
+        n_terms=5,
+        ylag=[1, 2],
+        xlag=2,
+        estimator=LeastMeanSquaresNormalizedLeaky(mu=0.05, gama=0.001),
+        basis_function=Polynomial(degree=2),
+        err_tol=None,
+    )
+    model.fit(X=xl, y=yl)
+    assert_almost_equal(model.theta, theta, decimal=2)
+
+
+def test_lmsl():
+    xl, yl, _ = create_test_data(n=30000)
+    model = FROLS(
+        n_terms=5,
+        ylag=[1, 2],
+        xlag=2,
+        estimator=LeastMeanSquaresLeaky(mu=0.05, gama=0.001),
+        basis_function=Polynomial(degree=2),
+        err_tol=None,
+    )
+    model.fit(X=xl, y=yl)
+    assert_almost_equal(model.theta, theta, decimal=2)
+
+
+def test_lmsf():
+    xl, yl, _ = create_test_data(n=30000)
+    model = FROLS(
+        n_terms=5,
+        ylag=[1, 2],
+        xlag=2,
+        estimator=LeastMeanSquaresFourth(mu=0.5),
+        basis_function=Polynomial(degree=2),
+        err_tol=None,
+    )
+    model.fit(X=xl, y=yl)
+    assert_almost_equal(model.theta, theta, decimal=2)
+
+
+# def test_model_order_selection():
+#     assert_raises(ValueError, Estimators, max_lag=-1)

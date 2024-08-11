@@ -3,6 +3,10 @@ from numpy.testing import assert_almost_equal, assert_array_equal
 from numpy.testing import assert_raises
 from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.basis_function import Polynomial
+from sysidentpy.parameter_estimation.estimators import (
+    LeastSquares,
+    RecursiveLeastSquares,
+)
 
 
 def create_test_data(n=1000):
@@ -50,10 +54,10 @@ def test_error_reduction_ratio():
         order_selection=True,
         n_info_values=5,
         info_criteria="aic",
-        extended_least_squares=False,
+        err_tol=None,
         ylag=[1, 2],
         xlag=2,
-        estimator="least_squares",
+        estimator=LeastSquares(),
         basis_function=basis_function,
     )
     model.fit(X=x, y=y)
@@ -65,7 +69,7 @@ def test_fit_with_information_criteria():
     model = FROLS(
         n_terms=15,
         order_selection=True,
-        extended_least_squares=False,
+        # extended_least_squares=False,
         basis_function=basis_function,
     )
     model.fit(X=x, y=y)
@@ -74,9 +78,7 @@ def test_fit_with_information_criteria():
 
 def test_fit_without_information_criteria():
     basis_function = Polynomial(degree=2)
-    model = FROLS(
-        n_terms=15, extended_least_squares=False, basis_function=basis_function
-    )
+    model = FROLS(n_terms=15, basis_function=basis_function, order_selection=False)
     model.fit(X=x, y=y)
     assert model.info_values is None
 
@@ -85,21 +87,14 @@ def test_default_values():
     default = {
         "ylag": 2,
         "xlag": 2,
-        "order_selection": False,
+        "order_selection": True,
         "info_criteria": "aic",
         "n_terms": None,
-        "n_info_values": 10,
-        "estimator": "recursive_least_squares",
-        "extended_least_squares": False,
-        "lam": 0.98,
-        "delta": 0.01,
-        "offset_covariance": 0.2,
-        "mu": 0.01,
+        "n_info_values": 15,
         "eps": np.finfo(np.float64).eps,
-        "ridge_param": np.finfo(np.float64).eps,
-        "gama": 0.2,
-        "weight": 0.02,
+        "alpha": 0,
         "model_type": "NARMAX",
+        "err_tol": None,
     }
     model = FROLS(basis_function=Polynomial(degree=2))
     model_values = [
@@ -109,19 +104,14 @@ def test_default_values():
         model.info_criteria,
         model.n_terms,
         model.n_info_values,
-        model.estimator,
-        model.extended_least_squares,
-        model.lam,
-        model.delta,
-        model.offset_covariance,
-        model.mu,
         model.eps,
         model.alpha,
-        model.gama,
-        model.weight,
         model.model_type,
+        model.err_tol,
     ]
     assert list(default.values()) == model_values
+    assert isinstance(model.estimator, RecursiveLeastSquares)
+    assert isinstance(model.basis_function, Polynomial)
 
 
 def test_validate_ylag():
@@ -160,22 +150,23 @@ def test_n_info_values():
     )
 
 
-def test_extended_least_squares():
-    assert_raises(
-        TypeError, FROLS, extended_least_squares=1, basis_function=Polynomial(degree=2)
-    )
-    assert_raises(
-        TypeError,
-        FROLS,
-        extended_least_squares="True",
-        basis_function=Polynomial(degree=2),
-    )
-    assert_raises(
-        TypeError,
-        FROLS,
-        extended_least_squares=None,
-        basis_function=Polynomial(degree=2),
-    )
+# def test_extended_least_squares():
+#     assert_raises(
+#         TypeError, FROLS, extended_least_squares=1,
+#         basis_function=Polynomial(degree=2)
+#     )
+#     assert_raises(
+#         TypeError,
+#         FROLS,
+#         extended_least_squares="True",
+#         basis_function=Polynomial(degree=2),
+#     )
+#     assert_raises(
+#         TypeError,
+#         FROLS,
+#         extended_least_squares=None,
+#         basis_function=Polynomial(degree=2),
+#     )
 
 
 def test_info_criteria():
@@ -188,10 +179,10 @@ def test_predict():
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
-        extended_least_squares=False,
+        err_tol=None,
         ylag=[1, 2],
         xlag=2,
-        estimator="least_squares",
+        estimator=LeastSquares(),
         basis_function=basis_function,
     )
     model.fit(X=X_train, y=y_train)
@@ -203,10 +194,10 @@ def test_model_prediction():
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
-        extended_least_squares=False,
+        # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
-        estimator="least_squares",
+        estimator=LeastSquares(),
         basis_function=basis_function,
     )
     model.fit(X=X_train, y=y_train)
@@ -217,13 +208,13 @@ def test_information_criteria_bic():
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
-        extended_least_squares=False,
+        # extended_least_squares=False,
         order_selection=True,
         info_criteria="bic",
         n_info_values=5,
         ylag=[1, 2],
         xlag=2,
-        estimator="least_squares",
+        estimator=LeastSquares(),
         basis_function=basis_function,
     )
     model.fit(X=x, y=y)
@@ -235,13 +226,13 @@ def test_information_criteria_aicc():
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
-        extended_least_squares=False,
+        # extended_least_squares=False,
         order_selection=True,
         info_criteria="aicc",
         n_info_values=5,
         ylag=[1, 2],
         xlag=2,
-        estimator="least_squares",
+        estimator=LeastSquares(),
         basis_function=basis_function,
     )
     model.fit(X=x, y=y)
@@ -253,13 +244,13 @@ def test_information_criteria_fpe():
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
-        extended_least_squares=False,
+        # extended_least_squares=False,
         order_selection=True,
         info_criteria="fpe",
         n_info_values=5,
         ylag=[1, 2],
         xlag=2,
-        estimator="least_squares",
+        estimator=LeastSquares(),
         basis_function=basis_function,
     )
     model.fit(X=x, y=y)
@@ -273,13 +264,13 @@ def test_information_criteria_lilc():
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
-        extended_least_squares=False,
+        # extended_least_squares=False,
         order_selection=True,
         info_criteria="lilc",
         n_info_values=5,
         ylag=[1, 2],
         xlag=2,
-        estimator="least_squares",
+        estimator=LeastSquares(),
         basis_function=basis_function,
     )
     model.fit(X=x, y=y)
