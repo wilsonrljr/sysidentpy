@@ -77,11 +77,11 @@ If you use SysIdentPy on your scientific publication, we would appreciate citati
 
 ## PDF, Epub and Mobi version
 
-Download the pdf version of the book: [pdf version](./Nonlinear_System_Identification_Theory_and_Practice_With_SysIdentPy_Wilson_R_L_Junior.pdf){:download="Nonlinear System Identification and Forecasting: Theory and Practice With SysIdentPy"}
+Download the pdf version of the book: [pdf version](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/Nonlinear_System_Identification_Theory_and_Practice_With_SysIdentPy_Wilson_R_L_Junior.pdf){:download="Nonlinear System Identification and Forecasting: Theory and Practice With SysIdentPy"}
 
-Download the epub version of the book: [epub version](./Nonlinear_System_Identification_Theory_and_Practice_With_SysIdentPy_Wilson_R_L_Junior.epub){:download="Nonlinear System Identification and Forecasting: Theory and Practice With SysIdentPy"}
+Download the epub version of the book: [epub version](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/Nonlinear_System_Identification_Theory_and_Practice_With_SysIdentPy_Wilson_R_L_Junior.epub){:download="Nonlinear System Identification and Forecasting: Theory and Practice With SysIdentPy"}
 
-Download the mobi version of the book: [mobi version](./Nonlinear_System_Identification_Theory_and_Practice_With_SysIdentPy_Wilson_R_L_Junior.mobi){:download="Nonlinear System Identification and Forecasting: Theory and Practice With SysIdentPy"}
+Download the mobi version of the book: [mobi version](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/Nonlinear_System_Identification_Theory_and_Practice_With_SysIdentPy_Wilson_R_L_Junior.mobi){:download="Nonlinear System Identification and Forecasting: Theory and Practice With SysIdentPy"}
 
 ## Acknowledgments
 
