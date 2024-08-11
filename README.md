@@ -13,18 +13,46 @@
 [![contributors](https://img.shields.io/github/contributors/wilsonrljr/sysidentpy?color=%23FF7800)](https://github.com/wilsonrljr/sysidentpy/graphs/contributors)
 [![stars](https://img.shields.io/github/stars/wilsonrljr/sysidentpy?style=social)](https://github.com/wilsonrljr/sysidentpy/stargazers)
 
-<h1 align="center"> NARMAX Methods In The Time Domain </h1>
+<h1 align="center"> NARMAX Methods For System Identification and Timeseries Forecasting </h1>
 <h3 align="center">From Classical Approaches to Neural Networks</h3>
 
 **SysIdentPy** offers State of the Art techniques to build your NARMAX models, including it's variants `NARX`, `NARMA`, `NAR`, `NFIR`, `ARMAX`, `ARX`, `ARMA` and others. It also includes tons of interesting examples to help you build nonlinear forecasting models using SysIdentPy.
 
 </div>
 
-## What is SysIdentPy?
+## Table of Contents
+
+- [What is SysIdentPy?](#what-is-sysidentpy)
+- [How do I install SysIdentPy?](#how-do-i-install_sysidentpy)
+- [Features](#what-are-the-main-features-of-sysidentpy)
+- [Why does SysIdentPy exist?](#why-does-sysidentpy-exist)
+- [How do I use sysIdentPy?](#how-do-i-use-sysIdentPy)
+- [Examples](#examples)
+- [Communication](#communication)
+- [Citation](#citation)
+- [Inspiration](#inspiration)
+- [Contributors](#contributors)
+- [Sponsors](#sponsors)
+
+
+## Introduction
 
 SysIdentPy is an open-source Python module for System Identification using **NARMAX** models built on top of **numpy** and is distributed under the 3-Clause BSD license. SysIdentPy provides an easy-to-use and  flexible framework for building Dynamical Nonlinear Models for time series and dynamic systems.
 
+With SysIdentPy, you can:
+
+- Build and customize nonlinear forecasting models.
+- Utilize state-of-the-art techniques for model structure selection and parameter estimation.
+- Experiment with neural NARX models and other advanced algorithms.
+
 Check our [documentation](https://sysidentpy.org)!
+
+For an in depth documentation, check our companion book:
+
+<a href="https://sysidentpy.org/book/preface/">
+  <img src="./docs/book/assets/Nonlinear_System_identification.png" alt="Nonlinear System Identification" style="width: 200px; height: auto;" />
+</a>
+
 
 ## How do I install SysIdentPy?
 
@@ -38,17 +66,14 @@ pip install sysidentpy
 `SysIdentPy` requires:
 
 - Python (>= 3.7)
-- NumPy (>= 1.9.2) for all numerical algorithms
+- NumPy (>= 1.9.2) for numerical algorithms
 - Matplotlib >= 3.3.2 for static plotting and visualizations
-- Pytorch (>=1.7.1) for building feed-forward neural networks
+- Pytorch (>=1.7.1) for building NARX neural networks
+- scipy (>= 1.7.0) for numerical and optimization algorithms
 
-| Platform | Status |
-| --------- | -----:|
-| Linux | ok |
-| Windows | ok |
-| macOS | ok |
+The library is compatible with Linux, Windows, and macOS. Some examples may also require additional packages like pandas.
 
-A few examples require pandas >= 0.18.0. However, it is not required to use SysIdentPy.
+For more details, check our [installation guide](https://sysidentpy.org/landing-page/getting-started/)
 
 ## What are the main features of SysIdentPy?
 
@@ -65,7 +90,7 @@ A few examples require pandas >= 0.18.0. However, it is not required to use SysI
 
 ## Why does SysIdentPy exist?
 
-SysIdentPy aims to be a free and open source package to help the community to design NARMAX models. More than that, be a free and robust alternative to one of the most used tools to build NARMAX models, which is the Matlab's System Identification Toolbox.
+SysIdentPy aims to be a free and open source package to help the community to design NARMAX models for System Identification and TimeSeries Forecasting. More than that, be a free and robust alternative to one of the most used tools to build NARMAX models, which is the Matlab's System Identification Toolbox.
 
 The project is actively maintained by Wilson R. L. Junior and looking for contributors.
 
@@ -74,7 +99,7 @@ The project is actively maintained by Wilson R. L. Junior and looking for contri
 The [SysIdentPy documentation](https://sysidentpy.org) includes more than 20 examples to help get you started:
 - Typical "Hello World" example, for an [entry-level description of the main SysIdentPy concepts](https://sysidentpy.org/examples/basic_steps/)
 - A dedicated section focusing on SysIdentPy features, like model structure selection algorithms, basis functions, parameter estimation, and more.
-- A dedicated section focusing on use cases using SysIdentPy with real world datasets. Besides, there is some brief comparisons and benchmarks against other time series tools, like Prophet, Neural Prophet, ARIMA, and more.  
+- A dedicated section focusing on use cases using SysIdentPy with real world datasets. Besides, there is some brief comparisons and benchmarks against other time series tools, like Prophet, Neural Prophet, ARIMA, and more.
 
 
 ### Examples
@@ -257,7 +282,7 @@ The examples directory has several Jupyter notebooks with tutorials of how to us
 
 - Discord server: https://discord.gg/8eGE3PQ
 
-  [![discord](https://img.shields.io/discord/711610087700955176?color=%23FF7800&label=discord)](https://discord.gg/7afBSzU4)
+  [![discord](https://img.shields.io/discord/711610087700955176?color=%23FF7800&label=discord)](https://discord.gg/8eGE3PQ)
 
 
 - Website: http://sysidentpy.org
@@ -308,6 +333,12 @@ The documentation and structure (even this section) is openly inspired by sklear
 
 <a href="https://github.com/ml-technium">
     <img alt="Technium" src="https://avatars.githubusercontent.com/u/83768197?v=4" width="90" height="90">
+</a>
+
+### Monthly Sponsors
+
+<a href="https://github.com/statisticallyinsifnificant">
+    <img alt="statisticallyinsifnificant" src="https://avatars.githubusercontent.com/u/158107107?v=4" width="90" height="90">
 </a>
 
 ### Individual Sponsors
