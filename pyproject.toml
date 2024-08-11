@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "sysidentpy"
 description = "A Python Package For System Identification Using NARMAX Models"
 readme = "README.md"
-requires-python = ">=3.7,<3.12"
+requires-python = ">=3.7,<3.13"
 license = { file = "LICENSE" }
 keywords = [
     "data-science",
@@ -40,6 +40,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering",
@@ -51,7 +52,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
-dependencies = ["numpy>=1.19.2,<=1.26", "scipy>=1.7.0", "matplotlib>=3.3.2"]
+dependencies = ["numpy>=1.19.2,<2.0", "scipy>=1.7.0", "matplotlib>=3.3.2"]
 
 dynamic = ["version"]
 
@@ -142,7 +143,7 @@ exclude_lines = [
 
 [tool.black]
 line-length = 88
-target_version = ["py37", "py38", "py39", "py310", "py311"]
+target_version = ["py37", "py38", "py39", "py310", "py311", "py312"]
 preview = true
 exclude = '''
 /(

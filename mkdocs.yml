@@ -202,11 +202,22 @@ nav:
               - load-forecasting: old_version/load_forecasting_benchmark.ipynb
               - pv-forecasting: old_version/PV_forecasting_benchmark.ipynb
   - Companion Book:
-      - Preface: book/preface.md
-      - Contents: book/contents.md
+      - Preface: book/0 - Preface.md
+      - Contents: book/0.1 - Contents.md
+      - Introduction: book/1 - Introduction.md
+      - 2. NARMAX Model Representation: book/2 - NARMAX Model Representation.md
+      - 3. Parameter Estimation: book/3 - Parameter Estimation.md
+      - 4. Model Structure Selection: book/4 - Model Structure Selection (MSS).md
+      - 5. Multiobjective Parameter Estimation: book/5 - Multiobjective Parameter Estimation.md
+      - 6. Multiobjective Model Structure Selection: book/6 - Multiobjective Model Structure Selection.md
+      - 7. NARX Neural Network: book/7 - NARX Neural Network.md
+      - 8. Severely Nonlinear System Identification: book/8 - Severely Nonlinear System Identification.md
+      - 9. Validation: book/9 - Validation.md
+      - 10. Case Studies: book/10 - Case Studies.md
   - Blog:
       - Events: events/events.md
       - Meetups:
+          - AI Networks Meetup: events/ai-networks-meetup.md
           - Nubank Timeseries Meetup: events/nubank-meetup.md
           - Nubank Open Source Talk: events/nubank-meetup-open-source.md
           - GCoM Meetup: events/gcom-meetup.md

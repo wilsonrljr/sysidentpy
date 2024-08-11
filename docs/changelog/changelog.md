@@ -22,7 +22,7 @@ This update introduces several major features and changes, including some breaki
   - **MAJOR**: Least Squares Minimal Residual algorithm for parameter estimation.
   - **MAJOR**: Error Reduction Ratio algorithm enhancement for FROLS model structure selection. Users can now set an `err_tol` value to stop the algorithm when the sum of the ERR values reaches this threshold, offering a faster alternative to Information Criteria algorithms. A new example is available in the documentation.
   - **MAJOR**: New Bernstein basis function available, allowing users to choose between Polynomial, Fourier, and Bernstein.
-  - **MAJOR**: v0.1 of the companion book "Nonlinear System Identification: Theory and Practice." This open-source book serves as robust documentation for the SysIdentPy package and a friendly introduction to Nonlinear System Identification and Timeseries Forecasting
+  - **MAJOR**: v0.1 of the companion book "Nonlinear System Identification: Theory and Practice With SysIdentPy." This open-source book serves as robust documentation for the SysIdentPy package and a friendly introduction to Nonlinear System Identification and Timeseries Forecasting. There are case studies in the book that were not included in the documentation at the time of the update release. The book will always feature more in-depth studies and will be updated regularly with additional case studies.
 
 - **Documentation:**
   - All examples updated to reflect changes in v0.4.0.
@@ -37,6 +37,7 @@ This update introduces several major features and changes, including some breaki
 - **API Changes:**
   - **BREAKING CHANGE**: Parameter estimation method must now be imported and passed to the model definition, replacing the previous string method. For example, use `from sysidentpy.parameter_estimation import LeastSquares` instead of `"least_squares"`. This change enhances code flexibility, organization, readability, and facilitates easier integration of custom methods. A specific doc page is available to guide migration from v0.3.4 to v0.4.0.
   - **BREAKING CHANGE**: The `fit` method in MetaMSS now requires only `X` and `y` values, omitting the need to pass `fit(X=, y=, X_test=, y_test=)`.
+  - Added support for Python 3.12.
   - Introduced `test_size` hyperparameter to set the proportion of training data used in the fitting process.
   - Extensive code refactoring, including type hint improvements, docstring enhancements, removal of unused code, and other behind-the-scenes changes to support new features.
 
