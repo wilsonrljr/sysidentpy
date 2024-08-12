@@ -89,10 +89,6 @@ The System Identification class taught by [Samir Martins](https://ufsj.edu.br/ma
 
 In addition to these resources, we will also reference Luis Antônio Aguirre Introdução à [Identificação de Sistemas. Técnicas Lineares e não Lineares Aplicadas a Sistemas. Teoria e Aplicação](https://www.researchgate.net/publication/303679484_Introducao_a_Identificacao_de_Sistemas) (in Portuguese), which has proven to be an invaluable tool in introducing complex dynamic modeling concepts in a straightforward way. As an open source material on System Identification and Forecasting, this book aims to provide a accessible yet rigorous approach to learning dynamic models and forecasting.
 
-## Contribute
-
-The **Nonlinear System Identification and Forecasting: Theory and Practice With SysIdentPy** is a comprehensive resource on the science of System Identification, offered as an open-source material. Our aim is to make this resource accessible to all, both financially and intellectually. If you have found this book helpful and want to support our endeavor financially, you are referred to the [Sponsor page](https://github.com/sponsors/wilsonrljr). However, if you are not yet ready to contribute financially, you can still help us by pointing out typos, suggesting edits, or offering feedback on passages that you found difficult to comprehend. Simply navigate to the book's repository and open an issue. Lastly, if you enjoyed our content, please consider sharing it with others who may find it useful and leave us a star on [GitHub](https://github.com/wilsonrljr/sysidentpy).
-
 ## Support the Project
 
 The **Nonlinear System Identification and Forecasting: Theory and Practice With SysIdentPy** is an extensive open-source resource dedicated to the science of System Identification. Our goal is to make this knowledge accessible to everyone, both financially and intellectually.
