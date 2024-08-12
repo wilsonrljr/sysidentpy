@@ -292,8 +292,6 @@ Before we finish, let's verify how the performance of the `H147` model has impro
 
 ![](./assets/c10_m4_h147_r2.png)
 
-We could achieve even better performance with small adjustments in the model configuration. However, I'll let suck alternative as a task for the user.
-
 > Based on the M4 benchmark paper, we could also clip the predictions lower than 10 to 10 and the results would be slightly better. But this is left to the user.
 
 We could achieve even better performance with some fine-tuning of the model configuration. However, I’ll leave exploring these alternative adjustments as an exercise for the user. However, keep in mind that experimenting with different settings does not always guarantee improved results. A deeper theoretical knowledge can often lead you to better configurations and, hence, better results.
