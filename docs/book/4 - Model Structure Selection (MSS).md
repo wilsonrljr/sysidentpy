@@ -209,11 +209,9 @@ $$
 Thus, the ERR due to the inclusion of the regressor $q_{{_i}}$ is expressed as:
 
 $$
-\begin{align}
-    [\text{ERR}]_i = \frac{g_{_i}^2q_{_i}^\topq_{_i} }{Y^\topY}, \qquad \text{for~} i=1,2,\dotsc, n_\Theta.
-\end{align}
-\tag{16}
+[\text{ERR}]_i = \frac{g_{i}^2 \cdot q_{i}^\top q_{i}}{Y^\top Y}, \qquad \text{for } i=1,2,\dotsc, n_\Theta.
 $$
+
 
 There are many ways to terminate the algorithm. An approach often used is stop the algorithm if the model output variance drops below some predetermined limit $\varepsilon$:
 
@@ -252,6 +250,7 @@ $$
 \left\langle x, y\right\rangle = \left\langle \hat{\theta} x, x\right\rangle = \hat{\theta} \left\langle x, x\right\rangle
 \tag{20}
 $$
+
 Which implies that
 
 $$

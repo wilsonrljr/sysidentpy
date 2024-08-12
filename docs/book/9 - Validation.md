@@ -132,7 +132,12 @@ $$
 
 where $\hat{y}_k \in \mathbb{R}$ the model predicted output and $\bar{y} \in \mathbb{R}$ the mean of the measured output $y_k$. The RRSE gives some indication regarding the quality of the model, but concluding about the best model by evaluating only this quantity may leads to an incorrect interpretation, as shown in following example.
 
-Consider the models $y_{{_a}k} = 0.7077y_{{_a}k-1} + 0.1642u_{k-1} + 0.1280u_{k-2}$ and $y_{{_b}k}=0.7103y_{{_b}k-1} + 0.1458u_{k-1} + 0.1631u_{k-2} -1467y^3_{{_b}k-1} + 0.0710y^3_{{_b}k-2} +0.0554y^2_{{_b}k-3}u_{k-3}$ defined in the [Meta Model Structure Selection: An Algorithm For Building Polynomial NARX Models For Regression And Classification](https://ufsj.edu.br/portal2-repositorio/File/ppgel/225-2020-02-17-DissertacaoWilsonLacerda.pdf). The former results in a $RRSE = 0.1202$ while the latter gives $RRSE~=0.0857$. Although the model $y_{{_b}k}$ fits the data better, it is only a biased representation to one piece of data and not a good description of the entire system.
+Consider the models 
+$$
+y_{{_a}k} = 0.7077y_{{_a}k-1} + 0.1642u_{k-1} + 0.1280u_{k-2}
+$$
+
+and $y_{{_b}k}=0.7103y_{{_b}k-1} + 0.1458u_{k-1} + 0.1631u_{k-2} -1467y^3_{{_b}k-1} + 0.0710y^3_{{_b}k-2} +0.0554y^2_{{_b}k-3}u_{k-3}$ defined in the [Meta Model Structure Selection: An Algorithm For Building Polynomial NARX Models For Regression And Classification](https://ufsj.edu.br/portal2-repositorio/File/ppgel/225-2020-02-17-DissertacaoWilsonLacerda.pdf). The former results in a $RRSE = 0.1202$ while the latter gives $RRSE~=0.0857$. Although the model $y_{{_b}k}$ fits the data better, it is only a biased representation to one piece of data and not a good description of the entire system.
 
 The RRSE (or any other metric) shows that validations test might be performed carefully. Another traditional practice is split the data set in two parts. In this respect, one can test the models obtained from the estimation part of the data using an specific data for validation. However, the one-step-ahead performance of NARX models generally results in misleading interpretations because even strongly biased models may fit the data well. Therefore, a free run simulation approach usually allows a better interpretation if the model is adequate or not ([Billings, S. A.](https://www.wiley.com/en-us/Nonlinear+System+Identification%3A+NARMAX+Methods+in+the+Time%2C+Frequency%2C+and+Spatio-Temporal+Domains-p-9781119943594)).
 

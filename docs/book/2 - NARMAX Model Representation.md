@@ -1344,7 +1344,7 @@ $$
 \tag{2.34}
 $$
 
-where $Xk ~= \{x_{{_1}k}, x_{{_2}k}, \dotsc, x_{{_r}k}\}\in \mathbb{R}^{n^i_{x{_r}}}$ and $\boldsymbol Yk~= \{y_{{_1}k}, y_{{_2}k}, \dotsc, y_{{_s}k}\}\in \mathbb{R}^{n^i_{y{_s}}}$. The number of possibles terms of MIMO NARX model given the $i$-th polynomial degree, $\ell_i$, is:
+where $Xk ~= \{x_{{_1}k}, x_{{_2}k}, \dotsc, x_{{_r}k}\}\in \mathbb{R}^{n^i_{x{_r}}}$ and $Yk~= \{y_{{_1}k}, y_{{_2}k}, \dotsc, y_{{_s}k}\}\in \mathbb{R}^{n^i_{y{_s}}}$. The number of possibles terms of MIMO NARX model given the $i$-th polynomial degree, $\ell_i$, is:
 
 $$
 \begin{equation}

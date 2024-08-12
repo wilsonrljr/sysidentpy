@@ -621,21 +621,19 @@ So
 $$
 q_i =
 \begin{bmatrix}
-0 & 0\\
-1 & 0\\
-2 & 0\\
-1 & 1\\
-2 & 1\\
+0 & 0 \\
+1 & 0 \\
+2 & 0 \\
+1 & 1 \\
+2 & 1 \\
 \end{bmatrix}
-
 =
-
 \begin{bmatrix}
-1\\
-\overline{y}\\
-\overline{u}\\
-\overline{y^2}\\
-\overline{u}\:\overline{y}\\
+1 \\
+\overline{y} \\
+\overline{u} \\
+\overline{y^2} \\
+\overline{u} \cdot \overline{y} \\
 \end{bmatrix}
 $$
 
@@ -944,17 +942,16 @@ $$
 $$
 q_i =
 \begin{bmatrix}
-0 & 0\\
-1 & 0\\
-2 & 0\\
-2 & 2\\
+0 & 0 \\
+1 & 0 \\
+2 & 0 \\
+2 & 2 \\
 \end{bmatrix}
 =
-
 \begin{bmatrix}
-1\\
-\overline{y}\\
-\overline{u}\\
+1 \\
+\overline{y} \\
+\overline{u} \\
 \overline{u^2}
 \end{bmatrix}
 $$
