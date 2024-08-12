@@ -26,4 +26,4 @@ jobs:
           restore-keys: |
             mkdocs-material-
       - run: pip install ."[dev, doc]"
-      - run: mkdocs gh-deploy --force
+      - run: mkdocs gh-deploy --clean --force
