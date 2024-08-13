@@ -3,7 +3,7 @@ There are several NARMAX model representations, including polynomial, Fourier, g
 To reproduce the codes presented in this section, make sure you have these packages installed:
 
 ```
-pip install sysidentpy, scikit-learn, scipy, pytorch, matplotlib
+sysidentpy, scikit-learn, scipy, pytorch, matplotlib
 ```
 
 ## Basis Function
