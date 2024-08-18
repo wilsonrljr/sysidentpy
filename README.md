@@ -13,7 +13,7 @@
 [![contributors](https://img.shields.io/github/contributors/wilsonrljr/sysidentpy?color=%23FF7800)](https://github.com/wilsonrljr/sysidentpy/graphs/contributors)
 [![stars](https://img.shields.io/github/stars/wilsonrljr/sysidentpy?style=social)](https://github.com/wilsonrljr/sysidentpy/stargazers)
 
-<h1 align="center"> NARMAX Methods For System Identification and Timeseries Forecasting </h1>
+<h1 align="center"> NARMAX Methods For System Identification and TimeSeries Forecasting </h1>
 <h3 align="center">From Classical Approaches to Neural Networks</h3>
 
 **SysIdentPy** offers State of the Art techniques to build your NARMAX models, including it's variants `NARX`, `NARMA`, `NAR`, `NFIR`, `ARMAX`, `ARX`, `ARMA` and others. It also includes tons of interesting examples to help you build nonlinear forecasting models using SysIdentPy.
@@ -26,7 +26,7 @@
 - [How do I install SysIdentPy?](#how-do-i-install_sysidentpy)
 - [Features](#what-are-the-main-features-of-sysidentpy)
 - [Why does SysIdentPy exist?](#why-does-sysidentpy-exist)
-- [How do I use sysIdentPy?](#how-do-i-use-sysIdentPy)
+- [How do I use SysIdentPy?](#how-do-i-use-SysIdentPy)
 - [Examples](#examples)
 - [Communication](#communication)
 - [Citation](#citation)
@@ -39,7 +39,7 @@
 
 SysIdentPy is an open-source Python module for System Identification using **NARMAX** models built on top of **numpy** and is distributed under the 3-Clause BSD license. SysIdentPy provides an easy-to-use and  flexible framework for building Dynamical Nonlinear Models for time series and dynamic systems.
 
-With SysIdentPy, you can:
+With **SysIdentPy**, you can:
 
 - Build and customize nonlinear forecasting models.
 - Utilize state-of-the-art techniques for model structure selection and parameter estimation.
@@ -86,15 +86,15 @@ For more details, check our [installation guide](https://sysidentpy.org/landing-
 | Multiobjective Parameter Estimation | You can use affine information to estimate the model parameters minimizing different objective functions. |
 | Model Simulation | You can reproduce results from papers easily with SimulateNARMAX class. Moreover, you can test published models with different parameter estimation methods and compare the performance. |
 | Neural NARX | You can use SysIdentPy with Pytorch to create custom neural NARX models architectures which support all the optimizers and loss functions from Pytorch. |
-| General Estimators | You can use estimators from packages like scikit-learn, Catboost, and many other compatible interfaces and composition tools, to create NARMAX models. |
+| General Estimators | You can use estimators from packages like scikit-learn, Catboost, and many other compatible interfaces and composition tools to create NARMAX models. |
 
 ## Why does SysIdentPy exist?
 
-SysIdentPy aims to be a free and open source package to help the community to design NARMAX models for System Identification and TimeSeries Forecasting. More than that, be a free and robust alternative to one of the most used tools to build NARMAX models, which is the Matlab's System Identification Toolbox.
+SysIdentPy aims to be a free and open-source package to help the community to design NARMAX models for System Identification and TimeSeries Forecasting. More than that, be a free and robust alternative to one of the most used tools to build NARMAX models, which is the Matlab's System Identification Toolbox.
 
 The project is actively maintained by Wilson R. L. Junior and looking for contributors.
 
-## How do I use sysIdentPy?
+## How do I use SysIdentPy?
 
 The [SysIdentPy documentation](https://sysidentpy.org) includes more than 20 examples to help get you started:
 - Typical "Hello World" example, for an [entry-level description of the main SysIdentPy concepts](https://sysidentpy.org/examples/basic_steps/)
@@ -313,7 +313,7 @@ If you use SysIdentPy on your scientific publication, we would appreciate citati
 
 ## Inspiration
 
-The documentation and structure (even this section) is openly inspired by sklearn, einsteinpy, and many others as we used (and keep using) them to learn.
+The documentation and structure (even this section) is openly inspired by Scikit-learn, EinsteinPy, and many others as we used (and keep using) them to learn.
 
 ## Contributors
 
