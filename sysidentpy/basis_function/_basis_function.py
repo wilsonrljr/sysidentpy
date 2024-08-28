@@ -82,12 +82,14 @@ class Polynomial(BaseBasisFunction):
         iterable_list =  self.get_iterable_list(ylag, xlag, model_type)
         combinations = list(combinations_with_replacement(iterable_list, self.degree))
         if predefined_regressors is not None:
-            combinations = [combinations[index] for index in predefined_regressors]
+            combination_list = [
+                combination_list[index] for index in predefined_regressors
+            ]
 
         psi = np.column_stack(
             [
-                np.prod(data[:, combinations[i]], axis=1)
-                for i in range(len(combinations))
+                np.prod(data[:, combination_list[i]], axis=1)
+                for i in range(len(combination_list))
             ]
         )
         psi = psi[max_lag:, :]
