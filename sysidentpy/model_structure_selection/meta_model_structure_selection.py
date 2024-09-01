@@ -385,7 +385,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             lagged_data = self.build_matrix(X_train, y_train)
 
             psi = self.basis_function.fit(
-                lagged_data, self.max_lag, predefined_regressors=self.pivv
+                lagged_data, self.max_lag, self.xlag, self.ylag, self.model_type, predefined_regressors=self.pivv
             )
 
             pos_insignificant_terms, _, _ = self.perform_t_test(

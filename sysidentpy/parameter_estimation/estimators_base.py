@@ -88,7 +88,7 @@ class BaseEstimator(metaclass=ABCMeta):
             lagged_data = im.build_output_matrix(None, e)
 
             e_regressors = basis_function.fit(
-                lagged_data, max_lag, predefined_regressors=None
+                lagged_data, max_lag, ylag=elag, predefined_regressors=None
             )
 
             psi_extended = np.concatenate([psi, e_regressors], axis=1)

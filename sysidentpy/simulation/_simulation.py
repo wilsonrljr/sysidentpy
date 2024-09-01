@@ -277,7 +277,7 @@ class SimulateNARMAX(BaseMSS):
             self.max_lag = self._get_max_lag()
             lagged_data = self.build_matrix(X_train, y_train)
             psi = self.basis_function.fit(
-                lagged_data, self.max_lag, predefined_regressors=self.pivv
+                lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type, predefined_regressors=self.pivv
             )
 
             self.theta = self.estimator.optimize(
@@ -303,7 +303,7 @@ class SimulateNARMAX(BaseMSS):
             self.max_lag = self._get_max_lag()
             lagged_data = self.build_matrix(X_train, y_train)
             psi = self.basis_function.fit(
-                lagged_data, self.max_lag, predefined_regressors=self.pivv
+                lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type, predefined_regressors=self.pivv
             )
 
             _, self.err, _, _ = self.error_reduction_ratio(
@@ -485,6 +485,9 @@ class SimulateNARMAX(BaseMSS):
         X_base = self.basis_function.transform(
             lagged_data,
             self.max_lag,
+            self.ylag,
+            self.xlag,
+            self.model_type,
             predefined_regressors=self.pivv[: len(self.final_model)],
         )
 

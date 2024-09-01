@@ -602,7 +602,7 @@ class FROLS(BaseMSS):
         lagged_data = self.build_matrix(X, y)
 
         reg_matrix = self.basis_function.fit(
-            lagged_data, self.max_lag, predefined_regressors=None
+            lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type, predefined_regressors=None
         )
 
         if X is not None:
@@ -743,6 +743,9 @@ class FROLS(BaseMSS):
         X_base = self.basis_function.transform(
             lagged_data,
             self.max_lag,
+            self.ylag,
+            self.xlag,
+            self.model_type,
             predefined_regressors=self.pivv[: len(self.final_model)],
         )
 

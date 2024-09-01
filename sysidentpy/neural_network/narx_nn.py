@@ -274,12 +274,12 @@ class NARXNN(BaseMSS):
         basis_name = self.basis_function.__class__.__name__
         if basis_name == "Polynomial":
             reg_matrix = self.basis_function.fit(
-                lagged_data, self.max_lag, predefined_regressors=None
+                lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type, predefined_regressors=None
             )
             reg_matrix = reg_matrix[:, 1:]
         else:
             reg_matrix = self.basis_function.fit(
-                lagged_data, self.max_lag, predefined_regressors=None
+                lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type, predefined_regressors=None
             )
 
         if X is not None:
@@ -518,12 +518,18 @@ class NARXNN(BaseMSS):
             X_base = self.basis_function.transform(
                 lagged_data,
                 self.max_lag,
+                self.ylag,
+                self.xlag,
+                self.model_type
             )
             X_base = X_base[:, 1:]
         else:
             X_base = self.basis_function.transform(
                 lagged_data,
                 self.max_lag,
+                self.ylag,
+                self.xlag,
+                self.model_type
             )
 
         yhat = np.zeros(X.shape[0], dtype=float)
@@ -712,6 +718,9 @@ class NARXNN(BaseMSS):
             X_tmp = self.basis_function.transform(
                 lagged_data,
                 self.max_lag,
+                self.ylag,
+                self.xlag,
+                self.model_type
             )
             X_tmp = np.atleast_1d(X_tmp).astype(np.float32)
             yhat = yhat.astype(np.float32)
