@@ -902,6 +902,9 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             X_tmp = self.basis_function.transform(
                 lagged_data,
                 self.max_lag,
+                self.ylag,
+                self.xlag,
+                self.model_type,
                 predefined_regressors=self.pivv[: len(self.final_model)],
             )
 

@@ -384,7 +384,7 @@ class AILS:
         )
 
         psi = Polynomial(degree=self.degree).fit(
-            lagged_data, max_lag=self.max_lag, predefined_regressors=pivv
+            lagged_data, max_lag=self.max_lag, ylag=ylag, xlag=xlag, predefined_regressors=pivv
         )
         return psi
 

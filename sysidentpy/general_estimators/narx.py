@@ -160,7 +160,7 @@ class NARX(BaseMSS):
         self.max_lag = self._get_max_lag()
         lagged_data = self.build_matrix(X, y)
         reg_matrix = self.basis_function.fit(
-            lagged_data, self.max_lag, predefined_regressors=None
+            lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type, predefined_regressors=None
         )
 
         if X is not None:
@@ -265,7 +265,9 @@ class NARX(BaseMSS):
         X_base = self.basis_function.transform(
             lagged_data,
             self.max_lag,
-            # predefined_regressors=self.pivv[: len(self.final_model)],
+            self.ylag,
+            self.xlag,
+            self.model_type
         )
 
         yhat = self.base_estimator.predict(X_base)
@@ -485,7 +487,9 @@ class NARX(BaseMSS):
             X_tmp = self.basis_function.transform(
                 lagged_data,
                 self.max_lag,
-                # predefined_regressors=self.pivv[: len(self.final_model)],
+                self.ylag,
+                self.xlag,
+                self.model_type
             )
 
             a = self.base_estimator.predict(X_tmp)
