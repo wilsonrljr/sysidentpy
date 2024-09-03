@@ -57,6 +57,7 @@ dependencies = ["numpy>=1.19.2,<2.0", "scipy>=1.7.0", "matplotlib>=3.3.2"]
 dynamic = ["version"]
 
 [project.optional-dependencies]
+
 dev = [
     "pytest >=7.0.0,<8.0.0",
     "pytest-cov >=2.12.0,<4.0.0",
@@ -87,7 +88,7 @@ doc = [
     # avoid jinja import error using 3.0.3 version
     "jinja2==3.0.3",
 ]
-all = ["torch >=1.7.1"]
+all = ["torch >=1.7.1, <2.4.0"]
 
 [project.urls]
 homepage = "http://sysidentpy.org"

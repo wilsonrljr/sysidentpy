@@ -385,7 +385,12 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             lagged_data = self.build_matrix(X_train, y_train)
 
             psi = self.basis_function.fit(
-                lagged_data, self.max_lag, self.xlag, self.ylag, self.model_type, predefined_regressors=self.pivv
+                lagged_data,
+                self.max_lag,
+                self.xlag,
+                self.ylag,
+                self.model_type,
+                predefined_regressors=self.pivv,
             )
 
             pos_insignificant_terms, _, _ = self.perform_t_test(
@@ -607,7 +612,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             The predicted values of the model.
 
         """
-        if self.basis_function.__class__.__name__ == "Polynomial":
+        if isinstance(self.basis_function, Polynomial):
             if steps_ahead is None:
                 yhat = self._model_prediction(X, y, forecast_horizon=forecast_horizon)
                 yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
