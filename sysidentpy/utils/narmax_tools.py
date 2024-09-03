@@ -4,6 +4,7 @@ from typing import Tuple, Optional, Any
 import numpy as np
 
 from ..narmax_base import RegressorDictionary
+from ..basis_function import Polynomial
 from ._check_arrays import _num_features
 
 
@@ -47,24 +48,28 @@ def regressor_code(
         xlag=xlag, ylag=ylag, model_type=model_type, basis_function=basis_function
     ).regressor_space(n_inputs)
 
-    basis_name = basis_function.__class__.__name__
-    if basis_name != "Polynomial" and basis_function.ensemble:
+    if not isinstance(basis_function, Polynomial) and basis_function.ensemble:
         repetition = basis_function.n * 2
         basis_code = np.sort(
             np.tile(encoding[1:, :], (repetition, 1)),
             axis=0,
         )
         encoding = np.concatenate([encoding[1:], basis_code])
-    elif basis_name != "Polynomial" and basis_function.ensemble is False:
+    elif (
+        not isinstance(basis_function, Polynomial) and basis_function.ensemble is False
+    ):
         repetition = basis_function.n * 2
         encoding = np.sort(
             np.tile(encoding[1:, :], (repetition, 1)),
             axis=0,
         )
 
-    if basis_name == "Polynomial" and model_representation == "neural_network":
+    if (
+        isinstance(basis_function, Polynomial)
+        and model_representation == "neural_network"
+    ):
         return encoding[1:]
-    if basis_name == "Polynomial" and model_representation is None:
+    if isinstance(basis_function, Polynomial) and model_representation is None:
         return encoding
 
     return encoding

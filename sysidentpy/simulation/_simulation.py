@@ -179,7 +179,7 @@ class SimulateNARMAX(BaseMSS):
             )
 
     def _check_simulate_params(self, y_train, y_test, model_code, steps_ahead, theta):
-        if self.basis_function.__class__.__name__ != "Polynomial":
+        if not isinstance(self.basis_function, Polynomial):
             raise NotImplementedError(
                 "Currently, SimulateNARMAX only works for polynomial models."
             )
@@ -277,7 +277,12 @@ class SimulateNARMAX(BaseMSS):
             self.max_lag = self._get_max_lag()
             lagged_data = self.build_matrix(X_train, y_train)
             psi = self.basis_function.fit(
-                lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type, predefined_regressors=self.pivv
+                lagged_data,
+                self.max_lag,
+                self.ylag,
+                self.xlag,
+                self.model_type,
+                predefined_regressors=self.pivv,
             )
 
             self.theta = self.estimator.optimize(
@@ -303,7 +308,12 @@ class SimulateNARMAX(BaseMSS):
             self.max_lag = self._get_max_lag()
             lagged_data = self.build_matrix(X_train, y_train)
             psi = self.basis_function.fit(
-                lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type, predefined_regressors=self.pivv
+                lagged_data,
+                self.max_lag,
+                self.ylag,
+                self.xlag,
+                self.model_type,
+                predefined_regressors=self.pivv,
             )
 
             _, self.err, _, _ = self.error_reduction_ratio(
@@ -434,7 +444,7 @@ class SimulateNARMAX(BaseMSS):
             The predicted values of the model.
 
         """
-        if self.basis_function.__class__.__name__ == "Polynomial":
+        if isinstance(self.basis_function, Polynomial):
             if steps_ahead is None:
                 yhat = self._model_prediction(X, y, forecast_horizon=forecast_horizon)
                 yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)

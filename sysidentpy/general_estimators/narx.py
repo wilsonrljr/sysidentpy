@@ -160,7 +160,12 @@ class NARX(BaseMSS):
         self.max_lag = self._get_max_lag()
         lagged_data = self.build_matrix(X, y)
         reg_matrix = self.basis_function.fit(
-            lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type, predefined_regressors=None
+            lagged_data,
+            self.max_lag,
+            self.ylag,
+            self.xlag,
+            self.model_type,
+            predefined_regressors=None,
         )
 
         if X is not None:
@@ -213,7 +218,7 @@ class NARX(BaseMSS):
             The predicted values of the model.
 
         """
-        if self.basis_function.__class__.__name__ == "Polynomial":
+        if isinstance(self.basis_function, Polynomial):
             if steps_ahead is None:
                 yhat = self._model_prediction(X, y, forecast_horizon=forecast_horizon)
                 yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
@@ -263,11 +268,7 @@ class NARX(BaseMSS):
         """
         lagged_data = self.build_matrix(X, y)
         X_base = self.basis_function.transform(
-            lagged_data,
-            self.max_lag,
-            self.ylag,
-            self.xlag,
-            self.model_type
+            lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type
         )
 
         yhat = self.base_estimator.predict(X_base)
@@ -485,11 +486,7 @@ class NARX(BaseMSS):
                 yhat[i : i + analyzed_elements_number].reshape(-1, 1),
             )
             X_tmp = self.basis_function.transform(
-                lagged_data,
-                self.max_lag,
-                self.ylag,
-                self.xlag,
-                self.model_type
+                lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type
             )
 
             a = self.base_estimator.predict(X_tmp)
