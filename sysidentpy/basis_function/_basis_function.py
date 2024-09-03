@@ -89,6 +89,9 @@ class Polynomial(BaseBasisFunction):
             combination_list = [
                 combination_list[index] for index in predefined_regressors
             ]
+            combination_list = [
+                combination_list[index] for index in predefined_regressors
+            ]
 
         psi = np.column_stack(
             [
