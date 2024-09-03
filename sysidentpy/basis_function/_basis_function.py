@@ -1,5 +1,7 @@
 """Basis Function for NARMAX models."""
 
+import warnings
+
 from itertools import combinations_with_replacement
 from typing import Optional
 import numpy as np
@@ -79,15 +81,19 @@ class Polynomial(BaseBasisFunction):
 
         """
         # Create combinations of all columns based on its index
-        iterable_list =  self.get_iterable_list(ylag, xlag, model_type)
-        combinations = list(combinations_with_replacement(iterable_list, self.degree))
+        iterable_list = self.get_iterable_list(ylag, xlag, model_type)
+        combination_list = list(
+            combinations_with_replacement(iterable_list, self.degree)
+        )
         if predefined_regressors is not None:
-            combinations = [combinations[index] for index in predefined_regressors]
+            combination_list = [
+                combination_list[index] for index in predefined_regressors
+            ]
 
         psi = np.column_stack(
             [
-                np.prod(data[:, combinations[i]], axis=1)
-                for i in range(len(combinations))
+                np.prod(data[:, combination_list[i]], axis=1)
+                for i in range(len(combination_list))
             ]
         )
         psi = psi[max_lag:, :]
@@ -97,8 +103,8 @@ class Polynomial(BaseBasisFunction):
         self,
         data: np.ndarray,
         max_lag: int = 1,
-        ylag: int=1,
-        xlag: int=1,
+        ylag: int = 1,
+        xlag: int = 1,
         model_type: str = "NARMAX",
         predefined_regressors: Optional[np.ndarray] = None,
     ):
@@ -202,7 +208,9 @@ class Fourier(BaseBasisFunction):
         """
         # remove intercept (because the data always have the intercept)
         if self.degree > 1:
-            data = Polynomial().fit(data, max_lag, ylag, xlag, model_type, predefined_regressors=None)
+            data = Polynomial().fit(
+                data, max_lag, ylag, xlag, model_type, predefined_regressors=None
+            )
             data = data[:, 1:]
         else:
             data = data[max_lag:, 1:]
@@ -337,7 +345,9 @@ class Bersntein(BaseBasisFunction):
     ):
         # remove intercept (because the data always have the intercept)
         if self.degree > 1:
-            data = Polynomial().fit(data, max_lag, ylag, xlag, model_type, predefined_regressors=None)
+            data = Polynomial().fit(
+                data, max_lag, ylag, xlag, model_type, predefined_regressors=None
+            )
             data = data[:, 1:]
         else:
             data = data[max_lag:, 1:]
@@ -381,6 +391,8 @@ class Bersntein(BaseBasisFunction):
             The range of lags according to user definition.
         xlag : ndarray of int
             The range of lags according to user definition.
+        model_type : str
+            The type of the model (NARMAX, NAR or NFIR).
         predefined_regressors: ndarray
             Regressors to be filtered in the transformation.
 
@@ -391,6 +403,7 @@ class Bersntein(BaseBasisFunction):
 
         """
         return self.fit(data, max_lag, ylag, xlag, model_type, predefined_regressors)
+
 
 class Bilinear(BaseBasisFunction):
     r"""Build Bilinear basis function.
@@ -403,11 +416,11 @@ class Bilinear(BaseBasisFunction):
 
     This is a special case of the Polynomial NARMAX model.
 
-    Bilinear system theory has been widely studied and it plays an important role in the context of continuous-time
-    systems.  This is because, roughly speaking, the set of bilinear
-    systems is dense in the space of continuous-time systems and any continuous causal
-    functional can be arbitrarily well approximated by bilinear systems within any
-    bounded time interval (see for example Fliess and Normand-Cyrot 1982). Moreover,
+    Bilinear system theory has been widely studied and it plays an important role in the
+    context of continuous-time systems.  This is because, roughly speaking, the set of
+    bilinear systems is dense in the space of continuous-time systems and any continuous
+    causal functional can be arbitrarily well approximated by bilinear systems within
+    any bounded time interval (see for example Fliess and Normand-Cyrot 1982). Moreover,
     many real continuous-time processes are naturally in bilinear form. A few examples
     are distillation columns (España and Landau 1978), nuclear and thermal control
     processes (Mohler 1973).
@@ -426,7 +439,6 @@ class Bilinear(BaseBasisFunction):
     significantly as the number of inputs, the max lag of the input and output, and
     degree increases. High degrees can cause overfitting.
     """
-
 
     def __init__(
         self,
@@ -472,26 +484,39 @@ class Bilinear(BaseBasisFunction):
 
         """
         # Create combinations of all columns based on its index
-        iterable_list =  self.get_iterable_list(ylag, xlag, model_type)
-        combinations = list(combinations_with_replacement(iterable_list, self.degree))
+        iterable_list = self.get_iterable_list(ylag, xlag, model_type)
+        combination_list = list(
+            combinations_with_replacement(iterable_list, self.degree)
+        )
         if self.degree == 1:
-            Warning('You choose a bilinear basis function and nonlinear degree = 1. In this case, you have a linear polynomial model.')
+            warnings.warn(
+                "You choose a bilinear basis function and nonlinear degree = 1."
+                "In this case, you have a linear polynomial model.",
+                stacklevel=2,
+            )
         else:
             ny = self.get_max_ylag(ylag)
             nx = self.get_max_xlag(xlag)
-            combination_ylag = list(combinations_with_replacement(list(range(1, ny + 1)), self.degree))
-            combination_xlag = list(combinations_with_replacement(list(range(ny + 1, nx + ny + 1)), self.degree))
+            combination_ylag = list(
+                combinations_with_replacement(list(range(1, ny + 1)), self.degree)
+            )
+            combination_xlag = list(
+                combinations_with_replacement(
+                    list(range(ny + 1, nx + ny + 1)), self.degree
+                )
+            )
             combinations_xy = combination_xlag + combination_ylag
-            combinations = list(set(combinations)-set(combinations_xy))
+            combination_list = list(set(combination_list) - set(combinations_xy))
 
         if predefined_regressors is not None:
-            combinations = [combinations[index] for index in predefined_regressors]
-
+            combination_list = [
+                combination_list[index] for index in predefined_regressors
+            ]
 
         psi = np.column_stack(
             [
-                np.prod(data[:, combinations[i]], axis=1)
-                for i in range(len(combinations))
+                np.prod(data[:, combination_list[i]], axis=1)
+                for i in range(len(combination_list))
             ]
         )
         psi = psi[max_lag:, :]
