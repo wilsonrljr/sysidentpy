@@ -1,6 +1,6 @@
 """Base class for Basis Function."""
 
-from itertools import combinations_with_replacement, chain
+from itertools import chain
 from abc import ABCMeta, abstractmethod
 from typing import Optional
 
@@ -21,6 +21,7 @@ class BaseBasisFunction(metaclass=ABCMeta):
         max_lag: int = 1,
         ylag: int = 1,
         xlag: int = 1,
+        model_type: str = "NARMAX",
         predefined_regressors: Optional[np.ndarray] = None,
     ):
         """Abstract method."""
@@ -32,6 +33,7 @@ class BaseBasisFunction(metaclass=ABCMeta):
         max_lag: int = 1,
         ylag: int = 1,
         xlag: int = 1,
+        model_type: str = "NARMAX",
         predefined_regressors: Optional[np.ndarray] = None,
     ) -> np.ndarray:
         """Abstract methods."""
@@ -71,10 +73,7 @@ class BaseBasisFunction(metaclass=ABCMeta):
         return nx
 
     def get_iterable_list(
-        self,
-        ylag: int = 1,
-        xlag: int = 1,
-        model_type: str = "NARMAX"
+        self, ylag: int = 1, xlag: int = 1, model_type: str = "NARMAX"
     ):
         """Get iterable list.
 
@@ -97,7 +96,6 @@ class BaseBasisFunction(metaclass=ABCMeta):
             ny = self.get_max_ylag(ylag)
             nx = self.get_max_xlag(xlag)
             iterable_list = list(range(ny + nx + 1))
-            combinations = list(combinations_with_replacement(iterable_list, self.degree))
         elif model_type == "NAR":
             ny = self.get_max_ylag(ylag)
             iterable_list = list(range(ny + 1))
@@ -105,4 +103,3 @@ class BaseBasisFunction(metaclass=ABCMeta):
             nx = self.get_max_xlag(xlag)
             iterable_list = list(range(nx + 1))
         return iterable_list
-
