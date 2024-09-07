@@ -132,7 +132,7 @@ $$
 
 where $\hat{y}_k \in \mathbb{R}$ the model predicted output and $\bar{y} \in \mathbb{R}$ the mean of the measured output $y_k$. The RRSE gives some indication regarding the quality of the model, but concluding about the best model by evaluating only this quantity may leads to an incorrect interpretation, as shown in following example.
 
-Consider the models 
+Consider the models
 $$
 y_{{_a}k} = 0.7077y_{{_a}k-1} + 0.1642u_{k-1} + 0.1280u_{k-2}
 $$
@@ -246,11 +246,11 @@ x1e = compute_cross_correlation(y_valid, yhat, x_valid)
 plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 ```
 
-![](./assets/c9_dc_1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c9_dc_1.png?raw=true)
 
-![](./assets/c09_ee_1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c09_ee_1.png?raw=true)
 
-![](./assets/c09_ex_1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c09_ex_1.png?raw=true)
 
 The RRSE is 0.0800, which is a very good metric. However, we can see that the residues have somo high auto-correlations anda with the input. This mean that our model maybe is not good enough as it could be.
 
@@ -282,11 +282,11 @@ plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 
 Now the RRSE is 0.0568 and we have a better residual correlation!
 
-![](./assets/c09_dc_2.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c09_dc_2.png?raw=true)
 
-![](./assets/c09_ee_2.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c09_ee_2.png?raw=true)
 
-![](./assets/c09_ex_2.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c09_ex_2.png?raw=true)
 
 In the end of day, the best model will be the model that satisfy the user needs. However, its important to understand how to analyse the models so you can have an idea if you can get some improvements without too much work.
 
@@ -306,9 +306,8 @@ plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 
 The same model, but evaluating the 1-step ahead prediction, now return a RRSE$= 0.02044$ and the residues are even better. But remember, that is expected, as explained in the previous section.
 
-![](./assets/c09_dc_3.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c09_dc_3.png?raw=true)
 
-![](./assets/c09_ee_3.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c09_ee_3.png?raw=true)
 
-![](./assets/c09_ex_03.png)
-
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c09_ex_03.png?raw=true)

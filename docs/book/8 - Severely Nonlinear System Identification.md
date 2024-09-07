@@ -12,7 +12,7 @@ The following are some of the essential concepts and formal definitions for unde
 
 One important characteristic to model hysteretic systems is the input signal. A loading-unloading quasi-static signal is a periodic continuous time signal $x_t$ with period $T = (t_f - t_i)$ and frequency $\omega = 2\pi f$ where $x_t$ increases monotonically from $x_{min}$ to $x_{max}$, considering $t_i \leq t \leq t_m$ (loading) and decreases monotonically from $x_{max}$ to $x_{min}$, considering $t_m \leq t \leq t_f$ (unloading). If the loading-unloading signal changes with $\omega \rightarrow 0$, the signal is also called a quasi-static signal. Visually, this is much more simple to understand. The following image shows a continuous-time loading-unloading quasi-static signal.
 
-![](./assets/load_unloading_signal.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/load_unloading_signal.png?raw=true)
 > Figure 1. Continuous-time loading-unloading quasi-static signal, demonstrating the periodic increase and decrease of the input signal.
 
 
@@ -66,7 +66,7 @@ $$
 
 where $\mathcal{H}_t(\omega)^{+} \neq \mathcal{H}_t(\omega)^{-}$, $\forall t \neq t_m$. $t_i \leq t \leq t_m$ and~$t_m \leq t \leq t_f$ correspond to the regime when $x_t$ is loading and unloading, respectively. $\mathcal{H}_t(\omega)^{+}$ corresponds to the part of the loop formed in the $x_t - y_t$ plane, while $t_i \leq t \leq t_m$ (when $x_t$ is loading) whereas $\mathcal{H}_t(\omega)^{-}$ is the part of the loop formed in the~$x_t - y_t$ plane for~$t_m \leq t \leq t_f$ (when $x_t$ is unloading), as shown in the Figure 2:
 
-![](./assets/hysteresis_loop.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/hysteresis_loop.png?raw=true)
 > Figure 2. Example of a hysteresis curve.
 
 
@@ -104,7 +104,7 @@ $$
 
 where $\overline {x}$ is a loading-unloading quasi-static input signal. Since the equilibrium points are asymptotically stable, the output converges to $\mathcal{H}_k (w)$ in the $x-y$ plane. Note that for a constant input value $x ~ = ~ 1 ~ = ~ \overline{x}$, the equilibrium lies in $\overline{y} ~ = ~ 3$ for loading regime and $\overline {y} ~ = ~ -1$ for unloading regime. Analogously, for $\overline {x} ~ = ~ -1$, the equilibrium lies in $\overline {y} ~ = ~ 1$ for loading regime and $\overline {y} ~ = ~ -3$ for unloading regime, as shown in the figure below:
 
-![](./assets/bounded_structure_example.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bounded_structure_example.png?raw=true)
 > Figure 3. Example of a bounding structure $\mathcal{H}$. The black dots are on $\mathcal{H}_{k}(\omega)$ for model $y_k  =  0.8y_{k-1} + 0.4\phi_{k-1} + 0.2x_{k-1}$. The bounding structure $\mathcal{H}$, in red, confines $\mathcal{H}_{k}(\omega)$.}
 
 As can be observed in the Figure 3, in we guarantee the sufficient conditions proposed by [Martins, S. A. M. and Aguirre, L. A.](https://www.sciencedirect.com/science/article/abs/pii/S0888327015005968), a NARX model can reproduce a histeretic behavior. Chapter 10 presents a case study of a system with hysteresis.
@@ -135,5 +135,5 @@ plt.title('Example')
 plt.show()
 ```
 
-![](./assets/bounded_structure_example_python.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bounded_structure_example_python.png?raw=true)
 > Figure 4.  Reproduction of a bounding structure $\mathcal{H}$ using python.

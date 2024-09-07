@@ -80,7 +80,7 @@ plt.gca().yaxis.set_ticks([])
 plt.show()
 ```
 
-![](./assets/vandermode_example.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/vandermode_example.png?raw=true)
 > Figure 1. Approximation using Vandermode Matrix. The yellow dots show the system data, the bold blue line represents the predicted values, and the other lines depict the basis functions.
 
 ### Example: Rectangular Basis Functions
@@ -136,7 +136,7 @@ plt.gca().yaxis.set_ticks([])
 plt.show()
 ```
 
-![](./assets/rectangular.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/rectangular.png?raw=true)
 > Figure 2. Approximation using Rectangular Basis Function. The yellow dots show the system data, the bold blue line represents the predicted values, and the other lines depict the basis functions.
 
 ### Example: Triangular Basis Functions
@@ -189,7 +189,7 @@ plt.gca().yaxis.set_ticks([])
 plt.show()
 ```
 
-![](./assets/triangular.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/triangular.png?raw=true)
  > Figure 3. Approximation using a Triangular Basis Function. The yellow dots show the system data, the bold blue line represents the predicted values, and the other lines depict the basis functions.
 
 ### Example: Radial Basis Function (RBF) - Gaussian
@@ -251,7 +251,7 @@ plt.gca().yaxis.set_ticks([])
 plt.show()
 ```
 
-![](./assets/rbf_example.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/rbf_example.png?raw=true)
 > Figure 4. Approximation using the Radial Basis Function. The yellow dots show the system data, the bold blue line represents the predicted values, and the other lines depict the basis functions.
 
 ## Linear Models
@@ -347,7 +347,7 @@ ax.set_title("Simulation of an ARMAX model")
 plt.show()
 ```
 
-![](./assets/armax_example.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/armax_example.png?raw=true)
 > Figure 4. Simulations to show the effects of different noise process generation on the ARMAX model's behavior.
 
 ### ARX
@@ -423,7 +423,7 @@ ax.set_title("Simulation of an ARX model")
 plt.show()
 ```
 
-![](./assets/arx_example.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/arx_example.png?raw=true)
 > Figure 5. Simulations to show the effects of different noise process generation on the ARX model's behavior.
 
 ### ARMA
@@ -499,7 +499,7 @@ ax.set_title("Simulation of an ARMA model")
 plt.show()
 ```
 
-![](./assets/arma_example.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/arma_example.png?raw=true)
 > Figure 6. Simulations to show the effects of different noise process generation on the ARMA model's behavior.
 
 ### AR
@@ -575,7 +575,7 @@ ax.set_title("Simulation of an AR model")
 plt.show()
 ```
 
-![](./assets/ar_example.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ar_example.png?raw=true)
 > Figure 7. Simulations to show the effects of different noise process generation on the AR model's behavior.
 
 ### FIR
@@ -652,7 +652,7 @@ ax.set_title("Simulation of an FIR model")
 plt.show()
 ```
 
-![](./assets/fir_example.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/fir_example.png?raw=true)
 > Figure 8. Simulations to show the effects of different noise process generation on the **FIR** model's behavior.
 
 > We didn't set the model_type for ARMAX and ARX because the default is `NARMAX`. SysIdentPy allows three different model types: `NARMAX`, `NAR`, and `NFIR`. Because ARMAX, ARX and others linear variants are subsets of NARMAX models, there is no need for specific `ARMAX` model type. The idea is to have model types for model with input and output regressors; models with only output regressors; and models with only input regressors.
@@ -1098,7 +1098,7 @@ Series-Parallel allows us to use `pytorch` directly for training, so **SysIdentP
 
 A simple neural NARX model can be represented as a Multi-Layer Perceptron neural network with autoregressive component along with delayed inputs.
 
-![](./assets/Pasted image 20240710121246.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/Pasted%20image%2020240710121246.png?raw=true)
 > Figure 9. Parallel and series-parallel neural network architectures for modeling the dynamic system $\mathbf{y}[k]=\mathbf{F}(\mathbf{y}[k-1], \mathbf{y}[k-2], \mathbf{u}[k-1], \mathbf{u}[k-2])$. The delay operator $q^{-1}$ is such that $\mathbf{y}[k-1]=q^{-1} \mathbf{y}[k]$. Reference: [Antonio H. Ribeiro and Luis A. Aguirre](https://arxiv.org/pdf/1706.07119)
 
 > Neural NARX is not the same model as Recurrent Neural Networks (RNN). The user is referred to the following paper for more details [A Note on the Equivalence of NARX and RNN](https://link.springer.com/article/10.1007/s005210050005)
@@ -1364,7 +1364,7 @@ $$
 
 If $s=1$, we have a MISO model that can be represented by a single polynomial function. Additionally, a MIMO model can be decomposed into MISO models, as presented in the following figure:
 
-![](./assets/mimo_split.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/mimo_split.png?raw=true)
 > Figure 10. A MIMO model split into individual MISO models.
 
 > SysIdentPy do not support MIMO models yet, only MISO models. You can, however, decompose a MIMO system as presented in Figure 9 and use SysIdentPy to create models for each subsystem.

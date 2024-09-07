@@ -1,4 +1,4 @@
-![](./assets/Nonlinear_System_identification.png)
+![](https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/Nonlinear_System_identification.png)
 
 All the world is a nonlinear system
 

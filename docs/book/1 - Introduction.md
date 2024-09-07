@@ -8,10 +8,10 @@ Mathematical modeling is a great way to understand and analyze different parts o
 
 Typing efficiently on a conventional QWERTY keyboard layout is the result of a well-learned model of the QWERTY keyboard embedded in the individual cognitive processes. However, if you are faced with a different keyboard layout, such as the Dvorak or AZERTY, you will probably struggle to adapt to the new model. The system changed, so you will have to update you *model*.
 
-![](./assets/QWERTY.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/QWERTY.png?raw=true)
 > [QWERTY - Wikipedia](https://en.wikipedia.org/wiki/QWERTY) - [ANSI](https://en.wikipedia.org/wiki/ANSI "ANSI") QWERTY keyboard layout (US)
 
-![](./assets/AZERTY.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/AZERTY.png?raw=true)
 > [AZERTY](https://en.wikipedia.org/wiki/AZERTY) layout used on a keyboard
 
 Mathematical modeling touches on many parts of our lives. Whether we're looking at economic trends, tracking how diseases spread, or figuring out consumer behavior, models are essential tools for gaining knowledge, making informed decisions, and take control over complex systems.
@@ -108,7 +108,7 @@ plt.grid(True)
 plt.show()
 ```
 
-![](./assets/static_example.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/static_example.png?raw=true)
 > Static response representation. The input signal representing the state of the switch (switch off (low level), switch on (high level)), and the static response: original sound (low level), processed sound (high level).
 
 Now, let’s consider a dynamic system: using an air conditioner to lower the room temperature. This example effectively illustrates the concepts of dynamic systems and how their output responds over time.
@@ -117,7 +117,7 @@ Let’s imagine this from the perspective of signals. The input signal represent
 
 Conversely, when the air conditioner is turned off, the room temperature does not immediately return to its original ambient temperature. Instead, it gradually warms up as the cooling effect diminishes.
 
-![](./assets/dynamic_example.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/dynamic_example.png?raw=true)
 > Using an air conditioner to lower the room temperature as dynamic system representation.
 
 In this dynamic system, the output (room temperature) does not instantly follow the input (state of the air conditioner) because there is a time lag involved in both cooling and warming processes. The system has memory, meaning the current room temperature depends not only on the current state of the air conditioner but also on how long it has been running or off, and how much it has already cooled or allowed the room to warm up.
