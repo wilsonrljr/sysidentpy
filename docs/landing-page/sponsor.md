@@ -38,6 +38,11 @@ organization GitHub account for sponsoring.
 
 [:octicons-heart-fill-24:{ .mdx-heart } &nbsp; Join our <span class="mdx-sponsorship-count" data-mdx-component="sponsorship-count"></span> awesome sponsors][wilsonrljr's sponsor profile]{ .md-button .md-button--primary .mdx-sponsorship-button }
 
+!!! info "If you're in Brazil, you can support me by making a donation via Pix. Just scan the QR code below."
+<a href="https://sysidentpy.org/book/0%20-%20Preface/">
+  <img src="https://github.com/wilsonrljr/sysidentpy-data/blob/79638c7985475b5d1ab941912f5a5ae9990d1d4d/docs/images/pix_qr_code.jpg?raw=true" alt="Nonlinear System Identification" style="width: 200px; height: auto;" />
+</a>
+
 <hr />
 **Special thanks** to our **sponsors**:
 
@@ -47,7 +52,13 @@ organization GitHub account for sponsoring.
         <img alt="Technium" src="https://avatars.githubusercontent.com/u/83768197?v=4" width="90" height="90">
     </a>
 
-!!! success ":octicons-person-fill-16: Individual Sponsors"
+!!! success ":star: Monthly Sponsors"
+
+    <a href="https://github.com/statisticallyinsifnificant">
+        <img alt="statisticallyinsifnificant" src="https://avatars.githubusercontent.com/u/158107107?v=4" width="90" height="90">
+    </a>
+
+!!! success ":gift_heart: Individual Sponsors"
 
     <a href="https://github.com/nataliakeles">
         <img alt="Nath Keles" src="https://avatars.githubusercontent.com/u/61664158?v=4" width="90" height="90">
