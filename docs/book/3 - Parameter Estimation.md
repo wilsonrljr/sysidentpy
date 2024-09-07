@@ -527,7 +527,7 @@ plt.plot(estimator.theta_evolution.T[:50, :])
 plt.xlabel("iterations")
 plt.ylabel("theta")
 ```
-![](./assets/theta_evolution.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/theta_evolution.png?raw=true)
 > Figure 1. Evolution of the estimated parameters over time using the RLS algorithm.
 
 ## Least Mean Squares
@@ -748,7 +748,7 @@ plt.legend()
 plt.show()
 ```
 
-![](./assets/biased_parameter.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/biased_parameter.png?raw=true)
 > Figure 2.: Kernel Density Estimates (KDEs) of the estimated parameters obtained from 50 NARX models realizations, each fitted to data with colored noise. The vertical dashed lines indicate the true parameter values used to generate the data. While the model structure is correctly identified, the estimated parameters are biased due to the omission of the Moving Average (MA) component, highlighting the need for the Extended Least Squares algorithm to achieve unbiased parameter estimation
 
 
@@ -792,7 +792,7 @@ plt.legend()
 plt.show()
 ```
 
-![](./assets/unbiased_estimator.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/unbiased_estimator.png?raw=true)
 > Figure 3. Kernel Density Estimates (KDEs) of the estimated parameters obtained from 50 NARX models using the Extended Least Squares (ELS) algorithm with unbiased estimation. The vertical dashed lines indicate the true parameter values used to generate the data.
 
 Unlike the previous biased estimation, these KDEs in Figure 3 show that the estimated parameters are now closely aligned with the true values, demonstrating the effectiveness of the ELS algorithm in achieving unbiased parameter estimation, even in the presence of colored noise.

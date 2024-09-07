@@ -42,7 +42,7 @@ In the system identification field, that means to find a model where you can't g
 
 A hypothetical Pareto set is shown in Figure 1.
 
-![](./assets/pareto_example.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/pareto_example.png?raw=true)
 > Figure 1. The figure illustrates the concept of Pareto optimality, where each point in the objective space represents a solution. The Pareto front is depicted as a curve, demonstrating the trade-off between two conflicting objectives. Points on the front cannot be improved in one objective without worsening the other, highlighting the balance in optimal solutions.
 
 In this case the model structure is assumed to be known and therefore there is a one-to-one correspondence between each parameter vector on the Pareto optimal solution and a model ([Nepomuceno, E. G. and Takahashi, R. H. C. and Aguirre, L. A.]([Multiobjective parameter estimation for non-linear systems: affine information and least-squares formulation](https://www.tandfonline.com/doi/abs/10.1080/00207170601185053))). One can build a Pareto set by applying the Weighted Sum Method, where a set of objectives are scalarized into a single objective by adding each objective multiplied by a user supplied weight. Consider
@@ -131,7 +131,7 @@ plt.legend()
 plt.show()
 ```
 
-![](./assets/buck_data.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_data.png?raw=true)
 
 ```python
 # Plotting the measured input (identification and validation data)
@@ -146,7 +146,7 @@ plt.legend()
 plt.show()
 ```
 
-![](./assets/buck_input_data.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_input_data.png?raw=true)
 
 ### Buck Converter Static Function
 
@@ -179,7 +179,7 @@ plt.plot(Uo, Yo, linewidth=1.5, linestyle="-", marker="o")
 plt.show()
 ```
 
-![](./assets/buck_static_data.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_static_data.png?raw=true)
 
 ### Buck converter Static Gain
 
@@ -209,7 +209,7 @@ plt.legend()
 plt.show()
 ```
 
-![](./assets/buck_static_gain.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_static_gain.png?raw=true)
 
 ### Building a dynamic model using the mono-objective approach
 
@@ -340,7 +340,7 @@ r
 plot_results(y=y_valid, yhat=yhat, n=1000)
 ```
 
-![](./assets/buck_dynamic_results.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_dynamic_results.png?raw=true)
 
 #### The static gain result is
 
@@ -370,7 +370,7 @@ plt.legend()
 plt.show()
 ```
 
-![](./assets/buck_static_gain_results.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_static_gain_results.png?raw=true)
 
 #### The static function result is
 
@@ -392,7 +392,7 @@ plt.legend()
 plt.show()
 ```
 
-![](./assets/buck_static_function_results.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_static_function_results.png?raw=true)
 
 ### Getting the best weight combination based on the norm of the cost function
 
@@ -480,11 +480,11 @@ plt.show()
 | y(k-2)^2      | 2.5832E-01  | 3.827E-06 |
 
 
-![](./assets/buck_result_mo_1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_result_mo_1.png?raw=true)
 
-![](./assets/buck_mo_static_gain_1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_mo_static_gain_1.png?raw=true)
 
-![](./assets/buck_static_curve_mo_1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_static_curve_mo_1.png?raw=true)
 
 You can also plot the pareto-set solutions
 
@@ -499,7 +499,7 @@ ax.set_zlabel("$J_{sf}$", fontsize=10)
 plt.show()
 ```
 
-![](./assets/pareto_set_solutions_1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/pareto_set_solutions_1.png?raw=true)
 
 ### Detailing AILS
 
@@ -807,7 +807,7 @@ r
 plot_results(y=y_valid, yhat=yhat, n=1000)
 ```
 
-![](./assets/buck_mo_results_2.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_mo_results_2.png?raw=true)
 
 #### Static gain
 
@@ -838,7 +838,7 @@ plt.legend()
 plt.show()
 ```
 
-![](./assets/buck_static_gain_mo_2.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_static_gain_mo_2.png?raw=true)
 
 #### Static function
 
@@ -861,7 +861,7 @@ plt.legend()
 plt.show()
 ```
 
-![](./assets/buck_static_curve_mo_2.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_static_curve_mo_2.png?raw=true)
 
 #### Pareto-set solutions
 
@@ -876,7 +876,7 @@ ax.set_zlabel("$J_{sf}$", fontsize=10)
 plt.show()
 ```
 
-![](./assets/buck_pareto_2.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_pareto_2.png?raw=true)
 
 The following table show the results reported in ‘IniciacaoCientifica2007’ and the ones obtained with SysIdentPy implementation
 
@@ -1041,7 +1041,7 @@ r
 plot_results(y=y_valid, yhat=yhat, n=1000)
 ```
 
-![](./assets/buck_mo_3.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_mo_3.png?raw=true)
 
 ```python
 plt.figure(10)
@@ -1071,7 +1071,7 @@ plt.ylabel("Prediction Error")
 plt.show()
 ```
 
-![](./assets/buck_pareto_mo_3.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_pareto_mo_3.png?raw=true)
 
 where the best estimated $\Theta$ is
 
@@ -1184,7 +1184,7 @@ r
 plot_results(y=y_valid, yhat=yhat, n=1000)
 ```
 
-![](./assets/buck_mo_4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_mo_4.png?raw=true)
 
 ```python
 plt.figure(12)
@@ -1212,7 +1212,7 @@ plt.legend()
 plt.show()
 ```
 
-![](./assets/buck_static_gain_mo_4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_static_gain_mo_4.png?raw=true)
 
 ```python
 plt.figure(11)
@@ -1223,7 +1223,7 @@ plt.ylabel("Prediction Error")
 plt.show()
 ```
 
-![](./assets/buck_pareto_mo_4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/buck_pareto_mo_4.png?raw=true)
 
 being the selected $\theta$:
 

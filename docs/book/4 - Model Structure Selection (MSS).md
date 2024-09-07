@@ -39,7 +39,7 @@ $$
 
 Given this linear relationship, an adequate model for the RLC circuit should reflect this second-order linearity. While Model 2, which includes nonlinear terms, may provide a closer fit to the data, it is clearly over-parameterized. Such over-parameterization can introduce spurious nonlinear effects, often referred to as "ghost" nonlinearities, which do not correspond to the actual dynamics of the system. Therefore, these models need to be interpreted with caution, as the use of an overly complex model could obscure the true linear nature of the system and lead to incorrect conclusions about its behavior.
 
-![](./assets/rlc.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/rlc.png?raw=true)
 > Figure 1.Results for two polynomial NARX models fitted to data from an unknown system. Model 1 (left) is a linear model, while Model 2 (right) includes nonlinear terms. The figure illustrates that Model 2 provides a closer fit to the data compared to Model 1. However, since the original system is a linear RLC circuit known to have a second-order linear behavior, the improved fit of Model 2 may be misleading due to over-parameterization. This highlights the importance of considering the physical characteristics of the system when interpreting model results to avoid misinterpretation of artificial nonlinearities. Reference: [Meta Model Structure Selection: An Algorithm For Building Polynomial NARX Models For Regression And Classification](https://ufsj.edu.br/portal2-repositorio/File/ppgel/225-2020-02-17-DissertacaoWilsonLacerda.pdf)
 
 Correctly identifying the structure of a model is crucial for accurately analyzing the system's dynamics. A well-chosen model structure ensures that the model reflects the true behavior of the system, allowing for consistent and meaningful analysis. In this respect, several algorithms have been developed to select the appropriate terms for constructing a polynomial NARX model. The primary goal of model structure selection (MSS) algorithms is to reveal the system's characteristics by producing the simplest model that adequately describes the data. While some systems may indeed require more complex models, it is essential to strike a balance between simplicity and accuracy. As Einstein aptly put it:
@@ -416,7 +416,7 @@ df2 = pd.read_csv("examples/datasets/y_cc.csv")
 df2[5000:80000].plot(figsize=(10, 4))
 ```
 
-![](./assets/generator_example.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/generator_example.png?raw=true)
 > Figure 2. Output of the electromechanical system.
 
 
@@ -495,7 +495,7 @@ yhat = model.predict(X=x_valid, y=y_valid)
 plot_results(y=y_valid, yhat=yhat, n=100)
 ```
 
-![](./assets/generator_predict_c4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/generator_predict_c4.png?raw=true)
 > Figure 3. Free run simulation (or infinity-steps ahead prediction) of the fitted model.
 
 ## Information Criteria
@@ -585,7 +585,7 @@ plt.xlabel("n_terms")
 plt.ylabel("Information Criteria")
 ```
 
-![](./assets/dc_generator_aic_c4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/dc_generator_aic_c4.png?raw=true)
 > Figure 4. The plot shows the Information Criterion values (BIC) as a function of the number of terms included in the model. The model selection process, using the BIC criterion, iteratively adds regressors until the BIC reaches a minimum, indicating the optimal balance between model complexity and fit. The point where the BIC value stops decreasing marks the optimal number of terms, resulting in a final model with 13 terms.
 
 The model prediction in this case is shown in Figure 5
@@ -596,7 +596,7 @@ yhat = model.predict(X=x_valid, y=y_valid)
 plot_results(y=y_valid, yhat=yhat, n=100)
 ```
 
-![](./assets/dc_generator_bic_c4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/dc_generator_bic_c4.png?raw=true)
 > Figure 5. Free run simulation (or infinity-steps ahead prediction) of the fitted model using BIC.
 
 ### Overview of the Information Criteria Methods
@@ -692,10 +692,10 @@ The regressors, the free run simulation and the AIC values are detailed bellow.
 | x1(k-2)x1(k-1) | 5.9034E-02  | 7.47435512E-04 |
 >Table 3
 
-![](./assets/predict_aic_c4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/predict_aic_c4.png?raw=true)
 > Figure 5. Free run simulation (or infinity-steps ahead prediction) of the fitted model using AIC.
 
-![](./assets/aic_c4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/aic_c4.png?raw=true)
 > Figure 6. The plot shows the Information Criterion values (AIC) as a function of the number of terms included in the model. The model selection process, using the AIC criterion, iteratively adds regressors until the AIC reaches a minimum, indicating the optimal balance between model complexity and fit. The point where the AICc value stops decreasing marks the optimal number of terms, resulting in a final model with 10 terms.
 
 For this case, we have a model with 10 terms. We know that the correct number is 3 because of the simulated system we are using as example.
@@ -750,10 +750,10 @@ plt.ylabel("Information Criteria")
 >Table 4
 
 
-![](./assets/predicted_aicc_c4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/predicted_aicc_c4.png?raw=true)
 > Figure 7. Free run simulation (or infinity-steps ahead prediction) of the fitted model using AICc.
 
-![](./assets/aicc_c4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/aicc_c4.png?raw=true)
 > Figure 8. The plot shows the Information Criterion values (AICc) as a function of the number of terms included in the model. The model selection process, using the AIC criterion, iteratively adds regressors until the AICc reaches a minimum, indicating the optimal balance between model complexity and fit. The point where the AICc value stops decreasing marks the optimal number of terms, resulting in a final model with 9 terms.
 
 This time we have a model with 9 regressors.
@@ -799,10 +799,10 @@ plt.ylabel("Information Criteria")
 >Table 5
 
 
-![](./assets/predicted_bic_c4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/predicted_bic_c4.png?raw=true)
 > Figure 9. Free run simulation (or infinity-steps ahead prediction) of the fitted model using BIC.
 
-![](./assets/bic_c4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bic_c4.png?raw=true)
 > Figure 10. The plot shows the Information Criterion values (BIC) as a function of the number of terms included in the model. The model selection process, using the BIC criterion, iteratively adds regressors until the BIC reaches a minimum, indicating the optimal balance between model complexity and fit. The point where the BIC value stops decreasing marks the optimal number of terms, resulting in a final model with 2 terms.
 
 BIC returned a model with only 2 regressors!
@@ -852,11 +852,11 @@ plt.ylabel("Information Criteria")
 | y(k-1)^2      | 8.2157E-02  | 1.70257419E-03 |
 >Table 6
 
-![](./assets/predicted_lilc_c4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/predicted_lilc_c4.png?raw=true)
 > Figure 11. Free run simulation (or infinity-steps ahead prediction) of the fitted model using LILC.
 
 
-![](./assets/lilc_c4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/lilc_c4.png?raw=true)
 >Figure 12. The plot shows the Information Criterion values (LILC) as a function of the number of terms included in the model. The model selection process, using the LILC criterion, iteratively adds regressors until the LILC reaches a minimum, indicating the optimal balance between model complexity and fit. The point where the LILC value stops decreasing marks the optimal number of terms, resulting in a final model with 7 terms.
 
 LILC returned a model with 7 regressors.
@@ -909,11 +909,11 @@ plt.ylabel("Information Criteria")
 | x1(k-2)x1(k-1) | 5.9034E-02  | 7.47435512E-04 |
 >Table 7
 
-![](./assets/predicted_fpe_c4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/predicted_fpe_c4.png?raw=true)
 > Figure 13. Free run simulation (or infinity-steps ahead prediction) of the fitted model using FPE.
 
 
-![](./assets/fpe_c4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/fpe_c4.png?raw=true)
 > Figure 14. The plot shows the Information Criterion values (FPE) as a function of the number of terms included in the model. The model selection process, using the FPE criterion, iteratively adds regressors until the FPE reaches a minimum, indicating the optimal balance between model complexity and fit. The point where the FPE value stops decreasing marks the optimal number of terms, resulting in a final model with 10 terms.
 
 FPE returned a model with 10 regressors.
@@ -1264,7 +1264,7 @@ Table 9 shows that all the model terms are correctly selected using the Meta-MSS
 
 Figure 15 presents the convergence of each execution of Meta-MSS. It is noticeable that the majority of executions converges to the correct model structures with $10$ or fewer iterations. The reason for this relies on the maximum number of iterations and the number of search agents. The first one is related to the acceleration coefficient, which boosts the exploration phase of the algorithm, while the latter increases the number of candidate models to be evaluated. Intuitively, one can see that both parameters influence the elapsed time and, more importantly, the model structure selected to compose the final model. Consequently, an inappropriate choice of one of them may results in sub/over-parameterized models, since the algorithm can converge to a local optimum. The next subsection presents an analysis of the max\_iter and n\_agents influence in the algorithm performance.
 
-![](./assets/metamss_convergence.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/metamss_convergence.png?raw=true)
 > Figure 15. Convergence of Meta-MSS for different model structures. The figure illustrates the convergence behavior of the Meta-MSS algorithm across multiple executions. Each curve represents the convergence trajectory for a specific model structure from $S_1$ to $S_6$ over a maximum of 30 iterations.
 
 #### Influence of the $max\_iter$ and $n\_agents$ parameters
@@ -1299,7 +1299,7 @@ Regardless of the successful selection of all models structures by the Meta-Stru
 
 Furthermore, it is interesting to point out the importance of tuning the parameters properly because since the exploration and exploitation phase of the algorithm are strongly dependent on them. A premature convergence of the algorithm may result in models with the factual number of terms, but with wrong ones. This happened with all cases with `n_agents=1`. For example, the algorithm generates models with correct number of terms in $33.33\%$ of the cases analyzed regarding $S_3$. However, Table 10 shows that only $14\%$ are, in fact, equivalent to the true model.
 
-![](./assets/metamss_terms_distribution.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/metamss_terms_distribution.png?raw=true)
 > Figure 16. The distribution of terms number selected for each simulated models concerning the variation of the `max_iter` and `n_agents`.
 
 #### Selection of over and sub-parameterized models
@@ -1416,7 +1416,7 @@ The results of the MetaMSS are
 | y(k-1)     | 1.8004E-01  | 0.00000000E+00|
 | x1(k-2)    | 8.9747E-01  | 0.00000000E+00|
 
-![](./assets/metamss_result_c4_example.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/metamss_result_c4_example.png?raw=true)
 > Figure 17. Free Run Simulation for the model fitted using MetaMSS.
 
 The `results` method brings ERR as 0 for every regressor because, as mentioned, ERR algorithm is not executed in this case.
@@ -1464,7 +1464,7 @@ plot_results(y=y_valid, yhat=yhat, n=1000)
 |------------|-------------|---------------|
 | x1(k-2)    | 9.1542E-01  | 0.00000000E+00|
 
-![](./assets/aols_example_c4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/aols_example_c4.png?raw=true)
 > Figure 18. Free Run Simulation for the model fitted using AOLS algorithm.
 
 ### Entropic Regression
@@ -1503,5 +1503,5 @@ plot_results(y=y_valid, yhat=yhat, n=1000)
 | 1          | -2.4554E-02 | 0.00000000E+00|
 | x1(k-2)    | 9.0273E-01  | 0.00000000E+00|
 
-![](./assets/er_example_c4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/er_example_c4.png?raw=true)
 > Figure 19. Free Run Simulation for the model fitted using Entropic Regression algorithm.

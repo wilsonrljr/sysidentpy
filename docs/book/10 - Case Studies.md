@@ -80,13 +80,13 @@ for xc in xcoords:
     plt.axvline(x=xc, color='red', linestyle='--', alpha=0.5)
 ```
 
-![](./assets/c10_m4_h10_1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h10_1.png?raw=true)
 
-![](./assets/c10_m4_h100_1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h100_1.png?raw=true)
 
-![](./assets/c10_m4_h20_1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h20_1.png?raw=true)
 
-![](./assets/c10_m4_h150_1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h150_1.png?raw=true)
 
 Lets check build a model for the `H20` group before we extrapolate the settings for every group. Because there are no input features, we will be using a `NAR` model type in SysIdentPy. To keep things simple and fast, we will start with Polynomial basis function with degree $1$.
 
@@ -112,7 +112,7 @@ smape = symmetric_mean_absolute_percentage_error(y_val[model.max_lag::], y_hat[m
 plot_results(y=y_val[model.max_lag :], yhat=y_hat[model.max_lag :], n=30000, figsize=(15, 4), title=f"Group: {unique_id} - SMAPE {round(smape, 4)}")
 ```
 
-![](./assets/c10_m4_h20_r1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h20_r1.png?raw=true)
 
 Probably, the result are not optimal and will not work for every group. However, let's check how this setting performs against the winner model  [M4 time series competition](https://www.researchgate.net/publication/325901666_The_M4_Competition_Results_findings_conclusion_and_way_forward): the Exponential Smoothing with Recurrent Neural Networks ([ESRNN](https://www.sciencedirect.com/science/article/abs/pii/S0169207019301153)).
 
@@ -173,17 +173,17 @@ Table 2. First test with SysIdentPy
 
 The initial results are reasonable, but they don't quite match the performance of `ESRNN`. These results are based solely on our first assumption. To better understand the performance, let’s examine the groups with the worst results.
 
-![](./assets/c10_m4_h147_r1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h147_r1.png?raw=true)
 
 The following plot illustrates two such groups, `H147` and `H136`. Both exhibit a 24-hour seasonal pattern.
 
-![](./assets/c10_m4_seasonal_h147_1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_seasonal_h147_1.png?raw=true)
 
-![](./assets/c10_m4_h136_seasonal_1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h136_seasonal_1.png?raw=true)
 
 However, a closer look reveals an additional insight: in addition to the daily pattern, these series also show a weekly pattern. Observe how the data looks like when we split the series into weekly segments.
 
-![](./assets/c10_m4_h147_seasonal_1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h147_seasonal_1.png?raw=true)
 
 ```python
 xcoords = list(range(0, 168*5, 168))
@@ -200,7 +200,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-![](./assets/c10_m4_h147_part_seasonal.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h147_part_seasonal.png?raw=true)
 
 Therefore, we will build models setting `ylag=168`.
 
@@ -290,7 +290,7 @@ The Overall Weighted Average (`OWA`) is even better than that of the `ESRNN` mod
 
 Before we finish, let's verify how the performance of the `H147` model has improved with the `ylag=168` setting.
 
-![](./assets/c10_m4_h147_r2.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h147_r2.png?raw=true)
 
 > Based on the M4 benchmark paper, we could also clip the predictions lower than 10 to 10 and the results would be slightly better. But this is left to the user.
 
@@ -309,7 +309,7 @@ The CE8 system, illustrated in Figure 1, features:
 - **Pulley Mechanism**: The pulley is supported by a spring, introducing a lightly damped dynamic mode that adds complexity to the system.
 - **Speed Control Focus**: The primary focus is on the speed control system. The pulley’s angular speed is measured using a pulse counter, which is insensitive to the direction of the velocity.
 
-![](./assets/ce8_design.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_design.png?raw=true)
 > Figure 1. CE8 system design.
 
 ### Sensor and Filtering
@@ -322,7 +322,7 @@ The measurement process involves:
 
 SysIdentPy can be used to build robust models for identifying and modeling the complex dynamics of the CE8 system. The performance will be compared against a benchmark provided by [Max D. Champneys, Gerben I. Beintema, Roland Tóth, Maarten Schoukens, and Timothy J. Rogers - Baselines for Nonlinear Benchmarks, Workshop on Nonlinear System Identification Benchmarks, 2024.](https://arxiv.org/pdf/2405.10779)
 
-![](./assets/ce8_sota.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_sota.png?raw=true)
 
 The benchmark evaluate the average metric between the two experiments. That's why the SOTA method do not have the better metric for `test 1`, but it is still the best overall.  The goal of this case study is not only to showcase the robustness of SysIdentPy but also provides valuable insights into its practical applications in real-world dynamic systems.
 
@@ -399,13 +399,13 @@ plt.title("Experiment 2: testing data")
 plt.show()
 ```
 
-![](./assets/ce8_data_1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_data_1.png?raw=true)
 
-![](./assets/ce8_test_data.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_test_data.png?raw=true)
 
-![](./assets/ce8_training_data.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_training_data.png?raw=true)
 
-![](./assets/ce8_2_experiment_testing_data.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_2_experiment_testing_data.png?raw=true)
 
 ### Results
 
@@ -441,7 +441,7 @@ rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag +
 plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, title=f"Free Run simulation. Model 1 -> RMSE: {round(rmse, 4)}")
 ```
 
-![](./assets/ce8_e1_r1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_e1_r1.png?raw=true)
 
 Model for experiment 2:
 ```python
@@ -470,7 +470,7 @@ rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag +
 plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, title=f"Free Run simulation. Model 2 -> RMSE: {round(rmse, 4)}")
 ```
 
-![](./assets/ce8_ex2_r1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_ex2_r1.png?raw=true)
 
 The first configuration for experiment 1 is already better than the **LTI ARX**, **LTI SS**, **GRU**, **LSTM**, **MLP NARX**, **MLP FIR**, **OLSTM**, and the **SOTA** models shown in the benchmark table. Better than 8 out 11 models shown in the benchmark. For experiment 2, its better than **LTI ARX**, **LTI SS**, **GRU**, **RNN**, **LSTM**, **OLSTM**, and **pNARX** (7 out 11). It's a good start, but let's check if the performance improves if we set a higher lag for both `xlag` and `ylag`.
 
@@ -482,7 +482,7 @@ plt.plot(xaxis, model.info_values)
 plt.xlabel("n_terms")
 plt.ylabel("Information Criteria")
 ```
-![](./assets/ce8_aic.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_aic.png?raw=true)
 
 It can be observed that after 22 regressors, adding new regressors do not improve the model performance (considering the configuration defined for that model). Because we want to try models with higher lags and higher nonlinearity degree, the stopping criteria will be changed to `err_tol` instead of information criteria. This will made the algorithm runs considerably faster.
 
@@ -517,7 +517,7 @@ rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag +
 plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, title=f"Free Run simulation. Model 1 -> RMSE: {round(rmse, 4)}")
 ```
 
-![](./assets/ce8_e1_r2.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_e1_r2.png?raw=true)
 
 ```python
 # experiment 2
@@ -550,7 +550,7 @@ rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag +
 plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, title=f"Free Run simulation. Model 2 -> RMSE: {round(rmse, 4)}")
 ```
 
-![](./assets/ce8_ex2_r2.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_ex2_r2.png?raw=true)
 
 In the first experiment, the model showed a slight improvement, while the performance of the second experiment experienced a minor decline. Increasing the lag settings with these configurations did not result in significant changes. Therefore, let's set the polynomial degree to $3$ and increase the number of terms to build the model to `n_terms=40` if the `err_tol` is not reached. It's important to note that these values are chosen empirically. We could also adjust the parameter estimation technique, the `err_tol`, the model structure selection algorithm, and the basis function, among other factors. Users are encouraged to employ hyperparameter tuning techniques to find the optimal combinations of hyperparameters.
 
@@ -585,7 +585,7 @@ rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag +
 plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, title=f"Free Run simulation. Model 1 -> RMSE: {round(rmse, 4)}")
 ```
 
-![](./assets/ce8_ex1_r3.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_ex1_r3.png?raw=true)
 
 ```python
 # experiment 2
@@ -618,7 +618,7 @@ rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag +
 plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, title=f"Free Run simulation. Model 2 -> RMSE: {round(rmse, 4)}")
 ```
 
-![](./assets/ce8_ex2_r3.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_ex2_r3.png?raw=true)
 
 As shown in the plot, we have surpassed the state-of-the-art (SOTA) results with an average metric of $(0.0969 + 0.0731)/2 = 0.0849$. Additionally, the metric for the first experiment matches the best model in the benchmark, and the metric for the second experiment slightly exceeds the benchmark's best model. Using the same configuration for both models, we achieved the best overall results!
 
@@ -633,7 +633,7 @@ This benchmark focuses on a Wiener-Hammerstein electronic circuit where process 
 The Wiener-Hammerstein structure is a well-known block-oriented system which contains a static nonlinearity sandwiched between two Linear Time-Invariant (LTI) blocks (Figure 2). This arrangement presents a challenging identification problem due to the presence of these LTI blocks.
 
 
-![](./assets/wh_system.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_system.png?raw=true)
 > Figure 2: the Wiener-Hammerstein system
 
 In Figure 2, the Wiener-Hammerstein system is illustrated with process noise $e_x(t)$ entering before the static nonlinearity $f(x)$, sandwiched between LTI blocks represented by $R(s)$ and $S(s)$ at the input and output, respectively. Additionally, small, negligible noise sources $e_u(t)$ and $e_y(t)$ affect the measurement channels. The measured input and output signals are denoted as $u_m(t)$ and $y_m(t)$.
@@ -722,13 +722,13 @@ plt.legend(["x_test", "y_test"])
 plt.show()
 ```
 
-![](./assets/wh_training_data.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_training_data.png?raw=true)
 
-![](./assets/wh_testing_data.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_testing_data.png?raw=true)
 
 The goal of this benchmark it to get a model that have a better performance than the SOTA model provided in the benchmarking paper.
 
-![](./assets/wh_sota_results.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_sota_results.png?raw=true)
 > State of the art results presented in the [benchmarking paper]([2405.10779 (arxiv.org)](https://arxiv.org/pdf/2405.10779)). In this section we are only working with the Wiener-Hammerstein results, which are presented in the $W-H$  column.
 
 ### Results
@@ -756,7 +756,7 @@ rmse_sota = rmse/y_test.std()
 plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=1000, title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(rmse_sota, 4)}")
 ```
 
-![](./assets/wh_r1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_r1.png?raw=true)
 
 The first configuration is already better than the **SOTA** models shown in the benchmark table! We started using `xlag=ylag=7` to have an idea of how well SysIdentPy would handle this dataset, but the results are pretty good already! However, the benchmarking paper indicates  that they used higher lags for their models. Let's check what happens if we set `xlag=ylag=10`.
 
@@ -784,7 +784,7 @@ rmse_sota = rmse/y_test.std()
 plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=1000, title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(rmse_sota, 4)}")
 ```
 
-![](./assets/wh_r2.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_r2.png?raw=true)
 
 The performance is even better now! For now, we are not worried about the model complexity (even in this case where we are comparing to a deep state neural network...). However, if we check the model order and the `AIC` plot, we see that the model have 50 regressors , but the `AIC` values do not change much after each added regression.
 
@@ -792,7 +792,7 @@ The performance is even better now! For now, we are not worried about the model 
 plt.plot(model.info_values)
 ```
 
-![](./assets/wh_aic.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_aic.png?raw=true)
 
 So, what happens if we set a model with half of the regressors?
 
@@ -822,7 +822,7 @@ rmse_sota = rmse/y_test.std()
 plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=1000, title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(rmse_sota, 4)}")
 ```
 
-![](./assets/wh_r3.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_r3.png?raw=true)
 
 As shown in the figure above, the results still outperform the SOTA models presented in the benchmarking paper. The SOTA results from the paper could likely be improved as well. Users are encouraged to explore the [deepsysid package](https://github.com/AlexandraBaier/deepsysid), which can be used to build deep state neural networks.
 
@@ -958,7 +958,7 @@ print(y_train.shape[0], y_test.shape[0])
 
 The following image shows the data of the system to be modeled.
 
-![](./assets/ap_dataset.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_dataset.png?raw=true)
 
 ## Results
 
@@ -1006,7 +1006,7 @@ plot_results(y=y_test[sysidentpy.max_lag :], yhat=yhat[sysidentpy.max_lag :])
 >>> 805.95
 ```
 
-![](./assets/ap_frols.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_frols.png?raw=true)
 
 ## SysIdentPy: AOLS
 
@@ -1041,7 +1041,7 @@ plot_results(y=y_test[sysidentpy_AOLS.max_lag :], yhat=yhat[sysidentpy_AOLS.max_
 >>> 476.64
 ```
 
-![](./assets/ap_aols.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_aols.png?raw=true)
 
 ## SysIdentPy: MetaMSS
 
@@ -1074,7 +1074,7 @@ plot_results(
 >>> 450.99
 ```
 
-![](./assets/ap_metamss.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_metamss.png?raw=true)
 
 ## SysIdentPy: Neural NARX
 
@@ -1135,7 +1135,7 @@ print(narxnet_loss)
 plot_results(y=y_test[narx_net.max_lag :], yhat=yhat[narx_net.max_lag :])
 ```
 
-![](./assets/ap_neural_narx.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_neural_narx.png?raw=true)
 
 ## sktime models
 
@@ -1162,7 +1162,7 @@ es_loss
 >>> 910.46
 ```
 
-![](./assets/ap_es.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_es.png?raw=true)
 
 ## sktime: AutoETS
 
@@ -1178,7 +1178,7 @@ ets_loss
 >>> 1739.11
 ```
 
-![](./assets/ap_ets.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_ets.png?raw=true)
 
 ## sktime: AutoArima
 
@@ -1195,7 +1195,7 @@ autoarima_loss
 >>> 1714.47
 ```
 
-![](./assets/ap_autoarima.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_autoarima.png?raw=true)
 
 ## sktime: Arima
 
@@ -1213,7 +1213,7 @@ manualarima_loss
 >>> 2085.42
 ```
 
-![](./assets/ap_manual_arima.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_manual_arima.png?raw=true)
 
 ## sktime: BATS
 
@@ -1229,7 +1229,7 @@ bats_loss
 >>> 7286.64
 ```
 
-![](./assets/ap_bats.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_bats.png?raw=true)
 
 ## sktime: TBATS
 
@@ -1245,7 +1245,7 @@ tbats_loss
 >>> 7448.43
 ```
 
-![](./assets/ap_tbats.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_tbats.png?raw=true)
 
 ## sktime: Prophet
 
@@ -1273,7 +1273,7 @@ prophet_loss
 >>> 1186.00
 ```
 
-![](./assets/ap_prophet.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_prophet.png?raw=true)
 
 ## Neural Prophet
 
@@ -1297,7 +1297,7 @@ neuralprophet_loss
 >>> 501.24
 ```
 
-![](./assets/ap_neuralprophet.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_neuralprophet.png)
 
 The final results can be summarized as follows, resulting in the table presented in the beginning of this case study:
 
@@ -1329,7 +1329,7 @@ Even though some progress has been made, previous work has been limited to model
 
 The data used in this study-case is the Bouc-Wen model ([Bouc, R]([R. Bouc, “Forced Vibrations of a Mechanical System with Hysteresis,” Proceedings of the 4th Conference on Non-linear Oscillations, Prague, 5-9 September 1967, pp. 315. - References - Scientific Research Publishing (scirp.org)](https://www.scirp.org/reference/referencespapers?referenceid=726819)), [Wen, Y. X.]([Method for Random Vibration of Hysteretic Systems | Journal of the Engineering Mechanics Division | Vol 102, No 2 (ascelibrary.org)](https://ascelibrary.org/doi/10.1061/JMCEA3.0002106))) of an MRD whose schematic diagram is shown in the figure below.
 
-![](./assets/bouc_wen.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bouc_wen.png?raw=true)
 > The model for a magneto-rheological damper proposed by [Spencer, B. F. and Sain, M. K.]([Controlling buildings: a new frontier in feedback | IEEE Journals & Magazine | IEEE Xplore](https://ieeexplore.ieee.org/document/642972)).
 
 The general form of the Bouc-Wen model can be described as ([Spencer, B. F. and Sain, M. K.]([Controlling buildings: a new frontier in feedback | IEEE Journals & Magazine | IEEE Xplore](https://ieeexplore.ieee.org/document/642972))):
@@ -1473,7 +1473,7 @@ plt.tight_layout(rect=[0, 0, 1, 0.95])
 plt.show()
 ```
 
-![](./assets/bouc_wen_data.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bouc_wen_data.png?raw=true)
 
 Let's check how is the histeretic behavior considering each input:
 ```python
@@ -1482,7 +1482,7 @@ plt.xlabel("x1 - Voltage")
 plt.ylabel("y - Force")
 ```
 
-![](./assets/bw_voltage.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_voltage.png?raw=true)
 
 
 ```python
@@ -1491,7 +1491,7 @@ plt.xlabel("x2 - Velocity")
 plt.ylabel("y - Force")
 ```
 
-![](./assets/bw_velocity.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_velocity.png?raw=true)
 
 ```python
 plt.plot(x_train[:, 2], y_train)
@@ -1499,7 +1499,7 @@ plt.xlabel("u3 - sign(Velocity)")
 plt.ylabel("y - Force")
 ```
 
-![](./assets/bw_sign.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_sign.png?raw=true)
 
 Now, we can just build a NARX model:
 
@@ -1521,7 +1521,7 @@ plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, tit
 >>> 0.0450
 ```
 
-![](./assets/bw_r1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r1.png?raw=true)
 
 
 If we remove the `sign(v)` input and try to build a NARX model using the same configuration, the model diverge, as can be seen in the following figure:
@@ -1544,7 +1544,7 @@ plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, tit
 >>> nan
 ```
 
-![](./assets/bw_divergent.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_divergent.png?raw=true)
 
 If we use the `MetaMSS` algorithm instead, the results are better.
 
@@ -1568,7 +1568,7 @@ plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, tit
 >>> 0.24
 ```
 
-![](./assets/bw_r2.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r2.png?raw=true)
 
 However, when the output of the system reach its minimum value, the model oscillate
 
@@ -1576,7 +1576,7 @@ However, when the output of the system reach its minimum value, the model oscill
 plot_results(y=y_test[1100 : 1200], yhat=yhat[1100 : 1200], n=10000, title="Unstable region")
 ```
 
-![](./assets/bw_unstable.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_unstable.png?raw=true)
 
 If we add the `sign(v)` input again and use `MetaMSS`, the results are very close to the `FROLS` algorithm with all inputs
 
@@ -1598,7 +1598,7 @@ plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, tit
 >>> 0.0554
 ```
 
-![](./assets/bw_r3.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r3.png?raw=true)
 
 This case will also highlight the significance of data scaling. Previously, we used the `MaxAbsScaler` method, which resulted in great models when using the `sign(v)` inputs, but also resulted in unstable models when removing that input feature. When scaling is applied using `MinMaxScaler`, however, the overall stability of the results improves, and the model does not diverge, even when the `sign(v)` input is removed, using the `FROLS` algorithm.
 
@@ -1611,16 +1611,16 @@ scaler_y = MinMaxScaler()
 
 and running the each model again. That is the only change to improve the results.
 
-![](./assets/bw_r4.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r4.png?raw=true)
 > FROLS: with `sign(v)` and `MinMaxScaler`. RMSE: 0.1159
 
-![](./assets/bw_r5.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r5.png?raw=true)
 FROLS: discarding `sign(v)` and using `MinMaxScaler`. RMSE: 0.1639
 
-![](./assets/bw_r6.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r6.png?raw=true)
 > MetaMSS: discarding `sign(v)` and using `MinMaxScaler`. RMSE: 0.1762
 
-![](./assets/bw_r7.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r7.png?raw=true)
 > MetaMSS: including `sign(v)` and using `MinMaxScaler`. RMSE: 0.0694
 
 In contrast, the MetaMSS method returned the best model overall, but not better than the best `FROLS` method using `MaxAbsScaler`.
@@ -1630,7 +1630,7 @@ Here is the predicted histeretic loop:
 plt.plot(x_test[:, 1], yhat)
 ```
 
-![](./assets/bw_predicted_hystereis.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_predicted_hystereis.png?raw=true)
 
 ## Silver box
 
@@ -1743,13 +1743,13 @@ plt.title("Experiment 2: testing data")
 plt.show()
 ```
 
-![](./assets/silver_e1_training.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_e1_training.png?raw=true)
 
-![](./assets/silver_e1_testing.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_e1_testing.png?raw=true)
 
-![](./assets/silver_e2_training.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_e2_training.png?raw=true)
 
-![](./assets/silver_e2_testing.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_e2_testing.png?raw=true)
 
 > Important Note
 
@@ -1773,7 +1773,7 @@ The goal of this benchmark is to develop a model that outperforms the state-of-t
 
 It appears that the values shown in the paper actually represent the training time, not the error metrics. I will contact the authors to confirm this information. According to the Nonlinear Benchmark website, the information is as follows:
 
-![](./assets/silver_sota.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_sota.png?raw=true)
 
 where the values in the "Training time" column matches the ones presented as error metrics in the paper.
 
@@ -1817,9 +1817,9 @@ plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=300, figsi
 > 7.727682109791501
 ```
 
-![](./assets/silver_r1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_r1.png?raw=true)
 
-![](./assets/silver_r1_zoom.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_r1_zoom.png?raw=true)
 
 
 ```python
@@ -1858,9 +1858,9 @@ plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=300, figsi
 ```
 
 
-![](./assets/silver_r2.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_r2.png?raw=true)
 
-![](./assets/silver_r2_zoom.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_r2_zoom.png?raw=true)
 
 ```python
 x_train, y_train = train_val.u, train_val.y
@@ -1892,9 +1892,9 @@ plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=30000, fig
 plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=300, figsize=(15, 4), title=f"Free Run simulation. Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}")
 ```
 
-![](./assets/silver_r3.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_r3.png?raw=true)
 
-![](./assets/silver_r3_zoom.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_r3_zoom.png?raw=true)
 
 ## F-16 Ground Vibration Test Benchmark
 
@@ -1969,13 +1969,13 @@ f_16[["x1", "x2"]][0:500].plot(figsize=(12, 8))
 
 >>> (32768, 3)
 ```
-![](./assets/f16_input.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/f16_input.png?raw=true)
 
 ```python
 f_16["y"][0:2000].plot(figsize=(12, 8))
 ```
 
-![](./assets/f16_output.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/f16_output.png?raw=true)
 
 The following code is to split the dataset into training and test sets
 
@@ -2078,11 +2078,11 @@ x1e = compute_cross_correlation(y_val, y_hat, x_val[:, 0])
 plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 ```
 
-![](./assets/f16_r1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/f16_r1.png?raw=true)
 
-![](./assets/f16_ee_1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/f16_ee_1.png?raw=true)
 
-![](./assets/f16_ex_1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/f16_ex_1.png?raw=true)
 
 ## PV Forecasting
 
@@ -2256,7 +2256,7 @@ plot_results(y=y_test[-104:], yhat=yhat[-104:])
 
 The $MSE=3869.34$ for this case.
 
-![](./assets/pv_r1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/pv_r1.png?raw=true)
 
 ### MetaMSS
 
@@ -2305,7 +2305,7 @@ plot_results(y=y_test[-104:], yhat=yhat[-104:])
 
 The MetaMSS algorithm was able to select a better model in this case, as can be observed in the error metric, $MSE=2157.77$.
 
-![](./assets/pv_r2.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/pv_r2.png?raw=true)
 
 ### AOLS
 
@@ -2342,5 +2342,5 @@ plot_results(y=y_test[-104:], yhat=yhat[-104:])
 
 The error now is $MSE=2361.56$.
 
-![](./assets/pv_r3.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/pv_r3.png?raw=true)
 
