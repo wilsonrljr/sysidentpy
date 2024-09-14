@@ -1,5 +1,5 @@
 from sysidentpy.model_structure_selection import FROLS
-from sysidentpy.basis_function._basis_function import Polynomial
+from sysidentpy.basis_function import Polynomial
 from sysidentpy.narmax_base import InformationMatrix
 
 from sysidentpy.parameter_estimation.estimators import (

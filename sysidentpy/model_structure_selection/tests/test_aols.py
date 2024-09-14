@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_equal, assert_raises
 
-from sysidentpy.basis_function._basis_function import Fourier, Polynomial
+from sysidentpy.basis_function import Fourier, Polynomial
 from sysidentpy.parameter_estimation.estimators import LeastSquares
 from sysidentpy.model_structure_selection.accelerated_orthogonal_least_squares import (
     AOLS,

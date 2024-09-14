@@ -12,21 +12,27 @@ class Legendre(BaseBasisFunction):
     r"""Build Legendre basis function expansion.
 
     This class constructs a feature matrix consisting of Legendre polynomial basis
-    functions up to a specified degree. Legendre polynomials, denoted by `P_n(x)`,
-    are orthogonal polynomials over the interval `[-1, 1]` with respect to the
-    uniform weight function `w(x) = 1`. They are widely used in numerical analysis,
+    functions up to a specified degree. Legendre polynomials, denoted by $P_n(x)$,
+    are orthogonal polynomials over the interval $[-1, 1]$ with respect to the
+    uniform weight function $w(x) = 1$. They are widely used in numerical analysis,
     curve fitting, and approximation theory.
 
-    The Legendre polynomial `P_n(x)` of degree `n` is defined by the following
+    The Legendre polynomial $P_n(x)$ of degree $n$ is defined by the following
     recurrence relation:
 
-    ```
+    $$
     P_0(x) = 1
-    P_1(x) = x
-    (n+1) P_{n+1}(x) = (2n + 1)x P_n(x) - n P_{n-1}(x)
-    ```
+    $$
 
-    where `P_n(x)` represents the Legendre polynomial of degree `n`.
+    $$
+    P_1(x) = x
+    $$
+
+    $$
+    (n+1) P_{n+1}(x) = (2n + 1)x P_n(x) - n P_{n-1}(x)
+    $$
+
+    where $P_n(x)$ represents the Legendre polynomial of degree $n$.
 
     Parameters
     ----------
@@ -55,12 +61,10 @@ class Legendre(BaseBasisFunction):
     def __init__(
         self,
         degree: int = 1,
-        n: int = 1,
         include_bias: bool = True,
         ensemble: bool = False,
     ):
         self.degree = degree
-        self.n = n
         self.include_bias = include_bias
         self.ensemble = ensemble
 
