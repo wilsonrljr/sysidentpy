@@ -5,8 +5,17 @@ import numpy as np
 from scipy.stats import binom
 
 from .basis_function_base import BaseBasisFunction
+from ..utils.deprecation import deprecated
 
 
+@deprecated(
+    version="v0.5.0",
+    future_version="v0.6.0",
+    message=(
+        " `bias` and `n` are deprecated in 0.5.0 and will be removed in 0.6.0."
+        " Use `include_bias` and `degree`, respectively, instead."
+    ),
+)
 class Bersntein(BaseBasisFunction):
     r"""Build Bersntein basis function.
 
@@ -39,8 +48,18 @@ class Bersntein(BaseBasisFunction):
 
     Parameters
     ----------
-    degree : int (max_degree), default=2
+    degree : int (max_degree), default=1
         The maximum degree of the polynomial features.
+    bias : bool, default=True
+        Whether to include the bias (constant) term in the output feature matrix.
+        deprecated in v.0.5.0
+           `bias` is deprecated in 0.5.0 and will be removed in 0.6.0.
+           Use `include_bias` instead.
+    n : int, default=1
+        The maximum degree of the bersntein polynomial features.
+        deprecated in v.0.5.0
+           `n` is deprecated in 0.5.0 and will be removed in 0.6.0.
+           Use `degree` instead.
 
     Notes
     -----
@@ -60,16 +79,28 @@ class Bersntein(BaseBasisFunction):
     """
 
     def __init__(
-        self, degree: int = 1, n: int = 1, bias: bool = True, ensemble: bool = False
+        self,
+        degree: int = 1,
+        n: Optional[int] = None,
+        bias: Optional[bool] = None,
+        include_bias: bool = True,
+        ensemble: bool = False,
     ):
-        self.degree = degree
-        self.n = n
-        self.bias = bias
+        if n is not None:
+            self.degree = n
+        else:
+            self.degree = degree
+
+        if bias is not None:
+            self.include_bias = bias
+        else:
+            self.include_bias = include_bias
+
         self.ensemble = ensemble
 
     def _bernstein_expansion(self, data: np.ndarray):
-        k = np.arange(1 + self.n)
-        base = binom.pmf(k, self.n, data[:, None])
+        k = np.arange(1 + self.degree)
+        base = binom.pmf(k, self.degree, data[:, None])
         return base
 
     def fit(
@@ -89,7 +120,7 @@ class Bersntein(BaseBasisFunction):
         psi = [basis[:, 1:] for basis in psi]
         psi = np.hstack(psi)
         psi = np.nan_to_num(psi, 0)
-        if self.bias:
+        if self.include_bias:
             bias_column = np.ones((psi.shape[0], 1))
             psi = np.hstack((bias_column, psi))
 
