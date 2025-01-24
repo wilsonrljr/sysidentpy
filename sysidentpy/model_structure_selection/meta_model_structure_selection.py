@@ -3,7 +3,56 @@
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
+
+
+#here few stpes to resolve the issue an per my 
+# 1) to check predefined_regressors and combination_list initialization
+'''ensure that predefined_regressors is correctly defined and matches the
+ indices in the combination_list. if not explicitly set, the
+ predefined_regressors may default to an invalid or empty state, causing the 
+ error.'''
+
+'''# Ensure your predefined_regressors are correctly set
+model = MetaMSS(
+    basis_function=basis_function,
+    ylag=[2],
+    xlag=[[1], [1], [1], [1]],  # MISO configuration
+    estimator=LeastSquares(unbiased=False),
+    predefined_regressors=[0, 1, 2, 3]  # Example indices, adjust based on your system
+)'''
+
+# 2) Verify the MISO configuration
+  '''working with a miso system esure that xlag is appropriately 
+  configuration for the multiple inputs. each element in xlag 
+  corresponds to the lag structure for particular input variable'''
+
+''' if have 4 inputs and want a lag of 1 for each input, xlag=[[1], [1], [1]]
+is correct.
+ adjust the lag values to match your systems requirements.'''
+
+ # 3)update the basic function
+   '''The polynamial basis function should handle the multiple-input
+   structure appropriately. confirm that the degree is set correctly and
+   compatible with  lag structure.
+
+   basis_function = Polynomial(degree=2)'''
+
+
+   # 4) Debug the simulation process
+'''print out combination_list and predefined_regressors during runtime 
+to ensure they are correctly constructed.
+
+print("Combination List:", combination_list)
+print("Predefined Regressors:", predefined_regressors)'''
+
+# 5) the version of sysidentpy
+'''the latest version of the library, as this issue may have been fixed in a
+newer release. update it with:
+
+pip install --upgrade sysidentpy'''
+
 from typing import Tuple, Union, Optional
+from enum import Enum
 
 import numpy as np
 from scipy.stats import t
@@ -39,7 +88,7 @@ from ..parameter_estimation.estimators import (
     NormalizedLeastMeanSquaresSignError,
     LeastMeanSquaresSignRegressor,
 )
-
+#union of possible estimators
 Estimators = Union[
     LeastSquares,
     RidgeRegression,
@@ -59,6 +108,12 @@ Estimators = Union[
     NormalizedLeastMeanSquaresSignError,
     LeastMeanSquaresSignRegressor,
 ]
+
+class LossFunction(Enum):
+    """Enum for loss function choices."""
+    METAMSS = "metamss_loss"
+    AIC = "aic"
+    BIC = "bic"
 
 
 class MetaMSS(SimulateNARMAX, BPSOGSA):
@@ -220,7 +275,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             p_zeros=p_zeros,
             p_ones=p_ones,
         )
-
+    # Assign MetaMSS-sprcific attributes
         self.xlag = xlag
         self.ylag = ylag
         self.elag = elag
