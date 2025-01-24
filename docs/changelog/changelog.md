@@ -28,6 +28,7 @@ This update introduces major features and changes. There is a guide to help you 
   **MAJOR**: Add Laguerre polynomial basis function. Now the user can use Laguerre NARX models for forecasting.
 
 - **Documentation:**
+  - Add basis function overview.
   - Files related to v.3.* doc removed.
   - Improved formatting in mathematical equations.
   - Fixed typos and grammatical errors in README.md (thanks Suyash Gaikwad and LeWerner42)
