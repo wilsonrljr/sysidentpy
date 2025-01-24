@@ -18,20 +18,20 @@ This update introduces major features and changes. There is a guide to help you 
 - **New Features:**
   - **MAJOR**: Add Bilinear Basis Function (thanks nataliakeles). Now the user can use Bilinear NARX models for forecasting.
   - **MAJOR**: Add Legendre polynomial basis function. Now the user can use Legendre NARX models for forecasting.
-  - **MAJOR**: Bounded Variables Least Squares algorithm for parameter estimation.
-  - **MAJOR**: Least Squares Minimal Residual algorithm for parameter estimation.
-  - **MAJOR**: Error Reduction Ratio algorithm enhancement for FROLS model structure selection. Users can now set an `err_tol` value to stop the algorithm when the sum of the ERR values reaches this threshold, offering a faster alternative to Information Criteria algorithms. A new example is available in the documentation.
-  - **MAJOR**: New Bernstein basis function available, allowing users to choose between Polynomial, Fourier, and Bernstein.
-  - **MAJOR**: v0.1 of the companion book "Nonlinear System Identification: Theory and Practice With SysIdentPy." This open-source book serves as robust documentation for the SysIdentPy package and a friendly introduction to Nonlinear System Identification and Timeseries Forecasting. There are case studies in the book that were not included in the documentation at the time of the update release. The book will always feature more in-depth studies and will be updated regularly with additional case studies.
+  - **MAJOR**: Add Hermite polynomial basis function. Now the user can use Hermite NARX models for forecasting.
+  **MAJOR**: Add Hermite Normalized polynomial basis function. Now the user can use Hermite Normalized NARX models for forecasting.
+  **MAJOR**: Add Laguerre polynomial basis function. Now the user can use Laguerre NARX models for forecasting.
 
 - **Documentation:**
   - Files related to v.3.* doc removed.
   - Improved formatting in mathematical equations.
   - Fixed typos and grammatical errors in README.md (thanks Suyash Gaikwad and LeWerner42)
+  - Minor additions and grammar fixes.
   - Remove book assets from main repository. The assets were moved to sysidentpy-data repository to keep main repository cleaner and lighter.
-  - Fix cover book link in readme. Also change x2_val to x_valid in examples of how to use in readme.
+  - Fixed link in the book cover to ensure it correctly redirects to the book details. Also change x2_val to x_valid in examples of how to use in readme.
   - Add Pix method as an alternative for brazilian sponsors.
   - Fix code documentation for basis function (it was not showing up in the docs before).
+  - Remove `pip install` from the list of the dependencies needed in the chapter.
 
 - **Datasets:**
   - Datasets are now available in a separate repository.
@@ -51,6 +51,9 @@ This update introduces major features and changes. There is a guide to help you 
   - Fix docstring math notation in basis functions docstring.
   - Remove requirements.txt file.
   - Extensive code refactoring, including type hint improvements, docstring enhancements, removal of unused code, and other behind-the-scenes changes to support new features.
+  - Add model_type in basis function base fit and predict method.
+  - Change variable name from `combinations` to `combination_list` to avoid any issue with itertools `combination` method in case I want to use it in the future.
+  - Remove requirements.txt file.
 
 
 ## v0.4.0
