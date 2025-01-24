@@ -46,7 +46,7 @@ This update introduces major features and changes. There is a guide to help you 
   - add deprecated messages for bias and n in Bersntein basis function. Both parameters will be removed in v0.6.0. Use `include_bias` and `degree`, respectively, instead.
   - Deploy-docs.yml: Change option to make a clean build of the documentation.
   - Deploy-docs.yml: Change python version to deploy docs.
-  - Added support for Python 3.13.
+  - Support for Python 3.13 depending on the release of the Pytorch 2.6. Every method in sysidentpy works in python 3.13 excluding neural narx.
   - Update mkdocstrings dependency version
   - Change Polynomial check from class name to isinstance method in every class.
   - Remove support for torch==2.4.0 due to pip error in pytorch side. I'll check if it was solved before allow newer versions of pytorch.
