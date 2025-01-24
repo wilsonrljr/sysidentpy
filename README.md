@@ -81,7 +81,7 @@ For more details, check our [installation guide](https://sysidentpy.org/landing-
 |----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | NARMAX philosophy | You can build variations of NARMAX models like NARX, NAR, NARMA, NFIR, ARMA, ARX, AR, and others. |
 | Model Structure Selection | Easy-to-use methods to select the best terms to build your models, including FROLS and MetaMSS and several combinations with parameter estimation techniques to select the model terms. |
-| Basis Function | You can use different basis functions to build your models. You can set linear and nonlinear basis functions and ensemble them to get custom NARMAX models. |
+| Basis Function | You can use up to 8 different basis functions to build your models. You can set linear and nonlinear basis functions and ensemble them to get custom NARMAX models. |
 | Parameter Estimation | More than 15 methods to estimate the model parameters and test different structure selection scenarios. |
 | Multiobjective Parameter Estimation | You can use affine information to estimate the model parameters minimizing different objective functions. |
 | Model Simulation | You can reproduce results from papers easily with SimulateNARMAX class. Moreover, you can test published models with different parameter estimation methods and compare the performance. |
