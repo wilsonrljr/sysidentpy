@@ -12,7 +12,7 @@
 
 ### CHANGES
 
-This update introduces major features and changes. There is a guide to help you update your code to the new version. Depending on your model definition, you might not need to change anything. I decided to go directly to version v0.5.0 instead of providing incremental updates (0.3.5, 0.3.6, etc.) because the breaking changes are easy to fix and the new features are highly beneficial. This release provides crucial groundwork for the future development of SysIdentPy, making easier to add new features and improve the code, setting the stage for a robust and feature-complete 1.0.0 release in the feature.
+This update introduces major new features and important bug fixes. This release provides crucial groundwork for the future development of SysIdentPy, making easier to add new features and improve the code, setting the stage for a robust and feature-complete 1.0.0 release in the feature.
 
 
 - **New Features:**
