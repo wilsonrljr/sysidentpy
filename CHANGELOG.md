@@ -1,5 +1,21 @@
 # Changes in SysIdentPy
 
+## v0.5.1
+
+### CONTRIBUTORS
+
+- wilsonrljr
+
+### CHANGES
+
+This update addresses a critical bug related to the unbiased estimator. The issue previously impacted all basis functions but has now been resolved. This release keep providing crucial groundwork for the future development of SysIdentPy, making easier to add new features and improve the code, setting the stage for a robust and feature-complete 1.0.0 release in the feature.
+
+- **Documentation:**
+  - Remove unnecessary code when importing basis functions in many examples.
+
+- **API Changes:**
+  - Fix unbiased estimator for every basis function.
+
 ## v0.5.0
 
 ### CONTRIBUTORS
