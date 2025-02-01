@@ -89,7 +89,9 @@ class Bilinear(BaseBasisFunction):
 
         """
         # Create combinations of all columns based on its index
-        iterable_list = self.get_iterable_list(ylag, xlag, model_type)
+        iterable_list = range(
+            data.shape[1]
+        )  # self.get_iterable_list(ylag, xlag, model_type)
         combination_list = list(
             combinations_with_replacement(iterable_list, self.degree)
         )

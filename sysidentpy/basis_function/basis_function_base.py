@@ -92,6 +92,7 @@ class BaseBasisFunction(metaclass=ABCMeta):
             List of tuples of the regressor combinations.
 
         """
+        # TODO: Need to check this method for more than 3 inputs. Its not working
         if model_type == "NARMAX":
             ny = self.get_max_ylag(ylag)
             nx = self.get_max_xlag(xlag)
