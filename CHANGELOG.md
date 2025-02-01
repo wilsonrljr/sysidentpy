@@ -1,5 +1,19 @@
 # Changes in SysIdentPy
 
+## v0.5.2
+
+### CONTRIBUTORS
+
+- wilsonrljr
+
+### CHANGES
+
+This update addresses a critical bug related to the Polynomial and Bilinear basis function for models with more the 3 inputs. The issue raised due to the changes in basis function for v0.5.0, but has now been resolved. This release keep providing crucial groundwork for the future development of SysIdentPy, making easier to add new features and improve the code, setting the stage for a robust and feature-complete 1.0.0 release in the feature.
+
+- **API Changes:**
+  - Fix Polynomial and Bilinear basis function issue for models with more than 3 inputs.
+
+
 ## v0.5.1
 
 ### CONTRIBUTORS
