@@ -56,21 +56,29 @@ class BaseBasisFunction(metaclass=ABCMeta):
         return ny
 
     def get_max_xlag(self, xlag: int = 1):
-        """Get maximum xlag.
+        """Get maximum value from various xlag structures.
 
         Parameters
         ----------
-        xlag : ndarray of int
-            The range of lags according to user definition.
+        xlag : int, list of int, or nested list of int
+            Input that can be a single integer, a list, or a nested list.
 
         Returns
         -------
-        nx : list
-            Maximum value of xlag.
-
+        int
+            Maximum value found.
         """
-        nx = np.max(list(chain.from_iterable([[np.array(xlag, dtype=object)]])))
-        return nx
+        if isinstance(xlag, int):  # Case 1: Single integer
+            return xlag
+
+        if isinstance(xlag, list):
+            # Case 2: Flat list of integers
+            if all(isinstance(i, int) for i in xlag):
+                return max(xlag)
+            # Case 3: Nested list
+            return max(chain.from_iterable(xlag))
+
+        raise ValueError("Unsupported data type for xlag")
 
     def get_iterable_list(
         self, ylag: int = 1, xlag: int = 1, model_type: str = "NARMAX"

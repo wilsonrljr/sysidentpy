@@ -2,7 +2,7 @@
 
 import warnings
 
-from itertools import combinations_with_replacement
+from itertools import combinations_with_replacement, chain
 from typing import Optional
 import numpy as np
 
@@ -101,19 +101,29 @@ class Bilinear(BaseBasisFunction):
                 "In this case, you have a linear polynomial model.",
                 stacklevel=2,
             )
-        else:
-            ny = self.get_max_ylag(ylag)
-            nx = self.get_max_xlag(xlag)
-            combination_ylag = list(
-                combinations_with_replacement(list(range(1, ny + 1)), self.degree)
-            )
-            combination_xlag = list(
+
+        ny = self.get_max_ylag(ylag)
+        combination_ylag = list(
+            combinations_with_replacement(list(range(1, ny + 1)), self.degree)
+        )
+        if isinstance(xlag, int):
+            xlag = [xlag]
+
+        combination_xlag = []
+        ni = 0
+        for lag in xlag:
+            nx = self.get_max_xlag(lag)
+            combination_lag = list(
                 combinations_with_replacement(
-                    list(range(ny + 1, nx + ny + 1)), self.degree
+                    list(range(ny + 1 + ni, nx + ny + 1 + ni)), self.degree
                 )
             )
-            combinations_xy = combination_xlag + combination_ylag
-            combination_list = list(set(combination_list) - set(combinations_xy))
+            combination_xlag.append(combination_lag)
+            ni += nx
+
+        combination_xlag = list(chain.from_iterable(combination_xlag))
+        combinations_xy = combination_xlag + combination_ylag
+        combination_list = list(set(combination_list) - set(combinations_xy))
 
         if predefined_regressors is not None:
             combination_list = [
