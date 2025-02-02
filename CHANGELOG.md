@@ -1,5 +1,18 @@
 # Changes in SysIdentPy
 
+## v0.5.3
+
+### CONTRIBUTORS
+
+- wilsonrljr
+
+### CHANGES
+
+IMPORTANT! This update addresses a bug related to the Bilinear basis function for models with more the 2 inputs. This release keep providing crucial groundwork for the future development of SysIdentPy, making easier to add new features and improve the code, setting the stage for a robust and feature-complete 1.0.0 release in the feature.
+
+- **API Changes:**
+  - Fix Bilinear basis function issue for models with more than 2 inputs. This fix the `get_max_xlag` method in `basis_function_base` and also fix how `combination_xlag` is created.
+
 ## v0.5.2
 
 ### CONTRIBUTORS
