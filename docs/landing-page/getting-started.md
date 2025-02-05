@@ -7,6 +7,14 @@ title: Getting Started
 
 SysIdentPy is a Python module for System Identification using NARMAX models built on top of numpy and is distributed under the 3-Clause BSD license.
 
+> **Looking for more details on NARMAX models?**
+> For comprehensive information on models, methods, and a wide range of examples and benchmarks implemented in SysIdentPy, check out our book:
+> [*Nonlinear System Identification and Forecasting: Theory and Practice With SysIdentPy*](https://sysidentpy.org/book/0%20-%20Preface/)
+>
+> This book provides in-depth guidance to support your work with SysIdentPy.
+>
+> You can also explore the [tutorials in the documentation](https://sysidentpy.org/examples/basic_steps/) for practical, hands-on examples.
+
 ## Do you like **SysIdentPy**?
 
 Would you like to help SysIdentPy, other users, and the author? You can "star" SysIdentPy in GitHub by clicking in the star button at the top right of the page: <a href="https://github.com/wilsonrljr/sysidentpy" class="external-link" target="_blank">https://github.com/wilsonrljr/sysidentpy</a>. ⭐️
@@ -25,7 +33,7 @@ SysIdentPy requires:
 
 | Dependency | version     | Comment                                              |
 |------------|-------------|------------------------------------------------------|
-| python     | >=3.7,<3.10 |                                                      |
+| python     | >=3.7,<3.13 |                                                      |
 | numpy      | >=1.9.2     | for all numerical algorithms                         |
 | scipy      | >=1.7.0     | for some linear regression methods                   |
 | matplotlib | >=3.3.2     | for static plotting and visualizations               |
@@ -65,7 +73,7 @@ the help box. Install with:
 === "v0.1.6"
 
     ``` sh
-    pip install sysidentpy=="0.1.6"
+    pip install sysidentpy=="0.5.3"
     ```
 
 ---

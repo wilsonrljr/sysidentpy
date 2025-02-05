@@ -12,6 +12,14 @@ $$
 where $n_y\in \mathbb{N}$, $n_x \in \mathbb{N}$, $n_e \in \mathbb{N}$, are the maximum lags for the system output and input respectively; $x_k \in \mathbb{R}^{n_x}$ is the system input and $y_k \in \mathbb{R}^{n_y}$ is the system output at discrete time $k \in \mathbb{N}^n$;
 $e_k \in \mathbb{R}^{n_e}$ stands for uncertainties and possible noise at discrete time $k$. In this case, $\mathcal{F}$ is some nonlinear function of the input and output regressors and $d$ is a time delay typically set to $d=1$.
 
+> **Looking for more details on NARMAX models?**
+> For comprehensive information on models, methods, and a wide range of examples and benchmarks implemented in SysIdentPy, check out our book:
+> [*Nonlinear System Identification and Forecasting: Theory and Practice With SysIdentPy*](https://sysidentpy.org/book/0%20-%20Preface/)
+>
+> This book provides in-depth guidance to support your work with SysIdentPy.
+>
+> You can also explore the [tutorials in the documentation](https://sysidentpy.org/examples/basic_steps/) for practical, hands-on examples.
+
 ``` py
 import numpy as np
 import pandas as pd
