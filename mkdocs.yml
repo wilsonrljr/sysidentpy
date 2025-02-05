@@ -34,9 +34,7 @@ theme:
     - content.code.annotate
     - content.tabs.link
     - content.tooltips
-    # - header.autohide
     - navigation.indexes
-    # - navigation.sections
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.top
