@@ -298,9 +298,9 @@ We could achieve even better performance with some fine-tuning of the model conf
 
 ## Coupled Eletric Device
 
-The CE8 coupled electric drives [dataset]([Nonlinear Benchmark](https://www.nonlinearbenchmark.org/benchmarks)) presents a compelling use case for demonstrating the performance of SysIdentPy. This system involves two electric motors driving a pulley with a flexible belt, creating a dynamic environment ideal for testing system identification tools.
+The CE8 coupled electric drives [dataset - Nonlinear Benchmark](https://www.nonlinearbenchmark.org/benchmarks) presents a compelling use case for demonstrating the performance of SysIdentPy. This system involves two electric motors driving a pulley with a flexible belt, creating a dynamic environment ideal for testing system identification tools.
 
-> The [nonlinear benchmark website](([Nonlinear Benchmark](https://www.nonlinearbenchmark.org/benchmarks))) stands as a significant contribution to the system identification and machine learning community. The users are encouraged to explore all the papers referenced on the site.
+> The [nonlinear benchmark website](https://www.nonlinearbenchmark.org/benchmarks) stands as a significant contribution to the system identification and machine learning community. The users are encouraged to explore all the papers referenced on the site.
 
 ### System Overview
 
@@ -373,7 +373,7 @@ data_train_1, data_train_2 = train_val
 data_test_1, data_test_2   = test
 ```
 
-We used the `nonlinear_benchmarks` package to load the data. The user is referred to the [package documentation]([GerbenBeintema/nonlinear_benchmarks: The official dataload for http://www.nonlinearbenchmark.org/ (github.com)](https://github.com/GerbenBeintema/nonlinear_benchmarks/tree/master)) to check the details of how to use it.
+We used the `nonlinear_benchmarks` package to load the data. The user is referred to the package documentation [GerbenBeintema - nonlinear_benchmarks: The official dataload for nonlinear benchmark datasets](https://github.com/GerbenBeintema/nonlinear_benchmarks/tree/master) to check the details of how to use it.
 
 The following plot detail the training and testing data of both experiments. Here we are trying to get two models, one for each experiment, that have a better performance than the mentioned baselines.
 
@@ -624,7 +624,7 @@ As shown in the plot, we have surpassed the state-of-the-art (SOTA) results with
 
 ## Wiener-Hammerstein
 
-The description content primarily derives from the [benchmark website]([Nonlinear Benchmark](https://www.nonlinearbenchmark.org/benchmarks)) and [associated paper]([Wiener-Hammerstein benchmark with process noise (dataset) (4tu.nl)](https://data.4tu.nl/articles/_/12952124)). For a detailed description, readers are referred to the linked references.
+The description content primarily derives from the [benchmark website - Nonlinear Benchmark](https://www.nonlinearbenchmark.org/benchmarks) and [associated paper - Wiener-Hammerstein benchmark with process noise](https://data.4tu.nl/articles/_/12952124). For a detailed description, readers are referred to the linked references.
 
 > The nonlinear benchmark website stands as a significant contribution to the system identification and machine learning community. The users are encouraged to explore all the papers referenced on the site.
 
@@ -700,7 +700,7 @@ x_train, y_train = train_val
 x_test, y_test = test
 ```
 
-We used the `nonlinear_benchmarks` package to load the data. The user is referred to the [package documentation]([GerbenBeintema/nonlinear_benchmarks: The official dataload for http://www.nonlinearbenchmark.org/ (github.com)](https://github.com/GerbenBeintema/nonlinear_benchmarks/tree/master)) to check the details of how to use it.
+We used the `nonlinear_benchmarks` package to load the data. The user is referred to the [package documentation](https://github.com/GerbenBeintema/nonlinear_benchmarks/tree/master) to check the details of how to use it.
 
 The following plot detail the training and testing data of the experiment.
 
@@ -729,7 +729,7 @@ plt.show()
 The goal of this benchmark it to get a model that have a better performance than the SOTA model provided in the benchmarking paper.
 
 ![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_sota_results.png?raw=true)
-> State of the art results presented in the [benchmarking paper]([2405.10779 (arxiv.org)](https://arxiv.org/pdf/2405.10779)). In this section we are only working with the Wiener-Hammerstein results, which are presented in the $W-H$  column.
+> State of the art results presented in the [benchmarking paper](https://arxiv.org/pdf/2405.10779). In this section we are only working with the Wiener-Hammerstein results, which are presented in the $W-H$  column.
 
 ### Results
 
@@ -1321,18 +1321,19 @@ sorted(results.items(), key=lambda result: result[1])
 
 ## System With Hysteresis - Modeling a Magneto-rheological Damper Device
 
-The memory effects between quasi-static input and output make the modeling of hysteretic systems very difficult. Physics-based models are often used to describe the hysteresis loops, but these models usually lack the simplicity and efficiency required in practical applications involving system characterization, identification, and control. As detailed in [Martins, S. A. M. and Aguirre, L. A.]([Sufficient conditions for rate-independent hysteresis in autoregressive identified models - ScienceDirect](https://www.sciencedirect.com/science/article/abs/pii/S0888327015005968)), NARX models have proven to be a feasible choice to describe the hysteresis loops. See Chapter 8 for a detailed background. However, even considering the sufficient conditions for rate independent hysteresis representation, classical structure selection algorithms fails to return a model with decent performance and the user needs to set a multi-valued function to ensure the occurrence of the bounding structure $\mathcal{H}$ ([Martins, S. A. M. and Aguirre, L. A.]([Sufficient conditions for rate-independent hysteresis in autoregressive identified models - ScienceDirect](https://www.sciencedirect.com/science/article/abs/pii/S0888327015005968))).
+The memory effects between quasi-static input and output make the modeling of hysteretic systems very difficult. Physics-based models are often used to describe the hysteresis loops, but these models usually lack the simplicity and efficiency required in practical applications involving system characterization, identification, and control. As detailed in [Martins, S. A. M. and Aguirre, L. A. - Sufficient conditions for rate-independent hysteresis in autoregressive identified models](https://www.sciencedirect.com/science/article/abs/pii/S0888327015005968), NARX models have proven to be a feasible choice to describe the hysteresis loops. See Chapter 8 for a detailed background. However, even considering the sufficient conditions for rate independent hysteresis representation, classical structure selection algorithms fails to return a model with decent performance and the user needs to set a multi-valued function to ensure the occurrence of the bounding structure $\mathcal{H}$ ([Martins, S. A. M. and Aguirre, L. A. - Sufficient conditions for rate-independent hysteresis in autoregressive identified models](https://www.sciencedirect.com/science/article/abs/pii/S0888327015005968)).
 
 Even though some progress has been made, previous work has been limited to models with a single equilibrium point. The present case study aims to present new prospects in the model structure selection of hysteretic systems regarding the cases where the models have multiple inputs and it is not restricted concerning the number of equilibrium points. For that, the MetaMSS algorithm will be used to build a model for a magneto-rheological damper (MRD) considering the mentioned sufficient conditions.
 
 ### A Brief description of the Bouc-Wen model of magneto-rheological damper device
 
-The data used in this study-case is the Bouc-Wen model ([Bouc, R]([R. Bouc, “Forced Vibrations of a Mechanical System with Hysteresis,” Proceedings of the 4th Conference on Non-linear Oscillations, Prague, 5-9 September 1967, pp. 315. - References - Scientific Research Publishing (scirp.org)](https://www.scirp.org/reference/referencespapers?referenceid=726819)), [Wen, Y. X.]([Method for Random Vibration of Hysteretic Systems | Journal of the Engineering Mechanics Division | Vol 102, No 2 (ascelibrary.org)](https://ascelibrary.org/doi/10.1061/JMCEA3.0002106))) of an MRD whose schematic diagram is shown in the figure below.
+The data used in this study-case is the Bouc-Wen model ([Bouc, R - Forced Vibrations of a Mechanical System with Hysteresis](https://www.scirp.org/reference/referencespapers?referenceid=726819)), ([Wen, Y. X. - Method for Random Vibration of Hysteretic Systems](https://ascelibrary.org/doi/10.1061/JMCEA3.0002106)) of an MRD whose schematic diagram is shown in the figure below.
+
 
 ![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bouc_wen.png?raw=true)
-> The model for a magneto-rheological damper proposed by [Spencer, B. F. and Sain, M. K.]([Controlling buildings: a new frontier in feedback | IEEE Journals & Magazine | IEEE Xplore](https://ieeexplore.ieee.org/document/642972)).
+> The model for a magneto-rheological damper proposed by [Spencer, B. F. and Sain, M. K. - Controlling buildings: a new frontier in feedback](https://ieeexplore.ieee.org/document/642972).
 
-The general form of the Bouc-Wen model can be described as ([Spencer, B. F. and Sain, M. K.]([Controlling buildings: a new frontier in feedback | IEEE Journals & Magazine | IEEE Xplore](https://ieeexplore.ieee.org/document/642972))):
+The general form of the Bouc-Wen model can be described as ([Spencer, B. F. and Sain, M. K. - Controlling buildings: a new frontier in feedback](https://ieeexplore.ieee.org/document/642972)):
 
 $$
 \begin{equation}
@@ -1340,7 +1341,7 @@ $$
 \end{equation}
 $$
 
-where $z$ is the hysteretic model output, $x$ the input and $g[\cdot]$ a nonlinear function of $x$, $z$ and $sign (dx/dt)$. [Spencer, B. F. and Sain, M. K.]([Controlling buildings: a new frontier in feedback | IEEE Journals & Magazine | IEEE Xplore](https://ieeexplore.ieee.org/document/642972)) proposed the following phenomenological model for the aforementioned device:
+where $z$ is the hysteretic model output, $x$ the input and $g[\cdot]$ a nonlinear function of $x$, $z$ and $sign (dx/dt)$. ([Spencer, B. F. and Sain, M. K. - Controlling buildings: a new frontier in feedback](https://ieeexplore.ieee.org/document/642972)) proposed the following phenomenological model for the aforementioned device:
 
 $$
 \begin{align}
@@ -1354,7 +1355,7 @@ c_0&=c_{0a}+c_{0b}u_{bw},\nonumber\\
 \end{align}
 $$
 
-where $f$ is the damping force, $c_1$ and $c_0$ represent the viscous coefficients, $E$ is the input voltage, $x$ is the displacement and $\dot{x}$ is the velocity of the model. The parameters of the system (see table below) were taken from [Leva, A. and Piroddi, L.]([NARX-based technique for the modelling of magneto-rheological damping devices - IOPscience](https://iopscience.iop.org/article/10.1088/0964-1726/11/1/309)).
+where $f$ is the damping force, $c_1$ and $c_0$ represent the viscous coefficients, $E$ is the input voltage, $x$ is the displacement and $\dot{x}$ is the velocity of the model. The parameters of the system (see table below) were taken from [Leva, A. and Piroddi, L. - NARX-based technique for the modelling of magneto-rheological damping devices](https://iopscience.iop.org/article/10.1088/0964-1726/11/1/309).
 
 | Parameter  | Value          | Parameter | Value        |
 |------------|----------------|-----------|--------------|
@@ -1366,7 +1367,7 @@ where $f$ is the damping force, $c_1$ and $c_0$ represent the viscous coefficien
 | $k_{1}$    | $5.37 \, N/cm$   | $\eta$       | $251 \, s^{-1}$ |
 | $x_{0}$    | $0 \, cm$      | $A$           | $47.2$       |
 
-For this particular study, both displacement and voltage inputs, $x$ and $E$, respectively, were generated by filtering a white Gaussian noise sequence using a Blackman-Harris FIR filter with $6$Hz cutoff frequency. The integration step-size was set to $h = 0.002$, following the procedures described in [Martins, S. A. M. and Aguirre, L. A.]([Sufficient conditions for rate-independent hysteresis in autoregressive identified models - ScienceDirect](https://www.sciencedirect.com/science/article/abs/pii/S0888327015005968)). These procedures are for identification purposes only since the inputs of a MRD could have several different characteristics.
+For this particular study, both displacement and voltage inputs, $x$ and $E$, respectively, were generated by filtering a white Gaussian noise sequence using a Blackman-Harris FIR filter with $6$Hz cutoff frequency. The integration step-size was set to $h = 0.002$, following the procedures described in [Martins, S. A. M. and Aguirre, L. A. - Sufficient conditions for rate-independent hysteresis in autoregressive identified models](https://www.sciencedirect.com/science/article/abs/pii/S0888327015005968). These procedures are for identification purposes only since the inputs of a MRD could have several different characteristics.
 
 The data used in this example is provided by the Professor Samir Angelo Milani Martins.
 
@@ -1634,9 +1635,9 @@ plt.plot(x_test[:, 1], yhat)
 
 ## Silver box
 
-The description content mainly derives (copy and paste) from the [associated paper]([Three free data sets for development and benchmarking in nonlinear system identification | IEEE Conference Publication | IEEE Xplore](https://ieeexplore.ieee.org/document/6669201)). For a detailed description, readers are referred to the linked reference.
+The description content mainly derives (copy and paste) from the [associated paper - Three free data sets for development and benchmarking in nonlinear system identification](https://ieeexplore.ieee.org/document/6669201). For a detailed description, readers are referred to the linked reference.
 
-> The Silverbox system can be seen as an electronic implementation of the Duffing oscillator. It is build as a 2nd order linear time-invariant system with a 3rd degree polynomial static nonlinearity around it in feedback. This type of dynamics are, for instance, often encountered in mechanical systems. [Nonlinear Benchmark]([Nonlinear Benchmark - Silverbox](https://www.nonlinearbenchmark.org/benchmarks/silverbox))
+> The Silverbox system can be seen as an electronic implementation of the Duffing oscillator. It is build as a 2nd order linear time-invariant system with a 3rd degree polynomial static nonlinearity around it in feedback. This type of dynamics are, for instance, often encountered in mechanical systems [Nonlinear Benchmark - Silverbox](https://www.nonlinearbenchmark.org/benchmarks/silverbox).
 
 In this case study, we will create a NARX model for the Silver box benchmark. The Silver box represents a simplified version of mechanical oscillating processes, which are a critical category of nonlinear dynamic systems. Examples include vehicle suspensions, where shock absorbers and progressive springs play vital roles. The data generated by the Silver box provides a simplified representation of such combined components. The electrical circuit generating this data closely approximates, but does not perfectly match, the idealized models described below.
 
@@ -1717,7 +1718,7 @@ import nonlinear_benchmarks
 train_val, test = nonlinear_benchmarks.Silverbox(atleast_2d=True)
 ```
 
-We used the `nonlinear_benchmarks` package to load the data. The user is referred to the [package documentation]([GerbenBeintema/nonlinear_benchmarks: The official dataload for http://www.nonlinearbenchmark.org/ (github.com)](https://github.com/GerbenBeintema/nonlinear_benchmarks/tree/master)) to check the details of how to use it.
+We used the `nonlinear_benchmarks` package to load the data. The user is referred to the [package documentation - GerbenBeintema/nonlinear_benchmarks: The official dataload for http://www.nonlinearbenchmark.org/ (github.com)](https://github.com/GerbenBeintema/nonlinear_benchmarks/tree/master) to check the details of how to use it.
 
 The following plot detail the training and testing data of the experiment.
 

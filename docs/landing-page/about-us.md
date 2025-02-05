@@ -3,12 +3,12 @@ template: overrides/main.html
 title: About Us
 ---
 
-# Project History  
+# Project History
 
 The project was started by Wilson R. L. Junior, Luan Pascoal and Samir A. M. Martins as a project for System Identification discipline. We have been working with System Identification for several years (Nonlinear Systems, Machine Learning, Chaotic Systems, Hysteretic models, etc) for several years.
 
 <br>
-Every work we did was using a great tool, but a **paid** one: Matlab. We started looking for some free alternatives to build NARMAX and its variants (AR, ARX, ARMAX, NAR, NARX, NFIR, Neural NARX, etc.) models using the methods known in System Identification community, but we didn't find any package written in Python with the features we needed to keep doing our research.  
+Every work we did was using a great tool, but a **paid** one: Matlab. We started looking for some free alternatives to build NARMAX and its variants (AR, ARX, ARMAX, NAR, NARX, NFIR, Neural NARX, etc.) models using the methods known in System Identification community, but we didn't find any package written in Python with the features we needed to keep doing our research.
 <br>
 Besides, it was always too difficult to find source code of the papers working with NARMAX models and reproduce results was a really hard thing to do.
 
@@ -16,14 +16,14 @@ Besides, it was always too difficult to find source code of the papers working w
 In that context, **SysIdentPy** was idealized with the following goal: be a free and open source package to help the community design NARMAX models. More than that, be a free and robust alternative to one of the most used tools to build NARMAX models, which is the Matlab's System Identification Toolbox.
 
 <br>
-Samuel joined early in 2019 to help us achieve our goal.  
+Samuel joined early in 2019 to help us achieve our goal.
 
 <br>
-## Active Maintainers  
+## Active Maintainers
 The project is actively maintained by Wilson Rocha Lacerda Junior and looking for contributors.
 
 
-## Citation  
+## Citation
 
 > If you use SysIdentPy on your project, please drop me a line.
 

@@ -290,7 +290,7 @@ As you can see, the estimated parameters are very close. However, be careful whe
 
 ## Total Least Squares
 
-This section is based on the [Overview of total least squares methods paper]([Markovsky+VanHuffel-SP-2007.pdf (duke.edu)](https://people.duke.edu/~hpgavin/SystemID/References/Markovsky+VanHuffel-SP-2007.pdf)) .
+This section is based on the [Markovsky, I., & Van Huffel, S. (2007). Overview of total least squares methods. Signal Processing.](https://people.duke.edu/~hpgavin/SystemID/References/Markovsky+VanHuffel-SP-2007.pdf).
 
 The Total Least Squares (TLS) algorithm, is a statistical method used to find the best-fitting linear relationship between variables when both the input and output signals present white noise pertubation. Unlike ordinary least squares (OLS), which assumes that only the dependent variable is subject to error, TLS considers errors in all measured variables, providing a more robust solution in many practical applications. The algorithm was proposed by Golub and Van Loan.
 
@@ -555,7 +555,7 @@ Q_k = \frac{P_{k-1}}{\psi_k^{\mathrm{T}} P_{k-1} \psi_k+v_0} \\
 \tag{3.25}
 $$
 
-where $v_0$ is the variance of the noise in the definition of the KF, in which the cost function is defined as the sum of squares of the innovation (noise). You can check the details in the [Billings, S. A. book]([Nonlinear System Identification: NARMAX Methods in the Time, Frequency, and Spatio-Temporal Domains](https://www.wiley.com/en-us/Nonlinear+System+Identification%3A+NARMAX+Methods+in+the+Time%2C+Frequency%2C+and+Spatio-Temporal+Domains-p-9781119943594))
+where $v_0$ is the variance of the noise in the definition of the KF, in which the cost function is defined as the sum of squares of the innovation (noise). You can check the details in the [Billings, S. A. - Nonlinear System Identification: NARMAX Methods in the Time, Frequency, and Spatio-Temporal Domains](https://www.wiley.com/en-us/Nonlinear+System+Identification%3A+NARMAX+Methods+in+the+Time%2C+Frequency%2C+and+Spatio-Temporal+Domains-p-9781119943594).
 
 If we change $Q_k$ in Equation 3.25 to scaled identity matrix
 
