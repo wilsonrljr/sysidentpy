@@ -18,6 +18,8 @@ jobs:
         with:
           python-version: 3.12
       - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+        env:
+            GOOGLE_ANALYTICS_KEY: ${{ secrets.GOOGLE_ANALYTICS_KEY }}
       - uses: actions/cache@v4
         with:
           key: mkdocs-material-${{ env.cache_id }}
