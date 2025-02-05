@@ -9,16 +9,24 @@ title: Introduction to NARMAX Models
 
 This is the first in a series of publications explaining a little bit about NARMAX[^1] models. I hope the content of these publications will help those who use or would like to use the SysIdentPy library.
 
+> **Looking for more details on NARMAX models?**
+> For comprehensive information on models, methods, and a wide range of examples and benchmarks implemented in SysIdentPy, check out our book:
+> [*Nonlinear System Identification and Forecasting: Theory and Practice With SysIdentPy*](https://sysidentpy.org/book/0%20-%20Preface/)
+>
+> This book provides in-depth guidance to support your work with SysIdentPy.
+>
+> You can also explore the [tutorials in the documentation](https://sysidentpy.org/examples/basic_steps/) for practical, hands-on examples.
+
 
 ### System Identification
 
 As I will use the term **Systems Identification** here and there, let me make a brief definition regarding these terms.
 
 <br>
-Systems identification is one of the major areas that deals with the modeling of data-based processes. In this context, the term "system" can be interpreted as any set of operations that process one or more inputs and return one or more outputs. Examples include electrical systems, mechanical systems, biological systems, financial systems, chemical systems … literally anything you can relate to input and output data. The electricity demand is part of a system whose inputs can be, for example, quantity of the population, quantity of water in the reservoirs, season, events. The price of a property is the output of a system whose entries can be the city, per capita income, neighborhood, number of rooms, how old the house is, and many others. You got the idea.  
+Systems identification is one of the major areas that deals with the modeling of data-based processes. In this context, the term "system" can be interpreted as any set of operations that process one or more inputs and return one or more outputs. Examples include electrical systems, mechanical systems, biological systems, financial systems, chemical systems … literally anything you can relate to input and output data. The electricity demand is part of a system whose inputs can be, for example, quantity of the population, quantity of water in the reservoirs, season, events. The price of a property is the output of a system whose entries can be the city, per capita income, neighborhood, number of rooms, how old the house is, and many others. You got the idea.
 
 <br>
-Although there are many things related with Machine Learning, Statistical Learning and other fields,  each field has its particularities.  
+Although there are many things related with Machine Learning, Statistical Learning and other fields,  each field has its particularities.
 
 
 ### So, what is a NARMAX model?
@@ -31,7 +39,7 @@ Let's go back to the model. I said that the **ARX** family of models is commonly
   [^1]:
     Non-linear Autoregressive Models with Moving Average and Exogenous Input.
 
-  [Nonlinear System Identification: NARMAX Methods in the Time, Frequency, and Spatio-Temporal Domains]: https://www.wiley.com/en-us/Nonlinear+System+Identification:+NARMAX+Methods+in+the+Time,+Frequency,+and+Spatio+Temporal+Domains-p-9781119943594
+  [Nonlinear System Identification: NARMAX Methods in the Time, Frequency, and Spatio-Temporal Domains](https://www.wiley.com/en-us/Nonlinear+System+Identification:+NARMAX+Methods+in+the+Time,+Frequency,+and+Spatio+Temporal+Domains-p-9781119943594)
 
 - Dynamical tests and collecting data;
 - Choice of mathematical representation;

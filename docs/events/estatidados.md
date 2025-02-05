@@ -3,7 +3,7 @@ template: overrides/main.html
 title: Contribute
 ---
 
-# Nubank Meetup
+# Estatidados Meetup
 
 Estatidados is a big statistic and data science community in Brazil. They host an online meetup that brings together leading researchers and developers from the Statistics and Data science community to join a multiple set of talks covering current trends in the Data Science field.
 

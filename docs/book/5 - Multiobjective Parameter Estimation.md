@@ -30,11 +30,11 @@ $$
 
 where $\Theta$ is an $n$-dimensional vector of the decision variables, $\mathrm{S}$ is the set of feasible solutions bounded by $m$ inequality constraints ($g_i$) and $n$ equality constraints ($h_j$), and $a_i$ and $b_j$ are constants. For continuous variables $A = \mathbb{R}$ while $A$ contains the set of permissible values for discrete variables.
 
-> Usually problems with $1 < m < 4$ are *called multiobjective optimization problems*. When there are more objectives ($m\geq 4$), it is referred as *many-objective optimization problems*, a emergence class of multi-objective problems for solving complex modern real-world tasks. More details can be found in [Fleming, P. J. and Purshouse, R. C. and Lygoe, R. J.]([Many-Objective Optimization: An Engineering Design Perspective](https://www.researchgate.net/publication/216300612_Many-Objective_Optimization_An_Engineering_Design_Perspective)), [Li, B. and Li, J. and Tang, K. and Yao, X.]([A survey on multi-objective evolutionary algorithms for many-objective problems](https://link.springer.com/article/10.1007/s10589-014-9644-1)).
+> Usually problems with $1 < m < 4$ are *called multiobjective optimization problems*. When there are more objectives ($m\geq 4$), it is referred as *many-objective optimization problems*, a emergence class of multi-objective problems for solving complex modern real-world tasks. More details can be found in ([Fleming, P. J., Purshouse, R. C., and Lygoe, R. J., "Many-Objective Optimization: An Engineering Design Perspective"](https://www.researchgate.net/publication/216300612_Many-Objective_Optimization_An_Engineering_Design_Perspective)), ([Li, B., Li, J., Tang, K., and Yao, X., "A survey on multi-objective evolutionary algorithms for many-objective problems"](https://link.springer.com/article/10.1007/s10589-014-9644-1)).
 
 ## Pareto Optimal Definition and Pareto Dominance
 
-> Consider $[y^{(1)}, y^{(2)}] \in \mathbb{R}^m$ two vectors in the objective space. If and only if $\forall \in \{1, \ldots, m \}: y_i^{(1)}\leq y_i^{(2)}$ and $\exists j \in \{1, \ldots, m \}: y_j^{(1)} < y_j^{(2)}$ one can said $y^{(1)} \prec y^{(2)}$ ([P. L. Yu]([Cone convexity, cone extreme points, and nondominated solutions in decision problems with multiobjectives](https://link.springer.com/article/10.1007/BF00932614))).
+> Consider $[y^{(1)}, y^{(2)}] \in \mathbb{R}^m$ two vectors in the objective space. If and only if $\forall \in \{1, \ldots, m \}: y_i^{(1)}\leq y_i^{(2)}$ and $\exists j \in \{1, \ldots, m \}: y_j^{(1)} < y_j^{(2)}$ one can said $y^{(1)} \prec y^{(2)}$ ([P. L. Yu, "Cone convexity, cone extreme points, and nondominated solutions in decision problems with multiobjectives"](https://link.springer.com/article/10.1007/BF00932614)).
 
 The concept of Pareto optimality is generally used to describe the trade-off among the minimization of different objectives. Following the pareto definition: the pareto optimal is any parameter vector representing an efficient solution  where no objective function can be improved without  making at least one objective function worse off will be referred to as a Pareto-model.
 
@@ -45,7 +45,7 @@ A hypothetical Pareto set is shown in Figure 1.
 ![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/pareto_example.png?raw=true)
 > Figure 1. The figure illustrates the concept of Pareto optimality, where each point in the objective space represents a solution. The Pareto front is depicted as a curve, demonstrating the trade-off between two conflicting objectives. Points on the front cannot be improved in one objective without worsening the other, highlighting the balance in optimal solutions.
 
-In this case the model structure is assumed to be known and therefore there is a one-to-one correspondence between each parameter vector on the Pareto optimal solution and a model ([Nepomuceno, E. G. and Takahashi, R. H. C. and Aguirre, L. A.]([Multiobjective parameter estimation for non-linear systems: affine information and least-squares formulation](https://www.tandfonline.com/doi/abs/10.1080/00207170601185053))). One can build a Pareto set by applying the Weighted Sum Method, where a set of objectives are scalarized into a single objective by adding each objective multiplied by a user supplied weight. Consider
+In this case the model structure is assumed to be known and therefore there is a one-to-one correspondence between each parameter vector on the Pareto optimal solution and a model ([Nepomuceno, E. G., Takahashi, R. H. C., and Aguirre, L. A., "Multiobjective parameter estimation for non-linear systems: affine information and least-squares formulation"](https://www.tandfonline.com/doi/abs/10.1080/00207170601185053)). One can build a Pareto set by applying the Weighted Sum Method, where a set of objectives are scalarized into a single objective by adding each objective multiplied by a user supplied weight. Consider
 
 $$
 \begin{equation}
@@ -62,7 +62,7 @@ $$
 \tag{5.4}
 $$
 
-where $w$ is a combination of weights to the different objectives functions. Therefore the Pareto-set is associated to the set of realizations of $w \in \mathrm{W}$. An efficient single-step computational strategy was presented by ([Nepomuceno, E. G. and Takahashi, R. H. C. and Aguirre, L. A.]([Multiobjective parameter estimation for non-linear systems: affine information and least-squares formulation](https://www.tandfonline.com/doi/abs/10.1080/00207170601185053))) for solving Equation 5.4 by means of a Least Squares formulation, which is presented in the following section.
+where $w$ is a combination of weights to the different objectives functions. Therefore the Pareto-set is associated to the set of realizations of $w \in \mathrm{W}$. An efficient single-step computational strategy was presented by ([Nepomuceno, E. G., Takahashi, R. H. C., and Aguirre, L. A., "Multiobjective parameter estimation for non-linear systems: affine information and least-squares formulation"](https://www.tandfonline.com/doi/abs/10.1080/00207170601185053)) for solving Equation 5.4 by means of a Least Squares formulation, which is presented in the following section.
 
 ## Affine Information Least Squares Algorithm
 

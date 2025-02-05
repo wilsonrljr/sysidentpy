@@ -121,7 +121,7 @@ and so on
 
 ## Model Performance
 
-Model validation is one of the most crucial part in system identification. As we mentioned before, in system identification we are trying the model the dynamic of the process without for task like control design. In such cases, we can not only rely on regression metrics, but also ensuring that residuals are unpredictable across various combinations of past inputs and outputs ([Billings, S. A. and Voon, W. S. F.]([Structure detection and model validity tests in the identification of nonlinear systems](https://digital-library.theiet.org/content/journals/10.1049/ip-d.1983.0034))). One often used statistical tests is the normalized RMSE, called RRSE, which can be expressed by
+Model validation is one of the most crucial part in system identification. As we mentioned before, in system identification we are trying the model the dynamic of the process without for task like control design. In such cases, we can not only rely on regression metrics, but also ensuring that residuals are unpredictable across various combinations of past inputs and outputs ([Billings, S. A. and Voon, W. S. F., "Structure detection and model validity tests in the identification of nonlinear systems"](https://digital-library.theiet.org/content/journals/10.1049/ip-d.1983.0034)). One often used statistical tests is the normalized RMSE, called RRSE, which can be expressed by
 
 $$
 \begin{equation}
@@ -133,15 +133,20 @@ $$
 where $\hat{y}_k \in \mathbb{R}$ the model predicted output and $\bar{y} \in \mathbb{R}$ the mean of the measured output $y_k$. The RRSE gives some indication regarding the quality of the model, but concluding about the best model by evaluating only this quantity may leads to an incorrect interpretation, as shown in following example.
 
 Consider the models
+
 $$
 y_{{_a}k} = 0.7077y_{{_a}k-1} + 0.1642u_{k-1} + 0.1280u_{k-2}
 $$
 
-and $y_{{_b}k}=0.7103y_{{_b}k-1} + 0.1458u_{k-1} + 0.1631u_{k-2} -1467y^3_{{_b}k-1} + 0.0710y^3_{{_b}k-2} +0.0554y^2_{{_b}k-3}u_{k-3}$ defined in the [Meta Model Structure Selection: An Algorithm For Building Polynomial NARX Models For Regression And Classification](https://ufsj.edu.br/portal2-repositorio/File/ppgel/225-2020-02-17-DissertacaoWilsonLacerda.pdf). The former results in a $RRSE = 0.1202$ while the latter gives $RRSE~=0.0857$. Although the model $y_{{_b}k}$ fits the data better, it is only a biased representation to one piece of data and not a good description of the entire system.
+and
+
+$$y_{{_b}k}=0.7103y_{{_b}k-1} + 0.1458u_{k-1} + 0.1631u_{k-2} -1467y^3_{{_b}k-1} + 0.0710y^3_{{_b}k-2} +0.0554y^2_{{_b}k-3}u_{k-3}$$
+
+defined in the [Meta Model Structure Selection: An Algorithm For Building Polynomial NARX Models For Regression And Classification](https://ufsj.edu.br/portal2-repositorio/File/ppgel/225-2020-02-17-DissertacaoWilsonLacerda.pdf). The former results in a $RRSE = 0.1202$ while the latter gives $RRSE~=0.0857$. Although the model $y_{{_b}k}$ fits the data better, it is only a biased representation to one piece of data and not a good description of the entire system.
 
 The RRSE (or any other metric) shows that validations test might be performed carefully. Another traditional practice is split the data set in two parts. In this respect, one can test the models obtained from the estimation part of the data using an specific data for validation. However, the one-step-ahead performance of NARX models generally results in misleading interpretations because even strongly biased models may fit the data well. Therefore, a free run simulation approach usually allows a better interpretation if the model is adequate or not ([Billings, S. A.](https://www.wiley.com/en-us/Nonlinear+System+Identification%3A+NARMAX+Methods+in+the+Time%2C+Frequency%2C+and+Spatio-Temporal+Domains-p-9781119943594)).
 
-Statistical tests for SISO models based on the correlation functions were proposed in [Billings, S. A. and Voon, W. S. F.]([A prediction-error and stepwise-regression estimation algorithm for non-linear systems](https://www.tandfonline.com/doi/abs/10.1080/00207178608933633)), [Model validity tests for non-linear signal processing applications]([Model validity tests for non-linear signal processing applications](https://www.tandfonline.com/doi/abs/10.1080/00207179108934155)). The tests are:
+Statistical tests for SISO models based on the correlation functions were proposed in ([Billings, S. A. and Voon, W. S. F., "A prediction-error and stepwise-regression estimation algorithm for non-linear systems"](https://www.tandfonline.com/doi/abs/10.1080/00207178608933633)), ([Model validity tests for non-linear signal processing applications](https://www.tandfonline.com/doi/abs/10.1080/00207179108934155)). The tests are:
 
 $$
 \begin{align}

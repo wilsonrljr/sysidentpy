@@ -207,9 +207,9 @@ Its always good to check if your implementations/modifications does not break an
 
 #### Example of how to run the tests:
 
-Open a terminal emulator of your choice and go to a subdirectory, e.g,
+Open a terminal emulator of your choice and go to the main directory, e.g,
 
-	\sysidentpy\metrics\
+	\sysidentpy\
 
 Just type `pytest` in the terminal emulator
 

@@ -7,10 +7,7 @@ title: Sponsors
 
 As a free and open source project, SysIdentPy relies on the support of the community for its development. If you work for an organization that uses and benefits from SysIdentPy, please consider supporting us.
 
-
-SysIdentPy __does not__ follow the __sponsorware__ release strategy, which means
-that all features are released to the public at the same time. SysIdentPy is a community driven project, however sponsorships will help to assure its sustainability.
-
+SysIdentPy __does not__ follow the __sponsorware__ release strategy, which means that all features are released to the public at the same time. SysIdentPy is a community driven project, however sponsorships will help to assure its sustainability.
 
 The main goal of sponsorships it to make this project sustainable. Your donation goes to support a variety of services and development as they buy the maintainers of this project time to work on the development of new features, bug fixing, stability improvement, issue triage and general support.
 
