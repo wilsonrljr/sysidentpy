@@ -70,7 +70,7 @@ dev = [
 
 examples = ["scikit-learn", "catboost"]
 
-doc = [
+docs = [
     "mkdocs >=1.1.2,<2.0.0",
     "mkdocs-material >=8.1.4,<=9.5.21",
     "mdx-include >=1.4.1,<2.0.0",
