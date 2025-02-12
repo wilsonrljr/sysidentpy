@@ -15,6 +15,7 @@ site/
 logs.log
 # for virtual environment
 venv/
+env/
 
 # Packages/installer info
 *.egg
