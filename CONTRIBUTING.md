@@ -104,6 +104,13 @@ If you created the environment using Python's `venv` module, activate it with:
     ```console
     .\env\Scripts\Activate.ps1
     ```
+    
+!!! note
+	If you get an error message like ".\env\Scripts\Activate.ps1 cannot be loaded..." then try running the below command before activating the venv again.
+
+	```console
+	$ Set-ExecutionPolicy Unrestricted -Scope Process
+	```
 
 === "Windows Bash"
 
