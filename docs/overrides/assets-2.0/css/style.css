@@ -146,6 +146,7 @@ body, html{
     margin-bottom: 0;
     max-width: 450px;
     line-height: 1.4;
+    font-size: 1rem;
 }
 .copy-pip {
   display: block;
@@ -879,9 +880,7 @@ footer .row {
   background-color: var(--new-color-background);
 }
 
-p {
-  font-size: 1rem;
-}
+
 @media screen and (min-width: 76.25em) {
   [data-md-color-primary=black] .md-tabs {
       background-color: var(--new-color-background);
