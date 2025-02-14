@@ -17,34 +17,6 @@ if (defaultOpenElement) {
   defaultOpenElement.click();
 }
 
-$(document).ready(function(){
-  $('.testimonial').slick({
-  slidesToShow: 3,
-  dots:true,
-  centerMode: true,
-  });
-});
-
-
-var navOpen = false;
-
-function toggleNav() {
-  if (navOpen) {
-    closeNav();
-  } else {
-    openNav();
-  }
-}
-
-function openNav() {
-  document.getElementById("mySidenav").style.right = "0";
-  navOpen = true;
-}
-
-function closeNav() {
-  document.getElementById("mySidenav").style.right = "-281px";
-  navOpen = false;
-}
 
 
 function installCode() {
