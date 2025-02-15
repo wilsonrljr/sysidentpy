@@ -551,6 +551,12 @@ ul.list-contributors li:nth-last-child(1) a::after {
 
 #users {
   margin: 80px 0;
+
+  .container {
+    @media (max-width: 425px) {
+      max-width: 100%;
+    }
+  }
 }
 #users h2 {
   font-weight: 500;
@@ -575,6 +581,10 @@ ul.list-contributors li:nth-last-child(1) a::after {
   width: 100%;
   max-width: 400px;
   text-align: center;
+
+  @media (max-width: 425px) {
+    padding: 45px 25px;
+  }
 }
 .box-testimonial:hover {
   border: 1px solid #EE771B
@@ -1113,6 +1123,15 @@ footer .row {
     font-size: 0.8rem;
     font-weight: 600;
     text-align: right;
+  }
+  .swiper-button-next, .swiper-button-prev {
+    display: none;
+  }
+  .swiper {
+    padding: 1rem;
+  }
+  label[for="__drawer"] {
+    display: none!important;
   }
 }
 @media (max-width: 376px) {}
