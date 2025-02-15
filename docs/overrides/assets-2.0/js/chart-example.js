@@ -1,3 +1,5 @@
+/* global ApexCharts */
+
 function generateChart(containerId, yValid, yHat) {
   var options = {
       series: [

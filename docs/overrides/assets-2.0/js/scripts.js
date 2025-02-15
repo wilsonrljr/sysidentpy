@@ -11,13 +11,12 @@ function openTab(evt, tabName) {
   document.getElementById(tabName).style.display = "block";
   evt.currentTarget.className += " active";
 }
+window.openTab = openTab;
 
 const defaultOpenElement = document.getElementById("defaultOpen");
 if (defaultOpenElement) {
   defaultOpenElement.click();
 }
-
-
 
 function installCode() {
   var elemento = document.getElementById("install");
@@ -29,7 +28,7 @@ function installCode() {
   document.execCommand("copy");
   selecao.removeAllRanges();
 }
-
+window.installCode = installCode;
 
 document.addEventListener("DOMContentLoaded", function () {
   const logo = document.querySelector('a.md-header__button.md-logo');
@@ -50,4 +49,3 @@ document.addEventListener("DOMContentLoaded", function () {
     logo.replaceWith(newLogo);
   }
 });
-
