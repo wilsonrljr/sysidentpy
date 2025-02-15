@@ -591,7 +591,6 @@
     <script src="overrides/assets-2.0/js/chart-example.js"></script>
     <script src="overrides/assets-2.0/js/scripts.js"></script>
   
-
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         var swiper = new Swiper(".mySwiper", {
@@ -611,6 +610,10 @@
             clickable: true,
           },
           breakpoints: {
+            0: {
+              slidesPerView: 1,
+              navigation: false,
+            },
             768: {
               slidesPerView: 1,
             },

@@ -1,15 +1,23 @@
 function openTab(evt, tabName) {
-  var i, tabcontent, tablinks;
-  tabcontent = document.getElementsByClassName("tabcontent");
-  for (i = 0; i < tabcontent.length; i++) {
+  const tabcontent = document.getElementsByClassName("tabcontent");
+  for (let i = 0; i < tabcontent.length; i++) {
     tabcontent[i].style.display = "none";
   }
-  tablinks = document.getElementsByClassName("tablinks");
-  for (i = 0; i < tablinks.length; i++) {
-    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  const tablinks = document.getElementsByClassName("tablinks");
+  for (let i = 0; i < tablinks.length; i++) {
+    tablinks[i].classList.remove("active");
   }
-  document.getElementById(tabName).style.display = "block";
-  evt.currentTarget.className += " active";
+  const currentTab = document.getElementById(tabName);
+  if (currentTab) {
+    currentTab.style.display = "block";
+  } else {
+    console.warn(`Error: Not found tab ${tabName}`);
+  }
+  if (evt.currentTarget && evt.currentTarget.classList) {
+    evt.currentTarget.classList.add("active");
+  } else {
+    console.warn("Error element.");
+  }
 }
 window.openTab = openTab;
 
