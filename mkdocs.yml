@@ -64,13 +64,15 @@ theme:
 
 ## Custom theme additions
 extra_javascript:
-  - "overrides/assets-2.0/extra.js"
+  - "overrides/assets-2.0/js/extra.js"
   - "overrides/assets-2.0/js/mathjax.js"
   - "https://polyfill.io/v3/polyfill.min.js?features=es6"
   - "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 
 extra_css:
   - "overrides/assets-2.0/css/extra.css"
+  - "overrides/assets-2.0/css/feature-grid.css"
+  - "overrides/assets-2.0/css/fontsize.css"
 
 # Plugins
 plugins:
@@ -178,31 +180,6 @@ nav:
           - electromechanical: examples/identification_of_an_electromechanical_system.ipynb
           - load-forecasting: examples/load_forecasting_benchmark.ipynb
           - pv-forecasting: examples/PV_forecasting_benchmark.ipynb
-      - V0.3.4:
-          - Features:
-              - basic-steps: old_version/basic_steps.ipynb
-              - defining-lags: old_version/defining_lags.ipynb
-              - miso: old_version/multiple_inputs_example.ipynb
-              - parameter-estimation: old_version/parameter_estimation.ipynb
-              - multiobjective-parameter-estimation: old_version/multiobjective_parameter_estimation.ipynb
-              - els: old_version/extended_least_squares.ipynb
-              - n-steps-prediction: old_version/n_steps_ahead_prediction.ipynb
-              - simulating: old_version/simulating_a_predefined_model.ipynb
-              - save-load: old_version/save_and_load_models.ipynb
-              - information-criteria: old_version/information_criteria_examples.ipynb
-              - general-estimators: old_version/general_estimators.ipynb
-              - fourier-basis: old_version/fourier_basis_function.ipynb
-              - metamss: old_version/metamss.ipynb
-              - neural-narx: old_version/narx_neural_network.ipynb
-              - aols: old_version/aols.ipynb
-              - entropic: old_version/entropic_regression.ipynb
-              - nfir: old_version/NFIR.ipynb
-          - Cases:
-              - air-passenger: old_version/air_passenger_benchmark.ipynb
-              - f16: old_version/f_16_benchmark.ipynb
-              - electromechanical: old_version/identification_of_an_electromechanical_system.ipynb
-              - load-forecasting: old_version/load_forecasting_benchmark.ipynb
-              - pv-forecasting: old_version/PV_forecasting_benchmark.ipynb
   - Companion Book:
       - Preface: book/0 - Preface.md
       - Contents: book/0.1 - Contents.md
