@@ -59,12 +59,13 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
   font:
-    text: Roboto
+    text: Nunito Sans
     code: Roboto Mono
 
 ## Custom theme additions
 extra_javascript:
   - "overrides/assets-2.0/js/extra.js"
+  - "overrides/assets-2.0/js/test.js"
   - "overrides/assets-2.0/js/mathjax.js"
   - "https://polyfill.io/v3/polyfill.min.js?features=es6"
   - "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -73,6 +74,8 @@ extra_css:
   - "overrides/assets-2.0/css/extra.css"
   - "overrides/assets-2.0/css/feature-grid.css"
   - "overrides/assets-2.0/css/fontsize.css"
+  - "overrides/assets-2.0/css/card-container.css"
+  - "overrides/assets-2.0/css/test.css"
 
 # Plugins
 plugins:

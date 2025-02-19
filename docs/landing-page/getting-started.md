@@ -77,7 +77,6 @@ the help box. Install with:
   </div>
 </div>
 
-
 <div class="custom-collapsible-card">
   <input type="checkbox" id="toggle-dependencies">
   <label for="toggle-dependencies">
@@ -104,46 +103,79 @@ the help box. Install with:
 
 <div class="feature-grid">
   <div class="feature-card">
-    <h3>🧩 NARMAX Philosophy</h3>
+    <a href="https://sysidentpy.org/docs/narmax-philosophy" class="feature-link">
+      <h3>🧩 NARMAX Philosophy</h3>
+    </a>
     <p>Build variations like <strong>NARX</strong>, <strong>NAR</strong>, <strong>ARMA</strong>, <strong>NFIR</strong>, and more.</p>
   </div>
   <div class="feature-card">
-    <h3>📝 Model Structure Selection</h3>
+    <a href="https://sysidentpy.org/docs/model-structure-selection" class="feature-link">
+      <h3>📝 Model Structure Selection</h3>
+    </a>
     <p>Use methods like <strong>FROLS</strong>, <strong>MetaMSS</strong>, and combinations with parameter estimation techniques.</p>
   </div>
   <div class="feature-card">
-    <h3>🔗 Basis Function</h3>
+    <a href="https://sysidentpy.org/docs/basis-function" class="feature-link">
+      <h3>🔗 Basis Function</h3>
+    </a>
     <p>Choose from <strong>8+ basis functions</strong>, combining linear and nonlinear types for custom NARMAX models.</p>
   </div>
   <div class="feature-card">
-    <h3>🎯 Parameter Estimation</h3>
+    <a href="https://sysidentpy.org/docs/parameter-estimation" class="feature-link">
+      <h3>🎯 Parameter Estimation</h3>
+    </a>
     <p>Over <strong>15 parameter estimation methods</strong> for exploring various structure selection scenarios.</p>
   </div>
   <div class="feature-card">
-    <h3>⚖️ Multiobjective Estimation</h3>
+    <a href="https://sysidentpy.org/docs/multiobjective-estimation" class="feature-link">
+      <h3>⚖️ Multiobjective Estimation</h3>
+    </a>
     <p>Minimize different objective functions using <strong>affine information</strong> for parameter estimation.</p>
   </div>
   <div class="feature-card">
-    <h3>🔄 Model Simulation</h3>
+    <a href="https://sysidentpy.org/docs/model-simulation" class="feature-link">
+      <h3>🔄 Model Simulation</h3>
+    </a>
     <p>Reproduce paper results easily with <strong>SimulateNARMAX</strong>. Test and compare published models effortlessly.</p>
   </div>
   <div class="feature-card">
-    <h3>🤖 Neural NARX (PyTorch)</h3>
+    <a href="https://sysidentpy.org/docs/neural-narx" class="feature-link">
+      <h3>🤖 Neural NARX (PyTorch)</h3>
+    </a>
     <p>Integrate with <strong>PyTorch</strong> for custom neural NARX architectures using all PyTorch optimizers and loss functions.</p>
   </div>
   <div class="feature-card">
-    <h3>🛠️ General Estimators</h3>
+    <a href="https://sysidentpy.org/docs/general-estimators" class="feature-link">
+      <h3>🛠️ General Estimators</h3>
+    </a>
     <p>Compatible with <strong>scikit-learn</strong>, <strong>Catboost</strong>, and more for creating NARMAX models.</p>
   </div>
 </div>
 
 
-## How do I use SysIdentPy?
 
-The [SysIdentPy documentation](https://sysidentpy.org) includes more than 20 examples to help get you started:
-- Typical "Hello World" example, for an [entry-level description of the main SysIdentPy concepts](https://sysidentpy.org/examples/basic_steps/)
-- A dedicated section focusing on SysIdentPy features, like model structure selection algorithms, basis functions, parameter estimation, and more.
-- A dedicated section focusing on use cases using SysIdentPy with real world datasets. Besides, there is some brief comparisons and benchmarks against other time series tools, like Prophet, Neural Prophet, ARIMA, and more.
+## Additional resources
+
+<ul class="custom-link-list">
+  <li>
+    <a href="https://sysidentpy.org/landing-page/contribute/" target="_blank">🤝 Contribute to SysIdentPy</a>
+  </li>
+  <li>
+    <a href="https://sysidentpy.org/landing-page/license/" target="_blank">📜 License Information</a>
+  </li>
+  <li>
+    <a href="https://sysidentpy.org/landing-page/get-help/" target="_blank">🆘 Get Help & Support</a>
+  </li>
+  <li>
+    <a href="https://sysidentpy.org/events/events/" target="_blank">📅 Upcoming Events</a>
+  </li>
+  <li>
+    <a href="https://sysidentpy.org/landing-page/sponsor/" target="_blank">💖 Become a Sponsor</a>
+  </li>
+  <li>
+    <a href="https://sysidentpy.org/code/narmax-base/" target="_blank">🧩 Explore NARMAX Base Code</a>
+  </li>
+</ul>
 
 
 ## Do you like **SysIdentPy**?
