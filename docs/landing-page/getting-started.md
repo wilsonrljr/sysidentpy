@@ -3,7 +3,35 @@ template: overrides/main.html
 title: Getting Started
 ---
 
+# Getting Started
 
+Welcome to SysIdentPy's documentation! Learn how to get started with SysIdentPy in your project. Then, explore SysIdentPy's main concepts and discover additional resources to help you model dynamic systems and time series.
+
+<div class="custom-collapsible-card">
+  <input type="checkbox" id="toggle-info">
+  <label for="toggle-info">
+    📚 <strong>Looking for more details on NARMAX models?</strong>
+    <span class="arrow">▼</span>
+  </label>
+  <div class="collapsible-content">
+    <p>
+      For comprehensive information on models, methods, and a wide range of examples and benchmarks implemented in <strong>SysIdentPy</strong>, check out our book:
+    </p>
+    <a href="https://sysidentpy.org/book/0%20-%20Preface/" target="_blank">
+      <em><strong>Nonlinear System Identification and Forecasting: Theory and Practice With SysIdentPy</strong></em>
+    </a>
+    <p>
+      This book provides in-depth guidance to support your work with <strong>SysIdentPy</strong>.
+    </p>
+    <p>
+      🛠️ You can also explore the <a href="https://sysidentpy.org/examples/basic_steps/" target="_blank"><strong>tutorials in the documentation</strong></a> for practical, hands-on examples.
+    </p>
+  </div>
+</div>
+
+## What is SysIdentPy
+
+SysIdentPy is an open-source Python module for System Identification using **NARMAX** models built on top of **numpy** and is distributed under the 3-Clause BSD license. SysIdentPy provides an easy-to-use and  flexible framework for building Dynamical Nonlinear Models for time series and dynamic systems.
 
 With **SysIdentPy**, you can:
 
@@ -11,48 +39,104 @@ With **SysIdentPy**, you can:
 - Utilize state-of-the-art techniques for model structure selection and parameter estimation.
 - Experiment with neural NARX models and other advanced algorithms.
 
-Check our [documentation](https://sysidentpy.org)!
+## Installation
 
-For an in depth documentation, check our companion book:
+SysIdentPy is published as a [Python package] and can be installed with
+`pip`, ideally by using a [virtual environment]. If not, scroll down and expand
+the help box. Install with:
 
-<a href="https://sysidentpy.org/book/0%20-%20Preface/">
-  <img src="https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/Nonlinear_System_identification.png?raw=true" alt="Nonlinear System Identification" style="width: 200px; height: auto;" />
-</a>
+<div class="custom-card">
+  <div class="tab-container">
+    <!-- Latest Tab -->
+    <input type="radio" id="tab-latest" name="tab-group" checked>
+    <label for="tab-latest">Latest</label>
+    <div class="tab-content">
+      <pre><code>pip install sysidentpy</code></pre>
+    </div>
+
+    <!-- Neural NARX Support Tab -->
+    <input type="radio" id="tab-neural" name="tab-group">
+    <label for="tab-neural">Neural NARX Support</label>
+    <div class="tab-content">
+      <pre><code>pip install sysidentpy["all"]</code></pre>
+    </div>
+
+    <!-- Version x.y.z Tab -->
+    <input type="radio" id="tab-version" name="tab-group">
+    <label for="tab-version">Specific Version</label>
+    <div class="tab-content">
+      <pre><code>pip install sysidentpy=="0.5.3"</code></pre>
+    </div>
+
+    <!-- Nightly Builds -->
+    <input type="radio" id="tab-git" name="tab-group">
+    <label for="tab-git">From Git</label>
+    <div class="tab-content">
+      <pre><code>pip install git+https://github.com/wilsonrljr/sysidentpy.git</code></pre>
+    </div>
+  </div>
+</div>
 
 
+<div class="custom-collapsible-card">
+  <input type="checkbox" id="toggle-dependencies">
+  <label for="toggle-dependencies">
+    ❓ <strong>How to manage my projects dependencies?</strong>
+    <span class="arrow">▼</span>
+  </label>
+  <div class="collapsible-content">
+    <p>
+      If you don't have prior experience with Python, we recommend reading
+      <a href="https://pip.pypa.io/en/stable/user_guide/" target="_blank">
+        Using Python's pip to Manage Your Projects' Dependencies
+      </a>, which is a really good introduction on the mechanics of Python package management and helps you troubleshoot if you run into errors.
+    </p>
+  </div>
+</div>
 
-### Requirements
 
-`SysIdentPy` requires:
+  [Python package]: https://pypi.org/project/sysidentpy/
+  [virtual environment]: https://realpython.com/what-is-pip/#using-pip-in-a-python-virtual-environment
+  [Using Python's pip to Manage Your Projects' Dependencies]: https://realpython.com/what-is-pip/
 
-- Python (>= 3.7)
-- NumPy (>= 1.9.2) for numerical algorithms
-- Matplotlib >= 3.3.2 for static plotting and visualizations
-- Pytorch (>=1.7.1) for building NARX neural networks
-- scipy (>= 1.7.0) for numerical and optimization algorithms
-
-The library is compatible with Linux, Windows, and macOS. Some examples may also require additional packages like pandas.
-
-For more details, check our [installation guide](https://sysidentpy.org/landing-page/getting-started/)
 
 ## What are the main features of SysIdentPy?
 
-| Feature | What is this? |
-|----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| NARMAX philosophy | You can build variations of NARMAX models like NARX, NAR, NARMA, NFIR, ARMA, ARX, AR, and others. |
-| Model Structure Selection | Easy-to-use methods to select the best terms to build your models, including FROLS and MetaMSS and several combinations with parameter estimation techniques to select the model terms. |
-| Basis Function | You can use up to 8 different basis functions to build your models. You can set linear and nonlinear basis functions and ensemble them to get custom NARMAX models. |
-| Parameter Estimation | More than 15 methods to estimate the model parameters and test different structure selection scenarios. |
-| Multiobjective Parameter Estimation | You can use affine information to estimate the model parameters minimizing different objective functions. |
-| Model Simulation | You can reproduce results from papers easily with SimulateNARMAX class. Moreover, you can test published models with different parameter estimation methods and compare the performance. |
-| Neural NARX | You can use SysIdentPy with Pytorch to create custom neural NARX models architectures which support all the optimizers and loss functions from Pytorch. |
-| General Estimators | You can use estimators from packages like scikit-learn, Catboost, and many other compatible interfaces and composition tools to create NARMAX models. |
+<div class="feature-grid">
+  <div class="feature-card">
+    <h3>🧩 NARMAX Philosophy</h3>
+    <p>Build variations like <strong>NARX</strong>, <strong>NAR</strong>, <strong>ARMA</strong>, <strong>NFIR</strong>, and more.</p>
+  </div>
+  <div class="feature-card">
+    <h3>📝 Model Structure Selection</h3>
+    <p>Use methods like <strong>FROLS</strong>, <strong>MetaMSS</strong>, and combinations with parameter estimation techniques.</p>
+  </div>
+  <div class="feature-card">
+    <h3>🔗 Basis Function</h3>
+    <p>Choose from <strong>8+ basis functions</strong>, combining linear and nonlinear types for custom NARMAX models.</p>
+  </div>
+  <div class="feature-card">
+    <h3>🎯 Parameter Estimation</h3>
+    <p>Over <strong>15 parameter estimation methods</strong> for exploring various structure selection scenarios.</p>
+  </div>
+  <div class="feature-card">
+    <h3>⚖️ Multiobjective Estimation</h3>
+    <p>Minimize different objective functions using <strong>affine information</strong> for parameter estimation.</p>
+  </div>
+  <div class="feature-card">
+    <h3>🔄 Model Simulation</h3>
+    <p>Reproduce paper results easily with <strong>SimulateNARMAX</strong>. Test and compare published models effortlessly.</p>
+  </div>
+  <div class="feature-card">
+    <h3>🤖 Neural NARX (PyTorch)</h3>
+    <p>Integrate with <strong>PyTorch</strong> for custom neural NARX architectures using all PyTorch optimizers and loss functions.</p>
+  </div>
+  <div class="feature-card">
+    <h3>🛠️ General Estimators</h3>
+    <p>Compatible with <strong>scikit-learn</strong>, <strong>Catboost</strong>, and more for creating NARMAX models.</p>
+  </div>
+</div>
 
-## Why does SysIdentPy exist?
-
-SysIdentPy aims to be a free and open-source package to help the community to design NARMAX models for System Identification and TimeSeries Forecasting. More than that, be a free and robust alternative to one of the most used tools to build NARMAX models, which is the Matlab's System Identification Toolbox.
-
-The project is actively maintained by Wilson R. L. Junior and looking for contributors.
 
 ## How do I use SysIdentPy?
 
@@ -60,90 +144,6 @@ The [SysIdentPy documentation](https://sysidentpy.org) includes more than 20 exa
 - Typical "Hello World" example, for an [entry-level description of the main SysIdentPy concepts](https://sysidentpy.org/examples/basic_steps/)
 - A dedicated section focusing on SysIdentPy features, like model structure selection algorithms, basis functions, parameter estimation, and more.
 - A dedicated section focusing on use cases using SysIdentPy with real world datasets. Besides, there is some brief comparisons and benchmarks against other time series tools, like Prophet, Neural Prophet, ARIMA, and more.
-
-
-
-
-
-
-
-# Getting Started
-
-Welcome to SysIdentPy's documentation! Learn how to get started with SysIdentPy in your project. Then, explore SysIdentPy's main concepts and discover additional resources to help you model dynamic systems and time series.
-
-> **Looking for more details on NARMAX models?**
-> For comprehensive information on models, methods, and a wide range of examples and benchmarks implemented in SysIdentPy, check out our book:
-> [*Nonlinear System Identification and Forecasting: Theory and Practice With SysIdentPy*](https://sysidentpy.org/book/0%20-%20Preface/)
->
-> This book provides in-depth guidance to support your work with SysIdentPy.
->
-> You can also explore the [tutorials in the documentation](https://sysidentpy.org/examples/basic_steps/) for practical, hands-on examples.
-
-## What is SysIdentPy
-
-SysIdentPy is an open-source Python module for System Identification using **NARMAX** models built on top of **numpy** and is distributed under the 3-Clause BSD license. SysIdentPy provides an easy-to-use and  flexible framework for building Dynamical Nonlinear Models for time series and dynamic systems.
-
-## Installation
-
-SysIdentPy is published as a [Python package] and can be installed with
-`pip`, ideally by using a [virtual environment]. If not, scroll down and expand
-the help box. Install with:
-
-<div class="custom-card-container">
-
-<div class="custom-card">
-    <h3>📦 Install SysIdentPy</h3>
-    <p>Choose the installation option that fits your needs:</p>
-
-    <div class="tab-container">
-        <input type="radio" id="tab-latest" name="tab-group" checked>
-        <label for="tab-latest">Latest</label>
-        <div class="tab-content">
-            <pre><code>pip install sysidentpy</code></pre>
-        </div>
-
-        <input type="radio" id="tab-neural" name="tab-group">
-        <label for="tab-neural">Neural NARX Support</label>
-        <div class="tab-content">
-            <pre><code>pip install sysidentpy["all"]</code></pre>
-        </div>
-
-        <input type="radio" id="tab-version" name="tab-group">
-        <label for="tab-version">Version x.y.z</label>
-        <div class="tab-content">
-            <pre><code>pip install sysidentpy=="0.5.3"</code></pre>
-        </div>
-    </div>
-</div>
-
-</div>
-
-
-
-??? question "How to manage my projects dependencies?"
-
-    If you don't have prior experience with Python, we recommend reading [Using Python's pip to Manage Your Projects' Dependencies], which is a really good introduction on the mechanics of Python package management and helps you troubleshoot if you run into errors.
-
-  [Python package]: https://pypi.org/project/sysidentpy/
-  [virtual environment]: https://realpython.com/what-is-pip/#using-pip-in-a-python-virtual-environment
-  [Using Python's pip to Manage Your Projects' Dependencies]: https://realpython.com/what-is-pip/
-
-
-### with git
-
-SysIdentPy can be used directly from [GitHub] by cloning the
-repository into a subfolder of your project root which might be useful if you
-want to use the very latest version:
-
-```
-git clone https://github.com/wilsonrljr/sysidentpy.git
-```
-
-  [GitHub]: https://github.com/wilsonrljr/sysidentpy
-
-
-## Main Concepts
-
 
 
 ## Do you like **SysIdentPy**?
