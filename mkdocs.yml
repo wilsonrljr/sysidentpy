@@ -14,7 +14,7 @@ copyright: Copyright &copy; 2016 - 2022 Wilson Rocha
 theme:
   name: material
   custom_dir: docs/
-  favicon: overrides/assets/images/favicon.png
+  favicon: overrides/assets-2.0/img/favicon.png
   icon:
     logo: fontawesome/solid/house
 
@@ -64,10 +64,13 @@ theme:
 
 ## Custom theme additions
 extra_javascript:
-  - "overrides/assets/extra.js"
-  - "overrides/assets/javascripts/mathjax.js"
+  - "overrides/assets-2.0/extra.js"
+  - "overrides/assets-2.0/js/mathjax.js"
   - "https://polyfill.io/v3/polyfill.min.js?features=es6"
   - "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+
+extra_css:
+  - "overrides/assets-2.0/css/extra.css"
 
 # Plugins
 plugins:
