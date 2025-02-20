@@ -151,9 +151,9 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Getting started:
-      - Installation: landing-page/getting-started.md
+      - Overview: landing-page/getting-started.md
       - Introduction to NARMAX: landing-page/ch0-narmax-intro.md
-      - Basic Usage: landing-page/basic-usage.md
+      - Quickstart Guide: landing-page/basic-usage.md
       - Get Help: landing-page/get-help.md
       - How to contribute: landing-page/contribute.md
       - License: landing-page/license.md
