@@ -57,18 +57,6 @@ Estimators_Union = Union[
 ]
 
 
-@deprecated(
-    version="v0.3.0",
-    future_version="v0.4.0",
-    message=(
-        "Passing a string to define the estimator will rise an error in v0.4.0."
-        " \n You'll have to use ER(estimator=LeastSquares()) instead. \n The"
-        " only change is that you'll have to define the estimator first instead"
-        " of passing a string like 'least_squares'. \n This change will make"
-        " easier to implement new estimators and it'll improve code"
-        " readability."
-    ),
-)
 class ER(BaseMSS):
     r"""Entropic Regression Algorithm.
 

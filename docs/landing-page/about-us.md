@@ -51,7 +51,7 @@ If you use SysIdentPy on your scientific publication, we would appreciate citati
 The documentation and structure (even this section) is openly inspired by sklearn, einsteinpy, and many others as we used (and keep using) them to learn.
 
 ## Future
-SysIdentPy is already useful for many researchers and companies to build NARX models for dynamical systems. But still, there are many improvements and features to come. **SysIdentPy** has a great future ahead, and [your help](/landing-page/contribute){.internal-link target=_blank} is greatly appreciated.
+SysIdentPy is already useful for many researchers and companies to build NARX models for dynamical systems. But still, there are many improvements and features to come. **SysIdentPy** has a great future ahead, and [your help](/developer_guide/contribute){.internal-link target=_blank} is greatly appreciated.
 
 ## Contributors
 
