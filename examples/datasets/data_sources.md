@@ -1,5 +1,7 @@
 ## data sources: Energy Datasets
 
+SysIdentPy datasets are now available in a dedicated repository for SysIdentPy assets: [sysidentpy-data](https://github.com/wilsonrljr/sysidentpy-data).
+
 The datasets SanFrancisco_Hospital.csv and SanFrancisco_PV_GHI.csv are sourced from [Neural Prophet Dataset Github repository](https://github.com/ourownstory/neuralprophet-data).
 
 Those datasets will be really useful for anyone interested in SysIdentPy time series modeling benchmarks available as examples of how to use SysIdentPy. The main goal is to provide the dataset to users to make sure they can reproduce all the examples available.
