@@ -16,6 +16,7 @@ from scipy.optimize import lsq_linear
 from scipy.sparse.linalg import lsmr
 
 from .estimators_base import BaseEstimator
+from ..utils.deprecation import deprecated
 
 
 class EstimatorError(Exception):
@@ -77,6 +78,14 @@ class LeastSquares(BaseEstimator):
         return theta
 
 
+@deprecated(
+    version="v0.5.4",
+    future_version="v0.6.0",
+    message=(
+        " `solver` is deprecated in v0.5.4 and will be removed in v0.6.0."
+        " A single solver option will be retained moving forward."
+    ),
+)
 class RidgeRegression(BaseEstimator):
     """Ridge Regression estimator using classic and SVD methods.
 
@@ -1589,7 +1598,7 @@ class BoundedVariableLeastSquares(BaseEstimator):
     This optimization problem is convex, hence a found minimum (if iterations
     have converged) is guaranteed to be global.
 
-    Attributes
+    Parameters
     ----------
     unbiased : bool
         Indicates whether an unbiased estimator is applied.
