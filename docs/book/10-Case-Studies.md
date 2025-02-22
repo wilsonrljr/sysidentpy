@@ -47,7 +47,7 @@ from pandas.errors import SettingWithCopyWarning
 import matplotlib.pyplot as plt
 
 from sysidentpy.model_structure_selection import FROLS, AOLS
-from sysidentpy.basis_function._basis_function import Polynomial
+from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation import LeastSquares
 from sysidentpy.metrics import root_relative_squared_error, symmetric_mean_absolute_percentage_error
 from sysidentpy.utils.plotting import plot_results
@@ -370,7 +370,7 @@ import nonlinear_benchmarks
 
 train_val, test = nonlinear_benchmarks.CED(atleast_2d=True)
 data_train_1, data_train_2 = train_val
-data_test_1, data_test_2   = test
+data_test_1, data_test_2 = test
 ```
 
 We used the `nonlinear_benchmarks` package to load the data. The user is referred to the package documentation [GerbenBeintema - nonlinear_benchmarks: The official dataload for nonlinear benchmark datasets](https://github.com/GerbenBeintema/nonlinear_benchmarks/tree/master) to check the details of how to use it.
@@ -1716,6 +1716,12 @@ from sysidentpy.utils.plotting import plot_results
 import nonlinear_benchmarks
 
 train_val, test = nonlinear_benchmarks.Silverbox(atleast_2d=True)
+
+x_train, y_train = train_val.u, train_val.y
+test_multisine, test_arrow_full, test_arrow_no_extrapolation = test
+x_test, y_test = test_multisine.u, test_multisine.y
+
+n = test_multisine.state_initialization_window_length
 ```
 
 We used the `nonlinear_benchmarks` package to load the data. The user is referred to the [package documentation - GerbenBeintema/nonlinear_benchmarks: The official dataload for http://www.nonlinearbenchmark.org/ (github.com)](https://github.com/GerbenBeintema/nonlinear_benchmarks/tree/master) to check the details of how to use it.
