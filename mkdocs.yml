@@ -215,7 +215,10 @@ nav:
       - 10. Case Studies: book/10-Case-Studies.md
   - Developer guide:
       - How to contribute: developer_guide/contribute.md
-      - Doc Structure: developer_guide/doc_structure.md
+      - Documentation:
+        - Documentation Overview: developer_guide/documentation-overview.md
+        - How To Write a Tutorial: developer_guide/how-to-write-a-tutorial.md
+        - How To Write a How-to Guide: developer_guide/how-to-write-a-how-to-guide.md
   - Community & Support:
       - Get Help: community_support/get-help.md
       - Meetups: community_support/meetups/meetup.md
