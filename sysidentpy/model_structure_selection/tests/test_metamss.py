@@ -9,7 +9,9 @@ from sysidentpy.parameter_estimation.estimators import LeastSquares
 
 def create_test_data(n=1000):
     theta = np.array([[0.6], [-0.5], [0.7], [-0.7], [0.2]])
-    data = np.loadtxt("examples/datasets/data_for_testing.txt")
+    data = np.loadtxt(
+        "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/testing/data_for_testing.txt"
+    )
     x = data[:, 0].reshape(-1, 1)
     y = data[:, 1].reshape(-1, 1)
     return x, y, theta

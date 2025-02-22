@@ -14,7 +14,7 @@ copyright: Copyright &copy; 2016 - 2022 Wilson Rocha
 theme:
   name: material
   custom_dir: docs/
-  favicon: overrides/assets/images/favicon.png
+  favicon: overrides/assets-2.0/img/favicon.png
   icon:
     logo: fontawesome/solid/house
 
@@ -59,15 +59,21 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
   font:
-    text: Roboto
+    text: Nunito Sans
     code: Roboto Mono
 
 ## Custom theme additions
 extra_javascript:
-  - "overrides/assets/extra.js"
-  - "overrides/assets/javascripts/mathjax.js"
+  - "overrides/assets-2.0/js/extra.js"
+  - "overrides/assets-2.0/js/mathjax.js"
   - "https://polyfill.io/v3/polyfill.min.js?features=es6"
   - "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+
+extra_css:
+  - "overrides/assets-2.0/css/extra.css"
+  - "overrides/assets-2.0/css/feature-grid.css"
+  - "overrides/assets-2.0/css/fontsize.css"
+  - "overrides/assets-2.0/css/card-container.css"
 
 # Plugins
 plugins:
@@ -143,103 +149,90 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Getting started:
-      - Installation: landing-page/getting-started.md
-      - Introduction to NARMAX: landing-page/ch0-narmax-intro.md
-      - Basic Usage: landing-page/basic-usage.md
-      - Get Help: landing-page/get-help.md
-      - How to contribute: landing-page/contribute.md
-      - License: landing-page/license.md
-  - Tutorials:
-      - Features:
-          - basic-steps: examples/basic_steps.ipynb
-          - defining-lags: examples/defining_lags.ipynb
-          - miso: examples/multiple_inputs_example.ipynb
-          - parameter-estimation: examples/parameter_estimation.ipynb
-          - basis-function: examples/basis_function.ipynb
-          - multiobjective-parameter-estimation: examples/multiobjective_parameter_estimation.ipynb
-          - els: examples/extended_least_squares.ipynb
-          - n-steps-prediction: examples/n_steps_ahead_prediction.ipynb
-          - simulating: examples/simulating_a_predefined_model.ipynb
-          - save-load: examples/save_and_load_models.ipynb
-          - information-criteria: examples/information_criteria_examples.ipynb
-          - general-estimators: examples/general_estimators.ipynb
-          - fourier-basis: examples/fourier_basis_function.ipynb
-          - metamss: examples/metamss.ipynb
-          - neural-narx: examples/narx_neural_network.ipynb
-          - aols: examples/aols.ipynb
-          - entropic: examples/entropic_regression.ipynb
-          - nfir: examples/NFIR.ipynb
-      - Cases:
-          - air-passenger: examples/air_passenger_benchmark.ipynb
-          - f16: examples/f_16_benchmark.ipynb
-          - electromechanical: examples/identification_of_an_electromechanical_system.ipynb
-          - load-forecasting: examples/load_forecasting_benchmark.ipynb
-          - pv-forecasting: examples/PV_forecasting_benchmark.ipynb
-      - V0.3.4:
+      - Overview: getting-started/getting-started.md
+      - Quickstart Guide: getting-started/quickstart-guide.md
+      - Introduction to NARMAX: getting-started/narmax-intro.md
+      - License: getting-started/license.md
+  - User guide:
+      - Overview: user-guide/overview.md
+      - Tutorials:
           - Features:
-              - basic-steps: old_version/basic_steps.ipynb
-              - defining-lags: old_version/defining_lags.ipynb
-              - miso: old_version/multiple_inputs_example.ipynb
-              - parameter-estimation: old_version/parameter_estimation.ipynb
-              - multiobjective-parameter-estimation: old_version/multiobjective_parameter_estimation.ipynb
-              - els: old_version/extended_least_squares.ipynb
-              - n-steps-prediction: old_version/n_steps_ahead_prediction.ipynb
-              - simulating: old_version/simulating_a_predefined_model.ipynb
-              - save-load: old_version/save_and_load_models.ipynb
-              - information-criteria: old_version/information_criteria_examples.ipynb
-              - general-estimators: old_version/general_estimators.ipynb
-              - fourier-basis: old_version/fourier_basis_function.ipynb
-              - metamss: old_version/metamss.ipynb
-              - neural-narx: old_version/narx_neural_network.ipynb
-              - aols: old_version/aols.ipynb
-              - entropic: old_version/entropic_regression.ipynb
-              - nfir: old_version/NFIR.ipynb
-          - Cases:
-              - air-passenger: old_version/air_passenger_benchmark.ipynb
-              - f16: old_version/f_16_benchmark.ipynb
-              - electromechanical: old_version/identification_of_an_electromechanical_system.ipynb
-              - load-forecasting: old_version/load_forecasting_benchmark.ipynb
-              - pv-forecasting: old_version/PV_forecasting_benchmark.ipynb
+              - your-first-model: user-guide/tutorials/your-first-model.ipynb
+              - model-with-multiple-inputs: user-guide/tutorials/model-with-multiple-inputs.ipynb
+              - parameter-estimation-overview: user-guide/tutorials/parameter-estimation-overview.ipynb
+              - basis-function-overview: user-guide/tutorials/basis-function-overview.ipynb
+              - information-criteria-overview: user-guide/tutorials/information-criteria-overview.ipynb
+              - general-NARX-models: user-guide/tutorials/general-NARX-models.ipynb
+              - fourier-NARX-overview: user-guide/tutorials/fourier-NARX-overview.ipynb
+              - aols-overview: user-guide/tutorials/aols-overview.ipynb
+              - nfir-model-overview: user-guide/tutorials/NFIR-model-overview.ipynb
+              - importance-of-extended-least-squares: user-guide/tutorials/importance-of-extended-least-squares.ipynb
+          - Electrical and Mechanical Systems:
+              - modeling-a-magneto-rheological-damper-device: user-guide/tutorials/modeling-a-magneto-rheological-damper-device.ipynb
+              - silver-box-system: user-guide/tutorials/silver-box-system.ipynb
+              - coupled-eletric-device: user-guide/tutorials/coupled-eletric-device.ipynb
+              - wiener-hammerstein-system: user-guide/tutorials/wiener-hammerstein-system.ipynb
+              - f16-aircraft: user-guide/tutorials/f-16-aircraft.ipynb
+              - f-16-aircraft-n-steps-ahead-prediction: user-guide/tutorials/f-16-aircraft-n-steps-ahead-prediction.ipynb
+              - electromechanical-system-identification-overview: user-guide/tutorials/electromechanical-system-identification-overview.ipynb
+              - electromechanical-system-identification-metamss: user-guide/tutorials/electromechanical-system-identification-metamss.ipynb
+              - electromechanical-system-identification-entropic-regression: user-guide/tutorials/electromechanical-system-identification-entropic-regression.ipynb
+              - multiobjective-parameter-estimation-overview: user-guide/tutorials/multiobjective-parameter-estimation-overview.ipynb
+          - Industrial and Corporate:
+              - m4-benchmark: user-guide/tutorials/m4-benchmark.ipynb
+              - air-passenger-benchmark: user-guide/tutorials/air-passenger-benchmark.ipynb
+              - load-forecasting-benchmark: user-guide/tutorials/load-forecasting-benchmark.ipynb
+              - pv-forecasting-benchmark: user-guide/tutorials/PV-forecasting-benchmark.ipynb
+      - How to:
+          - create-a-narx-neural-network: user-guide/how-to/create-a-narx-neural-network.ipynb
+          - save-and-load-models: user-guide/how-to/save-and-load-models.ipynb
+          - set-specific-lags: user-guide/how-to/set-specific-lags.ipynb
+          - simulating-existing-models: user-guide/how-to/simulating-existing-models.ipynb
+          - use-extended-least-squares: user-guide/how-to/use-extended-least-squares.ipynb
+      - API:
+          - NARMAX Base: user-guide/API/narmax-base.md
+          - Basis Functions: user-guide/API/basis-function.md
+          - FROLS: user-guide/API/frols.md
+          - MetaMSS: user-guide/API/metamss.md
+          - AOLS: user-guide/API/aols.md
+          - Entropic Regression: user-guide/API/entropic-regression.md
+          - Neural NARX: user-guide/API/neural-narx.md
+          - General Estimators: user-guide/API/general-estimators.md
+          - Parameter Estimation: user-guide/API/parameter-estimation.md
+          - Multiobjective Parameter Estimation: user-guide/API/multiobjective-parameter-estimation.md
+          - Simulation: user-guide/API/simulation.md
+          - Residual Analysis: user-guide/API/residues.md
+          - Metaheuristics: user-guide/API/metaheuristics.md
+          - Metrics: user-guide/API/metrics.md
+          - Utils: user-guide/API/utils.md
   - Companion Book:
-      - Preface: book/0 - Preface.md
-      - Contents: book/0.1 - Contents.md
-      - Introduction: book/1 - Introduction.md
-      - 2. NARMAX Model Representation: book/2 - NARMAX Model Representation.md
-      - 3. Parameter Estimation: book/3 - Parameter Estimation.md
-      - 4. Model Structure Selection: book/4 - Model Structure Selection (MSS).md
-      - 5. Multiobjective Parameter Estimation: book/5 - Multiobjective Parameter Estimation.md
-      - 6. Multiobjective Model Structure Selection: book/6 - Multiobjective Model Structure Selection.md
-      - 7. NARX Neural Network: book/7 - NARX Neural Network.md
-      - 8. Severely Nonlinear System Identification: book/8 - Severely Nonlinear System Identification.md
-      - 9. Validation: book/9 - Validation.md
-      - 10. Case Studies: book/10 - Case Studies.md
-  - Blog:
-      - Events: events/events.md
+      - Preface: book/0-Preface.md
+      - Contents: book/0.1-Contents.md
+      - Introduction: book/1-Introduction.md
+      - 2. NARMAX Model Representation: book/2-NARMAX-Model-Representation.md
+      - 3. Parameter Estimation: book/3-Parameter-Estimation.md
+      - 4. Model Structure Selection: book/4-Model-Structure-Selection.md
+      - 5. Multiobjective Parameter Estimation: book/5-Multiobjective-Parameter-Estimation.md
+      - 6. Multiobjective Model Structure Selection: book/6-Multiobjective-Model-Structure-Selection.md
+      - 7. NARX Neural Network: book/7-NARX-Neural-Network.md
+      - 8. Severely Nonlinear System Identification: book/8-Severely-Nonlinear-System-Identification.md
+      - 9. Validation: book/9-Validation.md
+      - 10. Case Studies: book/10-Case-Studies.md
+  - Developer guide:
+      - How to contribute: developer-guide/contribute.md
+      - Documentation:
+          - Documentation Overview: developer-guide/documentation-overview.md
+          - How To Write a Tutorial: developer-guide/how-to-write-a-tutorial.md
+          - How To Write a How-to Guide: developer-guide/how-to-write-a-how-to-guide.md
+  - Community & Support:
+      - community-overview: community-support/community-overview.md
+      - Get Help: community-support/get-help.md
       - Meetups:
-          - AI Networks Meetup: events/ai-networks-meetup.md
-          - Nubank Timeseries Meetup: events/nubank-meetup.md
-          - Nubank Open Source Talk: events/nubank-meetup-open-source.md
-          - GCoM Meetup: events/gcom-meetup.md
-          - Estatidados Meetup: events/estatidados.md
-  - About:
-      - landing-page/about-us.md
-      - landing-page/attribute.md
-  - Changelog:
-      - changelog/changelog.md
+          - AI Networks Meetup: community-support/meetups/ai-networks-meetup.md
+          - Nubank Timeseries Meetup: community-support/meetups/nubank-meetup.md
+          - Nubank Open Source Talk: community-support/meetups/nubank-meetup-open-source.md
+          - GCoM Meetup: community-support/meetups/gcom-meetup.md
+          - Estatidados Meetup: community-support/meetups/estatidados.md
+  - About: landing-page/about-us.md
+  - Changelog: changelog/changelog.md
   - Sponsors: landing-page/sponsor.md
-  - Code:
-      - NARMAX Base: code/narmax-base.md
-      - Basis Functions: code/basis-function.md
-      - FROLS: code/frols.md
-      - MetaMSS: code/metamss.md
-      - AOLS: code/aols.md
-      - Entropic Regression: code/entropic-regression.md
-      - Neural NARX: code/neural-narx.md
-      - General Estimators: code/general-estimators.md
-      - Parameter Estimation: code/parameter-estimation.md
-      - Multiobjective Parameter Estimation: code/multiobjective-parameter-estimation.md
-      - Simulation: code/simulation.md
-      - Residual Analysis: code/residues.md
-      - Metaheuristics: code/metaheuristics.md
-      - Metrics: code/metrics.md
-      - Utils: code/utils.md
