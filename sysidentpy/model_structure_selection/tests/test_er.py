@@ -16,7 +16,9 @@ def create_test_data(n=1000):
     # y = np.reshape(y, (len(y), 1))
     # x = np.reshape(x, (len(x), 1))
     # data = np.concatenate([x, y], axis=1)
-    data = np.loadtxt("examples/datasets/data_for_testing.txt")
+    data = np.loadtxt(
+        "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/testing/data_for_testing.txt"
+    )
     x = data[:, 0].reshape(-1, 1)
     y = data[:, 1].reshape(-1, 1)
     return x, y, theta

@@ -103,7 +103,7 @@ As you can see, SysIdentPy supports numerous model combinations, each tailored t
       This book provides in-depth guidance to support your work with <strong>SysIdentPy</strong>.
     </p>
     <p>
-      🛠️ You can also explore the <a href="https://sysidentpy.org/user_guide/overview/" target="_blank"><strong>tutorials in the documentation</strong></a> for practical, hands-on examples.
+      🛠️ You can also explore the <a href="https://sysidentpy.org/user-guide/overview/" target="_blank"><strong>tutorials in the documentation</strong></a> for practical, hands-on examples.
     </p>
   </div>
 </div>

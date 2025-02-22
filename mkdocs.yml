@@ -149,62 +149,62 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Getting started:
-      - Overview: getting_started/getting-started.md
-      - Quickstart Guide: getting_started/quickstart-guide.md
-      - Introduction to NARMAX: getting_started/narmax-intro.md
-      - License: getting_started/license.md
+      - Overview: getting-started/getting-started.md
+      - Quickstart Guide: getting-started/quickstart-guide.md
+      - Introduction to NARMAX: getting-started/narmax-intro.md
+      - License: getting-started/license.md
   - User guide:
-      - Overview: user_guide/overview.md
+      - Overview: user-guide/overview.md
       - Tutorials:
           - Features:
-              - your-first-model: user_guide/tutorials/your-first-model.ipynb
-              - model-with-multiple-inputs: user_guide/tutorials/model-with-multiple-inputs.ipynb
-              - parameter-estimation-overview: user_guide/tutorials/parameter-estimation-overview.ipynb
-              - basis-function-overview: user_guide/tutorials/basis-function-overview.ipynb
-              - information-criteria-overview: user_guide/tutorials/information-criteria-overview.ipynb
-              - general-NARX-models: user_guide/tutorials/general-NARX-models.ipynb
-              - fourier-NARX-overview: user_guide/tutorials/fourier-NARX-overview.ipynb
-              - aols-overview: user_guide/tutorials/aols-overview.ipynb
-              - nfir-model-overview: user_guide/tutorials/NFIR-model-overview.ipynb
-              - importance-of-extended-least-squares: user_guide/tutorials/importance-of-extended-least-squares.ipynb
+              - your-first-model: user-guide/tutorials/your-first-model.ipynb
+              - model-with-multiple-inputs: user-guide/tutorials/model-with-multiple-inputs.ipynb
+              - parameter-estimation-overview: user-guide/tutorials/parameter-estimation-overview.ipynb
+              - basis-function-overview: user-guide/tutorials/basis-function-overview.ipynb
+              - information-criteria-overview: user-guide/tutorials/information-criteria-overview.ipynb
+              - general-NARX-models: user-guide/tutorials/general-NARX-models.ipynb
+              - fourier-NARX-overview: user-guide/tutorials/fourier-NARX-overview.ipynb
+              - aols-overview: user-guide/tutorials/aols-overview.ipynb
+              - nfir-model-overview: user-guide/tutorials/NFIR-model-overview.ipynb
+              - importance-of-extended-least-squares: user-guide/tutorials/importance-of-extended-least-squares.ipynb
           - Electrical and Mechanical Systems:
-              - modeling-a-magneto-rheological-damper-device: user_guide/tutorials/modeling-a-magneto-rheological-damper-device.ipynb
-              - silver-box-system: user_guide/tutorials/silver-box-system.ipynb
-              - coupled-eletric-device: user_guide/tutorials/coupled-eletric-device.ipynb
-              - wiener-hammerstein-system: user_guide/tutorials/wiener-hammerstein-system.ipynb
-              - f16-aircraft: user_guide/tutorials/f-16-aircraft.ipynb
-              - f-16-aircraft-n-steps-ahead-prediction: user_guide/tutorials/f-16-aircraft-n-steps-ahead-prediction.ipynb
-              - electromechanical-system-identification-overview: user_guide/tutorials/electromechanical-system-identification-overview.ipynb
-              - electromechanical-system-identification-metamss: user_guide/tutorials/electromechanical-system-identification-metamss.ipynb
-              - electromechanical-system-identification-entropic-regression: user_guide/tutorials/electromechanical-system-identification-entropic-regression.ipynb
-              - multiobjective-parameter-estimation-overview: user_guide/tutorials/multiobjective-parameter-estimation-overview.ipynb
+              - modeling-a-magneto-rheological-damper-device: user-guide/tutorials/modeling-a-magneto-rheological-damper-device.ipynb
+              - silver-box-system: user-guide/tutorials/silver-box-system.ipynb
+              - coupled-eletric-device: user-guide/tutorials/coupled-eletric-device.ipynb
+              - wiener-hammerstein-system: user-guide/tutorials/wiener-hammerstein-system.ipynb
+              - f16-aircraft: user-guide/tutorials/f-16-aircraft.ipynb
+              - f-16-aircraft-n-steps-ahead-prediction: user-guide/tutorials/f-16-aircraft-n-steps-ahead-prediction.ipynb
+              - electromechanical-system-identification-overview: user-guide/tutorials/electromechanical-system-identification-overview.ipynb
+              - electromechanical-system-identification-metamss: user-guide/tutorials/electromechanical-system-identification-metamss.ipynb
+              - electromechanical-system-identification-entropic-regression: user-guide/tutorials/electromechanical-system-identification-entropic-regression.ipynb
+              - multiobjective-parameter-estimation-overview: user-guide/tutorials/multiobjective-parameter-estimation-overview.ipynb
           - Industrial and Corporate:
-              - m4-benchmark: user_guide/tutorials/m4-benchmark.ipynb
-              - air-passenger-benchmark: user_guide/tutorials/air-passenger-benchmark.ipynb
-              - load-forecasting-benchmark: user_guide/tutorials/load-forecasting-benchmark.ipynb
-              - pv-forecasting-benchmark: user_guide/tutorials/PV-forecasting-benchmark.ipynb
+              - m4-benchmark: user-guide/tutorials/m4-benchmark.ipynb
+              - air-passenger-benchmark: user-guide/tutorials/air-passenger-benchmark.ipynb
+              - load-forecasting-benchmark: user-guide/tutorials/load-forecasting-benchmark.ipynb
+              - pv-forecasting-benchmark: user-guide/tutorials/PV-forecasting-benchmark.ipynb
       - How to:
-          - create-a-narx-neural-network: user_guide/how_to/create-a-narx-neural-network.ipynb
-          - save-and-load-models: user_guide/how_to/save-and-load-models.ipynb
-          - set-specific-lags: user_guide/how_to/set-specific-lags.ipynb
-          - simulating-existing-models: user_guide/how_to/simulating-existing-models.ipynb
-          - use-extended-least-squares: user_guide/how_to/use-extended-least-squares.ipynb
+          - create-a-narx-neural-network: user-guide/how-to/create-a-narx-neural-network.ipynb
+          - save-and-load-models: user-guide/how-to/save-and-load-models.ipynb
+          - set-specific-lags: user-guide/how-to/set-specific-lags.ipynb
+          - simulating-existing-models: user-guide/how-to/simulating-existing-models.ipynb
+          - use-extended-least-squares: user-guide/how-to/use-extended-least-squares.ipynb
       - API:
-          - NARMAX Base: user_guide/API/narmax-base.md
-          - Basis Functions: user_guide/API/basis-function.md
-          - FROLS: user_guide/API/frols.md
-          - MetaMSS: user_guide/API/metamss.md
-          - AOLS: user_guide/API/aols.md
-          - Entropic Regression: user_guide/API/entropic-regression.md
-          - Neural NARX: user_guide/API/neural-narx.md
-          - General Estimators: user_guide/API/general-estimators.md
-          - Parameter Estimation: user_guide/API/parameter-estimation.md
-          - Multiobjective Parameter Estimation: user_guide/API/multiobjective-parameter-estimation.md
-          - Simulation: user_guide/API/simulation.md
-          - Residual Analysis: user_guide/API/residues.md
-          - Metaheuristics: user_guide/API/metaheuristics.md
-          - Metrics: user_guide/API/metrics.md
-          - Utils: user_guide/API/utils.md
+          - NARMAX Base: user-guide/API/narmax-base.md
+          - Basis Functions: user-guide/API/basis-function.md
+          - FROLS: user-guide/API/frols.md
+          - MetaMSS: user-guide/API/metamss.md
+          - AOLS: user-guide/API/aols.md
+          - Entropic Regression: user-guide/API/entropic-regression.md
+          - Neural NARX: user-guide/API/neural-narx.md
+          - General Estimators: user-guide/API/general-estimators.md
+          - Parameter Estimation: user-guide/API/parameter-estimation.md
+          - Multiobjective Parameter Estimation: user-guide/API/multiobjective-parameter-estimation.md
+          - Simulation: user-guide/API/simulation.md
+          - Residual Analysis: user-guide/API/residues.md
+          - Metaheuristics: user-guide/API/metaheuristics.md
+          - Metrics: user-guide/API/metrics.md
+          - Utils: user-guide/API/utils.md
   - Companion Book:
       - Preface: book/0-Preface.md
       - Contents: book/0.1-Contents.md
@@ -219,20 +219,20 @@ nav:
       - 9. Validation: book/9-Validation.md
       - 10. Case Studies: book/10-Case-Studies.md
   - Developer guide:
-      - How to contribute: developer_guide/contribute.md
+      - How to contribute: developer-guide/contribute.md
       - Documentation:
-          - Documentation Overview: developer_guide/documentation-overview.md
-          - How To Write a Tutorial: developer_guide/how-to-write-a-tutorial.md
-          - How To Write a How-to Guide: developer_guide/how-to-write-a-how-to-guide.md
+          - Documentation Overview: developer-guide/documentation-overview.md
+          - How To Write a Tutorial: developer-guide/how-to-write-a-tutorial.md
+          - How To Write a How-to Guide: developer-guide/how-to-write-a-how-to-guide.md
   - Community & Support:
-      - Get Help: community_support/get-help.md
-      - Meetups: community_support/meetups/meetup.md
+      - community-overview: community-support/community-overview.md
+      - Get Help: community-support/get-help.md
       - Meetups:
-          - AI Networks Meetup: community_support/meetups/ai-networks-meetup.md
-          - Nubank Timeseries Meetup: community_support/meetups/nubank-meetup.md
-          - Nubank Open Source Talk: community_support/meetups/nubank-meetup-open-source.md
-          - GCoM Meetup: community_support/meetups/gcom-meetup.md
-          - Estatidados Meetup: community_support/meetups/estatidados.md
+          - AI Networks Meetup: community-support/meetups/ai-networks-meetup.md
+          - Nubank Timeseries Meetup: community-support/meetups/nubank-meetup.md
+          - Nubank Open Source Talk: community-support/meetups/nubank-meetup-open-source.md
+          - GCoM Meetup: community-support/meetups/gcom-meetup.md
+          - Estatidados Meetup: community-support/meetups/estatidados.md
   - About: landing-page/about-us.md
   - Changelog: changelog/changelog.md
   - Sponsors: landing-page/sponsor.md
