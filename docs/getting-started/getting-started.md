@@ -133,13 +133,13 @@ the help box. Install with:
     <p>Minimize different objective functions using <strong>affine information</strong> for parameter estimation.</p>
   </div>
   <div class="feature-card">
-    <a href="https://sysidentpy.org/user-guide/how_to/simulating-existing-models/" class="feature-link">
+    <a href="https://sysidentpy.org/user-guide/how-to/simulating-existing-models/" class="feature-link">
       <h3>🔄 Model Simulation</h3>
     </a>
     <p>Reproduce paper results easily with <strong>SimulateNARMAX</strong>. Test and compare published models effortlessly.</p>
   </div>
   <div class="feature-card">
-    <a href="https://sysidentpy.org/user-guide/how_to/create-a-narx-neural-network/" class="feature-link">
+    <a href="https://sysidentpy.org/user-guide/how-to/create-a-narx-neural-network/" class="feature-link">
       <h3>🤖 Neural NARX (PyTorch)</h3>
     </a>
     <p>Integrate with <strong>PyTorch</strong> for custom neural NARX architectures using all PyTorch optimizers and loss functions.</p>
