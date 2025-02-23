@@ -183,6 +183,9 @@ nav:
               - air-passenger-benchmark: user-guide/tutorials/air-passenger-benchmark.ipynb
               - load-forecasting-benchmark: user-guide/tutorials/load-forecasting-benchmark.ipynb
               - pv-forecasting-benchmark: user-guide/tutorials/PV-forecasting-benchmark.ipynb
+          - Chaotic Systems:
+              - lorenz-system: user-guide/tutorials/chaotic-systems/lorenz-system.ipynb
+              - logistic-map: user-guide/tutorials/chaotic-systems/logistic-map.ipynb
       - How to:
           - create-a-narx-neural-network: user-guide/how-to/create-a-narx-neural-network.ipynb
           - save-and-load-models: user-guide/how-to/save-and-load-models.ipynb
