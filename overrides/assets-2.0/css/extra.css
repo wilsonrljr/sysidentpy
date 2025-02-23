@@ -1,0 +1,74 @@
+/* Collapsible card base */
+.custom-collapsible-card {
+    border: 1px solid var(--md-accent-fg-color);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin: 1.0rem 0;
+    background-color: var(--md-default-bg-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s ease;
+}
+
+/* Dark mode adjustment */
+[data-md-color-scheme="slate"] .custom-collapsible-card {
+    background-color: var(--md-default-bg-color-dark);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+}
+
+/* Hide default checkbox */
+.custom-collapsible-card input[type="checkbox"] {
+    display: none;
+}
+
+/* Header label styling */
+.custom-collapsible-card label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--md-accent-fg-color);
+}
+
+/* Arrow rotation on toggle */
+.custom-collapsible-card input[type="checkbox"]:checked + label .arrow {
+    transform: rotate(180deg);
+    transition: transform 0.3s ease;
+}
+
+/* Content behavior */
+.collapsible-content {
+    display: none;
+    margin-top: 1rem;
+    color: var(--md-default-fg-color);
+    animation: fadeIn 0.3s ease;
+}
+
+/* Show content when checked */
+.custom-collapsible-card input[type="checkbox"]:checked ~ .collapsible-content {
+    display: block;
+}
+
+/* Fade-in effect */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Link styling */
+.custom-collapsible-card a {
+    color: var(--md-accent-fg-color);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.custom-collapsible-card a:hover {
+    text-decoration: underline;
+}
