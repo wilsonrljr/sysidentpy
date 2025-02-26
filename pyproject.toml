@@ -85,6 +85,7 @@ docs = [
     "mkdocs-minify-plugin<=0.6.4",
     "mkdocs-glightbox <= 0.3.2",
     "mkdocs-jupyter<=0.25.0",
+    "mkdocs-autorefs<=1.3.1",
     # avoid jinja import error using 3.0.3 version
     "jinja2==3.0.3",
 ]
