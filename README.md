@@ -22,8 +22,8 @@
 
 ## Table of Contents
 
-- [What is SysIdentPy?](#what-is-sysidentpy)
-- [How do I install SysIdentPy?](#how-do-i-install_sysidentpy)
+- [What is SysIdentPy?](#introduction)
+- [How do I install SysIdentPy?](#how-do-i-install-sysidentpy)
 - [Features](#what-are-the-main-features-of-sysidentpy)
 - [Why does SysIdentPy exist?](#why-does-sysidentpy-exist)
 - [How do I use SysIdentPy?](#how-do-i-use-SysIdentPy)
