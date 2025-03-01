@@ -18,3 +18,12 @@ template: overrides/main.html
 
 ::: sysidentpy.basis_function._polynomial
       show_root_heading: false
+
+::: sysidentpy.basis_function._hermite
+      show_root_heading: false
+
+::: sysidentpy.basis_function._hermite_normalized
+      show_root_heading: false
+
+::: sysidentpy.basis_function._laguerre
+      show_root_heading: false
