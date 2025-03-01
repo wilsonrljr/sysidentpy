@@ -49,7 +49,7 @@ Check our [documentation](https://sysidentpy.org)!
 
 For an in depth documentation, check our companion book:
 
-<a href="https://sysidentpy.org/book/0%20-%20Preface/">
+<a href="https://sysidentpy.org/book/0-Preface/">
   <img src="https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/Nonlinear_System_identification.png?raw=true" alt="Nonlinear System Identification" style="width: 200px; height: auto;" />
 </a>
 
