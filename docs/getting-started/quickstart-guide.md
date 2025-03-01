@@ -503,7 +503,7 @@ yhat = model.predict(X=x_valid, y=y_valid)
 
 <div class="custom-collapsible-card">
   <input type="checkbox" id="initial-info">
-  <label for="toggle-info">
+  <label for="initial-info">
     📚 <strong>Looking for more details on what are initial conditions?</strong>
     <span class="arrow">▼</span>
   </label>
@@ -547,7 +547,7 @@ yhat_4_steps = model.predict(X=x_valid, y=y_valid, steps_ahead=4)
 
 <div class="custom-collapsible-card">
   <input type="checkbox" id="steps-info">
-  <label for="toggle-info">
+  <label for="steps-info">
     📚 <strong>Looking for more details about how steps-ahead prediction works?</strong>
     <span class="arrow">▼</span>
   </label>
