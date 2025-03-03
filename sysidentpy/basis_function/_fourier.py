@@ -13,6 +13,14 @@ class Fourier(BaseBasisFunction):
     Generate a new feature matrix consisting of all Fourier features
     with respect to the number of harmonics.
 
+    The Fourier expansion is given by:
+
+    $$
+    F(x) = [cos(2 * pi * x * n / p), sin(2 * pi * x * n / p)]
+    $$
+
+    where n is the harmonic number and p is the period.
+
     Parameters
     ----------
     degree : int (max_degree), default=2
