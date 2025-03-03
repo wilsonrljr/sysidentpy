@@ -8,18 +8,36 @@ from .basis_function_base import BaseBasisFunction
 
 
 class Fourier(BaseBasisFunction):
-    """Build Fourier basis function.
+    r"""Build Fourier basis function.
 
     Generate a new feature matrix consisting of all Fourier features
     with respect to the number of harmonics.
 
     The Fourier expansion is given by:
 
+    If you set $\mathcal{F}$ as the Fourier extension
+
     $$
-    F(x) = [cos(2 * pi * x * n / p), sin(2 * pi * x * n / p)]
+    \mathcal{F}(x) = [\cos(\pi x), \sin(\pi x), \cos(2\pi x), \sin(2\pi x), \ldots,
+    \cos(N\pi x), \sin(N\pi x)]
     $$
 
-    where n is the harmonic number and p is the period.
+    In this case, the Fourier ARX representation will be:
+
+    $$
+    \begin{align}
+    y_k = &[ \cos(\pi y_{k-1}), \sin(\pi y_{k-1}), \cos(2\pi y_{k-1}),
+    \sin(2\pi y_{k-1}), \ldots, \cos(N\pi y_{k-1}), \sin(N\pi y_{k-1}), \\ \nonumber
+    & \cos(\pi y_{k-n_y}), \sin(\pi y_{k-n_y}), \cos(2\pi y_{k-n_y}),
+    \sin(2\pi y_{k-n_y}), \ldots, \cos(N\pi y_{k-n_y}), \sin(N\pi y_{k-n_y}),
+    \\ \nonumber & \cos(\pi x_{k-1}), \sin(\pi x_{k-1}), \cos(2\pi x_{k-1}),
+    \sin(2\pi x_{k-1}), \ldots, \cos(N\pi x_{k-1}), \sin(N\pi x_{k-1}),
+    \\ \nonumber & \cos(\pi y_{k-n_y}), \sin(\pi y_{k-n_y}), \cos(2\pi y_{k-n_y}),
+    \sin(2\pi y_{k-n_y}), \ldots, \cos(N\pi y_{k-n_y}), \sin(N\pi y_{k-n_y})]
+    \\ \nonumber
+     & + e_k
+    \end{align}
+    $$
 
     Parameters
     ----------
