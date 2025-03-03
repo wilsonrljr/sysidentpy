@@ -28,7 +28,24 @@ logging.basicConfig(
 
 
 class NARXNN(BaseMSS):
-    """NARX Neural Network model build on top of Pytorch.
+    r"""NARX Neural Network model built on top of Pytorch.
+
+    Neural networks are models composed of interconnected layers of nodes
+    (neurons) designed for tasks like classification and regression. Each neuron
+    is a basic unit within these networks. Mathematically, a neuron is
+    represented by a function $f$ that takes an input vector
+    $\mathbf{x} = [x_1, x_2, \ldots, x_n]$ and generates an output $y$.
+    This function usually involves a weighted sum of the inputs, an optional
+    bias term $b$, and an activation function $\phi$:
+
+    $$
+    y = \phi \left( \sum_{i=1}^{n} w_i x_i + b \right)
+    \tag{2.31}
+    $$
+
+    where $\mathbf{w} = [w_1, w_2, \ldots, w_n]$ are the weights associated with the
+    inputs. The activation function $\phi$ introduces nonlinearity into the model,
+    allowing the network to learn complex patterns.
 
     Currently we support a Series-Parallel (open-loop) Feedforward Network training
     process, which make the training process easier, and we convert the
