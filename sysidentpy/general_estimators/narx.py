@@ -26,63 +26,72 @@ logging.basicConfig(
 
 
 class NARX(BaseMSS):
-    """NARX model build on top of general estimators.
+    r"""NARX model build on top of general estimators.
 
-    Currently is possible to use any estimator that have a fit/predict
-    as an Autoregressive Model. We use our GenerateRegressors and
-    InformationMatrix classes to handle the creation of the lagged
-    features and we are able to use a simple fit and prediction function
-    to run infinity-steps-ahead prediction.
+    The Nonlinear AutoRegressive with eXogenous inputs (NARX) model is mathematically
+    described by:
+
+    $$
+        y(t) = F\left(\mathbf{\phi}(t)\right) + \epsilon(t)
+    $$
+
+    where $\mathbf{\phi}(t)$ is the regression vector composed of lagged inputs and
+    outputs:
+
+    $$
+        \mathbf{\phi}(t) = [y(t-1), \ldots, y(t-n_y), x(t-1), \ldots, x(t-n_x)]
+    $$
+
+    Here, $n_y$ (``ylag``) and $n_x$ (``xlag``) are the maximum lags for the output and
+    input, respectively. The function $F$ is approximated by the base estimator. For
+    NARMAX models, the regression vector includes lagged residuals:
+
+    $$
+        \mathbf{\phi}(t) = [y(t-1), \ldots, y(t-n_y), x(t-1), \ldots, x(t-n_x),
+        \epsilon(t-1), \ldots, \epsilon(t-n_e)]
+    $$
+
+    where $n_e$ is determined by the basis function and ``model_type`` parameter.
+
+    This implementation uses ``GenerateRegressors`` and ``InformationMatrix`` to
+    construct lagged features and allows infinite-step-ahead prediction via iterative
+    methods.
 
     Parameters
     ----------
     ylag : int, default=2
-        The maximum lag of the output.
+        The maximum lag order of the output $n_y$ (number of past output terms used).
     xlag : int, default=2
-        The maximum lag of the input.
+        The maximum lag order of the input $n_x$ (number of past input terms used).
     fit_params : dict, default=None
-        Optional parameters of the fit function of the baseline estimator
-    base_estimator : default=None
-        The defined base estimator of the sklearn
+        Additional parameters to pass to the ``fit`` method of the base estimator.
+    base_estimator : estimator object, default=None
+        An sklearn-compatible estimator with ``fit`` and ``predict`` methods.
+    basis_function : basis function object, default=Polynomial
+        Nonlinear transformation applied to regressors (e.g., Polynomial, Fourier).
+    model_type : {"NARMAX", "NAR", "NFIR"}, default="NARMAX"
+        Model structure. Use "NARMAX" to include lagged residuals in the regression
+        vector.
 
     Examples
     --------
     >>> import numpy as np
-    >>> import pandas as pd
-    >>> import matplotlib.pyplot as plt
-    >>> from sysidentpy.metrics import mean_squared_error
-    >>> from sysidentpy.utils.generate_data import get_siso_data
     >>> from sysidentpy.general_estimators import NARX
     >>> from sklearn.linear_model import BayesianRidge
-    >>> from sysidentpy.basis_function._basis_function import Polynomial
-    >>> from sysidentpy.utils.display_results import results
-    >>> from sysidentpy.utils.plotting import plot_residues_correlation, plot_results
-    >>> from sysidentpy.residues.residues_correlation import(
-    ...    compute_residues_autocorrelation,
-    ...    compute_cross_correlation
-    ... )
-    >>> from sklearn.linear_model import BayesianRidge # to use as base estimator
-    >>> x_train, x_valid, y_train, y_valid = get_siso_data(
-    ...    n=1000,
-    ...    colored_noise=False,
-    ...    sigma=0.01,
-    ...    train_percentage=80
-    ... )
-    >>> BayesianRidge_narx = NARX(
+    >>> from sysidentpy.basis_function import Polynomial
+    >>> # Generate data and fit model
+    >>> x_train, x_valid, y_train, y_valid = get_siso_data(n=1000)
+    >>> basis_function = Polynomial(degree=2)
+    >>> model = NARX(
     ...     base_estimator=BayesianRidge(),
     ...     xlag=2,
     ...     ylag=2,
     ...     basis_function=basis_function,
-    ...     model_type="NARMAX",
+    ...     model_type="NARMAX"
     ... )
-    >>> BayesianRidge_narx.fit(x_train, y_train)
-    >>> yhat = BayesianRidge_narx.predict(x_valid, y_valid)
-    >>> print("MSE: ", mean_squared_error(y_valid, yhat))
-    >>> plot_results(y=y_valid, yhat=yhat, n=1000)
-    >>> ee = compute_residues_autocorrelation(y_valid, yhat)
-    >>> plot_residues_correlation(data=ee, title="Residues", ylabel="$e^2$")
-    >>> x1e = compute_cross_correlation(y_valid, yhat, x_valid)
-    >>> plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
+    >>> model.fit(x_train, y_train)
+    >>> yhat = model.predict(x_valid, y_valid)
+    >>> # Evaluation and plotting code here
     0.000131
 
     """
