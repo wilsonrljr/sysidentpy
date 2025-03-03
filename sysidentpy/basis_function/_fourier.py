@@ -24,20 +24,15 @@ class Fourier(BaseBasisFunction):
 
     In this case, the Fourier ARX representation will be:
 
-    $$
-    \begin{align}
-    y_k = &[ \cos(\pi y_{k-1}), \sin(\pi y_{k-1}), \cos(2\pi y_{k-1}),
-    \sin(2\pi y_{k-1}), \ldots, \cos(N\pi y_{k-1}), \sin(N\pi y_{k-1}), \\ \nonumber
-    & \cos(\pi y_{k-n_y}), \sin(\pi y_{k-n_y}), \cos(2\pi y_{k-n_y}),
-    \sin(2\pi y_{k-n_y}), \ldots, \cos(N\pi y_{k-n_y}), \sin(N\pi y_{k-n_y}),
-    \\ \nonumber & \cos(\pi x_{k-1}), \sin(\pi x_{k-1}), \cos(2\pi x_{k-1}),
-    \sin(2\pi x_{k-1}), \ldots, \cos(N\pi x_{k-1}), \sin(N\pi x_{k-1}),
-    \\ \nonumber & \cos(\pi y_{k-n_y}), \sin(\pi y_{k-n_y}), \cos(2\pi y_{k-n_y}),
-    \sin(2\pi y_{k-n_y}), \ldots, \cos(N\pi y_{k-n_y}), \sin(N\pi y_{k-n_y})]
-    \\ \nonumber
-     & + e_k
-    \end{align}
-    $$
+    \begin{aligned}
+    y_k = &\Big[ \cos(\pi y_{k-1}), \sin(\pi y_{k-1}), \cos(2\pi y_{k-1}),
+    \sin(2\pi y_{k-1}), \ldots, \cos(N\pi y_{k-1}), \sin(N\pi y_{k-1}), \\
+    &\ \ \cos(\pi y_{k-2}), \sin(\pi y_{k-2}), \ldots, \cos(N\pi y_{k-n_y}),
+    \sin(N\pi y_{k-n_y}), \\
+    &\ \ \cos(\pi x_{k-1}), \sin(\pi x_{k-1}), \cos(2\pi x_{k-1}), \sin(2\pi x_{k-1}),
+    \ldots, \cos(N\pi x_{k-n_x}), \sin(N\pi x_{k-n_x}) \Big] \\
+    &\ \ + e_k
+    \end{aligned}
 
     Parameters
     ----------
