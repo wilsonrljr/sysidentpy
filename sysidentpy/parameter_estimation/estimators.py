@@ -550,15 +550,26 @@ class AffineLeastMeanSquares(BaseEstimator):
 class LeastMeanSquares(BaseEstimator):
     """Least Mean Squares (LMS) filter for parameter estimation in adaptive filtering.
 
+    The LMS algorithm is an adaptive filter used to estimate the parameters of a model
+    by minimizing the mean square error between the observed and predicted values.
+
     Parameters
     ----------
     mu : float, default=0.01
         The learning rate or step size for the LMS algorithm.
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
 
     Attributes
     ----------
     mu : float
         The learning rate or step size for the LMS algorithm.
+    unbiased : bool
+        Indicates whether an unbiased estimator is applied.
+    uiter : int
+        Number of iterations for the unbiased estimator.
     xi : np.ndarray or None
         The estimation error at each iteration. Initialized as None and updated during
         optimization.
@@ -567,6 +578,14 @@ class LeastMeanSquares(BaseEstimator):
     -------
     optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
         Estimate the model parameters using the LMS filter.
+
+    References
+    ----------
+    - Haykin, S., & Widrow, B. (Eds.). (2003). Least-mean-square adaptive filters
+    (Vol. 31). John Wiley & Sons.
+    - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias de
+    algoritmos LMS de passo variável.
+    - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
     """
 
     def __init__(self, *, mu: float = 0.01, unbiased: bool = False, uiter: int = 30):
@@ -577,36 +596,38 @@ class LeastMeanSquares(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Estimate the model parameters using the Least Mean Squares filter.
+        r"""Estimate the model parameters using the Least Mean Squares filter.
+
+        The LMS algorithm updates the parameter estimates recursively as follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi_i = y_i - \psi_i^T \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} + 2 \mu \xi_i \psi_i
+           $$
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
 
         Notes
         -----
         A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
-
-        References
-        ----------
-        - Book: Haykin, S., & Widrow, B. (Eds.). (2003). Least-mean-square
-           adaptive filters (Vol. 31). John Wiley & Sons.
-        - Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
-           análise estatística e novas estratégias de algoritmos LMS de passo
-           variável.
-        - Wikipedia entry on Least Mean Squares
-           https://en.wikipedia.org/wiki/Least_mean_squares_filter
-
+        will be available soon. For now, please refer to the mentioned references.
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
 
