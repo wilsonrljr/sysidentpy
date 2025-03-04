@@ -296,9 +296,12 @@ class TotalLeastSquares(BaseEstimator):
 
 
 class RecursiveLeastSquares(BaseEstimator):
-    """_summary_.
+    """Recursive Least Squares (RLS) filter for parameter estimation.
 
-    _extended_summary_
+    The Recursive Least Squares method is used to estimate the parameters of a model
+    by minimizing the sum of the squares of the differences between the observed and
+    predicted values. This method incorporates a forgetting factor to give more weight
+    to recent observations.
 
     Parameters
     ----------
@@ -306,6 +309,32 @@ class RecursiveLeastSquares(BaseEstimator):
         Forgetting factor of the Recursive Least Squares method.
     delta : float, default=0.01
         Normalization factor of the P matrix.
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
+
+    Attributes
+    ----------
+    lam : float
+        Forgetting factor of the Recursive Least Squares method.
+    delta : float
+        Normalization factor of the P matrix.
+    xi : np.ndarray
+        The estimation error at each iteration.
+    theta_evolution : np.ndarray
+        Evolution of the estimated parameters over iterations.
+
+    Methods
+    -------
+    optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
+        Estimate the model parameters using the Recursive Least Squares method.
+
+    References
+    ----------
+    - Book (Portuguese): Aguirre, L. A. (2007). Introdução identificação
+       de sistemas: técnicas lineares e não-lineares aplicadas a sistemas
+       reais. Editora da UFMG. 3a edição.
     """
 
     def __init__(
@@ -325,16 +354,16 @@ class RecursiveLeastSquares(BaseEstimator):
         self.theta_evolution: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Estimate the model parameters using the Recursive Least Squares method.
+        r"""Estimate the model parameters using the Recursive Least Squares method.
 
-        The implementation consider the forgetting factor.
+        The implementation considers the forgetting factor.
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
         y : array-like of shape = y_training
-            The data used to training the model.
+            The data used to train the model.
 
         Returns
         -------
@@ -343,16 +372,34 @@ class RecursiveLeastSquares(BaseEstimator):
 
         Notes
         -----
-        A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
+        The RLS algorithm updates the parameter estimates recursively as follows:
+
+        1. Initialize the parameter vector `theta` and the covariance matrix `P`:
+
+           $$
+           \\theta_0 = \\mathbf{0}, \\quad P_0 = \\frac{1}{\\delta} I
+           $$
+
+        2. For each new observation `(psi_i, y_i)`, update the estimates:
+
+           $$
+           k_i = \\frac{\\lambda^{-1} P_{i-1} \\psi_i}{1 +
+           \\lambda^{-1} \\psi_i^T P_{i-1} \\psi_i}
+           $$
+
+           $$
+           \\theta_i = \\theta_{i-1} + k_i (y_i - \\psi_i^T \\theta_{i-1})
+           $$
+
+           $$
+           P_i = \\lambda^{-1} (P_{i-1} - k_i \\psi_i^T P_{i-1})
+           $$
 
         References
         ----------
         - Book (Portuguese): Aguirre, L. A. (2007). Introdução identificação
            de sistemas: técnicas lineares e não-lineares aplicadas a sistemas
            reais. Editora da UFMG. 3a edição.
-
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
         p = np.eye(n_theta) / self.delta
