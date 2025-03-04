@@ -36,20 +36,29 @@ class EstimatorError(Exception):
 class LeastSquares(BaseEstimator):
     """Ordinary Least Squares for linear parameter estimation.
 
+    The Least Squares method minimizes the sum of the squared differences
+    between the observed and predicted values. It is used to estimate the
+    parameters of a linear model.
+
+    Parameters
+    ----------
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 20.
+
     References
     ----------
-    - Manuscript: Sorenson, H. W. (1970). Least-squares estimation:
-        from Gauss to Kalman. IEEE spectrum, 7(7), 63-68.
-        http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf
-    - Book (Portuguese): Aguirre, L. A. (2007). Introdução identificação
-        de sistemas: técnicas lineares e não-lineares aplicadas a sistemas
-        reais. Editora da UFMG. 3a edição.
-    - Manuscript: Markovsky, I., & Van Huffel, S. (2007).
-        Overview of total least-squares methods.
-        Signal processing, 87(10), 2283-2302.
-        https://eprints.soton.ac.uk/263855/1/tls_overview.pdf
+    - Sorenson, H. W. (1970). Least-squares estimation: from Gauss to Kalman.
+      IEEE spectrum, 7(7), 63-68.
+      http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf
+    - Aguirre, L. A. (2007). Introdução identificação de sistemas: técnicas
+      lineares e não-lineares aplicadas a sistemas reais. Editora da UFMG. 3a edição.
+    - Markovsky, I., & Van Huffel, S. (2007). Overview of total least-squares methods.
+      Signal processing, 87(10), 2283-2302.
+      https://eprints.soton.ac.uk/263855/1/tls_overview.pdf
     - Wikipedia entry on Least Squares
-        https://en.wikipedia.org/wiki/Least_squares
+      https://en.wikipedia.org/wiki/Least_squares
     """
 
     def __init__(self, *, unbiased: bool = False, uiter: int = 20):
@@ -58,20 +67,28 @@ class LeastSquares(BaseEstimator):
         self._validate_params(vars(self))
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Estimate the model parameters using Least Squares method.
+        r"""Estimate the model parameters using the Least Squares method.
+
+        The Least Squares method solves the following optimization problem:
+
+        $$
+        \min_{\theta} \| \psi \theta - y \|_2^2
+        $$
+
+        where $\psi$ is the information matrix, $y$ is the observed data,
+        and $\theta$ are the model parameters to be estimated.
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
-
         """
         self._check_linear_dependence_rows(psi)
         theta = np.linalg.lstsq(psi, y, rcond=None)[0]
@@ -429,21 +446,27 @@ class RecursiveLeastSquares(BaseEstimator):
 class AffineLeastMeanSquares(BaseEstimator):
     """Affine Least Mean Squares (ALMS) filter for parameter estimation.
 
+    The ALMS filter is an adaptive filter used to estimate the parameters of a model.
+    It incorporates an offset covariance factor to improve the stability and convergence
+    of the parameter estimation process.
+
     Parameters
     ----------
     mu : float, default=0.01
         The learning rate or step size for the LMS algorithm.
     offset_covariance : float, default=0.2
-        The offset covariance factor of the affine least mean squares
-        filter.
+        The offset covariance factor of the affine least mean squares filter.
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
 
     Attributes
     ----------
     mu : float
         The learning rate or step size for the LMS algorithm.
-    offset_covariance : float, default=0.2
-        The offset covariance factor of the affine least mean squares
-        filter.
+    offset_covariance : float
+        The offset covariance factor of the affine least mean squares filter.
     xi : np.ndarray or None
         The estimation error at each iteration. Initialized as None and updated during
         optimization.
@@ -451,7 +474,12 @@ class AffineLeastMeanSquares(BaseEstimator):
     Methods
     -------
     optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
-        Estimate the model parameters using the LMS filter.
+        Estimate the model parameters using the ALMS filter.
+
+    References
+    ----------
+    - Poularikas, A. D. (2017). Adaptive filtering: Fundamentals of least mean squares
+    with MATLAB®. CRC Press.
     """
 
     def __init__(
@@ -470,31 +498,39 @@ class AffineLeastMeanSquares(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Estimate the model parameters using the Affine Least Mean Squares.
+        r"""Estimate the model parameters using the Affine Least Mean Squares.
+
+        The ALMS method updates the parameter estimates recursively as follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi = y - \psi \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} + \mu \psi (\psi^T \psi + \text{offset_covariance}
+           \cdot I)^{-1} \xi
+           $$
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
 
         Notes
         -----
         A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
-
-        References
-        ----------
-        - Book: Poularikas, A. D. (2017). Adaptive filtering: Fundamentals
-           of least mean squares with MATLAB®. CRC Press.
-
+        will be available soon. For now, please refer to the mentioned references.
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
 
