@@ -232,26 +232,29 @@ class RidgeRegression(BaseEstimator):
 
 
 class TotalLeastSquares(BaseEstimator):
-    """Estimate the model parameters using Total Least Squares method.
+    """Estimate the model parameters using the Total Least Squares (TLS) method.
 
-    _extended_summary_
+    The Total Least Squares method is used to solve the problem of fitting a model
+    to data when both the independent variables (psi) and the dependent variable (y)
+    are subject to errors. This method minimizes the orthogonal distances from the
+    data points to the fitted model, which is more appropriate when errors are present
+    in all variables.
 
     Parameters
     ----------
-    BaseEstimator : _type_
-        _description_
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
 
     References
     ----------
-    - Manuscript: Golub, G. H., & Van Loan, C. F. (1980).
-        An analysis of the total least squares problem.
-        SIAM journal on numerical analysis, 17(6), 883-893.
-    - Manuscript: Markovsky, I., & Van Huffel, S. (2007).
-        Overview of total least-squares methods.
-        Signal processing, 87(10), 2283-2302.
-        https://eprints.soton.ac.uk/263855/1/tls_overview.pdf
-    - Wikipedia entry on Total Least Squares
-        https://en.wikipedia.org/wiki/Total_least_squares
+    - Golub, G. H., & Van Loan, C. F. (1980). An analysis of the total least squares
+    problem.
+      SIAM journal on numerical analysis, 17(6), 883-893.
+    - Markovsky, I., & Van Huffel, S. (2007). Overview of total least-squares methods.
+      Signal processing, 87(10), 2283-2302. https://eprints.soton.ac.uk/263855/1/tls_overview.pdf
+    - Wikipedia entry on Total Least Squares: https://en.wikipedia.org/wiki/Total_least_squares
     """
 
     def __init__(self, *, unbiased: bool = False, uiter: int = 30):
@@ -260,20 +263,29 @@ class TotalLeastSquares(BaseEstimator):
         self._validate_params(vars(self))
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Estimate the model parameters using Total Least Squares method.
+        r"""Estimate the model parameters using the Total Least Squares method.
+
+        The TLS method solves the following problem:
+
+        $$
+            \min_{E, f} \| [E, f] \|_F \quad \text{subject to}
+            \quad (psi + E) \theta = y + f
+        $$
+
+        where $E$ and $f$ are the error matrices for $psi$ and $y$ respectively,
+        and $\| \cdot \|_F$ denotes the Frobenius norm.
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
-
         """
         self._check_linear_dependence_rows(psi)
         full = np.hstack((psi, y))
