@@ -825,7 +825,11 @@ class NormalizedLeastMeanSquares(BaseEstimator):
 
 
 class NormalizedLeastMeanSquaresSignError(BaseEstimator):
-    """Normalized Least Mean Squares SignError(NLMSSE) filter for parameter estimation.
+    """Normalized Least Mean Squares SignError (NLMSSE) filter for parameter estimation.
+
+    The NLMSSE algorithm updates the parameter estimates recursively by normalizing
+    the input signal to avoid numerical instability and using the sign of the error
+    vector to adjust the filter coefficients.
 
     Parameters
     ----------
@@ -838,7 +842,7 @@ class NormalizedLeastMeanSquaresSignError(BaseEstimator):
     ----------
     mu : float
         The learning rate or step size for the LMS algorithm.
-    eps : float, default=np.finfo(np.float64).eps
+    eps : float
         Normalization factor of the normalized filters.
     xi : np.ndarray or None
         The estimation error at each iteration. Initialized as None and updated during
@@ -847,7 +851,15 @@ class NormalizedLeastMeanSquaresSignError(BaseEstimator):
     Methods
     -------
     optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
-        Estimate the model parameters using the LMS filter.
+        Estimate the model parameters using the NLMSSE filter.
+
+    References
+    ----------
+    - Hayes, M. H. (2009). Statistical digital signal processing and modeling.
+      John Wiley & Sons.
+    - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias de
+      algoritmos LMS de passo variável.
+    - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
     """
 
     def __init__(
@@ -866,40 +878,40 @@ class NormalizedLeastMeanSquaresSignError(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Parameter estimation using the Normalized Sign-Error LMS filter.
+        r"""Parameter estimation using the Normalized Sign-Error LMS filter.
 
-        The normalization is used to avoid numerical instability when updating
-        the estimated parameters and the sign of the error vector is used to
-        to change the filter coefficients.
+        The NLMSSE algorithm updates the parameter estimates recursively as follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi_i = y_i - \psi_i^T \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} + 2 \mu \cdot \text{sign}(\xi_i) \cdot
+           \frac{\psi_i}{\epsilon + \psi_i^T \psi_i}
+           $$
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
 
         Notes
         -----
-        A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
-
-        References
-        ----------
-        - Book: Hayes, M. H. (2009). Statistical digital signal processing
-           and modeling. John Wiley & Sons.
-        - Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
-           análise estatística e novas estratégias de algoritmos LMS de passo
-           variável.
-        - Wikipedia entry on Least Mean Squares
-           https://en.wikipedia.org/wiki/Least_mean_squares_filter
-
+        The normalization is used to avoid numerical instability when updating
+        the estimated parameters and the sign of the error vector is used to
+        change the filter coefficients.
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
 
