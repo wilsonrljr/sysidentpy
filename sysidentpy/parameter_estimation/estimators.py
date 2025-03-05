@@ -1544,17 +1544,28 @@ class LeastMeanSquaresLeaky(BaseEstimator):
 
 
 class LeastMeanSquaresFourth(BaseEstimator):
-    """Least Mean Squares Fourth(LMSF) filter for parameter estimation.
+    """Least Mean Squares Fourth (LMSF) filter for parameter estimation.
+
+    The LMSF algorithm is an adaptive filter used to estimate the parameters of a model
+    by using the mean fourth error cost function to eliminate the noise effectively.
 
     Parameters
     ----------
-    mu : float, default=0.01
+    mu : float, default=0.5
         The learning rate or step size for the LMS algorithm.
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
 
     Attributes
     ----------
     mu : float
         The learning rate or step size for the LMS algorithm.
+    unbiased : bool
+        Indicates whether an unbiased estimator is applied.
+    uiter : int
+        Number of iterations for the unbiased estimator.
     xi : np.ndarray or None
         The estimation error at each iteration. Initialized as None and updated during
         optimization.
@@ -1562,7 +1573,22 @@ class LeastMeanSquaresFourth(BaseEstimator):
     Methods
     -------
     optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
-        Estimate the model parameters using the LMS filter.
+        Estimate the model parameters using the LMSF filter.
+
+    References
+    ----------
+    - Hayes, M. H. (2009). Statistical digital signal processing and modeling.
+      John Wiley & Sons.
+    - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias de
+      algoritmos LMS de passo variável.
+    - Gui, G., Mehbodniya, A., & Adachi, F. (2013). Least mean square/fourth algorithm
+      with application to sparse channel estimation. arXiv preprint arXiv:1304.3911.
+      https://arxiv.org/pdf/1304.3911.pdf
+    - Nascimento, V. H., & Bermudez, J. C. M. (2005, March). When is the least-mean
+      fourth algorithm mean-square stable? In Proceedings.(ICASSP'05). IEEE
+      International Conference on Acoustics, Speech, and Signal Processing, 2005.
+      (Vol. 4, pp. iv-341). IEEE. http://www.lps.usp.br/vitor/artigos/icassp05.pdf
+    - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
     """
 
     def __init__(self, *, mu: float = 0.5, unbiased: bool = False, uiter: int = 30):
@@ -1573,49 +1599,33 @@ class LeastMeanSquaresFourth(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Parameter estimation using the  LMS Fourth filter.
+        r"""Parameter estimation using the LMS Fourth filter.
 
-        When the leakage factor, gama, is set to 0 then there is no
-        leakage in the estimation process.
+        The LMSF algorithm updates the parameter estimates recursively as follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi_i = y_i - \psi_i^T \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} + \mu \psi_i \xi_i^3
+           $$
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : ndarray of floats of shape = y_training
-            The data used to training the model.
+        y : ndarray of floats of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : ndarray of floats of shape = number_of_model_elements
+        theta : ndarray of floats of shape (n_features, 1)
             The estimated parameters of the model.
-
-        Notes
-        -----
-        A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
-
-        References
-        ----------
-        - Book: Hayes, M. H. (2009). Statistical digital signal processing
-           and modeling. John Wiley & Sons.
-        - Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
-           análise estatística e novas estratégias de algoritmos LMS de passo
-           variável.
-        - Manuscript:Gui, G., Mehbodniya, A., & Adachi, F. (2013).
-           Least mean square/fourth algorithm with application to sparse
-           channel estimation. arXiv preprint arXiv:1304.3911.
-           https://arxiv.org/pdf/1304.3911.pdf
-        - Manuscript: Nascimento, V. H., & Bermudez, J. C. M. (2005, March).
-           When is the least-mean fourth algorithm mean-square stable?
-           In Proceedings.(ICASSP'05). IEEE International Conference on
-           Acoustics, Speech, and Signal Processing, 2005.
-           (Vol. 4, pp. iv-341). IEEE.
-           http://www.lps.usp.br/vitor/artigos/icassp05.pdf
-        - Wikipedia entry on Least Mean Squares
-           https://en.wikipedia.org/wiki/Least_mean_squares_filter
-
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
 
