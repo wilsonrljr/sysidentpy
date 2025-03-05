@@ -149,12 +149,13 @@ def _normalized_correlation(a, b):
     The normalized cross-correlation is computed as:
 
     $$
-        r_{uy}[i] = \\frac{\\sum_{j=0}^{N-i-1} (a[j] - \\bar{a})(b[j+i] - \\bar{b})}
-        {\\sqrt{\\sum_{j=0}^{N-i-1} (a[j] - \\bar{a})^2} \\sqrt{\\sum_{j=0}^{N-i-1}
-        (b[j+i] - \\bar{b})^2}}
+    r_{uy}[i] = \frac{\sum_{j=0}^{N-i-1} (a[j] - \bar{a})(b[j+i] - \bar{b})}
+        {\sqrt{\sum_{j=0}^{N-i-1} (a[j] - \bar{a})^2} \sqrt{\sum_{j=0}^{N-i-1}
+        (b[j+i] - \bar{b})^2}}
     $$
 
-    where $\\bar{a}$ and $\\bar{b}$ are the means of $a$ and $b$, respectively.
+    where $\bar{a}$ and $\bar{b}$ are the means of $a$ and $b$, respectively.
+
     """
     y = (a - np.mean(a)).flatten()
     u = (b - np.mean(b)).flatten()
