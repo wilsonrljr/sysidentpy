@@ -8,28 +8,47 @@ import numpy as np
 
 
 def get_siso_data(n=5000, colored_noise=False, sigma=0.05, train_percentage=90):
-    """Perform the Error Reduction Ration algorithm.
+    r"""Generate synthetic data for Single-Input Single-Output system identification.
+
+    This function simulates input-output data for a SISO system based on a predefined
+    nonlinear difference equation. The system output is affected by either white noise
+    or colored noise (autoregressive noise) depending on the `colored_noise` flag.
 
     Parameters
     ----------
-    n : int
-        The number of samples.
-    colored_noise : bool
-        Select white noise or colored noise (autoregressive noise).
-    sigma : float
-        The standard deviation of the random distribution to generate
-        the noise.
-    train_percentage : int
-        The percentage of the data to be used as train data.
+    n : int, optional (default=5000)
+        Number of samples to generate.
+    colored_noise : bool, optional (default=False)
+        If True, adds colored (autoregressive) noise to the system; otherwise, white
+        noise is used.
+    sigma : float, optional (default=0.05)
+        Standard deviation of the noise distribution.
+    train_percentage : int, optional (default=90)
+        Percentage of the dataset allocated for training. The rest is used for
+        validation.
 
     Returns
     -------
-    x_train, x_valid : array-like
-        The input data to be used in identification and validation,
-        respectively.
-    y_train, y_valid : array-like
-        The output data to be used in identification and validation,
-        respectively.
+    x_train : ndarray
+        Input data for system identification (training).
+    x_valid : ndarray
+        Input data for system validation (testing).
+    y_train : ndarray
+        Output data corresponding to `x_train`.
+    y_valid : ndarray
+        Output data corresponding to `x_valid`.
+
+    Notes
+    -----
+    - The system follows the nonlinear difference equation:
+
+      y[k] = 0.2 * y[k-1] + 0.1 * y[k-1] * x[k-1] + 0.9 * x[k-2] + e[k]
+
+      where `e[k]` is either white or colored noise.
+
+    - The input `x` is uniformly sampled from the range [-1, 1].
+    - The dataset is split based on `train_percentage`, ensuring a clear separation
+      between training and validation data.
 
     """
     mu = 0  # mean of the distribution
