@@ -39,7 +39,7 @@ function installCode() {
 window.installCode = installCode;
 
 document.addEventListener("DOMContentLoaded", function () {
-  const logo = document.querySelector('a.md-header__button.md-logo');
+  const logo = document.querySelector("a.md-header__button.md-logo");
 
   if (logo) {
     const newLogo = document.createElement("a");
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
     newLogo.setAttribute("title", "SysIdentPy");
 
     const img = document.createElement("img");
-    img.src = "overrides/assets-2.0/img/logotype-sysidentpy.svg";
+    img.src = "overrides/assets/img/logotype-sysidentpy.svg";
     img.alt = "Logotype SysIdentPy";
 
     newLogo.appendChild(img);
