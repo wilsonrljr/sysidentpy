@@ -1653,20 +1653,39 @@ class LeastMeanSquareMixedNorm(BaseEstimator):
     mu : float, optional
         The adaptation step size. Default is 0.01.
     weight : float, optional
-        The weight factor for mixed-norm control. Weight factor to control the
-        proportions of the error norms and offers an extra degree of freedom within
-        the adaptation of the LMS mixed norm method.
+        The weight factor for mixed-norm control. This factor controls the
+        proportions of the error norms and offers an extra degree of freedom
+        within the adaptation of the LMS mixed norm method.
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
 
     Attributes
     ----------
     mu : float
         The adaptation step size.
     weight : float
-        The weight factor for mixed-norm control. Weight factor to control the
-        proportions of the error norms and offers an extra degree of freedom within
-        the adaptation of the LMS mixed norm method.
+        The weight factor for mixed-norm control.
     xi : ndarray or None
         The error signal, initialized to None.
+
+    Methods
+    -------
+    optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
+        Estimate the model parameters using the LMSF filter.
+
+    References
+    ----------
+    - Chambers, J. A., Tanrikulu, O., & Constantinides, A. G. (1994).
+      Least mean mixed-norm adaptive filtering.
+      Electronics letters, 30(19), 1574-1575.
+      https://ieeexplore.ieee.org/document/326382
+    - Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
+      análise estatística e novas estratégias de algoritmos LMS de passo
+      variável.
+    - Wikipedia entry on Least Mean Squares
+      https://en.wikipedia.org/wiki/Least_mean_squares_filter
     """
 
     def __init__(
@@ -1685,38 +1704,39 @@ class LeastMeanSquareMixedNorm(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Parameter estimation using the Mixed-norm LMS filter.
+        r"""Parameter estimation using the Mixed-norm LMS filter.
+
+        The LMS-MN algorithm updates the parameter estimates recursively as follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi_i = y_i - \psi_i^T \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} + \mu \psi_i \xi_i (\text{weight}
+           + (1 - \text{weight}) \xi_i^2)
+           $$
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
 
         Notes
         -----
-        A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
-
-        References
-        ----------
-        - Chambers, J. A., Tanrikulu, O., & Constantinides, A. G. (1994).
-           Least mean mixed-norm adaptive filtering.
-           Electronics letters, 30(19), 1574-1575.
-           https://ieeexplore.ieee.org/document/326382
-        - Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
-           análise estatística e novas estratégias de algoritmos LMS de passo
-           variável.
-        - Wikipedia entry on Least Mean Squares
-           https://en.wikipedia.org/wiki/Least_mean_squares_filter
-
+        A more in-depth documentation of all methods for parameter estimation
+        will be available soon. For now, please refer to the mentioned references.
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
 
