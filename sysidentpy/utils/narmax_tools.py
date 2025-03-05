@@ -1,6 +1,6 @@
 """Utils methods for NARMAX modeling."""
 
-from typing import Tuple, Optional, Any
+from typing import Tuple, Optional
 import numpy as np
 
 from ..narmax_base import RegressorDictionary
@@ -15,7 +15,7 @@ def regressor_code(
     ylag: int = 2,
     model_type: str = "NARMAX",
     model_representation: Optional[str] = None,
-    basis_function: Optional[Any] = None,
+    basis_function: Polynomial = Polynomial(),
 ) -> np.ndarray:
     """Generate a regressor code based on the provided parameters.
 

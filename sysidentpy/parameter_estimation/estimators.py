@@ -36,20 +36,29 @@ class EstimatorError(Exception):
 class LeastSquares(BaseEstimator):
     """Ordinary Least Squares for linear parameter estimation.
 
+    The Least Squares method minimizes the sum of the squared differences
+    between the observed and predicted values. It is used to estimate the
+    parameters of a linear model.
+
+    Parameters
+    ----------
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 20.
+
     References
     ----------
-    - Manuscript: Sorenson, H. W. (1970). Least-squares estimation:
-        from Gauss to Kalman. IEEE spectrum, 7(7), 63-68.
-        http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf
-    - Book (Portuguese): Aguirre, L. A. (2007). Introdução identificação
-        de sistemas: técnicas lineares e não-lineares aplicadas a sistemas
-        reais. Editora da UFMG. 3a edição.
-    - Manuscript: Markovsky, I., & Van Huffel, S. (2007).
-        Overview of total least-squares methods.
-        Signal processing, 87(10), 2283-2302.
-        https://eprints.soton.ac.uk/263855/1/tls_overview.pdf
+    - Sorenson, H. W. (1970). Least-squares estimation: from Gauss to Kalman.
+      IEEE spectrum, 7(7), 63-68.
+      http://pzs.dstu.dp.ua/DataMining/mls/bibl/Gauss2Kalman.pdf
+    - Aguirre, L. A. (2007). Introdução identificação de sistemas: técnicas
+      lineares e não-lineares aplicadas a sistemas reais. Editora da UFMG. 3a edição.
+    - Markovsky, I., & Van Huffel, S. (2007). Overview of total least-squares methods.
+      Signal processing, 87(10), 2283-2302.
+      https://eprints.soton.ac.uk/263855/1/tls_overview.pdf
     - Wikipedia entry on Least Squares
-        https://en.wikipedia.org/wiki/Least_squares
+      https://en.wikipedia.org/wiki/Least_squares
     """
 
     def __init__(self, *, unbiased: bool = False, uiter: int = 20):
@@ -58,20 +67,28 @@ class LeastSquares(BaseEstimator):
         self._validate_params(vars(self))
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Estimate the model parameters using Least Squares method.
+        r"""Estimate the model parameters using the Least Squares method.
+
+        The Least Squares method solves the following optimization problem:
+
+        $$
+        \min_{\theta} \| \psi \theta - y \|_2^2
+        $$
+
+        where $\psi$ is the information matrix, $y$ is the observed data,
+        and $\theta$ are the model parameters to be estimated.
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
-
         """
         self._check_linear_dependence_rows(psi)
         theta = np.linalg.lstsq(psi, y, rcond=None)[0]
@@ -232,26 +249,29 @@ class RidgeRegression(BaseEstimator):
 
 
 class TotalLeastSquares(BaseEstimator):
-    """Estimate the model parameters using Total Least Squares method.
+    """Estimate the model parameters using the Total Least Squares (TLS) method.
 
-    _extended_summary_
+    The Total Least Squares method is used to solve the problem of fitting a model
+    to data when both the independent variables (psi) and the dependent variable (y)
+    are subject to errors. This method minimizes the orthogonal distances from the
+    data points to the fitted model, which is more appropriate when errors are present
+    in all variables.
 
     Parameters
     ----------
-    BaseEstimator : _type_
-        _description_
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
 
     References
     ----------
-    - Manuscript: Golub, G. H., & Van Loan, C. F. (1980).
-        An analysis of the total least squares problem.
-        SIAM journal on numerical analysis, 17(6), 883-893.
-    - Manuscript: Markovsky, I., & Van Huffel, S. (2007).
-        Overview of total least-squares methods.
-        Signal processing, 87(10), 2283-2302.
-        https://eprints.soton.ac.uk/263855/1/tls_overview.pdf
-    - Wikipedia entry on Total Least Squares
-        https://en.wikipedia.org/wiki/Total_least_squares
+    - Golub, G. H., & Van Loan, C. F. (1980). An analysis of the total least squares
+    problem.
+      SIAM journal on numerical analysis, 17(6), 883-893.
+    - Markovsky, I., & Van Huffel, S. (2007). Overview of total least-squares methods.
+      Signal processing, 87(10), 2283-2302. https://eprints.soton.ac.uk/263855/1/tls_overview.pdf
+    - Wikipedia entry on Total Least Squares: https://en.wikipedia.org/wiki/Total_least_squares
     """
 
     def __init__(self, *, unbiased: bool = False, uiter: int = 30):
@@ -260,20 +280,29 @@ class TotalLeastSquares(BaseEstimator):
         self._validate_params(vars(self))
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Estimate the model parameters using Total Least Squares method.
+        r"""Estimate the model parameters using the Total Least Squares method.
+
+        The TLS method solves the following problem:
+
+        $$
+            \min_{E, f} \| [E, f] \|_F \quad \text{subject to}
+            \quad (psi + E) \theta = y + f
+        $$
+
+        where $E$ and $f$ are the error matrices for $psi$ and $y$ respectively,
+        and $\| \cdot \|_F$ denotes the Frobenius norm.
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
-
         """
         self._check_linear_dependence_rows(psi)
         full = np.hstack((psi, y))
@@ -284,9 +313,12 @@ class TotalLeastSquares(BaseEstimator):
 
 
 class RecursiveLeastSquares(BaseEstimator):
-    """_summary_.
+    """Recursive Least Squares (RLS) filter for parameter estimation.
 
-    _extended_summary_
+    The Recursive Least Squares method is used to estimate the parameters of a model
+    by minimizing the sum of the squares of the differences between the observed and
+    predicted values. This method incorporates a forgetting factor to give more weight
+    to recent observations.
 
     Parameters
     ----------
@@ -294,6 +326,32 @@ class RecursiveLeastSquares(BaseEstimator):
         Forgetting factor of the Recursive Least Squares method.
     delta : float, default=0.01
         Normalization factor of the P matrix.
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
+
+    Attributes
+    ----------
+    lam : float
+        Forgetting factor of the Recursive Least Squares method.
+    delta : float
+        Normalization factor of the P matrix.
+    xi : np.ndarray
+        The estimation error at each iteration.
+    theta_evolution : np.ndarray
+        Evolution of the estimated parameters over iterations.
+
+    Methods
+    -------
+    optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
+        Estimate the model parameters using the Recursive Least Squares method.
+
+    References
+    ----------
+    - Book (Portuguese): Aguirre, L. A. (2007). Introdução identificação
+       de sistemas: técnicas lineares e não-lineares aplicadas a sistemas
+       reais. Editora da UFMG. 3a edição.
     """
 
     def __init__(
@@ -313,16 +371,16 @@ class RecursiveLeastSquares(BaseEstimator):
         self.theta_evolution: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Estimate the model parameters using the Recursive Least Squares method.
+        r"""Estimate the model parameters using the Recursive Least Squares method.
 
-        The implementation consider the forgetting factor.
+        The implementation considers the forgetting factor.
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
         y : array-like of shape = y_training
-            The data used to training the model.
+            The data used to train the model.
 
         Returns
         -------
@@ -331,16 +389,34 @@ class RecursiveLeastSquares(BaseEstimator):
 
         Notes
         -----
-        A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
+        The RLS algorithm updates the parameter estimates recursively as follows:
+
+        1. Initialize the parameter vector `theta` and the covariance matrix `P`:
+
+           $$
+           \\theta_0 = \\mathbf{0}, \\quad P_0 = \\frac{1}{\\delta} I
+           $$
+
+        2. For each new observation `(psi_i, y_i)`, update the estimates:
+
+           $$
+           k_i = \\frac{\\lambda^{-1} P_{i-1} \\psi_i}{1 +
+           \\lambda^{-1} \\psi_i^T P_{i-1} \\psi_i}
+           $$
+
+           $$
+           \\theta_i = \\theta_{i-1} + k_i (y_i - \\psi_i^T \\theta_{i-1})
+           $$
+
+           $$
+           P_i = \\lambda^{-1} (P_{i-1} - k_i \\psi_i^T P_{i-1})
+           $$
 
         References
         ----------
         - Book (Portuguese): Aguirre, L. A. (2007). Introdução identificação
            de sistemas: técnicas lineares e não-lineares aplicadas a sistemas
            reais. Editora da UFMG. 3a edição.
-
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
         p = np.eye(n_theta) / self.delta
@@ -370,21 +446,27 @@ class RecursiveLeastSquares(BaseEstimator):
 class AffineLeastMeanSquares(BaseEstimator):
     """Affine Least Mean Squares (ALMS) filter for parameter estimation.
 
+    The ALMS filter is an adaptive filter used to estimate the parameters of a model.
+    It incorporates an offset covariance factor to improve the stability and convergence
+    of the parameter estimation process.
+
     Parameters
     ----------
     mu : float, default=0.01
         The learning rate or step size for the LMS algorithm.
     offset_covariance : float, default=0.2
-        The offset covariance factor of the affine least mean squares
-        filter.
+        The offset covariance factor of the affine least mean squares filter.
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
 
     Attributes
     ----------
     mu : float
         The learning rate or step size for the LMS algorithm.
-    offset_covariance : float, default=0.2
-        The offset covariance factor of the affine least mean squares
-        filter.
+    offset_covariance : float
+        The offset covariance factor of the affine least mean squares filter.
     xi : np.ndarray or None
         The estimation error at each iteration. Initialized as None and updated during
         optimization.
@@ -392,7 +474,12 @@ class AffineLeastMeanSquares(BaseEstimator):
     Methods
     -------
     optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
-        Estimate the model parameters using the LMS filter.
+        Estimate the model parameters using the ALMS filter.
+
+    References
+    ----------
+    - Poularikas, A. D. (2017). Adaptive filtering: Fundamentals of least mean squares
+    with MATLAB®. CRC Press.
     """
 
     def __init__(
@@ -411,31 +498,39 @@ class AffineLeastMeanSquares(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Estimate the model parameters using the Affine Least Mean Squares.
+        r"""Estimate the model parameters using the Affine Least Mean Squares.
+
+        The ALMS method updates the parameter estimates recursively as follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi = y - \psi \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} + \mu \psi (\psi^T \psi + \text{offset_covariance}
+           \cdot I)^{-1} \xi
+           $$
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
 
         Notes
         -----
         A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
-
-        References
-        ----------
-        - Book: Poularikas, A. D. (2017). Adaptive filtering: Fundamentals
-           of least mean squares with MATLAB®. CRC Press.
-
+        will be available soon. For now, please refer to the mentioned references.
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
 
@@ -455,15 +550,26 @@ class AffineLeastMeanSquares(BaseEstimator):
 class LeastMeanSquares(BaseEstimator):
     """Least Mean Squares (LMS) filter for parameter estimation in adaptive filtering.
 
+    The LMS algorithm is an adaptive filter used to estimate the parameters of a model
+    by minimizing the mean square error between the observed and predicted values.
+
     Parameters
     ----------
     mu : float, default=0.01
         The learning rate or step size for the LMS algorithm.
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
 
     Attributes
     ----------
     mu : float
         The learning rate or step size for the LMS algorithm.
+    unbiased : bool
+        Indicates whether an unbiased estimator is applied.
+    uiter : int
+        Number of iterations for the unbiased estimator.
     xi : np.ndarray or None
         The estimation error at each iteration. Initialized as None and updated during
         optimization.
@@ -472,6 +578,14 @@ class LeastMeanSquares(BaseEstimator):
     -------
     optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
         Estimate the model parameters using the LMS filter.
+
+    References
+    ----------
+    - Haykin, S., & Widrow, B. (Eds.). (2003). Least-mean-square adaptive filters
+    (Vol. 31). John Wiley & Sons.
+    - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias de
+    algoritmos LMS de passo variável.
+    - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
     """
 
     def __init__(self, *, mu: float = 0.01, unbiased: bool = False, uiter: int = 30):
@@ -482,36 +596,33 @@ class LeastMeanSquares(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Estimate the model parameters using the Least Mean Squares filter.
+        r"""Estimate the model parameters using the Least Mean Squares filter.
+
+        The LMS algorithm updates the parameter estimates recursively as follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi_i = y_i - \psi_i^T \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} + 2 \mu \xi_i \psi_i
+           $$
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
-
-        Notes
-        -----
-        A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
-
-        References
-        ----------
-        - Book: Haykin, S., & Widrow, B. (Eds.). (2003). Least-mean-square
-           adaptive filters (Vol. 31). John Wiley & Sons.
-        - Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
-           análise estatística e novas estratégias de algoritmos LMS de passo
-           variável.
-        - Wikipedia entry on Least Mean Squares
-           https://en.wikipedia.org/wiki/Least_mean_squares_filter
-
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
 
@@ -527,12 +638,19 @@ class LeastMeanSquares(BaseEstimator):
 
 
 class LeastMeanSquaresSignError(BaseEstimator):
-    """Least Mean Squares (LMS) filter for parameter estimation.
+    """Least Mean Squares (LMS) filter for parameter estimation using sign-error.
+
+    The sign-error LMS algorithm uses the sign of the error vector to update the filter
+    coefficients.
 
     Parameters
     ----------
     mu : float, default=0.01
         The learning rate or step size for the LMS algorithm.
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
 
     Attributes
     ----------
@@ -546,6 +664,14 @@ class LeastMeanSquaresSignError(BaseEstimator):
     -------
     optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
         Estimate the model parameters using the LMS filter.
+
+    References
+    ----------
+    - Hayes, M. H. (2009). Statistical digital signal processing and modeling.
+    John Wiley & Sons.
+    - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias de
+    algoritmos LMS de passo variável.
+    - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
     """
 
     def __init__(self, *, mu: float = 0.01, unbiased: bool = False, uiter: int = 30):
@@ -556,38 +682,34 @@ class LeastMeanSquaresSignError(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Parameter estimation using the Sign-Error  Least Mean Squares filter.
+        r"""Parameter estimation using the Sign-Error Least Mean Squares filter.
 
-        The sign-error LMS algorithm uses the sign of the error vector
-        to change the filter coefficients.
+        The sign-error LMS algorithm updates the parameter estimates recursively as
+        follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi_i = y_i - \psi_i^T \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} + \mu \cdot \text{sign}(\xi_i) \cdot \psi_i
+           $$
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
-
-        Notes
-        -----
-        A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
-
-        References
-        ----------
-        - Book: Hayes, M. H. (2009). Statistical digital signal processing
-           and modeling. John Wiley & Sons.
-        - Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
-           análise estatística e novas estratégias de algoritmos LMS de passo
-           variável.
-        - Wikipedia entry on Least Mean Squares
-           https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
@@ -605,7 +727,12 @@ class LeastMeanSquaresSignError(BaseEstimator):
 
 
 class NormalizedLeastMeanSquares(BaseEstimator):
-    """Normalized Least Mean Squares (ALMS) filter for parameter estimation.
+    """Normalized Least Mean Squares (NLMS) filter for parameter estimation.
+
+    The NLMS algorithm is an adaptive filter used to estimate the parameters of a model
+    by minimizing the mean square error between the observed and predicted values. The
+    normalization is used to avoid numerical instability when updating the estimated
+    parameters.
 
     Parameters
     ----------
@@ -618,7 +745,7 @@ class NormalizedLeastMeanSquares(BaseEstimator):
     ----------
     mu : float
         The learning rate or step size for the LMS algorithm.
-    eps : float, default=np.finfo(np.float64).eps
+    eps : float
         Normalization factor of the normalized filters.
     xi : np.ndarray or None
         The estimation error at each iteration. Initialized as None and updated during
@@ -627,7 +754,15 @@ class NormalizedLeastMeanSquares(BaseEstimator):
     Methods
     -------
     optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
-        Estimate the model parameters using the LMS filter.
+        Estimate the model parameters using the NLMS filter.
+
+    References
+    ----------
+    - Hayes, M. H. (2009). Statistical digital signal processing and modeling.
+      John Wiley & Sons.
+    - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias de
+      algoritmos LMS de passo variável.
+    - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
     """
 
     def __init__(
@@ -646,38 +781,34 @@ class NormalizedLeastMeanSquares(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Parameter estimation using the Normalized Least Mean Squares filter.
+        r"""Parameter estimation using the Normalized Least Mean Squares filter.
 
-        The normalization is used to avoid numerical instability when updating
-        the estimated parameters.
+        The NLMS algorithm updates the parameter estimates recursively as follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi_i = y_i - \psi_i^T \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} + 2 \mu \xi_i \frac{\psi_i}{\epsilon +
+           \psi_i^T \psi_i}
+           $$
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
-
-        Notes
-        -----
-        A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
-
-        References
-        ----------
-        - Book: Hayes, M. H. (2009). Statistical digital signal processing
-           and modeling. John Wiley & Sons.
-        - Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
-           análise estatística e novas estratégias de algoritmos LMS de passo
-           variável.
-        - Wikipedia entry on Least Mean Squares
-           https://en.wikipedia.org/wiki/Least_mean_squares_filter
 
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
@@ -694,7 +825,11 @@ class NormalizedLeastMeanSquares(BaseEstimator):
 
 
 class NormalizedLeastMeanSquaresSignError(BaseEstimator):
-    """Normalized Least Mean Squares SignError(NLMSSE) filter for parameter estimation.
+    """Normalized Least Mean Squares SignError (NLMSSE) filter for parameter estimation.
+
+    The NLMSSE algorithm updates the parameter estimates recursively by normalizing
+    the input signal to avoid numerical instability and using the sign of the error
+    vector to adjust the filter coefficients.
 
     Parameters
     ----------
@@ -707,7 +842,7 @@ class NormalizedLeastMeanSquaresSignError(BaseEstimator):
     ----------
     mu : float
         The learning rate or step size for the LMS algorithm.
-    eps : float, default=np.finfo(np.float64).eps
+    eps : float
         Normalization factor of the normalized filters.
     xi : np.ndarray or None
         The estimation error at each iteration. Initialized as None and updated during
@@ -716,7 +851,15 @@ class NormalizedLeastMeanSquaresSignError(BaseEstimator):
     Methods
     -------
     optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
-        Estimate the model parameters using the LMS filter.
+        Estimate the model parameters using the NLMSSE filter.
+
+    References
+    ----------
+    - Hayes, M. H. (2009). Statistical digital signal processing and modeling.
+      John Wiley & Sons.
+    - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias de
+      algoritmos LMS de passo variável.
+    - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
     """
 
     def __init__(
@@ -735,40 +878,40 @@ class NormalizedLeastMeanSquaresSignError(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Parameter estimation using the Normalized Sign-Error LMS filter.
+        r"""Parameter estimation using the Normalized Sign-Error LMS filter.
 
-        The normalization is used to avoid numerical instability when updating
-        the estimated parameters and the sign of the error vector is used to
-        to change the filter coefficients.
+        The NLMSSE algorithm updates the parameter estimates recursively as follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi_i = y_i - \psi_i^T \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} + 2 \mu \cdot \text{sign}(\xi_i) \cdot
+           \frac{\psi_i}{\epsilon + \psi_i^T \psi_i}
+           $$
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
 
         Notes
         -----
-        A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
-
-        References
-        ----------
-        - Book: Hayes, M. H. (2009). Statistical digital signal processing
-           and modeling. John Wiley & Sons.
-        - Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
-           análise estatística e novas estratégias de algoritmos LMS de passo
-           variável.
-        - Wikipedia entry on Least Mean Squares
-           https://en.wikipedia.org/wiki/Least_mean_squares_filter
-
+        The normalization is used to avoid numerical instability when updating
+        the estimated parameters and the sign of the error vector is used to
+        change the filter coefficients.
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
 
@@ -786,15 +929,26 @@ class NormalizedLeastMeanSquaresSignError(BaseEstimator):
 class LeastMeanSquaresSignRegressor(BaseEstimator):
     """Least Mean Squares (LMSSR) filter for parameter estimation.
 
+    The sign-regressor LMS algorithm uses the sign of the matrix
+    information to change the filter coefficients.
+
     Parameters
     ----------
     mu : float, default=0.01
         The learning rate or step size for the LMS algorithm.
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
 
     Attributes
     ----------
     mu : float
         The learning rate or step size for the LMS algorithm.
+    unbiased : bool
+        Indicates whether an unbiased estimator is applied.
+    uiter : int
+        Number of iterations for the unbiased estimator.
     xi : np.ndarray or None
         The estimation error at each iteration. Initialized as None and updated during
         optimization.
@@ -803,6 +957,14 @@ class LeastMeanSquaresSignRegressor(BaseEstimator):
     -------
     optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
         Estimate the model parameters using the LMS filter.
+
+    References
+    ----------
+    - Hayes, M. H. (2009). Statistical digital signal processing and modeling.
+      John Wiley & Sons.
+    - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias de
+      algoritmos LMS de passo variável.
+    - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
     """
 
     def __init__(self, *, mu: float = 0.01, unbiased: bool = False, uiter: int = 30):
@@ -813,39 +975,34 @@ class LeastMeanSquaresSignRegressor(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Parameter estimation using the  Sign-Regressor LMS filter.
+        r"""Parameter estimation using the Sign-Regressor LMS filter.
 
-        The sign-regressor LMS algorithm uses the sign of the matrix
-        information to change the filter coefficients.
+        The sign-regressor LMS algorithm updates the parameter estimates recursively
+        as follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi_i = y_i - \psi_i^T \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} + \mu \cdot \xi_i \cdot \text{sign}(\psi_i)
+           $$
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
-
-        Notes
-        -----
-        A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
-
-        References
-        ----------
-        - Book: Hayes, M. H. (2009). Statistical digital signal processing
-           and modeling. John Wiley & Sons.
-        - Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
-           análise estatística e novas estratégias de algoritmos LMS de passo
-           variável.
-        - Wikipedia entry on Least Mean Squares
-           https://en.wikipedia.org/wiki/Least_mean_squares_filter
-
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
 
@@ -863,6 +1020,10 @@ class LeastMeanSquaresSignRegressor(BaseEstimator):
 class LeastMeanSquaresNormalizedSignRegressor(BaseEstimator):
     """Normalized Least Mean Squares SignRegressor filter for parameter estimation.
 
+    The Normalized Sign-Regressor LMS algorithm updates the parameter estimates
+    recursively by normalizing the input signal to avoid numerical instability
+    and using the sign of the information matrix to adjust the filter coefficients.
+
     Parameters
     ----------
     mu : float, default=0.01
@@ -883,7 +1044,16 @@ class LeastMeanSquaresNormalizedSignRegressor(BaseEstimator):
     Methods
     -------
     optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
-        Estimate the model parameters using the LMS filter.
+        Estimate the model parameters using the Normalized Sign-Regressor LMS filter.
+
+    References
+    ----------
+    - Hayes, M. H. (2009). Statistical digital signal processing and modeling.
+      John Wiley & Sons.
+    - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias de
+      algoritmos LMS de passo variável.
+    - Wikipedia entry on Least Mean Squares
+      https://en.wikipedia.org/wiki/Least_mean_squares_filter
     """
 
     def __init__(
@@ -902,7 +1072,23 @@ class LeastMeanSquaresNormalizedSignRegressor(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Parameter estimation using the Normalized Sign-Regressor LMS filter.
+        r"""Parameter estimation using the Normalized Sign-Regressor LMS filter.
+
+        The Normalized Sign-Regressor LMS algorithm updates the parameter estimates
+        recursively as follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi_i = y_i - \psi_i^T \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} + \mu \cdot \xi_i \cdot
+           \frac{\text{sign}(\psi_i)}{\epsilon + \psi_i^T \psi_i}
+           $$
 
         The normalization is used to avoid numerical instability when updating
         the estimated parameters and the sign of the information matrix is
@@ -912,30 +1098,13 @@ class LeastMeanSquaresNormalizedSignRegressor(BaseEstimator):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
-
-        Notes
-        -----
-        A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
-
-        References
-        ----------
-        .. [1] Book: Hayes, M. H. (2009). Statistical digital signal processing
-           and modeling. John Wiley & Sons.
-        .. [2] Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
-           análise estatística e novas estratégias de algoritmos LMS de passo
-           variável.
-        .. [3] Wikipedia entry on Least Mean Squares
-           https://en.wikipedia.org/wiki/Least_mean_squares_filter
-
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
 
@@ -951,12 +1120,19 @@ class LeastMeanSquaresNormalizedSignRegressor(BaseEstimator):
 
 
 class LeastMeanSquaresSignSign(BaseEstimator):
-    """Least Mean Squares SignSign(LMSSS) filter for parameter estimation.
+    """Least Mean Squares Sign-Sign (LMSSS) filter for parameter estimation.
+
+    The LMSSS algorithm uses both the sign of the matrix information and the sign of
+    the error vector to update the filter coefficients.
 
     Parameters
     ----------
     mu : float, default=0.01
         The learning rate or step size for the LMS algorithm.
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
 
     Attributes
     ----------
@@ -969,7 +1145,15 @@ class LeastMeanSquaresSignSign(BaseEstimator):
     Methods
     -------
     optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
-        Estimate the model parameters using the LMS filter.
+        Estimate the model parameters using the LMSSS filter.
+
+    References
+    ----------
+    - Hayes, M. H. (2009). Statistical digital signal processing and modeling.
+    John Wiley & Sons.
+    - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias de
+    algoritmos LMS de passo variável.
+    - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
     """
 
     def __init__(self, *, mu: float = 0.01, unbiased: bool = False, uiter: int = 30):
@@ -980,40 +1164,34 @@ class LeastMeanSquaresSignSign(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Parameter estimation using the  Sign-Sign LMS filter.
+        r"""Parameter estimation using the Sign-Sign LMS filter.
 
-        The sign-regressor LMS algorithm uses both the sign of the matrix
-        information and the sign of the error vector to change the filter
-        coefficients.
+        The LMSSS algorithm updates the parameter estimates recursively as follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi_i = y_i - \psi_i^T \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} + 2* \mu \cdot \text{sign}(\xi_i)
+           \cdot \text{sign}(\psi_i)
+           $$
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
-
-        Notes
-        -----
-        A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
-
-        References
-        ----------
-        - Book: Hayes, M. H. (2009). Statistical digital signal processing
-           and modeling. John Wiley & Sons.
-        - Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
-           análise estatística e novas estratégias de algoritmos LMS de passo
-           variável.
-        - Wikipedia entry on Least Mean Squares
-           https://en.wikipedia.org/wiki/Least_mean_squares_filter
-
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
 
@@ -1029,7 +1207,12 @@ class LeastMeanSquaresSignSign(BaseEstimator):
 
 
 class LeastMeanSquaresNormalizedSignSign(BaseEstimator):
-    """Normalized Least Mean Squares SignSign(NLMSSS) filter for parameter estimation.
+    """Normalized Least Mean Squares SignSign (NLMSSS) filter for parameter estimation.
+
+    The NLMSSS algorithm updates the parameter estimates recursively by normalizing
+    the input signal to avoid numerical instability and using both the sign of the
+    information matrix and the sign of the error vector to adjust the filter
+    coefficients.
 
     Parameters
     ----------
@@ -1042,7 +1225,7 @@ class LeastMeanSquaresNormalizedSignSign(BaseEstimator):
     ----------
     mu : float
         The learning rate or step size for the LMS algorithm.
-    eps : float, default=np.finfo(np.float64).eps
+    eps : float
         Normalization factor of the normalized filters.
     xi : np.ndarray or None
         The estimation error at each iteration. Initialized as None and updated during
@@ -1051,7 +1234,15 @@ class LeastMeanSquaresNormalizedSignSign(BaseEstimator):
     Methods
     -------
     optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
-        Estimate the model parameters using the LMS filter.
+        Estimate the model parameters using the NLMSSS filter.
+
+    References
+    ----------
+    - Hayes, M. H. (2009). Statistical digital signal processing and modeling.
+      John Wiley & Sons.
+    - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias de
+      algoritmos LMS de passo variável.
+    - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
     """
 
     def __init__(
@@ -1070,7 +1261,22 @@ class LeastMeanSquaresNormalizedSignSign(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Parameter estimation using the Normalized Sign-Sign LMS filter.
+        r"""Parameter estimation using the Normalized Sign-Sign LMS filter.
+
+        The NLMSSS algorithm updates the parameter estimates recursively as follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi_i = y_i - \psi_i^T \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} + 2 \mu \cdot \text{sign}(\xi_i) \cdot
+           \frac{\text{sign}(\psi_i)}{\epsilon + \psi_i^T \psi_i}
+           $$
 
         The normalization is used to avoid numerical instability when updating
         the estimated parameters and both the sign of the information matrix
@@ -1081,30 +1287,21 @@ class LeastMeanSquaresNormalizedSignSign(BaseEstimator):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
-
-        Notes
-        -----
-        A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
 
         References
         ----------
-        - Book: Hayes, M. H. (2009). Statistical digital signal processing
-           and modeling. John Wiley & Sons.
-        - Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
-           análise estatística e novas estratégias de algoritmos LMS de passo
-           variável.
-        - Wikipedia entry on Least Mean Squares
-           https://en.wikipedia.org/wiki/Least_mean_squares_filter
-
+        - Hayes, M. H. (2009). Statistical digital signal processing and modeling.
+          John Wiley & Sons.
+        - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias
+        de algoritmos LMS de passo variável.
+        - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
 
@@ -1120,7 +1317,12 @@ class LeastMeanSquaresNormalizedSignSign(BaseEstimator):
 
 
 class LeastMeanSquaresNormalizedLeaky(BaseEstimator):
-    """Normalized Least Mean Squares Leaky(NLMSL) filter for parameter estimation.
+    """Normalized Least Mean Squares Leaky (NLMSL) filter for parameter estimation.
+
+    The NLMSL algorithm is an adaptive filter used to estimate the parameters of a model
+    by minimizing the mean square error between the observed and predicted values. The
+    normalization is used to avoid numerical instability when updating the estimated
+    parameters, and the leakage factor helps to prevent coefficient drift.
 
     Parameters
     ----------
@@ -1146,7 +1348,15 @@ class LeastMeanSquaresNormalizedLeaky(BaseEstimator):
     Methods
     -------
     optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
-        Estimate the model parameters using the LMS filter.
+        Estimate the model parameters using the NLMSL filter.
+
+    References
+    ----------
+    - Hayes, M. H. (2009). Statistical digital signal processing and modeling.
+      John Wiley & Sons.
+    - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias de
+      algoritmos LMS de passo variável.
+    - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
     """
 
     def __init__(
@@ -1167,39 +1377,45 @@ class LeastMeanSquaresNormalizedLeaky(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Parameter estimation using the  Normalized Leaky LMS filter.
+        r"""Parameter estimation using the Normalized Leaky LMS filter.
 
-        When the leakage factor, gama, is set to 0 then there is no
-        leakage in the estimation process.
+        The NLMSL algorithm updates the parameter estimates recursively as follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi_i = y_i - \psi_i^T \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} (1 - \mu \gamma) + \mu \frac{\xi_i \psi_i}{\epsilon
+           + \psi_i^T \psi_i}
+           $$
+
+        When the leakage factor, $\gamma$, is set to 0, there is no leakage in the
+        estimation process.
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
-
-        Notes
-        -----
-        A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
 
         References
         ----------
-        - Book: Hayes, M. H. (2009). Statistical digital signal processing
-           and modeling. John Wiley & Sons.
-        - Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
-           análise estatística e novas estratégias de algoritmos LMS de passo
-           variável.
-        - Wikipedia entry on Least Mean Squares
-           https://en.wikipedia.org/wiki/Least_mean_squares_filter
-
+        - Hayes, M. H. (2009). Statistical digital signal processing and modeling.
+          John Wiley & Sons.
+        - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias
+          de algoritmos LMS de passo variável.
+        - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
 
@@ -1217,7 +1433,11 @@ class LeastMeanSquaresNormalizedLeaky(BaseEstimator):
 
 
 class LeastMeanSquaresLeaky(BaseEstimator):
-    """Least Mean Squares Leaky(LMSL) filter for parameter estimation.
+    """Least Mean Squares Leaky (LMSL) filter for parameter estimation.
+
+    The LMSL algorithm is an adaptive filter used to estimate the parameters of a model
+    by minimizing the mean square error between the observed and predicted values. The
+    leakage factor helps to prevent coefficient drift.
 
     Parameters
     ----------
@@ -1225,6 +1445,10 @@ class LeastMeanSquaresLeaky(BaseEstimator):
         The learning rate or step size for the LMS algorithm.
     gama : float, default=0.2
         The leakage factor of the Leaky LMS method.
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
 
     Attributes
     ----------
@@ -1239,7 +1463,15 @@ class LeastMeanSquaresLeaky(BaseEstimator):
     Methods
     -------
     optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
-        Estimate the model parameters using the LMS filter.
+        Estimate the model parameters using the LMSL filter.
+
+    References
+    ----------
+    - Hayes, M. H. (2009). Statistical digital signal processing and modeling.
+      John Wiley & Sons.
+    - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias de
+      algoritmos LMS de passo variável.
+    - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
     """
 
     def __init__(
@@ -1258,39 +1490,44 @@ class LeastMeanSquaresLeaky(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Parameter estimation using the  Leaky LMS filter.
+        r"""Parameter estimation using the Leaky LMS filter.
 
-        When the leakage factor, gama, is set to 0 then there is no
-        leakage in the estimation process.
+        The LMSL algorithm updates the parameter estimates recursively as follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi_i = y_i - \psi_i^T \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} (1 - \mu \gamma) + \mu \xi_i \psi_i
+           $$
+
+        When the leakage factor, $\gamma$, is set to 0, there is no leakage in the
+        estimation process.
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
-
-        Notes
-        -----
-        A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
 
         References
         ----------
-        - Book: Hayes, M. H. (2009). Statistical digital signal processing
-           and modeling. John Wiley & Sons.
-        - Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
-           análise estatística e novas estratégias de algoritmos LMS de passo
-           variável.
-        - Wikipedia entry on Least Mean Squares
-           https://en.wikipedia.org/wiki/Least_mean_squares_filter
-
+        - Hayes, M. H. (2009). Statistical digital signal processing and modeling.
+          John Wiley & Sons.
+        - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias
+          de algoritmos LMS de passo variável.
+        - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
 
@@ -1307,17 +1544,28 @@ class LeastMeanSquaresLeaky(BaseEstimator):
 
 
 class LeastMeanSquaresFourth(BaseEstimator):
-    """Least Mean Squares Fourth(LMSF) filter for parameter estimation.
+    """Least Mean Squares Fourth (LMSF) filter for parameter estimation.
+
+    The LMSF algorithm is an adaptive filter used to estimate the parameters of a model
+    by using the mean fourth error cost function to eliminate the noise effectively.
 
     Parameters
     ----------
-    mu : float, default=0.01
+    mu : float, default=0.5
         The learning rate or step size for the LMS algorithm.
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
 
     Attributes
     ----------
     mu : float
         The learning rate or step size for the LMS algorithm.
+    unbiased : bool
+        Indicates whether an unbiased estimator is applied.
+    uiter : int
+        Number of iterations for the unbiased estimator.
     xi : np.ndarray or None
         The estimation error at each iteration. Initialized as None and updated during
         optimization.
@@ -1325,7 +1573,22 @@ class LeastMeanSquaresFourth(BaseEstimator):
     Methods
     -------
     optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
-        Estimate the model parameters using the LMS filter.
+        Estimate the model parameters using the LMSF filter.
+
+    References
+    ----------
+    - Hayes, M. H. (2009). Statistical digital signal processing and modeling.
+      John Wiley & Sons.
+    - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias de
+      algoritmos LMS de passo variável.
+    - Gui, G., Mehbodniya, A., & Adachi, F. (2013). Least mean square/fourth algorithm
+      with application to sparse channel estimation. arXiv preprint arXiv:1304.3911.
+      https://arxiv.org/pdf/1304.3911.pdf
+    - Nascimento, V. H., & Bermudez, J. C. M. (2005, March). When is the least-mean
+      fourth algorithm mean-square stable? In Proceedings.(ICASSP'05). IEEE
+      International Conference on Acoustics, Speech, and Signal Processing, 2005.
+      (Vol. 4, pp. iv-341). IEEE. http://www.lps.usp.br/vitor/artigos/icassp05.pdf
+    - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
     """
 
     def __init__(self, *, mu: float = 0.5, unbiased: bool = False, uiter: int = 30):
@@ -1336,49 +1599,33 @@ class LeastMeanSquaresFourth(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Parameter estimation using the  LMS Fourth filter.
+        r"""Parameter estimation using the LMS Fourth filter.
 
-        When the leakage factor, gama, is set to 0 then there is no
-        leakage in the estimation process.
+        The LMSF algorithm updates the parameter estimates recursively as follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi_i = y_i - \psi_i^T \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} + \mu \psi_i \xi_i^3
+           $$
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : ndarray of floats of shape = y_training
-            The data used to training the model.
+        y : ndarray of floats of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : ndarray of floats of shape = number_of_model_elements
+        theta : ndarray of floats of shape (n_features, 1)
             The estimated parameters of the model.
-
-        Notes
-        -----
-        A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
-
-        References
-        ----------
-        - Book: Hayes, M. H. (2009). Statistical digital signal processing
-           and modeling. John Wiley & Sons.
-        - Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
-           análise estatística e novas estratégias de algoritmos LMS de passo
-           variável.
-        - Manuscript:Gui, G., Mehbodniya, A., & Adachi, F. (2013).
-           Least mean square/fourth algorithm with application to sparse
-           channel estimation. arXiv preprint arXiv:1304.3911.
-           https://arxiv.org/pdf/1304.3911.pdf
-        - Manuscript: Nascimento, V. H., & Bermudez, J. C. M. (2005, March).
-           When is the least-mean fourth algorithm mean-square stable?
-           In Proceedings.(ICASSP'05). IEEE International Conference on
-           Acoustics, Speech, and Signal Processing, 2005.
-           (Vol. 4, pp. iv-341). IEEE.
-           http://www.lps.usp.br/vitor/artigos/icassp05.pdf
-        - Wikipedia entry on Least Mean Squares
-           https://en.wikipedia.org/wiki/Least_mean_squares_filter
-
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
 
@@ -1406,20 +1653,39 @@ class LeastMeanSquareMixedNorm(BaseEstimator):
     mu : float, optional
         The adaptation step size. Default is 0.01.
     weight : float, optional
-        The weight factor for mixed-norm control. Weight factor to control the
-        proportions of the error norms and offers an extra degree of freedom within
-        the adaptation of the LMS mixed norm method.
+        The weight factor for mixed-norm control. This factor controls the
+        proportions of the error norms and offers an extra degree of freedom
+        within the adaptation of the LMS mixed norm method.
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
 
     Attributes
     ----------
     mu : float
         The adaptation step size.
     weight : float
-        The weight factor for mixed-norm control. Weight factor to control the
-        proportions of the error norms and offers an extra degree of freedom within
-        the adaptation of the LMS mixed norm method.
+        The weight factor for mixed-norm control.
     xi : ndarray or None
         The error signal, initialized to None.
+
+    Methods
+    -------
+    optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
+        Estimate the model parameters using the LMSF filter.
+
+    References
+    ----------
+    - Chambers, J. A., Tanrikulu, O., & Constantinides, A. G. (1994).
+      Least mean mixed-norm adaptive filtering.
+      Electronics letters, 30(19), 1574-1575.
+      https://ieeexplore.ieee.org/document/326382
+    - Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
+      análise estatística e novas estratégias de algoritmos LMS de passo
+      variável.
+    - Wikipedia entry on Least Mean Squares
+      https://en.wikipedia.org/wiki/Least_mean_squares_filter
     """
 
     def __init__(
@@ -1438,38 +1704,39 @@ class LeastMeanSquareMixedNorm(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Parameter estimation using the Mixed-norm LMS filter.
+        r"""Parameter estimation using the Mixed-norm LMS filter.
+
+        The LMS-MN algorithm updates the parameter estimates recursively as follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi_i = y_i - \psi_i^T \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} + \mu \psi_i \xi_i (\text{weight}
+           + (1 - \text{weight}) \xi_i^2)
+           $$
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
 
         Notes
         -----
-        A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
-
-        References
-        ----------
-        - Chambers, J. A., Tanrikulu, O., & Constantinides, A. G. (1994).
-           Least mean mixed-norm adaptive filtering.
-           Electronics letters, 30(19), 1574-1575.
-           https://ieeexplore.ieee.org/document/326382
-        - Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
-           análise estatística e novas estratégias de algoritmos LMS de passo
-           variável.
-        - Wikipedia entry on Least Mean Squares
-           https://en.wikipedia.org/wiki/Least_mean_squares_filter
-
+        A more in-depth documentation of all methods for parameter estimation
+        will be available soon. For now, please refer to the mentioned references.
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
 
@@ -1564,8 +1831,8 @@ class NonNegativeLeastSquares(BaseEstimator):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like
-            The data used to training the model.
+        y : ndarray of floats of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
@@ -1735,8 +2002,8 @@ class BoundedVariableLeastSquares(BaseEstimator):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like
-            The data used to training the model.
+        y : ndarray of floats of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
@@ -1878,8 +2145,8 @@ class LeastSquaresMinimalResidual(BaseEstimator):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like
-            The data used to training the model.
+        y : ndarray of floats of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------

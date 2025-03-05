@@ -8,28 +8,47 @@ import numpy as np
 
 
 def get_siso_data(n=5000, colored_noise=False, sigma=0.05, train_percentage=90):
-    """Perform the Error Reduction Ration algorithm.
+    r"""Generate synthetic data for Single-Input Single-Output system identification.
+
+    This function simulates input-output data for a SISO system based on a predefined
+    nonlinear difference equation. The system output is affected by either white noise
+    or colored noise (autoregressive noise) depending on the `colored_noise` flag.
 
     Parameters
     ----------
-    n : int
-        The number of samples.
-    colored_noise : bool
-        Select white noise or colored noise (autoregressive noise).
-    sigma : float
-        The standard deviation of the random distribution to generate
-        the noise.
-    train_percentage : int
-        The percentage of the data to be used as train data.
+    n : int, optional (default=5000)
+        Number of samples to generate.
+    colored_noise : bool, optional (default=False)
+        If True, adds colored (autoregressive) noise to the system; otherwise, white
+        noise is used.
+    sigma : float, optional (default=0.05)
+        Standard deviation of the noise distribution.
+    train_percentage : int, optional (default=90)
+        Percentage of the dataset allocated for training. The rest is used for
+        validation.
 
     Returns
     -------
-    x_train, x_valid : array-like
-        The input data to be used in identification and validation,
-        respectively.
-    y_train, y_valid : array-like
-        The output data to be used in identification and validation,
-        respectively.
+    x_train : ndarray
+        Input data for system identification (training).
+    x_valid : ndarray
+        Input data for system validation (testing).
+    y_train : ndarray
+        Output data corresponding to `x_train`.
+    y_valid : ndarray
+        Output data corresponding to `x_valid`.
+
+    Notes
+    -----
+    - The system follows the nonlinear difference equation:
+
+      y[k] = 0.2 * y[k-1] + 0.1 * y[k-1] * x[k-1] + 0.9 * x[k-2] + e[k]
+
+      where `e[k]` is either white or colored noise.
+
+    - The input `x` is uniformly sampled from the range [-1, 1].
+    - The dataset is split based on `train_percentage`, ensuring a clear separation
+      between training and validation data.
 
     """
     mu = 0  # mean of the distribution
@@ -67,28 +86,52 @@ def get_siso_data(n=5000, colored_noise=False, sigma=0.05, train_percentage=90):
 
 
 def get_miso_data(n=5000, colored_noise=False, sigma=0.05, train_percentage=90):
-    """Perform the Error Reduction Ration algorithm.
+    """Generate synthetic data for Multiple-Input Single-Output system identification.
+
+    This function simulates input-output data for a nonlinear MISO system using two
+    input signals. The system output is influenced by both inputs and can be affected
+    by either white or colored (autoregressive) noise based on the `colored_noise` flag.
 
     Parameters
     ----------
-    n : int
-        The number of samples.
-    colored_noise : bool
-        Select white noise or colored noise (autoregressive noise).
-    sigma : float
-        The standard deviation of the random distribution to generate
-        the noise.
-    train_percentage : int
-        The percentage of the data to be used as train data.
+    n : int, optional (default=5000)
+        Number of samples to generate.
+    colored_noise : bool, optional (default=False)
+        If True, adds colored (autoregressive) noise to the system; otherwise, white
+        noise is used.
+    sigma : float, optional (default=0.05)
+        Standard deviation of the noise distribution.
+    train_percentage : int, optional (default=90)
+        Percentage of the dataset allocated for training. The remainder is used
+        for validation.
 
     Returns
     -------
-    x_train, x_valid : array-like
-        The input data to be used in identification and validation,
-        respectively.
-    y_train, y_valid : array-like
-        The output data to be used in identification and validation,
-        respectively.
+    x_train : ndarray
+        Input data matrix (features) for system identification (training).
+    x_valid : ndarray
+        Input data matrix (features) for system validation (testing).
+    y_train : ndarray
+        Output data corresponding to `x_train`.
+    y_valid : ndarray
+        Output data corresponding to `x_valid`.
+
+    Notes
+    -----
+    - The system follows the nonlinear difference equation:
+
+      y[k] = 0.4 * y[k-1]² + 0.1 * y[k-1] * x1[k-1] + 0.6 * x2[k-1]
+             - 0.3 * x1[k-1] * x2[k-2] + e[k]
+
+      where `e[k]` is either white or colored noise.
+
+    - The inputs `x1` and `x2` are independently sampled from a uniform distribution in
+      the range [-1, 1].
+    - The dataset is split into training and validation sets based on `train_percentage`
+      , ensuring a clear separation between them.
+    - The function returns `x_train` and `x_valid` as stacked arrays, where each row
+      represents a sample and each column corresponds to an input variable
+      (`x1` or `x2`).
 
     """
     mu = 0  # mean of the distribution

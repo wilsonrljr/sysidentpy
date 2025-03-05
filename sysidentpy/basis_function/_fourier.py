@@ -8,10 +8,31 @@ from .basis_function_base import BaseBasisFunction
 
 
 class Fourier(BaseBasisFunction):
-    """Build Fourier basis function.
+    r"""Build Fourier basis function.
 
     Generate a new feature matrix consisting of all Fourier features
     with respect to the number of harmonics.
+
+    The Fourier expansion is given by:
+
+    If you set $\mathcal{F}$ as the Fourier extension
+
+    $$
+    \mathcal{F}(x) = [\cos(\pi x), \sin(\pi x), \cos(2\pi x), \sin(2\pi x), \ldots,
+    \cos(N\pi x), \sin(N\pi x)]
+    $$
+
+    In this case, the Fourier ARX representation will be:
+
+    \begin{aligned}
+    y_k = &\Big[ \cos(\pi y_{k-1}), \sin(\pi y_{k-1}), \cos(2\pi y_{k-1}),
+    \sin(2\pi y_{k-1}), \ldots, \cos(N\pi y_{k-1}), \sin(N\pi y_{k-1}), \\
+    &\ \ \cos(\pi y_{k-2}), \sin(\pi y_{k-2}), \ldots, \cos(N\pi y_{k-n_y}),
+    \sin(N\pi y_{k-n_y}), \\
+    &\ \ \cos(\pi x_{k-1}), \sin(\pi x_{k-1}), \cos(2\pi x_{k-1}), \sin(2\pi x_{k-1}),
+    \ldots, \cos(N\pi x_{k-n_x}), \sin(N\pi x_{k-n_x}) \Big] \\
+    &\ \ + e_k
+    \end{aligned}
 
     Parameters
     ----------
