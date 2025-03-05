@@ -54,78 +54,91 @@ Estimators = Union[
 
 
 class SimulateNARMAX(BaseMSS):
-    r"""Simulation of Polynomial NARMAX model.
+    r"""Simulates a Polynomial NARMAX model.
 
-    The NARMAX model is described as:
+    The NARMAX (Nonlinear AutoRegressive Moving Average with eXogenous inputs) model
+    is described as:
 
     $$
-        y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1},
-        \dotsc, x_{k-d-n_x}, e_{k-1}, \dotsc, e_{k-n_e}] + e_k
+    y_k = \mathcal{F}^\ell \Big[y_{k-1}, \dotsc, y_{k-n_y}, x_{k-d}, x_{k-d-1},
+    \dotsc, x_{k-d-n_x}, e_{k-1}, \dotsc, e_{k-n_e} \Big] + e_k
     $$
 
-    where $n_y\in \mathbb{N}^*$, $n_x \in \mathbb{N}$, $n_e \in \mathbb{N}$,
-    are the maximum lags for the system output and input respectively;
-    $x_k \in \mathbb{R}^{n_x}$ is the system input and $y_k \in \mathbb{R}^{n_y}$
-    is the system output at discrete time $k \in \mathbb{N}^n$;
-    $e_k \in \mathbb{R}^{n_e}$ stands for uncertainties and possible noise
-    at discrete time $k$. In this case, $\mathcal{F}^\ell$ is some nonlinear function
-    of the input and output regressors with nonlinearity degree $\ell \in \mathbb{N}$
-    and $d$ is a time delay typically set to $d=1$.
+    where:
+
+    - $ n_y \in \mathbb{N}^* $, $ n_x \in \mathbb{N} $, and $ n_e \in \mathbb{N} $ are
+        the maximum lags for the system output, input, and noise, respectively.
+    - $ x_k \in \mathbb{R}^{n_x} $ is the system input, and $ y_k \in \mathbb{R}^{n_y} $
+        is the system output at discrete time $ k \in \mathbb{N} $.
+    - $ e_k \in \mathbb{R}^{n_e} $ represents uncertainties and possible noise at
+        discrete time $ k $.
+    - $ \mathcal{F}^\ell $ is a nonlinear function of the input and output regressors
+        with nonlinearity degree $ \ell \in \mathbb{N} $.
+    - $ d $ is a time delay, typically set to $ d=1 $.
+
+    This class provides tools for simulating NARMAX models using a chosen basis function
+    and estimation method.
 
     Parameters
     ----------
-    estimator : str, default="least_squares"
-        The parameter estimation method.
-    estimate_parameter : bool, default=False
-        Whether to use a method for parameter estimation.
-        Must be True if the user do not enter the pre-estimated parameters.
-        Note that we define a specific set of noise regressors.
+    estimator : Estimators, default=RecursiveLeastSquares()
+        The parameter estimation method used for model identification.
+    elag : int or list, default=2
+        Specifies the maximum lags for the error variables.
+        If an integer, it applies to both input and output lags.
+        If a list, it should contain specific lag values for different variables.
+    estimate_parameter : bool, default=True
+        Whether to estimate model parameters. Set to `True` unless pre-estimated
+        parameters are provided.
     calculate_err : bool, default=False
-        Whether to use a ERR algorithm to the pre-defined regressors.
-    eps : float
-        Normalization factor of the normalized filters.
+        If `True`, uses the Error Reduction Ratio (ERR) algorithm to select regressors.
+    model_type : str, default="NARMAX"
+        Defines the model type. Supported values: `"NARMAX"`, `"ARX"`, `"OE"`, etc.
+    basis_function : Polynomial or Fourier, default=Polynomial()
+        The basis function used to define the model's nonlinear terms.
+    eps : float, default=np.finfo(np.float64).eps
+        A small numerical constant used for normalization.
+
+    Attributes
+    ----------
+    n_inputs : int
+        Number of input variables.
+    xlag : int or list
+        Lags for the input variables.
+    ylag : int or list
+        Lags for the output variables.
+    n_terms : int
+        Number of terms in the final model.
+    err : array-like
+        Error Reduction Ratio (ERR) values for the selected regressors.
+    final_model : array-like
+        The structure of the identified model.
+    theta : array-like
+        Estimated parameters of the model.
+    pivv : array-like
+        Pivot vector for variable selection.
+    non_degree : int
+        Degree of nonlinearity used in the model.
 
     Examples
     --------
     >>> import numpy as np
-    >>> import matplotlib.pyplot as plt
     >>> from sysidentpy.simulation import SimulateNARMAX
-    >>> from sysidentpy.basis_function._basis_function import Polynomial
-    >>> from sysidentpy.metrics import root_relative_squared_error
-    >>> from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
-    >>> x_train, x_valid, y_train, y_valid = get_siso_data(n=1000,
-    ...                                                    colored_noise=True,
-    ...                                                    sigma=0.2,
-    ...                                                    train_percentage=90)
+    >>> from sysidentpy.basis_function import Polynomial
+    >>> x_train = np.random.rand(1000, 1)
+    >>> y_train = np.random.rand(1000, 1)
     >>> basis_function = Polynomial(degree=2)
-    >>> s = SimulateNARMAX(basis_function=basis_function)
-    >>> model = np.array(
-    ...     [
-    ...     [1001,    0], # y(k-1)
-    ...     [2001, 1001], # x1(k-1)y(k-1)
-    ...     [2002,    0], # x1(k-2)
-    ...     ]
-    ...                 )
-    >>> # theta must be a numpy array of shape (n, 1) where n
-    ... is the number of regressors
-    >>> theta = np.array([[0.2, 0.9, 0.1]]).T
-    >>> yhat = s.simulate(
-    ...     X_test=x_test,
-    ...     y_test=y_test,
-    ...     model_code=model,
-    ...     theta=theta,
-    ...     )
-    >>> r = pd.DataFrame(
-    ...     results(
-    ...         model.final_model, model.theta, model.err,
-    ...         model.n_terms, err_precision=8, dtype='sci'
-    ...         ),
-    ...     columns=['Regressors', 'Parameters', 'ERR'])
-    >>> print(r)
-        Regressors Parameters         ERR
-    0        x1(k-2)     0.9000       0.0
-    1         y(k-1)     0.1999       0.0
-    2  x1(k-1)y(k-1)     0.1000       0.0
+    >>> simulator = SimulateNARMAX(basis_function=basis_function)
+    >>> model = np.array([
+    ...     [1001, 0],       # y(k-1)
+    ...     [2001, 1001],    # x1(k-1)y(k-1)
+    ...     [2002, 0]        # x1(k-2)
+    ... ])
+    >>> theta = np.array([[0.2, 0.9, 0.1]]).T  # Model parameters
+    >>> y_pred = simulator.simulate(
+    ...     X_test=x_train, y_test=y_train,
+    ...     model_code=model, theta=theta
+    ... )
     """
 
     def __init__(
@@ -220,31 +233,80 @@ class SimulateNARMAX(BaseMSS):
         theta=None,
         forecast_horizon=None,
     ):
-        """Simulate a model defined by the user.
+        """Simulate the response of a NARMAX model based on user-defined parameters.
+
+        This method simulates the system's response using a predefined model structure
+        (`model_code`) and estimated parameters (`theta`). It allows for both
+        training-based parameter estimation and direct simulation using precomputed
+        parameters.
 
         Parameters
         ----------
-        X_train : array_like
-            The input data to be used in the training process.
-        y_train : array_like
-            The output data to be used in the training process.
-        X_test : array_like
-            The input data to be used in the prediction process.
-        y_test : array_like
-            The output data (initial conditions) to be used in the prediction process.
-        model_code : array_like
-            Flattened list of input or output regressors.
-        steps_ahead : int or None, optional
-            The forecast horizon. Default is None
-        theta : array-like
-            The parameters of the model.
-        forecast_horizon : int or None, optional
-            The forecast horizon used in NARMA models and variants.
+        X_train : array-like, shape (n_samples, n_features), optional
+            Input data used for parameter estimation during training.
+            Required if `estimate_parameter=True`.
+        y_train : array-like, shape (n_samples, 1), optional
+            Output (target) data used for parameter estimation during training.
+            Required if `estimate_parameter=True`.
+        X_test : array-like, shape (n_samples, n_features), optional
+            Input data used for simulation (prediction).
+        y_test : array-like, shape (n_samples, 1), optional
+            Output data used as initial conditions for simulation.
+        model_code : array-like, shape (n_terms, n_columns)
+            Encoded representation of the model's regressors, defining
+            the input-output relationships in the system.
+        steps_ahead : int, optional
+            Number of steps ahead for multi-step prediction. If `None`, defaults to
+            one-step-ahead prediction.
+        theta : array-like, shape (n_terms, 1), optional
+            Precomputed model parameters. Required if `estimate_parameter=False`.
+        forecast_horizon : int, optional
+            Number of time steps to predict in open-loop forecasting.
+            Used mainly for NAR and NARMA-type models.
 
         Returns
         -------
-        yhat : array_like
-            The predicted values of the model.
+        yhat : array-like, shape (n_samples, 1)
+            Predicted output values of the system based on the given inputs.
+
+        Raises
+        ------
+        ValueError
+            If necessary parameters are missing, such as `y_train` when
+            `estimate_parameter=True` or `theta` when `estimate_parameter=False`.
+
+        Notes
+        -----
+        - If `estimate_parameter=True`, the method first estimates the parameters using
+        the provided training data (`X_train`, `y_train`) and the chosen basis function.
+        - If `estimate_parameter=False`, the method assumes `theta` contains the model
+            parameters.
+        - The forecast horizon is automatically adjusted for NAR models if not provided.
+        - The method internally computes the lag structure based on `model_code` to
+            define regressors.
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from sysidentpy.simulation import SimulateNARMAX
+        >>> from sysidentpy.basis_function import Polynomial
+        >>> X_train = np.random.rand(1000, 1)
+        >>> y_train = np.random.rand(1000, 1)
+        >>> X_test = np.random.rand(200, 1)
+        >>> y_test = np.random.rand(200, 1)
+        >>> basis_function = Polynomial(degree=2)
+        >>> simulator = SimulateNARMAX(basis_function=basis_function)
+        >>> model = np.array([
+        ...     [1001, 0],       # y(k-1)
+        ...     [2001, 1001],    # x1(k-1)y(k-1)
+        ...     [2002, 0]        # x1(k-2)
+        ... ])
+        >>> theta = np.array([[0.2, 0.9, 0.1]]).T  # Precomputed model parameters
+        >>> y_pred = simulator.simulate(
+        ...     X_train=X_train, y_train=y_train,
+        ...     X_test=X_test, y_test=y_test,
+        ...     model_code=model, theta=theta
+        ... )
 
         """
         self._check_simulate_params(y_train, y_test, model_code, steps_ahead, theta)

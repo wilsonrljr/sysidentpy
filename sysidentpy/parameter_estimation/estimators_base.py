@@ -18,9 +18,21 @@ class BaseEstimator(metaclass=ABCMeta):
 
     @abstractmethod
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Abstract method."""
+        """Abstract method to optimize the model parameters."""
 
     def _check_linear_dependence_rows(self, psi):
+        """Check for linear dependence in the rows of the Psi matrix.
+
+        Parameters
+        ----------
+        psi : ndarray of floats
+            The information matrix of the model.
+
+        Warns
+        -----
+        UserWarning
+            If the Psi matrix has linearly dependent rows.
+        """
         if np.linalg.matrix_rank(psi) != psi.shape[1]:
             warn(
                 "Psi matrix might have linearly dependent rows."
@@ -29,6 +41,24 @@ class BaseEstimator(metaclass=ABCMeta):
             )
 
     def _initial_values(self, psi: np.ndarray):
+        """Initialize values for the estimation process.
+
+        Parameters
+        ----------
+        psi : ndarray of floats
+            The information matrix of the model.
+
+        Returns
+        -------
+        n_theta : int
+            Number of parameters to be estimated.
+        n : int
+            Number of observations.
+        theta : ndarray of floats
+            Initial parameter estimates.
+        xi : ndarray of floats
+            Initial residuals.
+        """
         n_theta = psi.shape[1]
         n = len(psi)
         theta = np.zeros([n_theta, n])
@@ -38,7 +68,10 @@ class BaseEstimator(metaclass=ABCMeta):
     def unbiased_estimator(
         self, psi, y, theta, elag, max_lag, estimator, basis_function, uiter=20
     ):
-        """Estimate the model parameters using Extended Least Squares method.
+        """Estimate the model parameters using the Extended Least Squares method.
+
+        The Extended Least Squares method iteratively refines the parameter estimates
+        by incorporating the residuals as additional regressors.
 
         Parameters
         ----------
@@ -56,8 +89,9 @@ class BaseEstimator(metaclass=ABCMeta):
             The parameter estimation method.
         basis_function : BasisFunction
             The basis function to represent the function F in the model space.
-        uiter : int
-            The number of iterations to be used in the Extended Least Squares method.
+        uiter : int, optional
+            The number of iterations to be used in the Extended Least Squares method
+            (default is 20).
 
         Returns
         -------
@@ -78,7 +112,6 @@ class BaseEstimator(metaclass=ABCMeta):
             https://eprints.soton.ac.uk/263855/1/tls_overview.pdf
         - Wikipedia entry on Least Squares
            https://en.wikipedia.org/wiki/Least_squares
-
         """
         e = y - np.dot(psi, theta)
         im = InformationMatrix(ylag=elag)
@@ -102,7 +135,18 @@ class BaseEstimator(metaclass=ABCMeta):
         return unbiased_theta[0 : theta.shape[0], 0].reshape(-1, 1)
 
     def _validate_params(self, attributes):
-        """Validate input params."""
+        """Validate input parameters.
+
+        Parameters
+        ----------
+        attributes : dict
+            Dictionary containing parameter names and their values.
+
+        Raises
+        ------
+        ValueError
+            If any parameter is of incorrect type or out of the expected range.
+        """
         # Define expected types and value ranges for each parameter
         param_specs = {
             "lam": (float, (0, 1)),
