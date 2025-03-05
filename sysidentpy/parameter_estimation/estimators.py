@@ -1831,8 +1831,8 @@ class NonNegativeLeastSquares(BaseEstimator):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like
-            The data used to training the model.
+        y : ndarray of floats of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
@@ -2002,8 +2002,8 @@ class BoundedVariableLeastSquares(BaseEstimator):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like
-            The data used to training the model.
+        y : ndarray of floats of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
@@ -2145,8 +2145,8 @@ class LeastSquaresMinimalResidual(BaseEstimator):
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like
-            The data used to training the model.
+        y : ndarray of floats of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
