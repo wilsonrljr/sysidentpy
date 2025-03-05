@@ -39,21 +39,33 @@ function installCode() {
 window.installCode = installCode;
 
 document.addEventListener("DOMContentLoaded", function () {
-  const logo = document.querySelector("a.md-header__button.md-logo");
-
-  if (logo) {
-    const newLogo = document.createElement("a");
-    newLogo.href = "./";
-    newLogo.className = "md-header__button md-logo";
-    newLogo.setAttribute("aria-label", "SysIdentPy");
-    newLogo.setAttribute("data-md-component", "logo");
-    newLogo.setAttribute("title", "SysIdentPy");
-
-    const img = document.createElement("img");
-    img.src = "overrides/assets/img/logotype-sysidentpy.svg";
-    img.alt = "Logotype SysIdentPy";
-
-    newLogo.appendChild(img);
-    logo.replaceWith(newLogo);
-  }
+  var swiper = new Swiper(".mySwiper", {
+    slidesPerView: 3,
+    spaceBetween: 20,
+    loop: true,
+    autoplay: {
+      delay: 2000,
+      disableOnInteraction: false,
+    },
+    navigation: {
+      nextEl: ".swiper-button-next",
+      prevEl: ".swiper-button-prev",
+    },
+    pagination: {
+      el: ".swiper-pagination",
+      clickable: true,
+    },
+    breakpoints: {
+      0: {
+        slidesPerView: 1,
+        navigation: false,
+      },
+      768: {
+        slidesPerView: 1,
+      },
+      1200: {
+        slidesPerView: 3,
+      },
+    },
+  });
 });

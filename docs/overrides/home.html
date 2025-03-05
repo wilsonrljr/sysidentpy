@@ -1,17 +1,6 @@
 {#- This file was automatically generated - do not edit -#} {% extends
 "overrides/main.html" %} {% block tabs %} {{ super() }}
 
-<link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
-/>
-<link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css"
-/>
-<link href="overrides/assets/vendor/css/prism.css" rel="stylesheet" />
-<link href="overrides/assets/css/style.css" rel="stylesheet" />
-
 <section id="hero">
     <div class="container">
         <div class="row">
@@ -850,47 +839,6 @@
             });
         })
         .catch((error) => console.error("Error fetching repository:", error));
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-
-<script src="overrides/assets/vendor/js/prism.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-<script src="overrides/assets/js/chart-example.js"></script>
-<script src="overrides/assets/js/scripts.js"></script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var swiper = new Swiper(".mySwiper", {
-            slidesPerView: 3,
-            spaceBetween: 20,
-            loop: true,
-            autoplay: {
-                delay: 2000,
-                disableOnInteraction: false,
-            },
-            navigation: {
-                nextEl: ".swiper-button-next",
-                prevEl: ".swiper-button-prev",
-            },
-            pagination: {
-                el: ".swiper-pagination",
-                clickable: true,
-            },
-            breakpoints: {
-                0: {
-                    slidesPerView: 1,
-                    navigation: false,
-                },
-                768: {
-                    slidesPerView: 1,
-                },
-                1200: {
-                    slidesPerView: 3,
-                },
-            },
-        });
-    });
 </script>
 
 {% endblock %} {% block content %}{% endblock %} {% block footer %}{% endblock
