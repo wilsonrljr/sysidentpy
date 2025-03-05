@@ -1433,7 +1433,11 @@ class LeastMeanSquaresNormalizedLeaky(BaseEstimator):
 
 
 class LeastMeanSquaresLeaky(BaseEstimator):
-    """Least Mean Squares Leaky(LMSL) filter for parameter estimation.
+    """Least Mean Squares Leaky (LMSL) filter for parameter estimation.
+
+    The LMSL algorithm is an adaptive filter used to estimate the parameters of a model
+    by minimizing the mean square error between the observed and predicted values. The
+    leakage factor helps to prevent coefficient drift.
 
     Parameters
     ----------
@@ -1441,6 +1445,10 @@ class LeastMeanSquaresLeaky(BaseEstimator):
         The learning rate or step size for the LMS algorithm.
     gama : float, default=0.2
         The leakage factor of the Leaky LMS method.
+    unbiased : bool, optional
+        If True, applies an unbiased estimator. Default is False.
+    uiter : int, optional
+        Number of iterations for the unbiased estimator. Default is 30.
 
     Attributes
     ----------
@@ -1455,7 +1463,15 @@ class LeastMeanSquaresLeaky(BaseEstimator):
     Methods
     -------
     optimize(psi: np.ndarray, y: np.ndarray) -> np.ndarray
-        Estimate the model parameters using the LMS filter.
+        Estimate the model parameters using the LMSL filter.
+
+    References
+    ----------
+    - Hayes, M. H. (2009). Statistical digital signal processing and modeling.
+      John Wiley & Sons.
+    - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias de
+      algoritmos LMS de passo variável.
+    - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
     """
 
     def __init__(
@@ -1474,39 +1490,44 @@ class LeastMeanSquaresLeaky(BaseEstimator):
         self.xi: np.ndarray
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Parameter estimation using the  Leaky LMS filter.
+        r"""Parameter estimation using the Leaky LMS filter.
 
-        When the leakage factor, gama, is set to 0 then there is no
-        leakage in the estimation process.
+        The LMSL algorithm updates the parameter estimates recursively as follows:
+
+        1. Compute the estimation error:
+
+           $$
+           \xi_i = y_i - \psi_i^T \theta_{i-1}
+           $$
+
+        2. Update the parameter vector:
+
+           $$
+           \theta_i = \theta_{i-1} (1 - \mu \gamma) + \mu \xi_i \psi_i
+           $$
+
+        When the leakage factor, $\gamma$, is set to 0, there is no leakage in the
+        estimation process.
 
         Parameters
         ----------
         psi : ndarray of floats
             The information matrix of the model.
-        y : array-like of shape = y_training
-            The data used to training the model.
+        y : array-like of shape (n_samples, 1)
+            The data used to train the model.
 
         Returns
         -------
-        theta : array-like of shape = number_of_model_elements
+        theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
-
-        Notes
-        -----
-        A more in-depth documentation of all methods for parameters estimation
-        will be available soon. For now, please refer to the mentioned
-        references.
 
         References
         ----------
-        - Book: Hayes, M. H. (2009). Statistical digital signal processing
-           and modeling. John Wiley & Sons.
-        - Dissertation (Portuguese): Zipf, J. G. F. (2011). Classificação,
-           análise estatística e novas estratégias de algoritmos LMS de passo
-           variável.
-        - Wikipedia entry on Least Mean Squares
-           https://en.wikipedia.org/wiki/Least_mean_squares_filter
-
+        - Hayes, M. H. (2009). Statistical digital signal processing and modeling.
+          John Wiley & Sons.
+        - Zipf, J. G. F. (2011). Classificação, análise estatística e novas estratégias
+          de algoritmos LMS de passo variável.
+        - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
         """
         n_theta, n, theta, self.xi = self._initial_values(psi)
 
