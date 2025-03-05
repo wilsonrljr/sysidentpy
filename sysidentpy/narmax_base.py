@@ -17,7 +17,23 @@ from .utils._check_arrays import _num_features
 
 
 class InformationMatrix:
-    """Class for methods regarding preprocessing of columns."""
+    """Constructs lagged versions of input and output data for system identification.
+
+    This class provides methods to preprocess time-series data by shifting columns
+    according to user-defined input (`xlag`) and output (`ylag`) lags. The resulting
+    matrices are used for regression-based system identification, where each column
+    represents a candidate regressor derived from lagged input-output relationships.
+
+    Parameters
+    ----------
+    xlag : int or list of int, optional (default=1)
+        The number of past values (lags) to consider for each input variable.
+        If multiple inputs exist, `xlag` should be a nested list specifying lags for
+        each input.
+    ylag : int or list of int, optional (default=1)
+        The number of past values (lags) to consider for the output variable.
+
+    """
 
     def __init__(
         self,
@@ -28,25 +44,29 @@ class InformationMatrix:
         self.ylag = ylag
 
     def shift_column(self, col_to_shift: np.ndarray, lag: int) -> np.ndarray:
-        """Shift values based on a lag.
+        """Shift an array by a specified lag, introducing zeros for missing values.
 
         Parameters
         ----------
-        col_to_shift : array-like of shape = n_samples
-            The samples of the input or output.
+        col_to_shift : array-like of shape (n_samples,)
+            The input or output time-series data to be lagged.
         lag : int
-            The respective lag of the regressor.
+            The number of time steps to shift the data.
 
         Returns
         -------
-        tmp_column : array-like of shape = n_samples
-            The shifted array of the input or output.
+        tmp_column : ndarray of shape (n_samples, 1)
+            The shifted array, where the first `lag` values are replaced with zeros.
 
         Examples
         --------
-        >>> y = [1, 2, 3, 4, 5]
+        >>> y = np.array([1, 2, 3, 4, 5])
         >>> shift_column(y, 1)
-        [0, 1, 2, 3, 4]
+        array([[0],
+               [1],
+               [2],
+               [3],
+               [4]])
 
         """
         n_samples = col_to_shift.shape[0]
@@ -56,19 +76,25 @@ class InformationMatrix:
         return tmp_column
 
     def _process_xlag(self, X: np.ndarray) -> Tuple[int, List[int]]:
-        """Create the list of lags to be used for the inputs.
+        """Process and validate input lags, ensuring correct formatting.
 
         Parameters
         ----------
         X : array-like
-            Input data used on training phase.
+            Input data used during the training phase.
 
         Returns
         -------
-        x_lag : ndarray of int
-            The range of lags according to user definition.
         n_inputs : int
-            Number of input variables.
+            The number of input variables.
+        x_lag : list of int
+            The processed list of lags for input variables.
+
+        Raises
+        ------
+        ValueError
+            If multiple inputs exist but `xlag` is provided as a single integer instead
+            of a list.
 
         """
         n_inputs = _num_features(X)
@@ -90,7 +116,7 @@ class InformationMatrix:
         Returns
         -------
         y_lag : ndarray of int
-            The range of lags according to user definition.
+            The processed list of lags for the output variable.
 
         """
         if isinstance(self.ylag, int):
@@ -101,20 +127,19 @@ class InformationMatrix:
         return ylag
 
     def _create_lagged_X(self, X: np.ndarray, n_inputs: int) -> np.ndarray:
-        """Create a lagged matrix of inputs without combinations.
+        """Create a lagged matrix of input variables without interaction terms.
 
         Parameters
         ----------
         X : array-like
-            Input data used on training phase.
+            Input data used during the training phase.
         n_inputs : int
-            Number of input variables.
+            The number of input variables.
 
         Returns
         -------
-        x_lagged : ndarray of floats
-            A lagged input matrix formed by the input regressors
-            without combinations.
+        x_lagged : ndarray
+            A matrix where each column represents a lagged version of an input variable.
 
         """
         if n_inputs == 1:
@@ -138,7 +163,7 @@ class InformationMatrix:
         return x_lagged
 
     def _create_lagged_y(self, y: np.ndarray) -> np.ndarray:
-        """Create a lagged matrix of the output without combinations.
+        """Create a lagged matrix of the output variable.
 
         Parameters
         ----------
@@ -147,9 +172,9 @@ class InformationMatrix:
 
         Returns
         -------
-        y_lagged : ndarray of floats
-            A lagged input matrix formed by the output regressors
-            without combinations.
+        y_lagged : ndarray
+            A matrix where each column represents a lagged version of the output
+            variable.
 
         """
         y_lagged = np.column_stack(
@@ -158,26 +183,24 @@ class InformationMatrix:
         return y_lagged
 
     def initial_lagged_matrix(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Build a lagged matrix concerning each lag for each column.
+        """Construct a matrix with lagged versions of input and output variables.
 
         Parameters
         ----------
-        y : array-like
-            Target data used on training phase.
         X : array-like
-            Input data used on training phase.
+            Input data used during the training phase.
+        y : array-like
+            Output data used during the training phase.
 
         Returns
         -------
-        lagged_data : ndarray of floats
-            The lagged matrix built in respect with each lag and column.
+        lagged_data : ndarray
+            The combined matrix containing lagged input and output values.
 
         Examples
         --------
-        Let X and y be the input and output values of shape Nx1.
-        If the chosen lags are 2 for both input and output
-        the initial lagged matrix will be formed by Y[k-1], Y[k-2],
-        X[k-1], and X[k-2].
+        If `xlag=2` and `ylag=2`, the resulting matrix will contain columns:
+        Y[k-1], Y[k-2], X[k-1], X[k-2].
 
         """
         n_inputs, self.xlag = self._process_xlag(X)
@@ -197,13 +220,13 @@ class InformationMatrix:
         Parameters
         ----------
         args : array-like
-            Target data used on training phase.
-            args[0] is X=None in NAR scenario
+            Target data used during the training phase. In a NAR
+            (Nonlinear AutoRegressive) model, `X=None`.
 
         Returns
         -------
         data = ndarray of floats
-            The lagged matrix built in respect with each lag and column.
+            The constructed output regressor matrix.
 
         """
         # Generate a lagged data which each column is a input or output
@@ -265,7 +288,7 @@ class InformationMatrix:
         Returns
         -------
         data = ndarray of floats
-            The lagged matrix built in respect with each lag and column.
+            The constructed information matrix.
 
         """
         # Generate a lagged data which each column is a input or output
