@@ -43,12 +43,6 @@ organization GitHub account for sponsoring.
 <hr />
 **Special thanks** to our **sponsors**:
 
-!!! success ":medal: Gold Sponsors"
-
-    <a href="https://github.com/ml-technium">
-        <img alt="Technium" src="https://avatars.githubusercontent.com/u/83768197?v=4" width="90" height="90">
-    </a>
-
 !!! success ":star: Monthly Sponsors"
 
     <a href="https://github.com/statisticallyinsifnificant">
@@ -65,6 +59,9 @@ organization GitHub account for sponsoring.
 
   [wilsonrljr's sponsor profile]: https://github.com/sponsors/wilsonrljr
 
+
+### Powered by
+[![PyCharm logo](https://resources.jetbrains.com/storage/products/company/brand/logos/PyCharm.svg)](https://jb.gg/OpenSourceSupport)
 
 ### Goals
 

@@ -333,23 +333,16 @@ The documentation and structure (even this section) is openly inspired by Scikit
 
 
 ## Sponsors
-<!-- sponsors -->
+
 **Special thanks** to our **sponsors**
-
-<hr />
-
-
-### Gold Sponsors
-
-<a href="https://github.com/ml-technium">
-    <img alt="Technium" src="https://avatars.githubusercontent.com/u/83768197?v=4" width="90" height="90">
-</a>
 
 ### Monthly Sponsors
 
 <a href="https://github.com/statisticallyinsifnificant">
     <img alt="statisticallyinsifnificant" src="https://avatars.githubusercontent.com/u/158107107?v=4" width="90" height="90">
 </a>
+
+<hr />
 
 ### Individual Sponsors
 
@@ -361,4 +354,8 @@ The documentation and structure (even this section) is openly inspired by Scikit
 
   [wilsonrljr's sponsor profile]: https://github.com/sponsors/wilsonrljr
 
-<!-- sponsors -->
+
+### Powered by
+[![PyCharm logo](https://resources.jetbrains.com/storage/products/company/brand/logos/PyCharm.svg)](https://jb.gg/OpenSourceSupport)
+
+<hr />
