@@ -8,13 +8,14 @@ repo_name: wilsonrljr/sysidentpy
 repo_url: https://github.com/wilsonrljr/sysidentpy
 
 # Copyright
-copyright: Copyright &copy; 2016 - 2022 Wilson Rocha
+copyright: Copyright &copy; 2016 - 2025 Wilson Rocha
 
 # Configuration
 theme:
   name: material
   custom_dir: docs/
-  favicon: overrides/assets-2.0/img/favicon.png
+  favicon: /overrides/assets/img/favicon.png
+  logo: /overrides/assets/img/logotype-sysidentpy.svg
   icon:
     logo: fontawesome/solid/house
 
@@ -65,16 +66,25 @@ theme:
 ## Custom theme additions
 extra_javascript:
   - https://polyfill.io/v3/polyfill.min.js?features=es6
-  - overrides/assets-2.0/js/katex.js
+  - overrides/assets/js/katex.js
   - https://unpkg.com/katex@0/dist/katex.min.js
   - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
+  - https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js
+  - overrides/assets/vendor/js/prism.js
+  - https://cdn.jsdelivr.net/npm/apexcharts
+  - overrides/assets/js/chart-example.js
+  - overrides/assets/js/scripts.js
 
 extra_css:
-  - overrides/assets-2.0/css/extra.css
-  - overrides/assets-2.0/css/feature-grid.css
-  - overrides/assets-2.0/css/fontsize.css
-  - overrides/assets-2.0/css/card-container.css
+  - overrides/assets/css/extra.css
+  - overrides/assets/css/feature-grid.css
+  - overrides/assets/css/fontsize.css
+  - overrides/assets/css/card-container.css
   - https://unpkg.com/katex@0/dist/katex.min.css
+  - https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css
+  - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css
+  - overrides/assets/vendor/css/prism.css
+  - overrides/assets/css/style.css
 
 # Plugins
 plugins:
