@@ -212,7 +212,7 @@ Lets check the metrics of the eletro mechanical system modeled in Chapter 4.
 import numpy as np
 import pandas as pd
 from sysidentpy.model_structure_selection import FROLS
-from sysidentpy.basis_function._basis_function import Polynomial
+from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation import LeastSquares
 from sysidentpy.utils.display_results import results
 from sysidentpy.utils.plotting import plot_residues_correlation, plot_results

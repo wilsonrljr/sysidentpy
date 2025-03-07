@@ -16,7 +16,7 @@
 <h1 align="center"> NARMAX Methods For System Identification and TimeSeries Forecasting </h1>
 <h3 align="center">From Classical Approaches to Neural Networks</h3>
 
-**SysIdentPy** offers State of the Art techniques to build your NARMAX models, including it's variants `NARX`, `NARMA`, `NAR`, `NFIR`, `ARMAX`, `ARX`, `ARMA` and others. It also includes tons of interesting examples to help you build nonlinear forecasting models using SysIdentPy.
+**SysIdentPy** offers State of the Art techniques to build your NARMAX models, including its variants `NARX`, `NARMA`, `NAR`, `NFIR`, `ARMAX`, `ARX`, `ARMA` and others. It also includes tons of interesting examples to help you build nonlinear forecasting models using SysIdentPy.
 
 </div>
 
@@ -126,7 +126,7 @@ x_train, x_valid, y_train, y_valid = get_siso_data(
 
 ```python
 from sysidentpy.model_structure_selection import FROLS
-from sysidentpy.basis_function._basis_function import Polynomial
+from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation import LeastSquares
 from sysidentpy.metrics import root_relative_squared_error
 from sysidentpy.utils.generate_data import get_siso_data
@@ -330,7 +330,6 @@ The documentation and structure (even this section) is openly inspired by Scikit
 <a href="https://github.com/wilsonrljr/sysidentpy/graphs/contributors">
   <img src="https://contributors-img.web.app/image?repo=wilsonrljr/sysidentpy" width = 500/>
 </a>
-
 
 ## Sponsors
 

@@ -113,7 +113,7 @@ We can generate the input `X`  and output `y` using SysIdentPy. Before getting i
 ```python
 from sysidentpy.utils.generate_data import get_siso_data
 from sysidentpy.model_structure_selection import FROLS
-from sysidentpy.basis_function._basis_function import Polynomial
+from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation import LeastSquares
 from sysidentpy.utils.display_results import results
 
@@ -158,7 +158,7 @@ To check how this work, we can use SysIdentPy without Model Structure Selection 
 ```python
 from sysidentpy.utils.generate_data import get_siso_data
 from sysidentpy.model_structure_selection import FROLS
-from sysidentpy.basis_function._basis_function import Polynomial
+from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation import LeastSquares
 from sysidentpy.narmax_base import InformationMatrix
 
@@ -400,7 +400,7 @@ From now on the examples will not include the Model Structure Selection step. Th
 ```python
 from sysidentpy.utils.generate_data import get_siso_data
 from sysidentpy.model_structure_selection import FROLS
-from sysidentpy.basis_function._basis_function import Polynomial
+from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation import TotalLeastSquares
 from sysidentpy.narmax_base import InformationMatrix
 
@@ -481,7 +481,7 @@ You can access the source code to check how SysIdentPy implements the RLS algori
 ```python
 from sysidentpy.utils.generate_data import get_siso_data
 from sysidentpy.model_structure_selection import FROLS
-from sysidentpy.basis_function._basis_function import Polynomial
+from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation import RecursiveLeastSquares
 from sysidentpy.narmax_base import InformationMatrix
 import matplotlib.pyplot as plt
@@ -605,7 +605,7 @@ To use any one on the methods above, you just need to import it and set the `est
 ```python
 from sysidentpy.utils.generate_data import get_siso_data
 from sysidentpy.model_structure_selection import FROLS
-from sysidentpy.basis_function._basis_function import Polynomial
+from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation import LeastMeanSquares
 from sysidentpy.narmax_base import InformationMatrix
 import matplotlib.pyplot as plt
@@ -670,7 +670,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 from sysidentpy.model_structure_selection import FROLS
-from sysidentpy.basis_function._basis_function import Polynomial
+from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation import LeastSquares
 from sysidentpy.utils.generate_data import get_siso_data
 from sysidentpy.utils.display_results import results

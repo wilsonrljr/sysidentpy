@@ -404,7 +404,7 @@ An example using real data will be described using SysIdentPy. In this example, 
 import numpy as np
 import pandas as pd
 from sysidentpy.model_structure_selection import FROLS
-from sysidentpy.basis_function._basis_function import Polynomial
+from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation import LeastSquares
 from sysidentpy.utils.display_results import results
 from sysidentpy.utils.plotting import plot_results
@@ -630,7 +630,7 @@ In the next example, we will generate data with 100 samples, using white noise, 
 import numpy as np
 import pandas as pd
 from sysidentpy.model_structure_selection import FROLS
-from sysidentpy.basis_function._basis_function import Polynomial
+from sysidentpy.basis_function import Polynomial
 from sysidentpy.utils.generate_data import get_siso_data
 from sysidentpy.utils.display_results import results
 

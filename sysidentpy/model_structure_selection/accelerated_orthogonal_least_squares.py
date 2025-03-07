@@ -93,7 +93,7 @@ class AOLS(BaseMSS):
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
     >>> from sysidentpy.model_structure_selection import AOLS
-    >>> from sysidentpy.basis_function._basis_function import Polynomial
+    >>> from sysidentpy.basis_function import Polynomial
     >>> from sysidentpy.utils.display_results import results
     >>> from sysidentpy.metrics import root_relative_squared_error
     >>> from sysidentpy.utils.generate_data import get_miso_data, get_siso_data

@@ -122,7 +122,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
     >>> import matplotlib.pyplot as plt
     >>> from sysidentpy.model_structure_selection import MetaMSS
     >>> from sysidentpy.metrics import root_relative_squared_error
-    >>> from sysidentpy.basis_function._basis_function import Polynomial
+    >>> from sysidentpy.basis_function import Polynomial
     >>> from sysidentpy.utils.display_results import results
     >>> from sysidentpy.utils.generate_data import get_siso_data
     >>> x_train, x_valid, y_train, y_valid = get_siso_data(n=400,
