@@ -779,7 +779,7 @@ Lets use SysIdentPy to see how the search space grows in the linear versus the n
 
 ```python
 from sysidentpy.utils.narmax_tools import regressor_code
-from sysidentpy.basis_function._basis_function import Polynomial]
+from sysidentpy.basis_function import Polynomial
 import numpy as np
 ```
 
@@ -1113,7 +1113,7 @@ from torch import nn
 import torch
 
 from sysidentpy.neural_network import NARXNN
-from sysidentpy.basis_function._basis_function import Polynomial
+from sysidentpy.basis_function import Polynomial
 from sysidentpy.utils.generate_data import get_siso_data
 from sysidentpy.utils.narmax_tools import regressor_code
 
@@ -1265,7 +1265,7 @@ Scikit-learn, for example, is another great example. You can transform any Sciki
 
 ``` python
 from sysidentpy.general_estimators import NARX
-from sysidentpy.basis_function._basis_function import Polynomial
+from sysidentpy.basis_function import Polynomial
 from sklearn.linear_model import BayesianRidge
 import xgboost as xgb
 

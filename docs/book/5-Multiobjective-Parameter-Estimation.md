@@ -107,7 +107,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.multiobjective_parameter_estimation import AILS
-from sysidentpy.basis_function._basis_function import Polynomial
+from sysidentpy.basis_function import Polynomial
 from sysidentpy.utils.display_results import results
 from sysidentpy.utils.plotting import plot_results
 from sysidentpy.metrics import root_relative_squared_error
