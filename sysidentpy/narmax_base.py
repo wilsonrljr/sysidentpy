@@ -61,7 +61,7 @@ class InformationMatrix:
         Examples
         --------
         >>> y = np.array([1, 2, 3, 4, 5])
-        >>> shift_column(y, 1)
+        >>> self.shift_column(y, 1)
         array([[0],
                [1],
                [2],
@@ -213,7 +213,7 @@ class InformationMatrix:
     def build_output_matrix(self, *args: np.ndarray) -> np.ndarray:
         """Build the information matrix of output values.
 
-        Each columns of the information matrix represents a candidate
+        Each column of the information matrix represents a candidate
         regressor. The set of candidate regressors are based on xlag,
         ylag, and degree entered by the user.
 
@@ -243,7 +243,7 @@ class InformationMatrix:
     def build_input_matrix(self, *args: np.ndarray) -> np.ndarray:
         """Build the information matrix of input values.
 
-        Each columns of the information matrix represents a candidate
+        Each column of the information matrix represents a candidate
         regressor. The set of candidate regressors are based on xlag,
         ylag, and degree entered by the user.
 
@@ -274,7 +274,7 @@ class InformationMatrix:
     def build_input_output_matrix(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Build the information matrix.
 
-        Each columns of the information matrix represents a candidate
+        Each column of the information matrix represents a candidate
         regressor. The set of candidate regressors are based on xlag,
         ylag, and degree entered by the user.
 
@@ -341,10 +341,10 @@ class RegressorDictionary(InformationMatrix):
         --------
         The codification is defined as:
 
-        >>> 100n = y(k-n)
-        >>> 200n = u(k-n)
-        >>> [100n 100n] = y(k-n)y(k-n)
-        >>> [200n 200n] = u(k-n)u(k-n)
+        100n = y(k-n)
+        200n = u(k-n)
+        [100n, 100n] = y(k-n)y(k-n)
+        [200n, 200n] = u(k-n)u(k-n)
 
         References
         ----------
