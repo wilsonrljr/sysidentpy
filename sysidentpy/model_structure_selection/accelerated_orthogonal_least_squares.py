@@ -29,7 +29,7 @@ from ..parameter_estimation.estimators import (
     NormalizedLeastMeanSquaresSignError,
     LeastMeanSquaresSignRegressor,
 )
-from ..utils._check_arrays import _check_positive_int, _num_features
+from ..utils.check_arrays import check_positive_int, num_features
 
 Estimators = Union[
     LeastSquares,
@@ -317,7 +317,7 @@ class AOLS(BaseMSS):
         )
 
         if X is not None:
-            self.n_inputs = _num_features(X)
+            self.n_inputs = num_features(X)
         else:
             self.n_inputs = 1  # just to create the regressor space base
 
@@ -386,7 +386,7 @@ class AOLS(BaseMSS):
                 yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
                 return yhat
 
-            _check_positive_int(steps_ahead, "steps_ahead")
+            check_positive_int(steps_ahead, "steps_ahead")
             yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
             yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
             return yhat

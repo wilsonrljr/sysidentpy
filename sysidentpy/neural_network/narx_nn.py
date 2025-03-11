@@ -17,7 +17,7 @@ from torch.utils.data import DataLoader, TensorDataset
 
 from ..narmax_base import BaseMSS
 from ..basis_function import Polynomial
-from ..utils._check_arrays import _check_positive_int, _num_features
+from ..utils.check_arrays import check_positive_int, num_features
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -311,7 +311,7 @@ class NARXNN(BaseMSS):
             )
 
         if X is not None:
-            self.n_inputs = _num_features(X)
+            self.n_inputs = num_features(X)
         else:
             self.n_inputs = 1  # only used to create the regressor space base
 
@@ -510,7 +510,7 @@ class NARXNN(BaseMSS):
             if steps_ahead == 1:
                 return self._one_step_ahead_prediction(X, y)
 
-            _check_positive_int(steps_ahead, "steps_ahead")
+            check_positive_int(steps_ahead, "steps_ahead")
             return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
 
         if steps_ahead is None:

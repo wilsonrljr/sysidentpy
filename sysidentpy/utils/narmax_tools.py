@@ -5,7 +5,7 @@ import numpy as np
 
 from ..narmax_base import RegressorDictionary
 from ..basis_function import Polynomial
-from ._check_arrays import _num_features
+from .check_arrays import num_features
 
 
 def regressor_code(
@@ -40,7 +40,7 @@ def regressor_code(
         The generated regressor encoding.
     """
     if X is not None:
-        n_inputs = _num_features(X)
+        n_inputs = num_features(X)
     else:
         n_inputs = 1  # only used to create the regressor space base
 

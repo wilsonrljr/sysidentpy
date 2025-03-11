@@ -13,7 +13,7 @@ from typing import Any, List, Tuple, Union, Optional
 import numpy as np
 
 from .basis_function import Fourier, Polynomial
-from .utils._check_arrays import _num_features
+from .utils.check_arrays import num_features
 
 
 class InformationMatrix:
@@ -97,7 +97,7 @@ class InformationMatrix:
             of a list.
 
         """
-        n_inputs = _num_features(X)
+        n_inputs = num_features(X)
         if isinstance(self.xlag, int) and n_inputs > 1:
             raise ValueError(
                 f"If n_inputs > 1, xlag must be a nested list. Got {self.xlag}"
@@ -485,7 +485,7 @@ class RegressorDictionary(InformationMatrix):
         regressor_code = regressor_code[:, regressor_code.shape[1] :: -1]
         return regressor_code
 
-    def _get_index_from_regressor_code(
+    def get_index_from_regressor_code(
         self, regressor_code: np.ndarray, model_code: List[int]
     ):
         """Get the index of user regressor in regressor space.
@@ -514,7 +514,7 @@ class RegressorDictionary(InformationMatrix):
         )[0]
         return model_index
 
-    def _list_output_regressor_code(self, model_code: List[int]) -> np.ndarray:
+    def list_output_regressor_code(self, model_code: List[int]) -> np.ndarray:
         """Create a flattened array of output regressors.
 
         Parameters
@@ -534,7 +534,7 @@ class RegressorDictionary(InformationMatrix):
 
         return np.asarray(regressor_code)
 
-    def _list_input_regressor_code(self, model_code: List[int]) -> np.ndarray:
+    def list_input_regressor_code(self, model_code: List[int]) -> np.ndarray:
         """Create a flattened array of input regressors.
 
         Parameters
@@ -553,7 +553,7 @@ class RegressorDictionary(InformationMatrix):
         ]
         return np.asarray(regressor_code)
 
-    def _get_lag_from_regressor_code(self, regressors):
+    def get_lag_from_regressor_code(self, regressors):
         """Get the maximum lag from array of regressors.
 
         Parameters
@@ -575,7 +575,7 @@ class RegressorDictionary(InformationMatrix):
 
         return 1
 
-    def _get_max_lag_from_model_code(self, model_code: List[int]) -> int:
+    def get_max_lag_from_model_code(self, model_code: List[int]) -> int:
         """Create a flattened array of input regressors.
 
         Parameters
@@ -589,10 +589,10 @@ class RegressorDictionary(InformationMatrix):
             Maximum lag of list of regressors.
 
         """
-        xlag_code = self._list_input_regressor_code(model_code)
-        ylag_code = self._list_output_regressor_code(model_code)
-        xlag = self._get_lag_from_regressor_code(xlag_code)
-        ylag = self._get_lag_from_regressor_code(ylag_code)
+        xlag_code = self.list_input_regressor_code(model_code)
+        ylag_code = self.list_output_regressor_code(model_code)
+        xlag = self.get_lag_from_regressor_code(xlag_code)
+        ylag = self.get_lag_from_regressor_code(ylag_code)
         return max(xlag, ylag)
 
     def _get_max_lag(self):

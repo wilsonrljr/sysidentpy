@@ -20,7 +20,7 @@ class BaseEstimator(metaclass=ABCMeta):
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Abstract method to optimize the model parameters."""
 
-    def _check_linear_dependence_rows(self, psi):
+    def check_linear_dependence_rows(self, psi):
         """Check for linear dependence in the rows of the Psi matrix.
 
         Parameters

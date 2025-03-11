@@ -11,7 +11,7 @@ import numpy as np
 from ..basis_function import Fourier, Polynomial
 from ..narmax_base import BaseMSS, Orthogonalization
 
-from ..utils._check_arrays import _check_positive_int, _num_features
+from ..utils.check_arrays import check_positive_int, num_features
 from ..parameter_estimation.estimators import (
     LeastSquares,
     RidgeRegression,
@@ -312,14 +312,14 @@ class SimulateNARMAX(BaseMSS):
         self._check_simulate_params(y_train, y_test, model_code, steps_ahead, theta)
 
         if X_test is not None:
-            self.n_inputs = _num_features(X_test)
+            self.n_inputs = num_features(X_test)
         else:
             self.n_inputs = 1  # just to create the regressor space base
 
-        xlag_code = self._list_input_regressor_code(model_code)
-        ylag_code = self._list_output_regressor_code(model_code)
-        self.xlag = self._get_lag_from_regressor_code(xlag_code)
-        self.ylag = self._get_lag_from_regressor_code(ylag_code)
+        xlag_code = self.list_input_regressor_code(model_code)
+        ylag_code = self.list_output_regressor_code(model_code)
+        self.xlag = self.get_lag_from_regressor_code(xlag_code)
+        self.ylag = self.get_lag_from_regressor_code(ylag_code)
         self.max_lag = max(self.xlag, self.ylag)
         if self.n_inputs != 1:
             self.xlag = self.n_inputs * [list(range(1, self.max_lag + 1))]
@@ -331,7 +331,7 @@ class SimulateNARMAX(BaseMSS):
         self.non_degree = model_code.shape[1]
         regressor_code = self.regressor_space(self.n_inputs)
 
-        self.pivv = self._get_index_from_regressor_code(regressor_code, model_code)
+        self.pivv = self.get_index_from_regressor_code(regressor_code, model_code)
         self.final_model = regressor_code[self.pivv]
         # to use in the predict function
         self.n_terms = self.final_model.shape[0]
@@ -516,7 +516,7 @@ class SimulateNARMAX(BaseMSS):
                 yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
                 return yhat
 
-            _check_positive_int(steps_ahead, "steps_ahead")
+            check_positive_int(steps_ahead, "steps_ahead")
             yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
             yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
             return yhat

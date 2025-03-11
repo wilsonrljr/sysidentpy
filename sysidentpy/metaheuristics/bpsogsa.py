@@ -6,7 +6,7 @@
 
 import numpy as np
 
-from sysidentpy.utils._check_arrays import check_random_state
+from sysidentpy.utils.check_arrays import check_random_state
 
 
 class BPSOGSA:
@@ -58,7 +58,7 @@ class BPSOGSA:
     - A New Hybrid PSOGSA Algorithm for Function Optimization,
        https://www.mathworks.com/matlabcentral/fileexchange/35939-hybrid-particle-swarm-optimization-and-gravitational-search-algorithm-psogsa
     - Manuscript: Particle swarm optimization: developments, applications and resources.
-    - Manuscript: S-shaped versus v-shaped transfer functions for binary
+    - Manuscript: S-shaped versus V-shaped transfer functions for binary
        particle swarm optimization
     - Manuscript: BGSA: Binary Gravitational Search Algorithm.
     - Manuscript: A taxonomy of hybrid metaheuristics
@@ -113,7 +113,7 @@ class BPSOGSA:
            https://www.mathworks.com/matlabcentral/fileexchange/35939-hybrid-particle-swarm-optimization-and-gravitational-search-algorithm-psogsa
         - Manuscript: Particle swarm optimization: developments, applications and
             resources.
-        - Manuscript: S-shaped versus v-shaped transfer functions for binary.
+        - Manuscript: S-shaped versus V-shaped transfer functions for binary.
            particle swarm optimization
         - Manuscript: BGSA: Binary Gravitational Search Algorithm.
         - Manuscript: A taxonomy of hybrid metaheuristics.

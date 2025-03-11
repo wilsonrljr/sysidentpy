@@ -7,7 +7,7 @@
 
 import warnings
 
-from typing import Union
+from typing import Union, Optional
 
 import numpy as np
 
@@ -90,7 +90,7 @@ class LeastSquares(BaseEstimator):
         theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
         """
-        self._check_linear_dependence_rows(psi)
+        self.check_linear_dependence_rows(psi)
         theta = np.linalg.lstsq(psi, y, rcond=None)[0]
         return theta
 
@@ -191,7 +191,7 @@ class RidgeRegression(BaseEstimator):
         https://www.nature.com/articles/s41467-021-25801-2
 
         """
-        self._check_linear_dependence_rows(psi)
+        self.check_linear_dependence_rows(psi)
 
         theta = (
             np.linalg.pinv(psi.T @ psi + self.alpha * np.eye(psi.shape[1])) @ psi.T @ y
@@ -224,7 +224,7 @@ class RidgeRegression(BaseEstimator):
                          Cross Validated, accessed 21 September 2023,
                          https://stats.stackexchange.com/q/220324
         """
-        self._check_linear_dependence_rows(psi)
+        self.check_linear_dependence_rows(psi)
         try:
             U, S, Vh = np.linalg.svd(psi, full_matrices=False)
             S = np.diag(S)
@@ -304,7 +304,7 @@ class TotalLeastSquares(BaseEstimator):
         theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
         """
-        self._check_linear_dependence_rows(psi)
+        self.check_linear_dependence_rows(psi)
         full = np.hstack((psi, y))
         n = psi.shape[1]
         _, _, v = np.linalg.svd(full, full_matrices=True)
@@ -367,8 +367,8 @@ class RecursiveLeastSquares(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi: np.ndarray
-        self.theta_evolution: np.ndarray
+        self.xi: Optional[np.ndarray] = None
+        self.theta_evolution: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         r"""Estimate the model parameters using the Recursive Least Squares method.
@@ -495,7 +495,7 @@ class AffineLeastMeanSquares(BaseEstimator):
         self.uiter = uiter
         self.unbiased = unbiased
         self._validate_params(vars(self))
-        self.xi: np.ndarray
+        self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         r"""Estimate the model parameters using the Affine Least Mean Squares.
@@ -593,7 +593,7 @@ class LeastMeanSquares(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi: np.ndarray
+        self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         r"""Estimate the model parameters using the Least Mean Squares filter.
@@ -679,7 +679,7 @@ class LeastMeanSquaresSignError(BaseEstimator):
         self.uiter = uiter
         self.unbiased = unbiased
         self._validate_params(vars(self))
-        self.xi: np.ndarray
+        self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         r"""Parameter estimation using the Sign-Error Least Mean Squares filter.
@@ -778,7 +778,7 @@ class NormalizedLeastMeanSquares(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi: np.ndarray
+        self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         r"""Parameter estimation using the Normalized Least Mean Squares filter.
@@ -875,7 +875,7 @@ class NormalizedLeastMeanSquaresSignError(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi: np.ndarray
+        self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         r"""Parameter estimation using the Normalized Sign-Error LMS filter.
@@ -972,7 +972,7 @@ class LeastMeanSquaresSignRegressor(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi: np.ndarray
+        self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         r"""Parameter estimation using the Sign-Regressor LMS filter.
@@ -1069,7 +1069,7 @@ class LeastMeanSquaresNormalizedSignRegressor(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi: np.ndarray
+        self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         r"""Parameter estimation using the Normalized Sign-Regressor LMS filter.
@@ -1161,7 +1161,7 @@ class LeastMeanSquaresSignSign(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi: np.ndarray
+        self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         r"""Parameter estimation using the Sign-Sign LMS filter.
@@ -1258,7 +1258,7 @@ class LeastMeanSquaresNormalizedSignSign(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi: np.ndarray
+        self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         r"""Parameter estimation using the Normalized Sign-Sign LMS filter.
@@ -1374,7 +1374,7 @@ class LeastMeanSquaresNormalizedLeaky(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi: np.ndarray
+        self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         r"""Parameter estimation using the Normalized Leaky LMS filter.
@@ -1487,7 +1487,7 @@ class LeastMeanSquaresLeaky(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi: np.ndarray
+        self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         r"""Parameter estimation using the Leaky LMS filter.
@@ -1596,7 +1596,7 @@ class LeastMeanSquaresFourth(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi: np.ndarray
+        self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         r"""Parameter estimation using the LMS Fourth filter.
@@ -1701,7 +1701,7 @@ class LeastMeanSquareMixedNorm(BaseEstimator):
         self.unbiased = unbiased
         self.uiter = uiter
         self._validate_params(vars(self))
-        self.xi: np.ndarray
+        self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         r"""Parameter estimation using the Mixed-norm LMS filter.
@@ -1790,11 +1790,11 @@ class NonNegativeLeastSquares(BaseEstimator):
 
     References
     ----------
-    .. [1] Lawson C., Hanson R.J., "Solving Least Squares Problems", SIAM,
+    Lawson C., Hanson R.J., "Solving Least Squares Problems", SIAM,
        1995, :doi:`10.1137/1.9781611971217`
-    .. [2] Bro, Rasmus and de Jong, Sijmen, "A Fast Non-Negativity-Constrained Least
-    Squares Algorithm", Journal Of Chemometrics, 1997,
-    :doi:`10.1002/(SICI)1099-128X(199709/10)11:5<393::AID-CEM483>3.0.CO;2-L`
+    Bro, Rasmus and de Jong, Sijmen, "A Fast Non-Negativity-Constrained Least
+        Squares Algorithm", Journal Of Chemometrics, 1997,
+        :doi:`10.1002/(SICI)1099-128X(199709/10)11:5<393::AID-CEM483>3.0.CO;2-L`
 
     Examples
     --------
@@ -1931,14 +1931,13 @@ class BoundedVariableLeastSquares(BaseEstimator):
 
     References
     ----------
-    .. [STIR] M. A. Branch, T. F. Coleman, and Y. Li, "A Subspace, Interior,
-              and Conjugate Gradient Method for Large-Scale Bound-Constrained
-              Minimization Problems," SIAM Journal on Scientific Computing,
-              Vol. 21, Number 1, pp 1-23, 1999.
-    .. [BVLS] P. B. Start and R. L. Parker, "Bounded-Variable Least-Squares:
-              an Algorithm and Applications", Computational Statistics, 10,
-              129-141, 1995.
-
+    M. A. Branch, T. F. Coleman, and Y. Li, "A Subspace, Interior,
+        and Conjugate Gradient Method for Large-Scale Bound-Constrained
+        Minimization Problems," SIAM Journal on Scientific Computing,
+        Vol. 21, Number 1, pp 1-23, 1999.
+    P. B. Start and R. L. Parker, "Bounded-Variable Least-Squares:
+        an Algorithm and Applications", Computational Statistics, 10,
+        129-141, 1995.
 
     Notes
     -----

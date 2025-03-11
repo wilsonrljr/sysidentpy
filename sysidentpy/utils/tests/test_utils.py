@@ -1,8 +1,8 @@
 import numpy as np
 from numpy.testing import assert_equal, assert_raises
-from sysidentpy.utils._check_arrays import (
-    _check_positive_int,
-    _num_features,
+from sysidentpy.utils.check_arrays import (
+    check_positive_int,
+    num_features,
     check_dimension,
     check_infinity,
     check_length,
@@ -15,14 +15,14 @@ from sysidentpy.utils.display_results import results
 
 
 def test_check_positive_int():
-    assert_raises(ValueError, _check_positive_int, -1, "name")
+    assert_raises(ValueError, check_positive_int, -1, "name")
 
 
 def test_num_features():
     X = np.random.rand(10, 2)
     Y = np.random.rand(10, 1)
-    assert_equal(_num_features(X), 2)
-    assert_equal(_num_features(Y), 1)
+    assert_equal(num_features(X), 2)
+    assert_equal(num_features(Y), 1)
 
 
 def test_check_infinity():
@@ -98,11 +98,13 @@ def test_load_model():
 
 
 def test_results():
-    model = np.array([
-        [1001, 0],  # y(k-1)
-        [2001, 1001],  # x1(k-1)y(k-1)
-        [2002, 0],  # x1(k-2)
-    ])
+    model = np.array(
+        [
+            [1001, 0],  # y(k-1)
+            [2001, 1001],  # x1(k-1)y(k-1)
+            [2002, 0],  # x1(k-2)
+        ]
+    )
     theta = np.array([[0.19999698], [0.90011667], [0.10080975]])
     err = np.array([0.98, 0.01, 0.01])
     table = results(
