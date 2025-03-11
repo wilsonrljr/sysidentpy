@@ -21,7 +21,7 @@ Basis functions commonly used in system identification:
  In SysIdentPy you can define the basis function you want to use in your model by just import them:
 
 ```python
-from sysidentpy.basis_function import Polynomial, Fourier, Bernstein
+from sysidentpy.basis_function import Polynomial, Fourier, Bersntein
 ```
 
 To keep things simple for now, we will show simple examples of how basis function can be used in a modeling task. We will show a simple polynomial basis functions, a triangular basis function, a radial basis function and a rectangular basis function.
