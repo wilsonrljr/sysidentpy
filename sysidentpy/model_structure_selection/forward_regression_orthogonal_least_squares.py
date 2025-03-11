@@ -124,14 +124,14 @@ class FROLS(BaseMSS):
     ...                                                    sigma=0.2,
     ...                                                    train_percentage=90)
     >>> basis_function = Polynomial(degree=2)
-    >>> model = PolynomialNarmax(basis_function=basis_function,
-    ...                          order_selection=True,
-    ...                          n_info_values=10,
-    ...                          extended_least_squares=False,
-    ...                          ylag=2, xlag=2,
-    ...                          info_criteria='aic',
-    ...                          estimator='least_squares',
-    ...                          )
+    >>> model = FROLS(basis_function=basis_function,
+    ...               order_selection=True,
+    ...               n_info_values=10,
+    ...               extended_least_squares=False,
+    ...               ylag=2, xlag=2,
+    ...               info_criteria='aic',
+    ...               estimator='least_squares',
+    ...               )
     >>> model.fit(x_train, y_train)
     >>> yhat = model.predict(x_valid, y_valid)
     >>> rrse = root_relative_squared_error(y_valid, yhat)

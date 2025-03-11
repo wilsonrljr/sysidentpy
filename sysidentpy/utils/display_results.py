@@ -18,30 +18,54 @@ def results(
     err_precision=8,
     dtype="dec",
 ):
-    """Write the model regressors, parameters and ERR values.
+    """Return the model regressors, parameters and ERR values.
 
-    This function returns the model regressors, its respective parameter
-    and ERR value on a string matrix.
+    Generates a formatted string matrix containing model regressors,
+    their corresponding parameters, and error reduction ratio (ERR) values.
+
+    This function constructs a structured output where each row represents
+    a model regressor, its estimated parameter, and the associated ERR value.
+    The numerical values can be displayed in either decimal or scientific notation.
 
     Parameters
     ----------
-    theta_precision : int (default: 4)
-        Precision of shown parameters values.
-    err_precision : int (default: 8)
-        Precision of shown ERR values.
-    dtype : string (default: 'dec')
-        Type of representation:
-        sci - Scientific notation;
-        dec - Decimal notation.
+    final_model : array-like, optional
+        The identified model structure, where each row corresponds to
+        a regressor represented by numerical codes.
+
+    theta : array-like, optional
+        A column vector containing the estimated parameters for each regressor.
+
+    err : array-like, optional
+        A vector containing the error reduction ratio (ERR) values for each regressor.
+
+    n_terms : int, optional
+        Number of terms (regressors) in the model.
+
+    theta_precision : int, default=4
+        Number of decimal places for displaying parameter values.
+
+    err_precision : int, default=8
+        Number of decimal places for displaying ERR values.
+
+    dtype : {'dec', 'sci'}, default='dec'
+        Format for displaying numerical values:
+        - 'dec' : Decimal notation.
+        - 'sci' : Scientific notation.
 
     Returns
     -------
-    output_matrix : string
-        Where:
-            First column represents each regressor element;
-            Second column represents associated parameter;
-            Third column represents the error reduction ratio associated
-            to each regressor.
+    output_matrix : list of lists
+        A structured matrix where:
+        - The first column contains regressor representations as strings.
+        - The second column contains the corresponding estimated parameter values.
+        - The third column contains the associated ERR values.
+
+    Raises
+    ------
+    ValueError
+        If `theta_precision` or `err_precision` is not a positive integer.
+        If `dtype` is not 'dec' or 'sci'.
 
     """
     if not isinstance(theta_precision, int) or theta_precision < 1:

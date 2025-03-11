@@ -88,7 +88,9 @@ class NARXNN(BaseMSS):
     >>> from sysidentpy.metrics import mean_squared_error
     >>> from sysidentpy.utils.generate_data import get_siso_data
     >>> from sysidentpy.neural_network import NARXNN
+    >>> from sysidentpy.basis_function import Polynomial
     >>> from sysidentpy.utils.generate_data import get_siso_data
+    >>> basis_function = Polynomial(degree=2)
     >>> x_train, x_valid, y_train, y_valid = get_siso_data(
     ...     n=1000,
     ...     colored_noise=False,

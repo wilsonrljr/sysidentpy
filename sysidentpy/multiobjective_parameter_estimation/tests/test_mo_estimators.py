@@ -30,18 +30,6 @@ x_valid = df_valid[:, 1].reshape(-1, 1)
 y_valid = df_valid[:, 2].reshape(-1, 1)
 
 w = set_weights(static_function=True, static_gain=True)
-final_model = np.array(
-    [
-        [0, 0],
-        [1001, 0],
-        [1002, 0],
-        [2001, 0],
-        [1001, 1001],
-        [1002, 1001],
-        [2001, 1001],
-        [1002, 1002],
-    ]
-)
 
 final_model = np.array(
     [

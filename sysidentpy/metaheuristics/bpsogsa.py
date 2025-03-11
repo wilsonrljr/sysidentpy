@@ -306,7 +306,7 @@ class BPSOGSA:
             + c_factor_global_best * (global_best - population)
         )
         r = np.random.rand(self.dimension, self.n_agents)
-        transform_to_binary = np.absolute(np.tanh((velocity)))
+        transform_to_binary = np.absolute(np.tanh(velocity))
         ind = np.where(r < transform_to_binary)
         population[ind] = 1 - population[ind]
         return velocity, population

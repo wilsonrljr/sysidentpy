@@ -135,7 +135,6 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
     ...     norm=-2,
     ...     xlag=7,
     ...     ylag=7,
-    ...     estimator="least_squares",
     ...     k_agents_percent=2,
     ...     estimate_parameter=True,
     ...     maxiter=30,
@@ -143,7 +142,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
     ...     p_value=0.05,
     ...     loss_func='metamss_loss'
     ... )
-    >>> model.fit(x_train, y_train, x_valid, y_valid)
+    >>> model.fit(x_train, y_train)
     >>> yhat = model.predict(x_valid, y_valid)
     >>> rrse = root_relative_squared_error(y_valid, yhat)
     >>> print(rrse)
@@ -451,9 +450,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
         """
         sum_of_squared_residues = np.sum(residues**2)
-        variance_of_residues = (sum_of_squared_residues) / (
-            len(residues) - psi.shape[1]
-        )
+        variance_of_residues = sum_of_squared_residues / (len(residues) - psi.shape[1])
         if np.isnan(variance_of_residues):
             variance_of_residues = 4.3645e05
 
