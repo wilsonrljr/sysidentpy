@@ -12,7 +12,7 @@ from typing import Union, Tuple, Optional
 
 import numpy as np
 
-from sysidentpy.utils._check_arrays import _check_positive_int, _num_features
+from sysidentpy.utils.check_arrays import check_positive_int, num_features
 
 from ..basis_function import Fourier, Polynomial
 from ..narmax_base import BaseMSS, Orthogonalization
@@ -128,9 +128,9 @@ class FROLS(BaseMSS):
     ...               order_selection=True,
     ...               n_info_values=10,
     ...               extended_least_squares=False,
-    ...               ylag=2, xlag=2,
+    ...               ylag=2,
+    ...               xlag=2,
     ...               info_criteria='aic',
-    ...               estimator='least_squares',
     ...               )
     >>> model.fit(x_train, y_train)
     >>> yhat = model.predict(x_valid, y_valid)
@@ -611,7 +611,7 @@ class FROLS(BaseMSS):
         )
 
         if X is not None:
-            self.n_inputs = _num_features(X)
+            self.n_inputs = num_features(X)
         else:
             self.n_inputs = 1  # just to create the regressor space base
 
@@ -704,7 +704,7 @@ class FROLS(BaseMSS):
                 yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
                 return yhat
 
-            _check_positive_int(steps_ahead, "steps_ahead")
+            check_positive_int(steps_ahead, "steps_ahead")
             yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
             yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
             return yhat

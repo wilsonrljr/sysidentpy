@@ -177,8 +177,8 @@ class AILS:
         Q = Q.reshape(len(y_static), len(qit))
 
         QR = Q.dot(R)
-        static_covariance = (QR.T).dot(QR)
-        static_response = (QR.T).dot(y_static)
+        static_covariance = QR.T.dot(QR)
+        static_response = QR.T.dot(y_static)
         return QR, static_covariance, static_response
 
     def build_static_gain_information(
@@ -237,8 +237,8 @@ class AILS:
                         G[i, j] = qit[j, 1 + k] * X_static[i, k] ** (qit[j, 1 + k] - 1)
 
         HR = (G + H).dot(R)
-        gain_covariance = (HR.T).dot(HR)
-        gain_response = (HR.T).dot(gain)
+        gain_covariance = HR.T.dot(HR)
+        gain_response = HR.T.dot(gain)
         return HR, gain_covariance, gain_response
 
     def get_cost_function(
@@ -363,18 +363,18 @@ class AILS:
 
         """
         psi_builder = RegressorDictionary()
-        xlag_code = psi_builder._list_input_regressor_code(self.final_model)
-        ylag_code = psi_builder._list_output_regressor_code(self.final_model)
-        xlag = psi_builder._get_lag_from_regressor_code(xlag_code)
-        ylag = psi_builder._get_lag_from_regressor_code(ylag_code)
-        self.max_lag = psi_builder._get_max_lag_from_model_code(self.final_model)
+        xlag_code = psi_builder.list_input_regressor_code(self.final_model)
+        ylag_code = psi_builder.list_output_regressor_code(self.final_model)
+        xlag = psi_builder.get_lag_from_regressor_code(xlag_code)
+        ylag = psi_builder.get_lag_from_regressor_code(ylag_code)
+        self.max_lag = psi_builder.get_max_lag_from_model_code(self.final_model)
         if self.n_inputs != 1:
             xlag = self.n_inputs * [list(range(1, self.max_lag + 1))]
 
         psi_builder.xlag = xlag
         psi_builder.ylag = ylag
         regressor_code = psi_builder.regressor_space(self.n_inputs)
-        pivv = psi_builder._get_index_from_regressor_code(
+        pivv = psi_builder.get_index_from_regressor_code(
             regressor_code, self.final_model
         )
         self.final_model = regressor_code[pivv]
@@ -384,7 +384,11 @@ class AILS:
         )
 
         psi = Polynomial(degree=self.degree).fit(
-            lagged_data, max_lag=self.max_lag, ylag=ylag, xlag=xlag, predefined_regressors=pivv
+            lagged_data,
+            max_lag=self.max_lag,
+            ylag=ylag,
+            xlag=xlag,
+            predefined_regressors=pivv,
         )
         return psi
 

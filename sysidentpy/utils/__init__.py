@@ -1,4 +1,4 @@
-from ._check_arrays import (
+from .check_arrays import (
     check_length,
     check_dimension,
     check_infinity,

@@ -15,7 +15,7 @@ from numpy.typing import NDArray
 
 from ..narmax_base import BaseMSS
 from ..basis_function import Polynomial, Fourier
-from ..utils._check_arrays import _check_positive_int, _num_features
+from ..utils.check_arrays import check_positive_int, num_features
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -79,6 +79,7 @@ class NARX(BaseMSS):
     >>> from sysidentpy.general_estimators import NARX
     >>> from sklearn.linear_model import BayesianRidge
     >>> from sysidentpy.basis_function import Polynomial
+    >>> from sysidentpy.utils.generate_data import get_siso_data
     >>> # Generate data and fit model
     >>> x_train, x_valid, y_train, y_valid = get_siso_data(n=1000)
     >>> basis_function = Polynomial(degree=2)
@@ -178,7 +179,7 @@ class NARX(BaseMSS):
         )
 
         if X is not None:
-            self.n_inputs = _num_features(X)
+            self.n_inputs = num_features(X)
         else:
             self.n_inputs = 1  # just to create the regressor space base
 
@@ -238,7 +239,7 @@ class NARX(BaseMSS):
                 yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
                 return yhat
 
-            _check_positive_int(steps_ahead, "steps_ahead")
+            check_positive_int(steps_ahead, "steps_ahead")
             yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
             yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
             return yhat

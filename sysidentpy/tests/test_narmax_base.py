@@ -226,7 +226,7 @@ def test_get_index_from_regressor_code():
     )
     index = RegressorDictionary(
         xlag=2, ylag=2, basis_function=Polynomial(degree=2)
-    )._get_index_from_regressor_code(regressor_code=regressor_space, model_code=model)
+    ).get_index_from_regressor_code(regressor_code=regressor_space, model_code=model)
 
     assert (index == np.array([1, 3, 5])).all()
 
@@ -242,7 +242,7 @@ def test_list_output_regressor():
 
     y_code = RegressorDictionary(
         xlag=2, ylag=2, basis_function=Polynomial(degree=2)
-    )._list_output_regressor_code(model)
+    ).list_output_regressor_code(model)
     assert (y_code == np.array([1001, 1001])).all()
 
 
@@ -257,7 +257,7 @@ def test_list_input_regressor():
 
     x_code = RegressorDictionary(
         xlag=2, ylag=1, basis_function=Polynomial(degree=2)
-    )._list_input_regressor_code(model)
+    ).list_input_regressor_code(model)
     assert (x_code == np.array([2001, 2002])).all()
 
 
@@ -266,10 +266,10 @@ def test_get_lag_from_regressor_code():
     list_regressor2 = np.array([1004, 1002])
     max_lag1 = RegressorDictionary(
         xlag=2, ylag=2, basis_function=Polynomial(degree=1)
-    )._get_lag_from_regressor_code(list_regressor1)
+    ).get_lag_from_regressor_code(list_regressor1)
     max_lag2 = RegressorDictionary(
         xlag=2, ylag=2, basis_function=Polynomial(degree=1)
-    )._get_lag_from_regressor_code(list_regressor2)
+    ).get_lag_from_regressor_code(list_regressor2)
 
     assert max_lag1 == 2
     assert max_lag2 == 4
@@ -423,14 +423,14 @@ def test_regressor_space_raise():
 def test_model_information_get_lag():
     laglist = np.array([2001, 2002, 3001, 3002, 1001, 1002])
     output = 2
-    r1 = RegressorDictionary()._get_lag_from_regressor_code(laglist)
+    r1 = RegressorDictionary().get_lag_from_regressor_code(laglist)
     assert r1 == output
 
 
 def test_model_information_empty_list():
     laglist = np.array([])
     output = 1
-    r1 = RegressorDictionary()._get_lag_from_regressor_code(laglist)
+    r1 = RegressorDictionary().get_lag_from_regressor_code(laglist)
     assert r1 == output
 
 
@@ -442,7 +442,7 @@ def test_get_max_lag_from_model_code():
             [2002, 0],  # x1(k-2)
         ]
     )
-    assert RegressorDictionary()._get_max_lag_from_model_code(model) == 2
+    assert RegressorDictionary().get_max_lag_from_model_code(model) == 2
 
 
 def test_process_lag():

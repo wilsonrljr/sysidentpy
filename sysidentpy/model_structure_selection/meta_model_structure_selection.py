@@ -12,9 +12,9 @@ from ..basis_function import Polynomial
 from ..metaheuristics import BPSOGSA
 from ..metrics import mean_squared_error, root_relative_squared_error
 from ..simulation import SimulateNARMAX
-from ..utils._check_arrays import (
-    _check_positive_int,
-    _num_features,
+from ..utils.check_arrays import (
+    check_positive_int,
+    num_features,
     check_random_state,
     check_X_y,
 )
@@ -280,7 +280,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
         if X is not None:
             check_X_y(X, y)
-            self.n_inputs = _num_features(X)
+            self.n_inputs = num_features(X)
         else:
             self.n_inputs = 1  # just to create the regressor space base
 
@@ -619,7 +619,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
                 yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
                 return yhat
 
-            _check_positive_int(steps_ahead, "steps_ahead")
+            check_positive_int(steps_ahead, "steps_ahead")
             yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
             yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
             return yhat

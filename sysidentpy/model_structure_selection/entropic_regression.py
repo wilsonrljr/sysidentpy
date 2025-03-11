@@ -14,7 +14,7 @@ from scipy.special import psi
 
 from ..narmax_base import BaseMSS
 from ..basis_function import Fourier, Polynomial
-from ..utils._check_arrays import _check_positive_int, _num_features, check_random_state
+from ..utils.check_arrays import check_positive_int, num_features, check_random_state
 from ..utils.deprecation import deprecated
 from ..parameter_estimation.estimators import (
     LeastSquares,
@@ -581,7 +581,7 @@ class ER(BaseMSS):
         )
 
         if X is not None:
-            self.n_inputs = _num_features(X)
+            self.n_inputs = num_features(X)
         else:
             self.n_inputs = 1  # just to create the regressor space base
 
@@ -690,7 +690,7 @@ class ER(BaseMSS):
                 yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
                 return yhat
 
-            _check_positive_int(steps_ahead, "steps_ahead")
+            check_positive_int(steps_ahead, "steps_ahead")
             yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
             yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
             return yhat

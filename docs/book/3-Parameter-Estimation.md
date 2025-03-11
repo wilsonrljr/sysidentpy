@@ -370,27 +370,27 @@ This is implemented in SysIdentPy as follows:
 
 ```python
 def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
-	"""Estimate the model parameters using Total Least Squares method.
+    """Estimate the model parameters using Total Least Squares method.
 
-	Parameters
-	----------
-	psi : ndarray of floats
-		The information matrix of the model.
-	y : array-like of shape = y_training
-		The data used to training the model.
+    Parameters
+    ----------
+    psi : ndarray of floats
+        The information matrix of the model.
+    y : array-like of shape = y_training
+        The data used to training the model.
 
-	Returns
-	-------
-	theta : array-like of shape = number_of_model_elements
-		The estimated parameters of the model.
+    Returns
+    -------
+    theta : array-like of shape = number_of_model_elements
+        The estimated parameters of the model.
 
-	"""
-	self._check_linear_dependence_rows(psi)
-	full = np.hstack((psi, y))
-	n = psi.shape[1]
-	_, _, v = np.linalg.svd(full, full_matrices=True)
-	theta = -v.T[:n, n:] / v.T[n:, n:]
-	return theta.reshape(-1, 1)
+    """
+    self.check_linear_dependence_rows(psi)
+    full = np.hstack((psi, y))
+    n = psi.shape[1]
+    _, _, v = np.linalg.svd(full, full_matrices=True)
+    theta = -v.T[:n, n:] / v.T[n:, n:]
+    return theta.reshape(-1, 1)
 ```
 
 To use it in the modeling task, just import it like we did in the Least Squares example.

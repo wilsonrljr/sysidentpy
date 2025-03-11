@@ -231,7 +231,7 @@ for u_id, data in train.groupby(by=["unique_id"], observed=True):
             ]
         )
     except Exception:
-        print(f"Problema no id {u_id}")
+        print(f"Problem with {u_id}")
 
 results_1 = pd.DataFrame(r, columns=["unique_id", "ds", "NARMAX_1"]).explode(['unique_id', 'ds', 'NARMAX_1'])
 results_1["NARMAX_1"] = results_1["NARMAX_1"].astype(float)#.clip(lower=10)
@@ -272,7 +272,7 @@ for u_id, data in train.groupby(by=["unique_id"], observed=True):
             ]
         )
     except Exception:
-        print(f"Problema no id {u_id}")
+        print(f"Problem with {u_id}")
 
 results_1 = pd.DataFrame(r, columns=["unique_id", "ds", "NARMAX_1"]).explode(['unique_id', 'ds', 'NARMAX_1'])
 results_1["NARMAX_1"] = results_1["NARMAX_1"].astype(float)#.clip(lower=10)

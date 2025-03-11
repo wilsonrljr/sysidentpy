@@ -42,11 +42,11 @@ def check_random_state(seed):
     )
 
 
-def _num_features(X):
+def num_features(X):
     return X.shape[1]
 
 
-def _check_positive_int(value, name):
+def check_positive_int(value, name):
     if not isinstance(value, int) or value < 1:
         raise ValueError(f"{name} must be integer and > zero. Got {value}")
     else:
