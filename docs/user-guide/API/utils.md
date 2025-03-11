@@ -4,7 +4,7 @@ template: overrides/main.html
 
 # Documentation for `Neural NARX`
 
-::: sysidentpy.utils._check_arrays
+::: sysidentpy.utils.check_arrays
       show_root_heading: false
 
 ::: sysidentpy.utils.display_results
