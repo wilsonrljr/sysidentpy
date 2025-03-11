@@ -124,7 +124,7 @@ class FROLS(BaseMSS):
     ...                                                    sigma=0.2,
     ...                                                    train_percentage=90)
     >>> basis_function = Polynomial(degree=2)
-    >>> model = PolynomialNarmax(basis_function=basis_function,
+    >>> model = FROLS(basis_function=basis_function,
     ...                          order_selection=True,
     ...                          n_info_values=10,
     ...                          extended_least_squares=False,
