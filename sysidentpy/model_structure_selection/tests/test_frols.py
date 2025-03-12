@@ -7,27 +7,7 @@ from sysidentpy.parameter_estimation.estimators import (
     LeastSquares,
     RecursiveLeastSquares,
 )
-
-
-def create_test_data(n=1000):
-    # np.random.seed(42)
-    # x = np.random.uniform(-1, 1, n).T
-    # y = np.zeros((n, 1))
-    theta = np.array([[0.6], [-0.5], [0.7], [-0.7], [0.2]])
-    # lag = 2
-    # for k in range(lag, len(x)):
-    #     y[k] = theta[4]*y[k-1]**2 + theta[2]*y[k-1]*x[k-1] + theta[0]*x[k-2] \
-    #         + theta[3]*y[k-2]*x[k-2] + theta[1]*y[k-2]
-
-    # y = np.reshape(y, (len(y), 1))
-    # x = np.reshape(x, (len(x), 1))
-    # data = np.concatenate([x, y], axis=1)
-    data = np.loadtxt(
-        "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/testing/data_for_testing.txt"
-    )
-    x = data[:, 0].reshape(-1, 1)
-    y = data[:, 1].reshape(-1, 1)
-    return x, y, theta
+from sysidentpy.tests.test_narmax_base import create_test_data
 
 
 x, y, _ = create_test_data()

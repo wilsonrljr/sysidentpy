@@ -6,6 +6,8 @@ from torch import nn
 from sysidentpy.basis_function import Fourier, Polynomial
 from sysidentpy.neural_network import NARXNN
 from sysidentpy.utils.narmax_tools import regressor_code
+from sysidentpy.tests.test_narmax_base import create_test_data
+
 
 torch.manual_seed(0)
 
@@ -25,27 +27,6 @@ class NARX(nn.Module):
         z = self.tanh(z)
         z = self.lin3(z)
         return z
-
-
-def create_test_data(n=1000):
-    # np.random.seed(42)
-    # x = np.random.uniform(-1, 1, n).T
-    # y = np.zeros((n, 1))
-    theta = np.array([[0.6], [-0.5], [0.7], [-0.7], [0.2]])
-    # lag = 2
-    # for k in range(lag, len(x)):
-    #     y[k] = theta[4]*y[k-1]**2 + theta[2]*y[k-1]*x[k-1] + theta[0]*x[k-2] \
-    #         + theta[3]*y[k-2]*x[k-2] + theta[1]*y[k-2]
-
-    # y = np.reshape(y, (len(y), 1))
-    # x = np.reshape(x, (len(x), 1))
-    # data = np.concatenate([x, y], axis=1)
-    data = np.loadtxt(
-        "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/testing/data_for_testing.txt"
-    )
-    x = data[:, 0].reshape(-1, 1)
-    y = data[:, 1].reshape(-1, 1)
-    return x, y, theta
 
 
 x, y, _ = create_test_data()
@@ -120,7 +101,6 @@ def test_fit_raise_y():
 
 def test_fit_lag_nar():
     basis_function = Polynomial(degree=1)
-
     regressors = regressor_code(
         X=X_train,
         xlag=2,
@@ -218,7 +198,6 @@ def test_fit_lag_nfir():
 
 def test_fit_lag_narmax():
     basis_function = Polynomial(degree=1)
-
     regressors = regressor_code(
         X=X_train,
         xlag=2,
@@ -267,7 +246,6 @@ def test_fit_lag_narmax():
 
 def test_fit_lag_narmax_fourier():
     basis_function = Fourier(degree=1)
-
     regressors = regressor_code(
         X=X_train,
         xlag=2,
@@ -312,7 +290,6 @@ def test_fit_lag_narmax_fourier():
 
 def test_model_predict():
     basis_function = Polynomial(degree=2)
-
     regressors = regressor_code(
         X=X_train,
         xlag=2,
@@ -358,7 +335,6 @@ def test_model_predict():
 
 def test_steps_1():
     basis_function = Polynomial(degree=1)
-
     regressors = regressor_code(
         X=X_train,
         xlag=2,
@@ -404,7 +380,6 @@ def test_steps_1():
 
 def test_steps_3():
     basis_function = Polynomial(degree=1)
-
     regressors = regressor_code(
         X=X_train,
         xlag=2,
@@ -474,7 +449,6 @@ def test_raise_device():
 
 def test_model_predict_fourier():
     basis_function = Fourier(degree=1)
-
     regressors = regressor_code(
         X=X_train,
         xlag=2,
@@ -520,7 +494,6 @@ def test_model_predict_fourier():
 
 def test_steps_1_fourier():
     basis_function = Fourier(degree=1)
-
     regressors = regressor_code(
         X=X_train,
         xlag=2,
@@ -566,7 +539,6 @@ def test_steps_1_fourier():
 
 def test_steps_3_fourier():
     basis_function = Fourier(degree=1)
-
     regressors = regressor_code(
         X=X_train,
         xlag=2,
