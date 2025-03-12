@@ -73,7 +73,7 @@ pip install sysidentpy
 
 The library is compatible with Linux, Windows, and macOS. Some examples may also require additional packages like pandas.
 
-For more details, check our [installation guide](https://sysidentpy.org/landing-page/getting-started/)
+For more details, check our [installation guide](https://sysidentpy.org/getting-started/getting-started/)
 
 ## What are the main features of SysIdentPy?
 
@@ -97,7 +97,7 @@ The project is actively maintained by Wilson R. L. Junior and looking for contri
 ## How do I use SysIdentPy?
 
 The [SysIdentPy documentation](https://sysidentpy.org) includes more than 20 examples to help get you started:
-- Typical "Hello World" example, for an [entry-level description of the main SysIdentPy concepts](https://sysidentpy.org/examples/basic_steps/)
+- Quickstart guide, for an [entry-level description of the main SysIdentPy concepts](https://sysidentpy.org/getting-started/quickstart-guide/)
 - A dedicated section focusing on SysIdentPy features, like model structure selection algorithms, basis functions, parameter estimation, and more.
 - A dedicated section focusing on use cases using SysIdentPy with real world datasets. Besides, there is some brief comparisons and benchmarks against other time series tools, like Prophet, Neural Prophet, ARIMA, and more.
 
