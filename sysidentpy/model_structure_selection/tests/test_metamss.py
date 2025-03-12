@@ -5,16 +5,25 @@ from sysidentpy.model_structure_selection import MetaMSS
 from sysidentpy.basis_function import Polynomial
 from sysidentpy.utils.generate_data import get_siso_data
 from sysidentpy.parameter_estimation.estimators import LeastSquares
+from sysidentpy.tests.test_narmax_base import create_test_data
 
 
-def create_test_data(n=1000):
-    theta = np.array([[0.6], [-0.5], [0.7], [-0.7], [0.2]])
-    data = np.loadtxt(
-        "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/testing/data_for_testing.txt"
-    )
-    x = data[:, 0].reshape(-1, 1)
-    y = data[:, 1].reshape(-1, 1)
-    return x, y, theta
+x, y, _ = create_test_data()
+train_percentage = 90
+split_data = int(len(x) * (train_percentage / 100))
+
+X_train = x[0:split_data, 0]
+X_test = x[split_data::, 0]
+
+y1 = y[0:split_data, 0]
+y_test = y[split_data::, 0]
+y_train = y1.copy()
+
+y_train = np.reshape(y_train, (len(y_train), 1))
+X_train = np.reshape(X_train, (len(X_train), 1))
+
+y_test = np.reshape(y_test, (len(y_test), 1))
+X_test = np.reshape(X_test, (len(X_test), 1))
 
 
 def test_metamss():
@@ -119,29 +128,12 @@ def test_predict():
 
 
 def test_model_prediction():
-    x, y, _ = create_test_data()
-    basis_function = Polynomial(degree=2)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = MetaMSS(
         ylag=[1, 2],
         xlag=2,
         maxiter=30,
         n_agents=20,
-        basis_function=basis_function,
+        basis_function=Polynomial(degree=2),
         random_state=42,
         test_size=0.1,
     )

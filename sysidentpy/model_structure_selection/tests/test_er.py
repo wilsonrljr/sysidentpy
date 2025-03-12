@@ -4,24 +4,24 @@ from numpy.testing import assert_raises
 from sysidentpy.model_structure_selection import ER
 from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation.estimators import LeastSquares
+from sysidentpy.tests.test_narmax_base import create_test_data
 
+x, y, _ = create_test_data()
+train_percentage = 90
+split_data = int(len(x) * (train_percentage / 100))
 
-def create_test_data(n=1000):
-    theta = np.array([[0.6], [-0.5], [0.7], [-0.7], [0.2]])
-    # lag = 2
-    # for k in range(lag, len(x)):
-    #     y[k] = theta[4]*y[k-1]**2 + theta[2]*y[k-1]*x[k-1] + theta[0]*x[k-2] \
-    #         + theta[3]*y[k-2]*x[k-2] + theta[1]*y[k-2]
+X_train = x[0:split_data, 0]
+X_test = x[split_data::, 0]
 
-    # y = np.reshape(y, (len(y), 1))
-    # x = np.reshape(x, (len(x), 1))
-    # data = np.concatenate([x, y], axis=1)
-    data = np.loadtxt(
-        "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/testing/data_for_testing.txt"
-    )
-    x = data[:, 0].reshape(-1, 1)
-    y = data[:, 1].reshape(-1, 1)
-    return x, y, theta
+y1 = y[0:split_data, 0]
+y_test = y[split_data::, 0]
+y_train = y1.copy()
+
+y_train = np.reshape(y_train, (len(y_train), 1))
+X_train = np.reshape(X_train, (len(X_train), 1))
+
+y_test = np.reshape(y_test, (len(y_test), 1))
+X_test = np.reshape(X_test, (len(X_test), 1))
 
 
 def test_default_values():
@@ -111,40 +111,22 @@ def test_extended_least_squares():
 
 
 def test_model_prediction():
-    x, y, _ = create_test_data()
-    basis_function = Polynomial(degree=2)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = ER(
         ylag=2,
         xlag=2,
         estimator=LeastSquares(),
-        basis_function=basis_function,
+        basis_function=Polynomial(degree=2),
     )
     model.fit(X=X_train, y=y_train)
     assert_raises(Exception, model.predict, X=X_test, y=y_test[:1])
 
 
 def test_mutual_information_knn():
-    basis_function = Polynomial(degree=1)
     model = ER(
         ylag=2,
         xlag=2,
         estimator=LeastSquares(),
-        basis_function=basis_function,
+        basis_function=Polynomial(degree=1),
     )
     x = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)
     y = np.array([0.3, 0.87, 0, 0.1, 0.9]).reshape(-1, 1)
@@ -154,18 +136,17 @@ def test_mutual_information_knn():
 
 
 def test_conditional_mutual_information_knn():
-    basis_function = Polynomial(degree=1)
     model = ER(
         ylag=2,
         xlag=2,
         estimator=LeastSquares(),
-        basis_function=basis_function,
+        basis_function=Polynomial(degree=1),
     )
-    x = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)
-    y = np.array([0.3, 0.87, 0, 0.1, 0.9]).reshape(-1, 1)
-    z = np.array([90, 12, 212, 13, 15]).reshape(-1, 1)
+    a = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)
+    b = np.array([0.3, 0.87, 0, 0.1, 0.9]).reshape(-1, 1)
+    c = np.array([90, 12, 212, 13, 15]).reshape(-1, 1)
 
-    r = model.conditional_mutual_information(x, y, z)
+    r = model.conditional_mutual_information(a, b, c)
     assert_almost_equal(r, 0.2, decimal=3)
 
 
@@ -178,6 +159,6 @@ def test_tolerance_estimator():
         basis_function=basis_function,
         random_state=42,
     )
-    x = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)
-    r = model.tolerance_estimator(x)
+    a = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)
+    r = model.tolerance_estimator(a)
     assert_almost_equal(r, 2.6833, decimal=4)

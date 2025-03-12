@@ -22,27 +22,63 @@ from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
 IM = InformationMatrix()
 HH = Orthogonalization()
 GR = RegressorDictionary()
+bf_polynomial = Polynomial(degree=2)
+bf_fourier = Fourier(degree=2, n=1)
 
 
-def create_test_data(n=1000):
-    # np.random.seed(42)
-    # x = np.random.uniform(-1, 1, n).T
-    # y = np.zeros((n, 1))
+def create_test_data():
+    r"""Load test data from an external source.
+
+    The dataset is based on a nonlinear autoregressive model
+     with exogenous inputs (NARX) given by:
+
+    $$
+    y[k] = \theta_4 y[k-1]^2 + \theta_2 y[k-1] x[k-1] + \theta_0 x[k-2]
+          + \theta_3 y[k-2] x[k-2] + \theta_1 y[k-2]
+    $$
+
+    where:
+    - $ x[k] $ is the input at time step $ k $
+    - $ y[k] $ is the output at time step $ k $
+    - $ \theta = [\theta_0, \theta_1, \theta_2, \theta_3, \theta_4] $
+     are model parameters
+
+    Returns
+    -------
+        x (numpy.ndarray): Input data of shape $ (n, 1) $.
+        y (numpy.ndarray): Output data of shape $ (n, 1) $.
+        $\theta$ (numpy.ndarray): Model parameters.
+
+    """
     theta = np.array([[0.6], [-0.5], [0.7], [-0.7], [0.2]])
-    # lag = 2
-    # for k in range(lag, len(x)):
-    #     y[k] = theta[4]*y[k-1]**2 + theta[2]*y[k-1]*x[k-1] + theta[0]*x[k-2] \
-    #         + theta[3]*y[k-2]*x[k-2] + theta[1]*y[k-2]
 
-    # y = np.reshape(y, (len(y), 1))
-    # x = np.reshape(x, (len(x), 1))
-    # data = np.concatenate([x, y], axis=1)
-    data = np.loadtxt(
-        "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/testing/data_for_testing.txt"
-    )
-    x = data[:, 0].reshape(-1, 1)
-    y = data[:, 1].reshape(-1, 1)
-    return x, y, theta
+    # Load dataset from external source
+    url = "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/testing/data_for_testing.txt"
+    data = np.loadtxt(url)
+
+    # Extract input (x) and output (y)
+    xt = data[:, 0].reshape(-1, 1)
+    yt = data[:, 1].reshape(-1, 1)
+
+    return xt, yt, theta
+
+
+x, y, _ = create_test_data()
+train_percentage = 90
+split_data = int(len(x) * (train_percentage / 100))
+
+X_train = x[0:split_data, 0]
+X_test = x[split_data::, 0]
+
+y1 = y[0:split_data, 0]
+y_test = y[split_data::, 0]
+y_train = y1.copy()
+
+y_train = np.reshape(y_train, (len(y_train), 1))
+X_train = np.reshape(X_train, (len(X_train), 1))
+
+y_test = np.reshape(y_test, (len(y_test), 1))
+X_test = np.reshape(X_test, (len(X_test), 1))
 
 
 def test_create_narmax_code():
@@ -491,30 +527,13 @@ def test_create_lagged_x_miso():
 
 
 def test_model_predict():
-    x, y, _ = create_test_data()
-    basis_function = Polynomial(degree=2)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         n_terms=5,
         err_tol=None,
         ylag=[1, 2],
         xlag=2,
         estimator=LeastSquares(),
-        basis_function=basis_function,
+        basis_function=Polynomial(degree=2),
     )
     model.fit(X=X_train, y=y_train)
     print(model.final_model, model.err.sum())
@@ -523,29 +542,12 @@ def test_model_predict():
 
 
 def test_model_nfir():
-    x, y, _ = create_test_data()
-    basis_function = Polynomial(degree=2)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         n_terms=5,
         # extended_least_squares=False,
         xlag=2,
         estimator=LeastSquares(),
-        basis_function=basis_function,
+        basis_function=Polynomial(degree=2),
         model_type="NFIR",
     )
     model.fit(X=X_train, y=y_train)
@@ -554,30 +556,13 @@ def test_model_nfir():
 
 
 def test_model_predict_steps_none():
-    x, y, _ = create_test_data()
-    basis_function = Polynomial(degree=2)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         n_terms=5,
         err_tol=None,
         ylag=[1, 2],
         xlag=2,
         estimator=LeastSquares(),
-        basis_function=basis_function,
+        basis_function=Polynomial(degree=2),
     )
     model.fit(X=X_train, y=y_train)
     yhat = model.predict(X=X_test, y=y_test, steps_ahead=1)
@@ -585,30 +570,13 @@ def test_model_predict_steps_none():
 
 
 def test_model_predict_steps_3():
-    x, y, _ = create_test_data()
-    basis_function = Polynomial(degree=2)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         n_terms=5,
         err_tol=None,
         ylag=[1, 2],
         xlag=2,
         estimator=LeastSquares(),
-        basis_function=basis_function,
+        basis_function=Polynomial(degree=2),
     )
     model.fit(X=X_train, y=y_train)
     yhat = model.predict(X=X_test, y=y_test, steps_ahead=3)
@@ -616,30 +584,13 @@ def test_model_predict_steps_3():
 
 
 def test_model_predict_fourier_steps_none():
-    x, y, _ = create_test_data()
-    basis_function = Fourier(degree=2, n=1)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         order_selection=True,
         err_tol=None,
         ylag=[1, 2],
         xlag=2,
         estimator=RecursiveLeastSquares(),
-        basis_function=basis_function,
+        basis_function=Fourier(degree=2, n=1),
     )
     model.fit(X=X_train, y=y_train)
     yhat = model._basis_function_predict(X=X_test, y_initial=y_test)
@@ -647,30 +598,13 @@ def test_model_predict_fourier_steps_none():
 
 
 def test_model_predict_fourier_steps_1():
-    x, y, _ = create_test_data()
-    basis_function = Fourier(degree=2, n=1)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         order_selection=True,
         err_tol=None,
         ylag=[1, 2],
         xlag=2,
         estimator=RecursiveLeastSquares(),
-        basis_function=basis_function,
+        basis_function=Fourier(degree=2, n=1),
     )
     model.fit(X=X_train, y=y_train)
     yhat = model.predict(X=X_test, y=y_test, steps_ahead=1)
@@ -678,30 +612,13 @@ def test_model_predict_fourier_steps_1():
 
 
 def test_model_predict_fourier_nar_inputs():
-    x, y, _ = create_test_data()
-    basis_function = Fourier(degree=2, n=1)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         order_selection=True,
         # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
         estimator=RecursiveLeastSquares(),
-        basis_function=basis_function,
+        basis_function=Fourier(degree=2, n=1),
         model_type="NAR",
     )
     model.fit(X=X_train, y=y_train)
@@ -710,30 +627,13 @@ def test_model_predict_fourier_nar_inputs():
 
 
 def test_model_predict_fourier_raises():
-    x, y, _ = create_test_data()
-    basis_function = Fourier(degree=2, n=1)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         order_selection=True,
         # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
         estimator=RecursiveLeastSquares(),
-        basis_function=basis_function,
+        basis_function=Fourier(degree=2, n=1),
         model_type="NARMAX",
     )
     model.fit(X=X_train, y=y_train)
@@ -743,30 +643,13 @@ def test_model_predict_fourier_raises():
 
 
 def test_model_predict_fourier_value_error():
-    x, y, _ = create_test_data()
-    basis_function = Fourier(degree=2, n=1)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         order_selection=True,
         # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
         estimator=RecursiveLeastSquares(),
-        basis_function=basis_function,
+        basis_function=Fourier(degree=2, n=1),
         model_type="NARMAX",
     )
     model.fit(X=X_train, y=y_train)
@@ -782,30 +665,13 @@ def test_model_predict_fourier_value_error():
 
 
 def test_model_predict_fourier_horizon_error():
-    x, y, _ = create_test_data()
-    basis_function = Fourier(degree=2, n=1)
-    train_percentage = 90
-    split_data = int(len(x) * (train_percentage / 100))
-
-    X_train = x[0:split_data, 0]
-    X_test = x[split_data::, 0]
-
-    y1 = y[0:split_data, 0]
-    y_test = y[split_data::, 0]
-    y_train = y1.copy()
-
-    y_train = np.reshape(y_train, (len(y_train), 1))
-    X_train = np.reshape(X_train, (len(X_train), 1))
-
-    y_test = np.reshape(y_test, (len(y_test), 1))
-    X_test = np.reshape(X_test, (len(X_test), 1))
     model = FROLS(
         order_selection=True,
         # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
         estimator=RecursiveLeastSquares(),
-        basis_function=basis_function,
+        basis_function=Fourier(degree=2, n=1),
         model_type="NARMAX",
     )
     model.fit(X=X_train, y=y_train)
