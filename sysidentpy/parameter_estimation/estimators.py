@@ -16,7 +16,9 @@ from scipy.optimize import lsq_linear
 from scipy.sparse.linalg import lsmr
 
 from .estimators_base import BaseEstimator
+from .estimators_base import _validate_params, _initial_values
 from ..utils.deprecation import deprecated
+from ..utils.check_arrays import check_linear_dependence_rows
 
 
 class EstimatorError(Exception):
@@ -64,7 +66,7 @@ class LeastSquares(BaseEstimator):
     def __init__(self, *, unbiased: bool = False, uiter: int = 20):
         self.unbiased = unbiased
         self.uiter = uiter
-        self._validate_params(vars(self))
+        _validate_params(vars(self))
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         r"""Estimate the model parameters using the Least Squares method.
@@ -90,7 +92,7 @@ class LeastSquares(BaseEstimator):
         theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
         """
-        self.check_linear_dependence_rows(psi)
+        check_linear_dependence_rows(psi)
         theta = np.linalg.lstsq(psi, y, rcond=None)[0]
         return theta
 
@@ -158,7 +160,7 @@ class RidgeRegression(BaseEstimator):
         self.solver = solver
         self.uiter = uiter
         self.unbiased = unbiased
-        self._validate_params(vars(self))
+        _validate_params(vars(self))
 
     def ridge_regression_classic(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Estimate the model parameters using ridge regression.
@@ -191,7 +193,7 @@ class RidgeRegression(BaseEstimator):
         https://www.nature.com/articles/s41467-021-25801-2
 
         """
-        self.check_linear_dependence_rows(psi)
+        check_linear_dependence_rows(psi)
 
         theta = (
             np.linalg.pinv(psi.T @ psi + self.alpha * np.eye(psi.shape[1])) @ psi.T @ y
@@ -224,7 +226,7 @@ class RidgeRegression(BaseEstimator):
                          Cross Validated, accessed 21 September 2023,
                          https://stats.stackexchange.com/q/220324
         """
-        self.check_linear_dependence_rows(psi)
+        check_linear_dependence_rows(psi)
         try:
             U, S, Vh = np.linalg.svd(psi, full_matrices=False)
             S = np.diag(S)
@@ -277,7 +279,7 @@ class TotalLeastSquares(BaseEstimator):
     def __init__(self, *, unbiased: bool = False, uiter: int = 30):
         self.unbiased = unbiased
         self.uiter = uiter
-        self._validate_params(vars(self))
+        _validate_params(vars(self))
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         r"""Estimate the model parameters using the Total Least Squares method.
@@ -304,7 +306,7 @@ class TotalLeastSquares(BaseEstimator):
         theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
         """
-        self.check_linear_dependence_rows(psi)
+        check_linear_dependence_rows(psi)
         full = np.hstack((psi, y))
         n = psi.shape[1]
         _, _, v = np.linalg.svd(full, full_matrices=True)
@@ -366,7 +368,7 @@ class RecursiveLeastSquares(BaseEstimator):
         self.lam = lam
         self.unbiased = unbiased
         self.uiter = uiter
-        self._validate_params(vars(self))
+        _validate_params(vars(self))
         self.xi: Optional[np.ndarray] = None
         self.theta_evolution: Optional[np.ndarray] = None
 
@@ -418,7 +420,7 @@ class RecursiveLeastSquares(BaseEstimator):
            de sistemas: técnicas lineares e não-lineares aplicadas a sistemas
            reais. Editora da UFMG. 3a edição.
         """
-        n_theta, n, theta, self.xi = self._initial_values(psi)
+        n_theta, n, theta, self.xi = _initial_values(psi)
         p = np.eye(n_theta) / self.delta
 
         for i in range(2, n):
@@ -494,7 +496,7 @@ class AffineLeastMeanSquares(BaseEstimator):
         self.offset_covariance = offset_covariance
         self.uiter = uiter
         self.unbiased = unbiased
-        self._validate_params(vars(self))
+        _validate_params(vars(self))
         self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -532,7 +534,7 @@ class AffineLeastMeanSquares(BaseEstimator):
         A more in-depth documentation of all methods for parameters estimation
         will be available soon. For now, please refer to the mentioned references.
         """
-        n_theta, n, theta, self.xi = self._initial_values(psi)
+        n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
             self.xi = y - psi.dot(theta[:, i - 1].reshape(-1, 1))
@@ -592,7 +594,7 @@ class LeastMeanSquares(BaseEstimator):
         self.mu = mu
         self.unbiased = unbiased
         self.uiter = uiter
-        self._validate_params(vars(self))
+        _validate_params(vars(self))
         self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -624,7 +626,7 @@ class LeastMeanSquares(BaseEstimator):
         theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
         """
-        n_theta, n, theta, self.xi = self._initial_values(psi)
+        n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -678,7 +680,7 @@ class LeastMeanSquaresSignError(BaseEstimator):
         self.mu = mu
         self.uiter = uiter
         self.unbiased = unbiased
-        self._validate_params(vars(self))
+        _validate_params(vars(self))
         self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -712,7 +714,7 @@ class LeastMeanSquaresSignError(BaseEstimator):
             The estimated parameters of the model.
 
         """
-        n_theta, n, theta, self.xi = self._initial_values(psi)
+        n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -777,7 +779,7 @@ class NormalizedLeastMeanSquares(BaseEstimator):
         self.eps = eps
         self.unbiased = unbiased
         self.uiter = uiter
-        self._validate_params(vars(self))
+        _validate_params(vars(self))
         self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -811,7 +813,7 @@ class NormalizedLeastMeanSquares(BaseEstimator):
             The estimated parameters of the model.
 
         """
-        n_theta, n, theta, self.xi = self._initial_values(psi)
+        n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -874,7 +876,7 @@ class NormalizedLeastMeanSquaresSignError(BaseEstimator):
         self.eps = eps
         self.unbiased = unbiased
         self.uiter = uiter
-        self._validate_params(vars(self))
+        _validate_params(vars(self))
         self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -913,7 +915,7 @@ class NormalizedLeastMeanSquaresSignError(BaseEstimator):
         the estimated parameters and the sign of the error vector is used to
         change the filter coefficients.
         """
-        n_theta, n, theta, self.xi = self._initial_values(psi)
+        n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -971,7 +973,7 @@ class LeastMeanSquaresSignRegressor(BaseEstimator):
         self.mu = mu
         self.unbiased = unbiased
         self.uiter = uiter
-        self._validate_params(vars(self))
+        _validate_params(vars(self))
         self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -1004,7 +1006,7 @@ class LeastMeanSquaresSignRegressor(BaseEstimator):
         theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
         """
-        n_theta, n, theta, self.xi = self._initial_values(psi)
+        n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -1068,7 +1070,7 @@ class LeastMeanSquaresNormalizedSignRegressor(BaseEstimator):
         self.eps = eps
         self.unbiased = unbiased
         self.uiter = uiter
-        self._validate_params(vars(self))
+        _validate_params(vars(self))
         self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -1106,7 +1108,7 @@ class LeastMeanSquaresNormalizedSignRegressor(BaseEstimator):
         theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
         """
-        n_theta, n, theta, self.xi = self._initial_values(psi)
+        n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -1160,7 +1162,7 @@ class LeastMeanSquaresSignSign(BaseEstimator):
         self.mu = mu
         self.unbiased = unbiased
         self.uiter = uiter
-        self._validate_params(vars(self))
+        _validate_params(vars(self))
         self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -1193,7 +1195,7 @@ class LeastMeanSquaresSignSign(BaseEstimator):
         theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
         """
-        n_theta, n, theta, self.xi = self._initial_values(psi)
+        n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -1257,7 +1259,7 @@ class LeastMeanSquaresNormalizedSignSign(BaseEstimator):
         self.eps = eps
         self.unbiased = unbiased
         self.uiter = uiter
-        self._validate_params(vars(self))
+        _validate_params(vars(self))
         self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -1303,7 +1305,7 @@ class LeastMeanSquaresNormalizedSignSign(BaseEstimator):
         de algoritmos LMS de passo variável.
         - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
         """
-        n_theta, n, theta, self.xi = self._initial_values(psi)
+        n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -1373,7 +1375,7 @@ class LeastMeanSquaresNormalizedLeaky(BaseEstimator):
         self.gama = gama
         self.unbiased = unbiased
         self.uiter = uiter
-        self._validate_params(vars(self))
+        _validate_params(vars(self))
         self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -1417,7 +1419,7 @@ class LeastMeanSquaresNormalizedLeaky(BaseEstimator):
           de algoritmos LMS de passo variável.
         - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
         """
-        n_theta, n, theta, self.xi = self._initial_values(psi)
+        n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -1486,7 +1488,7 @@ class LeastMeanSquaresLeaky(BaseEstimator):
         self.gama = gama
         self.unbiased = unbiased
         self.uiter = uiter
-        self._validate_params(vars(self))
+        _validate_params(vars(self))
         self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -1529,7 +1531,7 @@ class LeastMeanSquaresLeaky(BaseEstimator):
           de algoritmos LMS de passo variável.
         - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
         """
-        n_theta, n, theta, self.xi = self._initial_values(psi)
+        n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -1595,7 +1597,7 @@ class LeastMeanSquaresFourth(BaseEstimator):
         self.mu = mu
         self.unbiased = unbiased
         self.uiter = uiter
-        self._validate_params(vars(self))
+        _validate_params(vars(self))
         self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -1627,7 +1629,7 @@ class LeastMeanSquaresFourth(BaseEstimator):
         theta : ndarray of floats of shape (n_features, 1)
             The estimated parameters of the model.
         """
-        n_theta, n, theta, self.xi = self._initial_values(psi)
+        n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)
@@ -1700,7 +1702,7 @@ class LeastMeanSquareMixedNorm(BaseEstimator):
         self.weight = weight
         self.unbiased = unbiased
         self.uiter = uiter
-        self._validate_params(vars(self))
+        _validate_params(vars(self))
         self.xi: Optional[np.ndarray] = None
 
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -1738,7 +1740,7 @@ class LeastMeanSquareMixedNorm(BaseEstimator):
         A more in-depth documentation of all methods for parameter estimation
         will be available soon. For now, please refer to the mentioned references.
         """
-        n_theta, n, theta, self.xi = self._initial_values(psi)
+        n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
             psi_tmp = psi[i, :].reshape(-1, 1)

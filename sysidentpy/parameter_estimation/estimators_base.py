@@ -1,11 +1,89 @@
 """Base class for Basis Function."""
 
-from warnings import warn
 from abc import ABCMeta, abstractmethod
 
 import numpy as np
 
 from ..narmax_base import InformationMatrix
+
+
+def _initial_values(psi: np.ndarray):
+    """Initialize values for the estimation process.
+
+    Parameters
+    ----------
+    psi : ndarray of floats
+        The information matrix of the model.
+
+    Returns
+    -------
+    n_theta : int
+        Number of parameters to be estimated.
+    n : int
+        Number of observations.
+    theta : ndarray of floats
+        Initial parameter estimates.
+    xi : ndarray of floats
+        Initial residuals.
+    """
+    n_theta = psi.shape[1]
+    n = len(psi)
+    theta = np.zeros([n_theta, n])
+    xi = np.zeros([n, 1])
+    return n_theta, n, theta, xi
+
+
+def _validate_params(attributes):
+    """Validate input parameters.
+
+    Parameters
+    ----------
+    attributes : dict
+        Dictionary containing parameter names and their values.
+
+    Raises
+    ------
+    ValueError
+        If any parameter is of incorrect type or out of the expected range.
+    """
+    # Define expected types and value ranges for each parameter
+    param_specs = {
+        "lam": (float, (0, 1)),
+        "weight": (float, (0, 1)),
+        "offset_covariance": (float, (0, 1)),
+        "mu": (float, (0, None)),
+        "eps": (float, (0, None)),
+        "gama": (float, (0, None)),
+        "uiter": (int, (0, None)),
+        "delta": (float, (0, None)),
+        "alpha": (float, (0, None)),
+        "unbiased": (bool, None),
+        "solver": (str, None),
+    }
+    valid_solvers = ["svd", "classic"]
+    for attribute, value in attributes.items():
+        if attribute not in param_specs:
+            raise ValueError(f"Unexpected parameter: {attribute}")
+
+        expected_type, value_range = param_specs[attribute]
+
+        if not isinstance(value, expected_type):
+            raise ValueError(
+                f"{attribute} must be of type {expected_type.__name__}. "
+                f"Got {type(value).__name__} instead."
+            )
+
+        if value_range:
+            min_val, max_val = value_range
+            if min_val is not None and value < min_val:
+                raise ValueError(f"{attribute} must be >= {min_val}. Got {value}.")
+            if max_val is not None and value > max_val:
+                raise ValueError(f"{attribute} must be <= {max_val}. Got {value}.")
+
+        if attribute == "solver" and value not in valid_solvers:
+            raise ValueError(
+                f"{attribute} must be one of {valid_solvers}. Got {value}."
+            )
 
 
 class BaseEstimator(metaclass=ABCMeta):
@@ -19,51 +97,6 @@ class BaseEstimator(metaclass=ABCMeta):
     @abstractmethod
     def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Abstract method to optimize the model parameters."""
-
-    def check_linear_dependence_rows(self, psi):
-        """Check for linear dependence in the rows of the Psi matrix.
-
-        Parameters
-        ----------
-        psi : ndarray of floats
-            The information matrix of the model.
-
-        Warns
-        -----
-        UserWarning
-            If the Psi matrix has linearly dependent rows.
-        """
-        if np.linalg.matrix_rank(psi) != psi.shape[1]:
-            warn(
-                "Psi matrix might have linearly dependent rows."
-                "Be careful and check your data",
-                stacklevel=2,
-            )
-
-    def _initial_values(self, psi: np.ndarray):
-        """Initialize values for the estimation process.
-
-        Parameters
-        ----------
-        psi : ndarray of floats
-            The information matrix of the model.
-
-        Returns
-        -------
-        n_theta : int
-            Number of parameters to be estimated.
-        n : int
-            Number of observations.
-        theta : ndarray of floats
-            Initial parameter estimates.
-        xi : ndarray of floats
-            Initial residuals.
-        """
-        n_theta = psi.shape[1]
-        n = len(psi)
-        theta = np.zeros([n_theta, n])
-        xi = np.zeros([n, 1])
-        return n_theta, n, theta, xi
 
     def unbiased_estimator(
         self, psi, y, theta, elag, max_lag, estimator, basis_function, uiter=20
@@ -133,55 +166,3 @@ class BaseEstimator(metaclass=ABCMeta):
             e = y - np.dot(psi_extended, unbiased_theta.reshape(-1, 1))
 
         return unbiased_theta[0 : theta.shape[0], 0].reshape(-1, 1)
-
-    def _validate_params(self, attributes):
-        """Validate input parameters.
-
-        Parameters
-        ----------
-        attributes : dict
-            Dictionary containing parameter names and their values.
-
-        Raises
-        ------
-        ValueError
-            If any parameter is of incorrect type or out of the expected range.
-        """
-        # Define expected types and value ranges for each parameter
-        param_specs = {
-            "lam": (float, (0, 1)),
-            "weight": (float, (0, 1)),
-            "offset_covariance": (float, (0, 1)),
-            "mu": (float, (0, None)),
-            "eps": (float, (0, None)),
-            "gama": (float, (0, None)),
-            "uiter": (int, (0, None)),
-            "delta": (float, (0, None)),
-            "alpha": (float, (0, None)),
-            "unbiased": (bool, None),
-            "solver": (str, None),
-        }
-        valid_solvers = ["svd", "classic"]
-        for attribute, value in attributes.items():
-            if attribute not in param_specs:
-                raise ValueError(f"Unexpected parameter: {attribute}")
-
-            expected_type, value_range = param_specs[attribute]
-
-            if not isinstance(value, expected_type):
-                raise ValueError(
-                    f"{attribute} must be of type {expected_type.__name__}. "
-                    f"Got {type(value).__name__} instead."
-                )
-
-            if value_range:
-                min_val, max_val = value_range
-                if min_val is not None and value < min_val:
-                    raise ValueError(f"{attribute} must be >= {min_val}. Got {value}.")
-                if max_val is not None and value > max_val:
-                    raise ValueError(f"{attribute} must be <= {max_val}. Got {value}.")
-
-            if attribute == "solver" and value not in valid_solvers:
-                raise ValueError(
-                    f"{attribute} must be one of {valid_solvers}. Got {value}."
-                )

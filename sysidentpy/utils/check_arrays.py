@@ -4,6 +4,7 @@
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
 
+from warnings import warn
 
 import numpy as np
 import numbers
@@ -184,3 +185,24 @@ def check_X_y(X, y):
     check_dimension(X, y)
     check_infinity(X, y)
     check_nan(X, y)
+
+
+def check_linear_dependence_rows(psi):
+    """Check for linear dependence in the rows of the Psi matrix.
+
+    Parameters
+    ----------
+    psi : ndarray of floats
+        The information matrix of the model.
+
+    Warns
+    -----
+    UserWarning
+        If the Psi matrix has linearly dependent rows.
+    """
+    if np.linalg.matrix_rank(psi) != psi.shape[1]:
+        warn(
+            "Psi matrix might have linearly dependent rows."
+            "Be careful and check your data",
+            stacklevel=2,
+        )

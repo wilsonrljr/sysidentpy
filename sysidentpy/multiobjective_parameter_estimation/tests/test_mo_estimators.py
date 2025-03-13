@@ -2,6 +2,10 @@
 
 import numpy as np
 from sysidentpy.multiobjective_parameter_estimation.estimators import AILS
+from sysidentpy.multiobjective_parameter_estimation.estimators import (
+    get_term_clustering,
+    get_cost_function,
+)
 from sysidentpy.utils.narmax_tools import set_weights
 from numpy.testing import assert_array_equal, assert_almost_equal, assert_allclose
 
@@ -66,8 +70,7 @@ def test_get_term_clustering():
     qit = np.array([[0, 0], [1, 0], [2, 0], [1, 1], [2, 1]])
 
     expected_result = np.array(np.array([[0, 0], [1, 0], [0, 1], [2, 0], [1, 1]]))
-    estimator = AILS()
-    result = estimator.get_term_clustering(qit)
+    result = get_term_clustering(qit)
     assert_array_equal(result, expected_result)
 
 

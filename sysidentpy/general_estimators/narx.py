@@ -146,7 +146,7 @@ class NARX(BaseMSS):
     def fit(self, *, X=None, y=None):
         """Train a NARX Neural Network model.
 
-        This is an training pipeline that allows a friendly usage
+        This is a training pipeline that allows a friendly usage
         by the user. All the lagged features are built using the
         SysIdentPy classes and we use the fit method of the base
         estimator of the sklearn to fit the model.
@@ -207,7 +207,7 @@ class NARX(BaseMSS):
         This method accept y values mainly for prediction n-steps ahead
         (to be implemented in the future).
 
-        Currently we only support infinity-steps-ahead prediction,
+        Currently, we only support infinity-steps-ahead prediction,
         but run 1-step-ahead prediction manually is straightforward.
 
         Parameters
