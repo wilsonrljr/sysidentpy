@@ -385,7 +385,7 @@ def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
         The estimated parameters of the model.
 
     """
-    self.check_linear_dependence_rows(psi)
+    check_linear_dependence_rows(psi)
     full = np.hstack((psi, y))
     n = psi.shape[1]
     _, _, v = np.linalg.svd(full, full_matrices=True)

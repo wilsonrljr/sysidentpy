@@ -12,10 +12,11 @@ from typing import Union, Tuple, Optional
 
 import numpy as np
 
+from sysidentpy.narmax_base import house, rowhouse
 from sysidentpy.utils.check_arrays import check_positive_int, num_features
 
 from ..basis_function import Fourier, Polynomial
-from ..narmax_base import BaseMSS, Orthogonalization
+from ..narmax_base import BaseMSS
 
 from ..parameter_estimation.estimators import (
     LeastSquares,
@@ -320,9 +321,9 @@ class FROLS(BaseMSS):
 
             tmp_psi[:, [piv_index, i]] = tmp_psi[:, [i, piv_index]]
             piv[[piv_index, i]] = piv[[i, piv_index]]
-            v = Orthogonalization().house(tmp_psi[i:, i])
-            row_result = Orthogonalization().rowhouse(tmp_psi[i:, i:], v)
-            tmp_y[i:] = Orthogonalization().rowhouse(tmp_y[i:], v)
+            v = house(tmp_psi[i:, i])
+            row_result = rowhouse(tmp_psi[i:, i:], v)
+            tmp_y[i:] = rowhouse(tmp_y[i:], v)
             tmp_psi[i:, i:] = np.copy(row_result)
 
         tmp_piv = piv[0:process_term_number]

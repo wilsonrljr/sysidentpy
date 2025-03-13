@@ -8,6 +8,82 @@ from sysidentpy.basis_function import Polynomial
 from sysidentpy.narmax_base import InformationMatrix, RegressorDictionary
 
 
+def get_term_clustering(qit: np.ndarray) -> np.ndarray:
+    """Get the term clustering of the model.
+
+    This function takes a matrix `qit` and compute the term clustering based
+    on their values. It calculates the number of occurrences of each value
+    for each row in the matrix.
+
+    Parameters
+    ----------
+    qit : ndarray
+        Input matrix containing terms clustering to be sorted.
+
+    Returns
+    -------
+    N_aux : ndarray
+        A new matrix with rows representing the number of occurrences of each value
+        for each row in the input matrix `qit`. The columns correspond to different
+        values.
+
+    Examples
+    --------
+    >>> qit = np.array([[1, 2, 2],
+    ...                 [1, 3, 1],
+    ...                 [2, 2, 3]])
+    >>> result = get_term_clustering(qit)
+    >>> print(result)
+    [[1. 2. 0. 0.]
+    [2. 0. 1. 0.]
+    [0. 2. 1. 0.]]
+
+    Notes
+    -----
+    The function calculates the number of occurrences of each value (from 1 to
+    the maximum value in the input matrix `qit`) for each row and returns a matrix
+    where rows represent rows of the input matrix `qit`, and columns represent
+    different values.
+
+    """
+    max_value = int(np.max(qit))
+    counts_matrix = np.zeros((qit.shape[0], max_value))
+
+    for k in range(1, max_value + 1):
+        counts_matrix[:, k - 1] = np.sum(qit == k, axis=1)
+
+    return counts_matrix.astype(int)
+
+
+def get_cost_function(y: np.ndarray, psi: np.ndarray, theta: np.ndarray) -> np.ndarray:
+    """Calculate the cost function based on residuals.
+
+    Parameters
+    ----------
+    y : ndarray of floats
+        The target data used in the identification process.
+    psi : ndarray of floats, shape (n_samples, n_parameters)
+        The matrix of regressors.
+    theta : ndarray of floats
+        The parameter vector.
+
+    Returns
+    -------
+    cost_function : float
+        The calculated cost function value.
+
+    Notes
+    -----
+    This method computes the cost function value based on the residuals between
+    the target data (y) and the predicted values using the regressors (dynamic
+    and static) and parameter vector (theta). It quantifies the error in the
+    model's predictions.
+
+    """
+    residuals = y - psi.dot(theta)
+    return residuals.T.dot(residuals)
+
+
 class AILS:
     """Affine Information Least Squares (AILS) for NARMAX Parameter Estimation.
 
@@ -51,52 +127,6 @@ class AILS:
         self.static_function = static_function
         self.normalize = normalize
 
-    def get_term_clustering(self, qit: np.ndarray) -> np.ndarray:
-        """Get the term clustering of the model.
-
-        This function takes a matrix `qit` and compute the term clustering based
-        on their values. It calculates the number of occurrences of each value
-        for each row in the matrix.
-
-        Parameters
-        ----------
-        qit : ndarray
-            Input matrix containing terms clustering to be sorted.
-
-        Returns
-        -------
-        N_aux : ndarray
-            A new matrix with rows representing the number of occurrences of each value
-            for each row in the input matrix `qit`. The columns correspond to different
-            values.
-
-        Examples
-        --------
-        >>> qit = np.array([[1, 2, 2],
-        ...                 [1, 3, 1],
-        ...                 [2, 2, 3]])
-        >>> result = get_term_clustering(qit)
-        >>> print(result)
-        [[1. 2. 0. 0.]
-        [2. 0. 1. 0.]
-        [0. 2. 1. 0.]]
-
-        Notes
-        -----
-        The function calculates the number of occurrences of each value (from 1 to
-        the maximum value in the input matrix `qit`) for each row and returns a matrix
-        where rows represent rows of the input matrix `qit`, and columns represent
-        different values.
-
-        """
-        max_value = int(np.max(qit))
-        counts_matrix = np.zeros((qit.shape[0], max_value))
-
-        for k in range(1, max_value + 1):
-            counts_matrix[:, k - 1] = np.sum(qit == k, axis=1)
-
-        return counts_matrix.astype(int)
-
     def build_linear_mapping(self):
         """Assemble the linear mapping matrix R using the regressor-space method.
 
@@ -136,7 +166,7 @@ class AILS:
 
         R = np.delete(R, null_rows, axis=0)
         qit = np.delete(qit, null_rows, axis=0)
-        return R, self.get_term_clustering(qit)
+        return R, get_term_clustering(qit)
 
     def build_static_function_information(
         self, X_static: np.ndarray, y_static: np.ndarray
@@ -240,36 +270,6 @@ class AILS:
         gain_covariance = HR.T.dot(HR)
         gain_response = HR.T.dot(gain)
         return HR, gain_covariance, gain_response
-
-    def get_cost_function(
-        self, y: np.ndarray, psi: np.ndarray, theta: np.ndarray
-    ) -> np.ndarray:
-        """Calculate the cost function based on residuals.
-
-        Parameters
-        ----------
-        y : ndarray of floats
-            The target data used in the identification process.
-        psi : ndarray of floats, shape (n_samples, n_parameters)
-            The matrix of regressors.
-        theta : ndarray of floats
-            The parameter vector.
-
-        Returns
-        -------
-        cost_function : float
-            The calculated cost function value.
-
-        Notes
-        -----
-        This method computes the cost function value based on the residuals between
-        the target data (y) and the predicted values using the regressors (dynamic
-        and static) and parameter vector (theta). It quantifies the error in the
-        model's predictions.
-
-        """
-        residuals = y - psi.dot(theta)
-        return residuals.T.dot(residuals)
 
     def build_system_data(
         self,
@@ -474,7 +474,7 @@ class AILS:
             theta[i, :] = tmp_theta.T
 
             for j in range(num_objectives):
-                residuals = self.get_cost_function(
+                residuals = get_cost_function(
                     system_data[j], affine_information_data[j], tmp_theta
                 )
                 J[j, i] = residuals[0]

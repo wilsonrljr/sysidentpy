@@ -7,6 +7,7 @@ from typing import Optional
 import numpy as np
 
 from .basis_function_base import BaseBasisFunction
+from sysidentpy.narmax_base import get_max_xlag, get_max_ylag
 
 
 class Bilinear(BaseBasisFunction):
@@ -102,7 +103,7 @@ class Bilinear(BaseBasisFunction):
                 stacklevel=2,
             )
 
-        ny = self.get_max_ylag(ylag)
+        ny = get_max_ylag(ylag)
         combination_ylag = list(
             combinations_with_replacement(list(range(1, ny + 1)), self.degree)
         )
@@ -112,7 +113,7 @@ class Bilinear(BaseBasisFunction):
         combination_xlag = []
         ni = 0
         for lag in xlag:
-            nx = self.get_max_xlag(lag)
+            nx = get_max_xlag(lag)
             combination_lag = list(
                 combinations_with_replacement(
                     list(range(ny + 1 + ni, nx + ny + 1 + ni)), self.degree

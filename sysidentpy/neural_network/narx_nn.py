@@ -27,6 +27,48 @@ logging.basicConfig(
 )
 
 
+def _check_cuda(device):
+    if device not in ["cpu", "cuda"]:
+        raise ValueError(f"device must be 'cpu' or 'cuda'. Got {device}")
+
+    if device == "cpu":
+        return torch.device("cpu")
+
+    if device == "cuda":
+        if torch.cuda.is_available():
+            return torch.device("cuda")
+
+        warnings.warn(
+            "No CUDA available. We set the device as CPU",
+            stacklevel=2,
+        )
+
+    return torch.device("cpu")
+
+
+def convert_to_tensor(reg_matrix, y):
+    """Return the lagged matrix and the y values given the maximum lags.
+
+    Based on Pytorch official docs:
+    https://pytorch.org/tutorials/beginner/nn_tutorial.html
+
+    Parameters
+    ----------
+    reg_matrix : ndarray of floats
+        The information matrix of the model.
+    y : ndarray of floats
+        The output data
+
+    Returns
+    -------
+    Tensor: tensor
+        tensors that have the same size of the first dimension.
+
+    """
+    reg_matrix, y = map(torch.tensor, (reg_matrix, y))
+    return TensorDataset(reg_matrix, y)
+
+
 class NARXNN(BaseMSS):
     r"""NARX Neural Network model built on top of Pytorch.
 
@@ -172,7 +214,7 @@ class NARXNN(BaseMSS):
         self.train_percentage = train_percentage
         self.verbose = verbose
         self.optim_params = optim_params
-        self.device = self._check_cuda(device)
+        self.device = _check_cuda(device)
         self.regressor_code = None
         self.train_loss = None
         self.val_loss = None
@@ -215,24 +257,6 @@ class NARXNN(BaseMSS):
             raise ValueError(
                 f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
             )
-
-    def _check_cuda(self, device):
-        if device not in ["cpu", "cuda"]:
-            raise ValueError(f"device must be 'cpu' or 'cuda'. Got {device}")
-
-        if device == "cpu":
-            return torch.device("cpu")
-
-        if device == "cuda":
-            if torch.cuda.is_available():
-                return torch.device("cuda")
-
-            warnings.warn(
-                "No CUDA available. We set the device as CPU",
-                stacklevel=2,
-            )
-
-        return torch.device("cpu")
 
     def define_opt(self):
         """Define the optimizer using the user parameters."""
@@ -334,28 +358,6 @@ class NARXNN(BaseMSS):
         y = np.atleast_1d(y[self.max_lag :]).astype(np.float32)
         return reg_matrix, y
 
-    def convert_to_tensor(self, reg_matrix, y):
-        """Return the lagged matrix and the y values given the maximum lags.
-
-        Based on Pytorch official docs:
-        https://pytorch.org/tutorials/beginner/nn_tutorial.html
-
-        Parameters
-        ----------
-        reg_matrix : ndarray of floats
-            The information matrix of the model.
-        y : ndarray of floats
-            The output data
-
-        Returns
-        -------
-        Tensor: tensor
-            tensors that have the same size of the first dimension.
-
-        """
-        reg_matrix, y = map(torch.tensor, (reg_matrix, y))
-        return TensorDataset(reg_matrix, y)
-
     def get_data(self, train_ds):
         """Return the lagged matrix and the y values given the maximum lags.
 
@@ -397,7 +399,7 @@ class NARXNN(BaseMSS):
             raise ValueError("y cannot be None")
 
         x_train, y_train = self.split_data(X, y)
-        train_ds = self.convert_to_tensor(x_train, y_train)
+        train_ds = convert_to_tensor(x_train, y_train)
         train_dl = self.get_data(train_ds)
         return train_dl
 

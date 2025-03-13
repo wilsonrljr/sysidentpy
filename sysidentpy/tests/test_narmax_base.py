@@ -10,17 +10,17 @@ from sysidentpy.basis_function import Polynomial, Fourier
 from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.narmax_base import (
     RegressorDictionary,
-    Orthogonalization,
     InformationMatrix,
 )
 from sysidentpy.parameter_estimation.estimators import (
     LeastSquares,
     RecursiveLeastSquares,
 )
+from sysidentpy.narmax_base import house, rowhouse
+
 from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
 
 IM = InformationMatrix()
-HH = Orthogonalization()
 GR = RegressorDictionary()
 bf_polynomial = Polynomial(degree=2)
 bf_fourier = Fourier(degree=2, n=1)
@@ -186,7 +186,7 @@ def test_house():
             0.08369197,
         ]
     )
-    assert_almost_equal(HH.house(a), output)
+    assert_almost_equal(house(a), output)
 
 
 def test_row_house():
@@ -234,7 +234,7 @@ def test_row_house():
             [-0.15920982],
         ]
     )
-    assert_almost_equal(HH.rowhouse(a, b), output)
+    assert_almost_equal(rowhouse(a, b), output)
 
 
 def test_get_index_from_regressor_code():
