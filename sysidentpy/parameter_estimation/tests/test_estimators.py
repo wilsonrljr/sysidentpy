@@ -1,6 +1,11 @@
 from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.basis_function import Polynomial
-from sysidentpy.narmax_base import InformationMatrix
+from sysidentpy.narmax_base import build_input_output_matrix
+from sysidentpy.parameter_estimation.estimators_base import BaseEstimator
+from sysidentpy.parameter_estimation import (
+    BoundedVariableLeastSquares,
+    LeastSquaresMinimalResidual,
+)
 
 from sysidentpy.parameter_estimation.estimators import (
     LeastSquares,
@@ -50,9 +55,7 @@ def create_test_data(n=1000):
 
 x, y, theta = create_test_data()
 max_lag = 2
-lagged_data = InformationMatrix(xlag=2, ylag=2).build_input_output_matrix(X=x, y=y)[
-    :, :
-]
+lagged_data = build_input_output_matrix(X=x, y=y, xlag=2, ylag=2)[:, :]
 
 psi = Polynomial(degree=2).fit(lagged_data, max_lag, predefined_regressors=None)
 # optimize(psi, y_train[max_lag:, :], 0.01)
@@ -330,3 +333,150 @@ def test_lmsf():
 
 # def test_model_order_selection():
 #     assert_raises(ValueError, Estimators, max_lag=-1)
+
+
+def test_unbiased_least_squares():
+    # x, y, theta = create_test_data()
+    basis_function = Polynomial(degree=2)
+    model = FROLS(
+        n_terms=5,
+        ylag=[1, 2],
+        xlag=2,
+        estimator=LeastSquares(unbiased=True),
+        basis_function=basis_function,
+        err_tol=None,
+    )
+    model.fit(X=x, y=y)
+    assert_almost_equal(model.theta.shape[0], theta.shape[0], decimal=2)
+
+
+def test_bvls_init():
+    """Test initialization of BoundedVariableLeastSquares."""
+    # Define parameters
+    unbiased = True
+    uiter = 50
+    bounds = (-1.0, 1.0)
+    method = "dogbox"
+    tol = 1e-8
+    lsq_solver = "exact"
+    lsmr_tol = 1e-5
+    max_iter = 500
+    verbose = 1
+    lsmr_maxiter = 1000
+
+    # Instantiate the class
+    model = BoundedVariableLeastSquares(
+        unbiased=unbiased,
+        uiter=uiter,
+        bounds=bounds,
+        method=method,
+        tol=tol,
+        lsq_solver=lsq_solver,
+        lsmr_tol=lsmr_tol,
+        max_iter=max_iter,
+        verbose=verbose,
+        lsmr_maxiter=lsmr_maxiter,
+    )
+
+    # Assertions to check if attributes are correctly set
+    assert model.unbiased == unbiased
+    assert model.uiter == uiter
+    assert model.bounds == bounds
+    assert model.method == method
+    assert model.tol == tol
+    assert model.lsq_solver == lsq_solver
+    assert model.lsmr_tol == lsmr_tol
+    assert model.max_iter == max_iter
+    assert model.verbose == verbose
+    assert model.lsmr_maxiter == lsmr_maxiter
+
+    # Check default values
+    default_model = BoundedVariableLeastSquares()
+    assert default_model.unbiased is False
+    assert default_model.uiter == 30
+    assert default_model.bounds == (-np.inf, np.inf)
+    assert default_model.method == "trf"
+    assert default_model.tol == 1e-10
+    assert default_model.lsq_solver is None
+    assert default_model.lsmr_tol is None
+    assert default_model.max_iter is None
+    assert default_model.verbose == 0
+    assert default_model.lsmr_maxiter is None
+
+
+def test_bvls_results():
+    basis_function = Polynomial(degree=2)
+    model = FROLS(
+        n_terms=5,
+        ylag=[1, 2],
+        xlag=2,
+        estimator=BoundedVariableLeastSquares(),
+        basis_function=basis_function,
+        err_tol=None,
+    )
+    model.fit(X=x, y=y)
+    assert_almost_equal(model.theta, theta, decimal=2)
+
+
+def test_lsmr_results():
+    basis_function = Polynomial(degree=2)
+    model = FROLS(
+        n_terms=5,
+        ylag=[1, 2],
+        xlag=2,
+        estimator=LeastSquaresMinimalResidual(),
+        basis_function=basis_function,
+        err_tol=None,
+    )
+    model.fit(X=x, y=y)
+    assert_almost_equal(model.theta, theta, decimal=2)
+
+
+def test_lsqr_init():
+    """Test initialization of LeastSquaresMinimalResidual."""
+    # Define parameters
+    unbiased = True
+    uiter = 50
+    damp = 0.1
+    atol = 1e-5
+    btol = 1e-5
+    conlim = 1e7
+    maxiter = 100
+    show = True
+    x0 = [0.5, -0.2, 1.0]
+
+    # Instantiate the class
+    model = LeastSquaresMinimalResidual(
+        unbiased=unbiased,
+        uiter=uiter,
+        damp=damp,
+        atol=atol,
+        btol=btol,
+        conlim=conlim,
+        maxiter=maxiter,
+        show=show,
+        x0=x0,
+    )
+
+    # Assertions to check if attributes are correctly set
+    assert model.unbiased == unbiased
+    assert model.uiter == uiter
+    assert model.damp == damp
+    assert model.atol == atol
+    assert model.btol == btol
+    assert model.conlim == conlim
+    assert model.maxiter == maxiter
+    assert model.show == show
+    assert model.x0 == x0
+
+    # Check default values
+    default_model = LeastSquaresMinimalResidual()
+    assert default_model.unbiased is False
+    assert default_model.uiter == 30
+    assert default_model.damp == 0.0
+    assert default_model.atol == 1e-6
+    assert default_model.btol == 1e-6
+    assert default_model.conlim == 1e8
+    assert default_model.maxiter is None
+    assert default_model.show is False
+    assert default_model.x0 is None
