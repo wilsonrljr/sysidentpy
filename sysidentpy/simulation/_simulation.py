@@ -11,6 +11,18 @@ import numpy as np
 from sysidentpy.narmax_base import house, rowhouse
 from ..basis_function import Fourier, Polynomial
 from ..narmax_base import BaseMSS
+from ..narmax_base import prepare_data
+
+from sysidentpy.utils.simulation import (
+    get_index_from_regressor_code,
+    list_output_regressor_code,
+    list_input_regressor_code,
+)
+
+from sysidentpy.utils.lags import (
+    get_lag_from_regressor_code,
+    get_max_lag_from_model_code,
+)
 
 from ..utils.check_arrays import check_positive_int, num_features
 from ..parameter_estimation.estimators import (
@@ -155,7 +167,7 @@ class SimulateNARMAX(BaseMSS):
     ):
         self.elag = elag
         self.model_type = model_type
-        self.build_matrix = self.get_build_io_method(model_type)
+        # self.build_matrix = self.get_build_io_method(model_type)
         self.basis_function = basis_function
         self.estimator = estimator
         self.estimate_parameter = estimate_parameter
@@ -317,10 +329,10 @@ class SimulateNARMAX(BaseMSS):
         else:
             self.n_inputs = 1  # just to create the regressor space base
 
-        xlag_code = self.list_input_regressor_code(model_code)
-        ylag_code = self.list_output_regressor_code(model_code)
-        self.xlag = self.get_lag_from_regressor_code(xlag_code)
-        self.ylag = self.get_lag_from_regressor_code(ylag_code)
+        xlag_code = list_input_regressor_code(model_code)
+        ylag_code = list_output_regressor_code(model_code)
+        self.xlag = get_lag_from_regressor_code(xlag_code)
+        self.ylag = get_lag_from_regressor_code(ylag_code)
         self.max_lag = max(self.xlag, self.ylag)
         if self.n_inputs != 1:
             self.xlag = self.n_inputs * [list(range(1, self.max_lag + 1))]
@@ -332,13 +344,16 @@ class SimulateNARMAX(BaseMSS):
         self.non_degree = model_code.shape[1]
         regressor_code = self.regressor_space(self.n_inputs)
 
-        self.pivv = self.get_index_from_regressor_code(regressor_code, model_code)
+        self.pivv = get_index_from_regressor_code(regressor_code, model_code)
         self.final_model = regressor_code[self.pivv]
         # to use in the predict function
         self.n_terms = self.final_model.shape[0]
         if self.estimate_parameter and not self.calculate_err:
             self.max_lag = self._get_max_lag()
-            lagged_data = self.build_matrix(X_train, y_train)
+            # lagged_data = self.build_matrix(X_train, y_train)
+            lagged_data = prepare_data(
+                X_train, y_train, self.xlag, self.ylag, self.model_type
+            )
             psi = self.basis_function.fit(
                 lagged_data,
                 self.max_lag,
@@ -369,7 +384,10 @@ class SimulateNARMAX(BaseMSS):
             self.err = self.n_terms * [0]
         else:
             self.max_lag = self._get_max_lag()
-            lagged_data = self.build_matrix(X_train, y_train)
+            # lagged_data = self.build_matrix(X_train, y_train)
+            lagged_data = prepare_data(
+                X_train, y_train, self.xlag, self.ylag, self.model_type
+            )
             psi = self.basis_function.fit(
                 lagged_data,
                 self.max_lag,
@@ -554,7 +572,8 @@ class SimulateNARMAX(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        lagged_data = self.build_matrix(X, y)
+        # lagged_data = self.build_matrix(X, y)
+        lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
         X_base = self.basis_function.transform(
             lagged_data,
             self.max_lag,
