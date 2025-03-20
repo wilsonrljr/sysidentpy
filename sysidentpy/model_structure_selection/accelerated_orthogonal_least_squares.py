@@ -9,6 +9,7 @@ import numpy as np
 from numpy import linalg as LA
 
 from ..narmax_base import BaseMSS
+from ..narmax_base import prepare_data
 from ..basis_function import Fourier, Polynomial
 from ..parameter_estimation.estimators import (
     LeastSquares,
@@ -146,7 +147,7 @@ class AOLS(BaseMSS):
     ):
         self.basis_function = basis_function
         self.model_type = model_type
-        self.build_matrix = self.get_build_io_method(model_type)
+        # self.build_matrix = self.get_build_io_method(model_type)
         self.xlag = xlag
         self.ylag = ylag
         self.max_lag = self._get_max_lag()
@@ -306,7 +307,8 @@ class AOLS(BaseMSS):
             raise ValueError("y cannot be None")
 
         self.max_lag = self._get_max_lag()
-        lagged_data = self.build_matrix(X, y)
+        # lagged_data = self.build_matrix(X, y)
+        lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
         reg_matrix = self.basis_function.fit(
             lagged_data,
             self.max_lag,
@@ -425,7 +427,8 @@ class AOLS(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        lagged_data = self.build_matrix(X, y)
+        # lagged_data = self.build_matrix(X, y)
+        lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
         X_base = self.basis_function.transform(
             lagged_data,
             self.max_lag,
