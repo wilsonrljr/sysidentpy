@@ -13,6 +13,7 @@ from scipy.spatial.distance import cdist
 from scipy.special import psi
 
 from ..narmax_base import BaseMSS
+from ..narmax_base import prepare_data
 from ..basis_function import Fourier, Polynomial
 from ..utils.check_arrays import check_positive_int, num_features, check_random_state
 from ..utils.deprecation import deprecated
@@ -171,7 +172,7 @@ class ER(BaseMSS):
     ):
         self.basis_function = basis_function
         self.model_type = model_type
-        self.build_matrix = self.get_build_io_method(model_type)
+        # self.build_matrix = self.get_build_io_method(model_type)
         self.xlag = xlag
         self.ylag = ylag
         self.non_degree = basis_function.degree
@@ -569,7 +570,8 @@ class ER(BaseMSS):
             raise ValueError("y cannot be None")
 
         self.max_lag = self._get_max_lag()
-        lagged_data = self.build_matrix(X, y)
+        # lagged_data = self.build_matrix(X, y)
+        lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
 
         reg_matrix = self.basis_function.fit(
             lagged_data,
@@ -727,7 +729,8 @@ class ER(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        lagged_data = self.build_matrix(X, y)
+        # lagged_data = self.build_matrix(X, y)
+        lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
 
         X_base = self.basis_function.transform(
             lagged_data,
