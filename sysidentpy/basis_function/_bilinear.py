@@ -7,7 +7,8 @@ from typing import Optional
 import numpy as np
 
 from .basis_function_base import BaseBasisFunction
-from sysidentpy.narmax_base import get_max_xlag, get_max_ylag
+
+from sysidentpy.utils.lags import get_max_xlag, get_max_ylag
 
 
 class Bilinear(BaseBasisFunction):
