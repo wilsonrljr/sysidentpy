@@ -14,6 +14,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ..narmax_base import BaseMSS
+from ..narmax_base import prepare_data
 from ..basis_function import Polynomial, Fourier
 from ..utils.check_arrays import check_positive_int, num_features
 
@@ -109,7 +110,7 @@ class NARX(BaseMSS):
     ):
         self.basis_function = basis_function
         self.model_type = model_type
-        self.build_matrix = self.get_build_io_method(model_type)
+        # self.build_matrix = self.get_build_io_method(model_type)
         self.non_degree = basis_function.degree
         self.ylag = ylag
         self.xlag = xlag
@@ -168,7 +169,8 @@ class NARX(BaseMSS):
             raise ValueError("y cannot be None")
 
         self.max_lag = self._get_max_lag()
-        lagged_data = self.build_matrix(X, y)
+        # lagged_data = self.build_matrix(X, y)
+        lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
         reg_matrix = self.basis_function.fit(
             lagged_data,
             self.max_lag,
@@ -276,7 +278,8 @@ class NARX(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        lagged_data = self.build_matrix(X, y)
+        # lagged_data = self.build_matrix(X, y)
+        lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
         X_base = self.basis_function.transform(
             lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type
         )
@@ -491,9 +494,16 @@ class NARX(BaseMSS):
         analyzed_elements_number = self.max_lag + 1
 
         for i in range(forecast_horizon - self.max_lag):
-            lagged_data = self.build_matrix(
+            # lagged_data = self.build_matrix(
+            #     X[i : i + analyzed_elements_number],
+            #     yhat[i : i + analyzed_elements_number].reshape(-1, 1),
+            # )
+            lagged_data = prepare_data(
                 X[i : i + analyzed_elements_number],
                 yhat[i : i + analyzed_elements_number].reshape(-1, 1),
+                self.xlag,
+                self.ylag,
+                self.model_type,
             )
             X_tmp = self.basis_function.transform(
                 lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type
