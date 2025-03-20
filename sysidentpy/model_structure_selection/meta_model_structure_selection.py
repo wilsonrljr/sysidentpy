@@ -8,6 +8,7 @@ from typing import Tuple, Union, Optional
 import numpy as np
 from scipy.stats import t
 
+from ..narmax_base import prepare_data
 from ..basis_function import Polynomial
 from ..metaheuristics import BPSOGSA
 from ..metrics import mean_squared_error, root_relative_squared_error
@@ -230,7 +231,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self.steps_ahead = steps_ahead
         self.random_state = random_state
         self.test_size = test_size
-        self.build_matrix = self.get_build_io_method(model_type)
+        # self.build_matrix = self.get_build_io_method(model_type)
         self.n_inputs = None
         self.regressor_code = None
         self.best_model_history = None
@@ -381,7 +382,10 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
             residues = y_test - yhat
             self.max_lag = self._get_max_lag()
-            lagged_data = self.build_matrix(X_train, y_train)
+            # lagged_data = self.build_matrix(X_train, y_train)
+            lagged_data = prepare_data(
+                X_train, y_train, self.xlag, self.ylag, self.model_type
+            )
 
             psi = self.basis_function.fit(
                 lagged_data,
