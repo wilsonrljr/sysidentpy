@@ -13,10 +13,9 @@ from typing import Union, Tuple, Optional
 import numpy as np
 
 from sysidentpy.narmax_base import house, rowhouse
-from sysidentpy.utils.check_arrays import check_positive_int, num_features
 
 from ..basis_function import Fourier, Polynomial
-from ..narmax_base import BaseMSS
+from .ofr_base import OFRBase, get_info_criteria
 
 from ..parameter_estimation.estimators import (
     LeastSquares,
@@ -59,7 +58,7 @@ Estimators = Union[
 ]
 
 
-class FROLS(BaseMSS):
+class FROLS(OFRBase):
     r"""Forward Regression Orthogonal Least Squares algorithm.
 
     This class uses the FROLS algorithm ([1]_, [2]_) to build NARMAX models.
@@ -183,13 +182,12 @@ class FROLS(BaseMSS):
         self.xlag = xlag
         self.max_lag = self._get_max_lag()
         self.info_criteria = info_criteria
-        self.info_criteria_function = self.get_info_criteria(info_criteria)
+        self.info_criteria_function = get_info_criteria(info_criteria)
         self.n_info_values = n_info_values
         self.n_terms = n_terms
         self.estimator = estimator
         self.elag = elag
         self.model_type = model_type
-        self.build_matrix = self.get_build_io_method(model_type)
         self.basis_function = basis_function
         self.eps = eps
         if isinstance(self.estimator, RidgeRegression):
@@ -206,45 +204,6 @@ class FROLS(BaseMSS):
         self.final_model = None
         self.theta = None
         self.pivv = None
-
-    def _validate_params(self):
-        """Validate input params."""
-        if not isinstance(self.n_info_values, int) or self.n_info_values < 1:
-            raise ValueError(
-                f"n_info_values must be integer and > zero. Got {self.n_info_values}"
-            )
-
-        if isinstance(self.ylag, int) and self.ylag < 1:
-            raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
-
-        if isinstance(self.xlag, int) and self.xlag < 1:
-            raise ValueError(f"xlag must be integer and > zero. Got {self.xlag}")
-
-        if not isinstance(self.xlag, (int, list)):
-            raise ValueError(f"xlag must be integer and > zero. Got {self.xlag}")
-
-        if not isinstance(self.ylag, (int, list)):
-            raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
-
-        if not isinstance(self.order_selection, bool):
-            raise TypeError(
-                f"order_selection must be False or True. Got {self.order_selection}"
-            )
-
-        if self.info_criteria not in ["aic", "aicc", "bic", "fpe", "lilc"]:
-            raise ValueError(
-                f"info_criteria must be aic, bic, fpe or lilc. Got {self.info_criteria}"
-            )
-
-        if self.model_type not in ["NARMAX", "NAR", "NFIR"]:
-            raise ValueError(
-                f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
-            )
-
-        if (
-            not isinstance(self.n_terms, int) or self.n_terms < 1
-        ) and self.n_terms is not None:
-            raise ValueError(f"n_terms must be integer and > zero. Got {self.n_terms}")
 
     def error_reduction_ratio(
         self, psi: np.ndarray, y: np.ndarray, process_term_number: int
@@ -330,240 +289,10 @@ class FROLS(BaseMSS):
         psi_orthogonal = psi[:, tmp_piv]
         return err, tmp_piv, psi_orthogonal
 
-    def information_criterion(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Determine the model order.
-
-        This function uses a information criterion to determine the model size.
-        'Akaike'-  Akaike's Information Criterion with
-                   critical value 2 (AIC) (default).
-        'Bayes' -  Bayes Information Criterion (BIC).
-        'FPE'   -  Final Prediction Error (FPE).
-        'LILC'  -  Khundrin's law ofiterated logarithm criterion (LILC).
-
-        Parameters
-        ----------
-        y : array-like of shape = n_samples
-            Target values of the system.
-        X : array-like of shape = n_samples
-            Input system values measured by the user.
-
-        Returns
-        -------
-        output_vector : array-like of shape = n_regressor
-            Vector with values of akaike's information criterion
-            for models with N terms (where N is the
-            vector position + 1).
-
-        """
-        if self.n_info_values is not None and self.n_info_values > X.shape[1]:
-            self.n_info_values = X.shape[1]
-            warnings.warn(
-                "n_info_values is greater than the maximum number of all"
-                " regressors space considering the chosen y_lag, u_lag, and"
-                f" non_degree. We set as {X.shape[1]}",
-                stacklevel=2,
-            )
-
-        output_vector = np.zeros(self.n_info_values)
-        output_vector[:] = np.nan
-
-        n_samples = len(y) - self.max_lag
-
-        for i in range(self.n_info_values):
-            n_theta = i + 1
-            regressor_matrix = self.error_reduction_ratio(X, y, n_theta)[2]
-
-            tmp_theta = self.estimator.optimize(
-                regressor_matrix, y[self.max_lag :, 0].reshape(-1, 1)
-            )
-
-            tmp_yhat = np.dot(regressor_matrix, tmp_theta)
-            tmp_residual = y[self.max_lag :] - tmp_yhat
-            e_var = np.var(tmp_residual, ddof=1)
-            output_vector[i] = self.info_criteria_function(n_theta, n_samples, e_var)
-
-        return output_vector
-
-    def get_info_criteria(self, info_criteria: str):
-        """Get info criteria."""
-        info_criteria_options = {
-            "aic": self.aic,
-            "aicc": self.aicc,
-            "bic": self.bic,
-            "fpe": self.fpe,
-            "lilc": self.lilc,
-        }
-        return info_criteria_options.get(info_criteria)
-
-    def bic(self, n_theta: int, n_samples: int, e_var: float) -> float:
-        """Compute the Bayesian information criteria value.
-
-        Parameters
-        ----------
-        n_theta : int
-            Number of parameters of the model.
-        n_samples : int
-            Number of samples given the maximum lag.
-        e_var : float
-            Variance of the residues
-
-        Returns
-        -------
-        info_criteria_value : float
-            The computed value given the information criteria selected by the
-            user.
-
-        """
-        model_factor = n_theta * np.log(n_samples)
-        e_factor = n_samples * np.log(e_var)
-        info_criteria_value = e_factor + model_factor
-
-        return info_criteria_value
-
-    def aic(self, n_theta: int, n_samples: int, e_var: float) -> float:
-        """Compute the Akaike information criteria value.
-
-        Parameters
-        ----------
-        n_theta : int
-            Number of parameters of the model.
-        n_samples : int
-            Number of samples given the maximum lag.
-        e_var : float
-            Variance of the residues
-
-        Returns
-        -------
-        info_criteria_value : float
-            The computed value given the information criteria selected by the
-            user.
-
-        """
-        model_factor = 2 * n_theta
-        e_factor = n_samples * np.log(e_var)
-        info_criteria_value = e_factor + model_factor
-
-        return info_criteria_value
-
-    def aicc(self, n_theta: int, n_samples: int, e_var: float) -> float:
-        """Compute the Akaike information Criteria corrected value.
-
-        Parameters
-        ----------
-        n_theta : int
-            Number of parameters of the model.
-        n_samples : int
-            Number of samples given the maximum lag.
-        e_var : float
-            Variance of the residues
-
-        Returns
-        -------
-        aicc : float
-            The computed aicc value.
-
-        References
-        ----------
-        - https://www.mathworks.com/help/ident/ref/idmodel.aic.html
-
-        """
-        aic = self.aic(n_theta, n_samples, e_var)
-        aicc = aic + (2 * n_theta * (n_theta + 1) / (n_samples - n_theta - 1))
-
-        return aicc
-
-    def fpe(self, n_theta: int, n_samples: int, e_var: float) -> float:
-        """Compute the Final Error Prediction value.
-
-        Parameters
-        ----------
-        n_theta : int
-            Number of parameters of the model.
-        n_samples : int
-            Number of samples given the maximum lag.
-        e_var : float
-            Variance of the residues
-
-        Returns
-        -------
-        info_criteria_value : float
-            The computed value given the information criteria selected by the
-            user.
-
-        """
-        model_factor = n_samples * np.log((n_samples + n_theta) / (n_samples - n_theta))
-        e_factor = n_samples * np.log(e_var)
-        info_criteria_value = e_factor + model_factor
-
-        return info_criteria_value
-
-    def lilc(self, n_theta: int, n_samples: int, e_var: float) -> float:
-        """Compute the Lilc information criteria value.
-
-        Parameters
-        ----------
-        n_theta : int
-            Number of parameters of the model.
-        n_samples : int
-            Number of samples given the maximum lag.
-        e_var : float
-            Variance of the residues
-
-        Returns
-        -------
-        info_criteria_value : float
-            The computed value given the information criteria selected by the
-            user.
-
-        """
-        model_factor = 2 * n_theta * np.log(np.log(n_samples))
-        e_factor = n_samples * np.log(e_var)
-        info_criteria_value = e_factor + model_factor
-
-        return info_criteria_value
-
-    def get_min_info_value(self, info_values):
-        """Find the index of the first increasing value in an array.
-
-        Parameters
-        ----------
-        info_values : array-like
-            A sequence of numeric values to be analyzed.
-
-        Returns
-        -------
-        int
-            The index of the first element where the values start to increase
-            monotonically. If no such element exists, the length of
-            `info_values` is returned.
-
-        Notes
-        -----
-        - The function assumes that `info_values` is a 1-dimensional array-like
-        structure.
-        - The function uses `np.diff` to compute the difference between consecutive
-        elements in the sequence.
-        - The function checks if any differences are positive, indicating an increase
-        in value.
-
-        Examples
-        --------
-        >>> class MyClass:
-        ...     def __init__(self, values):
-        ...         self.info_values = values
-        ...     def get_min_info_value(self):
-        ...         is_monotonique = np.diff(self.info_values) > 0
-        ...         if any(is_monotonique):
-        ...             return np.where(is_monotonique)[0][0] + 1
-        ...         return len(self.info_values)
-        >>> instance = MyClass([3, 2, 1, 4, 5])
-        >>> instance.get_min_info_value()
-        3
-        """
-        is_monotonique = np.diff(info_values) > 0
-        if any(is_monotonique):
-            return np.where(is_monotonique)[0][0] + 1
-        return len(info_values)
+    def run_mss_algorithm(
+        self, psi: np.ndarray, y: np.ndarray, process_term_number: int
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        return self.error_reduction_ratio(psi, y, process_term_number)
 
     def fit(self, *, X: Optional[np.ndarray] = None, y: np.ndarray):
         """Fit polynomial NARMAX model.
@@ -596,68 +325,7 @@ class FROLS(BaseMSS):
             vector position + 1).
 
         """
-        if y is None:
-            raise ValueError("y cannot be None")
-
-        self.max_lag = self._get_max_lag()
-        lagged_data = self.build_matrix(X, y)
-
-        reg_matrix = self.basis_function.fit(
-            lagged_data,
-            self.max_lag,
-            self.ylag,
-            self.xlag,
-            self.model_type,
-            predefined_regressors=None,
-        )
-
-        if X is not None:
-            self.n_inputs = num_features(X)
-        else:
-            self.n_inputs = 1  # just to create the regressor space base
-
-        self.regressor_code = self.regressor_space(self.n_inputs)
-
-        if self.order_selection is True:
-            self.info_values = self.information_criterion(reg_matrix, y)
-
-        if self.n_terms is None and self.order_selection is True:
-            model_length = self.get_min_info_value(self.info_values)
-            self.n_terms = model_length
-        elif self.n_terms is None and self.order_selection is not True:
-            raise ValueError(
-                "If order_selection is False, you must define n_terms value."
-            )
-        else:
-            model_length = self.n_terms
-
-        (self.err, self.pivv, psi) = self.error_reduction_ratio(
-            reg_matrix, y, model_length
-        )
-
-        tmp_piv = self.pivv[0:model_length]
-        repetition = len(reg_matrix)
-        if isinstance(self.basis_function, Polynomial):
-            self.final_model = self.regressor_code[tmp_piv, :].copy()
-        else:
-            self.regressor_code = np.sort(
-                np.tile(self.regressor_code[1:, :], (repetition, 1)),
-                axis=0,
-            )
-            self.final_model = self.regressor_code[tmp_piv, :].copy()
-
-        self.theta = self.estimator.optimize(psi, y[self.max_lag :, 0].reshape(-1, 1))
-        if self.estimator.unbiased is True:
-            self.theta = self.estimator.unbiased_estimator(
-                psi,
-                y[self.max_lag :, 0].reshape(-1, 1),
-                self.theta,
-                self.elag,
-                self.max_lag,
-                self.estimator,
-                self.basis_function,
-                self.estimator.uiter,
-            )
+        super().fit(X=X, y=y)
         return self
 
     def predict(
@@ -695,34 +363,9 @@ class FROLS(BaseMSS):
             The predicted values of the model.
 
         """
-        if isinstance(self.basis_function, Polynomial):
-            if steps_ahead is None:
-                yhat = self._model_prediction(X, y, forecast_horizon=forecast_horizon)
-                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
-                return yhat
-            if steps_ahead == 1:
-                yhat = self._one_step_ahead_prediction(X, y)
-                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
-                return yhat
-
-            check_positive_int(steps_ahead, "steps_ahead")
-            yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
-            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
-            return yhat
-
-        if steps_ahead is None:
-            yhat = self._basis_function_predict(X, y, forecast_horizon)
-            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
-            return yhat
-        if steps_ahead == 1:
-            yhat = self._one_step_ahead_prediction(X, y)
-            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
-            return yhat
-
-        yhat = self._basis_function_n_step_prediction(
-            X, y, steps_ahead, forecast_horizon
+        yhat = super().predict(
+            X=X, y=y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
         )
-        yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
         return yhat
 
     def _one_step_ahead_prediction(
@@ -744,18 +387,7 @@ class FROLS(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        lagged_data = self.build_matrix(X, y)
-
-        X_base = self.basis_function.transform(
-            lagged_data,
-            self.max_lag,
-            self.ylag,
-            self.xlag,
-            self.model_type,
-            predefined_regressors=self.pivv[: len(self.final_model)],
-        )
-
-        yhat = super()._one_step_ahead_prediction(X_base)
+        yhat = super()._one_step_ahead_prediction(X, y)
         return yhat.reshape(-1, 1)
 
     def _n_step_ahead_prediction(
@@ -818,20 +450,6 @@ class FROLS(BaseMSS):
         y_initial: np.ndarray,
         forecast_horizon: int = 0,
     ) -> np.ndarray:
-        if len(y_initial) < self.max_lag:
-            raise ValueError(
-                "Insufficient initial condition elements! Expected at least"
-                f" {self.max_lag} elements."
-            )
-
-        if X is not None:
-            forecast_horizon = X.shape[0]
-        else:
-            forecast_horizon = forecast_horizon + self.max_lag
-
-        if self.model_type == "NAR":
-            self.n_inputs = 0
-
         y_output = super()._narmax_predict(X, y_initial, forecast_horizon)
         return y_output
 
@@ -847,14 +465,6 @@ class FROLS(BaseMSS):
         y_initial: Optional[np.ndarray],
         forecast_horizon: int = 0,
     ) -> np.ndarray:
-        if X is not None:
-            forecast_horizon = X.shape[0]
-        else:
-            forecast_horizon = forecast_horizon + self.max_lag
-
-        if self.model_type == "NAR":
-            self.n_inputs = 0
-
         yhat = super()._basis_function_predict(X, y_initial, forecast_horizon)
         return yhat.reshape(-1, 1)
 
@@ -881,17 +491,6 @@ class FROLS(BaseMSS):
                The n-steps-ahead predicted values of the model.
 
         """
-        if len(y) < self.max_lag:
-            raise ValueError(
-                "Insufficient initial condition elements! Expected at least"
-                f" {self.max_lag} elements."
-            )
-
-        if X is not None:
-            forecast_horizon = X.shape[0]
-        else:
-            forecast_horizon = forecast_horizon + self.max_lag
-
         yhat = super()._basis_function_n_step_prediction(
             X, y, steps_ahead, forecast_horizon
         )
