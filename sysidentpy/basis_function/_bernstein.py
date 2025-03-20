@@ -16,7 +16,7 @@ from ..utils.deprecation import deprecated
         " Use `include_bias` and `degree`, respectively, instead."
     ),
 )
-class Bersntein(BaseBasisFunction):
+class Bernstein(BaseBasisFunction):
     r"""Build Bersntein basis function.
 
     Generate Bernstein basis functions.
