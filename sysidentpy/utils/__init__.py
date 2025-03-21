@@ -15,7 +15,9 @@ from sysidentpy.utils.lags import (
     get_max_ylag,
 )
 
-from sysidentpy.utils.narmax_tools import regressor_code, set_weights, train_test_split
+# need refactor to avoid circular import
+# from sysidentpy.utils.narmax_tools import regressor_code, set_weights,
+# train_test_split
 from sysidentpy.utils.plotting import plot_results, plot_residues_correlation
 from sysidentpy.utils.save_load import save_model, load_model
 from sysidentpy.utils.simulation import (
@@ -37,9 +39,9 @@ __ALL__ = [
     "get_max_lag_from_model_code",
     "get_max_xlag",
     "get_max_ylag",
-    "regressor_code",
-    "set_weights",
-    "train_test_split",
+    # "regressor_code",
+    # "set_weights",
+    # "train_test_split",
     "plot_results",
     "plot_residues_correlation",
     "save_model",
