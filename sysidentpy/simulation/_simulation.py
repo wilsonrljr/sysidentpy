@@ -167,7 +167,6 @@ class SimulateNARMAX(BaseMSS):
     ):
         self.elag = elag
         self.model_type = model_type
-        # self.build_matrix = self.get_build_io_method(model_type)
         self.basis_function = basis_function
         self.estimator = estimator
         self.estimate_parameter = estimate_parameter
@@ -350,7 +349,6 @@ class SimulateNARMAX(BaseMSS):
         self.n_terms = self.final_model.shape[0]
         if self.estimate_parameter and not self.calculate_err:
             self.max_lag = self._get_max_lag()
-            # lagged_data = self.build_matrix(X_train, y_train)
             lagged_data = prepare_data(
                 X_train, y_train, self.xlag, self.ylag, self.model_type
             )
@@ -384,7 +382,6 @@ class SimulateNARMAX(BaseMSS):
             self.err = self.n_terms * [0]
         else:
             self.max_lag = self._get_max_lag()
-            # lagged_data = self.build_matrix(X_train, y_train)
             lagged_data = prepare_data(
                 X_train, y_train, self.xlag, self.ylag, self.model_type
             )
@@ -572,7 +569,6 @@ class SimulateNARMAX(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        # lagged_data = self.build_matrix(X, y)
         lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
         X_base = self.basis_function.transform(
             lagged_data,

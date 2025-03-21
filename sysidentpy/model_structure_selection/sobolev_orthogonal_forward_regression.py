@@ -1,24 +1,17 @@
-"""Build Polynomial NARMAX Models using FROLS algorithm."""
+"""Build NARMAX Models using UOFR algorithm."""
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
-#           Luan Pascoal da Costa Andrade <luan_pascoal13@hotmail.com>
-#           Samuel Carlos Pessoa Oliveira <samuelcpoliveira@gmail.com>
-#           Samir Angelo Milani Martins <martins@ufsj.edu.br>
 # License: BSD 3 clause
 
-import warnings
 from typing import Union, Tuple, Optional
 
 import numpy as np
 
 from sysidentpy.narmax_base import house, rowhouse
-from sysidentpy.utils.check_arrays import check_positive_int, num_features
 
 from ..basis_function import Fourier, Polynomial
-from ..narmax_base import BaseMSS
-from ..narmax_base import prepare_data
-from .ofr_base import OFRBase, get_min_info_value, get_info_criteria
+from .ofr_base import OFRBase, get_info_criteria
 
 from ..parameter_estimation.estimators import (
     LeastSquares,

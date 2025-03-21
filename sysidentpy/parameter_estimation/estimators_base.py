@@ -147,7 +147,6 @@ class BaseEstimator(metaclass=ABCMeta):
            https://en.wikipedia.org/wiki/Least_squares
         """
         e = y - np.dot(psi, theta)
-        # im = InformationMatrix(ylag=elag)
         for _ in range(uiter):
             e = np.concatenate([np.zeros([max_lag, 1]), e], axis=0)
 

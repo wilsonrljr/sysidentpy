@@ -208,7 +208,6 @@ class NARXNN(BaseMSS):
         self.xlag = xlag
         self.basis_function = basis_function
         self.model_type = model_type
-        # self.build_matrix = self.get_build_io_method(model_type)
         self.non_degree = basis_function.degree
         self.max_lag = self._get_max_lag()
         self.batch_size = batch_size
@@ -318,7 +317,6 @@ class NARXNN(BaseMSS):
             raise ValueError("y cannot be None")
 
         self.max_lag = self._get_max_lag()
-        # lagged_data = self.build_matrix(X, y)
         lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
 
         if isinstance(self.basis_function, Polynomial):
@@ -492,7 +490,7 @@ class NARXNN(BaseMSS):
         This method accept y values mainly for prediction n-steps ahead
         (to be implemented in the future).
 
-        Currently we only support infinity-steps-ahead prediction,
+        Currently, we only support infinity-steps-ahead prediction,
         but run 1-step-ahead prediction manually is straightforward.
 
         Parameters
@@ -548,7 +546,6 @@ class NARXNN(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        # lagged_data = self.build_matrix(X, y)
         lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
 
         if isinstance(self.basis_function, Polynomial):

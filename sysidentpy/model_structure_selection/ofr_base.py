@@ -656,7 +656,6 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
                The 1-step-ahead predicted values of the model.
 
         """
-        # lagged_data = self.build_matrix(X, y)
         lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
 
         X_base = self.basis_function.transform(

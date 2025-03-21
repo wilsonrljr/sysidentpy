@@ -7,7 +7,6 @@
 #           Samir Angelo Milani Martins <martins@ufsj.edu.br>
 # License: BSD 3 clause
 
-import warnings
 from typing import Union, Tuple, Optional
 
 import numpy as np

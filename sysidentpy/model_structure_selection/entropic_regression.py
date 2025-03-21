@@ -16,7 +16,6 @@ from ..narmax_base import BaseMSS
 from ..narmax_base import prepare_data
 from ..basis_function import Fourier, Polynomial
 from ..utils.check_arrays import check_positive_int, num_features, check_random_state
-from ..utils.deprecation import deprecated
 from ..parameter_estimation.estimators import (
     LeastSquares,
     RidgeRegression,
@@ -159,7 +158,6 @@ class ER(BaseMSS):
         xlag: Union[int, list] = 1,
         q: float = 0.99,
         estimator: Estimators_Union = LeastSquares(),
-        extended_least_squares: bool = False,
         h: float = 0.01,
         k: int = 2,
         mutual_information_estimator: str = "mutual_information_knn",
@@ -172,14 +170,12 @@ class ER(BaseMSS):
     ):
         self.basis_function = basis_function
         self.model_type = model_type
-        # self.build_matrix = self.get_build_io_method(model_type)
         self.xlag = xlag
         self.ylag = ylag
         self.non_degree = basis_function.degree
         self.max_lag = self._get_max_lag()
         self.k = k
         self.estimator = estimator
-        self.extended_least_squares = extended_least_squares
         self.q = q
         self.h = h
         self.mutual_information_estimator = mutual_information_estimator
@@ -189,7 +185,6 @@ class ER(BaseMSS):
         self.random_state = random_state
         self.rng = check_random_state(random_state)
         self.tol = None
-        # self.ensemble = None
         self.n_inputs = None
         self.estimated_tolerance = None
         self.regressor_code = None
@@ -228,12 +223,6 @@ class ER(BaseMSS):
         if not isinstance(self.skip_forward, bool):
             raise TypeError(
                 f"skip_forward must be False or True. Got {self.skip_forward}"
-            )
-
-        if not isinstance(self.extended_least_squares, bool):
-            raise TypeError(
-                "extended_least_squares must be False or True. Got"
-                f" {self.extended_least_squares}"
             )
 
         if self.model_type not in ["NARMAX", "NAR", "NFIR"]:
@@ -570,7 +559,6 @@ class ER(BaseMSS):
             raise ValueError("y cannot be None")
 
         self.max_lag = self._get_max_lag()
-        # lagged_data = self.build_matrix(X, y)
         lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
 
         reg_matrix = self.basis_function.fit(
@@ -637,7 +625,6 @@ class ER(BaseMSS):
             )
             self.final_model = self.regressor_code[final_model, :].copy()
 
-        # self.theta = getattr(self, self.estimator)(reg_matrix[:, final_model], y_full)
         self.theta = self.estimator.optimize(
             reg_matrix[:, final_model], y_full[self.max_lag :, 0].reshape(-1, 1)
         )
@@ -729,7 +716,6 @@ class ER(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        # lagged_data = self.build_matrix(X, y)
         lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
 
         X_base = self.basis_function.transform(

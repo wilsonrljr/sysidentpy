@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.special import eval_hermite
 from sysidentpy.basis_function import Hermite  # Replace with actual import path
 
 

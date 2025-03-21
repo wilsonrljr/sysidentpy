@@ -10,7 +10,6 @@ from sysidentpy.neural_network import NARXNN
 from sysidentpy.utils.narmax_tools import regressor_code
 from sysidentpy.tests.test_narmax_base import create_test_data
 import pytest
-import warnings
 from sysidentpy.neural_network.narx_nn import _check_cuda
 
 torch.manual_seed(0)
@@ -37,7 +36,6 @@ basis_function = Polynomial(degree=1)
 regressors = regressor_code(
     X=X_train,
     xlag=2,
-    # ylag=2,
     model_type="NFIR",
     model_representation="neural_network",
     basis_function=basis_function,
@@ -60,20 +58,6 @@ class NARX(nn.Module):
         z = self.tanh(z)
         z = self.lin3(z)
         return z
-
-
-model1 = NARXNN(
-    net=NARX(),
-    ylag=2,
-    xlag=2,
-    epochs=2,
-    basis_function=basis_function,
-    model_type="NFIR",
-    optim_params={
-        "betas": (0.9, 0.999),
-        "eps": 1e-05,
-    },  # optional parameters of the optimizer
-)
 
 
 def test_default_values():
@@ -705,7 +689,6 @@ def test_nfir():
     regressors = regressor_code(
         X=X_train,
         xlag=2,
-        # ylag=2,
         model_type="NFIR",
         model_representation="neural_network",
         basis_function=basis_function,
@@ -752,7 +735,6 @@ def test_nfir_predict_output_shape():
     regressors = regressor_code(
         X=X_train,
         xlag=2,
-        # ylag=2,
         model_type="NFIR",
         model_representation="neural_network",
         basis_function=basis_function,
@@ -805,7 +787,6 @@ def test_nfir_predict_initial_values():
     regressors = regressor_code(
         X=X_train,
         xlag=2,
-        # ylag=2,
         model_type="NFIR",
         model_representation="neural_network",
         basis_function=basis_function,
@@ -941,8 +922,6 @@ def test_basis_n_step_shape():
         },  # optional parameters of the optimizer
     )
 
-    # X = np.random.rand(10, model.n_inputs)
-    # y_initial = np.random.rand(10, 1)
     model.fit(
         X=X_train[:30].reshape(-1, 1),
         y=y_train[:30].reshape(-1, 1),

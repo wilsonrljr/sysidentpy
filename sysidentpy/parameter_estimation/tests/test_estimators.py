@@ -1,7 +1,6 @@
 from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.basis_function import Polynomial
 from sysidentpy.narmax_base import build_input_output_matrix
-from sysidentpy.parameter_estimation.estimators_base import BaseEstimator
 from sysidentpy.parameter_estimation import (
     BoundedVariableLeastSquares,
     LeastSquaresMinimalResidual,
@@ -58,11 +57,9 @@ max_lag = 2
 lagged_data = build_input_output_matrix(X=x, y=y, xlag=2, ylag=2)[:, :]
 
 psi = Polynomial(degree=2).fit(lagged_data, max_lag, predefined_regressors=None)
-# optimize(psi, y_train[max_lag:, :], 0.01)
 
 
 def test_least_squares():
-    # x, y, theta = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
@@ -77,7 +74,6 @@ def test_least_squares():
 
 
 def test_ridge_regression():
-    # x, y, theta = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
@@ -92,7 +88,6 @@ def test_ridge_regression():
 
 
 def test_ridge_regression_classic():
-    # x, y, theta = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,
@@ -119,7 +114,6 @@ def test_lam_raise():
 
 
 def test_total_least_squares():
-    # x, y, theta = create_test_data()
     model = FROLS(
         n_terms=5,
         ylag=[1, 2],
@@ -133,7 +127,6 @@ def test_total_least_squares():
 
 
 def test_recursive_least_squares():
-    # x, y, theta = create_test_data()
     model = FROLS(
         n_terms=5,
         ylag=[1, 2],
@@ -147,7 +140,6 @@ def test_recursive_least_squares():
 
 
 def test_affine_least_mean_squares():
-    # x, y, theta = create_test_data()
     model = FROLS(
         n_terms=5,
         ylag=[1, 2],
@@ -161,7 +153,6 @@ def test_affine_least_mean_squares():
 
 
 def test_least_mean_squares():
-    # x, y, theta = create_test_data()
     model = FROLS(
         n_terms=5,
         ylag=[1, 2],
@@ -190,7 +181,6 @@ def test_least_mean_squares_sign_error():
 
 
 def test_normalized_least_mean_squares():
-    # x, y, theta = create_test_data()
     model = FROLS(
         n_terms=5,
         ylag=[1, 2],
@@ -204,7 +194,6 @@ def test_normalized_least_mean_squares():
 
 
 def test_least_mean_squares_normalized_sign_error():
-    # x, y, theta = create_test_data()
     model = FROLS(
         n_terms=5,
         n_info_values=6,
@@ -220,7 +209,6 @@ def test_least_mean_squares_normalized_sign_error():
 
 
 def test_least_mean_squares_sign_regressor():
-    # x, y, theta = create_test_data()
     model = FROLS(
         n_terms=5,
         ylag=[1, 2],
@@ -234,7 +222,6 @@ def test_least_mean_squares_sign_regressor():
 
 
 def test_least_mean_squares_normalized_sign_regressor():
-    # x, y, theta = create_test_data()
     model = FROLS(
         n_terms=5,
         ylag=[1, 2],
@@ -331,10 +318,6 @@ def test_lmsf():
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
-# def test_model_order_selection():
-#     assert_raises(ValueError, Estimators, max_lag=-1)
-
-
 def test_unbiased_least_squares():
     # x, y, theta = create_test_data()
     basis_function = Polynomial(degree=2)
@@ -352,7 +335,6 @@ def test_unbiased_least_squares():
 
 def test_bvls_init():
     """Test initialization of BoundedVariableLeastSquares."""
-    # Define parameters
     unbiased = True
     uiter = 50
     bounds = (-1.0, 1.0)
@@ -364,7 +346,6 @@ def test_bvls_init():
     verbose = 1
     lsmr_maxiter = 1000
 
-    # Instantiate the class
     model = BoundedVariableLeastSquares(
         unbiased=unbiased,
         uiter=uiter,
@@ -378,7 +359,6 @@ def test_bvls_init():
         lsmr_maxiter=lsmr_maxiter,
     )
 
-    # Assertions to check if attributes are correctly set
     assert model.unbiased == unbiased
     assert model.uiter == uiter
     assert model.bounds == bounds
@@ -390,7 +370,6 @@ def test_bvls_init():
     assert model.verbose == verbose
     assert model.lsmr_maxiter == lsmr_maxiter
 
-    # Check default values
     default_model = BoundedVariableLeastSquares()
     assert default_model.unbiased is False
     assert default_model.uiter == 30
@@ -434,7 +413,6 @@ def test_lsmr_results():
 
 def test_lsqr_init():
     """Test initialization of LeastSquaresMinimalResidual."""
-    # Define parameters
     unbiased = True
     uiter = 50
     damp = 0.1
@@ -445,7 +423,6 @@ def test_lsqr_init():
     show = True
     x0 = [0.5, -0.2, 1.0]
 
-    # Instantiate the class
     model = LeastSquaresMinimalResidual(
         unbiased=unbiased,
         uiter=uiter,
@@ -458,7 +435,6 @@ def test_lsqr_init():
         x0=x0,
     )
 
-    # Assertions to check if attributes are correctly set
     assert model.unbiased == unbiased
     assert model.uiter == uiter
     assert model.damp == damp
@@ -469,7 +445,6 @@ def test_lsqr_init():
     assert model.show == show
     assert model.x0 == x0
 
-    # Check default values
     default_model = LeastSquaresMinimalResidual()
     assert default_model.unbiased is False
     assert default_model.uiter == 30

@@ -1,6 +1,5 @@
 import pytest
 import numpy as np
-from scipy.stats import binom
 from sysidentpy.basis_function import Bernstein
 
 

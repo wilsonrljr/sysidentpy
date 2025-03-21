@@ -7,7 +7,6 @@ from sysidentpy.utils.generate_data import get_siso_data
 from sysidentpy.parameter_estimation.estimators import LeastSquares
 from sysidentpy.tests.test_narmax_base import create_test_data
 
-
 x, y, _ = create_test_data()
 train_percentage = 90
 split_data = int(len(x) * (train_percentage / 100))
@@ -85,8 +84,6 @@ def test_default_values():
         model.p_zeros,
         model.p_ones,
         model.p_value,
-        # model.estimator,
-        # model.extended_least_squares,
         model.eps,
         model.steps_ahead,
         model.estimate_parameter,

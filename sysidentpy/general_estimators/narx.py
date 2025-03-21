@@ -110,7 +110,6 @@ class NARX(BaseMSS):
     ):
         self.basis_function = basis_function
         self.model_type = model_type
-        # self.build_matrix = self.get_build_io_method(model_type)
         self.non_degree = basis_function.degree
         self.ylag = ylag
         self.xlag = xlag
@@ -169,7 +168,6 @@ class NARX(BaseMSS):
             raise ValueError("y cannot be None")
 
         self.max_lag = self._get_max_lag()
-        # lagged_data = self.build_matrix(X, y)
         lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
         reg_matrix = self.basis_function.fit(
             lagged_data,
@@ -278,14 +276,12 @@ class NARX(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        # lagged_data = self.build_matrix(X, y)
         lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
         X_base = self.basis_function.transform(
             lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type
         )
 
         yhat = self.base_estimator.predict(X_base)
-        # yhat = np.concatenate([y[: self.max_lag].flatten(), yhat])  # delete this one
         return yhat.reshape(-1, 1)
 
     def _nar_step_ahead(self, y, steps_ahead):
@@ -494,10 +490,6 @@ class NARX(BaseMSS):
         analyzed_elements_number = self.max_lag + 1
 
         for i in range(forecast_horizon - self.max_lag):
-            # lagged_data = self.build_matrix(
-            #     X[i : i + analyzed_elements_number],
-            #     yhat[i : i + analyzed_elements_number].reshape(-1, 1),
-            # )
             lagged_data = prepare_data(
                 X[i : i + analyzed_elements_number],
                 yhat[i : i + analyzed_elements_number].reshape(-1, 1),

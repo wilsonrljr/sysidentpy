@@ -2,10 +2,7 @@ from typing import Tuple
 
 import pytest
 import numpy as np
-from sysidentpy.narmax_base import (
-    house,
-    rowhouse,
-)
+
 from sysidentpy.model_structure_selection.ofr_base import (
     OFRBase,
 )

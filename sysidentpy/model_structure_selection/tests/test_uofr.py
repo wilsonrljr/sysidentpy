@@ -154,7 +154,6 @@ def test_model_prediction():
     basis_function = Polynomial(degree=2)
     model = UOFR(
         n_terms=5,
-        # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
         estimator=LeastSquares(),
@@ -168,7 +167,6 @@ def test_information_criteria_bic():
     basis_function = Polynomial(degree=2)
     model = UOFR(
         n_terms=5,
-        # extended_least_squares=False,
         order_selection=True,
         info_criteria="bic",
         n_info_values=5,
@@ -186,7 +184,6 @@ def test_information_criteria_aicc():
     basis_function = Polynomial(degree=2)
     model = UOFR(
         n_terms=5,
-        # extended_least_squares=False,
         order_selection=True,
         info_criteria="aicc",
         n_info_values=5,
@@ -204,7 +201,6 @@ def test_information_criteria_fpe():
     basis_function = Polynomial(degree=2)
     model = UOFR(
         n_terms=5,
-        # extended_least_squares=False,
         order_selection=True,
         info_criteria="fpe",
         n_info_values=5,

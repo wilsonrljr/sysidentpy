@@ -287,7 +287,6 @@ def test_model_predict_fourier_none():
     )
 
     model.fit(X=X_train, y=y_train)
-    # yhat = model.predict(X=x_valid, y=y_valid)
     assert_equal(model.max_lag, 10)
 
 
@@ -302,7 +301,6 @@ def test_model_predict_fourier_1():
     )
 
     model.fit(X=X_train, y=y_train)
-    # yhat = model.predict(X=x_valid, y=y_valid, steps_ahead=1)
     assert_equal(model.max_lag, 10)
 
 
@@ -317,5 +315,4 @@ def test_model_predict_fourier_n():
     )
 
     model.fit(X=X_train, y=y_train)
-    # yhat = model.predict(X=x_valid, y=y_valid, steps_ahead=3)
     assert_equal(model.max_lag, 10)
