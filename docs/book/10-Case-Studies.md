@@ -88,7 +88,7 @@ for xc in xcoords:
 
 ![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h150_1.png?raw=true)
 
-Lets check build a model for the `H20` group before we extrapolate the settings for every group. Because there are no input features, we will be using a `NAR` model type in SysIdentPy. To keep things simple and fast, we will start with Polynomial basis function with degree $1$.
+Let's check build a model for the `H20` group before we extrapolate the settings for every group. Because there are no input features, we will be using a `NAR` model type in SysIdentPy. To keep things simple and fast, we will start with Polynomial basis function with degree $1$.
 
 ```python
 unique_id = "H20"
@@ -114,7 +114,7 @@ plot_results(y=y_val[model.max_lag :], yhat=y_hat[model.max_lag :], n=30000, fig
 
 ![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h20_r1.png?raw=true)
 
-Probably, the result are not optimal and will not work for every group. However, let's check how this setting performs against the winner model  [M4 time series competition](https://www.researchgate.net/publication/325901666_The_M4_Competition_Results_findings_conclusion_and_way_forward): the Exponential Smoothing with Recurrent Neural Networks ([ESRNN](https://www.sciencedirect.com/science/article/abs/pii/S0169207019301153)).
+Probably, the result are not optimal and will not work for every group. However, let's check how this setting performs against the winner model [M4 time series competition](https://www.researchgate.net/publication/325901666_The_M4_Competition_Results_findings_conclusion_and_way_forward): the Exponential Smoothing with Recurrent Neural Networks ([ESRNN](https://www.sciencedirect.com/science/article/abs/pii/S0169207019301153)).
 
 ```python
 esrnn_url = 'https://github.com/Nixtla/m4-forecasts/raw/master/forecasts/submission-118.zip'
@@ -204,7 +204,7 @@ plt.show()
 
 Therefore, we will build models setting `ylag=168`.
 
-> Note that this is a very high number for lags, so be careful if you want to try it with higher polynomial degrees because the time to run the models can increase significantly. I tried some configurations with polynomial degree equal to 2 and only took $6$ minutes to run (even less, using `AOLS`), without making the code run in parallel. As you can see, SysIdentPy can be very fast and you can make it faster by applying parallelization.
+> Note that this is a very high number for lags, so be careful if you want to try it with higher polynomial degrees because the time to run the models can increase significantly. I tried some configurations with polynomial degree equal to 2 and only took $6$ minutes to run (even less, using `AOLS`), without making the code run in parallel. As you can see, SysIdentPy can be very fast, and you can make it faster by applying parallelization.
 
 ```python
 # this took 2min to run on my computer.
@@ -316,7 +316,7 @@ The CE8 system, illustrated in Figure 1, features:
 
 The measurement process involves:
 - **Pulse Counter**: This sensor measures the angular speed of the pulley without regard to the direction.
-- **Analogue Low Pass Filtering**: This reduces high-frequency noise, followed by anti-aliasing filtering to prepare the signal for digital processing. The dynamic effects are mainly influenced by the electric drive time constants and the spring, with the low pass filtering having a minimal impact on the output.
+- **Analogue Low Pass Filtering**: This reduces high-frequency noise, followed by antialiasing filtering to prepare the signal for digital processing. The dynamic effects are mainly influenced by the electric drive time constants and the spring, with the low pass filtering having a minimal impact on the output.
 
 ### SOTA Results
 
@@ -373,7 +373,7 @@ data_train_1, data_train_2 = train_val
 data_test_1, data_test_2 = test
 ```
 
-We used the `nonlinear_benchmarks` package to load the data. The user is referred to the package documentation [GerbenBeintema - nonlinear_benchmarks: The official dataload for nonlinear benchmark datasets](https://github.com/GerbenBeintema/nonlinear_benchmarks/tree/master) to check the details of how to use it.
+We used the `nonlinear_benchmarks` package to load the data. The user is referred to the package documentation [GerbenBeintema - nonlinear_benchmarks: The official data load for nonlinear benchmark datasets](https://github.com/GerbenBeintema/nonlinear_benchmarks/tree/master) to check the details of how to use it.
 
 The following plot detail the training and testing data of both experiments. Here we are trying to get two models, one for each experiment, that have a better performance than the mentioned baselines.
 
@@ -644,7 +644,7 @@ The static nonlinearity $f(x)$ is implemented using a diode-resistor network, re
 
 Measurement noise sources $e_u(t)$ and $e_y(t)$ are minimal compared to $e_x(t)$. The system's inputs and process noise are generated using an Arbitrary Waveform Generator (AWG), specifically the Agilent/HP E1445A, sampling at $78125 Hz$, synchronized with an acquisition system (Agilent/HP E1430A) to ensure phase coherence and prevent leakage errors. Buffering between the acquisition cards and the system's inputs and outputs minimizes measurement equipment distortion.
 
-The benchmark provides two standard test signals through the benchmarking website: a random phase multisine and a sine-sweep signal. Both signals have an $rms$ value of $0.71 Vrms$ and cover frequencies from DC to $15 kHz$ (excluding DC). The sine-sweep spans this frequency range at a rate of $4.29 MHz/min$. These test sets serve as targets for evaluating the model's performance, emphasizing accurate representation under varied conditions.
+The benchmark provides two standard test signals through the benchmarking website: a random phase multi sine and a sine-sweep signal. Both signals have a $rms$ value of $0.71 Vrms$ and cover frequencies from DC to $15 kHz$ (excluding DC). The sine-sweep spans this frequency range at a rate of $4.29 MHz/min$. These test sets serve as targets for evaluating the model's performance, emphasizing accurate representation under varied conditions.
 
 The Wiener-Hammerstein benchmark highlights three primary nonlinear system identification challenges:
 
@@ -733,7 +733,7 @@ The goal of this benchmark it to get a model that have a better performance than
 
 ### Results
 
-We will start with a basic configuration of FROLS using a polynomial basis function with degree equal 2. The `xlag` and `ylag` are set to $7$ in this first example. Because the dataset is considerably large, we will start with `n_info_values=50`. This means the FROLS algorithm will not include all regressors when calculating the information criteria used to determine the model order. While this approach might result in a sub-optimal model, it is a reasonable starting point for our first attempt.
+We will start with a basic configuration of FROLS using a polynomial basis function with degree equal 2. The `xlag` and `ylag` are set to $7$ in this first example. Because the dataset is considerably large, we will start with `n_info_values=50`. This means the FROLS algorithm will not include all regressors when calculating the information criteria used to determine the model order. While this approach might result in a suboptimal model, it is a reasonable starting point for our first attempt.
 
 ```python
 n = test.state_initialization_window_length
@@ -1323,7 +1323,7 @@ sorted(results.items(), key=lambda result: result[1])
 
 The memory effects between quasi-static input and output make the modeling of hysteretic systems very difficult. Physics-based models are often used to describe the hysteresis loops, but these models usually lack the simplicity and efficiency required in practical applications involving system characterization, identification, and control. As detailed in [Martins, S. A. M. and Aguirre, L. A. - Sufficient conditions for rate-independent hysteresis in autoregressive identified models](https://www.sciencedirect.com/science/article/abs/pii/S0888327015005968), NARX models have proven to be a feasible choice to describe the hysteresis loops. See Chapter 8 for a detailed background. However, even considering the sufficient conditions for rate independent hysteresis representation, classical structure selection algorithms fails to return a model with decent performance and the user needs to set a multi-valued function to ensure the occurrence of the bounding structure $\mathcal{H}$ ([Martins, S. A. M. and Aguirre, L. A. - Sufficient conditions for rate-independent hysteresis in autoregressive identified models](https://www.sciencedirect.com/science/article/abs/pii/S0888327015005968)).
 
-Even though some progress has been made, previous work has been limited to models with a single equilibrium point. The present case study aims to present new prospects in the model structure selection of hysteretic systems regarding the cases where the models have multiple inputs and it is not restricted concerning the number of equilibrium points. For that, the MetaMSS algorithm will be used to build a model for a magneto-rheological damper (MRD) considering the mentioned sufficient conditions.
+Even though some progress has been made, previous work has been limited to models with a single equilibrium point. The present case study aims to present new prospects in the model structure selection of hysteretic systems regarding the cases where the models have multiple inputs, and it is not restricted concerning the number of equilibrium points. For that, the MetaMSS algorithm will be used to build a model for a magneto-rheological damper (MRD) considering the mentioned sufficient conditions.
 
 ### A Brief description of the Bouc-Wen model of magneto-rheological damper device
 
@@ -1476,7 +1476,7 @@ plt.show()
 
 ![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bouc_wen_data.png?raw=true)
 
-Let's check how is the histeretic behavior considering each input:
+Let's check how is the hysteretic behavior considering each input:
 ```python
 plt.plot(x_train[:, 0], y_train)
 plt.xlabel("x1 - Voltage")
@@ -1610,7 +1610,7 @@ scaler_x = MinMaxScaler()
 scaler_y = MinMaxScaler()
 ```
 
-and running the each model again. That is the only change to improve the results.
+and running each model again. That is the only change to improve the results.
 
 ![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r4.png?raw=true)
 > FROLS: with `sign(v)` and `MinMaxScaler`. RMSE: 0.1159
@@ -1626,7 +1626,7 @@ FROLS: discarding `sign(v)` and using `MinMaxScaler`. RMSE: 0.1639
 
 In contrast, the MetaMSS method returned the best model overall, but not better than the best `FROLS` method using `MaxAbsScaler`.
 
-Here is the predicted histeretic loop:
+Here is the predicted hysteretic loop:
 ```python
 plt.plot(x_test[:, 1], yhat)
 ```
@@ -1724,7 +1724,7 @@ x_test, y_test = test_multisine.u, test_multisine.y
 n = test_multisine.state_initialization_window_length
 ```
 
-We used the `nonlinear_benchmarks` package to load the data. The user is referred to the [package documentation - GerbenBeintema/nonlinear_benchmarks: The official dataload for http://www.nonlinearbenchmark.org/ (github.com)](https://github.com/GerbenBeintema/nonlinear_benchmarks/tree/master) to check the details of how to use it.
+We used the `nonlinear_benchmarks` package to load the data. The user is referred to the [package documentation - GerbenBeintema/nonlinear_benchmarks: The official data load for http://www.nonlinearbenchmark.org/ (github.com)](https://github.com/GerbenBeintema/nonlinear_benchmarks/tree/master) to check the details of how to use it.
 
 The following plot detail the training and testing data of the experiment.
 
@@ -1788,7 +1788,7 @@ where the values in the "Training time" column matches the ones presented as err
 
 ### Results
 
-We will start (as we did in every other case study) with a basic configuration of FROLS using a polynomial basis function with degree equal 2. The `xlag` and `ylag` are set to $7$ in this first example. Because the dataset is considerably large, we will start with `n_info_values=40`. Because we dealing with a large training dataset, we will use the `err_tol` instead of information criteria to have a faster performance. We will also set `n_terms=40`, which means that the search will stop if the `err_tol` is reached or 40 regressors is tested in the `ERR` algorithm. While this approach might result in a sub-optimal model, it is a reasonable starting point for our first attempt. There are three different experiments: multisine, arrow (full), and arrow (no extrapolation).
+We will start (as we did in every other case study) with a basic configuration of FROLS using a polynomial basis function with degree equal 2. The `xlag` and `ylag` are set to $7$ in this first example. Because the dataset is considerably large, we will start with `n_info_values=40`. Because we're dealing with a large training dataset, we will use the `err_tol` instead of information criteria to have a faster performance. We will also set `n_terms=40`, which means that the search will stop if the `err_tol` is reached or 40 regressors is tested in the `ERR` algorithm. While this approach might result in a suboptimal model, it is a reasonable starting point for our first attempt. There are three different experiments: multi sine, arrow (full), and arrow (no extrapolation).
 
 ```python
 x_train, y_train = train_val.u, train_val.y
@@ -2199,7 +2199,7 @@ set_random_seed(42)
 files = ["\SanFrancisco_PV_GHI.csv", "\SanFrancisco_Hospital.csv"]
 raw = pd.read_csv(data_location + files[0])
 df = pd.DataFrame()
-df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=(8760))
+df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=8760)
 df["y"] = raw.iloc[:, 0].values
 
 m = NeuralProphet(
@@ -2220,7 +2220,7 @@ plt.plot(forecast["y"][-104:], "ro-")
 plt.plot(forecast["yhat1"][-104:], "k*-")
 ```
 
-The error is $MSE=4642.23$ and will be used as baseline in this case. Lets check how SysIdentPy methods handle this data.
+The error is $MSE=4642.23$ and will be used as baseline in this case. Let's check how SysIdentPy methods handle this data.
 
 ### FROLS
 
@@ -2228,7 +2228,7 @@ The error is $MSE=4642.23$ and will be used as baseline in this case. Lets check
 files = ["\SanFrancisco_PV_GHI.csv", "\SanFrancisco_Hospital.csv"]
 raw = pd.read_csv(data_location + files[0])
 df = pd.DataFrame()
-df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=(8760))
+df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=8760)
 df["y"] = raw.iloc[:, 0].values
 df_train, df_val = df.iloc[:7008, :], df.iloc[7008:, :]
 y = df["y"].values.reshape(-1, 1)
@@ -2272,7 +2272,7 @@ set_random_seed(42)
 files = ["\SanFrancisco_PV_GHI.csv", "\SanFrancisco_Hospital.csv"]
 raw = pd.read_csv(data_location + files[0])
 df = pd.DataFrame()
-df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=(8760))
+df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=8760)
 df["y"] = raw.iloc[:, 0].values
 df_train, df_val = df.iloc[:7008, :], df.iloc[7008:, :]
 y = df["y"].values.reshape(-1, 1)
@@ -2321,7 +2321,7 @@ set_random_seed(42)
 files = ["\SanFrancisco_PV_GHI.csv", "\SanFrancisco_Hospital.csv"]
 raw = pd.read_csv(data_location + files[0])
 df = pd.DataFrame()
-df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=(8760))
+df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=8760)
 df["y"] = raw.iloc[:, 0].values
 df_train, df_val = df.iloc[:7008, :], df.iloc[7008:, :]
 y = df["y"].values.reshape(-1, 1)

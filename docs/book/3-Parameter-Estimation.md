@@ -9,7 +9,7 @@ $$
 \tag{3.1}
 $$
 
-where $\psi^\top_{k-1} \in \mathbb{R}^{n_r \times n}$ is the information matrix, also known as the regressors matrix. The information matrix is the input and output transformation based in a basis function and $\hat{\Theta}~\in \mathbb{R}^{n_{\Theta}}$ the vector of estimated parameters. The model above can also be represented in a matrix form as:
+where $\psi^\top_{k-1} \in \mathbb{R}^{n_r \times n}$ is the information matrix, also known as the regressors' matrix. The information matrix is the input and output transformation based in a basis function and $\hat{\Theta}~\in \mathbb{R}^{n_{\Theta}}$ the vector of estimated parameters. The model above can also be represented in a matrix form as:
 
 $$
 \begin{equation}
@@ -101,14 +101,14 @@ The aforementioned assumptions are needed to guarantee that the Least Squares al
 
 #### Example
 
-Lets see a practical example. Consider the model
+Let's see a practical example. Consider the model
 
 $$
 y_k = 0.2y_{k-1} + 0.1y_{k-1}x_{k-1} + 0.9x_{k-2} + e_{k}
 \tag{3.10}
 $$
 
-We can generate the input `X`  and output `y` using SysIdentPy. Before getting in the details, let run a simple model using SysIdentPy. Because we know a priori that the system we are trying to have is not linear (the simulated system have an interaction term $0.1y_{k-1}x_{k-1}$) and the order is 2 (the maximum lag of the input and output), we will set the hyperparameters accordingly. Note that this a simulated scenario and you'll not have such information a priori in a real identification task. But don't worry, the idea, for now, is just show how things works and we will develop some real models along the book.
+We can generate the input `X`  and output `y` using SysIdentPy. Before getting in the details, let run a simple model using SysIdentPy. Because we know a priori that the system we are trying to have is not linear (the simulated system have an interaction term $0.1y_{k-1}x_{k-1}$) and the order is 2 (the maximum lag of the input and output), we will set the hyperparameters accordingly. Note that this a simulated scenario, and you'll not have such information a priori in a real identification task. But don't worry, the idea, for now, is just show how things works and we will develop some real models along the book.
 
 ```python
 from sysidentpy.utils.generate_data import get_siso_data
@@ -149,7 +149,7 @@ Regressors   Parameters             ERR
 2  x1(k-1)y(k-1)  1.0001E-01  3.48355000E-03
 ```
 
-As you can see, the final model have the same 3 regressors of the simulated system and the parameters are very close the ones used to simulate the system. This show us that the Least Squares performed well for this data.
+As you can see, the final model have the same 3 regressors of the simulated system and the parameters are very close the ones used to simulate the system. This shows us that the Least Squares performed well for this data.
 
 In this example, however, we are applying a Model Structure Selection algorithm (FROLS), which we will see in chapter 6. That's why the final model have only 3 regressors. The parameter estimation algorithm do not choose which terms to include in the model, so if we have a expanded basis function with 6 regressors, it will estimate the parameter for each one of the regressors.
 
@@ -160,38 +160,37 @@ from sysidentpy.utils.generate_data import get_siso_data
 from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation import LeastSquares
-from sysidentpy.narmax_base import InformationMatrix
-
+from sysidentpy.utils import build_lagged_matrix
 
 x_train, x_test, y_train, y_test = get_siso_data(
-	n=1000, colored_noise=False, sigma=0.001, train_percentage=90
+    n=1000, colored_noise=False, sigma=0.001, train_percentage=90
 )
-regressor_matrix = InformationMatrix(xlag=2, ylag=2).build_input_output_matrix(
-	X=x_train, y=y_train
-)
+xlag = 2
+ylag = 2
 max_lag = 2
+regressor_matrix = build_lagged_matrix(
+    x=x_train, y=y_train, xlag=xlag, ylag=ylag, model_type="NARMAX",
+)
 # apply the basis function
-psi = Polynomial(degree=2).fit(regressor_matrix, max_lag=max_lag)
+psi = Polynomial(degree=2).fit(regressor_matrix, max_lag=max_lag, xlag=xlag, ylag=ylag)
 theta = LeastSquares().optimize(psi, y_train[max_lag:, :])
 theta
 
-array([
-   [-1.08377785e-05],
-   [ 2.00002486e-01],
-   [ 1.73422294e-05],
-   [-3.50957931e-06],
-   [ 8.99927332e-01],
-   [ 2.04427279e-05],
-   [-1.47542408e-04],
-   [ 1.00062340e-01],
-   [ 4.53379771e-05],
-   [ 8.90006341e-05],
-   [ 1.15234873e-04],
-   [ 1.57770755e-04],
-   [ 1.58414037e-04],
-   [-3.09236444e-05],
-   [-1.60377753e-04]]
-   )
+[[-4.1511e-06]
+ [ 2.0002e-01]
+ [ 1.1237e-05]
+ [ 1.0068e-05]
+ [ 8.9997e-01]
+ [-6.3216e-05]
+ [ 1.3298e-04]
+ [ 1.0008e-01]
+ [ 6.3118e-05]
+ [-5.6031e-05]
+ [-1.9073e-05]
+ [-1.8223e-04]
+ [ 1.1307e-04]
+ [-1.6601e-04]
+ [-8.5068e-05]]
 ```
 
 In this case, we have 15 model parameters. If we take a look in the basis function expansion where the degree of the polynomial is equal to 2 and the lags for `y` and `x` are set to 2, we have
@@ -292,7 +291,7 @@ As you can see, the estimated parameters are very close. However, be careful whe
 
 This section is based on the [Markovsky, I., & Van Huffel, S. (2007). Overview of total least squares methods. Signal Processing.](https://people.duke.edu/~hpgavin/SystemID/References/Markovsky+VanHuffel-SP-2007.pdf).
 
-The Total Least Squares (TLS) algorithm, is a statistical method used to find the best-fitting linear relationship between variables when both the input and output signals present white noise pertubation. Unlike ordinary least squares (OLS), which assumes that only the dependent variable is subject to error, TLS considers errors in all measured variables, providing a more robust solution in many practical applications. The algorithm was proposed by Golub and Van Loan.
+The Total Least Squares (TLS) algorithm, is a statistical method used to find the best-fitting linear relationship between variables when both the input and output signals present white noise perturbation. Unlike ordinary least squares (OLS), which assumes that only the dependent variable is subject to error, TLS considers errors in all measured variables, providing a more robust solution in many practical applications. The algorithm was proposed by Golub and Van Loan.
 
 In TLS, we assume errors in both $\mathbf{X}$ and $\mathbf{Y}$, denoted as $\Delta \mathbf{X}$ and $\Delta \mathbf{Y}$, respectively. The true model becomes:
 
@@ -399,40 +398,39 @@ From now on the examples will not include the Model Structure Selection step. Th
 
 ```python
 from sysidentpy.utils.generate_data import get_siso_data
-from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation import TotalLeastSquares
-from sysidentpy.narmax_base import InformationMatrix
-
+from sysidentpy.utils import build_lagged_matrix
 
 x_train, x_test, y_train, y_test = get_siso_data(
-	n=1000, colored_noise=False, sigma=0.001, train_percentage=90
+    n=1000, colored_noise=False, sigma=0.001, train_percentage=90
 )
-regressor_matrix = InformationMatrix(xlag=2, ylag=2).build_input_output_matrix(
-	X=x_train, y=y_train
-)
+xlag = 2
+ylag = 2
 max_lag = 2
+regressor_matrix = build_lagged_matrix(
+    x=x_train, y=y_train, xlag=xlag, ylag=ylag, model_type="NARMAX",
+)
 # apply the basis function
-psi = Polynomial(degree=2).fit(regressor_matrix, max_lag=max_lag)
+psi = Polynomial(degree=2).fit(regressor_matrix, max_lag=max_lag, xlag=xlag, ylag=ylag)
 theta = TotalLeastSquares().optimize(psi, y_train[max_lag:, :])
 theta
 
-array([
-   [-4.29547026e-05],
-   [ 2.00085880e-01],
-   [-5.20210280e-05],
-   [ 4.03019271e-05],
-   [ 8.99982943e-01],
-   [-1.49492072e-05],
-   [ 9.72399351e-05],
-   [ 1.00072619e-01],
-   [ 7.25253323e-05],
-   [-1.37338363e-04],
-   [ 1.37115512e-04],
-   [ 2.42269843e-04],
-   [ 1.20466767e-04],
-   [ 6.32937185e-05],
-   [ 1.36101591e-04]])
+[[ 1.3321e-04]
+ [ 2.0014e-01]
+ [-1.1771e-04]
+ [ 5.8085e-05]
+ [ 9.0011e-01]
+ [-1.5490e-04]
+ [-1.3517e-05]
+ [ 9.9824e-02]
+ [ 8.2326e-05]
+ [-2.2814e-04]
+ [-7.0837e-05]
+ [-5.4319e-05]
+ [-1.7472e-04]
+ [-2.0396e-04]
+ [ 1.7416e-05]]
 ```
 
 ## Recursive Least Squares
@@ -447,9 +445,9 @@ where:
 - $\theta_k$ is the parameter vector to be estimated at time $k$.
 - $\epsilon_k$ is the noise at time $k$.
 
-The Recursive Least Squares (RLS) algorithm updates the parameter estimate $\theta_k$ recursively as new data points $(\mathbf{x}_k, y_k)$ become available, minimizing a weighted linear least squares cost function relating to the information matrix in a sequencial manner. RLS is particularly useful in real-time applications where the data arrives sequentially and the model needs continuous updating or for modeling time varying systems (if the forgetting factor is included).
+The Recursive Least Squares (RLS) algorithm updates the parameter estimate $\theta_k$ recursively as new data points $(\mathbf{x}_k, y_k)$ become available, minimizing a weighted linear least squares cost function relating to the information matrix in a sequential manner. RLS is particularly useful in real-time applications where the data arrives sequentially and the model needs continuous updating or for modeling time varying systems (if the forgetting factor is included).
 
-Because its a recursive estimation, it is useful to relate $\hat{\Theta}_k$ to $\hat{\Theta}_{k-1}$. In other words, the new $\hat{\Theta}_k$ depends on the last estimated value (k). Moreover, to estimate $\hat{\Theta}_k$, we need to incorporate the current information present in $y_k$.
+Because it's a recursive estimation, it is useful to relate $\hat{\Theta}_k$ to $\hat{\Theta}_{k-1}$. In other words, the new $\hat{\Theta}_k$ depends on the last estimated value (k). Moreover, to estimate $\hat{\Theta}_k$, we need to incorporate the current information present in $y_k$.
 
 Aguirre BOOK defines the Recursive Least Squares estimator with forgetting factor $\lambda$ as
 
@@ -480,44 +478,42 @@ You can access the source code to check how SysIdentPy implements the RLS algori
 
 ```python
 from sysidentpy.utils.generate_data import get_siso_data
-from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation import RecursiveLeastSquares
-from sysidentpy.narmax_base import InformationMatrix
+from sysidentpy.utils import build_lagged_matrix
 import matplotlib.pyplot as plt
 
 x_train, x_test, y_train, y_test = get_siso_data(
-    n=1000, colored_noise=False, sigma=0.001, train_percentage=90
+    n = 1000, colored_noise = False, sigma = 0.001, train_percentage = 90
 )
 
-regressor_matrix = InformationMatrix(xlag=2, ylag=2).build_input_output_matrix(
-    X=x_train, y=y_train
-)
+xlag = 2
+ylag = 2
 max_lag = 2
-psi = Polynomial(degree=2).fit(regressor_matrix, max_lag=max_lag)
+regressor_matrix = build_lagged_matrix(
+    x=x_train, y=y_train, xlag=xlag, ylag=ylag, model_type="NARMAX",
+)
+# apply the basis function
+psi = Polynomial(degree=2).fit(regressor_matrix, max_lag=max_lag, xlag=xlag, ylag=ylag)
 estimator = RecursiveLeastSquares(lam=0.99)
 theta = estimator.optimize(psi, y_train[max_lag:, :])
 theta
 
-array(
-  [
-  [-1.42674741e-04],
-  [ 2.00108231e-01],
-  [-7.15658788e-05],
-  [-2.63118243e-05],
-  [ 9.00023979e-01],
-  [ 3.38729072e-04],
-  [ 8.22835678e-07],
-  [ 9.95974120e-02],
-  [ 8.52966331e-05],
-  [-1.47007370e-04],
-  [-4.65885373e-04],
-  [-2.57612698e-04],
-  [-2.61078457e-04],
-  [ 4.78599408e-04],
-  [ 3.50698606e-04]
-  ]
-  )
+[[-1.1778e-04]
+ [ 1.9988e-01]
+ [-9.3114e-05]
+ [ 2.5119e-04]
+ [ 9.0006e-01]
+ [ 1.8339e-04]
+ [-1.1943e-04]
+ [ 9.9957e-02]
+ [-4.6181e-05]
+ [ 1.3155e-04]
+ [ 3.4535e-04]
+ [ 1.3843e-04]
+ [-3.5454e-05]
+ [ 1.5669e-04]
+ [ 2.4311e-04]]
 ```
 
 You can plot the evolution of the estimated parameters over time by accessing the `theta_evolution` values
@@ -604,40 +600,41 @@ To use any one on the methods above, you just need to import it and set the `est
 
 ```python
 from sysidentpy.utils.generate_data import get_siso_data
-from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation import LeastMeanSquares
-from sysidentpy.narmax_base import InformationMatrix
-import matplotlib.pyplot as plt
+from sysidentpy.utils import build_lagged_matrix
 
 x_train, x_test, y_train, y_test = get_siso_data(
-    n=1000, colored_noise=False, sigma=0.001, train_percentage=90
+    n = 1000, colored_noise = False, sigma = 0.001, train_percentage = 90
 )
 
-regressor_matrix = InformationMatrix(xlag=2, ylag=2).build_input_output_matrix(
-    X=x_train, y=y_train
-)
+xlag = 2
+ylag = 2
 max_lag = 2
-psi = Polynomial(degree=2).fit(regressor_matrix, max_lag=max_lag)
+regressor_matrix = build_lagged_matrix(
+    x=x_train, y=y_train, xlag=xlag, ylag=ylag, model_type="NARMAX",
+)
+# apply the basis function
+psi = Polynomial(degree=2).fit(regressor_matrix, max_lag=max_lag, xlag=xlag, ylag=ylag)
 estimator = LeastMeanSquares(mu=0.1)
 theta = estimator.optimize(psi, y_train[max_lag:, :])
 theta
 
-array([[ 7.53481862e-05],
-      [ 2.00336327e-01],
-      [ 4.03075867e-04],
-      [ 5.16401623e-05],
-      [ 8.99539417e-01],
-      [-6.38551780e-04],
-      [-5.68962465e-05],
-      [ 1.00643282e-01],
-      [ 5.48097106e-04],
-      [ 5.15983109e-04],
-      [ 5.46693676e-04],
-      [-3.18759644e-04],
-      [-4.90420481e-04],
-      [ 4.09662242e-04],
-      [ 5.39826714e-04]])
+[[ 1.5924e-04]
+ [ 1.9950e-01]
+ [ 3.2137e-04]
+ [ 1.7824e-04]
+ [ 8.9951e-01]
+ [ 2.7314e-04]
+ [ 3.3538e-04]
+ [ 1.0062e-01]
+ [ 3.5219e-04]
+ [ 1.3544e-04]
+ [ 3.4149e-04]
+ [ 5.6315e-04]
+ [-4.6664e-04]
+ [ 2.2849e-04]
+ [ 1.0536e-04]]
 ```
 
 ## Extended Least Squares Algorithm
@@ -717,7 +714,7 @@ Clearly we have something wrong with the obtained model. The estimated parameter
 
 That is a great feature! However, although the structure is correct, the model *parameters* are not correct! Here we have a biased estimation! For instance, the real parameter for $y_{k-1}$ is $0.2$, not $0.274$.
 
-In this case, we are actually modeling using a NARX model, not a NARMAX. The MA part exists to allow a unbiased estimation of the parameters. To achieve a unbiased estimation of the parameters we have the Extend Least Squares algorithm.
+In this case, we are actually modeling using a NARX model, not a NARMAX. The MA part exists to allow an unbiased estimation of the parameters. To achieve a unbiased estimation of the parameters we have the Extend Least Squares algorithm.
 
 Before applying the Extended Least Squares Algorithm we will run several NARX models to check how different the estimated parameters are from the real ones.
 

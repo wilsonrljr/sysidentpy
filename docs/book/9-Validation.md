@@ -81,11 +81,11 @@ model.fit(X=x, y=y)
 model.max_lag
 ```
 
-> Its important to mention that, in current version of SysIdentPy, the maximum lag considered is actually the maximum lag between `xlag` and `ylag` definition. This is important because you can pass `ylag = xlag = 10` and the final model, after the model structure selection, select terms where the maximum lag is 3. You have to pass 10 initial conditions, but internally the calculations are done using the correct regressors. This is necessary due the way the regressors are created after that the model is fitted. Therefore is recommend to use the `model.max_lag` to be sure.
+> Its important to mention that, in current version of SysIdentPy, the maximum lag considered is actually the maximum lag between `xlag` and `ylag` definition. This is important because you can pass `ylag = xlag = 10` and the final model, after the model structure selection, select terms where the maximum lag is 3. You have to pass 10 initial conditions, but internally the calculations are done using the correct regressors. This is necessary due the way the regressors are created after that the model is fitted. Therefore, is recommended to use the `model.max_lag` to be sure.
 
 ### 1-step ahead prediction
 
-The difference between 1 step-ahead prediction and infinity-steps ahead prediction is that the model take the previous real `y_test` test values in the loop instead of the predicted `yhat` values. And that is a huge and important difference. Lets do prediction using 1-step ahead method:
+The difference between 1 step-ahead prediction and infinity-steps ahead prediction is that the model take the previous real `y_test` test values in the loop instead of the predicted `yhat` values. And that is a huge and important difference. Let's do prediction using 1-step ahead method:
 
 ```python
 y_initial = yhat(0) = 8
@@ -108,7 +108,7 @@ In this case, as you can imagine, we need to pass the all the `y_test` data beca
 
 ### n-steps ahead prediction
 
-The n-steps ahead prediction is almost the same as the 1-step ahead, but here you can define the number of steps ahead you want to test your model. If you set `steps_ahead=5`, for example, it means that the first 5 values will be predicted using `yhat` in the loop, but then the process is *restarted* by feeding the real values in `y_test` in the next iteration, then performing other 5 predictions using the `yhat` and so on. Lets check the example considering `steps_ahead=2`:
+The n-steps ahead prediction is almost the same as the 1-step ahead, but here you can define the number of steps ahead you want to test your model. If you set `steps_ahead=5`, for example, it means that the first 5 values will be predicted using `yhat` in the loop, but then the process is *restarted* by feeding the real values in `y_test` in the next iteration, then performing other 5 predictions using the `yhat` and so on. Let's check the example considering `steps_ahead=2`:
 
 ```python
 y_initial = yhat(0) = 8
@@ -130,7 +130,7 @@ $$
 \tag{1}
 $$
 
-where $\hat{y}_k \in \mathbb{R}$ the model predicted output and $\bar{y} \in \mathbb{R}$ the mean of the measured output $y_k$. The RRSE gives some indication regarding the quality of the model, but concluding about the best model by evaluating only this quantity may leads to an incorrect interpretation, as shown in following example.
+where $\hat{y}_k \in \mathbb{R}$ the model predicted output and $\bar{y} \in \mathbb{R}$ the mean of the measured output $y_k$. The RRSE gives some indication regarding the quality of the model, but concluding about the best model by evaluating only this quantity may lead to an incorrect interpretation, as shown in following example.
 
 Consider the models
 
@@ -144,7 +144,7 @@ $$y_{{_b}k}=0.7103y_{{_b}k-1} + 0.1458u_{k-1} + 0.1631u_{k-2} -1467y^3_{{_b}k-1}
 
 defined in the [Meta Model Structure Selection: An Algorithm For Building Polynomial NARX Models For Regression And Classification](https://ufsj.edu.br/portal2-repositorio/File/ppgel/225-2020-02-17-DissertacaoWilsonLacerda.pdf). The former results in a $RRSE = 0.1202$ while the latter gives $RRSE~=0.0857$. Although the model $y_{{_b}k}$ fits the data better, it is only a biased representation to one piece of data and not a good description of the entire system.
 
-The RRSE (or any other metric) shows that validations test might be performed carefully. Another traditional practice is split the data set in two parts. In this respect, one can test the models obtained from the estimation part of the data using an specific data for validation. However, the one-step-ahead performance of NARX models generally results in misleading interpretations because even strongly biased models may fit the data well. Therefore, a free run simulation approach usually allows a better interpretation if the model is adequate or not ([Billings, S. A.](https://www.wiley.com/en-us/Nonlinear+System+Identification%3A+NARMAX+Methods+in+the+Time%2C+Frequency%2C+and+Spatio-Temporal+Domains-p-9781119943594)).
+The RRSE (or any other metric) shows that validations test might be performed carefully. Another traditional practice is split the data set in two parts. In this respect, one can test the models obtained from the estimation part of the data using a specific data for validation. However, the one-step-ahead performance of NARX models generally results in misleading interpretations because even strongly biased models may fit the data well. Therefore, a free run simulation approach usually allows a better interpretation if the model is adequate or not ([Billings, S. A.](https://www.wiley.com/en-us/Nonlinear+System+Identification%3A+NARMAX+Methods+in+the+Time%2C+Frequency%2C+and+Spatio-Temporal+Domains-p-9781119943594)).
 
 Statistical tests for SISO models based on the correlation functions were proposed in ([Billings, S. A. and Voon, W. S. F., "A prediction-error and stepwise-regression estimation algorithm for non-linear systems"](https://www.tandfonline.com/doi/abs/10.1080/00207178608933633)), ([Model validity tests for non-linear signal processing applications](https://www.tandfonline.com/doi/abs/10.1080/00207179108934155)). The tests are:
 
@@ -293,7 +293,7 @@ Now the RRSE is 0.0568 and we have a better residual correlation!
 
 ![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c09_ex_2.png?raw=true)
 
-In the end of day, the best model will be the model that satisfy the user needs. However, its important to understand how to analyse the models so you can have an idea if you can get some improvements without too much work.
+In the end of day, the best model will be the model that satisfy the user needs. However, it's important to understand how to analyse the models so you can have an idea if you can get some improvements without too much work.
 
 For the sake of curiosity, lets check how the model perform if we run a 1-step ahead prediction. We don't need to fit the model again, just make another prediction using the 1-step option.
 

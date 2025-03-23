@@ -2,7 +2,7 @@
 
 > This section is taken mainly from my master thesis, which was based on [Billings, S. A](https://www.wiley.com/en-us/Nonlinear+System+Identification%3A+NARMAX+Methods+in+the+Time%2C+Frequency%2C+and+Spatio-Temporal+Domains-p-9781119943594).
 
-Selecting the model structure is crucial to develop models that can correctly reproduce the system behavior. If some prior information about the system are known, e.g., the dynamic order and degree of nonlinearity, determining the terms and then estimate the parameters is trivial. In real life scenarios, however, in most of the times there is no information about what terms should be included in the model and the correct regressors has to be selected in the identification framework. If the MSS is not performed with the necessary concerns, the scientific law that describes the system may will not be revealed and resulting in misleading interpretations about the system. To illustrate this scenario, consider the following example.
+Selecting the model structure is crucial to develop models that can correctly reproduce the system behavior. If some prior information about the system are known, e.g., the dynamic order and degree of nonlinearity, determining the terms and then estimate the parameters is trivial. In real life scenarios, however, usually there is no information about what terms should be included in the model and the correct regressors has to be selected in the identification framework. If the MSS is not performed with the necessary concerns, the scientific law that describes the system may will not be revealed and resulting in misleading interpretations about the system. To illustrate this scenario, consider the following example.
 
 Let $\mathcal{D}$ denote an arbitrary dataset
 
@@ -61,7 +61,7 @@ $$
 \tag{5}
 $$
 
-where $n_r$ and  and $n_{{_{m}}r}$ are the values computed using the equations presented in Chapter 2.
+where $n_r$ and $n_{{_{m}}r}$ are the values computed using the equations presented in Chapter 2.
 
 A classical solution to regressors selection problem is the Forward Regression Orthogonal Least Squares (FROLS) algorithm associated with Error Reduction Ratio (ERR) algorithm. This technique is based on the Prediction Error Minimization framework and, one at time, select the most relevant regressor by using a step-wise regression. The FROLS method adapt the set of regressors in the search space into a set of orthogonal vectors, which ERR evaluates the individual contribution to the desired output variance.
 
@@ -224,7 +224,7 @@ $$
 
 ### Keep it simple
 
-For the sake of simplicity, let's present the FROLS along with simple examples to make the intuition clear. First, let define the ERR calculation and then explain the idea of the FRLOS in simple terms.
+For the sake of simplicity, let's present the FROLS along with simple examples to make the intuition clear. First, let define the ERR calculation and then explain the idea of the FROLS in simple terms.
 
 #### Orthogonal case
 
@@ -304,7 +304,7 @@ $$
 \begin{align}
 \frac{\|e\|^2}{\|y\|^2} & =1-\left(\frac{x_1^T y}{\left\|x_1\right\|^2}\right)^2 \frac{\left\|x_1\right\|^2}{\|y\|^2}-\left(\frac{x_2^T y}{\left\|x_2\right\|^2}\right)^2 \frac{\left\|x_2\right\|^2}{\|y\|^2}-\ldots-\left(\frac{x_n^T y}{\left\|x_n\right\|^2}\right)^2 \frac{\left\|x_n\right\|^2}{\|y\|^2} \\
 & =1-\frac{\left(x_1^T y\right)^2}{\left\|x_1\right\|\left\|^2\right\| y \|^2}-\frac{\left(x_2^T y\right)^2}{\left\|x_2\right\|^2\|y\|^2}-\cdots-\frac{\left(x_n^T y\right)^2}{\left\|x_n\right\|^2\|y\|^2} \\
-& =1-E R R_1 \quad-E R R_2-\cdots-E R R_n
+& =1-ERR_1 \quad-ERR_2-\cdots-ERR_n
 \end{align}
 \tag{27}
 $$
@@ -361,7 +361,7 @@ print(f"x1 represents {round(err1*100, 2)}% of the variation in y, \n x2 represe
 >>> x2 represents 2.13% of the variation in y,
 >>> x3 represents 52.46% of the variation in y
 ```
-In this case, $x1$ have the highest $err$ value, so we have choose it to be the first orthogonal vector.
+In this case, $x1$ have the highest $err$ value, so we have chosen it to be the first orthogonal vector.
 
 ```python
 q1 = x1.copy()
@@ -528,7 +528,7 @@ $$
 
 To use any information criteria in SysIdentPy, set `order_selection=True` (as said before, the default value is already `True`). Besides `order_selection`, you can define how many regressors you want to evaluate before stopping the algorithm by using the `n_info_values` hyperparameter. The default value is $15$, but the user should increase it based on how many regressors exists given the `ylag`, `xlag` and the degree of the basis function.
 
-> Using information Criteria can take a long time depending on how many regressors you are evaluating and the number of samples. To calculate the criteria, the ERR algorithm is executed `n` times where `n` is the number defined in `n_info_values`. Make sure to understand how it works to define whether you have to use it or not.
+> Using information Criteria can take a long time depending on how many regressors you are evaluating and the number of samples. To calculate the criteria, the ERR algorithm is executed `n` times, where `n` is the number defined in `n_info_values`. Make sure to understand how it works to define whether you have to use it or not.
 
 Running the same example, but now using the BIC information criteria to select the order of the model, we have
 
@@ -927,7 +927,7 @@ FPE returned a model with 10 regressors.
 
 This section introduces a meta-heuristic approach for selecting the structure of polynomial NARX models in regression tasks. The proposed method considers both the complexity of the model and the contribution of each term to construct parsimonious models through a novel cost function formulation. The robustness of this new algorithm is evaluated using various simulated and experimental systems with different nonlinear characteristics. The results demonstrate that the algorithm effectively identifies the correct model when the true structure is known and produces parsimonious models for experimental data, even in cases where traditional and contemporary methods often fail. The new approach is compared against classical methods such as FROLS and recent randomized techniques.
 
-We mentioned that selecting the appropriate model terms is crucial for accurately capturing the dynamics of the original system. Challenges such as overparameterization and numerical ill-conditioning often arise due to the limitations of existing identification algorithms in selecting the right terms for the final model. Check [Aguirre, L. A. and Billings, S. A. - Dynamical effects of overparametrization in nonlinear models](https://www.sciencedirect.com/science/article/abs/pii/0167278995900535), [Piroddi, L. and Spinelli, W. - An identification algorithm for polynomial NARX models based on simulation error minimization](https://www.tandfonline.com/doi/abs/10.1080/00207170310001635419). We also mentioned that one of the most traditionally algorithms for structure selection of polynomial NARMAX is the ERR algorithm. Numerous variants of FROLS algorithm has been developed to improve the model selection performance such as [Billings, S. A., Chen, S., and Korenberg, M. J. - Identification of MIMO non-linear systems using a forward-regression orthogonal estimator](https://www.tandfonline.com/doi/abs/10.1080/00207178908559767), [Farina, M. and Piroddi, L. - Simulation Error Minimization–Based Identification of Polynomial Input–Output Recursive Models](https://www.sciencedirect.com/science/article/pii/S1474667016388462), [Guo, Y., Guo, L. Z., Billings, S. A., and Wei, H. - A New Iterative Orthogonal Forward Regression Algorithm](https://eprints.whiterose.ac.uk/107315/3/A%20New%20Iterative%20Orthogonal%20Forward%20Regression%20Algorithm%20-%20R2.pdf), [Mao, K. Z. and Billings, S. A. - VARIABLE SELECTION IN NON-LINEAR SYSTEMS MODELLING](https://www.sciencedirect.com/science/article/abs/pii/S0888327098901807). The drawbacks of the FROLS have been extensively reviewed in the literature, e.g., in [Billings, S. A. and Aguirre, L. A.](https://core.ac.uk/download/pdf/29031334.pdf), [Palumbo, P. and Piroddi, L.](https://ui.adsabs.harvard.edu/abs/2001JSV...239..405P/abstract), [Falsone, A., Piroddi, L., and Prandini, M.](https://www.sciencedirect.com/science/article/abs/pii/S0005109815003088). Most of these weak points are related to (i) the Prediction Error Minimization (PEM) framework; (ii) the inadequacy of the ERR index in measuring the absolute importance of regressors; (iii) the use of information criteria such as AIC, FPE and the BIC, to select the model order. Regarding the information criteria, although these techniques work well for linear models, in a nonlinear context no simple relation between model size and accuracy can be established [Falsone, A., Piroddi, L., and Prandini, M. - A randomized algorithm for nonlinear model structure selection](https://www.sciencedirect.com/science/article/abs/pii/S0005109815003088), [Chen, S., Hong, X., and Harris, C. J. - Sparse kernel regression modeling using combined locally regularized orthogonal least squares and D-optimality experimental design](https://ieeexplore.ieee.org/document/1205199).
+We mentioned that selecting the appropriate model terms is crucial for accurately capturing the dynamics of the original system. Challenges such as over-parameterization and numerical ill-conditioning often arise due to the limitations of existing identification algorithms in selecting the right terms for the final model. Check [Aguirre, L. A. and Billings, S. A. - Dynamical effects of overparametrization in nonlinear models](https://www.sciencedirect.com/science/article/abs/pii/0167278995900535), [Piroddi, L. and Spinelli, W. - An identification algorithm for polynomial NARX models based on simulation error minimization](https://www.tandfonline.com/doi/abs/10.1080/00207170310001635419). We also mentioned that one of the most traditionally algorithms for structure selection of polynomial NARMAX is the ERR algorithm. Numerous variants of FROLS algorithm has been developed to improve the model selection performance such as [Billings, S. A., Chen, S., and Korenberg, M. J. - Identification of MIMO non-linear systems using a forward-regression orthogonal estimator](https://www.tandfonline.com/doi/abs/10.1080/00207178908559767), [Farina, M. and Piroddi, L. - Simulation Error Minimization–Based Identification of Polynomial Input–Output Recursive Models](https://www.sciencedirect.com/science/article/pii/S1474667016388462), [Guo, Y., Guo, L. Z., Billings, S. A., and Wei, H. - A New Iterative Orthogonal Forward Regression Algorithm](https://eprints.whiterose.ac.uk/107315/3/A%20New%20Iterative%20Orthogonal%20Forward%20Regression%20Algorithm%20-%20R2.pdf), [Mao, K. Z. and Billings, S. A. - VARIABLE SELECTION IN NON-LINEAR SYSTEMS MODELLING](https://www.sciencedirect.com/science/article/abs/pii/S0888327098901807). The drawbacks of the FROLS have been extensively reviewed in the literature, e.g., in [Billings, S. A. and Aguirre, L. A.](https://core.ac.uk/download/pdf/29031334.pdf), [Palumbo, P. and Piroddi, L.](https://ui.adsabs.harvard.edu/abs/2001JSV...239..405P/abstract), [Falsone, A., Piroddi, L., and Prandini, M.](https://www.sciencedirect.com/science/article/abs/pii/S0005109815003088). Most of these weak points are related to (i) the Prediction Error Minimization (PEM) framework; (ii) the inadequacy of the ERR index in measuring the absolute importance of regressors; (iii) the use of information criteria such as AIC, FPE and the BIC, to select the model order. Regarding the information criteria, although these techniques work well for linear models, in a nonlinear context no simple relation between model size and accuracy can be established [Falsone, A., Piroddi, L., and Prandini, M. - A randomized algorithm for nonlinear model structure selection](https://www.sciencedirect.com/science/article/abs/pii/S0005109815003088), [Chen, S., Hong, X., and Harris, C. J. - Sparse kernel regression modeling using combined locally regularized orthogonal least squares and D-optimality experimental design](https://ieeexplore.ieee.org/document/1205199).
 
 Due to the limitations of Ordinary Least Squares (OLS)-based algorithms, recent research has presented solutions that diverged from the classical FROLS approach. New methods have reformulated the Model Structure Selection (MSS) process within a probabilistic framework and employed random sampling techniques [Falsone, A., Piroddi, L., and Prandini, M. - A randomized algorithm for nonlinear model structure selection](https://www.sciencedirect.com/science/article/abs/pii/S0005109815003088), [Tempo, R., Calafiore, G., and Dabbene, F. - Randomized Algorithms for Analysis and Control of Uncertain Systems: With Applications](https://link.springer.com/book/10.1007/978-1-4471-4610-0), [Baldacchino, T., Anderson, S. R., and Kadirkamanathan, V. - Computational system identification for Bayesian NARMAX modelling](https://www.sciencedirect.com/science/article/abs/pii/S0005109813003063), [Rodriguez-Vazquez, K., Fonseca, C. M., and Fleming, P. J. - Identifying the structure of nonlinear dynamic systems using multiobjective genetic programming](https://ieeexplore.ieee.org/document/1306531), [Severino, A. G. V. and Araujo, F. M. U. de](https://repositorio.ufrn.br/bitstream/123456789/24900/1/AlcemyGabrielVitorSeverino_DISSERT.pdf). Despite their advancements, these meta-heuristic and probabilistic approaches exhibit certain shortcomings. In particular, these methods often rely on information criteria such as AIC, FPE, and BIC to define the cost function for optimization, which frequently leads to over-parameterized models.
 
@@ -963,7 +963,7 @@ $$
 \tag{34}
 $$
 
-which can be viewed as an steeper sigmoid function with overshoot.
+which can be viewed as a steeper sigmoid function with overshoot.
 
 ### Meta-heuristics
 
@@ -977,7 +977,7 @@ Despite the lack of a universal consensus on the definitions of exploration and 
 
 Achieving a balance between exploration and exploitation is a significant challenge in most meta-heuristic algorithms. For this method, we enhance performance and flexibility in the search process by employing a hybrid approach that combines Binary Particle Swarm Optimization (BPSO) with Gravitational Search Algorithm (GSA), as proposed by [Mirjalili, S. and Hashim, S. Z. M.](https://ieeexplore.ieee.org/abstract/document/6141614). This hybrid method incorporates a low-level co-evolutionary heterogeneous technique originally introduced by [Talbi, E. G.](https://link.springer.com/article/10.1023/A:1016540724870).
 
-The BPSOGSA approach leverages the strengths of both algorithms: the Particle Swarm Optimization (PSO) component is known to be good in exploring the entire search space to identify the global optimum, while the Gravitational Search Algorithm (GSA) component effectively refines the search by focusing on local solutions within a binary space. This combination aims to provide a more comprehensive and effective optimization strategy, ensuring a better balance between exploration and exploitation.
+The BPSOGSA approach leverages the strengths of both algorithms: the Particle Swarm Optimization (PSO) component is known to be good at exploring the entire search space to identify the global optimum, while the Gravitational Search Algorithm (GSA) component effectively refines the search by focusing on local solutions within a binary space. This combination aims to provide a more comprehensive and effective optimization strategy, ensuring a better balance between exploration and exploitation.
 
 #### Standard Particle Swarm Optimization (PSO)
 

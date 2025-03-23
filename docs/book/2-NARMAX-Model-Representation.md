@@ -8,7 +8,7 @@ sysidentpy, scikit-learn, scipy, pytorch, matplotlib
 
 ## Basis Function
 
-In System Identification, understanding the concept of basis functions is crucial for effectively modeling complex systems. Basis functions are predefined mathematical functions used to transform the input data into a new space, where the relationships within the data can be more easily modeled. By expressing the original data in terms of these basis functions, we can build nonlinear models in respect to it's structure while keeping it linear in the parameters, allowing the usage of straightforward parameter estimation methods.
+In System Identification, understanding the concept of basis functions is crucial for effectively modeling complex systems. Basis functions are predefined mathematical functions used to transform the input data into a new space, where the relationships within the data can be more easily modeled. By expressing the original data in terms of these basis functions, we can build nonlinear models in respect to its structure while keeping it linear in the parameters, allowing the usage of straightforward parameter estimation methods.
 
 Basis functions commonly used in system identification:
 
@@ -21,7 +21,7 @@ Basis functions commonly used in system identification:
  In SysIdentPy you can define the basis function you want to use in your model by just import them:
 
 ```python
-from sysidentpy.basis_function import Polynomial, Fourier, Bersntein
+from sysidentpy.basis_function import Polynomial, Fourier, Bernstein
 ```
 
 To keep things simple for now, we will show simple examples of how basis function can be used in a modeling task. We will show a simple polynomial basis functions, a triangular basis function, a radial basis function and a rectangular basis function.
@@ -299,7 +299,7 @@ model = FROLS(
 )
 ```
 
-In the example above, we define the linear polynomial basis function by importing the Polynomial basis and setting the degree equal to 1 (this ensure that we do not have a nonlinear combination of the regressors). Don't worry about the `FROLS` and `LeastSquares` yet. We'll talk about them in chapters 3 and 4, respectively.
+In the example above, we define the linear polynomial basis function by importing the Polynomial basis and setting the degree equal to 1 (this ensures that we do not have a nonlinear combination of the regressors). Don't worry about the `FROLS` and `LeastSquares` yet. We'll talk about them in chapters 3 and 4, respectively.
 
 For Figure 4, we conducted 10 separate simulations to analyse the effects of different noise process generation on the ARMAX system's behavior. Each simulation uses a unique sample of noise to observe how variations in this random component influence the overall system output. To illustrate this, we highlight one specific simulation while the others are displayed with less emphasis.
 
@@ -773,12 +773,12 @@ $$
 \tag{2.22}
 $$
 
-As we mentioned in the Introduction of the book, NARMAX methods aims to build the simplest models possible. The idea is to be reproduce a wide range of behaviors using a small subset of terms from the vast search space formed by candidate regressors.
+As we mentioned in the Introduction of the book, NARMAX methods aims to build the simplest models possible. The idea is to reproduce a wide range of behaviors using a small subset of terms from the vast search space formed by candidate regressors.
 
-Lets use SysIdentPy to see how the search space grows in the linear versus the nonlinear scenario. The `regressor_code` method available in `narmax_tools` can be used the check how many regressors exists in the search space given the number of inputs, the delays of `y` and `x` regressors and the basis function. We will use `xlag=ylag=10` and the polynomial basis function. The user can simulate different scenarios by setting different parameters.
+Let's use SysIdentPy to see how the search space grows in the linear versus the nonlinear scenario. The `count_model_regressors` method available in `narmax_tools` can be used the check how many regressors exists in the search space given the number of inputs, the delays of `y` and `x` regressors and the basis function. We will use `xlag=ylag=10` and the polynomial basis function. The user can simulate different scenarios by setting different parameters.
 
 ```python
-from sysidentpy.utils.narmax_tools import regressor_code
+from sysidentpy.utils.information_matrix import count_model_regressors
 from sysidentpy.basis_function import Polynomial
 import numpy as np
 ```
@@ -786,53 +786,56 @@ import numpy as np
 For the linear case with 1 input we have 21 regressors:
 ```python
 x_train = np.random.rand(10, 1)  # simulating a case with 1 input
+y_train = np.random.rand(10, 1)
 basis_function = Polynomial(degree=1)
-regressors = regressor_code(
-    X=x_train,
-    xlag=10,
-    ylag=10,
-    model_type="NARMAX",
-    model_representation="Polynomial",
-    basis_function=basis_function,
+n_regressors = count_model_regressors(
+    x=x_train,
+    y=y_train,
+    xlag=10,
+    ylag=10,
+    model_type="NARMAX",
+    basis_function=basis_function,
+    is_neural_narx=False,
 )
-n_regressors = regressors.shape[0]  # the number of features of the NARX net
 n_regressors
 >>> 21
 ```
 
-For the linear case with 2 inputs, the number of regressors jumps to 111:
+For the linear case with 2 inputs, the number of regressors jumps to 31:
 
 ```python
 x_train = np.random.rand(10, 2)  # simulating a case with 2 inputs
+y_train = np.random.rand(10, 1)
 basis_function = Polynomial(degree=1)
 xlag = [list(range(1, 11))] * x_train.shape[1]
-regressors = regressor_code(
-    X=x_train,
-    xlag=xlag,
-    ylag=10,
-    model_type="NARMAX",
-    model_representation="Polynomial",
-    basis_function=basis_function,
+n_regressors = count_model_regressors(
+    x=x_train,
+    y=y_train,
+    xlag=xlag,
+    ylag=10,
+    model_type="NARMAX",
+    basis_function=basis_function,
+    is_neural_narx=False,
 )
-n_regressors = regressors.shape[0]  # the number of features of the NARX net
 n_regressors
->>> 111
+>>> 31
 ```
 
 If we consider a nonlinear case with 1 input by just changing the degree to 2, we have 231 regressors.
 
 ```python
 x_train = np.random.rand(10, 1)  # simulating a case with 1 input
+y_train = np.random.rand(10, 1)
 basis_function = Polynomial(degree=2)
-regressors = regressor_code(
-    X=x_train,
-    xlag=10,
-    ylag=10,
-    model_type="NARMAX",
-    model_representation="Polynomial",
-    basis_function=basis_function,
+n_regressors = count_model_regressors(
+    x=x_train,
+    y=y_train,
+    xlag=10,
+    ylag=10,
+    model_type="NARMAX",
+    basis_function=basis_function,
+    is_neural_narx=False,
 )
-n_regressors = regressors.shape[0]  # the number of features of the NARX net
 n_regressors
 >>> 231
 ```
@@ -841,16 +844,17 @@ If we set the degree to 3, the number of terms increases significantly to 1771 r
 
 ```python
 x_train = np.random.rand(10, 1)  # simulating a case with 1 input
-basis_function = Polynomial(degree=2)
-regressors = regressor_code(
-    X=x_train,
-    xlag=10,
-    ylag=10,
-    model_type="NARMAX",
-    model_representation="Polynomial",
-    basis_function=basis_function,
+y_train = np.random.rand(10, 1)
+basis_function = Polynomial(degree=3)
+n_regressors = count_model_regressors(
+    x=x_train,
+    y=y_train,
+    xlag=10,
+    ylag=10,
+    model_type="NARMAX",
+    basis_function=basis_function,
+    is_neural_narx=False,
 )
-n_regressors = regressors.shape[0]  # the number of features of the NARX net
 n_regressors
 >>> 1771
 ```
@@ -858,18 +862,19 @@ n_regressors
 If you have 2 inputs in the nonlinear scenario with `degree=2`, the number of regressors is 496:
 
 ```python
-x_train = np.random.rand(10, 2)  # simulating a case with 2 input
+x_train = np.random.rand(10, 2)  # simulating a case with 2 inputs
+y_train = np.random.rand(10, 1)
 basis_function = Polynomial(degree=2)
 xlag = [list(range(1, 11))] * x_train.shape[1]
-regressors = regressor_code(
-    X=x_train,
-    xlag=xlag,
-    ylag=10,
-    model_type="NARMAX",
-    model_representation="Polynomial",
-    basis_function=basis_function,
+n_regressors = count_model_regressors(
+    x=x_train,
+    y=y_train,
+    xlag=xlag,
+    ylag=10,
+    model_type="NARMAX",
+    basis_function=basis_function,
+    is_neural_narx=False,
 )
-n_regressors = regressors.shape[0]  # the number of features of the NARX net
 n_regressors
 >>> 496
 ```
@@ -877,25 +882,26 @@ n_regressors
 If you have 2 inputs in the nonlinear scenario with `degree=3`, the number jumps to 5456 regressors:
 
 ```python
-x_train = np.random.rand(10, 2)  # simulating a case with 2 input
+x_train = np.random.rand(10, 2)  # simulating a case with 2 inputs
+y_train = np.random.rand(10, 1)
 basis_function = Polynomial(degree=3)
 xlag = [list(range(1, 11))] * x_train.shape[1]
-regressors = regressor_code(
-    X=x_train,
-    xlag=xlag,
-    ylag=10,
-    model_type="NARMAX",
-    model_representation="Polynomial",
-    basis_function=basis_function,
+n_regressors = count_model_regressors(
+    x=x_train,
+    y=y_train,
+    xlag=xlag,
+    ylag=10,
+    model_type="NARMAX",
+    basis_function=basis_function,
+    is_neural_narx=False,
 )
-n_regressors = regressors.shape[0]  # the number of features of the NARX net
 n_regressors
 >>> 5456
 ```
 
 As you can notice, the number of regressors increases significantly as the degree of the polynomial and the number of inputs increases. That makes the model structure selection much more complex! In the linear case with 10 inputs we have `2^31=2.15e+09` possible model combinations. When `degree=2` with 2 inputs we have `2^496=2.05e+149` possible combinations! Try to get the number of possible model combinations when `degree=3` with 2 inputs. Moreover, try that with more inputs and higher nonlinear degree and see how the course of dimensionality is a big problem.
 
-As you can see, getting a simple model in such a large search space is complex model structure selection task. To select the most significant terms from a huge dictionary of possible terms is not an easy task. And it is hard not only because the complex combinatoric problem and the uncertainty concerning the model order. Identifying the most significant terms in a nonlinear scenario is very difficult because depends on the type of the nonlinearity (sparse singularity or near-singular behavior, memory or dumping effects and many others), dynamical response (spatial-temporal systems, time-dependent), the steady-state response,  frequency of the data, the noise and many more.
+As you can see, getting a simple model in such a large search space is complex model structure selection task. To select the most significant terms from a huge dictionary of possible terms is not an easy task. And it is hard not only because the complex combinatorial problem and the uncertainty concerning the model order. Identifying the most significant terms in a nonlinear scenario is very difficult because depends on the type of the nonlinearity (sparse singularity or near-singular behavior, memory or dumping effects and many others), dynamical response (spatial-temporal systems, time-dependent), the steady-state response,  frequency of the data, the noise and many more.
 
 Because of the model structure selection algorithms developed for NARMAX models, even linear models like ARMAX can have different performance when obtained using SysIdentPy when compared to other libraries, like Statsmodels. We have a case study showing exactly that in Chapter 10.
 
@@ -1054,7 +1060,7 @@ in the basis function definition
 ```python
 from sysidentpy.basis_function import Fourier
 
-basis_function = Fourier(degree=2, ensamble=True)
+basis_function = Fourier(degree=2, ensemble=True)
 ```
 
 ### Neural NARX Network
@@ -1106,7 +1112,7 @@ A simple neural NARX model can be represented as a Multi-Layer Perceptron neural
 
 > Neural NARX is not the same model as Recurrent Neural Networks (RNN). The user is referred to the following paper for more details [A Note on the Equivalence of NARX and RNN](https://link.springer.com/article/10.1007/s005210050005)
 
-To build a Neural NARX network in SysIdentPy, the user must use `pytorch`. We use `pytorch` to make the definition of the network architecture flexible. However, this require that the user have a better understanding of how a neural networks. See the script bellow of how to build a simple Neural NARX model in **SysIdentPy**
+To build a Neural NARX network in SysIdentPy, the user must use `pytorch`. We use `pytorch` to make the definition of the network architecture flexible. However, this requires that the user have a better understanding of how a neural networks. See the script bellow of how to build a simple Neural NARX model in **SysIdentPy**
 
 ```python
 from torch import nn
@@ -1163,17 +1169,16 @@ If you need help finding how many regressors are created behind the scenes you c
 
 ```python
 basis_function = Polynomial(degree=1)
-regressors = regressor_code(
-    X=x_train, # t
-    xlag=2,
-    ylag=2,
-    model_type="NARMAX",
-    model_representation="neural_network",
-    basis_function=basis_function,
+n_regressors = count_model_regressors(
+    x=x_train,
+    y=y_train,
+    xlag=2,
+    ylag=2,
+    model_type="NARMAX",
+    basis_function=basis_function,
+    is_neural_narx=True,
 )
-
-n_features = regressors.shape[0]  # the number of features of the NARX net
-n_features
+n_regressors
 >>> 4
 ```
 
@@ -1183,7 +1188,7 @@ The configuration of your network follows exactly the same pattern of a network 
 class NARX(nn.Module):
     def __init__(self):
         super().__init__()
-        self.lin = nn.Linear(n_features, 30)
+        self.lin = nn.Linear(n_regressors, 30)
         self.lin2 = nn.Linear(30, 30)
         self.lin3 = nn.Linear(30, 1)
         self.tanh = nn.Tanh()
@@ -1220,7 +1225,7 @@ If the net configuration is built before calling the NARXNN, just pass the model
 class NARX(nn.Module):
     def __init__(self):
         super().__init__()
-        self.lin = nn.Linear(n_features, 30)
+        self.lin = nn.Linear(n_regressors, 30)
         self.lin2 = nn.Linear(30, 30)
         self.lin3 = nn.Linear(30, 1)
         self.tanh = nn.Tanh()
@@ -1257,9 +1262,9 @@ yhat = narx_net2.predict(X=x_valid, y=y_valid)
 
 ### General Model Set Representation
 
-Based on the ideia of transforming a static neural network in a neural NARX model, we can extend the method for basically any model class. SysIdentPy do not aim to implement every model class that exists in literature. However, we created a functionality that allows the usage of any other machine learning package that follows a `fit` and `predict` API inside SysIdentPy to convert such models to NARX versions of them.
+Based on the idea of transforming a static neural network in a neural NARX model, we can extend the method for basically any model class. SysIdentPy do not aim to implement every model class that exists in literature. However, we created a functionality that allows the usage of any other machine learning package that follows a `fit` and `predict` API inside SysIdentPy to convert such models to NARX versions of them.
 
-Lets take XGboost (eXtreme Gradient Boosting) Algorithm as an example. XGBoost is a well kown model class used for regression tasks. XGboost, however, are not a common choice when you are dealing with a dynamical system identification task because they are originally made for modeling static systems. You can easily transform XGboost into a NARX model using SysIdentPy.
+Let's take XGBoost (eXtreme Gradient Boosting) Algorithm as an example. XGBoost is a well known model class used for regression tasks. XGBoost, however, are not a common choice when you are dealing with a dynamical system identification task because they are originally made for modeling static systems. You can easily transform XGBoost into a NARX model using SysIdentPy.
 
 Scikit-learn, for example, is another great example. You can transform any Scikit-learn model into NARX models using SysIdentPy. We will see such applications in detail at Chapter 11, but you can see how easy it in the script bellow
 
