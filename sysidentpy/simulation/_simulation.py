@@ -11,7 +11,7 @@ import numpy as np
 from sysidentpy.narmax_base import house, rowhouse
 from ..basis_function import Fourier, Polynomial
 from ..narmax_base import BaseMSS
-from ..narmax_base import prepare_data
+from sysidentpy.utils.information_matrix import build_lagged_matrix
 
 from sysidentpy.utils.simulation import (
     get_index_from_regressor_code,
@@ -349,7 +349,7 @@ class SimulateNARMAX(BaseMSS):
         self.n_terms = self.final_model.shape[0]
         if self.estimate_parameter and not self.calculate_err:
             self.max_lag = self._get_max_lag()
-            lagged_data = prepare_data(
+            lagged_data = build_lagged_matrix(
                 X_train, y_train, self.xlag, self.ylag, self.model_type
             )
             psi = self.basis_function.fit(
@@ -382,7 +382,7 @@ class SimulateNARMAX(BaseMSS):
             self.err = self.n_terms * [0]
         else:
             self.max_lag = self._get_max_lag()
-            lagged_data = prepare_data(
+            lagged_data = build_lagged_matrix(
                 X_train, y_train, self.xlag, self.ylag, self.model_type
             )
             psi = self.basis_function.fit(
@@ -552,7 +552,7 @@ class SimulateNARMAX(BaseMSS):
         yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
         return yhat
 
-    def _one_step_ahead_prediction(self, X, y):
+    def _one_step_ahead_prediction(self, x, y):
         """Perform the 1-step-ahead prediction of a model.
 
         Parameters
@@ -560,7 +560,7 @@ class SimulateNARMAX(BaseMSS):
         y : array-like of shape = max_lag
             Initial conditions values of the model
             to start recursive process.
-        X : array_like of shape = n_samples
+        x : array_like of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
@@ -569,8 +569,8 @@ class SimulateNARMAX(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
-        X_base = self.basis_function.transform(
+        lagged_data = build_lagged_matrix(x, y, self.xlag, self.ylag, self.model_type)
+        x_base = self.basis_function.transform(
             lagged_data,
             self.max_lag,
             self.ylag,
@@ -579,10 +579,10 @@ class SimulateNARMAX(BaseMSS):
             predefined_regressors=self.pivv[: len(self.final_model)],
         )
 
-        yhat = super()._one_step_ahead_prediction(X_base)
+        yhat = super()._one_step_ahead_prediction(x_base)
         return yhat.reshape(-1, 1)
 
-    def _n_step_ahead_prediction(self, X, y, steps_ahead):
+    def _n_step_ahead_prediction(self, x, y, steps_ahead):
         """Perform the n-steps-ahead prediction of a model.
 
         Parameters
@@ -590,7 +590,7 @@ class SimulateNARMAX(BaseMSS):
         y : array-like of shape = max_lag
             Initial conditions values of the model
             to start recursive process.
-        X : array_like of shape = n_samples
+        x : array_like of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
@@ -599,10 +599,10 @@ class SimulateNARMAX(BaseMSS):
                The n-steps-ahead predicted values of the model.
 
         """
-        yhat = super()._n_step_ahead_prediction(X, y, steps_ahead)
+        yhat = super()._n_step_ahead_prediction(x, y, steps_ahead)
         return yhat
 
-    def _model_prediction(self, X, y_initial, forecast_horizon=None):
+    def _model_prediction(self, x, y_initial, forecast_horizon=None):
         """Perform the infinity steps-ahead simulation of a model.
 
         Parameters
@@ -610,7 +610,7 @@ class SimulateNARMAX(BaseMSS):
         y_initial : array-like of shape = max_lag
             Number of initial conditions values of output
             to start recursive process.
-        X : array_like of shape = n_samples
+        x : array_like of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
@@ -620,49 +620,49 @@ class SimulateNARMAX(BaseMSS):
 
         """
         if self.model_type in ["NARMAX", "NAR"]:
-            return self._narmax_predict(X, y_initial, forecast_horizon)
+            return self._narmax_predict(x, y_initial, forecast_horizon)
         if self.model_type == "NFIR":
-            return self._nfir_predict(X, y_initial)
+            return self._nfir_predict(x, y_initial)
 
         raise ValueError(
             f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
         )
 
-    def _narmax_predict(self, X, y_initial, forecast_horizon):
+    def _narmax_predict(self, x, y_initial, forecast_horizon):
         if len(y_initial) < self.max_lag:
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
                 f" {self.max_lag} elements."
             )
 
-        if X is not None:
-            forecast_horizon = X.shape[0]
+        if x is not None:
+            forecast_horizon = x.shape[0]
         else:
             forecast_horizon = forecast_horizon + self.max_lag
 
         if self.model_type == "NAR":
             self.n_inputs = 0
 
-        y_output = super()._narmax_predict(X, y_initial, forecast_horizon)
+        y_output = super()._narmax_predict(x, y_initial, forecast_horizon)
         return y_output
 
-    def _nfir_predict(self, X, y_initial):
-        y_output = super()._nfir_predict(X, y_initial)
+    def _nfir_predict(self, x, y_initial):
+        y_output = super()._nfir_predict(x, y_initial)
         return y_output
 
-    def _basis_function_predict(self, X, y_initial, forecast_horizon=None):
+    def _basis_function_predict(self, x, y_initial, forecast_horizon=None):
         """Not implemented."""
         raise NotImplementedError(
             "You can only use Polynomial Basis Function in SimulateNARMAX for now."
         )
 
-    def _basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
+    def _basis_function_n_step_prediction(self, x, y, steps_ahead, forecast_horizon):
         """Not implemented."""
         raise NotImplementedError(
             "You can only use Polynomial Basis Function in SimulateNARMAX for now."
         )
 
-    def _basis_function_n_steps_horizon(self, X, y, steps_ahead, forecast_horizon):
+    def _basis_function_n_steps_horizon(self, x, y, steps_ahead, forecast_horizon):
         """Not implemented."""
         raise NotImplementedError(
             "You can only use Polynomial Basis Function in SimulateNARMAX for now."
