@@ -12,249 +12,12 @@ from typing import Any, List, Tuple, Union, Optional
 
 import numpy as np
 
+from sysidentpy.utils.information_matrix import (
+    build_output_matrix,
+    build_input_matrix,
+    build_input_output_matrix,
+)
 from .basis_function import Fourier, Polynomial
-from .utils.check_arrays import num_features
-from .utils.lags import _process_ylag, _process_xlag
-
-
-def shift_column(col_to_shift: np.ndarray, lag: int) -> np.ndarray:
-    """Shift an array by a specified lag, introducing zeros for missing values.
-
-    Parameters
-    ----------
-    col_to_shift : array-like of shape (n_samples,)
-        The input or output time-series data to be lagged.
-    lag : int
-        The number of time steps to shift the data.
-
-    Returns
-    -------
-    tmp_column : ndarray of shape (n_samples, 1)
-        The shifted array, where the first `lag` values are replaced with zeros.
-
-    Examples
-    --------
-    >>> y = np.array([1, 2, 3, 4, 5])
-    >>> shift_column(y, 1)
-    array([[0],
-           [1],
-           [2],
-           [3],
-           [4]])
-
-    """
-    n_samples = col_to_shift.shape[0]
-    tmp_column = np.zeros((n_samples, 1))
-    aux = col_to_shift[0 : n_samples - lag].reshape(-1, 1)
-    tmp_column[lag:, 0] = aux[:, 0]
-    return tmp_column
-
-
-def _create_lagged_X(X: np.ndarray, n_inputs: int, xlag) -> np.ndarray:
-    """Create a lagged matrix of input variables without interaction terms.
-
-    Parameters
-    ----------
-    X : array-like
-        Input data used during the training phase.
-    n_inputs : int
-        The number of input variables.
-
-    Returns
-    -------
-    x_lagged : ndarray
-        A matrix where each column represents a lagged version of an input variable.
-
-    """
-    if n_inputs == 1:
-        x_lagged = np.column_stack([shift_column(X[:, 0], lag) for lag in xlag])
-    else:
-        x_lagged = np.zeros([len(X), 1])  # just to stack other columns
-        # if user input a nested list like [[1, 2], 4], the following
-        # line convert it to [[1, 2], [4]].
-        # Remember, for multiple inputs all lags must be entered explicitly
-        xlag = [[i] if isinstance(i, int) else i for i in xlag]
-        for col in range(n_inputs):
-            x_lagged_col = np.column_stack(
-                [shift_column(X[:, col], lag) for lag in xlag[col]]
-            )
-            x_lagged = np.column_stack([x_lagged, x_lagged_col])
-
-        x_lagged = x_lagged[:, 1:]  # remove the column of 0 created above
-
-    return x_lagged
-
-
-def _create_lagged_y(y: np.ndarray, ylag) -> np.ndarray:
-    """Create a lagged matrix of the output variable.
-
-    Parameters
-    ----------
-    y : array-like
-        Output data used on training phase.
-
-    Returns
-    -------
-    y_lagged : ndarray
-        A matrix where each column represents a lagged version of the output
-        variable.
-
-    """
-    y_lagged = np.column_stack([shift_column(y[:, 0], lag) for lag in ylag])
-    return y_lagged
-
-
-def initial_lagged_matrix(X: np.ndarray, y: np.ndarray, xlag, ylag) -> np.ndarray:
-    """Construct a matrix with lagged versions of input and output variables.
-
-    Parameters
-    ----------
-    X : array-like
-        Input data used during the training phase.
-    y : array-like
-        Output data used during the training phase.
-
-    Returns
-    -------
-    lagged_data : ndarray
-        The combined matrix containing lagged input and output values.
-
-    Examples
-    --------
-    If `xlag=2` and `ylag=2`, the resulting matrix will contain columns:
-    Y[k-1], Y[k-2], X[k-1], X[k-2].
-
-    """
-    n_inputs, xlag = _process_xlag(X, xlag)
-    ylag = _process_ylag(ylag)
-    x_lagged = _create_lagged_X(X, n_inputs, xlag)
-    y_lagged = _create_lagged_y(y, ylag)
-    lagged_data = np.concatenate([y_lagged, x_lagged], axis=1)
-    return lagged_data
-
-
-def build_output_matrix(y, ylag: np.ndarray) -> np.ndarray:
-    """Build the information matrix of output values.
-
-    Each column of the information matrix represents a candidate
-    regressor. The set of candidate regressors are based on xlag,
-    ylag, and degree entered by the user.
-
-    Parameters
-    ----------
-    args : array-like
-        Target data used during the training phase. In a NAR
-        (Nonlinear AutoRegressive) model, `X=None`.
-
-    Returns
-    -------
-    data = ndarray of floats
-        The constructed output regressor matrix.
-
-    """
-    # Generate a lagged data which each column is a input or output
-    # related to its respective lags. With this approach we can create
-    # the information matrix by using all possible combination of
-    # the columns as a product in the iterations
-    # y = args[1]  # args[0] is X=None in NAR scenario
-    ylag = _process_ylag(ylag)
-    y_lagged = _create_lagged_y(y, ylag)
-    constant = np.ones([y_lagged.shape[0], 1])
-    data = np.concatenate([constant, y_lagged], axis=1)
-    return data
-
-
-def build_input_matrix(X, xlag: np.ndarray) -> np.ndarray:
-    """Build the information matrix of input values.
-
-    Each column of the information matrix represents a candidate
-    regressor. The set of candidate regressors are based on xlag,
-    ylag, and degree entered by the user.
-
-    Parameters
-    ----------
-    *args : array-like
-        Input data (X) used on training phase.
-        args[0] is X=None in NAR scenario
-
-    Returns
-    -------
-    data = ndarray of floats
-        The lagged matrix built in respect with each lag and column.
-
-    """
-    # Generate a lagged data which each column is a input or output
-    # related to its respective lags. With this approach we can create
-    # the information matrix by using all possible combination of
-    # the columns as a product in the iterations
-
-    # X = args[0]  # args[1] is y=None in NFIR scenario
-    n_inputs, xlag = _process_xlag(X, xlag)
-    x_lagged = _create_lagged_X(X, n_inputs, xlag)
-    constant = np.ones([x_lagged.shape[0], 1])
-    data = np.concatenate([constant, x_lagged], axis=1)
-    return data
-
-
-def build_input_output_matrix(X: np.ndarray, y: np.ndarray, xlag, ylag) -> np.ndarray:
-    """Build the information matrix.
-
-    Each column of the information matrix represents a candidate
-    regressor. The set of candidate regressors are based on xlag,
-    ylag, and degree entered by the user.
-
-    Parameters
-    ----------
-    y : array-like
-        Target data used on training phase.
-    X : array-like
-        Input data used on training phase.
-
-    Returns
-    -------
-    data = ndarray of floats
-        The constructed information matrix.
-
-    """
-    # Generate a lagged data which each column is a input or output
-    # related to its respective lags. With this approach we can create
-    # the information matrix by using all possible combination of
-    # the columns as a product in the iterations
-    lagged_data = initial_lagged_matrix(X, y, xlag, ylag)
-    constant = np.ones([lagged_data.shape[0], 1])
-    data = np.concatenate([constant, lagged_data], axis=1)
-    return data
-
-
-def get_build_io_method(model_type):
-    """Get info criteria method.
-
-    Parameters
-    ----------
-    model_type = str
-        The type of the model (NARMAX, NAR or NFIR)
-
-    Returns
-    -------
-    build_method = Self
-        Method to build the input-output matrix
-    """
-    build_matrix_options = {
-        "NARMAX": build_input_output_matrix,
-        "NFIR": build_input_matrix,
-        "NAR": build_output_matrix,
-    }
-    return build_matrix_options.get(model_type, None)
-
-
-def prepare_data(x, y, xlag, ylag, model_type):
-    build_matrix = get_build_io_method(model_type)
-    if model_type == "NARMAX":
-        return build_matrix(x, y, xlag, ylag)
-    if model_type == "NFIR":
-        return build_matrix(x, xlag)
-
-    return build_matrix(y, ylag)
 
 
 class RegressorDictionary:
@@ -518,12 +281,12 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
         return exponents
 
-    def _one_step_ahead_prediction(self, X_base: np.ndarray) -> np.ndarray:
+    def _one_step_ahead_prediction(self, x_base: np.ndarray) -> np.ndarray:
         """Perform the 1-step-ahead prediction of a model.
 
         Parameters
         ----------
-        X_base : ndarray of floats of shape = n_samples
+        x_base : ndarray of floats of shape = n_samples
             Regressor matrix with input-output arrays.
 
         Returns
@@ -532,13 +295,13 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
                The 1-step-ahead predicted values of the model.
 
         """
-        yhat = np.dot(X_base, self.theta.flatten())
+        yhat = np.dot(x_base, self.theta.flatten())
         return yhat.reshape(-1, 1)
 
     @abstractmethod
     def _model_prediction(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y_initial: np.ndarray,
         forecast_horizon: int = 1,
     ) -> np.ndarray:
@@ -546,7 +309,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
     def _narmax_predict(
         self,
-        X: np.ndarray,
+        x: np.ndarray,
         y_initial: np.ndarray,
         forecast_horizon: int = 1,
     ) -> np.ndarray:
@@ -567,7 +330,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             for j in range(self.n_inputs):
                 init += self.max_lag
                 final += self.max_lag
-                raw_regressor[init:final] = X[k:i, j]
+                raw_regressor[init:final] = x[k:i, j]
 
             regressor_value = np.zeros(len(model_exponents))
             for j, model_exponent in enumerate(model_exponents):
@@ -577,17 +340,17 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         return y_output[self.max_lag : :].reshape(-1, 1)
 
     @abstractmethod
-    def _nfir_predict(self, X: np.ndarray, y_initial: np.ndarray) -> np.ndarray:
+    def _nfir_predict(self, x: np.ndarray, y_initial: np.ndarray) -> np.ndarray:
         """Nfir predict method."""
-        y_output = np.zeros(X.shape[0], dtype=float)
+        y_output = np.zeros(x.shape[0], dtype=float)
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
-        X = X.reshape(-1, self.n_inputs)
+        x = x.reshape(-1, self.n_inputs)
         model_exponents = [
             self._code2exponents(code=model) for model in self.final_model
         ]
         raw_regressor = np.zeros(len(model_exponents[0]), dtype=float)
-        for i in range(self.max_lag, X.shape[0]):
+        for i in range(self.max_lag, x.shape[0]):
             init = 0
             final = self.max_lag
             k = int(i - self.max_lag)
@@ -595,7 +358,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             for j in range(self.n_inputs):
                 init += self.max_lag
                 final += self.max_lag
-                raw_regressor[init:final] = X[k:i, j]
+                raw_regressor[init:final] = x[k:i, j]
 
             regressor_value = np.zeros(len(model_exponents))
             for j, model_exponent in enumerate(model_exponents):
@@ -622,17 +385,17 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         if len(steps) > 1:
             for step in steps[:-1]:
                 yhat[i : i + steps_ahead] = self._model_prediction(
-                    X=None, y_initial=y[step:i], forecast_horizon=steps_ahead
+                    x=None, y_initial=y[step:i], forecast_horizon=steps_ahead
                 )[-steps_ahead:].ravel()
                 i += steps_ahead
 
             steps_ahead = np.sum(np.isnan(yhat))
             yhat[i : i + steps_ahead] = self._model_prediction(
-                X=None, y_initial=y[steps[-1] : i]
+                x=None, y_initial=y[steps[-1] : i]
             )[-steps_ahead:].ravel()
         else:
             yhat[i : i + steps_ahead] = self._model_prediction(
-                X=None, y_initial=y[0:i], forecast_horizon=steps_ahead
+                x=None, y_initial=y[0:i], forecast_horizon=steps_ahead
             )[-steps_ahead:].ravel()
 
         yhat = yhat.ravel()[self.max_lag : :]
@@ -640,7 +403,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
     def narmax_n_step_ahead(
         self,
-        X: np.ndarray,
+        x: np.ndarray,
         y: np.ndarray,
         steps_ahead: Optional[int],
     ) -> np.ndarray:
@@ -652,8 +415,8 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             )
 
         to_remove = int(np.ceil((len(y) - self.max_lag) / steps_ahead))
-        X = X.reshape(-1, self.n_inputs)
-        yhat = np.zeros(X.shape[0], dtype=float)
+        x = x.reshape(-1, self.n_inputs)
+        yhat = np.zeros(x.shape[0], dtype=float)
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
         i = self.max_lag
@@ -661,19 +424,19 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         if len(steps) > 1:
             for step in steps[:-1]:
                 yhat[i : i + steps_ahead] = self._model_prediction(
-                    X=X[step : i + steps_ahead],
+                    x=x[step : i + steps_ahead],
                     y_initial=y[step:i],
                 )[-steps_ahead:].ravel()
                 i += steps_ahead
 
             steps_ahead = np.sum(np.isnan(yhat))
             yhat[i : i + steps_ahead] = self._model_prediction(
-                X=X[steps[-1] : i + steps_ahead],
+                x=x[steps[-1] : i + steps_ahead],
                 y_initial=y[steps[-1] : i],
             )[-steps_ahead:].ravel()
         else:
             yhat[i : i + steps_ahead] = self._model_prediction(
-                X=X[0 : i + steps_ahead],
+                x=x[0 : i + steps_ahead],
                 y_initial=y[0:i],
             )[-steps_ahead:].ravel()
 
@@ -683,7 +446,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
     @abstractmethod
     def _n_step_ahead_prediction(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y: Optional[np.ndarray],
         steps_ahead: Optional[int],
     ) -> np.ndarray:
@@ -694,7 +457,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         y : array-like of shape = max_lag
             Initial conditions values of the model
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        x : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
         steps_ahead : int (default = None)
             The user can use free run simulation, one-step ahead prediction
@@ -706,7 +469,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             Predicted values for NARMAX and NAR models.
         """
         if self.model_type == "NARMAX":
-            return self.narmax_n_step_ahead(X, y, steps_ahead)
+            return self.narmax_n_step_ahead(x, y, steps_ahead)
 
         if self.model_type == "NAR":
             return self._nar_step_ahead(y, steps_ahead)
@@ -718,7 +481,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
     @abstractmethod
     def _basis_function_predict(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y_initial: np.ndarray,
         forecast_horizon: int = 1,
     ) -> np.ndarray:
@@ -733,7 +496,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         for i in range(forecast_horizon - self.max_lag):
             if self.model_type == "NARMAX":
                 lagged_data = build_input_output_matrix(
-                    X[i : i + analyzed_elements_number],
+                    x[i : i + analyzed_elements_number],
                     yhat[i : i + analyzed_elements_number].reshape(-1, 1),
                     self.xlag,
                     self.ylag,
@@ -744,14 +507,14 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
                 )
             elif self.model_type == "NFIR":
                 lagged_data = build_input_matrix(
-                    X[i : i + analyzed_elements_number], self.xlag
+                    x[i : i + analyzed_elements_number], self.xlag
                 )
             else:
                 raise ValueError(
                     f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
                 )
 
-            X_tmp = self.basis_function.transform(
+            x_tmp = self.basis_function.transform(
                 lagged_data,
                 self.max_lag,
                 self.ylag,
@@ -760,7 +523,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
                 predefined_regressors=self.pivv[: len(self.final_model)],
             )
 
-            a = X_tmp @ self.theta
+            a = x_tmp @ self.theta
             yhat[i + self.max_lag] = a.item()
 
         return yhat[self.max_lag :].reshape(-1, 1)
@@ -768,7 +531,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
     @abstractmethod
     def _basis_function_n_step_prediction(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y: np.ndarray,
         steps_ahead: int,
         forecast_horizon: int,
@@ -788,19 +551,19 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
             if self.model_type == "NARMAX":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
-                    X[k : i + steps_ahead],
+                    x[k : i + steps_ahead],
                     y[k : i + steps_ahead],
                     forecast_horizon=forecast_horizon,
                 )[-steps_ahead:].ravel()
             elif self.model_type == "NAR":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
-                    X=None,
+                    x=None,
                     y_initial=y[k : i + steps_ahead],
                     forecast_horizon=forecast_horizon,
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
             elif self.model_type == "NFIR":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
-                    X=X[k : i + steps_ahead],
+                    x=x[k : i + steps_ahead],
                     y_initial=y[k : i + steps_ahead],
                     forecast_horizon=forecast_horizon,
                 )[-steps_ahead:].ravel()
@@ -815,7 +578,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
     def _basis_function_n_steps_horizon(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y: np.ndarray,
         steps_ahead: int,
         forecast_horizon: int,
@@ -835,17 +598,17 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
             if self.model_type == "NARMAX":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
-                    X[k : i + steps_ahead], y[k : i + steps_ahead], forecast_horizon
+                    x[k : i + steps_ahead], y[k : i + steps_ahead], forecast_horizon
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
             elif self.model_type == "NAR":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
-                    X=None,
+                    x=None,
                     y_initial=y[k : i + steps_ahead],
                     forecast_horizon=forecast_horizon,
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
             elif self.model_type == "NFIR":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
-                    X=X[k : i + steps_ahead],
+                    x=x[k : i + steps_ahead],
                     y_initial=y[k : i + steps_ahead],
                     forecast_horizon=forecast_horizon,
                 )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
