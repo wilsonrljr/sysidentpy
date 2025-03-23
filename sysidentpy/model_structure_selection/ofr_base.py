@@ -10,7 +10,8 @@ from typing import Union, Tuple, Optional
 
 import numpy as np
 
-from sysidentpy.narmax_base import house, rowhouse, prepare_data
+from sysidentpy.narmax_base import house, rowhouse
+from sysidentpy.utils.information_matrix import build_lagged_matrix
 from sysidentpy.utils.check_arrays import check_positive_int, num_features
 
 from ..basis_function import Fourier, Polynomial
@@ -201,9 +202,9 @@ def aicc(n_theta: int, n_samples: int, e_var: float) -> float:
 
     """
     aic_values = aic(n_theta, n_samples, e_var)
-    aicc = aic_values + (2 * n_theta * (n_theta + 1) / (n_samples - n_theta - 1))
+    aicc_values = aic_values + (2 * n_theta * (n_theta + 1) / (n_samples - n_theta - 1))
 
-    return aicc
+    return aicc_values
 
 
 def bic(n_theta: int, n_samples: int, e_var: float) -> float:
@@ -425,7 +426,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
         psi_orthogonal = psi[:, tmp_piv]
         return err, tmp_piv, psi_orthogonal
 
-    def information_criterion(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def information_criterion(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Determine the model order.
 
         This function uses a information criterion to determine the model size.
@@ -439,7 +440,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
         ----------
         y : array-like of shape = n_samples
             Target values of the system.
-        X : array-like of shape = n_samples
+        x : array-like of shape = n_samples
             Input system values measured by the user.
 
         Returns
@@ -450,12 +451,12 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
             vector position + 1).
 
         """
-        if self.n_info_values is not None and self.n_info_values > X.shape[1]:
-            self.n_info_values = X.shape[1]
+        if self.n_info_values is not None and self.n_info_values > x.shape[1]:
+            self.n_info_values = x.shape[1]
             warnings.warn(
                 "n_info_values is greater than the maximum number of all"
                 " regressors space considering the chosen y_lag, u_lag, and"
-                f" non_degree. We set as {X.shape[1]}",
+                f" non_degree. We set as {x.shape[1]}",
                 stacklevel=2,
             )
 
@@ -466,7 +467,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
 
         for i in range(self.n_info_values):
             n_theta = i + 1
-            regressor_matrix = self.run_mss_algorithm(X, y, n_theta)[2]
+            regressor_matrix = self.run_mss_algorithm(x, y, n_theta)[2]
 
             tmp_theta = self.estimator.optimize(
                 regressor_matrix, y[self.max_lag :, 0].reshape(-1, 1)
@@ -514,7 +515,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
             raise ValueError("y cannot be None")
 
         self.max_lag = self._get_max_lag()
-        lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
+        lagged_data = build_lagged_matrix(X, y, self.xlag, self.ylag, self.model_type)
 
         reg_matrix = self.basis_function.fit(
             lagged_data,
@@ -638,7 +639,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
         return yhat
 
     def _one_step_ahead_prediction(
-        self, X: Optional[np.ndarray], y: Optional[np.ndarray]
+        self, x: Optional[np.ndarray], y: Optional[np.ndarray]
     ) -> np.ndarray:
         """Perform the 1-step-ahead prediction of a model.
 
@@ -647,7 +648,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
         y : array-like of shape = max_lag
             Initial conditions values of the model
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        x : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
@@ -656,9 +657,9 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
                The 1-step-ahead predicted values of the model.
 
         """
-        lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
+        lagged_data = build_lagged_matrix(x, y, self.xlag, self.ylag, self.model_type)
 
-        X_base = self.basis_function.transform(
+        x_base = self.basis_function.transform(
             lagged_data,
             self.max_lag,
             self.ylag,
@@ -667,11 +668,11 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
             predefined_regressors=self.pivv[: len(self.final_model)],
         )
 
-        yhat = super()._one_step_ahead_prediction(X_base)
+        yhat = super()._one_step_ahead_prediction(x_base)
         return yhat.reshape(-1, 1)
 
     def _n_step_ahead_prediction(
-        self, X: Optional[np.ndarray], y: Optional[np.ndarray], steps_ahead: int
+        self, x: Optional[np.ndarray], y: Optional[np.ndarray], steps_ahead: int
     ) -> float:
         """Perform the n-steps-ahead prediction of a model.
 
@@ -680,7 +681,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
         y : array-like of shape = max_lag
             Initial conditions values of the model
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        x : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
@@ -689,12 +690,12 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
                The n-steps-ahead predicted values of the model.
 
         """
-        yhat = super()._n_step_ahead_prediction(X, y, steps_ahead)
+        yhat = super()._n_step_ahead_prediction(x, y, steps_ahead)
         return yhat
 
     def _model_prediction(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y_initial: np.ndarray,
         forecast_horizon: int = 0,
     ) -> np.ndarray:
@@ -705,7 +706,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
         y_initial : array-like of shape = max_lag
             Number of initial conditions values of output
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        x : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
@@ -715,10 +716,10 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
 
         """
         if self.model_type in ["NARMAX", "NAR"]:
-            return self._narmax_predict(X, y_initial, forecast_horizon)
+            return self._narmax_predict(x, y_initial, forecast_horizon)
 
         if self.model_type == "NFIR":
-            return self._nfir_predict(X, y_initial)
+            return self._nfir_predict(x, y_initial)
 
         raise ValueError(
             f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
@@ -726,7 +727,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
 
     def _narmax_predict(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y_initial: np.ndarray,
         forecast_horizon: int = 0,
     ) -> np.ndarray:
@@ -736,43 +737,43 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
                 f" {self.max_lag} elements."
             )
 
-        if X is not None:
-            forecast_horizon = X.shape[0]
+        if x is not None:
+            forecast_horizon = x.shape[0]
         else:
             forecast_horizon = forecast_horizon + self.max_lag
 
         if self.model_type == "NAR":
             self.n_inputs = 0
 
-        y_output = super()._narmax_predict(X, y_initial, forecast_horizon)
+        y_output = super()._narmax_predict(x, y_initial, forecast_horizon)
         return y_output
 
     def _nfir_predict(
-        self, X: Optional[np.ndarray], y_initial: Optional[np.ndarray]
+        self, x: Optional[np.ndarray], y_initial: Optional[np.ndarray]
     ) -> np.ndarray:
-        y_output = super()._nfir_predict(X, y_initial)
+        y_output = super()._nfir_predict(x, y_initial)
         return y_output
 
     def _basis_function_predict(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y_initial: Optional[np.ndarray],
         forecast_horizon: int = 0,
     ) -> np.ndarray:
-        if X is not None:
-            forecast_horizon = X.shape[0]
+        if x is not None:
+            forecast_horizon = x.shape[0]
         else:
             forecast_horizon = forecast_horizon + self.max_lag
 
         if self.model_type == "NAR":
             self.n_inputs = 0
 
-        yhat = super()._basis_function_predict(X, y_initial, forecast_horizon)
+        yhat = super()._basis_function_predict(x, y_initial, forecast_horizon)
         return yhat.reshape(-1, 1)
 
     def _basis_function_n_step_prediction(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y: np.ndarray,
         steps_ahead: Optional[int],
         forecast_horizon: int,
@@ -784,7 +785,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
         y : array-like of shape = max_lag
             Initial conditions values of the model
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        x : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
@@ -799,24 +800,24 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
                 f" {self.max_lag} elements."
             )
 
-        if X is not None:
-            forecast_horizon = X.shape[0]
+        if x is not None:
+            forecast_horizon = x.shape[0]
         else:
             forecast_horizon = forecast_horizon + self.max_lag
 
         yhat = super()._basis_function_n_step_prediction(
-            X, y, steps_ahead, forecast_horizon
+            x, y, steps_ahead, forecast_horizon
         )
         return yhat.reshape(-1, 1)
 
     def _basis_function_n_steps_horizon(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y: Optional[np.ndarray],
         steps_ahead: Optional[int],
         forecast_horizon: int,
     ) -> np.ndarray:
         yhat = super()._basis_function_n_steps_horizon(
-            X, y, steps_ahead, forecast_horizon
+            x, y, steps_ahead, forecast_horizon
         )
         return yhat.reshape(-1, 1)
