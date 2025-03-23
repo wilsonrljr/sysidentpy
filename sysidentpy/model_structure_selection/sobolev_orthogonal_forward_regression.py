@@ -55,9 +55,9 @@ Estimators = Union[
 
 
 class UOFR(OFRBase):
-    r"""Forward Regression Orthogonal Least Squares algorithm.
+    r"""Ultra Orthogonal Forward Regression algorithm.
 
-    This class uses the FROLS algorithm ([1]_, [2]_) to build NARMAX models.
+    This class uses the UOFR algorithm ([1]) to build NARMAX models.
     The NARMAX model is described as:
 
     $$
@@ -120,7 +120,7 @@ class UOFR(OFRBase):
     ...                                                    sigma=0.2,
     ...                                                    train_percentage=90)
     >>> basis_function = Polynomial(degree=2)
-    >>> model = FROLS(basis_function=basis_function,
+    >>> model = UOFR(basis_function=basis_function,
     ...               order_selection=True,
     ...               n_info_values=10,
     ...               extended_least_squares=False,
@@ -147,12 +147,9 @@ class UOFR(OFRBase):
 
     References
     ----------
-    - Manuscript: Orthogonal least squares methods and their application
-       to non-linear system identification
-       https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
-    - Manuscript (portuguese): Identificação de Sistemas não Lineares
-       Utilizando Modelos NARMAX Polinomiais - Uma Revisão
-       e Novos Resultados
+    - Manuscript: Ultra-Orthogonal Forward Regression Algorithms for the
+        Identification of Non-Linear Dynamic Systems
+       https://eprints.whiterose.ac.uk/107310/1/UOFR%20Algorithms%20R1.pdf
 
     """
 
@@ -211,7 +208,7 @@ class UOFR(OFRBase):
         return derivative
 
     def normalize_test_function(self, phi_j: np.ndarray) -> np.ndarray:
-        """Normalize derivatives (Eq. 20)."""
+        """Normalize derivatives."""
         norm = np.linalg.norm(phi_j, ord=2)
         return phi_j / norm if norm != 0 else phi_j
 
@@ -229,27 +226,23 @@ class UOFR(OFRBase):
         num_terms = psi.shape[1]
         t = np.linspace(-3, 3, test_support)
 
-        # Initialize Y_ULS and Phi_ULS with original truncated signals
-        Y_ULS = y[:modulated_length].reshape(-1, 1)  # (N', 1)
-        Phi_ULS = psi[:modulated_length, :]  # (N', k)
+        # Initialize y_augmented and psi_augmented with original truncated signals
+        y_augmented = y[:modulated_length].reshape(-1, 1)  # (N', 1)
+        psi_augmented = psi[:modulated_length, :]  # (N', k)
 
         for j in range(1, m + 1):
-            # Generate test function and modulate signals
             phi_j = self.gaussian_test_function(t, order=j)
             phi_bar_j = self.normalize_test_function(phi_j)
-
-            # Modulate y and append to Y_ULS
             y_j = self.compute_modulated_signal(y, phi_bar_j).reshape(-1, 1)
-            Y_ULS = np.vstack([Y_ULS, y_j])  # (N'*(m+1), 1)
-
-            # Modulate each regressor and append to Phi_ULS vertically
+            y_augmented = np.vstack([y_augmented, y_j])  # (N'*(m+1), 1)
             modulated_terms = np.zeros((modulated_length, num_terms))
             for term in range(num_terms):
                 x_j = self.compute_modulated_signal(psi[:, term], phi_bar_j)
                 modulated_terms[:, term] = x_j
-            Phi_ULS = np.vstack([Phi_ULS, modulated_terms])  # (N'*(m+1), k)
 
-        return Y_ULS, Phi_ULS
+            psi_augmented = np.vstack([psi_augmented, modulated_terms])  # (N'*(m+1), k)
+
+        return y_augmented, psi_augmented
 
     def sobolev_error_reduction_ratio(
         self,
@@ -259,50 +252,57 @@ class UOFR(OFRBase):
         m: int = 2,
         test_support: int = 5,
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """Define Ultra-OFR ERR algorithm."""
+        """Define Ultra Orthogonal Least Squares."""
         y = y[self.max_lag :, 0].reshape(-1, 1)
-        # squared_y = np.dot(y.T, y)
-        # tmp_psi = psi.copy()
+        y_augmented, psi_augmented = self.augment_uls_terms(y, psi, m, test_support)
+        y_augmented = y_augmented.reshape(-1, 1)
+        # Compute ERR on the augmented ULS matrix
+        squared_y = np.dot(y_augmented.T, y_augmented)
+        psi_working = psi_augmented.copy()
+        y_working = y_augmented.copy()
+        num_terms = psi_working.shape[1]
+        piv = np.arange(num_terms)
+        candidate_err = np.zeros(num_terms)
+        err = np.zeros(num_terms)
 
-        # Step 1: Augment signals with ULS terms
-        Y_ULS, Phi_ULS = self.augment_uls_terms(y, psi, m, test_support)
-        Y_ULS = Y_ULS.reshape(-1, 1)
-        # Step 2: Compute ERR on the augmented ULS matrix (use your existing OFR logic)
-        squared_y = np.dot(Y_ULS.T, Y_ULS)
-        tmp_psi = Phi_ULS.copy()
-        tmp_y = Y_ULS.copy()
-        dimension = tmp_psi.shape[1]
-        piv = np.arange(dimension)
-        tmp_err = np.zeros(dimension)
-        err = np.zeros(dimension)
-
-        for i in np.arange(0, dimension):
-            for j in np.arange(i, dimension):
-                tmp_err[j] = (
-                    (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2)
+        for step_idx in np.arange(0, num_terms):
+            for term_idx in np.arange(step_idx, num_terms):
+                candidate_err[term_idx] = (
+                    (
+                        np.dot(psi_working[step_idx:, term_idx].T, y_working[step_idx:])
+                        ** 2
+                    )
                     / (
-                        (np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) + self.alpha)
+                        (
+                            np.dot(
+                                psi_working[step_idx:, term_idx].T,
+                                psi_working[step_idx:, term_idx],
+                            )
+                            + self.alpha
+                        )
                         * squared_y
                     )
                     + self.eps
                 )[0, 0]
 
-            piv_index = np.argmax(tmp_err[i:]) + i
-            err[i] = tmp_err[piv_index]
-            if i == process_term_number:
+            max_err_idx = np.argmax(candidate_err[step_idx:]) + step_idx
+            err[step_idx] = candidate_err[max_err_idx]
+            if step_idx == process_term_number:
                 break
 
-            if (self.err_tol is not None) and (err.cumsum()[i] >= self.err_tol):
-                self.n_terms = i + 1
-                process_term_number = i + 1
+            if (self.err_tol is not None) and (err.cumsum()[step_idx] >= self.err_tol):
+                self.n_terms = step_idx + 1
+                process_term_number = step_idx + 1
                 break
 
-            tmp_psi[:, [piv_index, i]] = tmp_psi[:, [i, piv_index]]
-            piv[[piv_index, i]] = piv[[i, piv_index]]
-            v = house(tmp_psi[i:, i])
-            row_result = rowhouse(tmp_psi[i:, i:], v)
-            tmp_y[i:] = rowhouse(tmp_y[i:], v)
-            tmp_psi[i:, i:] = np.copy(row_result)
+            psi_working[:, [max_err_idx, step_idx]] = psi_working[
+                :, [step_idx, max_err_idx]
+            ]
+            piv[[max_err_idx, step_idx]] = piv[[step_idx, max_err_idx]]
+            reflector = house(psi_working[step_idx:, step_idx])
+            row_result = rowhouse(psi_working[step_idx:, step_idx:], reflector)
+            y_working[step_idx:] = rowhouse(y_working[step_idx:], reflector)
+            psi_working[step_idx:, step_idx:] = np.copy(row_result)
 
         tmp_piv = piv[0:process_term_number]
         psi_orthogonal = psi[:, tmp_piv]
