@@ -218,7 +218,7 @@ def test_model_predict_fourier_value_error():
     assert_raises(
         ValueError,
         model._basis_function_n_step_prediction,
-        X=X_test,
+        x=X_test,
         y=y_test,
         steps_ahead=1,
         forecast_horizon=None,
@@ -239,7 +239,7 @@ def test_model_predict_fourier_horizon_error():
     assert_raises(
         ValueError,
         model._basis_function_n_steps_horizon,
-        X=X_test,
+        x=X_test,
         y=y_test,
         steps_ahead=1,
         forecast_horizon=10,

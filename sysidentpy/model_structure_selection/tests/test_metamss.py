@@ -31,7 +31,7 @@ def test_metamss():
         [[1001, 0], [2002, 0], [2001, 1001]]  # y(k-1)  # x1(k-2)  # x1(k-1)y(k-1)
     )
     basis_function = Polynomial(degree=2)
-    X_train, X_test, y_train, y_test = get_siso_data(
+    x_train, x_test, y_train, y_test = get_siso_data(
         n=1000, colored_noise=False, sigma=0.0001, train_percentage=90
     )
 
@@ -44,7 +44,7 @@ def test_metamss():
         random_state=42,
         test_size=0.1,
     )
-    model.fit(X=X_train, y=y_train)
+    model.fit(X=x_train, y=y_train)
     assert_array_equal(model.final_model, model_code)
 
 

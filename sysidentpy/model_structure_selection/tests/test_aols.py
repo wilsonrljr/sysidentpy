@@ -89,7 +89,7 @@ def test_model_predict_fourier_steps_none():
         basis_function=basis_function,
     )
     model.fit(X=X_train, y=y_train)
-    yhat = model._basis_function_predict(X=X_test, y_initial=y_test)
+    yhat = model._basis_function_predict(x=X_test, y_initial=y_test)
     assert_almost_equal(yhat.mean(), y_test.mean(), decimal=1)
 
 

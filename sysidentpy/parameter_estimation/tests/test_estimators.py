@@ -1,6 +1,6 @@
 from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.basis_function import Polynomial
-from sysidentpy.narmax_base import build_input_output_matrix
+from sysidentpy.utils.information_matrix import build_input_output_matrix
 from sysidentpy.parameter_estimation import (
     BoundedVariableLeastSquares,
     LeastSquaresMinimalResidual,
@@ -54,7 +54,7 @@ def create_test_data(n=1000):
 
 x, y, theta = create_test_data()
 max_lag = 2
-lagged_data = build_input_output_matrix(X=x, y=y, xlag=2, ylag=2)[:, :]
+lagged_data = build_input_output_matrix(x=x, y=y, xlag=2, ylag=2)[:, :]
 
 psi = Polynomial(degree=2).fit(lagged_data, max_lag, predefined_regressors=None)
 

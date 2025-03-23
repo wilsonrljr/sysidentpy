@@ -877,7 +877,7 @@ def test_basis_n_step():
 
     model.fit(X=X_train, y=y_train)
     yhat = model._basis_function_n_step_prediction(
-        X=X_test, y=y_test, steps_ahead=2, forecast_horizon=1
+        x=X_test, y=y_test, steps_ahead=2, forecast_horizon=1
     )
     assert isinstance(yhat, np.ndarray)
 

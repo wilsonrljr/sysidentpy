@@ -1,5 +1,4 @@
 import pytest
-import os
 import pickle as pk
 from sysidentpy.utils.save_load import save_model, load_model
 
