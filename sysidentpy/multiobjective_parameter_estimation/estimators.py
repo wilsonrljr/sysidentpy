@@ -5,7 +5,7 @@ from typing import Tuple, List
 import numpy as np
 
 from sysidentpy.basis_function import Polynomial
-from sysidentpy.narmax_base import build_input_output_matrix
+from sysidentpy.utils.information_matrix import build_input_output_matrix
 from sysidentpy.narmax_base import RegressorDictionary
 from sysidentpy.utils.simulation import (
     get_index_from_regressor_code,
@@ -180,7 +180,7 @@ class AILS:
         return R, get_term_clustering(qit)
 
     def build_static_function_information(
-        self, X_static: np.ndarray, y_static: np.ndarray
+        self, x_static: np.ndarray, y_static: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Construct a matrix of static regressors for a NARMAX model.
 
@@ -188,7 +188,7 @@ class AILS:
         ----------
         y_static : array-like, shape (n_samples_static_function,)
             Output of the static function.
-        X_static : array-like, shape (n_samples_static_function,)
+        x_static : array-like, shape (n_samples_static_function,)
             Static function input.
 
         Returns
@@ -213,7 +213,7 @@ class AILS:
         R, qit = self.build_linear_mapping()
         Q = y_static ** qit[:, 0]
         for k in range(self.n_inputs):
-            Q *= X_static ** qit[:, 1 + k]
+            Q *= x_static ** qit[:, 1 + k]
 
         Q = Q.reshape(len(y_static), len(qit))
 
@@ -223,7 +223,7 @@ class AILS:
         return QR, static_covariance, static_response
 
     def build_static_gain_information(
-        self, X_static: np.ndarray, y_static: np.ndarray, gain: np.ndarray
+        self, x_static: np.ndarray, y_static: np.ndarray, gain: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Construct a matrix of static regressors referring to the derivative (gain).
 
@@ -231,7 +231,7 @@ class AILS:
         ----------
         y_static : array-like, shape (n_samples_static_function,)
             Output of the static function.
-        X_static : array-like, shape (n_samples_static_function,)
+        x_static : array-like, shape (n_samples_static_function,)
             Static function input.
         gain : array-like, shape (n_samples_static_gain,)
             Static gain input.
@@ -269,13 +269,13 @@ class AILS:
                         0
                     ]
                 for k in range(self.n_inputs):
-                    if X_static[i, k] == 0:
+                    if x_static[i, k] == 0:
                         if (qit[j, 1 + k]) == 1:
                             G[i, j] = 1
                         else:
                             G[i, j] = 0
                     else:
-                        G[i, j] = qit[j, 1 + k] * X_static[i, k] ** (qit[j, 1 + k] - 1)
+                        G[i, j] = qit[j, 1 + k] * x_static[i, k] ** (qit[j, 1 + k] - 1)
 
         HR = (G + H).dot(R)
         gain_covariance = HR.T.dot(HR)
@@ -388,7 +388,7 @@ class AILS:
         pivv = get_index_from_regressor_code(regressor_code, self.final_model)
         self.final_model = regressor_code[pivv]
 
-        lagged_data = build_input_output_matrix(X=X, y=y, xlag=xlag, ylag=ylag)
+        lagged_data = build_input_output_matrix(x=X, y=y, xlag=xlag, ylag=ylag)
 
         psi = Polynomial(degree=self.degree).fit(
             lagged_data,
