@@ -1,9 +1,7 @@
 from itertools import chain, combinations_with_replacement
-from typing import Any, List, Tuple, Union, Optional
+from typing import List
 
 import numpy as np
-
-from .check_arrays import num_features
 
 
 def get_index_from_regressor_code(regressor_code: np.ndarray, model_code: List[int]):
