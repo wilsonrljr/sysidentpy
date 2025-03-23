@@ -6,10 +6,10 @@
 from typing import Tuple, Union, Optional
 
 import numpy as np
-from numpy import linalg as LA
+from numpy.linalg import norm
 
 from ..narmax_base import BaseMSS
-from ..narmax_base import prepare_data
+from sysidentpy.utils.information_matrix import build_lagged_matrix
 from ..basis_function import Fourier, Polynomial
 from ..parameter_estimation.estimators import (
     LeastSquares,
@@ -223,49 +223,54 @@ class AOLS(BaseMSS):
         r = y[self.max_lag :].reshape(-1, 1).copy()
         it = 0
         max_iter = int(min(self.k, np.floor(n / self.L)))
-        aols_index = np.zeros(max_iter * self.L)
-        U = np.zeros([n, max_iter * self.L])
-        T = psi.copy()
-        while LA.norm(r) > self.threshold and it < max_iter:
+        selected_indices = np.zeros(max_iter * self.L)
+        basis_matrix = np.zeros([n, max_iter * self.L])
+        transformed_psi = psi.copy()
+        while norm(r) > self.threshold and it < max_iter:
             it = it + 1
-            temp_in = (it - 1) * self.L
+            offset = (it - 1) * self.L
             if it > 1:
-                T = T - U[:, temp_in].reshape(-1, 1) @ (
-                    U[:, temp_in].reshape(-1, 1).T @ psi
-                )
+                transformed_psi = transformed_psi - basis_matrix[:, offset].reshape(
+                    -1, 1
+                ) @ (basis_matrix[:, offset].reshape(-1, 1).T @ psi)
 
-            q = ((r.T @ psi) / np.sum(psi * T, axis=0)).ravel()
-            TT = np.sum(T**2, axis=0) * (q**2)
-            sub_ind = list(aols_index[:temp_in].astype(int))
-            TT[sub_ind] = 0
-            sorting_indices = np.argsort(TT)[::-1].ravel()
-            aols_index[temp_in : temp_in + self.L] = sorting_indices[: self.L]
+            q = ((r.T @ psi) / np.sum(psi * transformed_psi, axis=0)).ravel()
+            contribution = np.sum(transformed_psi**2, axis=0) * (q**2)
+            sub_ind = list(selected_indices[:offset].astype(int))
+            contribution[sub_ind] = 0
+            sorted_indices = np.argsort(contribution)[::-1].ravel()
+            selected_indices[offset : offset + self.L] = sorted_indices[: self.L]
             for i in range(self.L):
-                TEMP = T[:, sorting_indices[i]].reshape(-1, 1) * q[sorting_indices[i]]
-                U[:, temp_in + i] = (TEMP / np.linalg.norm(TEMP, axis=0)).ravel()
-                r = r - TEMP
+                temp = (
+                    transformed_psi[:, sorted_indices[i]].reshape(-1, 1)
+                    * q[sorted_indices[i]]
+                )
+                basis_matrix[:, offset + i] = (
+                    temp / np.linalg.norm(temp, axis=0)
+                ).ravel()
+                r = r - temp
                 if i == self.L:
                     break
 
-                T = T - U[:, temp_in + i].reshape(-1, 1) @ (
-                    U[:, temp_in + i].reshape(-1, 1).T @ psi
-                )
-                q = ((r.T @ psi) / np.sum(psi * T, axis=0)).ravel()
+                transformed_psi = transformed_psi - basis_matrix[:, offset + i].reshape(
+                    -1, 1
+                ) @ (basis_matrix[:, offset + i].reshape(-1, 1).T @ psi)
+                q = ((r.T @ psi) / np.sum(psi * transformed_psi, axis=0)).ravel()
 
-        aols_index = aols_index[aols_index > 0].ravel().astype(int)
-        residual_norm = LA.norm(r)
-        theta[aols_index] = self.estimator.optimize(
-            psi[:, aols_index], y[self.max_lag :, 0].reshape(-1, 1)
+        selected_indices = selected_indices[selected_indices > 0].ravel().astype(int)
+        residual_norm = norm(r)
+        theta[selected_indices] = self.estimator.optimize(
+            psi[:, selected_indices], y[self.max_lag :, 0].reshape(-1, 1)
         )
         if self.L > 1:
-            sorting_indices = np.argsort(np.abs(theta))[::-1]
-            aols_index = sorting_indices[: self.k].ravel().astype(int)
-            theta[aols_index] = self.estimator.optimize(
-                psi[:, aols_index], y[self.max_lag :, 0].reshape(-1, 1)
+            sorted_indices = np.argsort(np.abs(theta))[::-1]
+            selected_indices = sorted_indices[: self.k].ravel().astype(int)
+            theta[selected_indices] = self.estimator.optimize(
+                psi[:, selected_indices], y[self.max_lag :, 0].reshape(-1, 1)
             )
-            residual_norm = LA.norm(
+            residual_norm = norm(
                 y[self.max_lag :].reshape(-1, 1)
-                - psi[:, aols_index] @ theta[aols_index]
+                - psi[:, selected_indices] @ theta[selected_indices]
             )
 
         pivv = np.argwhere(theta.ravel() != 0).ravel()
@@ -306,7 +311,7 @@ class AOLS(BaseMSS):
             raise ValueError("y cannot be None")
 
         self.max_lag = self._get_max_lag()
-        lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
+        lagged_data = build_lagged_matrix(X, y, self.xlag, self.ylag, self.model_type)
         reg_matrix = self.basis_function.fit(
             lagged_data,
             self.max_lag,
@@ -407,7 +412,7 @@ class AOLS(BaseMSS):
         return yhat
 
     def _one_step_ahead_prediction(
-        self, X: Optional[np.ndarray], y: Optional[np.ndarray]
+        self, x: Optional[np.ndarray], y: Optional[np.ndarray]
     ) -> np.ndarray:
         """Perform the 1-step-ahead prediction of a model.
 
@@ -416,7 +421,7 @@ class AOLS(BaseMSS):
         y : array-like of shape = max_lag
             Initial conditions values of the model
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        x : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
@@ -425,8 +430,8 @@ class AOLS(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        lagged_data = prepare_data(X, y, self.xlag, self.ylag, self.model_type)
-        X_base = self.basis_function.transform(
+        lagged_data = build_lagged_matrix(x, y, self.xlag, self.ylag, self.model_type)
+        x_base = self.basis_function.transform(
             lagged_data,
             self.max_lag,
             self.ylag,
@@ -435,12 +440,12 @@ class AOLS(BaseMSS):
             predefined_regressors=self.pivv[: len(self.final_model)],
         )
 
-        yhat = super()._one_step_ahead_prediction(X_base)
+        yhat = super()._one_step_ahead_prediction(x_base)
         return yhat.reshape(-1, 1)
 
     def _n_step_ahead_prediction(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y: Optional[np.ndarray],
         steps_ahead: Optional[int],
     ) -> np.ndarray:
@@ -463,12 +468,12 @@ class AOLS(BaseMSS):
                The n-steps-ahead predicted values of the model.
 
         """
-        yhat = super()._n_step_ahead_prediction(X, y, steps_ahead)
+        yhat = super()._n_step_ahead_prediction(x, y, steps_ahead)
         return yhat
 
     def _model_prediction(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y_initial: Optional[np.ndarray],
         forecast_horizon: int = 1,
     ) -> np.ndarray:
@@ -489,9 +494,9 @@ class AOLS(BaseMSS):
 
         """
         if self.model_type in ["NARMAX", "NAR"]:
-            return self._narmax_predict(X, y_initial, forecast_horizon)
+            return self._narmax_predict(x, y_initial, forecast_horizon)
         if self.model_type == "NFIR":
-            return self._nfir_predict(X, y_initial)
+            return self._nfir_predict(x, y_initial)
 
         raise ValueError(
             f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
@@ -499,7 +504,7 @@ class AOLS(BaseMSS):
 
     def _narmax_predict(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y_initial: Optional[np.ndarray],
         forecast_horizon: int = 1,
     ) -> np.ndarray:
@@ -509,43 +514,43 @@ class AOLS(BaseMSS):
                 f" {self.max_lag} elements."
             )
 
-        if X is not None:
-            forecast_horizon = X.shape[0]
+        if x is not None:
+            forecast_horizon = x.shape[0]
         else:
             forecast_horizon = forecast_horizon + self.max_lag
 
         if self.model_type == "NAR":
             self.n_inputs = 0
 
-        y_output = super()._narmax_predict(X, y_initial, forecast_horizon)
+        y_output = super()._narmax_predict(x, y_initial, forecast_horizon)
         return y_output
 
     def _nfir_predict(
-        self, X: Optional[np.ndarray], y_initial: Optional[np.ndarray]
+        self, x: Optional[np.ndarray], y_initial: Optional[np.ndarray]
     ) -> np.ndarray:
-        y_output = super()._nfir_predict(X, y_initial)
+        y_output = super()._nfir_predict(x, y_initial)
         return y_output
 
     def _basis_function_predict(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y_initial: Optional[np.ndarray],
         forecast_horizon: int = 1,
     ) -> np.ndarray:
-        if X is not None:
-            forecast_horizon = X.shape[0]
+        if x is not None:
+            forecast_horizon = x.shape[0]
         else:
             forecast_horizon = forecast_horizon + self.max_lag
 
         if self.model_type == "NAR":
             self.n_inputs = 0
 
-        yhat = super()._basis_function_predict(X, y_initial, forecast_horizon)
+        yhat = super()._basis_function_predict(x, y_initial, forecast_horizon)
         return yhat.reshape(-1, 1)
 
     def _basis_function_n_step_prediction(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y: Optional[np.ndarray],
         steps_ahead: Optional[int],
         forecast_horizon: int,
@@ -557,7 +562,7 @@ class AOLS(BaseMSS):
         y : array-like of shape = max_lag
             Initial conditions values of the model
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        x : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
@@ -572,24 +577,24 @@ class AOLS(BaseMSS):
                 f" {self.max_lag} elements."
             )
 
-        if X is not None:
-            forecast_horizon = X.shape[0]
+        if x is not None:
+            forecast_horizon = x.shape[0]
         else:
             forecast_horizon = forecast_horizon + self.max_lag
 
         yhat = super()._basis_function_n_step_prediction(
-            X, y, steps_ahead, forecast_horizon
+            x, y, steps_ahead, forecast_horizon
         )
         return yhat.reshape(-1, 1)
 
     def _basis_function_n_steps_horizon(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y: Optional[np.ndarray],
         steps_ahead: Optional[int],
         forecast_horizon: int,
     ) -> np.ndarray:
         yhat = super()._basis_function_n_steps_horizon(
-            X, y, steps_ahead, forecast_horizon
+            x, y, steps_ahead, forecast_horizon
         )
         return yhat.reshape(-1, 1)
