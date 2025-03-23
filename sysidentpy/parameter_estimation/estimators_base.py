@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 
 import numpy as np
 
-from sysidentpy.narmax_base import build_output_matrix
+from sysidentpy.utils.information_matrix import build_output_matrix
 
 
 def _initial_values(psi: np.ndarray):
