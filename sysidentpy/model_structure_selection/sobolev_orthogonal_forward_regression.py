@@ -61,7 +61,7 @@ class UOFR(OFRBase):
     The NARMAX model is described as:
 
     $$
-        y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1},
+        y_k= F[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1},
         \dotsc, x_{k-d-n_x}, e_{k-1}, \dotsc, e_{k-n_e}] + e_k
     $$
 
@@ -70,9 +70,9 @@ class UOFR(OFRBase):
     $x_k \in \mathbb{R}^{n_x}$ is the system input and $y_k \in \mathbb{R}^{n_y}$
     is the system output at discrete time $k \in \mathbb{N}^n$;
     $e_k \in \mathbb{R}^{n_e}4 stands for uncertainties and possible noise
-    at discrete time $k$. In this case, $\mathcal{F}^\ell$ is some nonlinear function
-    of the input and output regressors with nonlinearity degree $\ell \in \mathbb{N}$
-    and $d$ is a time delay typically set to $d=1$.
+    at discrete time $k$. In this case, $\mathcal{F}$ is some nonlinear function
+    of the input and output regressors and $d$ is a time delay typically set to
+     $d=1$.
 
     Parameters
     ----------
