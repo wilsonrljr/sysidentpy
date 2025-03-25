@@ -1,10 +1,7 @@
 from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.basis_function import Polynomial
 from sysidentpy.utils.information_matrix import build_input_output_matrix
-from sysidentpy.parameter_estimation import (
-    BoundedVariableLeastSquares,
-    LeastSquaresMinimalResidual,
-)
+
 
 from sysidentpy.parameter_estimation.estimators import (
     LeastSquares,
@@ -24,6 +21,8 @@ from sysidentpy.parameter_estimation.estimators import (
     NormalizedLeastMeanSquares,
     NormalizedLeastMeanSquaresSignError,
     LeastMeanSquaresSignRegressor,
+    BoundedVariableLeastSquares,
+    LeastSquaresMinimalResidual,
 )
 
 
