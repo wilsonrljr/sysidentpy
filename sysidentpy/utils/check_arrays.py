@@ -55,7 +55,7 @@ def check_positive_int(value, name):
 
 
 def check_infinity(x, y):
-    """Check that X and y have no NaN or Inf samples.
+    """Check that x and y have no NaN or Inf samples.
 
     If there is any NaN or Inf samples a ValueError is raised.
 
@@ -83,7 +83,7 @@ def check_infinity(x, y):
 
 
 def check_nan(x, y):
-    """Check that X and y have no NaN or Inf samples.
+    """Check that x and y have no NaN or Inf samples.
 
     If there is any NaN or Inf samples a ValueError is raised.
 
@@ -113,7 +113,7 @@ def check_nan(x, y):
 def check_length(x, y):
     """Check that x and y have the same number of samples.
 
-    If the length of X and y are different a ValueError is raised.
+    If the length of x and y are different a ValueError is raised.
 
     Parameters
     ----------

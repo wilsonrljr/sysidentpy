@@ -362,7 +362,7 @@ class NARX(BaseMSS):
         y : array-like of shape = max_lag
             Initial conditions values of the model
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        x : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
         steps_ahead : int (default = None)
             The user can use free run simulation, one-step ahead prediction
@@ -388,7 +388,7 @@ class NARX(BaseMSS):
         y_initial : array-like of shape = max_lag
             Number of initial conditions values of output
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        x : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
         forecast_horizon : int, default=None
             The number of predictions over the time.

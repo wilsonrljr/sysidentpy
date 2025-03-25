@@ -173,8 +173,8 @@ class NARXNN(BaseMSS):
     ...         return z
     >>>
     >>> narx_nn.net = Net()
-    >>> neural_narx.fit(X=x_train, y=y_train)
-    >>> yhat = neural_narx.predict(X=x_valid, y=y_valid)
+    >>> neural_narx.fit(x=x_train, y=y_train)
+    >>> yhat = neural_narx.predict(x=x_valid, y=y_valid)
     >>> print(mean_squared_error(y_valid, yhat))
     0.000131
 

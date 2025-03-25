@@ -281,7 +281,7 @@ class AOLS(BaseMSS):
         """Fit polynomial NARMAX model using AOLS algorithm.
 
         The 'fit' function allows a friendly usage by the user.
-        Given two arguments, X and y, fit training data.
+        Given two arguments, x and y, fit training data.
 
         Parameters
         ----------
@@ -456,7 +456,7 @@ class AOLS(BaseMSS):
         y : array-like of shape = max_lag
             Initial conditions values of the model
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        x : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
         steps_ahead : int (default = None)
             The user can use free run simulation, one-step ahead prediction
@@ -484,7 +484,7 @@ class AOLS(BaseMSS):
         y_initial : array-like of shape = max_lag
             Number of initial conditions values of output
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        x : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns

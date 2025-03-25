@@ -297,7 +297,7 @@ class FROLS(OFRBase):
         """Fit polynomial NARMAX model.
 
         This is an 'alpha' version of the 'fit' function which allows
-        a friendly usage by the user. Given two arguments, X and y, fit
+        a friendly usage by the user. Given two arguments, x and y, fit
         training data.
 
         Parameters

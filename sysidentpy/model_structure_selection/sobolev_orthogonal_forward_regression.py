@@ -227,20 +227,20 @@ class UOFR(OFRBase):
         t = np.linspace(-3, 3, test_support)
 
         # Initialize y_augmented and psi_augmented with original truncated signals
-        y_augmented = y[:modulated_length].reshape(-1, 1)  # (N', 1)
-        psi_augmented = psi[:modulated_length, :]  # (N', k)
+        y_augmented = y[:modulated_length].reshape(-1, 1)
+        psi_augmented = psi[:modulated_length, :]
 
         for j in range(1, m + 1):
             phi_j = self.gaussian_test_function(t, order=j)
             phi_bar_j = self.normalize_test_function(phi_j)
             y_j = self.compute_modulated_signal(y, phi_bar_j).reshape(-1, 1)
-            y_augmented = np.vstack([y_augmented, y_j])  # (N'*(m+1), 1)
+            y_augmented = np.vstack([y_augmented, y_j])
             modulated_terms = np.zeros((modulated_length, num_terms))
             for term in range(num_terms):
                 x_j = self.compute_modulated_signal(psi[:, term], phi_bar_j)
                 modulated_terms[:, term] = x_j
 
-            psi_augmented = np.vstack([psi_augmented, modulated_terms])  # (N'*(m+1), k)
+            psi_augmented = np.vstack([psi_augmented, modulated_terms])
 
         return y_augmented, psi_augmented
 
@@ -317,7 +317,7 @@ class UOFR(OFRBase):
         """Fit polynomial NARMAX model.
 
         This is an 'alpha' version of the 'fit' function which allows
-        a friendly usage by the user. Given two arguments, X and y, fit
+        a friendly usage by the user. Given two arguments, x and y, fit
         training data.
 
         Parameters

@@ -770,7 +770,7 @@ def test_nfir_predict_output_shape():
         },  # optional parameters of the optimizer
     )
 
-    # X = np.random.rand(10, model.n_inputs)
+    # x = np.random.rand(10, model.n_inputs)
     # y_initial = np.random.rand(10, 1)
     model.fit(
         X=X_train[:30].reshape(-1, 1),

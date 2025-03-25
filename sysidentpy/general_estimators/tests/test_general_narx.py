@@ -257,7 +257,7 @@ def test_model_predict_nfir_cat():
     )
 
     model.fit(X=X_train, y=y_train)
-    # yhat = model.predict(X=x_valid, y=y_valid)
+    # yhat = model.predict(x=x_valid, y=y_valid)
     assert_equal(model.max_lag, 10)
 
 
@@ -272,7 +272,7 @@ def test_model_predict_steps_1():
     )
 
     model.fit(X=X_train, y=y_train)
-    # yhat = model.predict(X=x_valid, y=y_valid, steps_ahead=1)
+    # yhat = model.predict(x=x_valid, y=y_valid, steps_ahead=1)
     assert_equal(model.max_lag, 2)
 
 

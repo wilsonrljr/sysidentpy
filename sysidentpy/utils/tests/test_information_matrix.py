@@ -7,7 +7,7 @@ from numpy.testing import (
 
 from sysidentpy.utils.information_matrix import (
     shift_column,
-    _create_lagged_X,
+    _create_lagged_x,
     _create_lagged_y,
     initial_lagged_matrix,
     build_input_matrix,
@@ -149,7 +149,7 @@ def test_shift_column():
 
 def test_create_lagged_x():
     X = np.array([1, 2, 3, 4, 5, 6]).reshape(-1, 1)
-    r = _create_lagged_X(X=X, n_inputs=1, xlag=[1, 2])
+    r = _create_lagged_x(x=X, n_inputs=1, xlag=[1, 2])
     assert_equal(
         r,
         np.array(
@@ -160,7 +160,7 @@ def test_create_lagged_x():
 
 def test_create_lagged_x_miso():
     X = np.array(range(1, 13)).reshape(-1, 2)
-    r = _create_lagged_X(X=X, n_inputs=2, xlag=[[1, 2], [1, 2]])
+    r = _create_lagged_x(x=X, n_inputs=2, xlag=[[1, 2], [1, 2]])
     assert_equal(
         r,
         np.array(

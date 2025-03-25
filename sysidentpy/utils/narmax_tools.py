@@ -147,9 +147,9 @@ def train_test_split(
     Returns
     -------
     X_train : np.ndarray or None
-        The training set feature matrix, or None if X is None.
+        The training set feature matrix, or None if x is None.
     X_test : np.ndarray or None
-        The testing set feature matrix, or None if X is None.
+        The testing set feature matrix, or None if x is None.
     y_train : np.ndarray
         The training set target vector.
     y_test : np.ndarray

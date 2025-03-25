@@ -521,7 +521,7 @@ class ER(BaseMSS):
         """Fit polynomial NARMAX model using AOLS algorithm.
 
         The 'fit' function allows a friendly usage by the user.
-        Given two arguments, X and y, fit training data.
+        Given two arguments, x and y, fit training data.
 
         The Entropic Regression algorithm is based on the Matlab package available on:
         https://github.com/almomaa/ERFit-Package

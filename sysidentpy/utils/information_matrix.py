@@ -36,12 +36,12 @@ def shift_column(col_to_shift: np.ndarray, lag: int) -> np.ndarray:
     return tmp_column
 
 
-def _create_lagged_X(X: np.ndarray, n_inputs: int, xlag) -> np.ndarray:
+def _create_lagged_x(x: np.ndarray, n_inputs: int, xlag) -> np.ndarray:
     """Create a lagged matrix of input variables without interaction terms.
 
     Parameters
     ----------
-    X : array-like
+    x : array-like
         Input data used during the training phase.
     n_inputs : int
         The number of input variables.
@@ -53,16 +53,16 @@ def _create_lagged_X(X: np.ndarray, n_inputs: int, xlag) -> np.ndarray:
 
     """
     if n_inputs == 1:
-        x_lagged = np.column_stack([shift_column(X[:, 0], lag) for lag in xlag])
+        x_lagged = np.column_stack([shift_column(x[:, 0], lag) for lag in xlag])
     else:
-        x_lagged = np.zeros([len(X), 1])  # just to stack other columns
+        x_lagged = np.zeros([len(x), 1])  # just to stack other columns
         # if user input a nested list like [[1, 2], 4], the following
         # line convert it to [[1, 2], [4]].
         # Remember, for multiple inputs all lags must be entered explicitly
         xlag = [[i] if isinstance(i, int) else i for i in xlag]
         for col in range(n_inputs):
             x_lagged_col = np.column_stack(
-                [shift_column(X[:, col], lag) for lag in xlag[col]]
+                [shift_column(x[:, col], lag) for lag in xlag[col]]
             )
             x_lagged = np.column_stack([x_lagged, x_lagged_col])
 
@@ -112,12 +112,12 @@ def initial_lagged_matrix(x: np.ndarray, y: np.ndarray, xlag, ylag) -> np.ndarra
     Examples
     --------
     If `xlag=2` and `ylag=2`, the resulting matrix will contain columns:
-    Y[k-1], Y[k-2], X[k-1], X[k-2].
+    Y[k-1], Y[k-2], x[k-1], x[k-2].
 
     """
     n_inputs, xlag = _process_xlag(x, xlag)
     ylag = _process_ylag(ylag)
-    x_lagged = _create_lagged_X(x, n_inputs, xlag)
+    x_lagged = _create_lagged_x(x, n_inputs, xlag)
     y_lagged = _create_lagged_y(y, ylag)
     lagged_data = np.concatenate([y_lagged, x_lagged], axis=1)
     return lagged_data
@@ -143,11 +143,10 @@ def build_output_matrix(y, ylag: np.ndarray) -> np.ndarray:
         The constructed output regressor matrix.
 
     """
-    # Generate a lagged data which each column is a input or output
+    # Generate a lagged data which each column is an input or output
     # related to its respective lags. With this approach we can create
     # the information matrix by using all possible combination of
     # the columns as a product in the iterations
-    # y = args[1]  # args[0] is X=None in NAR scenario
     ylag = _process_ylag(ylag)
     y_lagged = _create_lagged_y(y, ylag)
     constant = np.ones([y_lagged.shape[0], 1])
@@ -181,7 +180,7 @@ def build_input_matrix(x, xlag: np.ndarray) -> np.ndarray:
     # the columns as a product in the iterations
 
     n_inputs, xlag = _process_xlag(x, xlag)
-    x_lagged = _create_lagged_X(x, n_inputs, xlag)
+    x_lagged = _create_lagged_x(x, n_inputs, xlag)
     constant = np.ones([x_lagged.shape[0], 1])
     data = np.concatenate([constant, x_lagged], axis=1)
     return data
