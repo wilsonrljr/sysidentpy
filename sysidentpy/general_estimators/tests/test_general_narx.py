@@ -218,7 +218,7 @@ def test_model_predict_fourier_value_error():
     assert_raises(
         ValueError,
         model._basis_function_n_step_prediction,
-        X=X_test,
+        x=X_test,
         y=y_test,
         steps_ahead=1,
         forecast_horizon=None,
@@ -239,7 +239,7 @@ def test_model_predict_fourier_horizon_error():
     assert_raises(
         ValueError,
         model._basis_function_n_steps_horizon,
-        X=X_test,
+        x=X_test,
         y=y_test,
         steps_ahead=1,
         forecast_horizon=10,
@@ -257,7 +257,7 @@ def test_model_predict_nfir_cat():
     )
 
     model.fit(X=X_train, y=y_train)
-    # yhat = model.predict(X=x_valid, y=y_valid)
+    # yhat = model.predict(x=x_valid, y=y_valid)
     assert_equal(model.max_lag, 10)
 
 
@@ -272,7 +272,7 @@ def test_model_predict_steps_1():
     )
 
     model.fit(X=X_train, y=y_train)
-    # yhat = model.predict(X=x_valid, y=y_valid, steps_ahead=1)
+    # yhat = model.predict(x=x_valid, y=y_valid, steps_ahead=1)
     assert_equal(model.max_lag, 2)
 
 
@@ -287,7 +287,6 @@ def test_model_predict_fourier_none():
     )
 
     model.fit(X=X_train, y=y_train)
-    # yhat = model.predict(X=x_valid, y=y_valid)
     assert_equal(model.max_lag, 10)
 
 
@@ -302,7 +301,6 @@ def test_model_predict_fourier_1():
     )
 
     model.fit(X=X_train, y=y_train)
-    # yhat = model.predict(X=x_valid, y=y_valid, steps_ahead=1)
     assert_equal(model.max_lag, 10)
 
 
@@ -317,5 +315,4 @@ def test_model_predict_fourier_n():
     )
 
     model.fit(X=X_train, y=y_train)
-    # yhat = model.predict(X=x_valid, y=y_valid, steps_ahead=3)
     assert_equal(model.max_lag, 10)

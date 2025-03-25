@@ -7,7 +7,7 @@ from sysidentpy.utils.check_arrays import (
     check_infinity,
     check_length,
     check_nan,
-    check_X_y,
+    check_x_y,
 )
 from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
 from sysidentpy.utils.save_load import load_model, save_model
@@ -58,7 +58,7 @@ def test_check_dimension():
 def test_check_X_y():
     X = np.ones([10, 2])
     y = np.ones([8, 1])
-    assert_raises(ValueError, check_X_y, X, y)
+    assert_raises(ValueError, check_x_y, X, y)
 
 
 def test_get_siso_data():

@@ -51,6 +51,9 @@ def get_siso_data(n=5000, colored_noise=False, sigma=0.05, train_percentage=90):
       between training and validation data.
 
     """
+    if train_percentage < 0 or train_percentage > 100:
+        raise ValueError("train_percentage must be smaller than 100")
+
     mu = 0  # mean of the distribution
     nu = np.random.normal(mu, sigma, n).T
     e = np.zeros((n, 1))
@@ -134,6 +137,9 @@ def get_miso_data(n=5000, colored_noise=False, sigma=0.05, train_percentage=90):
       (`x1` or `x2`).
 
     """
+    if train_percentage < 0 or train_percentage > 100:
+        raise ValueError("train_percentage must be smaller than 100")
+
     mu = 0  # mean of the distribution
     nu = np.random.normal(mu, sigma, n).T
     e = np.zeros((n, 1))

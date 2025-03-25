@@ -18,7 +18,7 @@ One important characteristic to model hysteretic systems is the input signal. A 
 
 In this respect, [Martins, S. A. M. and Aguirre, L. A.](https://www.sciencedirect.com/science/article/abs/pii/S0888327015005968) also presented the idea of transforming the inputs of the system using multi-valued functions.
 
-> Multi-valued functions - Let $\phi (\Delta x_{k}): \mathbb{R} \rightarrow \mathbb{R}$. If~$\Delta x_{k}=x_k-x_{k-1}$, $\phi (\Delta x_{k})$ is a multi-valued function if:
+> Multivalued functions - Let $\phi (\Delta x_{k}): \mathbb{R} \rightarrow \mathbb{R}$. If~$\Delta x_{k}=x_k-x_{k-1}$, $\phi (\Delta x_{k})$ is a multivalued function if:
 
 $$
 \begin{equation}
@@ -34,7 +34,7 @@ $$
 
 where $\epsilon \in \mathbb{R}$, $\phi_1 \neq \phi_2 \neq \phi_3$. For some inputs  $\Delta x_{k}\neq \epsilon, \ \forall{k} \in \mathbb{N}$ , and the last value in equation above is not used.
 
-A frequently used multi-valued function is the sign$(\cdot): \mathbb{R} \rightarrow \mathbb{R}$:
+A frequently used multivalued function is the sign$(\cdot): \mathbb{R} \rightarrow \mathbb{R}$:
 
 $$
  \begin{equation}
@@ -107,7 +107,7 @@ where $\overline {x}$ is a loading-unloading quasi-static input signal. Since th
 ![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bounded_structure_example.png?raw=true)
 > Figure 3. Example of a bounding structure $\mathcal{H}$. The black dots are on $\mathcal{H}_{k}(\omega)$ for model $y_k  =  0.8y_{k-1} + 0.4\phi_{k-1} + 0.2x_{k-1}$. The bounding structure $\mathcal{H}$, in red, confines $\mathcal{H}_{k}(\omega)$.}
 
-As can be observed in the Figure 3, in we guarantee the sufficient conditions proposed by [Martins, S. A. M. and Aguirre, L. A.](https://www.sciencedirect.com/science/article/abs/pii/S0888327015005968), a NARX model can reproduce a histeretic behavior. Chapter 10 presents a case study of a system with hysteresis.
+As can be observed in the Figure 3, in we guarantee the sufficient conditions proposed by [Martins, S. A. M. and Aguirre, L. A.](https://www.sciencedirect.com/science/article/abs/pii/S0888327015005968), a NARX model can reproduce a hysteretic behavior. Chapter 10 presents a case study of a system with hysteresis.
 
 The following code can be used to reproduce the behavior shown in Figure 3. Change `w` from $1$ to $0.1$ to see how the bounded structure $\mathcal{H}$ converge to the equilibria of the system.
 

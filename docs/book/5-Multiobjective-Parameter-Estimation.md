@@ -2,13 +2,13 @@ Multiobjective parameter estimation represents a fundamental paradigm shift in t
 
 What does that mean? It means that when we are modeling a dynamical system we are, most of the time, building models that are only good to represent the dynamical behavior of the system under study. Well, that is valid most of the time because we are building dynamical models, so if it doesn't perform well in static scenarios, it won't be a problem. However, that's not always the case and we might build a model that is good in both dynamical and static behavior. In such cases, the methods for purely dynamical systems are not adequate and multiobjective algorithms can help us in such task.
 
-The main idea in multiobjective parameter estimation is the inclusion of the *affine information*. The affine information is an auxiliary information that can be defined *a priori* such as the static gain and the static function of the system. Formally, the affine information can be defined as [follows](https://www.researchgate.net/publication/216771768_Multiobjective_parameter_estimation_for_nonlinear_systems_Affine_information_and_least-squares_formulation):
+The main idea in multiobjective parameter estimation is the inclusion of the *affine information*. The affine information is auxiliary information that can be defined *a priori* such as the static gain and the static function of the system. Formally, the affine information can be defined as [follows](https://www.researchgate.net/publication/216771768_Multiobjective_parameter_estimation_for_nonlinear_systems_Affine_information_and_least-squares_formulation):
 
-Let the parameter vector $\Theta \in \mathbb{R}^{n_{\Theta}}$, a vector $\mathrm{v}\in \mathbb{R}^p$ and a matrix $\mathrm{G}\in \mathbb{R}^{n_{\Theta}\times p}$ where $\mathrm{v}$ and $\mathrm{G}$ are assumed to be accessible. Suppose $\mathrm{G}\Theta$ be an estimate of $\mathrm{v}$. Hence $\mathrm{v} = \mathrm{G}\Theta + \xi$. Then, $[\mathrm{v}, \mathrm{G}]$ is a pair of affine information of the system.
+Let the parameter vector $\Theta \in \mathbb{R}^{n_{\Theta}}$, a vector $\mathrm{v}\in \mathbb{R}^p$ and a matrix $\mathrm{G}\in \mathbb{R}^{n_{\Theta}\times p}$ where $\mathrm{v}$ and $\mathrm{G}$ are assumed to be accessible. Suppose $\mathrm{G}\Theta$ be an estimate of $\mathrm{v}$. Hence, $\mathrm{v} = \mathrm{G}\Theta + \xi$. Then, $[\mathrm{v}, \mathrm{G}]$ is a pair of affine information of the system.
 
 ## Multi-objective optimization problem
 
-Lets define what is a multiobjective problem. Given $m$ objective functions
+Let's define what is a multiobjective problem. Given $m$ objective functions
 
 $$
 \begin{equation}
@@ -30,11 +30,11 @@ $$
 
 where $\Theta$ is an $n$-dimensional vector of the decision variables, $\mathrm{S}$ is the set of feasible solutions bounded by $m$ inequality constraints ($g_i$) and $n$ equality constraints ($h_j$), and $a_i$ and $b_j$ are constants. For continuous variables $A = \mathbb{R}$ while $A$ contains the set of permissible values for discrete variables.
 
-> Usually problems with $1 < m < 4$ are *called multiobjective optimization problems*. When there are more objectives ($m\geq 4$), it is referred as *many-objective optimization problems*, a emergence class of multi-objective problems for solving complex modern real-world tasks. More details can be found in ([Fleming, P. J., Purshouse, R. C., and Lygoe, R. J., "Many-Objective Optimization: An Engineering Design Perspective"](https://www.researchgate.net/publication/216300612_Many-Objective_Optimization_An_Engineering_Design_Perspective)), ([Li, B., Li, J., Tang, K., and Yao, X., "A survey on multi-objective evolutionary algorithms for many-objective problems"](https://link.springer.com/article/10.1007/s10589-014-9644-1)).
+> Usually problems with $1 < m < 4$ are *called multiobjective optimization problems*. When there are more objectives ($m\geq 4$), it is referred as *many-objective optimization problems*, an emergence class of multi-objective problems for solving complex modern real-world tasks. More details can be found in ([Fleming, P. J., Purshouse, R. C., and Lygoe, R. J., "Many-Objective Optimization: An Engineering Design Perspective"](https://www.researchgate.net/publication/216300612_Many-Objective_Optimization_An_Engineering_Design_Perspective)), ([Li, B., Li, J., Tang, K., and Yao, X., "A survey on multi-objective evolutionary algorithms for many-objective problems"](https://link.springer.com/article/10.1007/s10589-014-9644-1)).
 
 ## Pareto Optimal Definition and Pareto Dominance
 
-> Consider $[y^{(1)}, y^{(2)}] \in \mathbb{R}^m$ two vectors in the objective space. If and only if $\forall \in \{1, \ldots, m \}: y_i^{(1)}\leq y_i^{(2)}$ and $\exists j \in \{1, \ldots, m \}: y_j^{(1)} < y_j^{(2)}$ one can said $y^{(1)} \prec y^{(2)}$ ([P. L. Yu, "Cone convexity, cone extreme points, and nondominated solutions in decision problems with multiobjectives"](https://link.springer.com/article/10.1007/BF00932614)).
+> Consider $[y^{(1)}, y^{(2)}] \in \mathbb{R}^m$ two vectors in the objective space. If and only if $\forall \in \{1, \ldots, m \}: y_i^{(1)}\leq y_i^{(2)}$ and $\exists j \in \{1, \ldots, m \}: y_j^{(1)} < y_j^{(2)}$ one can say $y^{(1)} \prec y^{(2)}$ ([P. L. Yu, "Cone convexity, cone extreme points, and non dominated solutions in decision problems with multiobjectives"](https://link.springer.com/article/10.1007/BF00932614)).
 
 The concept of Pareto optimality is generally used to describe the trade-off among the minimization of different objectives. Following the pareto definition: the pareto optimal is any parameter vector representing an efficient solution  where no objective function can be improved without  making at least one objective function worse off will be referred to as a Pareto-model.
 
@@ -62,7 +62,7 @@ $$
 \tag{5.4}
 $$
 
-where $w$ is a combination of weights to the different objectives functions. Therefore the Pareto-set is associated to the set of realizations of $w \in \mathrm{W}$. An efficient single-step computational strategy was presented by ([Nepomuceno, E. G., Takahashi, R. H. C., and Aguirre, L. A., "Multiobjective parameter estimation for non-linear systems: affine information and least-squares formulation"](https://www.tandfonline.com/doi/abs/10.1080/00207170601185053)) for solving Equation 5.4 by means of a Least Squares formulation, which is presented in the following section.
+where $w$ is a combination of weights to the different objectives functions. Therefore, the Pareto-set is associated to the set of realizations of $w \in \mathrm{W}$. An efficient single-step computational strategy was presented by ([Nepomuceno, E. G., Takahashi, R. H. C., and Aguirre, L. A., "Multiobjective parameter estimation for non-linear systems: affine information and least-squares formulation"](https://www.tandfonline.com/doi/abs/10.1080/00207170601185053)) for solving Equation 5.4 by means of a Least Squares formulation, which is presented in the following section.
 
 ## Affine Information Least Squares Algorithm
 
@@ -150,15 +150,15 @@ plt.show()
 
 ### Buck Converter Static Function
 
-The duty cycle, represented by the symbol $D$, is defined as the ratio of the time the system is on ($T_{on}$​) to the total operation cycle time ($T$). Mathematically, this can be expressed as $D=\frac{T_{on}}{T}$. The complement of the duty cycle, represented by $D'$, is defined as the ratio of the time the system is off ($T_{off}$) to the total operation cycle time ($T$) and can be expressed as $D'=\frac{T_{off}}{T}$.
+The duty cycle, represented by the symbol $D$, is defined as the ratio of the time the system is on ($T_{on}$) to the total operation cycle time ($T$). Mathematically, this can be expressed as $D=\frac{T_{on}}{T}$. The complement of the duty cycle, represented by $D'$, is defined as the ratio of the time the system is off ($T_{off}$) to the total operation cycle time ($T$) and can be expressed as $D'=\frac{T_{off}}{T}$.
 
-The load voltage ($V_o$) is related to the source voltage ($V_d$) by the equation $V_o​=D⋅V_d​=(1−D’)⋅V_d$.  For this particular converter, it is known that $D′=\frac{\bar{u}-1}{3}​$,​ which means that the static function of this system can be derived from theory to be:
+The load voltage ($V_o$) is related to the source voltage ($V_d$) by the equation $V_o = D⋅V_d = (1−D')⋅V_d$. For this particular converter, it is known that $D′=\frac{\bar{u}-1}{3}$, which means that the static function of this system can be derived from theory to be:
 
 $$
 V_o = \frac{4V_d}{3} - \frac{V_d}{3}\cdot \bar{u}
 $$
 
-If we assume that the source voltage $V_d$​ is equal to 24 V, then we can rewrite the above expression as follows:
+If we assume that the source voltage $V_d$ is equal to 24 V, then we can rewrite the above expression as follows:
 
 $$
 V_o = (4 - \bar{u})\cdot 8
@@ -191,7 +191,7 @@ $$
 V_o = (4 - \bar{u})\cdot 8
 $$
 
-Taking the derivative of this equation with respect to $\hat{u}$, we find that the gain of the Buck converter is equal to −8. In other words, for every unit increase in the input voltage $\hat{u}$, the output voltage Vo​ will decrease by 8 units, so
+Taking the derivative of this equation with respect to $\hat{u}$, we find that the gain of the Buck converter is equal to −8. In other words, for every unit increase in the input voltage $\hat{u}$, the output voltage Vo will decrease by 8 units, so
 
 $$
 gain=V_o'=-8
@@ -396,7 +396,7 @@ plt.show()
 
 ### Getting the best weight combination based on the norm of the cost function
 
-The variable `position` returned in `estimate` method give the position of the best weight combination. The model structure is exactly the same, but the order of the regressors is changed in estimate method. Thats why you have to change the model.final_model. The dynamic, static gain, and the static function  results for that chosen theta is shown below.
+The variable `position` returned in `estimate` method give the position of the best weight combination. The model structure is exactly the same, but the order of the regressors is changed in estimate method. That's why you have to change the model.final_model. The dynamic, static gain, and the static function  results for that chosen theta is shown below.
 
 ```python
 model.theta = theta[position, :].reshape(
@@ -520,7 +520,7 @@ The $\Psi$ matrix is built using the usual mono-objective dynamic modeling appro
 $$
 q_i^T =
 \begin{bmatrix}
-1 & \overline{y_i} & \overline{u_1} & \overline{y_i}^2 & \cdots & \overline{y_i}^l &  F_{yu} & \overline{u_i}^2 & \cdots & \overline{u_i}^l
+1 & \overline{y_i} & \overline{u_1} & \overline{y_i}^2 & \cdots & \overline{y_i}^l & F_{yu} & \overline{u_i}^2 & \cdots & \overline{u_i}^l
 \end{bmatrix}
 $$
 
@@ -903,7 +903,7 @@ $$
 E_{Python} = 17.474865
 $$
 
-Note: as mentioned before, the order of the regressors in the model change, but it is the same structure. The tables shows the respective regressor parameter concerning `SysIdentPy` and `IniciacaoCientifica2007`,  but the order $\Theta_1$, $\Theta_2$ and so on are not the same of the ones in `model.final_model`
+Note: as mentioned before, the order of the regressors in the model change, but it is the same structure. The tables shows the respective regressor parameter concerning `SysIdentPy` and `IniciacaoCientifica2007`, but the order $\Theta_1$, $\Theta_2$ and so on are not the same of the ones in `model.final_model`
 
 ```python
 R, qit = mult2.build_linear_mapping()

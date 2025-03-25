@@ -43,8 +43,8 @@ def check_random_state(seed):
     )
 
 
-def num_features(X):
-    return X.shape[1]
+def num_features(x):
+    return x.shape[1]
 
 
 def check_positive_int(value, name):
@@ -54,23 +54,23 @@ def check_positive_int(value, name):
         pass
 
 
-def check_infinity(X, y):
-    """Check that X and y have no NaN or Inf samples.
+def check_infinity(x, y):
+    """Check that x and y have no NaN or Inf samples.
 
     If there is any NaN or Inf samples a ValueError is raised.
 
     Parameters
     ----------
-    X : ndarray of floats
+    x : ndarray of floats
         The input data.
     y : ndarray of floats
         The output data.
 
     """
-    if np.isinf(X).any():
+    if np.isinf(x).any():
         msg_error = (
             "Input contains invalid values (e.g. NaN, Inf) on "
-            f"index {np.argwhere(np.isinf(X))}"
+            f"index {np.argwhere(np.isinf(x))}"
         )
         raise ValueError(msg_error)
 
@@ -82,23 +82,23 @@ def check_infinity(X, y):
         raise ValueError(msg_error)
 
 
-def check_nan(X, y):
-    """Check that X and y have no NaN or Inf samples.
+def check_nan(x, y):
+    """Check that x and y have no NaN or Inf samples.
 
     If there is any NaN or Inf samples a ValueError is raised.
 
     Parameters
     ----------
-    X : ndarray of floats
+    x : ndarray of floats
         The input data.
     y : ndarray of floats
         The output data.
 
     """
-    if np.isnan(X).any():
+    if np.isnan(x).any():
         msg_error = (
             "Input contains invalid values (e.g. NaN, Inf) on "
-            f"index {np.argwhere(np.isnan(X))}"
+            f"index {np.argwhere(np.isnan(x))}"
         )
         raise ValueError(msg_error)
 
@@ -110,48 +110,48 @@ def check_nan(X, y):
         raise ValueError(msg_error)
 
 
-def check_length(X, y):
-    """Check that X and y have the same number of samples.
+def check_length(x, y):
+    """Check that x and y have the same number of samples.
 
-    If the length of X and y are different a ValueError is raised.
+    If the length of x and y are different a ValueError is raised.
 
     Parameters
     ----------
-    X : ndarray of floats
+    x : ndarray of floats
         The input data.
     y : ndarray of floats
         The output data.
 
     """
-    if X.shape[0] != y.shape[0]:
+    if x.shape[0] != y.shape[0]:
         msg_error = (
             "Input and output data must have the same number of "
-            f"samples. X has dimension {X.shape} and "
+            f"samples. x has dimension {x.shape} and "
             f"y has dimension {y.shape}"
         )
         raise ValueError(msg_error)
 
 
-def check_dimension(X, y):
-    """Check if X and y have only real values.
+def check_dimension(x, y):
+    """Check if x and y have only real values.
 
     If there is any string or object samples a ValueError is raised.
 
     Parameters
     ----------
-    X : ndarray of floats
+    x : ndarray of floats
         The input data.
     y : ndarray of floats
         The output data.
 
     """
-    if X.ndim == 0:
+    if x.ndim == 0:
         raise ValueError(
             "Input must be a 2d array, got scalar instead. Reshape your data using"
             " array.reshape(-1, 1)"
         )
 
-    if X.ndim == 1:
+    if x.ndim == 1:
         raise ValueError(
             "Input must be a 2d array, got 1d array instead. "
             "Reshape your data using array.reshape(-1, 1)"
@@ -170,21 +170,21 @@ def check_dimension(X, y):
         )
 
 
-def check_X_y(X, y):
+def check_x_y(x, y):
     """Validate input and output data using some crucial tests.
 
     Parameters
     ----------
-    X : ndarray of floats
+    x : ndarray of floats
         The input data.
     y : ndarray of floats
         The output data.
 
     """
-    check_length(X, y)
-    check_dimension(X, y)
-    check_infinity(X, y)
-    check_nan(X, y)
+    check_length(x, y)
+    check_dimension(x, y)
+    check_infinity(x, y)
+    check_nan(x, y)
 
 
 def check_linear_dependence_rows(psi):

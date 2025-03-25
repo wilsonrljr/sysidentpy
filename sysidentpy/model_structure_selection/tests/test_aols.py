@@ -8,7 +8,6 @@ from sysidentpy.model_structure_selection.accelerated_orthogonal_least_squares i
 )
 from sysidentpy.tests.test_narmax_base import create_test_data
 
-
 x, y, _ = create_test_data()
 train_percentage = 90
 split_data = int(len(x) * (train_percentage / 100))
@@ -90,7 +89,7 @@ def test_model_predict_fourier_steps_none():
         basis_function=basis_function,
     )
     model.fit(X=X_train, y=y_train)
-    yhat = model._basis_function_predict(X=X_test, y_initial=y_test)
+    yhat = model._basis_function_predict(x=X_test, y_initial=y_test)
     assert_almost_equal(yhat.mean(), y_test.mean(), decimal=1)
 
 
@@ -131,3 +130,36 @@ def test_model_predict_fourier_raises():
     assert_raises(
         Exception, model._basis_function_n_step_prediction, X=X_test, y=y_test[:1]
     )
+
+
+def test_model_prediction_ell():
+    basis_function = Polynomial(degree=2)
+    model = AOLS(ylag=[1, 2], xlag=2, basis_function=basis_function, L=2)
+    model.fit(X=X_train, y=y_train)
+    assert_raises(Exception, model.predict, X=X_test, y=y_test[:1])
+
+
+def test_model_prediction_osa():
+    basis_function = Polynomial(degree=2)
+    model = AOLS(ylag=[1, 2], xlag=2, basis_function=basis_function)
+    model.fit(X=X_train, y=y_train)
+    assert_raises(Exception, model.predict, X=X_test, y=y_test[:1], steps_ahead=1)
+
+
+def test_nar():
+    basis_function = Polynomial(degree=2)
+    model = AOLS(ylag=[1, 2], basis_function=basis_function, model_type="NAR")
+    model.fit(y=y_train)
+    assert_raises(Exception, model.predict, X=X_test, y=y_test[:1], forecast_horizon=5)
+
+
+def test_model_predict_fourier_nsa():
+    basis_function = Fourier(degree=2, n=1)
+    model = AOLS(
+        ylag=[1, 2],
+        xlag=2,
+        basis_function=basis_function,
+    )
+    model.fit(X=X_train, y=y_train)
+    yhat = model.predict(X=X_test, y=y_test, steps_ahead=3)
+    assert_almost_equal(yhat.mean(), y_test.mean(), decimal=1)

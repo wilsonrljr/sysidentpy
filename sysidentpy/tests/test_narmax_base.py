@@ -1,4 +1,7 @@
+from typing import Optional
+
 import numpy as np
+import pytest
 from numpy.testing import (
     assert_almost_equal,
     assert_array_equal,
@@ -8,19 +11,16 @@ from numpy.testing import (
 
 from sysidentpy.basis_function import Polynomial, Fourier
 from sysidentpy.model_structure_selection import FROLS
-from sysidentpy.narmax_base import (
-    RegressorDictionary,
-    InformationMatrix,
-)
+from sysidentpy.narmax_base import RegressorDictionary, BaseMSS
 from sysidentpy.parameter_estimation.estimators import (
     LeastSquares,
     RecursiveLeastSquares,
 )
-from sysidentpy.narmax_base import house, rowhouse
+from sysidentpy.narmax_base import (
+    house,
+    rowhouse,
+)
 
-from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
-
-IM = InformationMatrix()
 GR = RegressorDictionary()
 bf_polynomial = Polynomial(degree=2)
 bf_fourier = Fourier(degree=2, n=1)
@@ -237,80 +237,6 @@ def test_row_house():
     assert_almost_equal(rowhouse(a, b), output)
 
 
-def test_get_index_from_regressor_code():
-    model = np.array(
-        [
-            [1001, 0],  # y(k-1)
-            [2001, 1001],  # x1(k-1)y(k-1)
-            [2002, 0],  # x1(k-2)
-        ]
-    )
-
-    regressor_space = np.array(
-        [
-            [0, 0],
-            [1001, 0],
-            [2001, 0],
-            [2002, 0],
-            [1001, 1001],
-            [2001, 1001],
-            [2002, 1001],
-            [2001, 2001],
-            [2002, 2001],
-            [2002, 2002],
-        ]
-    )
-    index = RegressorDictionary(
-        xlag=2, ylag=2, basis_function=Polynomial(degree=2)
-    ).get_index_from_regressor_code(regressor_code=regressor_space, model_code=model)
-
-    assert (index == np.array([1, 3, 5])).all()
-
-
-def test_list_output_regressor():
-    model = np.array(
-        [
-            [1001, 0],  # y(k-1)
-            [2001, 1001],  # x1(k-1)y(k-1)
-            [2002, 0],  # x1(k-2)
-        ]
-    )
-
-    y_code = RegressorDictionary(
-        xlag=2, ylag=2, basis_function=Polynomial(degree=2)
-    ).list_output_regressor_code(model)
-    assert (y_code == np.array([1001, 1001])).all()
-
-
-def test_list_input_regressor():
-    model = np.array(
-        [
-            [1001, 0],  # y(k-1)
-            [2001, 1001],  # x1(k-1)y(k-1)
-            [2002, 0],  # x1(k-2)
-        ]
-    )
-
-    x_code = RegressorDictionary(
-        xlag=2, ylag=1, basis_function=Polynomial(degree=2)
-    ).list_input_regressor_code(model)
-    assert (x_code == np.array([2001, 2002])).all()
-
-
-def test_get_lag_from_regressor_code():
-    list_regressor1 = np.array([2001, 2002])
-    list_regressor2 = np.array([1004, 1002])
-    max_lag1 = RegressorDictionary(
-        xlag=2, ylag=2, basis_function=Polynomial(degree=1)
-    ).get_lag_from_regressor_code(list_regressor1)
-    max_lag2 = RegressorDictionary(
-        xlag=2, ylag=2, basis_function=Polynomial(degree=1)
-    ).get_lag_from_regressor_code(list_regressor2)
-
-    assert max_lag1 == 2
-    assert max_lag2 == 4
-
-
 def test_get_max_lag():
     output1 = 1
     r = RegressorDictionary(
@@ -322,69 +248,6 @@ def test_get_max_lag():
     )._get_max_lag()
     assert_equal(output1, r)
     assert_equal(output2, r2)
-
-
-def test_shift_column():
-    a = np.array(
-        [
-            0.42544384,
-            0.39365905,
-            0.22209413,
-            0.69760074,
-            0.88183369,
-            0.24818225,
-            0.78482346,
-            0.26967285,
-            0.53987842,
-            0.17367185,
-        ]
-    ).reshape(-1, 1)
-
-    output = np.array(
-        [
-            [0.0],
-            [0.0],
-            [0.42544384],
-            [0.39365905],
-            [0.22209413],
-            [0.69760074],
-            [0.88183369],
-            [0.24818225],
-            [0.78482346],
-            [0.26967285],
-        ]
-    )
-    r = IM.shift_column(a, 2)
-    assert_almost_equal(output, r)
-
-
-def test_process_xlag():
-    a = np.array(
-        [
-            0.42544384,
-            0.39365905,
-            0.22209413,
-            0.69760074,
-            0.88183369,
-            0.24818225,
-            0.78482346,
-            0.26967285,
-            0.53987842,
-            0.17367185,
-        ]
-    ).reshape(-1, 1)
-
-    n_inputs, xlag = InformationMatrix(xlag=2)._process_xlag(a.reshape(-1, 1))
-    output1 = 1
-    output2 = list(range(1, 3))
-    assert_equal(output1, n_inputs)
-    assert_equal(output2, xlag)
-
-
-def test_process_ylag():
-    ylag = InformationMatrix(ylag=2)._process_ylag()
-    output1 = list(range(1, 3))
-    assert_equal(output1, ylag)
 
 
 def test_errors():
@@ -456,76 +319,6 @@ def test_regressor_space_raise():
     )
 
 
-def test_model_information_get_lag():
-    laglist = np.array([2001, 2002, 3001, 3002, 1001, 1002])
-    output = 2
-    r1 = RegressorDictionary().get_lag_from_regressor_code(laglist)
-    assert r1 == output
-
-
-def test_model_information_empty_list():
-    laglist = np.array([])
-    output = 1
-    r1 = RegressorDictionary().get_lag_from_regressor_code(laglist)
-    assert r1 == output
-
-
-def test_get_max_lag_from_model_code():
-    model = np.array(
-        [
-            [1001, 0],  # y(k-1)
-            [2001, 1001],  # x1(k-1)y(k-1)
-            [2002, 0],  # x1(k-2)
-        ]
-    )
-    assert RegressorDictionary().get_max_lag_from_model_code(model) == 2
-
-
-def test_process_lag():
-    x_train, _, _, _ = get_miso_data(
-        n=10, colored_noise=False, sigma=0.001, train_percentage=90
-    )
-    assert_raises(ValueError, InformationMatrix(xlag=2)._process_xlag, X=x_train)
-
-
-def test_process_lag_n1():
-    x_train, _, _, _ = get_siso_data(
-        n=10, colored_noise=False, sigma=0.001, train_percentage=90
-    )
-    n_inputs, xlag = InformationMatrix(xlag=2)._process_xlag(X=x_train)
-    assert n_inputs == 1
-    assert list(xlag) == [1, 2]
-
-
-def test_create_lagged_x():
-    X = np.array([1, 2, 3, 4, 5, 6]).reshape(-1, 1)
-    r = InformationMatrix(xlag=[1, 2])._create_lagged_X(X=X, n_inputs=1)
-    assert_equal(
-        r,
-        np.array(
-            [[0.0, 0.0], [1.0, 0.0], [2.0, 1.0], [3.0, 2.0], [4.0, 3.0], [5.0, 4.0]]
-        ),
-    )
-
-
-def test_create_lagged_x_miso():
-    X = np.array(range(1, 13)).reshape(-1, 2)
-    r = InformationMatrix(xlag=[[1, 2], [1, 2]])._create_lagged_X(X=X, n_inputs=2)
-    assert_equal(
-        r,
-        np.array(
-            [
-                [0.0, 0.0, 0.0, 0.0],
-                [1.0, 0.0, 2.0, 0.0],
-                [3.0, 1.0, 4.0, 2.0],
-                [5.0, 3.0, 6.0, 4.0],
-                [7.0, 5.0, 8.0, 6.0],
-                [9.0, 7.0, 10.0, 8.0],
-            ]
-        ),
-    )
-
-
 def test_model_predict():
     model = FROLS(
         n_terms=5,
@@ -593,7 +386,7 @@ def test_model_predict_fourier_steps_none():
         basis_function=Fourier(degree=2, n=1),
     )
     model.fit(X=X_train, y=y_train)
-    yhat = model._basis_function_predict(X=X_test, y_initial=y_test)
+    yhat = model._basis_function_predict(x=X_test, y_initial=y_test)
     assert_almost_equal(yhat.mean(), y_test[model.max_lag : :].mean(), decimal=6)
 
 
@@ -657,7 +450,7 @@ def test_model_predict_fourier_value_error():
     assert_raises(
         ValueError,
         model._basis_function_n_step_prediction,
-        X=X_test,
+        x=X_test,
         y=y_test,
         steps_ahead=1,
         forecast_horizon=None,
@@ -679,8 +472,211 @@ def test_model_predict_fourier_horizon_error():
     assert_raises(
         ValueError,
         model._basis_function_n_steps_horizon,
-        X=X_test,
+        x=X_test,
         y=y_test,
         steps_ahead=1,
         forecast_horizon=10,
     )
+
+
+def test_nar_step_ahead_insufficient_initial_conditions():
+    """Test that _nar_step_ahead raises an error if input is too short."""
+    model = FROLS(
+        order_selection=True,
+        # extended_least_squares=False,
+        ylag=[1, 2],
+        estimator=RecursiveLeastSquares(),
+        basis_function=Polynomial(degree=2),
+        model_type="NAR",
+    )
+    model.fit(y=y_train)
+
+    with pytest.raises(ValueError, match="Insufficient initial condition elements!"):
+        model._nar_step_ahead(y[0], steps_ahead=2)
+
+
+def test_narmarx_step_ahead_insufficient_initial_conditions():
+    """Test that _narmax_step_ahead raises an error if input is too short."""
+    model = FROLS(
+        order_selection=True,
+        ylag=[1, 2],
+        estimator=RecursiveLeastSquares(),
+        basis_function=Polynomial(degree=2),
+        model_type="NARMAX",
+    )
+    model.fit(X=X_train, y=y_train)
+
+    with pytest.raises(ValueError, match="Insufficient initial condition elements!"):
+        model.narmax_n_step_ahead(X_train, y[0], steps_ahead=2)
+
+
+def test_miso_x_lag_list_single_input_int():
+    """Test get_miso_x_lag_list with a single input and integer xlag."""
+    model = FROLS(
+        xlag=[[1, 2, 3], [1, 2, 3]],
+        basis_function=Polynomial(degree=1),
+    )
+
+    expected_output = np.array([2001, 2002, 2003, 3001, 3002, 3003])
+    result = model.get_miso_x_lag_list(n_inputs=2)
+
+    assert np.array_equal(
+        result, expected_output
+    ), f"Expected {expected_output}, got {result}"
+
+
+def test_siso_x_lag_list_single_input_list():
+    """Test get_siso_x_lag_list with a single input and xlag as a list."""
+    model = FROLS(
+        xlag=[1, 3, 6],
+        basis_function=Polynomial(degree=1),
+    )
+
+    expected_output = np.array([2001, 2003, 2006])
+    result = model.get_siso_x_lag_list()
+
+    assert np.array_equal(
+        result, expected_output
+    ), f"Expected {expected_output}, got {result}"
+
+
+def test_miso_x_lag_list_single_input_list():
+    """Test get_miso_x_lag_list with a single input and xlag as a list."""
+    model = FROLS(
+        xlag=[[1, 3, 6], [2]],
+        basis_function=Polynomial(degree=1),
+    )
+
+    expected_output = np.array([2001, 2003, 2006, 3002])
+    result = model.get_miso_x_lag_list(n_inputs=2)
+
+    assert np.array_equal(
+        result, expected_output
+    ), f"Expected {expected_output}, got {result}"
+
+
+class ConcreteMSS(BaseMSS):
+    def __init__(self, model_type="NARMAX"):
+        super().__init__()
+        self.model_type = model_type
+
+    def some_method(self):
+        pass
+
+    def _basis_function_n_step_prediction(
+        self,
+        X: Optional[np.ndarray],
+        y: np.ndarray,
+        steps_ahead: int,
+        forecast_horizon: int,
+    ) -> np.ndarray:
+        pass
+
+    def _basis_function_predict(
+        self,
+        X: Optional[np.ndarray],
+        y_initial: np.ndarray,
+        forecast_horizon: int = 1,
+    ) -> np.ndarray:
+        pass
+
+    def _model_prediction(
+        self,
+        X: Optional[np.ndarray],
+        y_initial: np.ndarray,
+        forecast_horizon: int = 1,
+    ) -> np.ndarray:
+        pass
+
+    def _nfir_predict(self, X: np.ndarray, y_initial: np.ndarray) -> np.ndarray:
+        pass
+
+    def _n_step_ahead_prediction(self, X, y, steps_ahead):
+        return super()._n_step_ahead_prediction(X, y, steps_ahead)
+
+    def narmax_n_step_ahead(self, X, y, steps_ahead):
+        """Mock function for NARMAX predictions."""
+        return np.array([0.5] * steps_ahead)  # Dummy prediction
+
+    def _nar_step_ahead(self, y, steps_ahead):
+        """Mock function for NAR predictions."""
+        return np.array([1.0] * steps_ahead)  # Dummy prediction
+
+    def fit(self, *, X, y):
+        pass
+
+    def predict(
+        self,
+        *,
+        X: Optional[np.ndarray] = None,
+        y: np.ndarray,
+        steps_ahead: Optional[int] = None,
+        forecast_horizon: int = 1,
+    ) -> np.ndarray:
+        pass
+
+
+def test_base_mss_initialization():
+    """Test if BaseMSS initializes correctly."""
+    model = ConcreteMSS()
+
+    assert model.max_lag is None, "max_lag should be initialized as None"
+    assert model.n_inputs is None, "n_inputs should be initialized as None"
+    assert model.theta is None, "theta should be initialized as None"
+    assert model.final_model is None, "final_model should be initialized as None"
+    assert model.pivv is None, "pivv should be initialized as None"
+
+
+def test_base_mss_is_instance_of_regressor_dict():
+    """Test if BaseMSS is a subclass of RegressorDictionary."""
+    model = ConcreteMSS()
+    assert isinstance(model, BaseMSS), "ConcreteMSS should be an instance of BaseMSS"
+    assert isinstance(
+        model, RegressorDictionary
+    ), "ConcreteMSS should inherit from RegressorDictionary"
+
+
+def test_base_mss_abstract_methods():
+    """Test if instantiating BaseMSS directly raises an error."""
+    with pytest.raises(TypeError):
+        BaseMSS()  # Should fail because it's an abstract class
+
+
+def test_n_step_ahead_prediction_narmax():
+    """Test `_n_step_ahead_prediction` for NARMAX model."""
+    model = ConcreteMSS(model_type="NARMAX")
+    X = np.array([[1, 2], [3, 4]])
+    y = np.array([1, 2, 3])
+    steps_ahead = 3
+
+    result = model._n_step_ahead_prediction(X, y, steps_ahead)
+    expected = np.array([0.5, 0.5, 0.5])
+
+    np.testing.assert_array_almost_equal(
+        result, expected, err_msg="NARMAX prediction incorrect"
+    )
+
+
+def test_n_step_ahead_prediction_nar():
+    """Test `_n_step_ahead_prediction` for NAR model."""
+    model = ConcreteMSS(model_type="NAR")
+    y = np.array([1, 2, 3])
+    steps_ahead = 2
+
+    result = model._n_step_ahead_prediction(None, y, steps_ahead)
+    expected = np.array([1.0, 1.0])
+
+    np.testing.assert_array_almost_equal(
+        result, expected, err_msg="NAR prediction incorrect"
+    )
+
+
+def test_n_step_ahead_prediction_invalid_model():
+    """Test `_n_step_ahead_prediction` with an invalid model type."""
+    model = ConcreteMSS(model_type="NFIR")
+
+    with pytest.raises(
+        ValueError,
+        match="n_steps_ahead prediction will be implemented for NFIR models in v0.4.*",
+    ):
+        model._n_step_ahead_prediction(None, np.array([1, 2, 3]), 2)

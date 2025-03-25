@@ -8,14 +8,14 @@ import warnings
 from typing import Union, Optional
 
 import numpy as np
-from numpy import linalg as LA
+from numpy.linalg import pinv
 from scipy.spatial.distance import cdist
 from scipy.special import psi
 
 from ..narmax_base import BaseMSS
+from sysidentpy.utils.information_matrix import build_lagged_matrix
 from ..basis_function import Fourier, Polynomial
 from ..utils.check_arrays import check_positive_int, num_features, check_random_state
-from ..utils.deprecation import deprecated
 from ..parameter_estimation.estimators import (
     LeastSquares,
     RidgeRegression,
@@ -158,7 +158,6 @@ class ER(BaseMSS):
         xlag: Union[int, list] = 1,
         q: float = 0.99,
         estimator: Estimators_Union = LeastSquares(),
-        extended_least_squares: bool = False,
         h: float = 0.01,
         k: int = 2,
         mutual_information_estimator: str = "mutual_information_knn",
@@ -171,14 +170,12 @@ class ER(BaseMSS):
     ):
         self.basis_function = basis_function
         self.model_type = model_type
-        self.build_matrix = self.get_build_io_method(model_type)
         self.xlag = xlag
         self.ylag = ylag
         self.non_degree = basis_function.degree
         self.max_lag = self._get_max_lag()
         self.k = k
         self.estimator = estimator
-        self.extended_least_squares = extended_least_squares
         self.q = q
         self.h = h
         self.mutual_information_estimator = mutual_information_estimator
@@ -188,7 +185,6 @@ class ER(BaseMSS):
         self.random_state = random_state
         self.rng = check_random_state(random_state)
         self.tol = None
-        # self.ensemble = None
         self.n_inputs = None
         self.estimated_tolerance = None
         self.regressor_code = None
@@ -227,12 +223,6 @@ class ER(BaseMSS):
         if not isinstance(self.skip_forward, bool):
             raise TypeError(
                 f"skip_forward must be False or True. Got {self.skip_forward}"
-            )
-
-        if not isinstance(self.extended_least_squares, bool):
-            raise TypeError(
-                "extended_least_squares must be False or True. Got"
-                f" {self.extended_least_squares}"
             )
 
         if self.model_type not in ["NARMAX", "NAR", "NFIR"]:
@@ -321,8 +311,8 @@ class ER(BaseMSS):
             for i in range(initial_array.shape[1]):
                 if piv[i] not in []:  # if you want to keep any regressor
                     rem = np.setdiff1d(piv, piv[i])
-                    f1 = reg_matrix[:, piv] @ LA.pinv(reg_matrix[:, piv]) @ y
-                    f2 = reg_matrix[:, rem] @ LA.pinv(reg_matrix[:, rem]) @ y
+                    f1 = reg_matrix[:, piv] @ pinv(reg_matrix[:, piv]) @ y
+                    f2 = reg_matrix[:, rem] @ pinv(reg_matrix[:, rem]) @ y
                     initial_array[0, i] = self.conditional_mutual_information(y, f1, f2)
 
             ix = np.argmin(initial_array)
@@ -362,7 +352,7 @@ class ER(BaseMSS):
         reg_matrix_columns = np.array(list(range(reg_matrix.shape[1])))
         self.tol = self.tolerance_estimator(y)
         ksg_max = getattr(self, self.mutual_information_estimator)(
-            y, reg_matrix @ LA.pinv(reg_matrix) @ y
+            y, reg_matrix @ pinv(reg_matrix) @ y
         )
         stop_criteria = False
         while stop_criteria is False:
@@ -373,7 +363,7 @@ class ER(BaseMSS):
                 ksg_local = getattr(self, self.mutual_information_estimator)(
                     y,
                     reg_matrix[:, selected_terms]
-                    @ LA.pinv(reg_matrix[:, selected_terms])
+                    @ pinv(reg_matrix[:, selected_terms])
                     @ y,
                 )
             else:
@@ -386,15 +376,13 @@ class ER(BaseMSS):
                 if reg_matrix_columns[i] not in selected_terms:
                     f1 = (
                         reg_matrix[:, [*selected_terms, reg_matrix_columns[i]]]
-                        @ LA.pinv(
-                            reg_matrix[:, [*selected_terms, reg_matrix_columns[i]]]
-                        )
+                        @ pinv(reg_matrix[:, [*selected_terms, reg_matrix_columns[i]]])
                         @ y
                     )
                     if len(selected_terms) != 0:
                         f2 = (
                             reg_matrix[:, selected_terms]
-                            @ LA.pinv(reg_matrix[:, selected_terms])
+                            @ pinv(reg_matrix[:, selected_terms])
                             @ y
                         )
                     else:
@@ -533,7 +521,7 @@ class ER(BaseMSS):
         """Fit polynomial NARMAX model using AOLS algorithm.
 
         The 'fit' function allows a friendly usage by the user.
-        Given two arguments, X and y, fit training data.
+        Given two arguments, x and y, fit training data.
 
         The Entropic Regression algorithm is based on the Matlab package available on:
         https://github.com/almomaa/ERFit-Package
@@ -569,7 +557,7 @@ class ER(BaseMSS):
             raise ValueError("y cannot be None")
 
         self.max_lag = self._get_max_lag()
-        lagged_data = self.build_matrix(X, y)
+        lagged_data = build_lagged_matrix(X, y, self.xlag, self.ylag, self.model_type)
 
         reg_matrix = self.basis_function.fit(
             lagged_data,
@@ -635,7 +623,6 @@ class ER(BaseMSS):
             )
             self.final_model = self.regressor_code[final_model, :].copy()
 
-        # self.theta = getattr(self, self.estimator)(reg_matrix[:, final_model], y_full)
         self.theta = self.estimator.optimize(
             reg_matrix[:, final_model], y_full[self.max_lag :, 0].reshape(-1, 1)
         )
@@ -710,7 +697,7 @@ class ER(BaseMSS):
         yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
         return yhat
 
-    def _one_step_ahead_prediction(self, X, y):
+    def _one_step_ahead_prediction(self, x, y):
         """Perform the 1-step-ahead prediction of a model.
 
         Parameters
@@ -718,7 +705,7 @@ class ER(BaseMSS):
         y : array-like of shape = max_lag
             Initial conditions values of the model
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        x : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
@@ -727,9 +714,9 @@ class ER(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        lagged_data = self.build_matrix(X, y)
+        lagged_data = build_lagged_matrix(x, y, self.xlag, self.ylag, self.model_type)
 
-        X_base = self.basis_function.transform(
+        x_base = self.basis_function.transform(
             lagged_data,
             self.max_lag,
             self.ylag,
@@ -738,10 +725,10 @@ class ER(BaseMSS):
             predefined_regressors=self.pivv[: len(self.final_model)],
         )
 
-        yhat = super()._one_step_ahead_prediction(X_base)
+        yhat = super()._one_step_ahead_prediction(x_base)
         return yhat.reshape(-1, 1)
 
-    def _n_step_ahead_prediction(self, X, y, steps_ahead):
+    def _n_step_ahead_prediction(self, x, y, steps_ahead):
         """Perform the n-steps-ahead prediction of a model.
 
         Parameters
@@ -749,7 +736,7 @@ class ER(BaseMSS):
         y : array-like of shape = max_lag
             Initial conditions values of the model
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        x : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
@@ -758,10 +745,10 @@ class ER(BaseMSS):
                The n-steps-ahead predicted values of the model.
 
         """
-        yhat = super()._n_step_ahead_prediction(X, y, steps_ahead)
+        yhat = super()._n_step_ahead_prediction(x, y, steps_ahead)
         return yhat
 
-    def _model_prediction(self, X, y_initial, forecast_horizon=None):
+    def _model_prediction(self, x, y_initial, forecast_horizon=None):
         """Perform the infinity steps-ahead simulation of a model.
 
         Parameters
@@ -769,7 +756,7 @@ class ER(BaseMSS):
         y_initial : array-like of shape = max_lag
             Number of initial conditions values of output
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        x : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
@@ -779,49 +766,49 @@ class ER(BaseMSS):
 
         """
         if self.model_type in ["NARMAX", "NAR"]:
-            return self._narmax_predict(X, y_initial, forecast_horizon)
+            return self._narmax_predict(x, y_initial, forecast_horizon)
         elif self.model_type == "NFIR":
-            return self._nfir_predict(X, y_initial)
+            return self._nfir_predict(x, y_initial)
         else:
             raise ValueError(
                 f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
             )
 
-    def _narmax_predict(self, X, y_initial, forecast_horizon):
+    def _narmax_predict(self, x, y_initial, forecast_horizon):
         if len(y_initial) < self.max_lag:
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
                 f" {self.max_lag} elements."
             )
 
-        if X is not None:
-            forecast_horizon = X.shape[0]
+        if x is not None:
+            forecast_horizon = x.shape[0]
         else:
             forecast_horizon = forecast_horizon + self.max_lag
 
         if self.model_type == "NAR":
             self.n_inputs = 0
 
-        y_output = super()._narmax_predict(X, y_initial, forecast_horizon)
+        y_output = super()._narmax_predict(x, y_initial, forecast_horizon)
         return y_output
 
-    def _nfir_predict(self, X, y_initial):
-        y_output = super()._nfir_predict(X, y_initial)
+    def _nfir_predict(self, x, y_initial):
+        y_output = super()._nfir_predict(x, y_initial)
         return y_output
 
-    def _basis_function_predict(self, X, y_initial, forecast_horizon=None):
-        if X is not None:
-            forecast_horizon = X.shape[0]
+    def _basis_function_predict(self, x, y_initial, forecast_horizon=None):
+        if x is not None:
+            forecast_horizon = x.shape[0]
         else:
             forecast_horizon = forecast_horizon + self.max_lag
 
         if self.model_type == "NAR":
             self.n_inputs = 0
 
-        yhat = super()._basis_function_predict(X, y_initial, forecast_horizon)
+        yhat = super()._basis_function_predict(x, y_initial, forecast_horizon)
         return yhat.reshape(-1, 1)
 
-    def _basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
+    def _basis_function_n_step_prediction(self, x, y, steps_ahead, forecast_horizon):
         """Perform the n-steps-ahead prediction of a model.
 
         Parameters
@@ -829,7 +816,7 @@ class ER(BaseMSS):
         y : array-like of shape = max_lag
             Initial conditions values of the model
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        x : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
@@ -844,18 +831,18 @@ class ER(BaseMSS):
                 f" {self.max_lag} elements."
             )
 
-        if X is not None:
-            forecast_horizon = X.shape[0]
+        if x is not None:
+            forecast_horizon = x.shape[0]
         else:
             forecast_horizon = forecast_horizon + self.max_lag
 
         yhat = super()._basis_function_n_step_prediction(
-            X, y, steps_ahead, forecast_horizon
+            x, y, steps_ahead, forecast_horizon
         )
         return yhat.reshape(-1, 1)
 
-    def _basis_function_n_steps_horizon(self, X, y, steps_ahead, forecast_horizon):
+    def _basis_function_n_steps_horizon(self, x, y, steps_ahead, forecast_horizon):
         yhat = super()._basis_function_n_steps_horizon(
-            X, y, steps_ahead, forecast_horizon
+            x, y, steps_ahead, forecast_horizon
         )
         return yhat.reshape(-1, 1)

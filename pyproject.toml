@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "sysidentpy"
 description = "A Python Package For System Identification Using NARMAX Models"
 readme = "README.md"
-requires-python = ">=3.7,<3.13"
+requires-python = ">=3.8,<3.13"
 license = { file = "LICENSE" }
 keywords = [
     "data-science",
@@ -35,7 +35,6 @@ classifiers = [
     "License :: OSI Approved :: BSD License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -52,7 +51,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
-dependencies = ["numpy>=1.19.2,<2.0", "scipy>=1.7.0", "matplotlib>=3.3.2"]
+dependencies = ["numpy>=1.19.2,<2.0", "scipy>=1.8.0", "matplotlib>=3.3.2"]
 
 dynamic = ["version"]
 
@@ -131,7 +130,7 @@ omit = [
     "sysidentpy/simulation/tests/*",
 ]
 show_missing = true
-fail_under = 80
+fail_under = 90
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
@@ -145,7 +144,7 @@ exclude_lines = [
 
 [tool.black]
 line-length = 88
-target_version = ["py37", "py38", "py39", "py310", "py311", "py312"]
+target_version = ["py38", "py39", "py310", "py311", "py312"]
 preview = true
 exclude = '''
 /(

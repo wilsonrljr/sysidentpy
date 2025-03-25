@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
 from numpy.testing import assert_raises
-from sysidentpy.model_structure_selection import FROLS
+from sysidentpy.model_structure_selection import UOFR
 from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation.estimators import (
     LeastSquares,
@@ -30,7 +30,7 @@ def test_error_reduction_ratio():
     )
     basis_function = Polynomial(degree=2)
     x, y, _ = create_test_data()
-    model = FROLS(
+    model = UOFR(
         n_terms=5,
         order_selection=True,
         n_info_values=5,
@@ -47,7 +47,7 @@ def test_error_reduction_ratio():
 
 def test_fit_with_information_criteria():
     basis_function = Polynomial(degree=2)
-    model = FROLS(
+    model = UOFR(
         n_terms=15,
         order_selection=True,
         basis_function=basis_function,
@@ -58,7 +58,7 @@ def test_fit_with_information_criteria():
 
 def test_fit_without_information_criteria():
     basis_function = Polynomial(degree=2)
-    model = FROLS(n_terms=15, basis_function=basis_function, order_selection=False)
+    model = UOFR(n_terms=15, basis_function=basis_function, order_selection=False)
     model.fit(X=x, y=y)
     assert model.info_values is None
 
@@ -76,7 +76,7 @@ def test_default_values():
         "model_type": "NARMAX",
         "err_tol": None,
     }
-    model = FROLS(basis_function=Polynomial(degree=2))
+    model = UOFR(basis_function=Polynomial(degree=2))
     model_values = [
         model.ylag,
         model.xlag,
@@ -95,51 +95,50 @@ def test_default_values():
 
 
 def test_validate_ylag():
-    assert_raises(ValueError, FROLS, ylag=-1, basis_function=Polynomial(degree=2))
-    assert_raises(ValueError, FROLS, ylag=1.3, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, UOFR, ylag=-1, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, UOFR, ylag=1.3, basis_function=Polynomial(degree=2))
 
 
 def test_validate_xlag():
-    assert_raises(ValueError, FROLS, xlag=-1, basis_function=Polynomial(degree=2))
-    assert_raises(ValueError, FROLS, xlag=1.3, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, UOFR, xlag=-1, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, UOFR, xlag=1.3, basis_function=Polynomial(degree=2))
 
 
 def test_model_order_selection():
     assert_raises(
-        TypeError, FROLS, order_selection=1, basis_function=Polynomial(degree=2)
+        TypeError, UOFR, order_selection=1, basis_function=Polynomial(degree=2)
     )
     assert_raises(
-        TypeError, FROLS, order_selection="True", basis_function=Polynomial(degree=2)
+        TypeError, UOFR, order_selection="True", basis_function=Polynomial(degree=2)
     )
     assert_raises(
-        TypeError, FROLS, order_selection=None, basis_function=Polynomial(degree=2)
+        TypeError, UOFR, order_selection=None, basis_function=Polynomial(degree=2)
     )
 
 
 def test_n_terms():
-    assert_raises(ValueError, FROLS, n_terms=1.2, basis_function=Polynomial(degree=2))
-    assert_raises(ValueError, FROLS, n_terms=-1, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, UOFR, n_terms=1.2, basis_function=Polynomial(degree=2))
+    assert_raises(ValueError, UOFR, n_terms=-1, basis_function=Polynomial(degree=2))
 
 
 def test_n_info_values():
     assert_raises(
-        ValueError, FROLS, n_info_values=1.2, basis_function=Polynomial(degree=2)
+        ValueError, UOFR, n_info_values=1.2, basis_function=Polynomial(degree=2)
     )
     assert_raises(
-        ValueError, FROLS, n_info_values=-1, basis_function=Polynomial(degree=2)
+        ValueError, UOFR, n_info_values=-1, basis_function=Polynomial(degree=2)
     )
 
 
 def test_info_criteria():
     assert_raises(
-        ValueError, FROLS, info_criteria="AIC", basis_function=Polynomial(degree=2)
+        ValueError, UOFR, info_criteria="AIC", basis_function=Polynomial(degree=2)
     )
 
 
 def test_predict():
     basis_function = Polynomial(degree=2)
-    model = FROLS(
-        n_terms=5,
+    model = UOFR(
         err_tol=None,
         ylag=[1, 2],
         xlag=2,
@@ -153,7 +152,7 @@ def test_predict():
 
 def test_model_prediction():
     basis_function = Polynomial(degree=2)
-    model = FROLS(
+    model = UOFR(
         n_terms=5,
         ylag=[1, 2],
         xlag=2,
@@ -166,7 +165,7 @@ def test_model_prediction():
 
 def test_information_criteria_bic():
     basis_function = Polynomial(degree=2)
-    model = FROLS(
+    model = UOFR(
         n_terms=5,
         order_selection=True,
         info_criteria="bic",
@@ -183,7 +182,7 @@ def test_information_criteria_bic():
 
 def test_information_criteria_aicc():
     basis_function = Polynomial(degree=2)
-    model = FROLS(
+    model = UOFR(
         n_terms=5,
         order_selection=True,
         info_criteria="aicc",
@@ -200,7 +199,7 @@ def test_information_criteria_aicc():
 
 def test_information_criteria_fpe():
     basis_function = Polynomial(degree=2)
-    model = FROLS(
+    model = UOFR(
         n_terms=5,
         order_selection=True,
         info_criteria="fpe",
@@ -219,7 +218,7 @@ def test_information_criteria_fpe():
 
 def test_information_criteria_lilc():
     basis_function = Polynomial(degree=2)
-    model = FROLS(
+    model = UOFR(
         n_terms=5,
         order_selection=True,
         info_criteria="lilc",

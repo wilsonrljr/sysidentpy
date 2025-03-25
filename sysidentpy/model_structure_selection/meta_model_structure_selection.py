@@ -8,6 +8,7 @@ from typing import Tuple, Union, Optional
 import numpy as np
 from scipy.stats import t
 
+from sysidentpy.utils.information_matrix import build_lagged_matrix
 from ..basis_function import Polynomial
 from ..metaheuristics import BPSOGSA
 from ..metrics import mean_squared_error, root_relative_squared_error
@@ -16,7 +17,7 @@ from ..utils.check_arrays import (
     check_positive_int,
     num_features,
     check_random_state,
-    check_X_y,
+    check_x_y,
 )
 from ..utils.narmax_tools import train_test_split
 
@@ -230,7 +231,6 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self.steps_ahead = steps_ahead
         self.random_state = random_state
         self.test_size = test_size
-        self.build_matrix = self.get_build_io_method(model_type)
         self.n_inputs = None
         self.regressor_code = None
         self.best_model_history = None
@@ -279,7 +279,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             raise ValueError("y cannot be None")
 
         if X is not None:
-            check_X_y(X, y)
+            check_x_y(X, y)
             self.n_inputs = num_features(X)
         else:
             self.n_inputs = 1  # just to create the regressor space base
@@ -297,10 +297,10 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self.best_model_history = []
         self.tested_models = []
 
-        X, X_test, y, y_test = train_test_split(X, y, test_size=self.test_size)
+        x, x_test, y, y_test = train_test_split(X, y, test_size=self.test_size)
 
         for i in range(self.maxiter):
-            fitness = self.evaluate_objective_function(X, y, X_test, y_test, population)
+            fitness = self.evaluate_objective_function(x, y, x_test, y_test, population)
             column_of_best_solution = np.nanargmin(fitness)
             current_best_fitness = fitness[column_of_best_solution]
 
@@ -325,9 +325,9 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
         self.final_model = self.regressor_code[self.optimal_model == 1].copy()
         _ = self.simulate(
-            X_train=X,
+            X_train=x,
             y_train=y,
-            X_test=X_test,
+            X_test=x_test,
             y_test=y_test,
             model_code=self.final_model,
             steps_ahead=self.steps_ahead,
@@ -337,9 +337,9 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
     def evaluate_objective_function(
         self,
-        X_train: Optional[np.ndarray],
+        x_train: Optional[np.ndarray],
         y_train: Optional[np.ndarray],
-        X_test: Optional[np.ndarray],
+        x_test: Optional[np.ndarray],
         y_test: Optional[np.ndarray],
         population: np.ndarray,
     ):
@@ -347,11 +347,11 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
         Parameters
         ----------
-        X_train : ndarray of floats
+        x_train : ndarray of floats
             The input data to be used in the training process.
         y_train : ndarray of floats
             The output data to be used in the training process.
-        X_test : ndarray of floats
+        x_test : ndarray of floats
             The input data to be used in the prediction process.
         y_test : ndarray of floats
             The output data (initial conditions) to be used in the prediction process.
@@ -371,9 +371,9 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
             m = self.regressor_code[agent == 1].copy()
             yhat = self.simulate(
-                X_train=X_train,
+                X_train=x_train,
                 y_train=y_train,
-                X_test=X_test,
+                X_test=x_test,
                 y_test=y_test,
                 model_code=m,
                 steps_ahead=self.steps_ahead,
@@ -381,7 +381,9 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
             residues = y_test - yhat
             self.max_lag = self._get_max_lag()
-            lagged_data = self.build_matrix(X_train, y_train)
+            lagged_data = build_lagged_matrix(
+                x_train, y_train, self.xlag, self.ylag, self.model_type
+            )
 
             psi = self.basis_function.fit(
                 lagged_data,
@@ -407,9 +409,9 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
                 continue
 
             yhat = self.simulate(
-                X_train=X_train,
+                X_train=x_train,
                 y_train=y_train,
-                X_test=X_test,
+                X_test=x_test,
                 y_test=y_test,
                 model_code=m,
                 steps_ahead=self.steps_ahead,
@@ -629,7 +631,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         )
 
     def _one_step_ahead_prediction(
-        self, X: Optional[np.ndarray], y: Optional[np.ndarray]
+        self, x: Optional[np.ndarray], y: Optional[np.ndarray]
     ) -> np.ndarray:
         """Perform the 1-step-ahead prediction of a model.
 
@@ -638,7 +640,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         y : array-like of shape = max_lag
             Initial conditions values of the model
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        x : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
@@ -647,12 +649,12 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
                The 1-step-ahead predicted values of the model.
 
         """
-        yhat = super()._one_step_ahead_prediction(X, y)
+        yhat = super()._one_step_ahead_prediction(x, y)
         return yhat.reshape(-1, 1)
 
     def _n_step_ahead_prediction(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y: Optional[np.ndarray],
         steps_ahead: Optional[int],
     ) -> np.ndarray:
@@ -663,7 +665,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         y : array-like of shape = max_lag
             Initial conditions values of the model
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        x : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
@@ -672,12 +674,12 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
                The n-steps-ahead predicted values of the model.
 
         """
-        yhat = super()._n_step_ahead_prediction(X, y, steps_ahead)
+        yhat = super()._n_step_ahead_prediction(x, y, steps_ahead)
         return yhat
 
     def _model_prediction(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y_initial: Optional[np.ndarray],
         forecast_horizon: int = 1,
     ):
@@ -688,7 +690,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         y_initial : array-like of shape = max_lag
             Number of initial conditions values of output
             to start recursive process.
-        X : ndarray of floats of shape = n_samples
+        x : ndarray of floats of shape = n_samples
             Vector with input values to be used in model simulation.
 
         Returns
@@ -698,9 +700,9 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
         """
         if self.model_type in ["NARMAX", "NAR"]:
-            return self._narmax_predict(X, y_initial, forecast_horizon)
+            return self._narmax_predict(x, y_initial, forecast_horizon)
         if self.model_type == "NFIR":
-            return self._nfir_predict(X, y_initial)
+            return self._nfir_predict(x, y_initial)
 
         raise ValueError(
             f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
@@ -708,32 +710,32 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
     def _narmax_predict(
         self,
-        X: Optional[np.ndarray],
+        x: Optional[np.ndarray],
         y_initial: Optional[np.ndarray],
         forecast_horizon: int = 1,
     ) -> np.ndarray:
-        y_output = super()._narmax_predict(X, y_initial, forecast_horizon)
+        y_output = super()._narmax_predict(x, y_initial, forecast_horizon)
         return y_output
 
     def _nfir_predict(
-        self, X: Optional[np.ndarray], y_initial: Optional[np.ndarray]
+        self, x: Optional[np.ndarray], y_initial: Optional[np.ndarray]
     ) -> np.ndarray:
-        y_output = super()._nfir_predict(X, y_initial)
+        y_output = super()._nfir_predict(x, y_initial)
         return y_output
 
-    def _basis_function_predict(self, X, y_initial, forecast_horizon=None):
+    def _basis_function_predict(self, x, y_initial, forecast_horizon=None):
         """Not implemented."""
         raise NotImplementedError(
             "You can only use Polynomial Basis Function in MetaMSS for now."
         )
 
-    def _basis_function_n_step_prediction(self, X, y, steps_ahead, forecast_horizon):
+    def _basis_function_n_step_prediction(self, x, y, steps_ahead, forecast_horizon):
         """Not implemented."""
         raise NotImplementedError(
             "You can only use Polynomial Basis Function in MetaMSS for now."
         )
 
-    def _basis_function_n_steps_horizon(self, X, y, steps_ahead, forecast_horizon):
+    def _basis_function_n_steps_horizon(self, x, y, steps_ahead, forecast_horizon):
         """Not implemented."""
         raise NotImplementedError(
             "You can only use Polynomial Basis Function in MetaMSS for now."

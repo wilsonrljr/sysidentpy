@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 
 import numpy as np
 
-from ..narmax_base import InformationMatrix
+from sysidentpy.utils.information_matrix import build_output_matrix
 
 
 def _initial_values(psi: np.ndarray):
@@ -147,11 +147,10 @@ class BaseEstimator(metaclass=ABCMeta):
            https://en.wikipedia.org/wiki/Least_squares
         """
         e = y - np.dot(psi, theta)
-        im = InformationMatrix(ylag=elag)
         for _ in range(uiter):
             e = np.concatenate([np.zeros([max_lag, 1]), e], axis=0)
 
-            lagged_data = im.build_output_matrix(None, e)
+            lagged_data = build_output_matrix(e, elag)
 
             e_regressors = basis_function.fit(
                 lagged_data,

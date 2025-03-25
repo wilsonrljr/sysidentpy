@@ -1,10 +1,7 @@
-"""Build Polynomial NARMAX Models using FROLS algorithm."""
+"""Build NARMAX Models using UOFR algorithm."""
 
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
-#           Luan Pascoal da Costa Andrade <luan_pascoal13@hotmail.com>
-#           Samuel Carlos Pessoa Oliveira <samuelcpoliveira@gmail.com>
-#           Samir Angelo Milani Martins <martins@ufsj.edu.br>
 # License: BSD 3 clause
 
 from typing import Union, Tuple, Optional
@@ -57,14 +54,14 @@ Estimators = Union[
 ]
 
 
-class FROLS(OFRBase):
-    r"""Forward Regression Orthogonal Least Squares algorithm.
+class UOFR(OFRBase):
+    r"""Ultra Orthogonal Forward Regression algorithm.
 
-    This class uses the FROLS algorithm ([1]_, [2]_) to build NARMAX models.
+    This class uses the UOFR algorithm ([1]) to build NARMAX models.
     The NARMAX model is described as:
 
     $$
-        y_k= F^\ell[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1},
+        y_k= F[y_{k-1}, \dotsc, y_{k-n_y},x_{k-d}, x_{k-d-1},
         \dotsc, x_{k-d-n_x}, e_{k-1}, \dotsc, e_{k-n_e}] + e_k
     $$
 
@@ -73,9 +70,9 @@ class FROLS(OFRBase):
     $x_k \in \mathbb{R}^{n_x}$ is the system input and $y_k \in \mathbb{R}^{n_y}$
     is the system output at discrete time $k \in \mathbb{N}^n$;
     $e_k \in \mathbb{R}^{n_e}4 stands for uncertainties and possible noise
-    at discrete time $k$. In this case, $\mathcal{F}^\ell$ is some nonlinear function
-    of the input and output regressors with nonlinearity degree $\ell \in \mathbb{N}$
-    and $d$ is a time delay typically set to $d=1$.
+    at discrete time $k$. In this case, $\mathcal{F}$ is some nonlinear function
+    of the input and output regressors and $d$ is a time delay typically set to
+     $d=1$.
 
     Parameters
     ----------
@@ -123,7 +120,7 @@ class FROLS(OFRBase):
     ...                                                    sigma=0.2,
     ...                                                    train_percentage=90)
     >>> basis_function = Polynomial(degree=2)
-    >>> model = FROLS(basis_function=basis_function,
+    >>> model = UOFR(basis_function=basis_function,
     ...               order_selection=True,
     ...               n_info_values=10,
     ...               extended_least_squares=False,
@@ -150,12 +147,9 @@ class FROLS(OFRBase):
 
     References
     ----------
-    - Manuscript: Orthogonal least squares methods and their application
-       to non-linear system identification
-       https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
-    - Manuscript (portuguese): Identificação de Sistemas não Lineares
-       Utilizando Modelos NARMAX Polinomiais - Uma Revisão
-       e Novos Resultados
+    - Manuscript: Ultra-Orthogonal Forward Regression Algorithms for the
+        Identification of Non-Linear Dynamic Systems
+       https://eprints.whiterose.ac.uk/107310/1/UOFR%20Algorithms%20R1.pdf
 
     """
 
@@ -204,85 +198,111 @@ class FROLS(OFRBase):
         self.theta = None
         self.pivv = None
 
-    def error_reduction_ratio(
-        self, psi: np.ndarray, y: np.ndarray, process_term_number: int
+    def gaussian_test_function(self, t: np.ndarray, order: int) -> np.ndarray:
+        """Generate Gaussian-like test function derivatives."""
+        sigma = 1.0  # Adjust based on signal characteristics
+        gaussian = np.exp(-(t**2) / (2 * sigma**2))
+        derivative = np.gradient(gaussian, t)
+        for _ in range(order - 1):
+            derivative = np.gradient(derivative, t)
+        return derivative
+
+    def normalize_test_function(self, phi_j: np.ndarray) -> np.ndarray:
+        """Normalize derivatives."""
+        norm = np.linalg.norm(phi_j, ord=2)
+        return phi_j / norm if norm != 0 else phi_j
+
+    def compute_modulated_signal(
+        self, signal: np.ndarray, phi_bar_j: np.ndarray
+    ) -> np.ndarray:
+        modulated = np.convolve(signal.flatten(), phi_bar_j, mode="valid")
+        return modulated  # Length = len(signal) - len(phi_bar_j) + 1
+
+    def augment_uls_terms(
+        self, y: np.ndarray, psi: np.ndarray, m: int = 2, test_support: int = 5
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Augment signals for ULS with matching row counts."""
+        modulated_length = len(y) - test_support + 1
+        num_terms = psi.shape[1]
+        t = np.linspace(-3, 3, test_support)
+
+        # Initialize y_augmented and psi_augmented with original truncated signals
+        y_augmented = y[:modulated_length].reshape(-1, 1)
+        psi_augmented = psi[:modulated_length, :]
+
+        for j in range(1, m + 1):
+            phi_j = self.gaussian_test_function(t, order=j)
+            phi_bar_j = self.normalize_test_function(phi_j)
+            y_j = self.compute_modulated_signal(y, phi_bar_j).reshape(-1, 1)
+            y_augmented = np.vstack([y_augmented, y_j])
+            modulated_terms = np.zeros((modulated_length, num_terms))
+            for term in range(num_terms):
+                x_j = self.compute_modulated_signal(psi[:, term], phi_bar_j)
+                modulated_terms[:, term] = x_j
+
+            psi_augmented = np.vstack([psi_augmented, modulated_terms])
+
+        return y_augmented, psi_augmented
+
+    def sobolev_error_reduction_ratio(
+        self,
+        psi: np.ndarray,
+        y: np.ndarray,
+        process_term_number: int,
+        m: int = 2,
+        test_support: int = 5,
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """Perform the Error Reduction Ration algorithm.
-
-        Parameters
-        ----------
-        y : array-like of shape = n_samples
-            The target data used in the identification process.
-        psi : ndarray of floats
-            The information matrix of the model.
-        process_term_number : int
-            Number of Process Terms defined by the user.
-
-        Returns
-        -------
-        err : array-like of shape = number_of_model_elements
-            The respective ERR calculated for each regressor.
-        piv : array-like of shape = number_of_model_elements
-            Contains the index to put the regressors in the correct order
-            based on err values.
-        psi_orthogonal : ndarray of floats
-            The updated and orthogonal information matrix.
-
-        References
-        ----------
-        - Manuscript: Orthogonal least squares methods and their application
-           to non-linear system identification
-           https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
-        - Manuscript (portuguese): Identificação de Sistemas não Lineares
-           Utilizando Modelos NARMAX Polinomiais - Uma Revisão
-           e Novos Resultados
-
-        """
-        squared_y = np.dot(y[self.max_lag :].T, y[self.max_lag :])
-        tmp_psi = psi.copy()
+        """Define Ultra Orthogonal Least Squares."""
         y = y[self.max_lag :, 0].reshape(-1, 1)
-        tmp_y = y.copy()
-        dimension = tmp_psi.shape[1]
-        piv = np.arange(dimension)
-        tmp_err = np.zeros(dimension)
-        err = np.zeros(dimension)
+        y_augmented, psi_augmented = self.augment_uls_terms(y, psi, m, test_support)
+        y_augmented = y_augmented.reshape(-1, 1)
+        # Compute ERR on the augmented ULS matrix
+        squared_y = np.dot(y_augmented.T, y_augmented)
+        psi_working = psi_augmented.copy()
+        y_working = y_augmented.copy()
+        num_terms = psi_working.shape[1]
+        piv = np.arange(num_terms)
+        candidate_err = np.zeros(num_terms)
+        err = np.zeros(num_terms)
 
-        for i in np.arange(0, dimension):
-            for j in np.arange(i, dimension):
-                # Add `eps` in the denominator to omit division by zero if
-                # denominator is zero
-                # To implement regularized regression (ridge regression), add
-                # alpha to psi.T @ psi.   See S. Chen, Local regularization assisted
-                # orthogonal least squares regression, Neurocomputing 69 (2006) 559-585.
-                # The version implemented below uses the same regularization for every
-                # feature, # What Chen refers to Uniform regularized orthogonal least
-                # squares (UROLS) Set to tiny (self.eps) when you are not regularizing.
-                # alpha = eps is the default.
-                tmp_err[j] = (
-                    (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2)
+        for step_idx in np.arange(0, num_terms):
+            for term_idx in np.arange(step_idx, num_terms):
+                candidate_err[term_idx] = (
+                    (
+                        np.dot(psi_working[step_idx:, term_idx].T, y_working[step_idx:])
+                        ** 2
+                    )
                     / (
-                        (np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) + self.alpha)
+                        (
+                            np.dot(
+                                psi_working[step_idx:, term_idx].T,
+                                psi_working[step_idx:, term_idx],
+                            )
+                            + self.alpha
+                        )
                         * squared_y
                     )
                     + self.eps
                 )[0, 0]
 
-            piv_index = np.argmax(tmp_err[i:]) + i
-            err[i] = tmp_err[piv_index]
-            if i == process_term_number:
+            max_err_idx = np.argmax(candidate_err[step_idx:]) + step_idx
+            err[step_idx] = candidate_err[max_err_idx]
+            if step_idx == process_term_number:
                 break
 
-            if (self.err_tol is not None) and (err.cumsum()[i] >= self.err_tol):
-                self.n_terms = i + 1
-                process_term_number = i + 1
+            if (self.err_tol is not None) and (err.cumsum()[step_idx] >= self.err_tol):
+                self.n_terms = step_idx + 1
+                process_term_number = step_idx + 1
                 break
 
-            tmp_psi[:, [piv_index, i]] = tmp_psi[:, [i, piv_index]]
-            piv[[piv_index, i]] = piv[[i, piv_index]]
-            v = house(tmp_psi[i:, i])
-            row_result = rowhouse(tmp_psi[i:, i:], v)
-            tmp_y[i:] = rowhouse(tmp_y[i:], v)
-            tmp_psi[i:, i:] = np.copy(row_result)
+            psi_working[:, [max_err_idx, step_idx]] = psi_working[
+                :, [step_idx, max_err_idx]
+            ]
+            piv[[max_err_idx, step_idx]] = piv[[step_idx, max_err_idx]]
+            reflector = house(psi_working[step_idx:, step_idx])
+            row_result = rowhouse(psi_working[step_idx:, step_idx:], reflector)
+            y_working[step_idx:] = rowhouse(y_working[step_idx:], reflector)
+            psi_working[step_idx:, step_idx:] = np.copy(row_result)
 
         tmp_piv = piv[0:process_term_number]
         psi_orthogonal = psi[:, tmp_piv]
@@ -291,7 +311,7 @@ class FROLS(OFRBase):
     def run_mss_algorithm(
         self, psi: np.ndarray, y: np.ndarray, process_term_number: int
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        return self.error_reduction_ratio(psi, y, process_term_number)
+        return self.sobolev_error_reduction_ratio(psi, y, process_term_number)
 
     def fit(self, *, X: Optional[np.ndarray] = None, y: np.ndarray):
         """Fit polynomial NARMAX model.
@@ -335,33 +355,6 @@ class FROLS(OFRBase):
         steps_ahead: Optional[int] = None,
         forecast_horizon: Optional[int] = None,
     ) -> np.ndarray:
-        """Return the predicted values given an input.
-
-        The predict function allows a friendly usage by the user.
-        Given a previously trained model, predict values given
-        a new set of data.
-
-        This method accept y values mainly for prediction n-steps ahead
-        (to be implemented in the future)
-
-        Parameters
-        ----------
-        X : ndarray of floats
-            The input data to be used in the prediction process.
-        y : ndarray of floats
-            The output data to be used in the prediction process.
-        steps_ahead : int (default = None)
-            The user can use free run simulation, one-step ahead prediction
-            and n-step ahead prediction.
-        forecast_horizon : int, default=None
-            The number of predictions over the time.
-
-        Returns
-        -------
-        yhat : ndarray of floats
-            The predicted values of the model.
-
-        """
         yhat = super().predict(
             X=X, y=y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
         )

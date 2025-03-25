@@ -7,7 +7,8 @@ from typing import Optional
 import numpy as np
 
 from .basis_function_base import BaseBasisFunction
-from sysidentpy.narmax_base import get_max_xlag, get_max_ylag
+
+from sysidentpy.utils.lags import get_max_xlag, get_max_ylag
 
 
 class Bilinear(BaseBasisFunction):
@@ -90,9 +91,7 @@ class Bilinear(BaseBasisFunction):
 
         """
         # Create combinations of all columns based on its index
-        iterable_list = range(
-            data.shape[1]
-        )  # self.get_iterable_list(ylag, xlag, model_type)
+        iterable_list = range(data.shape[1])
         combination_list = list(
             combinations_with_replacement(iterable_list, self.degree)
         )

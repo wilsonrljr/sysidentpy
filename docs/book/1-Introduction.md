@@ -16,7 +16,7 @@ Typing efficiently on a conventional QWERTY keyboard layout is the result of a w
 
 Mathematical modeling touches on many parts of our lives. Whether we're looking at economic trends, tracking how diseases spread, or figuring out consumer behavior, models are essential tools for gaining knowledge, making informed decisions, and take control over complex systems.
 
-In essence, mathematical models help us make sense of the world. They let us understand human behavior and the systems we deal with every day. By using these models, we can learn, adapt, and adjust our strategies to keep up with the changes around us.
+In essence, mathematical models help us make sense of the world. They let us understand human behavior and the systems we deal with every day. By using these models, we can learn, adapt, and adjust our strategies to keep up with the surrounding changes.
 
 ## System Identification
 
@@ -54,7 +54,7 @@ The main steps involved to build NARMAX models are [(Billings, 2013)](https://ww
 6. Analysis: understanding the dynamical properties of the system under study
 7. Control: develop control design schemes based on the obtained model.
 
-Model Structure Selection (MSS) is the most important aspect of NARMAX methods and the most complex. Selecting the model terms is fundamental if the goal of the identification is to obtain models that can reproduce the dynamics of the original system and impacts every other aspect of the identification process. Problems related to overparameterization and numerical ill-conditioning are typical because of the limitations the identification algorithms in selecting the appropriate terms that should compose the final model ([L. A. Aguirre e S. A. Billings](https://www.sciencedirect.com/science/article/abs/pii/0167278995900535), [L. Piroddi e W. Spinelli](https://www.tandfonline.com/doi/abs/10.1080/00207170310001635419)).
+Model Structure Selection (MSS) is the most important aspect of NARMAX methods and the most complex. Selecting the model terms is fundamental if the goal of the identification is to obtain models that can reproduce the dynamics of the original system and impacts every other aspect of the identification process. Problems related to over parameterization and numerical ill-conditioning are typical because of the limitations the identification algorithms in selecting the appropriate terms that should compose the final model ([L. A. Aguirre e S. A. Billings](https://www.sciencedirect.com/science/article/abs/pii/0167278995900535), [L. Piroddi e W. Spinelli](https://www.tandfonline.com/doi/abs/10.1080/00207170310001635419)).
 
 > In SysIdentPy, you are allowed to interact directly with every item described in the 7 steps, except for the control one. SysIdentPy focuses on modeling, not on control design. You'll have to use some of the code bellow in every modeling task using SysIdentPy. You'll learn the details along the book, so don't worry if you are not familiar with those methods yet.
 
@@ -113,7 +113,7 @@ plt.show()
 
 Now, let’s consider a dynamic system: using an air conditioner to lower the room temperature. This example effectively illustrates the concepts of dynamic systems and how their output responds over time.
 
-Let’s imagine this from the perspective of signals. The input signal represents the state of the air conditioner’s control: turning the air conditioner on (high level) or turning it off (low level). When the air conditioner is turned on, it begins to cool the room. However, the room temperature does not drop instantaneously to the desired cooler level. It takes time for the air conditioner to affect the temperature, and the rate at which the temperature decreases can vary based on factors like the room size and insulation.
+Let’s imagine this from the perspective of signals. The input signal represents the state of the air conditioner's control: turning the air conditioner on (high level) or turning it off (low level). When the air conditioner is turned on, it begins to cool the room. However, the room temperature does not drop instantaneously to the desired cooler level. It takes time for the air conditioner to affect the temperature, and the rate at which the temperature decreases can vary based on factors like the room size and insulation.
 
 Conversely, when the air conditioner is turned off, the room temperature does not immediately return to its original ambient temperature. Instead, it gradually warms up as the cooling effect diminishes.
 
@@ -146,7 +146,7 @@ where $\alpha$ and $\beta$ are constants that determine the system's response. T
 
 In summary, static systems are modeled by algebraic equations, while dynamic systems are modeled by differential equations.
 
-> As Luis Antonio Aguirre states in one of his [classes on Youtube (in Portuguese)](https://www.youtube.com/watch?v=OVs0p2jem1Q), **all physical systems are dynamic, but depending on the time scale, they can be modeled as static for simplification**. For example, the transition between the effects on the guitar sound, if taken in seconds (as we did in the example), could be treated as static depending on your analysis. However, the pedal board have components like capacitors, which are dynamic electrical components, making it a dynamic system. The response, however, is so fast that we dealt with it like a static system. Therefore, representing a system as static is a **modeling decision**.
+> As Luis Antonio Aguirre states in one of his [classes on YouTube (in Portuguese)](https://www.youtube.com/watch?v=OVs0p2jem1Q), **all physical systems are dynamic, but depending on the timescale, they can be modeled as static for simplification**. For example, the transition between the effects on the guitar sound, if taken in seconds (as we did in the example), could be treated as static depending on your analysis. However, the pedal board have components like capacitors, which are dynamic electrical components, making it a dynamic system. The response, however, is so fast that we dealt with it like a static system. Therefore, representing a system as static is a **modeling decision**.
 
 Table 1 shows how this field can be categorized with respect to linear/nonlinear and static/dynamic systems.
 
@@ -259,5 +259,5 @@ The goals of this book are to help you:
 - Interpret and comprehend the obtained results.
 - valuate the reliability and limitations of your models.
 
-Many chapters includes real-world examples and data, guiding you on how to apply these methods using SysIdentPy in practice.
+Many chapters include real-world examples and data, guiding you on how to apply these methods using SysIdentPy in practice.
 
