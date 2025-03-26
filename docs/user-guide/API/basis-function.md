@@ -4,7 +4,7 @@ template: overrides/main.html
 
 # Documentation for `Basis Functions`
 
-::: sysidentpy.basis_function._bersntein
+::: sysidentpy.basis_function._bernstein
       show_root_heading: false
 
 ::: sysidentpy.basis_function._bilinear
