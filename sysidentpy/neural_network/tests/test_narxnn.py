@@ -770,8 +770,6 @@ def test_nfir_predict_output_shape():
         },  # optional parameters of the optimizer
     )
 
-    # x = np.random.rand(10, model.n_inputs)
-    # y_initial = np.random.rand(10, 1)
     model.fit(
         X=X_train[:30].reshape(-1, 1),
         y=y_train[:30].reshape(-1, 1),
@@ -819,7 +817,7 @@ def test_nfir_predict_initial_values():
         optim_params={
             "betas": (0.9, 0.999),
             "eps": 1e-05,
-        },  # optional parameters of the optimizer
+        },
     )
     model.fit(
         X=X_train[:30].reshape(-1, 1),
@@ -919,7 +917,7 @@ def test_basis_n_step_shape():
         optim_params={
             "betas": (0.9, 0.999),
             "eps": 1e-05,
-        },  # optional parameters of the optimizer
+        },
     )
 
     model.fit(
@@ -970,7 +968,7 @@ def test_basis_n_step_initial_values():
         optim_params={
             "betas": (0.9, 0.999),
             "eps": 1e-05,
-        },  # optional parameters of the optimizer
+        },
     )
     model.fit(
         X=X_train[:30].reshape(-1, 1),

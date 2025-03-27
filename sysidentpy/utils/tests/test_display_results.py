@@ -5,11 +5,9 @@ from sysidentpy.utils.display_results import results
 
 def test_results_valid_input():
     """Test results function with valid input."""
-    final_model = np.array(
-        [[1001, 2002], [1002, 0], [3001, 1001]]
-    )  # Example model regressors
-    theta = np.array([[1.2345], [2.3456], [3.4567]])  # Parameters
-    err = np.array([0.12345678, 0.23456789, 0.34567890])  # ERR values
+    final_model = np.array([[1001, 2002], [1002, 0], [3001, 1001]])
+    theta = np.array([[1.2345], [2.3456], [3.4567]])
+    err = np.array([0.12345678, 0.23456789, 0.34567890])
     n_terms = 3
 
     output = results(
