@@ -7,10 +7,19 @@ template: overrides/main.html
 ::: sysidentpy.utils.check_arrays
       show_root_heading: false
 
+::: sysidentpy.utils.deprecation
+      show_root_heading: false
+
 ::: sysidentpy.utils.display_results
       show_root_heading: false
 
 ::: sysidentpy.utils.generate_data
+      show_root_heading: false
+
+::: sysidentpy.utils.information_matrix
+      show_root_heading: false
+
+::: sysidentpy.utils.lags
       show_root_heading: false
 
 ::: sysidentpy.utils.narmax_tools
@@ -20,4 +29,7 @@ template: overrides/main.html
       show_root_heading: false
 
 ::: sysidentpy.utils.save_load
+      show_root_heading: false
+
+::: sysidentpy.utils.simulation
       show_root_heading: false
