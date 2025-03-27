@@ -205,10 +205,12 @@ nav:
           - use-extended-least-squares: user-guide/how-to/use-extended-least-squares.ipynb
       - API:
           - NARMAX Base: user-guide/API/narmax-base.md
+          - OFR Base: user-guide/API/ofr-base.md
           - Basis Functions: user-guide/API/basis-function.md
           - FROLS: user-guide/API/frols.md
           - MetaMSS: user-guide/API/metamss.md
           - AOLS: user-guide/API/aols.md
+          - UOFR: user-guide/API/uofr.md
           - Entropic Regression: user-guide/API/entropic-regression.md
           - Neural NARX: user-guide/API/neural-narx.md
           - General Estimators: user-guide/API/general-estimators.md
