@@ -136,7 +136,7 @@ class Laguerre(BaseBasisFunction):
 
         Returns
         -------
-        X_tr : {ndarray, sparse matrix} of shape (n_samples, n_features)
+        x_tr : {ndarray, sparse matrix} of shape (n_samples, n_features)
             Transformed array.
 
         """

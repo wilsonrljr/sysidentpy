@@ -64,7 +64,7 @@ class Bilinear(BaseBasisFunction):
     ):
         """Build the Bilinear information matrix.
 
-        Each columns of the information matrix represents a candidate
+        Each column of the information matrix represents a candidate
         regressor. The set of candidate regressors are based on xlag,
         ylag, and degree defined by the user.
 
@@ -167,7 +167,7 @@ class Bilinear(BaseBasisFunction):
 
         Returns
         -------
-        X_tr : {ndarray, sparse matrix} of shape (n_samples, n_features)
+        x_tr : {ndarray, sparse matrix} of shape (n_samples, n_features)
             Transformed array.
 
         """

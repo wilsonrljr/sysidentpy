@@ -36,7 +36,6 @@ def test_simulate_theta():
 
     s = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=True)
 
-    # the model must be a numpy array
     model = np.array(
         [
             [1001, 0],  # y(k-1)
@@ -72,7 +71,6 @@ def test_estimate_parameter():
 
 def test_default_values():
     default = {
-        # "estimator": RecursiveLeastSquares(),
         "eps": np.finfo(np.float64).eps,
         "model_type": "NARMAX",
         "estimate_parameter": True,
@@ -80,7 +78,6 @@ def test_default_values():
     }
     model = SimulateNARMAX(basis_function=Polynomial())
     model_values = [
-        # model.estimator,
         model.eps,
         model.model_type,
         model.estimate_parameter,
@@ -122,7 +119,6 @@ def test_model_order_selection():
 
     s = SimulateNARMAX(basis_function=Fourier(), estimate_parameter=False)
 
-    # the model must be a numpy array
     model = np.array(
         [
             [1001, 0],  # y(k-1)
@@ -153,7 +149,6 @@ def test_raises():
 
     s = SimulateNARMAX(basis_function=Polynomial(degree=2), estimate_parameter=False)
 
-    # the model must be a numpy array
     model = np.array(
         [
             [1001, 0],  # y(k-1)
@@ -205,7 +200,6 @@ def test_estimate_parameter_conditions():
 
     s = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=True)
 
-    # the model must be a numpy array
     model = np.array(
         [
             [1001, 0],  # y(k-1)
@@ -234,7 +228,6 @@ def test_input_dimension():
         basis_function=Polynomial(), estimate_parameter=False, model_type="NAR"
     )
 
-    # the model must be a numpy array
     model = np.array(
         [
             [1001, 0],  # y(k-1)
@@ -258,7 +251,6 @@ def test_miso_dimension():
 
     s = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
 
-    # the model must be a numpy array
     model = np.array(
         [
             [1001, 0],  # y(k-1)
@@ -282,7 +274,6 @@ def test_forecast_horizon():
         basis_function=Polynomial(), estimate_parameter=False, model_type="NAR"
     )
 
-    # the model must be a numpy array
     model = np.array(
         [
             [1001, 0],  # y(k-1)
@@ -312,7 +303,6 @@ def test_estimate_parameter_narmax():
 
     s = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=True)
 
-    # the model must be a numpy array
     model = np.array(
         [
             [1001, 0],  # y(k-1)
@@ -341,7 +331,6 @@ def test_estimate_parameter_nar():
         basis_function=Polynomial(), estimate_parameter=True, model_type="NAR"
     )
 
-    # the model must be a numpy array
     model = np.array(
         [
             [1001, 0],  # y(k-1)
@@ -370,7 +359,6 @@ def test_estimate_parameter_nfir():
         basis_function=Polynomial(), estimate_parameter=True, model_type="NFIR"
     )
 
-    # the model must be a numpy array
     model = np.array(
         [
             [2001, 0],  # y(k-1)
@@ -390,9 +378,6 @@ def test_estimate_parameter_nfir():
     assert s.max_lag == 3
 
 
-##############
-
-
 def test_err_narmax():
     x_train, x_valid, y_train, y_valid = get_siso_data(
         n=1000, colored_noise=False, sigma=0.001, train_percentage=90
@@ -402,7 +387,6 @@ def test_err_narmax():
         basis_function=Polynomial(), calculate_err=True, estimate_parameter=True
     )
 
-    # the model must be a numpy array
     model = np.array(
         [
             [1001, 0],  # y(k-1)
@@ -434,7 +418,6 @@ def test_err_nar():
         model_type="NAR",
     )
 
-    # the model must be a numpy array
     model = np.array(
         [
             [1001, 0],  # y(k-1)
@@ -466,7 +449,6 @@ def test_err_nfir():
         model_type="NFIR",
     )
 
-    # the model must be a numpy array
     model = np.array(
         [
             [2001, 0],  # y(k-1)
@@ -496,7 +478,6 @@ def test_estimate_parameter_els():
         estimate_parameter=True,
     )
 
-    # the model must be a numpy array
     model = np.array(
         [
             [1001, 0],  # y(k-1)

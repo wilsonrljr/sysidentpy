@@ -33,13 +33,13 @@ def test_set_weights_default():
 
 def test_train_test_split():
     """Test train_test_split with valid inputs."""
-    X = np.random.rand(100, 5)
+    x = np.random.rand(100, 5)
     y = np.random.rand(100)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
 
-    assert X_train.shape[0] == 80, "X_train should have 80 samples"
-    assert X_test.shape[0] == 20, "X_test should have 20 samples"
+    assert x_train.shape[0] == 80, "x_train should have 80 samples"
+    assert x_test.shape[0] == 20, "x_test should have 20 samples"
     assert y_train.shape[0] == 80, "y_train should have 80 samples"
     assert y_test.shape[0] == 20, "y_test should have 20 samples"
 

@@ -99,9 +99,9 @@ class LeastSquares(BaseEstimator):
 
 @deprecated(
     version="v0.6.0",
-    future_version="v0.7.0",
+    future_version="v1.0.0",
     message=(
-        " `solver` is deprecated in v0.5.4 and will be removed in v0.7.0."
+        " `solver` is deprecated in v0.5.4 and will be removed in v1.0.0."
         " A single solver option will be retained moving forward."
     ),
 )

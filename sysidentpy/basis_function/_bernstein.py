@@ -10,9 +10,9 @@ from ..utils.deprecation import deprecated
 
 @deprecated(
     version="v0.5.0",
-    future_version="v0.6.0",
+    future_version="v1.0.0",
     message=(
-        " `bias` and `n` are deprecated in 0.5.0 and will be removed in 0.6.0."
+        " `bias` and `n` are deprecated in 0.5.0 and will be removed in 1.0.0."
         " Use `include_bias` and `degree`, respectively, instead."
     ),
 )

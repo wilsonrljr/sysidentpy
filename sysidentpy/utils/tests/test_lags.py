@@ -35,9 +35,9 @@ def test_get_max_ylag(ylag, expected):
 @pytest.mark.parametrize(
     ("xlag", "expected"),
     [
-        (1, 1),  # Single integer
-        ([1, 2, 3], 3),  # Flat list
-        ([[1, 2], [3, 4]], 4),  # Nested list
+        (1, 1),
+        ([1, 2, 3], 3),
+        ([[1, 2], [3, 4]], 4),
     ],
 )
 def test_get_max_xlag(xlag, expected):
@@ -63,7 +63,7 @@ def test_get_max_lag_from_model_code():
             [2002, 0],  # x1(k-2)
         ]
     )
-    assert get_max_lag_from_model_code(model) == 2  # Max sum of digits
+    assert get_max_lag_from_model_code(model) == 2
 
 
 def test_process_xlag():

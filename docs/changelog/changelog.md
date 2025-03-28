@@ -5,6 +5,77 @@ template: overrides/main.html
 
 # Changes in SysIdentPy
 
+## v0.6.0
+
+### CONTRIBUTORS
+
+- wilsonrljr
+- oliveira-mark
+
+### CHANGES
+
+This release introduces significant improvements focused on improving code organization, readability, and compliance with PEP8 standards. It also includes a new foundational class for Error Reduction Ratio (ERR) based algorithms, expanded testing, and the discontinuation of Python 3.7 support.
+
+
+- **New Features:**
+  - Introduced the `OFRBase` class, encapsulating common methods essential for ERR-based algorithms.
+  - Refactored the `FROLS` class to inherit from `OFRBase`, focusing it solely on the ERR algorithm.
+  - Implemented the Ultra Orthogonal Forward Regression (UOFR) algorithm, also inheriting from `OFRBase`.
+
+- **API Changes:**
+  - **BREAKING CHANGE**: Fixed a typo in Bernstein Basis Function. Previously it was defined as Bersntein.
+  - **Refactoring and Modularization:**
+    - Extracted the `InformationMatrix` class from `narmax_base` into a new module: `utils.information_matrix`.
+    - Moved specific methods to newly created modules: `utils.lags` and `utils.simulation`, promoting better separation of concerns.
+    - Add deprecation message for RidgeRegression `solver` argument.
+
+- **Code Quality Improvements:**
+  - Renamed variables and methods for better readability and PEP8 compliance, including changing uppercase variable names to lowercase.
+  - Updated imports to use new utility modules, reducing redundancy and improving maintainability.
+  - Removed unused imports and redundant parentheses, streamlining the codebase.
+  - Change python version in deploy action.
+
+- **Testing Enhancements:**
+  - Added comprehensive tests for basis functions: Bernstein, Bilinear, Hermite (normalized), Laguerre, and Legendre.
+  - Introduced tests for utility methods, including `narmax_tools`, `save_load`, and the new simulation utilities.
+  - Increased test coverage to **92%**, ensuring robustness and reliability.
+
+- **Validation and Error Handling:**
+  - Implemented a validation check for `train_percentage`, raising an error for values exceeding 100%.
+  - Adapted methods and tests following the removal of the `InformationMatrix` class to ensure consistency across the codebase.
+
+- **Documentation Updates:**
+  - Launched a redesigned frontend page featuring a modern UI and improved responsiveness.
+  - Restructured multiple sections for better organization and clarity.
+  - Overhauled key guides, including `quick_start`, `developer_guide`, and `user_guide`.
+  - Added new examples, including the Lorenz System and Chaotic Map.
+  - Enhanced grammar and readability across documentation.
+  - Updated dependencies related to `mkdocs` for better performance and compatibility.
+  - Improved Google Analytics integration.
+  - Fixed broken links for the Nubank and Estatidados blogs, and refined link formatting in the book.
+  - Updated class docstrings to align with the latest changes.
+  - Standardized docstrings and method signatures to use lowercase variable names, following PEP8 guidelines.
+  - Revised contribution examples to reflect the latest `sysidentpy` version.
+  - Integrated book examples into traditional documentation, with direct links to the book section.
+  - Adjusted structure, titles, and links across various docs and examples for better navigation.
+  - Removed dataset files; datasets are now hosted in a dedicated repository, `sysidentpy-data`.
+  - Acknowledged JetBrains support and collaboration in the README and sponsor page.
+  - Fix edit uri when clicking to edit doc page in doc website.
+  - Now every example loads the data from `sysidentpy-data` repository.
+
+- **Python Version Support Update:**
+  - **Support for Python 3.7 has been discontinued.** This aligns with the official end of support for Python 3.7 and resolves compatibility issues with newer dependencies.
+  - Certain parameter estimation algorithms, such as Bounded Variable Least Squares, require newer versions of SciPy that no longer support Python 3.7.
+  - Users can still run SysIdentPy on Python 3.7, but some features, including some parameter estimation functionalities, will be unavailable.
+
+### IMPACT
+
+These changes improve the modularity, readability, and maintainability of the codebase. The introduction of the `OFRBase` class simplifies the implementation of ERR-based algorithms, facilitating future extensions. Comprehensive testing ensures the reliability of both new and existing functionalities.
+
+### TESTING
+
+All new and existing tests were executed, achieving **92% test coverage**.
+
 ## v0.5.3
 
 ### CONTRIBUTORS

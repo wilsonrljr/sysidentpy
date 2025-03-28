@@ -52,11 +52,9 @@ def create_test_data():
     """
     theta = np.array([[0.6], [-0.5], [0.7], [-0.7], [0.2]])
 
-    # Load dataset from external source
     url = "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/testing/data_for_testing.txt"
     data = np.loadtxt(url)
 
-    # Extract input (x) and output (y)
     xt = data[:, 0].reshape(-1, 1)
     yt = data[:, 1].reshape(-1, 1)
 
@@ -337,7 +335,6 @@ def test_model_predict():
 def test_model_nfir():
     model = FROLS(
         n_terms=5,
-        # extended_least_squares=False,
         xlag=2,
         estimator=LeastSquares(),
         basis_function=Polynomial(degree=2),
@@ -407,7 +404,6 @@ def test_model_predict_fourier_steps_1():
 def test_model_predict_fourier_nar_inputs():
     model = FROLS(
         order_selection=True,
-        # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
         estimator=RecursiveLeastSquares(),
@@ -422,7 +418,6 @@ def test_model_predict_fourier_nar_inputs():
 def test_model_predict_fourier_raises():
     model = FROLS(
         order_selection=True,
-        # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
         estimator=RecursiveLeastSquares(),
@@ -438,7 +433,6 @@ def test_model_predict_fourier_raises():
 def test_model_predict_fourier_value_error():
     model = FROLS(
         order_selection=True,
-        # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
         estimator=RecursiveLeastSquares(),
@@ -460,7 +454,6 @@ def test_model_predict_fourier_value_error():
 def test_model_predict_fourier_horizon_error():
     model = FROLS(
         order_selection=True,
-        # extended_least_squares=False,
         ylag=[1, 2],
         xlag=2,
         estimator=RecursiveLeastSquares(),
@@ -483,7 +476,6 @@ def test_nar_step_ahead_insufficient_initial_conditions():
     """Test that _nar_step_ahead raises an error if input is too short."""
     model = FROLS(
         order_selection=True,
-        # extended_least_squares=False,
         ylag=[1, 2],
         estimator=RecursiveLeastSquares(),
         basis_function=Polynomial(degree=2),
