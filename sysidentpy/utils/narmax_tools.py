@@ -3,11 +3,20 @@
 from typing import Tuple, Optional
 import numpy as np
 
+from .deprecation import deprecated
 from ..narmax_base import RegressorDictionary
 from ..basis_function import Polynomial
 from .check_arrays import num_features
 
 
+@deprecated(
+    version="v0.6.0",
+    future_version="v1.0.0",
+    message=(
+        " `regressor_code` is deprecated in v0.6.0 and will be removed in v1.0.0."
+        " Use the `count_model_regressors` from sysidentpy.utils instead."
+    ),
+)
 def regressor_code(
     *,
     X: Optional[np.ndarray] = None,

@@ -6,6 +6,7 @@ site_author: Wilson Rocha
 # Repository
 repo_name: wilsonrljr/sysidentpy
 repo_url: https://github.com/wilsonrljr/sysidentpy
+edit_uri: edit/main/docs/
 
 # Copyright
 copyright: Copyright &copy; 2016 - 2025 Wilson Rocha

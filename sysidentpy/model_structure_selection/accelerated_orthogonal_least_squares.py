@@ -343,7 +343,7 @@ class AOLS(BaseMSS):
         )  # the number of terms we selected (necessary in the 'results' methods)
         self.err = self.n_terms * [
             0
-        ]  # just to use the `results` method. Will be changed in next update.
+        ]  # just to use the `results` method. Will be changed in future updates.
         return self
 
     def predict(

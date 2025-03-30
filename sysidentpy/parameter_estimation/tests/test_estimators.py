@@ -318,7 +318,6 @@ def test_lmsf():
 
 
 def test_unbiased_least_squares():
-    # x, y, theta = create_test_data()
     basis_function = Polynomial(degree=2)
     model = FROLS(
         n_terms=5,

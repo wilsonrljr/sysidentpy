@@ -16,7 +16,7 @@
 <h1 align="center"> NARMAX Methods For System Identification and TimeSeries Forecasting </h1>
 <h3 align="center">From Classical Approaches to Neural Networks</h3>
 
-**SysIdentPy** offers State of the Art techniques to build your NARMAX models, including its variants `NARX`, `NARMA`, `NAR`, `NFIR`, `ARMAX`, `ARX`, `ARMA` and others. It also includes tons of interesting examples to help you build nonlinear forecasting models using SysIdentPy.
+**SysIdentPy** offers State-of-the-Art techniques to build your NARMAX models, including its variants `NARX`, `NARMA`, `NAR`, `NFIR`, `ARMAX`, `ARX`, `ARMA` and others. It also includes tons of interesting examples to help you build nonlinear forecasting models using SysIdentPy.
 
 </div>
 
@@ -65,11 +65,11 @@ pip install sysidentpy
 
 `SysIdentPy` requires:
 
-- Python (>= 3.7)
+- Python (>= 3.8) (3.7 works for everything except for 3 parameter estimation methods)
 - NumPy (>= 1.9.2) for numerical algorithms
 - Matplotlib >= 3.3.2 for static plotting and visualizations
 - Pytorch (>=1.7.1) for building NARX neural networks
-- scipy (>= 1.7.0) for numerical and optimization algorithms
+- scipy (>= 1.8.0) for numerical and optimization algorithms
 
 The library is compatible with Linux, Windows, and macOS. Some examples may also require additional packages like pandas.
 
