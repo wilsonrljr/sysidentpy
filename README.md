@@ -169,13 +169,9 @@ Regressors     Parameters        ERR
 2  x1(k-1)y(k-1)     0.1000  0.00335113
 ````
 ```python
-plot_results(y=y_valid, yhat=yhat, n=1000)
-ee = compute_residues_autocorrelation(y_valid, yhat)
-plot_residues_correlation(data=ee, title="Residues", ylabel="$e^2$")
-x1e = compute_cross_correlation(y_valid, yhat, x_valid)
-plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
+plot_results(y=y_valid, yhat=yhat, n=100, figsize=(14, 3), linewidth=1.5)
 ```
-![polynomial](./examples/figures/polynomial_narmax.png)
+![polynomial](https://github.com/wilsonrljr/sysidentpy-data/blob/main/docs/images/readme_polynomial_narmax.png?raw=true)
 
 #### NARX Neural Network
 ```python
@@ -218,13 +214,9 @@ narx_net = NARXNN(
 
 narx_net.fit(X=x_train, y=y_train)
 yhat = narx_net.predict(X=x_valid, y=y_valid)
-plot_results(y=y_valid, yhat=yhat, n=1000)
-ee = compute_residues_autocorrelation(y_valid, yhat)
-plot_residues_correlation(data=ee, title="Residues", ylabel="$e^2$")
-x1e = compute_cross_correlation(y_valid, yhat, x_valid)
-plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
+plot_results(y=y_valid, yhat=yhat, n=100, figsize=(14, 3), linewidth=1.5)
 ```
-![neural](/examples/figures/narx_network.png)
+![neural](https://github.com/wilsonrljr/sysidentpy-data/blob/main/docs/images/readme_narx_network.png?raw=true)
 
 #### Catboost-narx
 ```python
@@ -251,13 +243,9 @@ catboost_narx = NARX(
 
 catboost_narx.fit(X=x_train, y=y_train)
 yhat = catboost_narx.predict(X=x_valid, y=y_valid)
-plot_results(y=y_valid, yhat=yhat, n=1000)
-ee = compute_residues_autocorrelation(y_valid, yhat)
-plot_residues_correlation(data=ee, title="Residues", ylabel="$e^2$")
-x1e = compute_cross_correlation(y_valid, yhat, x_valid)
-plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
+plot_results(y=y_valid, yhat=yhat, n=100, figsize=(14, 3), linewidth=1.5)
 ```
-![catboost](/examples/figures/catboost_narx.png)
+![catboost](https://github.com/wilsonrljr/sysidentpy-data/blob/main/docs/images/readme_catboost_narx.png?raw=true)
 
 #### Catboost without NARX configuration
 
@@ -265,26 +253,15 @@ The following is the Catboost performance without the NARX configuration.
 
 
 ```python
-
-def plot_results_tmp(y_valid, yhat):
-    _, ax = plt.subplots(figsize=(14, 8))
-    ax.plot(y_valid[:200], label='Data', marker='o')
-    ax.plot(yhat[:200], label='Prediction', marker='*')
-    ax.set_xlabel("$n$", fontsize=18)
-    ax.set_ylabel("$y[n]$", fontsize=18)
-    ax.grid()
-    ax.legend(fontsize=18)
-    plt.show()
-
 catboost = CatBoostRegressor(
   iterations=300,
   learning_rate=0.1,
   depth=6
 )
 catboost.fit(x_train, y_train, verbose=False)
-plot_results_tmp(y_valid, catboost.predict(x_valid))
+plot_results(y=y_valid, yhat=catboost.predict(x_valid), n=100, figsize=(14, 3), linewidth=1.5)
 ```
-![catboost](/examples/figures/catboost.png)
+![catboost](https://github.com/wilsonrljr/sysidentpy-data/blob/main/docs/images/readme_catboost_without_narx.png?raw=true)
 
 The examples directory has several Jupyter notebooks with tutorials of how to use the package and some specific applications of sysidentpy. Try it out!
 
