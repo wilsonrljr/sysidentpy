@@ -26,6 +26,8 @@ class Polynomial(BaseBasisFunction):
     ----------
     degree : int (max_degree), default=2
         The maximum degree of the polynomial features.
+    include_bias : bool, default=True
+        Whether to include the bias (constant) term in the output feature matrix.
 
     Notes
     -----
@@ -37,8 +39,10 @@ class Polynomial(BaseBasisFunction):
     def __init__(
         self,
         degree: int = 2,
+        include_bias: bool = True,
     ):
         self.degree = degree
+        self.include_bias = include_bias
 
     def fit(
         self,
@@ -94,6 +98,11 @@ class Polynomial(BaseBasisFunction):
             ]
         )
         psi = psi[max_lag:, :]
+
+        if self.include_bias:
+            bias_column = np.ones((psi.shape[0], 1))
+            psi = np.hstack((bias_column, psi))
+
         return psi
 
     def transform(
