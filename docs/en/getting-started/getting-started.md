@@ -184,7 +184,7 @@ Would you like to help SysIdentPy, other users, and the author? You can "star" S
 
 Starring a repository makes it easy to find it later and help you to find similar projects on GitHub based on Github recommendation contents. Besides, by starring a repository also shows appreciation to the SysIdentPy maintainer for their work.
 
-[:octicons-star-fill-24:{ .mdx-heart } &nbsp; Join our <span class="mdx-sponsorship-count" data-mdx-component="sponsorship-count"></span> "Star" in github][wilsonrljr's sponsor profile]{ .md-button .md-button--primary .mdx-sponsorship-button }
+[:octicons-star-fill-24:{ .mdx-heart } &nbsp; Join our <span class="mdx-sponsorship-count" data-mdx-component="sponsorship-count"></span> "Sponsor" in github][wilsonrljr's sponsor profile]{ .md-button .md-button--primary .mdx-sponsorship-button }
 
   [wilsonrljr's sponsor profile]: https://github.com/sponsors/wilsonrljr
 

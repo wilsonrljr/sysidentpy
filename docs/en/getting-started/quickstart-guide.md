@@ -42,6 +42,7 @@ You can also define advanced NARX models such as Bayesian and Gradient Boosting 
 - Meta-model Structure Selection (MeMoSS)
 - Accelerated Orthogonal Least Squares (AOLS)
 - Entropic Regression
+- Ultra Orthogonal Least Squares (UOLS)
 
 ### Parameter Estimation Methods
 - Least Squares (LS)
@@ -82,7 +83,7 @@ You can also define advanced NARX models such as Bayesian and Gradient Boosting 
 
 ---
 
-As you can see, SysIdentPy supports numerous model combinations, each tailored to different use cases. But don’t worry about picking the perfect combination right away—let’s start with the default settings to get you up and running quickly.
+As you can see, SysIdentPy supports numerous model combinations, each tailored to different use cases. But don’t worry about picking the perfect combination right away. Let’s start with the default settings to get you up and running quickly.
 
 
 
