@@ -48,3 +48,5 @@ raw.githubusercontent.com/
 uv.lock
 .python-version
 
+# macos
+.DS_Store

@@ -13,8 +13,10 @@ copyright: Copyright &copy; 2016 - 2025 Wilson Rocha
 # Configuration
 theme:
   name: material
-  custom_dir: docs/
-  favicon: overrides/assets/img/favicon.png
+  docs_dir: docs/en/
+  custom_dir: docs/en/
+  site_dir: site/en/
+  favicon: en/assets/img/favicon.png
   logo: overrides/assets/img/logotype-sysidentpy.svg
   icon:
     logo: fontawesome/solid/house
@@ -109,6 +111,12 @@ plugins:
         - locale: pt
           name: Português (Brasil)
           build: true
+          site_description: De Métodos Clássicos a Redes Neurais
+          theme:
+            docs_dir: docs/pt/
+            custom_dir: docs/pt/
+            site_dir: site/pt/
+            logo: overrides/assets/img/logotype-sysidentpy.svg
 
 # Customization
 extra:
