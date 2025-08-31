@@ -2,7 +2,6 @@ site_name: SysIdentPy
 site_description: From Classical Approaches to Neural Networks
 site_url: https://sysidentpy.org/
 site_author: Wilson Rocha
-
 # Repository
 repo_name: wilsonrljr/sysidentpy
 repo_url: https://github.com/wilsonrljr/sysidentpy
@@ -14,9 +13,11 @@ copyright: Copyright &copy; 2016 - 2025 Wilson Rocha
 # Configuration
 theme:
   name: material
-  custom_dir: docs/
-  favicon: /overrides/assets/img/favicon.png
-  logo: /overrides/assets/img/logotype-sysidentpy.svg
+  docs_dir: docs/en/
+  custom_dir: docs/en/
+  site_dir: site/en/
+  favicon: en/assets/img/favicon.png
+  logo: overrides/assets/img/logotype-sysidentpy.svg
   icon:
     logo: fontawesome/solid/house
 
@@ -41,8 +42,6 @@ theme:
     - navigation.tabs.sticky
     - navigation.top
     - navigation.tracking
-    - navigation.instant
-    - navigation.instant.progress
     - search.highlight
     - search.share
     - search.suggest
@@ -102,6 +101,22 @@ plugins:
           options:
             show_source: true
             docstring_style: numpy
+  - i18n:
+      docs_structure: folder
+      languages:
+        - locale: en
+          default: true
+          name: English
+          build: true
+        - locale: pt
+          name: Português (Brasil)
+          build: true
+          site_description: De Métodos Clássicos a Redes Neurais
+          theme:
+            docs_dir: docs/pt/
+            custom_dir: docs/pt/
+            site_dir: site/pt/
+            logo: overrides/assets/img/logotype-sysidentpy.svg
 
 # Customization
 extra:
@@ -124,6 +139,10 @@ markdown_extensions:
   - def_list
   - footnotes
   - md_in_html
+  - toc:
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
   - toc:
       permalink: true
   - pymdownx.arithmatex:

@@ -1,0 +1,840 @@
+{#- This file was automatically generated - do not edit -#} {% extends
+"overrides/main.html" %} {% block tabs %} {{ super() }}
+
+<section id="hero">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1>
+                    Sistemas Dinâmicos e Séries Temporais com <span>SysIdentPy</span>
+                </h1>
+                <p>
+                    SysIdentPy é uma biblioteca Python fácil de usar para identificação de sistemas e previsão de séries temporais!
+                </p>
+            </div>
+            <div class="col">
+                <a
+                    class="btn solid-orange"
+                    href="https://sysidentpy.org/getting-started/getting-started/"
+                    >Comece Agora</a
+                >
+                <span class="copy-pip"
+                    ><b id="install">pip install sysidentpy</b>
+                    <button onclick="installCode()">
+                        <i class="far fa-copy"></i></button
+                ></span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="example">
+    <img
+        class="img-bg"
+        src="overrides/assets/img/header/bg-chart.svg"
+        alt="Background chart"
+    />
+    <div class="browser">
+        <header>
+            <div class="controllers">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <p>Introdução ao SysIdentPy</p>
+        </header>
+        <nav>
+            <button
+                class="tablinks"
+                onclick="openTab(event, 'PolynomialNARX')"
+                id="defaultOpen"
+            >
+                Polynomial NARX
+            </button>
+            <button class="tablinks" onclick="openTab(event, 'LegendreNARX')">
+                Legendre NARX
+            </button>
+            <button class="tablinks" onclick="openTab(event, 'FourierNARX')">
+                Fourier NARX
+            </button>
+            <button class="tablinks" onclick="openTab(event, 'NeuralNARX')">
+                Neural NARX
+            </button>
+            <button class="tablinks" onclick="openTab(event, 'BayesianNARX')">
+                Bayesian NARX
+            </button>
+            <button class="tablinks" onclick="openTab(event, 'CatboostNARX')">
+                Catboost NARX
+            </button>
+        </nav>
+        <main>
+            <div id="PolynomialNARX" class="tabcontent">
+                <div class="code">
+                    <pre>
+                <code class="language-python">
+    from sysidentpy.model_structure_selection import FROLS
+    from sysidentpy.basis_function import Polynomial
+    from sysidentpy.utils.generate_data import get_siso_data
+
+    x_train, x_valid, y_train, y_valid = get_siso_data(
+        n=1000, colored_noise=False, sigma=0.0001, train_percentage=90
+    )
+
+    basis_function = Polynomial(degree=2)
+    model = FROLS(ylag=2, xlag=2, basis_function=basis_function)
+
+    model.fit(X=x_train, y=y_train)
+    yhat = model.predict(X=x_valid, y=y_valid)
+                </code>
+              </pre>
+                </div>
+                <div class="chart">
+                    <div id="chart1"></div>
+                </div>
+            </div>
+
+            <div id="LegendreNARX" class="tabcontent">
+                <div class="code">
+                    <pre>
+                <code class="language-python">
+    from sysidentpy.model_structure_selection import FROLS
+    from sysidentpy.basis_function import Legendre
+    from sysidentpy.utils.generate_data import get_siso_data
+
+    x_train, x_valid, y_train, y_valid = get_siso_data(
+        n=1000, colored_noise=False, sigma=0.0001, train_percentage=90
+    )
+
+    basis_function = Legendre(degree=2)
+    model = FROLS(ylag=2, xlag=2, basis_function=basis_function)
+
+    model.fit(X=x_train, y=y_train)
+    yhat = model.predict(X=x_valid, y=y_valid)
+                </code>
+              </pre>
+                </div>
+                <div class="chart">
+                    <div id="chart2"></div>
+                </div>
+            </div>
+
+            <div id="FourierNARX" class="tabcontent">
+                <div class="code">
+                    <pre>
+                <code class="language-python">
+    from sysidentpy.model_structure_selection import FROLS
+    from sysidentpy.basis_function import Fourier
+    from sysidentpy.utils.generate_data import get_siso_data
+
+    x_train, x_valid, y_train, y_valid = get_siso_data(
+        n=1000, colored_noise=False, sigma=0.0001, train_percentage=90
+    )
+
+    basis_function = Fourier(degree=2)
+    model = FROLS(ylag=2, xlag=2, basis_function=basis_function)
+
+    model.fit(X=x_train, y=y_train)
+    yhat = model.predict(X=x_valid, y=y_valid)
+                </code>
+              </pre>
+                </div>
+                <div class="chart">
+                    <div id="chart3"></div>
+                </div>
+            </div>
+
+            <div id="NeuralNARX" class="tabcontent">
+                <div class="code">
+                    <pre>
+                <code class="language-python">
+    from torch import nn
+    from sysidentpy.neural_network import NARXNN
+
+    from sysidentpy.basis_function import Polynomial
+    from sysidentpy.utils.generate_data import get_siso_data
+
+    x_train, x_valid, y_train, y_valid = get_siso_data(
+        n=1000, colored_noise=False, sigma=0.01, train_percentage=80
+    )
+
+    class NARX(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.lin = nn.Linear(4, 30)
+            self.lin2 = nn.Linear(30, 1)
+            self.tanh = nn.Tanh()
+
+        def forward(self, xb):
+            z = self.lin(xb)
+            z = self.tanh(z)
+            z = self.lin2(z)
+            return z
+
+
+    narx_net2 = NARXNN(
+        net=NARX(),
+        ylag=2,
+        xlag=2,
+        basis_function=Polynomial(degree=1),
+        optimizer="Adam",
+        optim_params={
+            "betas": (0.9, 0.999),
+            "eps": 1e-05,
+        },
+    )
+
+    narx_net2.fit(X=x_train, y=y_train)
+    yhat = narx_net2.predict(X=x_valid, y=y_valid)
+                </code>
+              </pre>
+                </div>
+                <div class="chart">
+                    <div id="chart4"></div>
+                </div>
+            </div>
+
+            <div id="BayesianNARX" class="tabcontent">
+                <div class="code">
+                    <pre>
+                <code class="language-python">
+    from sysidentpy.utils.generate_data import get_siso_data
+    from sysidentpy.general_estimators import NARX
+    from sklearn.linear_model import BayesianRidge
+    from sysidentpy.basis_function import Polynomial
+
+    x_train, x_valid, y_train, y_valid = get_siso_data(
+        n=1000, colored_noise=False, sigma=0.0001, train_percentage=90
+    )
+
+    BayesianRidge_narx = NARX(
+        base_estimator=BayesianRidge(),
+        xlag=2,
+        ylag=2,
+        basis_function=Polynomial(degree=2),
+        model_type="NARMAX",
+    )
+
+    BayesianRidge_narx.fit(X=x_train, y=y_train)
+    yhat = BayesianRidge_narx.predict(X=x_valid, y=y_valid)
+                </code>
+              </pre>
+                </div>
+                <div class="chart">
+                    <div id="chart5"></div>
+                </div>
+            </div>
+
+            <div id="CatboostNARX" class="tabcontent">
+                <div class="code">
+                    <pre>
+                <code class="language-python">
+    from catboost import CatBoostRegressor
+    from sysidentpy.utils.generate_data import get_siso_data
+    from sysidentpy.general_estimators import NARX
+    from sysidentpy.basis_function import Polynomial
+
+    x_train, x_valid, y_train, y_valid = get_siso_data(
+        n=1000, colored_noise=False, sigma=0.0001, train_percentage=90
+    )
+
+    catboost_narx = NARX(
+        base_estimator=CatBoostRegressor(
+            iterations=300,
+            learning_rate=0.1
+        ),
+        xlag=2,
+        ylag=2,
+        basis_function=Polynomial(degree=2),
+        model_type="NARMAX",
+        fit_params={"verbose": False},
+    )
+
+    catboost_narx.fit(X=x_train, y=y_train)
+    yhat = catboost_narx.predict(X=x_valid, y=y_valid, steps_ahead=None)
+                </code>
+              </pre>
+                </div>
+                <div class="chart">
+                    <div id="chart6"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+</section>
+
+<section id="companeis">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h3>Companies using</h3>
+            </div>
+            <div class="col">
+                <img
+                    src="overrides/assets/img/logos/logo-01.png"
+                    alt="A3Data"
+                />
+                <img src="overrides/assets/img/logos/logo-02.png" alt="Gcom" />
+                <img
+                    src="overrides/assets/img/logos/logo-03.png"
+                    alt="Technium"
+                />
+                <img
+                    src="overrides/assets/img/logos/logo-01.png"
+                    alt="A3Data"
+                />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="content">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <img src="overrides/assets/img/content/img-mockup-book.png" />
+            </div>
+            <div class="col">
+                <div class="text-box">
+                    <h2>
+                        Identificação de Sistemas <strong>Não Lineares</strong> e Séries Temporais
+                    </h2>
+                    <p>
+                        Bem-vindo ao nosso livro de apoio sobre Identificação de Sistemas!
+                        Este livro é um guia abrangente para aprender sobre
+                        modelos dinâmicos e previsão de séries temporais.
+                    </p>
+                    <p>
+                        O principal objetivo deste livro é descrever um grande conjunto
+                        de algoritmos para a identificação, previsão
+                        e análise de sistemas não lineares.
+                    </p>
+                    <a
+                        href="https://sysidentpy.org/book/0-Preface/"
+                        class="btn light-border"
+                        ><img
+                            src="overrides/assets/img/icon/fi-rr-book-alt.svg"
+                            alt="Ebook Icon"
+                        />
+                        Baixe o E-book</a
+                    >
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="features">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="grid-features">
+                    <div class="item">
+                        <h2>
+                            Documentação
+                            <strong
+                                >robusta<br />
+                                + exemplos</strong
+                            >
+                        </h2>
+                        <p>
+                            Há muitos exemplos interessantes para ajudá-lo a
+                            aprender mais sobre SysIdentPy. Você pode começar com nossos tutoriais
+                            oficiais agora mesmo!
+                        </p>
+                    </div>
+                    <div class="item">
+                        <a
+                            href="https://sysidentpy.org/getting-started/getting-started/"
+                            class="card-feature"
+                        >
+                            <img
+                                src="overrides/assets/img/icon/fi-rr-book-alt.svg"
+                                alt="Overview Icon"
+                            />
+                            <h4>Visão Geral</h4>
+                            <p>
+                                Aprenda sobre o pacote SysIdentPy e como usá-lo
+                                em seus projetos.
+                            </p>
+                        </a>
+                    </div>
+                    <div class="item">
+                        <a
+                            href="https://sysidentpy.org/book/0-Preface/"
+                            class="card-feature"
+                        >
+                            <img
+                                src="overrides/assets/img/icon/fi-rr-book-alt.svg"
+                                alt="Book Icon"
+                            />
+                            <h4>Livro</h4>
+                            <p>
+                                Saiba mais sobre o livro e como usá-lo em seus
+                                projetos.
+                            </p>
+                        </a>
+                    </div>
+                    <div class="item">
+                        <a
+                            href="https://sysidentpy.org/book/10-Case-Studies/"
+                            class="card-feature"
+                        >
+                            <img
+                                src="overrides/assets/img/icon/fi-rr-book-alt.svg"
+                                alt="Case Studies Icon"
+                            />
+                            <h4>Estudos de Caso</h4>
+                            <p>
+                                Explore aplicações do mundo real usando
+                                SysIdentPy.
+                            </p>
+                        </a>
+                    </div>
+                    <div class="item">
+                        <a
+                            href="https://sysidentpy.org/getting-started/getting-started/#installation"
+                            class="card-feature"
+                        >
+                            <img
+                                src="overrides/assets/img/icon/fi-rr-book-alt.svg"
+                                alt="Installation Icon"
+                            />
+                            <h4>Instalação</h4>
+                            <p>
+                                Veja como instalar o SysIdentPy em seu
+                                ambiente de programação.
+                            </p>
+                        </a>
+                    </div>
+                    <div class="item">
+                        <a
+                            href="https://sysidentpy.org/user-guide/how-to/create-a-narx-neural-network/"
+                            class="card-feature"
+                        >
+                            <img
+                                src="overrides/assets/img/icon/fi-rr-book-alt.svg"
+                                alt="Neural NARX Network Icon"
+                            />
+                            <h4>Rede Neural NARX</h4>
+                            <p>
+                                Aprenda sobre Rede Neural NARX e como usá-la
+                                em seus projetos.
+                            </p>
+                        </a>
+                    </div>
+                    <div class="item">
+                        <a
+                            href="https://sysidentpy.org/user-guide/tutorials/general-NARX-models/"
+                            class="card-feature"
+                        >
+                            <img
+                                src="overrides/assets/img/icon/fi-rr-book-alt.svg"
+                                alt="Machine Learning Estimators Icon"
+                            />
+                            <h4>Estimadores de Aprendizado de Máquina</h4>
+                            <p>
+                                Explore os diferentes estimadores disponíveis
+                                no SysIdentPy.
+                            </p>
+                        </a>
+                    </div>
+                    <div class="item">
+                        <a
+                            href="https://sysidentpy.org/getting-started/narmax-intro/"
+                            class="card-feature"
+                        >
+                            <img
+                                src="overrides/assets/img/icon/fi-rr-book-alt.svg"
+                                alt="Introduction to NARMAX models Icon"
+                            />
+                            <h4>Introdução aos modelos NARMAX</h4>
+                            <p>
+                                Aprenda sobre modelos NARMAX e como usá-los em
+                                seus projetos.
+                            </p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="contributors">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h3>Principal <strong>Desenvolvedor</strong></h3>
+                <div class="card-maintainer">
+                    <img
+                        src="https://github.com/wilsonrljr.png"
+                        alt="Wilson Rocha"
+                    />
+                    <div>
+                        <h6>Wilson Rocha</h6>
+                        <p>
+                            Gerente de Ciência de Dados na RD. Mestre em Engenharia
+                            Elétrica. Professor. Membro do Grupo de Controle e
+                            Modelagem da UFSJ (GCOM)
+                        </p>
+                        <ul>
+                            <li>
+                                <a href="https://github.com/wilsonrljr"
+                                    ><i class="fab fa-github"></i
+                                ></a>
+                            </li>
+                            <li>
+                                <a href="https://www.linkedin.com/in/wilsonrljr"
+                                    ><i class="fab fa-linkedin"></i
+                                ></a>
+                            </li>
+                            <li>
+                                <a href="https://x.com/wilsonrljr"
+                                    ><i class="fab fa-twitter"></i
+                                ></a>
+                            </li>
+                            <li>
+                                <a href="https://discord.gg/8eGE3PQ"
+                                    ><i class="fab fa-discord"></i
+                                ></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <h3>Nossos <strong>Contribuidores</strong></h3>
+                <ul class="list-contributors" id="contributorsList">
+                    <li>
+                        <a
+                            target="_blank"
+                            href="https://github.com/wilsonrljr/sysidentpy"
+                            class="btn-contributors"
+                        ></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    async function fetchContributors() {
+        const url = `https://api.github.com/repos/wilsonrljr/sysidentpy/contributors`;
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Error");
+
+            const contributors = await response.json();
+            const container = document.getElementById("contributorsList");
+
+            contributors.forEach((user) => {
+                const li = document.createElement("li");
+                const img = document.createElement("img");
+
+                img.src = user.avatar_url;
+                img.alt = `@${user.login}`;
+                img.title = `@${user.login}`;
+                img.onclick = () => window.open(user.html_url, "_blank");
+
+                li.appendChild(img);
+                container.insertBefore(li, container.lastElementChild);
+            });
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+
+    fetchContributors();
+</script>
+
+<section id="big-numbers">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h3>Nossos números</h3>
+            </div>
+            <div class="col">
+                <ul>
+                    <li>
+                        <i class="fi-rr-vector-alt"></i>
+                        <h6><strong>+85%</strong> de Cobertura de Código</h6>
+                    </li>
+                    <li>
+                        <i class="fi-rr-vector-alt"></i>
+                        <h6><strong>60K</strong> Downloads</h6>
+                    </li>
+                    <li>
+                        <i class="fi-rr-vector-alt"></i>
+                        <h6><strong>1.5k</strong> Downloads/mês</h6>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="users">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h2><strong>Usuários compartilhando</strong> suas experiências</h2>
+            </div>
+        </div>
+        <div class="carousel-container">
+            <div class="swiper mySwiper">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <div class="box-testimonial">
+                            <img
+                                src="overrides/assets/img/avatar/user-01.jpg"
+                                alt="David Quintão"
+                            />
+                            <h5>David Quintão</h5>
+                            <p>
+                                <small>COO, Technium - AI for EveryOne</small>
+                            </p>
+                            <hr />
+                            <p>
+                                <i
+                                    >SysidentPy é uma solução de alto desempenho
+                                    que pode ser usada em cenários desafiadores
+                                    para modelagem dinâmica não linear.
+                                    Na Technium - IA For EveryOne, recomendamos
+                                    seu uso em nossos projetos.</i
+                                >
+                            </p>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="box-testimonial">
+                            <img
+                                src="overrides/assets/img/avatar/user-02.jpg"
+                                alt="Neylson Crepalde"
+                            />
+                            <h5>Neylson Crepalde</h5>
+                            <p><small>Generative AI Strategist, AWS</small></p>
+                            <hr />
+                            <p>
+                                <i
+                                    >A maior vantagem do SysidentPy é que
+                                    ele resolve problemas complexos de forma
+                                    simples e elegante. Além disso, possui um
+                                    ótimo desempenho e é muito fácil de usar.
+                                    Já o utilizamos em produção.</i
+                                >
+                            </p>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="box-testimonial">
+                            <img
+                                src="overrides/assets/img/avatar/user-03.jpg"
+                                alt="Nath Keles"
+                            />
+                            <h5>Nath Keles</h5>
+                            <p><small>Data Scientist Coordinator, RD</small></p>
+                            <hr />
+                            <p>
+                                <i
+                                    >SysIdentPy é uma ótima ferramenta para trabalhar com séries
+                                    temporais e sistemas dinâmicos, fornecendo métodos nativos e
+                                    suportando muitos estimadores diferentes de pacotes como sklearn
+                                    e Catboost para construir diferentes modelos NARMAX.</i
+                                >
+                            </p>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="box-testimonial">
+                            <img
+                                src="overrides/assets/img/avatar/user-04.jpg"
+                                alt="Mehran Shahpari"
+                            />
+                            <h5>Mehran Shahpari</h5>
+                            <p>
+                                <small
+                                    >MSc. Civil - Earthquake engineering |
+                                    University of Science and Culture, Tehran,
+                                    Iran</small
+                                >
+                            </p>
+                            <hr />
+                            <p>
+                                <i
+                                    >Na minha experiência, SysIdentPy é o melhor
+                                    pacote python para Identificação de Sistemas
+                                    utilizando modelos NARMAX.</i
+                                >
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="recents-post">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h2>Nossas Publicações <strong>Recentes</strong></h2>
+            </div>
+            <div class="col text-right">
+                <a
+                    href="https://sysidentpy.org/community-support/community-overview/"
+                    class="btn-light"
+                    ><i class="fi-rr-notebook"></i> Ver todas as publicações</a
+                >
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="box-recent-post">
+                    <p class="author">
+                        <i class="fi-rr-user"></i> Wilson Rocha
+                    </p>
+                    <h3>Pacotes de Código Aberto (em português)</h3>
+                    <a
+                        href="https://sysidentpy.org/community-support/meetups/nubank-meetup-open-source/"
+                        >Saiba Mais <i class="fi-rr-angle-right"></i
+                    ></a>
+                </div>
+            </div>
+            <div class="col">
+                <div class="box-recent-post">
+                    <p class="author">
+                        <i class="fi-rr-user"></i> Wilson Rocha
+                    </p>
+                    <h3>Apresentação no Meetup Nubank (em português)</h3>
+                    <a href="https://sysidentpy.org/community-support/meetups/nubank-meetup/"
+                        >Saiba Mais <i class="fi-rr-angle-right"></i
+                    ></a>
+                </div>
+            </div>
+            <div class="col">
+                <div class="box-recent-post">
+                    <p class="author">
+                        <i class="fi-rr-user"></i> Wilson Rocha
+                    </p>
+                    <h3>GCoM Meetup (em português)</h3>
+                    <a href="https://sysidentpy.org/community-support/meetups/gcom-meetup/"
+                        >Saiba Mais <i class="fi-rr-angle-right"></i
+                    ></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <img
+                    src="overrides/assets/img/logotype-sysidentpy.svg"
+                    alt="Logotype SysIdentPy"
+                />
+                <p>
+                    SysIdentPy é uma biblioteca de Identificação de Sistemas simples e fácil de aprender em Python!
+                </p>
+                <ul>
+                    <li>
+                        <a href="https://github.com/wilsonrljr/sysidentpy"
+                            ><i class="fab fa-github"></i
+                        ></a>
+                    </li>
+                    <li>
+                        <a href="https://www.linkedin.com/in/wilsonrljr/"
+                            ><i class="fab fa-linkedin"></i
+                        ></a>
+                    </li>
+                    <li>
+                        <a href="https://x.com/wilsonrljr"
+                            ><i class="fab fa-twitter"></i
+                        ></a>
+                    </li>
+                    <li>
+                        <a href="https://discord.gg/8eGE3PQ"
+                            ><i class="fab fa-discord"></i
+                        ></a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col">
+                <h4>Comunidade</h4>
+                <a href="https://discord.gg/8eGE3PQ">Discord</a>
+                <a href="https://github.com/wilsonrljr/sysidentpy/discussions"
+                    >Discussão no Github</a
+                >
+                <a
+                    href="https://github.com/wilsonrljr/sysidentpy/graphs/contributors"
+                    >Contribuidores</a
+                >
+                <a
+                    href="https://github.com/wilsonrljr/sysidentpy/blob/main/CODE_OF_CONDUCT.md"
+                    >Código de Conduta</a
+                >
+                <a href="https://sysidentpy.org/developer-guide/contribute/"
+                    >Contribuir</a
+                >
+                <a href="https://sysidentpy.org/landing-page/sponsor/"
+                    >Patrocinar</a
+                >
+            </div>
+            <div class="col">
+                <h4>Recursos</h4>
+                <a href="https://sysidentpy.org/book/0-Preface/">Livro</a>
+                <a href="https://sysidentpy.org/getting-started/quickstart-guide/"
+                    >Documentação</a
+                >
+                <a href="https://sysidentpy.org/landing-page/about-us/#citation"
+                    >Citando SysIdentPy</a
+                >
+                <a href="https://sysidentpy.org/community-support/community-overview/">Meetups</a>
+            </div>
+            <div class="col">
+                <h4>Github Repo</h4>
+                <div id="github-repo-card"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col text-center">
+                <p>
+                    Copyright © 2018 - 2025 SysIdentPy - De Abordagens Clássicas
+                    a Redes Neurais.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    const repoUrl = "https://api.github.com/repos/wilsonrljr/sysidentpy";
+    fetch(repoUrl)
+        .then((response) => response.json())
+        .then((data) => {
+            const repoCard = `
+                  <a href="${data.html_url}" target="_blank">
+                    <h2><i class="fab fa-github"></i> ${data.owner.login}/${data.name}</h2>
+                    <p>${data.description}</p>
+                    <p class="numbers-repo"><i class="fas fa-star"></i> ${data.stargazers_count} <i class="fas fa-network-wired"></i> ${data.forks_count}</p>
+                    <span>View on GitHub</span>
+                  </a>
+                `;
+            document.querySelectorAll("#github-repo-card").forEach((card) => {
+                card.innerHTML = repoCard;
+            });
+        })
+        .catch((error) => console.error("Error fetching repository:", error));
+</script>
+
+{% endblock %} {% block content %}{% endblock %} {% block footer %}{% endblock
+%}
