@@ -43,3 +43,8 @@ sysidentpy.code-workspace
 examples/data/
 raw.githubusercontent.com/
 /qodana.yaml
+
+# uv related
+uv.lock
+.python-version
+
