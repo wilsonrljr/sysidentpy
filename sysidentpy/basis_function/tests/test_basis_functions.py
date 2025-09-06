@@ -5,7 +5,29 @@ from sysidentpy.basis_function import Polynomial, Fourier
 
 
 def test_fit_polynomial():
-    basis_function = Polynomial(degree=2)
+    basis_function = Polynomial(degree=2, include_bias=True)
+    data = np.array(([1, 1, 1], [2, 3, 4], [3, 3, 3]))
+    max_lag = 1
+    output = np.array([[1, 4, 6, 8, 9, 12, 16], [1, 9, 9, 9, 9, 9, 9]])
+
+    r = basis_function.fit(data=data, max_lag=max_lag)
+
+    assert_array_equal(output, r)
+
+
+def test_fit_polynomial_with_bias():
+    basis_function = Polynomial(degree=2, include_bias=True)
+    data = np.array(([1, 1, 1], [2, 3, 4], [3, 3, 3]))
+    max_lag = 1
+    output = np.array([[1, 4, 6, 8, 9, 12, 16], [1, 9, 9, 9, 9, 9, 9]])
+
+    r = basis_function.fit(data=data, max_lag=max_lag)
+
+    assert_array_equal(output, r)
+
+
+def test_fit_polynomial_without_bias():
+    basis_function = Polynomial(degree=2, include_bias=False)
     data = np.array(([1, 1, 1], [2, 3, 4], [3, 3, 3]))
     max_lag = 1
     output = np.array([[4, 6, 8, 9, 12, 16], [9, 9, 9, 9, 9, 9]])
@@ -16,11 +38,11 @@ def test_fit_polynomial():
 
 
 def test_fit_polynomial_predefined():
-    basis_function = Polynomial(degree=2)
+    basis_function = Polynomial(degree=2, include_bias=True)
     data = np.array(([1, 1, 1], [2, 3, 4], [3, 3, 3]))
     max_lag = 1
     predefined_regressors = np.array([0, 2, 4])
-    output = np.array([[4, 8, 12], [9, 9, 9]])
+    output = np.array([[1, 4, 8, 12], [1, 9, 9, 9]])
 
     r = basis_function.fit(
         data=data, max_lag=max_lag, predefined_regressors=predefined_regressors
@@ -30,10 +52,10 @@ def test_fit_polynomial_predefined():
 
 
 def test_transform_polynomial():
-    basis_function = Polynomial(degree=2)
+    basis_function = Polynomial(degree=2, include_bias=True)
     data = np.array(([1, 1, 1], [2, 3, 4], [3, 3, 3]))
     max_lag = 1
-    output = np.array([[4, 6, 8, 9, 12, 16], [9, 9, 9, 9, 9, 9]])
+    output = np.array([[1, 4, 6, 8, 9, 12, 16], [1, 9, 9, 9, 9, 9, 9]])
 
     r = basis_function.transform(data=data, max_lag=max_lag)
 
