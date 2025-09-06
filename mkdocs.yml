@@ -188,41 +188,41 @@ nav:
       - Overview: user-guide/overview.md
       - Tutorials:
           - Features:
-              - your-first-model: user-guide/tutorials/your-first-model.ipynb
-              - model-with-multiple-inputs: user-guide/tutorials/model-with-multiple-inputs.ipynb
-              - parameter-estimation-overview: user-guide/tutorials/parameter-estimation-overview.ipynb
-              - basis-function-overview: user-guide/tutorials/basis-function-overview.ipynb
-              - information-criteria-overview: user-guide/tutorials/information-criteria-overview.ipynb
-              - general-NARX-models: user-guide/tutorials/general-NARX-models.ipynb
-              - fourier-NARX-overview: user-guide/tutorials/fourier-NARX-overview.ipynb
-              - aols-overview: user-guide/tutorials/aols-overview.ipynb
-              - nfir-model-overview: user-guide/tutorials/NFIR-model-overview.ipynb
-              - importance-of-extended-least-squares: user-guide/tutorials/importance-of-extended-least-squares.ipynb
+              - Your First Model: user-guide/tutorials/your-first-model.md
+              - Model with Multiple Inputs: user-guide/tutorials/model-with-multiple-inputs.md
+              - Parameter Estimation - Overview: user-guide/tutorials/parameter-estimation-overview.md
+              - Basis Function - Overview: user-guide/tutorials/basis-function-overview.md
+              - Information Criteria - Overview: user-guide/tutorials/information-criteria-overview.md
+              - General NARX Models - Overview: user-guide/tutorials/general-NARX-models.md
+              - Fourier NARX - Overview: user-guide/tutorials/fourier-NARX-overview.md
+              - AOLS - Overview: user-guide/tutorials/aols-overview.md
+              - NFIR - Overview: user-guide/tutorials/NFIR-model-overview.md
+              - Importance of Extended Least Squares: user-guide/tutorials/importance-of-extended-least-squares.md
           - Electrical and Mechanical Systems:
-              - modeling-a-magneto-rheological-damper-device: user-guide/tutorials/modeling-a-magneto-rheological-damper-device.ipynb
-              - silver-box-system: user-guide/tutorials/silver-box-system.ipynb
-              - coupled-eletric-device: user-guide/tutorials/coupled-eletric-device.ipynb
-              - wiener-hammerstein-system: user-guide/tutorials/wiener-hammerstein-system.ipynb
-              - f16-aircraft: user-guide/tutorials/f-16-aircraft.ipynb
-              - f-16-aircraft-n-steps-ahead-prediction: user-guide/tutorials/f-16-aircraft-n-steps-ahead-prediction.ipynb
-              - electromechanical-system-identification-overview: user-guide/tutorials/electromechanical-system-identification-overview.ipynb
-              - electromechanical-system-identification-metamss: user-guide/tutorials/electromechanical-system-identification-metamss.ipynb
-              - electromechanical-system-identification-entropic-regression: user-guide/tutorials/electromechanical-system-identification-entropic-regression.ipynb
-              - multiobjective-parameter-estimation-overview: user-guide/tutorials/multiobjective-parameter-estimation-overview.ipynb
+              - Modeling a Magneto-Rheological Damper Device: user-guide/tutorials/modeling-a-magneto-rheological-damper-device.md
+              - Silver Box System: user-guide/tutorials/silver-box-system.md
+              - Coupled Electric Device: user-guide/tutorials/coupled-eletric-device.md
+              - Wiener-Hammerstein System: user-guide/tutorials/wiener-hammerstein-system.md
+              - F-16 Aircraft: user-guide/tutorials/f-16-aircraft.md
+              - F-16 Aircraft - N-Steps Ahead Prediction: user-guide/tutorials/f-16-aircraft-n-steps-ahead-prediction.md
+              - Electromechanical System Identification - Overview: user-guide/tutorials/electromechanical-system-identification-overview.md
+              - Electromechanical System Identification - MetaMSS: user-guide/tutorials/electromechanical-system-identification-metamss.md
+              - Electromechanical System Identification - Entropic Regression: user-guide/tutorials/electromechanical-system-identification-entropic-regression.md
+              - Multiobjective Parameter Estimation - Overview: user-guide/tutorials/multiobjective-parameter-estimation-overview.md
           - Industrial and Corporate:
-              - m4-benchmark: user-guide/tutorials/m4-benchmark.ipynb
-              - air-passenger-benchmark: user-guide/tutorials/air-passenger-benchmark.ipynb
-              - load-forecasting-benchmark: user-guide/tutorials/load-forecasting-benchmark.ipynb
-              - pv-forecasting-benchmark: user-guide/tutorials/PV-forecasting-benchmark.ipynb
+              - M4 Benchmark: user-guide/tutorials/m4-benchmark.md
+              - Air Passenger Benchmark: user-guide/tutorials/air-passenger-benchmark.md
+              - Load Forecasting Benchmark: user-guide/tutorials/load-forecasting-benchmark.md
+              - PV Forecasting Benchmark: user-guide/tutorials/PV-forecasting-benchmark.md
           - Chaotic Systems:
-              - lorenz-system: user-guide/tutorials/chaotic-systems/lorenz-system.ipynb
-              - logistic-map: user-guide/tutorials/chaotic-systems/logistic-map.ipynb
+              - Lorenz System: user-guide/tutorials/chaotic-systems/lorenz-system.md
+              - Logistic Map: user-guide/tutorials/chaotic-systems/logistic-map.md
       - How to:
-          - create-a-narx-neural-network: user-guide/how-to/create-a-narx-neural-network.ipynb
-          - save-and-load-models: user-guide/how-to/save-and-load-models.ipynb
-          - set-specific-lags: user-guide/how-to/set-specific-lags.ipynb
-          - simulating-existing-models: user-guide/how-to/simulating-existing-models.ipynb
-          - use-extended-least-squares: user-guide/how-to/use-extended-least-squares.ipynb
+          - Create a Neural NARX Network: user-guide/how-to/create-a-narx-neural-network.md
+          - Save and Load Models: user-guide/how-to/save-and-load-models.md
+          - Set Specific Lags: user-guide/how-to/set-specific-lags.md
+          - Simulating Existing Models: user-guide/how-to/simulating-existing-models.md
+          - Use Extended Least Squares: user-guide/how-to/use-extended-least-squares.md
       - API:
           - NARMAX Base: user-guide/API/narmax-base.md
           - OFR Base: user-guide/API/ofr-base.md
