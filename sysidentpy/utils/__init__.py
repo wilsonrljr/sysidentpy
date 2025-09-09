@@ -29,7 +29,7 @@ from sysidentpy.utils.simulation import (
     list_input_regressor_code,
     list_output_regressor_code,
 )
-from .equation_printer import print_equation, results_general
+from .equation_formatter import format_equation, results_general
 
 __ALL__ = [
     "check_length",
@@ -53,6 +53,6 @@ __ALL__ = [
     "list_output_regressor_code",
     "count_model_regressors",
     "build_lagged_matrix",
-    "print_equation",
+    "format_equation",
     "results_general",
 ]
