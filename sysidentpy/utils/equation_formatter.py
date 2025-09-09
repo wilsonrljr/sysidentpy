@@ -27,9 +27,10 @@ its `fit/transform` method given the model configuration.
 from __future__ import annotations
 
 from collections import Counter
+import warnings
 from dataclasses import dataclass
 from itertools import combinations_with_replacement
-from typing import List, Optional, Sequence
+from typing import Callable, Dict, List, Optional, Sequence
 
 import numpy as np
 
@@ -38,6 +39,8 @@ from .lags import _process_ylag
 
 @dataclass(frozen=True)
 class EquationItem:
+    """Pair name-coefficient used to assemble human readable equations."""
+
     name: str
     coef: float
 
@@ -107,11 +110,13 @@ def _legendre_like_names(
 ) -> List[str]:
     """Return names for Legendre/Hermite/Laguerre/Bernstein-style classes.
 
-    These classes share the same fit logic:
-    - Start from lagged_data[:, 1:] (no constant)
-    - For each base column, build degrees 1..degree
-    - Optionally prepend a bias column
-    - Optionally prepend the original data columns if ensemble=True
+    Real ordering in *fit*:
+        data := lagged_data[max_lag:, 1:]  (lags only; no intercept)
+        expansions (remove P0) => degrees 1..degree per original column
+        if include_bias: prepend bias column (1)
+        if ensemble: prepend original data columns before bias/expansions
+
+    We reproduce exactly this ordering so indices map correctly to theta.
     """
     base = _base_lag_feature_names(
         n_inputs=n_inputs,
@@ -120,8 +125,6 @@ def _legendre_like_names(
         input_names=input_names,
         output_name=output_name,
     )
-
-    # expansion symbol per basis
     sym = {
         "Legendre": "P",
         "Hermite": "H",
@@ -130,20 +133,21 @@ def _legendre_like_names(
         "Bernstein": "B",
     }.get(basis_name, basis_name)
 
-    exp_names: List[str] = []
+    expansions: List[str] = []
     for var in base:
         for d in range(1, degree + 1):
-            if sym == "B":
-                exp_names.append(f"B{d}({var})")
-            else:
-                exp_names.append(f"{sym}{d}({var})")
+            token = "B" if sym == "B" else sym
+            expansions.append(f"{token}{d}({var})")
 
     names: List[str] = []
-    if include_bias:
-        names.append("1")
+    # ensemble first (original data columns)
     if ensemble:
         names.extend(base)
-    names.extend(exp_names)
+    # bias next (if any)
+    if include_bias:
+        names.append("1")
+    # then expansions
+    names.extend(expansions)
     return names
 
 
@@ -245,6 +249,224 @@ def _polynomial_monomial_names(
     return names
 
 
+def _bilinear_names(
+    *,
+    n_inputs: int,
+    xlag,
+    ylag,
+    degree: int,
+    input_names: Optional[Sequence[str]],
+    output_name: str,
+) -> List[str]:
+    """Reconstruct bilinear feature names matching Bilinear.fit ordering.
+
+    Bilinear.fit:
+        1. Builds combination_list over full lagged matrix columns (with intercept)
+        2. Removes combinations containing only y or only x-block of a single input
+        3. Keeps remaining (mixed) combinations
+
+    We replicate the same steps here to ensure indices align.
+    """
+    # Base columns (with intercept) replicating polynomial style
+    ylags = _process_ylag(ylag)
+    in_names = _ensure_input_names(n_inputs, input_names)
+    xlags_nested = _normalize_xlag(xlag, n_inputs)
+
+    base_cols: List[str] = ["1"]
+    base_cols.extend([f"{output_name}(k-{lag})" for lag in ylags])
+    x_block_indices: List[List[int]] = []
+    cursor = 1 + len(ylags)
+    for i, lags in enumerate(xlags_nested):
+        block = list(range(cursor, cursor + len(lags)))
+        x_block_indices.append(block)
+        base_cols.extend([f"{in_names[i]}(k-{lag})" for lag in lags])
+        cursor += len(lags)
+
+    # Generate all combinations with replacement
+    all_idx = list(range(len(base_cols)))
+    combos = list(combinations_with_replacement(all_idx, degree))
+
+    y_indices = list(range(1, 1 + len(ylags)))
+
+    def is_pure_y(cmb):
+        return cmb and all(i in y_indices for i in cmb)
+
+    def is_pure_single_x(cmb):
+        if not cmb:
+            return False
+        for block in x_block_indices:
+            if all(i in block for i in cmb):
+                return True
+        return False
+
+    filtered = [c for c in combos if not (is_pure_y(c) or is_pure_single_x(c))]
+
+    def combo_to_name(cmb):
+        counts = Counter(cmb)
+        parts: List[str] = []
+        for idx in sorted(counts.keys()):
+            if idx == 0:
+                continue  # skip implicit intercept
+            var = base_cols[idx]
+            exp = counts[idx]
+            parts.append(var + (f"^{exp}" if exp > 1 else ""))
+        return "".join(parts) if parts else "1"
+
+    return [combo_to_name(c) for c in filtered]
+
+
+# ---------------- Registry Pattern ---------------- #
+
+Renderer = Callable[[object, Optional[Sequence[str]], str], List[str]]
+
+
+def _render_polynomial(model, input_names, output_name):
+    n_inputs = getattr(model, "n_inputs", None)
+    if n_inputs is None:
+        xlag_attr = getattr(model, "xlag", 1)
+        n_inputs = 1 if isinstance(xlag_attr, int) else len(xlag_attr)
+    return _polynomial_monomial_names(
+        n_inputs=n_inputs,
+        xlag=getattr(model, "xlag", 1),
+        ylag=getattr(model, "ylag", 1),
+        degree=getattr(getattr(model, "basis_function", object()), "degree", 1) or 1,
+        input_names=input_names,
+        output_name=output_name,
+        drop_intercept=False,
+    )
+
+
+def _render_fourier(model, input_names, output_name):
+    bf = model.basis_function
+    n_inputs = getattr(model, "n_inputs", None)
+    if n_inputs is None:
+        xlag_attr = getattr(model, "xlag", 1)
+        n_inputs = 1 if isinstance(xlag_attr, int) else len(xlag_attr)
+    return _fourier_names(
+        n_inputs=n_inputs,
+        xlag=getattr(model, "xlag", 1),
+        ylag=getattr(model, "ylag", 1),
+        degree=getattr(bf, "degree", 1) or 1,
+        n_harmonics=getattr(bf, "n", 1) or 1,
+        ensemble=bool(getattr(bf, "ensemble", False)),
+        input_names=input_names,
+        output_name=output_name,
+    )
+
+
+def _render_legendre_like(model, input_names, output_name):
+    bf = model.basis_function
+    n_inputs = getattr(model, "n_inputs", None)
+    if n_inputs is None:
+        xlag_attr = getattr(model, "xlag", 1)
+        n_inputs = 1 if isinstance(xlag_attr, int) else len(xlag_attr)
+    return _legendre_like_names(
+        basis_name=bf.__class__.__name__,
+        n_inputs=n_inputs,
+        xlag=getattr(model, "xlag", 1),
+        ylag=getattr(model, "ylag", 1),
+        degree=getattr(bf, "degree", 1) or 1,
+        include_bias=bool(getattr(bf, "include_bias", True)),
+        ensemble=bool(getattr(bf, "ensemble", False)),
+        input_names=input_names,
+        output_name=output_name,
+    )
+
+
+def _render_bilinear(model, input_names, output_name):
+    bf = model.basis_function
+    n_inputs = getattr(model, "n_inputs", None)
+    if n_inputs is None:
+        xlag_attr = getattr(model, "xlag", 1)
+        n_inputs = 1 if isinstance(xlag_attr, int) else len(xlag_attr)
+    return _bilinear_names(
+        n_inputs=n_inputs,
+        xlag=getattr(model, "xlag", 1),
+        ylag=getattr(model, "ylag", 1),
+        degree=getattr(bf, "degree", 2) or 2,
+        input_names=input_names,
+        output_name=output_name,
+    )
+
+
+def _render_fallback(model, input_names, output_name):
+    # Basic lag names; if degree>1 append synthetic powers.
+    # Emit a one-time warning for unknown / unregistered basis class.
+    bf = getattr(model, "basis_function", None)
+    degree = getattr(bf, "degree", 1) if bf is not None else 1
+    if bf is not None:
+        cls_name = bf.__class__.__name__
+        if cls_name not in RendererRegistry and cls_name not in _warned_unknown_bases:
+            warnings.warn(
+                (
+                    "Equation formatter fallback used for unregistered basis '"
+                    f"{cls_name}'. "
+                    "Rendered feature names may be approximate. "
+                    "Register a renderer via register_equation_renderer "
+                    "for exact names."
+                ),
+                UserWarning,
+                stacklevel=2,
+            )
+            _warned_unknown_bases.add(cls_name)
+    n_inputs = getattr(model, "n_inputs", None)
+    if n_inputs is None:
+        xlag_attr = getattr(model, "xlag", 1)
+        n_inputs = 1 if isinstance(xlag_attr, int) else len(xlag_attr)
+    base = _base_lag_feature_names(
+        n_inputs=n_inputs,
+        xlag=getattr(model, "xlag", 1),
+        ylag=getattr(model, "ylag", 1),
+        input_names=input_names,
+        output_name=output_name,
+    )
+    if degree and degree > 1:
+        ext = [f"{b}^{d}" for b in base for d in range(2, degree + 1)]
+        return base + ext
+    return base
+
+
+RendererRegistry: Dict[str, Renderer] = {
+    "Polynomial": _render_polynomial,
+    "Fourier": _render_fourier,
+    "Legendre": _render_legendre_like,
+    "Hermite": _render_legendre_like,
+    "HermiteNormalized": _render_legendre_like,
+    "Laguerre": _render_legendre_like,
+    "Bernstein": _render_legendre_like,
+    "Bilinear": _render_bilinear,
+}
+
+_warned_unknown_bases: set[str] = set()
+
+
+def register_equation_renderer(
+    name: str, renderer: Renderer, *, overwrite: bool = False
+) -> None:
+    """Register or replace a custom equation renderer.
+
+    Parameters
+    ----------
+    name : str
+        Basis function class name (basis_function.__class__.__name__).
+    renderer : callable
+    Function(model, input_names, output_name) -> List[str] with ordered
+    feature names.
+    overwrite : bool, default False
+        If False and a renderer already exists for this name, raises ValueError.
+    """
+    if not name or not isinstance(name, str):
+        raise ValueError("'name' must be a non-empty string")
+    if not callable(renderer):
+        raise ValueError("'renderer' must be callable")
+    if name in RendererRegistry and not overwrite:
+        raise ValueError(
+            f"Renderer for '{name}' already registered. Use overwrite=True to replace."
+        )
+    RendererRegistry[name] = renderer
+    _warned_unknown_bases.discard(name)
+
+
 def _is_polynomial_model(model) -> bool:
     bf = getattr(model, "basis_function", None)
     return (
@@ -261,128 +483,37 @@ def results_general(
 ) -> List[EquationItem]:
     """Return list of (feature name, coefficient) for the model's selected terms.
 
-    Behavior:
-    - Polynomial basis: delegate to existing `display_results.results` (if available)
-      to generate names and use `theta` values.
-    - Non-polynomial basis: reconstruct full column name list and map selected
-      column indices (`pivv`) to names, zipped with `theta`.
+    Steps:
+        1. Retrieve theta
+        2. Obtain renderer by basis_function class name (registry)
+        3. Build full name list
+        4. Map pivv -> names (or full order if pivv None)
     """
     theta = getattr(model, "theta", None)
-    # Prepare default empty result
-    items: List[EquationItem] = []
     if theta is None:
-        return items
-
-    # Normalize theta to 1D float list
+        return []
     theta_arr = np.array(theta).reshape(-1)
     if theta_arr.size == 0:
-        return items
+        return []
 
-    # Build names based on basis function
-    if _is_polynomial_model(model):
-        # Infer n_inputs (prefer attribute; fallback to xlag structure)
-        n_inputs_poly = getattr(model, "n_inputs", None)
-        if n_inputs_poly is None:
-            xlag_attr = getattr(model, "xlag", 1)
-            n_inputs_poly = 1 if isinstance(xlag_attr, int) else len(xlag_attr)
+    bf = getattr(model, "basis_function", None)
+    class_name = getattr(bf, "__class__", type("", (), {})).__name__ if bf else ""
+    renderer = RendererRegistry.get(class_name, _render_fallback)
+    names = renderer(model, input_names, output_name)
 
-        names = _polynomial_monomial_names(
-            n_inputs=n_inputs_poly,
-            xlag=getattr(model, "xlag", 1),
-            ylag=getattr(model, "ylag", 1),
-            degree=getattr(getattr(model, "basis_function", object()), "degree", 1)
-            or 1,
-            input_names=input_names,
-            output_name=output_name,
-            drop_intercept=False,
-        )
-        pivv = getattr(model, "pivv", None)
-    else:
-        # Non-polynomial path
-        basis = getattr(model, "basis_function", None)
-        if basis is None:
-            return items
-
-        # Infer n_inputs (prefer attribute; fallback to xlag structure)
-        n_inputs = getattr(model, "n_inputs", None)
-        if n_inputs is None:
-            # Approximate: single input if xlag is int
-            xlag = getattr(model, "xlag", 1)
-            n_inputs = 1 if isinstance(xlag, int) else len(xlag)
-
-        xlag = getattr(model, "xlag", 1)
-        ylag = getattr(model, "ylag", 1)
-        degree = getattr(basis, "degree", 1) or 1
-        basis_name = basis.__class__.__name__
-        # Build the full column name list as generated by basis_function.fit
-        if basis_name == "Fourier":
-            n_harm = getattr(basis, "n", 1) or 1
-            ensemble = bool(getattr(basis, "ensemble", False))
-            names = _fourier_names(
-                n_inputs=n_inputs,
-                xlag=xlag,
-                ylag=ylag,
-                degree=degree,
-                n_harmonics=n_harm,
-                ensemble=ensemble,
-                input_names=input_names,
-                output_name=output_name,
-            )
-        elif basis_name in {
-            "Legendre",
-            "Hermite",
-            "HermiteNormalized",
-            "Laguerre",
-            "Bernstein",
-        }:
-            include_bias = bool(getattr(basis, "include_bias", True))
-            ensemble = bool(getattr(basis, "ensemble", False))
-            names = _legendre_like_names(
-                basis_name=basis_name,
-                n_inputs=n_inputs,
-                xlag=xlag,
-                ylag=ylag,
-                degree=degree,
-                include_bias=include_bias,
-                ensemble=ensemble,
-                input_names=input_names,
-                output_name=output_name,
-            )
-        else:
-            # Generic fallback: base lags only
-            names = _base_lag_feature_names(
-                n_inputs=n_inputs,
-                xlag=xlag,
-                ylag=ylag,
-                input_names=input_names,
-                output_name=output_name,
-            )
-
-            # If basis has degree attribute and it's >1, append placeholders
-            if degree and degree > 1:
-                extra: List[str] = [
-                    f"{var}^{d}" for var in names for d in range(2, degree + 1)
-                ]
-                names = names + extra
-
-        # Map selected columns via pivv; if not available, assume full model in order
-        pivv = getattr(model, "pivv", None)
-
+    pivv = getattr(model, "pivv", None)
+    items: List[EquationItem] = []
     if pivv is None:
-        # Just pair in order up to min length
         size = min(len(names), theta_arr.size)
-        items = [
+        return [
             EquationItem(name=names[i], coef=float(theta_arr[i])) for i in range(size)
         ]
-    else:
-        # Ensure indices are within bounds and map
-        items = []
-        for i, col_idx in enumerate(np.array(pivv).reshape(-1)[: theta_arr.size]):
-            idx = int(col_idx)
-            if 0 <= idx < len(names):
-                items.append(EquationItem(name=names[idx], coef=float(theta_arr[i])))
-            else:
-                items.append(EquationItem(name=f"f_{idx}", coef=float(theta_arr[i])))
+    for i, col_idx in enumerate(np.array(pivv).reshape(-1)[: theta_arr.size]):
+        idx = int(col_idx)
+        if 0 <= idx < len(names):
+            items.append(EquationItem(name=names[idx], coef=float(theta_arr[i])))
+        else:
+            items.append(EquationItem(name=f"f_{idx}", coef=float(theta_arr[i])))
     return items
 
 
@@ -393,28 +524,36 @@ def format_equation(
     output_name: str = "y",
     style: str = "text",  # "text" or "latex"
     coef_format: str = ".6g",
+    first_sign: bool = False,
+    ascii_mode: bool = False,
 ) -> str:
-    """Format the final model as a compact equation string.
+    """Format model as equation string.
 
-    Example (text):
-        y(k) = +0.9·cos(1·x1(k-2)) -0.2·y(k-1) + ...
+    Parameters
+    ----------
+    first_sign : bool
+        If False (default) suppress leading '+' for first positive term.
+    ascii_mode : bool
+        If True use '*' instead of '·' middle dot.
     """
     items = results_general(model, input_names=input_names, output_name=output_name)
     if not items:
         return ""
 
-    def fmt_coef(c: float) -> str:
+    def fmt_coef(c: float, leading: bool) -> str:
         s = format(c, coef_format)
-        if not s.startswith("-"):
-            s = "+" + s
-        return s
+        if s.startswith("-"):
+            return s
+        return ("+" + s) if (leading or first_sign) else s
 
+    mult = "*" if ascii_mode or style == "latex" else "·"
     lhs = f"{output_name}(k)"
-    if style == "latex":
-        rhs_terms = [f"{fmt_coef(t.coef)}\\,{t.name}" for t in items]
-        rhs = " ".join(rhs_terms)
-        return f"{lhs} = {rhs}"
-
-    rhs_terms = [f"{fmt_coef(t.coef)}·{t.name}" for t in items]
-    rhs = " ".join(rhs_terms)
+    rhs_parts: List[str] = []
+    for i, it in enumerate(items):
+        coef_txt = fmt_coef(it.coef, i > 0)
+        if style == "latex":
+            rhs_parts.append(f"{coef_txt}\\,{it.name}")
+        else:
+            rhs_parts.append(f"{coef_txt}{mult}{it.name}")
+    rhs = " ".join(rhs_parts)
     return f"{lhs} = {rhs}"
