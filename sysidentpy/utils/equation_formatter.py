@@ -45,6 +45,28 @@ class EquationItem:
     coef: float
 
 
+def _format_coefficient(
+    value: float, *, coef_format: str, leading: bool, first_sign: bool
+) -> str:
+    """Format a single coefficient with sign logic.
+
+    Parameters
+    ----------
+    value : float
+        Coefficient value.
+    coef_format : str
+        Format specification passed to format().
+    leading : bool
+        True if this term is not the first already appended (controls '+').
+    first_sign : bool
+        Force show '+' on the first positive term when True.
+    """
+    s = format(value, coef_format)
+    if s.startswith("-"):
+        return s
+    return ("+" + s) if (leading or first_sign) else s
+
+
 def _ensure_input_names(
     n_inputs: int, input_names: Optional[Sequence[str]]
 ) -> List[str]:
@@ -315,8 +337,6 @@ def _bilinear_names(
     return [combo_to_name(c) for c in filtered]
 
 
-# ---------------- Registry Pattern ---------------- #
-
 Renderer = Callable[[object, Optional[Sequence[str]], str], List[str]]
 
 
@@ -540,17 +560,16 @@ def format_equation(
     if not items:
         return ""
 
-    def fmt_coef(c: float, leading: bool) -> str:
-        s = format(c, coef_format)
-        if s.startswith("-"):
-            return s
-        return ("+" + s) if (leading or first_sign) else s
-
     mult = "*" if ascii_mode or style == "latex" else "·"
     lhs = f"{output_name}(k)"
     rhs_parts: List[str] = []
     for i, it in enumerate(items):
-        coef_txt = fmt_coef(it.coef, i > 0)
+        coef_txt = _format_coefficient(
+            it.coef,
+            coef_format=coef_format,
+            leading=i > 0,
+            first_sign=first_sign,
+        )
         if style == "latex":
             rhs_parts.append(f"{coef_txt}\\,{it.name}")
         else:

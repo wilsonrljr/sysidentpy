@@ -13,6 +13,7 @@ from sysidentpy.utils.equation_formatter import (
     register_equation_renderer,
     RendererRegistry,
     _warned_unknown_bases,
+    _format_coefficient,
 )
 
 
@@ -218,3 +219,39 @@ def test_dynamic_renderer_registration_avoids_fallback_warning():
         ), "No fallback warning should be emitted when custom renderer is registered"
     names = [it.name for it in items]
     assert names == ["__const__", "y(k-1)", "u(k-1)"]
+
+
+def test__format_coefficient_positive_first_without_first_sign():
+    assert (
+        _format_coefficient(1.23, coef_format=".2f", leading=False, first_sign=False)
+        == "1.23"
+    )
+
+
+def test__format_coefficient_positive_first_with_first_sign():
+    assert (
+        _format_coefficient(1.0, coef_format=".1f", leading=False, first_sign=True)
+        == "+1.0"
+    )
+
+
+def test__format_coefficient_positive_non_first():
+    assert (
+        _format_coefficient(2, coef_format=".0f", leading=True, first_sign=False)
+        == "+2"
+    )
+
+
+def test__format_coefficient_negative_first():
+    assert (
+        _format_coefficient(-3.1415, coef_format=".3f", leading=False, first_sign=False)
+        == "-3.142"
+    )
+
+
+def test__format_coefficient_negative_non_first_still_negative():
+    # leading flag shouldn't affect negative sign handling
+    assert (
+        _format_coefficient(-5, coef_format=".0f", leading=True, first_sign=True)
+        == "-5"
+    )
