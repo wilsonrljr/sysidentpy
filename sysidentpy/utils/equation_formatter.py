@@ -67,6 +67,47 @@ def _format_coefficient(
     return ("+" + s) if (leading or first_sign) else s
 
 
+def _poly_idx_row_to_name(idx_row: Sequence[int], base_cols: Sequence[str]) -> str:
+    """Build monomial name from a combination row and base column labels."""
+    counts = Counter(idx_row)
+    parts: List[str] = []
+    for idx in sorted(counts.keys()):
+        if idx == 0:
+            # skip explicit "1" factor
+            continue
+        var = base_cols[idx]
+        exp = counts[idx]
+        parts.append(var + (f"^{exp}" if exp > 1 else ""))
+    return "".join(parts) if parts else "1"
+
+
+def _is_pure_y_combo(combo: Sequence[int], y_indices: Sequence[int]) -> bool:
+    return bool(combo) and all(i in y_indices for i in combo)
+
+
+def _is_pure_single_x_combo(
+    combo: Sequence[int], x_block_indices: Sequence[Sequence[int]]
+) -> bool:
+    if not combo:
+        return False
+    for block in x_block_indices:
+        if all(i in block for i in combo):
+            return True
+    return False
+
+
+def _combo_to_name(combo: Sequence[int], base_cols: Sequence[str]) -> str:
+    counts = Counter(combo)
+    parts: List[str] = []
+    for idx in sorted(counts.keys()):
+        if idx == 0:
+            continue  # skip implicit intercept
+        var = base_cols[idx]
+        exp = counts[idx]
+        parts.append(var + (f"^{exp}" if exp > 1 else ""))
+    return "".join(parts) if parts else "1"
+
+
 def _ensure_input_names(
     n_inputs: int, input_names: Optional[Sequence[str]]
 ) -> List[str]:
@@ -251,20 +292,7 @@ def _polynomial_monomial_names(
         base_cols.extend([f"{xi}(k-{lag})" for lag in xlags_nested[i]])
 
     combos = list(combinations_with_replacement(range(len(base_cols)), degree))
-
-    def idx_row_to_name(idx_row: Sequence[int]) -> str:
-        counts = Counter(idx_row)
-        parts: List[str] = []
-        for idx in sorted(counts.keys()):
-            if idx == 0:
-                # skip explicit "1" factor
-                continue
-            var = base_cols[idx]
-            exp = counts[idx]
-            parts.append(var + (f"^{exp}" if exp > 1 else ""))
-        return "".join(parts) if parts else "1"
-
-    names = [idx_row_to_name(row) for row in combos]
+    names = [_poly_idx_row_to_name(row, base_cols) for row in combos]
     if drop_intercept:
         # Mirror Fourier.fit slicing [:, 1:]
         return names[1:]
@@ -310,31 +338,15 @@ def _bilinear_names(
 
     y_indices = list(range(1, 1 + len(ylags)))
 
-    def is_pure_y(cmb):
-        return cmb and all(i in y_indices for i in cmb)
-
-    def is_pure_single_x(cmb):
-        if not cmb:
-            return False
-        for block in x_block_indices:
-            if all(i in block for i in cmb):
-                return True
-        return False
-
-    filtered = [c for c in combos if not (is_pure_y(c) or is_pure_single_x(c))]
-
-    def combo_to_name(cmb):
-        counts = Counter(cmb)
-        parts: List[str] = []
-        for idx in sorted(counts.keys()):
-            if idx == 0:
-                continue  # skip implicit intercept
-            var = base_cols[idx]
-            exp = counts[idx]
-            parts.append(var + (f"^{exp}" if exp > 1 else ""))
-        return "".join(parts) if parts else "1"
-
-    return [combo_to_name(c) for c in filtered]
+    filtered = [
+        c
+        for c in combos
+        if not (
+            _is_pure_y_combo(c, y_indices)
+            or _is_pure_single_x_combo(c, x_block_indices)
+        )
+    ]
+    return [_combo_to_name(c, base_cols) for c in filtered]
 
 
 Renderer = Callable[[object, Optional[Sequence[str]], str], List[str]]
