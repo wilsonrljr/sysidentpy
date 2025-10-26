@@ -1,0 +1,31 @@
+{% extends "overrides/main.html" %} {% block tabs %} {{ super() }}
+
+<section id="hero">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h1>Modelado Dinámico y Pronóstico con <span>SysIdentPy</span></h1>
+        <p>
+          ¡SysIdentPy es una librería Python fácil de usar para la
+          identificación de sistemas y el pronóstico de series temporales!
+        </p>
+      </div>
+      <div class="col">
+        <a
+          class="btn solid-orange"
+          href="https://sysidentpy.org/getting-started/getting-started/"
+          >Primeros Pasos</a
+        >
+        <span class="copy-pip"
+          ><b id="install">pip install sysidentpy</b>
+          <button onclick="installCode()">
+            <i class="far fa-copy"></i></button
+        ></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# - rest of the PT template content was intentionally omitted in this copy - #}
+{% endblock %} {% block content %}{% endblock %} {% block footer %}{% endblock
+%}

@@ -117,6 +117,34 @@ plugins:
             custom_dir: docs/pt/
             site_dir: site/pt/
             logo: overrides/assets/img/logotype-sysidentpy.svg
+        - locale: es
+          name: Español
+          build: true
+          site_description: De Métodos Clásicos a Redes Neuronales
+          theme:
+            docs_dir: docs/es/
+            # Temporarily use the complete overrides from `docs/en/`
+            # so the Spanish site has the full theme/templates/assets.
+            # Later we can copy/translate `docs/en/overrides` into
+            # `docs/es/overrides` to have fully localized templates.
+            custom_dir: docs/en/
+            site_dir: site/es/
+            logo: overrides/assets/img/logotype-sysidentpy.svg
+            language: es
+          nav_translations:
+            Home: Inicio
+            Getting started: Primeros pasos
+            User guide: Guía de usuario
+            Companion Book: Libro
+            Developer guide: Guía de desarrollo
+            Community & Support: Comunidad y soporte
+            About: Acerca de
+            Changelog: Registro de cambios
+            Sponsors: Patrocinadores
+            Overview: Resumen
+            Quickstart Guide: Guía rápida
+            Introduction to NARMAX: Introducción a NARMAX
+            License: Licencia
 
 # Customization
 extra:
