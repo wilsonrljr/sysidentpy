@@ -45,6 +45,41 @@ def test_polynomial_equation_names_match_structure():
     assert any(t.name == "1" or "y(k-" in t.name or "x1(k-" in t.name for t in items)
 
 
+def test_results_general_accepts_numpy_xlag_single_input():
+    basis = Polynomial(degree=1)
+    pivv = np.array([0, 1, 2, 3])
+    theta = np.ones((len(pivv), 1))
+    model = DummyModel(
+        basis_function=basis,
+        xlag=np.array([1, 2]),
+        ylag=1,
+        n_inputs=1,
+        pivv=pivv,
+        theta=theta,
+    )
+    items = results_general(model)
+    names = [item.name for item in items]
+    assert "x1(k-2)" in names
+
+
+def test_results_general_accepts_numpy_object_xlag_multi_input():
+    basis = Polynomial(degree=1)
+    pivv = np.array([0, 1, 2, 3, 4])
+    theta = np.ones((len(pivv), 1))
+    xlag = np.array([[1, 2], [1]], dtype=object)
+    model = DummyModel(
+        basis_function=basis,
+        xlag=xlag,
+        ylag=1,
+        n_inputs=2,
+        pivv=pivv,
+        theta=theta,
+    )
+    items = results_general(model, input_names=["u", "v"])
+    names = [item.name for item in items]
+    assert "v(k-1)" in names
+
+
 def test_fourier_with_degree_2_uses_poly_names_without_intercept():
     basis = Fourier(n=1, degree=2, ensemble=False)
     # pick first 4 features of the generated Fourier list
@@ -134,6 +169,19 @@ def test_format_equation_ascii_and_first_sign():
     rhs = eq.split("=", 1)[1]
     assert "*" in rhs
     assert "+" in rhs
+
+
+def test_format_equation_omits_constant_multiplier():
+    basis = Polynomial(degree=1)
+    pivv = np.array([0, 1])
+    theta = [2.0, -0.5]
+    model = DummyModel(
+        basis_function=basis, xlag=1, ylag=1, n_inputs=1, pivv=pivv, theta=theta
+    )
+    eq = format_equation(model)
+    assert "·1" not in eq
+    rhs = eq.split("=", 1)[1]
+    assert rhs.strip().startswith("2")
 
 
 def test_fallback_warning_for_unknown_basis():

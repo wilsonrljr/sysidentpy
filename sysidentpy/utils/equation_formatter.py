@@ -27,6 +27,7 @@ its `fit/transform` method given the model configuration.
 from __future__ import annotations
 
 from collections import Counter
+from numbers import Integral
 import warnings
 from dataclasses import dataclass
 from itertools import combinations_with_replacement
@@ -120,20 +121,47 @@ def _ensure_input_names(
     return names
 
 
+def _as_sequence(obj):
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    if isinstance(obj, (list, tuple, range)):
+        return list(obj)
+    return list(obj)
+
+
 def _normalize_xlag(xlag, n_inputs: int) -> List[List[int]]:
     """Normalize xlag into a nested list of per-input lag lists.
 
     Mirrors the ordering in `information_matrix._create_lagged_x`.
     """
-    if isinstance(xlag, int):
-        return [list(range(1, xlag + 1))] if n_inputs == 1 else [[xlag]]
+    if n_inputs <= 0:
+        return []
 
-    # xlag is a list: could be flat or nested
-    if n_inputs == 1 and all(isinstance(i, int) for i in xlag):
-        return [list(xlag)]
+    if isinstance(xlag, Integral):
+        return [list(range(1, int(xlag) + 1))] if n_inputs == 1 else [[int(xlag)]]
 
-    # nested case: ensure each item is a list
-    return [[i] if isinstance(i, int) else list(i) for i in xlag]
+    if xlag is None:
+        return [[] for _ in range(n_inputs)]
+
+    seq = _as_sequence(xlag)
+
+    if n_inputs == 1 and all(isinstance(i, Integral) for i in seq):
+        return [[int(i) for i in seq]]
+
+    normalized: List[List[int]] = []
+    for entry in seq:
+        if isinstance(entry, Integral):
+            normalized.append([int(entry)])
+            continue
+        entry_seq = _as_sequence(entry)
+        normalized.append([int(i) for i in entry_seq])
+
+    if len(normalized) < n_inputs:
+        normalized.extend([[] for _ in range(n_inputs - len(normalized))])
+    elif len(normalized) > n_inputs:
+        normalized = normalized[:n_inputs]
+
+    return normalized
 
 
 def _base_lag_feature_names(
@@ -582,7 +610,9 @@ def format_equation(
             leading=i > 0,
             first_sign=first_sign,
         )
-        if style == "latex":
+        if it.name == "1":
+            rhs_parts.append(coef_txt)
+        elif style == "latex":
             rhs_parts.append(f"{coef_txt}\\,{it.name}")
         else:
             rhs_parts.append(f"{coef_txt}{mult}{it.name}")
