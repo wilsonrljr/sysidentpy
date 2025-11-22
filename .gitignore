@@ -5,6 +5,7 @@ __pycache__/sys_identfy.cpython-36.pyc
 *.coverage
 .ipynb_checkpoints/
 .ipynb_checkpoints
+/*.ipynb
 __pycache__/
 # Sphinx
 docs/_build
