@@ -271,35 +271,62 @@
    ============================================ */
 
 #companies {
-    background: linear-gradient(135deg, rgba(240, 126, 25, 0.05) 0%, rgba(255, 168, 0, 0.05) 100%);
-    padding: 4rem 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    padding: 2rem 0;
+    border-top: 1px solid rgba(240, 126, 25, 0.1);
+    border-bottom: 1px solid rgba(240, 126, 25, 0.1);
 }
 
 .section-subtitle {
     font-size: 1rem;
     color: var(--new-color-details);
     margin-top: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 .logos-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 3rem;
+    gap: 2rem;
     flex-wrap: wrap;
-    padding: 2rem 0;
+    padding: 0;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.logo-card {
+    background: #2d3748;
+    border-radius: 12px;
+    padding: 1.2rem 2.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 180px;
+    min-height: 70px;
+    border: 1px solid rgba(240, 126, 25, 0.2);
+}
+
+.logo-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(240, 126, 25, 0.25);
+    border-color: rgba(240, 126, 25, 0.5);
+    background: #374151;
 }
 
 .company-logo {
-    opacity: 0.6;
+    max-width: 140px;
+    height: auto;
+    opacity: 0.9;
     transition: all 0.3s ease;
-    filter: grayscale(100%);
+    filter: brightness(1) contrast(1.1);
 }
 
-.company-logo:hover {
+.logo-card:hover .company-logo {
     opacity: 1;
-    filter: grayscale(0%);
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
 /* ============================================
@@ -891,7 +918,17 @@ footer::before {
     }
     
     .logos-container {
-        gap: 2rem;
+        gap: 1.5rem;
+    }
+    
+    .logo-card {
+        padding: 1rem 2rem;
+        min-width: 150px;
+        min-height: 60px;
+    }
+    
+    .company-logo {
+        max-width: 120px;
     }
     
     .book-stats {
