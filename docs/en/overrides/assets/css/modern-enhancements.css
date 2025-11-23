@@ -286,13 +286,55 @@
 
 .logos-container {
     display: flex;
-    justify-content: center;
     align-items: center;
     gap: 2rem;
-    flex-wrap: wrap;
     padding: 0;
-    max-width: 900px;
     margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.logos-container::before,
+.logos-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.logos-container::before {
+    left: 0;
+    background: linear-gradient(to right, var(--new-color-primary), transparent);
+}
+
+.logos-container::after {
+    right: 0;
+    background: linear-gradient(to left, var(--new-color-primary), transparent);
+}
+
+@keyframes scroll-logos {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.logos-container > div {
+    display: flex;
+    gap: 2rem;
+    animation: scroll-logos 20s linear infinite;
+    will-change: transform;
+}
+
+.logos-container:hover > div {
+    animation-play-state: paused;
 }
 
 .logo-card {
@@ -305,8 +347,10 @@
     align-items: center;
     justify-content: center;
     min-width: 180px;
+    width: 180px;
     min-height: 70px;
     border: 1px solid rgba(240, 126, 25, 0.2);
+    flex-shrink: 0;
 }
 
 .logo-card:hover {
