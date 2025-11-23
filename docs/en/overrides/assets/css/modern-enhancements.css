@@ -338,7 +338,7 @@
 }
 
 .logo-card {
-    background: #2d3748;
+    background: #ffffff;
     border-radius: 12px;
     padding: 1.2rem 2.5rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
@@ -355,8 +355,16 @@
 
 .logo-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(240, 126, 25, 0.25);
-    border-color: rgba(240, 126, 25, 0.5);
+    box-shadow: 0 8px 20px rgba(240, 126, 25, 0.35);
+    border-color: rgba(240, 126, 25, 0.6);
+    background: #f8f9fa;
+}
+
+.logo-card.dark-bg {
+    background: #2d3748;
+}
+
+.logo-card.dark-bg:hover {
     background: #374151;
 }
 
