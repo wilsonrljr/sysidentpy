@@ -12,27 +12,17 @@
         </p>
       </div>
       <div class="col">
-        <a
-          class="btn solid-orange"
-          href="https://sysidentpy.org/getting-started/getting-started/"
-          >Primeros Pasos</a
-        >
-        <span class="copy-pip"
-          ><b id="install">pip install sysidentpy</b>
+        <a class="btn solid-orange" href="https://sysidentpy.org/getting-started/getting-started/">Primeros Pasos</a>
+        <span class="copy-pip"><b id="install">pip install sysidentpy</b>
           <button onclick="installCode()">
-            <i class="far fa-copy"></i></button
-        ></span>
+            <i class="far fa-copy"></i></button></span>
       </div>
     </div>
   </div>
 </section>
 
 <section id="example">
-  <img
-    class="img-bg"
-    src="overrides/assets/img/header/bg-chart.svg"
-    alt="Gráfico de fondo"
-  />
+  <img class="img-bg" src="overrides/assets/img/header/bg-chart.svg" alt="Gráfico de fondo" />
   <div class="browser">
     <header>
       <div class="controllers">
@@ -43,11 +33,7 @@
       <p>Introducción a SysIdentPy</p>
     </header>
     <nav>
-      <button
-        class="tablinks"
-        onclick="openTab(event, 'PolynomialNARX')"
-        id="defaultOpen"
-      >
+      <button class="tablinks" onclick="openTab(event, 'PolynomialNARX')" id="defaultOpen">
         NARX Polinomial
       </button>
       <button class="tablinks" onclick="openTab(event, 'LegendreNARX')">
@@ -298,15 +284,9 @@
             completo de algoritmos para la identificación, el pronóstico y el
             análisis de sistemas no lineales.
           </p>
-          <a
-            href="https://sysidentpy.org/book/0-Preface/"
-            class="btn light-border"
-            ><img
-              src="overrides/assets/img/icon/fi-rr-book-alt.svg"
-              alt="Ícono de E‑book"
-            />
-            Descargar el E‑book</a
-          >
+          <a href="https://sysidentpy.org/book/0-Preface/" class="btn light-border"><img
+              src="overrides/assets/img/icon/fi-rr-book-alt.svg" alt="Ícono de E‑book" />
+            Descargar el E‑book</a>
         </div>
       </div>
     </div>
@@ -327,25 +307,382 @@
             </p>
           </div>
           <div class="item">
-            <a
-              href="https://sysidentpy.org/getting-started/getting-started/"
-              class="card-feature"
-            >
-              <img
-                src="overrides/assets/img/icon/fi-rr-book-alt.svg"
-                alt="Overview Icon"
-              />
+            <a href="https://sysidentpy.org/getting-started/getting-started/" class="card-feature">
+              <img src="overrides/assets/img/icon/fi-rr-book-alt.svg" alt="Overview Icon" />
               <h4>Resumen</h4>
               <p>
                 Conoce el paquete SysIdentPy y cómo usarlo en tus proyectos.
               </p>
             </a>
           </div>
-
-          ... (rest omitted for brevity in the patch) {% endblock %} {% block
-          content %}{% endblock %} {% block footer %}{% endblock %}
+          <div class="item">
+            <a href="https://sysidentpy.org/book/0-Preface/" class="card-feature">
+              <img src="overrides/assets/img/icon/fi-rr-book-alt.svg" alt="Book Icon" />
+              <h4>Libro</h4>
+              <p>
+                Conoce el libro y cómo aprovecharlo en tus proyectos.
+              </p>
+            </a>
+          </div>
+          <div class="item">
+            <a href="https://sysidentpy.org/book/10-Case-Studies/" class="card-feature">
+              <img src="overrides/assets/img/icon/fi-rr-book-alt.svg" alt="Case Studies Icon" />
+              <h4>Casos de Estudio</h4>
+              <p>
+                Aprende sobre aplicaciones reales de SysIdentPy.
+              </p>
+            </a>
+          </div>
+          <div class="item">
+            <a href="https://sysidentpy.org/getting-started/getting-started/#installation" class="card-feature">
+              <img src="overrides/assets/img/icon/fi-rr-book-alt.svg" alt="Installation Icon" />
+              <h4>Instalación</h4>
+              <p>
+                Aprende cómo instalar SysIdentPy en tu entorno.
+              </p>
+            </a>
+          </div>
+          <div class="item">
+            <a href="https://sysidentpy.org/user-guide/how-to/create-a-narx-neural-network/" class="card-feature">
+              <img src="overrides/assets/img/icon/fi-rr-book-alt.svg" alt="Neural NARX Network Icon" />
+              <h4>Red Neuronal NARX</h4>
+              <p>
+                Aprende sobre la Red Neuronal NARX y cómo usarla.
+              </p>
+            </a>
+          </div>
+          <div class="item">
+            <a href="https://sysidentpy.org/user-guide/tutorials/general-NARX-models/" class="card-feature">
+              <img src="overrides/assets/img/icon/fi-rr-book-alt.svg" alt="Machine Learning Estimators Icon" />
+              <h4>Estimadores de ML</h4>
+              <p>
+                Conoce los distintos estimadores disponibles en SysIdentPy.
+              </p>
+            </a>
+          </div>
+          <div class="item">
+            <a href="https://sysidentpy.org/getting-started/narmax-intro/" class="card-feature">
+              <img src="overrides/assets/img/icon/fi-rr-book-alt.svg" alt="Introducción a modelos NARMAX Icon" />
+              <h4>Introducción a NARMAX</h4>
+              <p>
+                Aprende qué son los modelos NARMAX y cómo emplearlos.
+              </p>
+            </a>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
+
+<section id="contributors">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h3><strong>Desarrollador</strong> Principal</h3>
+        <div class="card-maintainer">
+          <img src="https://github.com/wilsonrljr.png" alt="Wilson Rocha" />
+          <div>
+            <h6>Wilson Rocha</h6>
+            <p>
+              Head de Ciencia de Datos en RD. Máster en Ingeniería Eléctrica.
+              Profesor. Miembro del Grupo de Control y Modelado (GCOM).
+            </p>
+            <ul>
+              <li>
+                <a href="https://github.com/wilsonrljr"><i class="fab fa-github"></i></a>
+              </li>
+              <li>
+                <a href="https://www.linkedin.com/in/wilsonrljr"><i class="fab fa-linkedin"></i></a>
+              </li>
+              <li>
+                <a href="https://x.com/wilsonrljr"><i class="fab fa-twitter"></i></a>
+              </li>
+              <li>
+                <a href="https://discord.gg/8eGE3PQ"><i class="fab fa-discord"></i></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <h3>Nuestros <strong>Colaboradores</strong></h3>
+        <ul class="list-contributors" id="contributorsList">
+          <li>
+            <a target="_blank" href="https://github.com/wilsonrljr/sysidentpy" class="btn-contributors"></a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  async function fetchContributors() {
+    const url = `https://api.github.com/repos/wilsonrljr/sysidentpy/contributors`;
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Error");
+
+      const contributors = await response.json();
+      const container = document.getElementById("contributorsList");
+
+      contributors.forEach((user) => {
+        const li = document.createElement("li");
+        const img = document.createElement("img");
+
+        img.src = user.avatar_url;
+        img.alt = `@${user.login}`;
+        img.title = `@${user.login}`;
+        img.onclick = () => window.open(user.html_url, "_blank");
+
+        li.appendChild(img);
+        container.insertBefore(li, container.lastElementChild);
+      });
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+
+  fetchContributors();
+</script>
+
+<section id="big-numbers">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h3>Nuestros números</h3>
+      </div>
+      <div class="col">
+        <ul>
+          <li>
+            <i class="fi-rr-vector-alt"></i>
+            <h6><strong>+80%</strong> Cobertura</h6>
+          </li>
+          <li>
+            <i class="fi-rr-vector-alt"></i>
+            <h6><strong>56K</strong> Descargas</h6>
+          </li>
+          <li>
+            <i class="fi-rr-vector-alt"></i>
+            <h6><strong>1.5k</strong> Descargas/mes</h6>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="users">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h2><strong>Usuarios compartiendo</strong> su experiencia</h2>
+      </div>
+    </div>
+    <div class="carousel-container">
+      <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide">
+            <div class="box-testimonial">
+              <img src="overrides/assets/img/avatar/user-01.jpg" alt="David Quintão" />
+              <h5>David Quintão</h5>
+              <p>
+                <small>COO, Technium - IA para Todos</small>
+              </p>
+              <hr />
+              <p>
+                <i>
+                  SysIdentPy es una solución de alto rendimiento que puede
+                  utilizarse en escenarios muy desafiantes para el modelado
+                  dinámico no lineal. En Technium - IA Para Todos recomendamos
+                  su uso en nuestros proyectos.
+                </i>
+              </p>
+            </div>
+          </div>
+          <div class="swiper-slide">
+            <div class="box-testimonial">
+              <img src="overrides/assets/img/avatar/user-02.jpg" alt="Neylson Crepalde" />
+              <h5>Neylson Crepalde</h5>
+              <p><small>Estratega de IA Generativa, AWS</small></p>
+              <hr />
+              <p>
+                <i>
+                  Lo mejor de SysIdentPy es que resuelve problemas complejos
+                  de forma simple y elegante. Además tiene gran rendimiento y
+                  es muy fácil de usar. Ya lo tenemos en producción.
+                </i>
+              </p>
+            </div>
+          </div>
+          <div class="swiper-slide">
+            <div class="box-testimonial">
+              <img src="overrides/assets/img/avatar/user-03.jpg" alt="Nath Keles" />
+              <h5>Nath Keles</h5>
+              <p><small>Coordinadora Data Science, RD</small></p>
+              <hr />
+              <p>
+                <i>
+                  SysIdentPy es excelente para trabajar con series temporales
+                  y sistemas dinámicos, ofreciendo métodos nativos y soportando
+                  numerosos estimadores de paquetes como sklearn y CatBoost
+                  para construir diferentes modelos NARMAX.
+                </i>
+              </p>
+            </div>
+          </div>
+          <div class="swiper-slide">
+            <div class="box-testimonial">
+              <img src="overrides/assets/img/avatar/user-04.jpg" alt="Mehran Shahpari" />
+              <h5>Mehran Shahpari</h5>
+              <p>
+                <small>
+                  MSc. Ingeniería Civil - Ingeniería Sísmica | University of
+                  Science and Culture, Teherán, Irán
+                </small>
+              </p>
+              <hr />
+              <p>
+                <i>
+                  En mi experiencia, SysIdentPy es el mejor paquete de Python
+                  para Identificación de Sistemas usando modelos NARMAX.
+                </i>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+
+        <div class="swiper-pagination"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="recents-post">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h2>Nuestras <strong>Publicaciones Recientes</strong></h2>
+      </div>
+      <div class="col text-right">
+        <a href="https://sysidentpy.org/community-support/community-overview/" class="btn-light"><i
+            class="fi-rr-notebook"></i> Ver todas</a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="box-recent-post">
+          <p class="author">
+            <i class="fi-rr-user"></i> Wilson Rocha
+          </p>
+          <h3>Paquetes Open Source (en portugués)</h3>
+          <a href="https://sysidentpy.org/community-support/meetups/nubank-meetup-open-source/">Ver más <i
+              class="fi-rr-angle-right"></i></a>
+        </div>
+      </div>
+      <div class="col">
+        <div class="box-recent-post">
+          <p class="author">
+            <i class="fi-rr-user"></i> Wilson Rocha
+          </p>
+          <h3>Presentación Meetup Nubank (en portugués)</h3>
+          <a href="https://sysidentpy.org/community-support/meetups/nubank-meetup/">Ver más <i
+              class="fi-rr-angle-right"></i></a>
+        </div>
+      </div>
+      <div class="col">
+        <div class="box-recent-post">
+          <p class="author">
+            <i class="fi-rr-user"></i> Wilson Rocha
+          </p>
+          <h3>Meetup GCoM (en portugués)</h3>
+          <a href="https://sysidentpy.org/community-support/meetups/gcom-meetup/">Ver más <i
+              class="fi-rr-angle-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <img src="overrides/assets/img/logotype-sysidentpy.svg" alt="Logotipo SysIdentPy" />
+        <p>
+          SysIdentPy es una biblioteca de Identificación de Sistemas simple y
+          fácil de aprender en Python.
+        </p>
+        <ul>
+          <li>
+            <a href="https://github.com/wilsonrljr/sysidentpy"><i class="fab fa-github"></i></a>
+          </li>
+          <li>
+            <a href="https://www.linkedin.com/in/wilsonrljr/"><i class="fab fa-linkedin"></i></a>
+          </li>
+          <li>
+            <a href="https://x.com/wilsonrljr"><i class="fab fa-twitter"></i></a>
+          </li>
+          <li>
+            <a href="https://discord.gg/8eGE3PQ"><i class="fab fa-discord"></i></a>
+          </li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Comunidad</h4>
+        <a href="https://discord.gg/8eGE3PQ">Discord</a>
+        <a href="https://github.com/wilsonrljr/sysidentpy/discussions">Discusión en Github</a>
+        <a href="https://github.com/wilsonrljr/sysidentpy/graphs/contributors">Contribuidores</a>
+        <a href="https://github.com/wilsonrljr/sysidentpy/blob/main/CODE_OF_CONDUCT.md">Código de Conducta</a>
+        <a href="https://sysidentpy.org/developer-guide/contribute/">Contribuir</a>
+        <a href="https://sysidentpy.org/landing-page/sponsor/">Patrocinar</a>
+      </div>
+      <div class="col">
+        <h4>Recursos</h4>
+        <a href="https://sysidentpy.org/book/0-Preface/">Libro</a>
+        <a href="https://sysidentpy.org/getting-started/quickstart-guide/">Documentación</a>
+        <a href="https://sysidentpy.org/landing-page/about-us/#citation">Cómo citar SysIdentPy</a>
+        <a href="https://sysidentpy.org/community-support/community-overview/">Meetups</a>
+      </div>
+      <div class="col">
+        <h4>Repositorio Github</h4>
+        <div id="github-repo-card"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col text-center">
+        <p>
+          Copyright © 2018 - 2025 SysIdentPy - De Enfoques Clásicos a Redes
+          Neuronales.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const repoUrl = "https://api.github.com/repos/wilsonrljr/sysidentpy";
+  fetch(repoUrl)
+    .then((response) => response.json())
+    .then((data) => {
+      const repoCard = `
+                  <a href="${data.html_url}" target="_blank">
+                    <h2><i class="fab fa-github"></i> ${data.owner.login}/${data.name}</h2>
+                    <p>${data.description}</p>
+                    <p class="numbers-repo"><i class="fas fa-star"></i> ${data.stargazers_count} <i class="fas fa-network-wired"></i> ${data.forks_count}</p>
+                    <span>Ver en GitHub</span>
+                  </a>
+                `;
+      document.querySelectorAll("#github-repo-card").forEach((card) => {
+        card.innerHTML = repoCard;
+      });
+    })
+    .catch((error) => console.error("Error al obtener el repositorio:", error));
+</script>
+
+{% endblock %} {% block content %}{% endblock %} {% block footer %}{% endblock %}
