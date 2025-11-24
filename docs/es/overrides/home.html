@@ -1,31 +1,1178 @@
-{% extends "overrides/main.html" %} {% block tabs %} {{ super() }}
+{#- This file was automatically generated - do not edit -#} {% extends
+"overrides/main.html" %}
+{% set pepy_stats = config.extra.pepy_stats | default({}) %}
+{% set pepy_total = pepy_stats.total_downloads %}
+{% set pepy_month = pepy_stats.downloads_month %}
+{% set pepy_updated = pepy_stats.last_updated %}
+{% set pepy_formatted = pepy_stats.formatted_total | default('56K+') %}
+{% set pypi_version = config.extra.pypi_version | default('', true) %}
+{% block tabs %} {{ super() }}
+
+<link rel="stylesheet" href="overrides/assets/css/modern-enhancements.css">
 
 <section id="hero">
-  <div class="container">
-    <div class="row">
-      <div class="col">
-        <h1>Modelado Dinámico y Pronóstico con <span>SysIdentPy</span></h1>
-        <p>
-          ¡SysIdentPy es una librería Python fácil de usar para la
-          identificación de sistemas y el pronóstico de series temporales!
-        </p>
-      </div>
-      <div class="col">
-        <a
-          class="btn solid-orange"
-          href="https://sysidentpy.org/getting-started/getting-started/"
-          >Primeros Pasos</a
-        >
-        <span class="copy-pip"
-          ><b id="install">pip install sysidentpy</b>
-          <button onclick="installCode()">
-            <i class="far fa-copy"></i></button
-        ></span>
-      </div>
+    <div class="container">
+        <div class="row footer-columns">
+            <div class="col">
+                <div class="hero-badges">
+                    <span class="badge" id="github-stars-badge">
+                        <i class="fas fa-star"></i> <span id="stars-count">...</span> stars
+                    </span>
+                    <span class="badge" id="downloads-badge">
+                        <i class="fas fa-download"></i> <span id="downloads-count">{{ pepy_formatted }}</span> downloads
+                    </span>
+                    <span class="badge">
+                        <i class="fas fa-check-circle"></i> 90%+ coverage
+                    </span>
+                    <span class="badge" id="pypi-badge">
+                        <i class="fab fa-python"></i> <span id="pypi-version">v{{ pypi_version if pypi_version else
+                            '0.4.0' }}</span>
+                    </span>
+                </div>
+                <h1>
+                    Build Intelligent <span>Dynamic Models</span> with Python
+                </h1>
+                <p class="hero-subtitle">
+                    Open-source Python library for nonlinear system identification,
+                    time series forecasting, and dynamic modeling. From classical approaches to neural networks.
+                </p>
+            </div>
+            <div class="col">
+                <a class="btn solid-orange" href="https://sysidentpy.org/getting-started/getting-started/"><i
+                        class="fas fa-rocket"></i> Start Building Now</a>
+                <span class="copy-pip"><b id="install">pip install sysidentpy</b>
+                    <button onclick="installCode()" title="Copy to clipboard">
+                        <i class="far fa-copy"></i></button></span>
+                <a class="btn-link"
+                    href="https://colab.research.google.com/github/wilsonrljr/sysidentpy/blob/master/examples/your-first-model.ipynb"
+                    target="_blank"><i class="fab fa-google"></i> Try in Google Colab</a>
+            </div>
+        </div>
     </div>
-  </div>
 </section>
 
-{# - rest of the PT template content was intentionally omitted in this copy - #}
+<section id="example">
+    <img class="img-bg" src="overrides/assets/img/header/bg-chart.svg" alt="Background chart" />
+    <div class="browser">
+        <header>
+            <div class="controllers">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <p>Introduction to SysIdentPy</p>
+        </header>
+        <nav>
+            <button class="tablinks" onclick="openTab(event, 'PolynomialNARX')" id="defaultOpen">
+                <span class="tab-title">Polynomial NARX</span>
+                <span class="tab-subtitle">Fast & Interpretable</span>
+            </button>
+            <button class="tablinks" onclick="openTab(event, 'LegendreNARX')">
+                <span class="tab-title">Legendre NARX</span>
+                <span class="tab-subtitle">Orthogonal Basis</span>
+            </button>
+            <button class="tablinks" onclick="openTab(event, 'FourierNARX')">
+                <span class="tab-title">Fourier NARX</span>
+                <span class="tab-subtitle">Periodic Patterns</span>
+            </button>
+            <button class="tablinks" onclick="openTab(event, 'NeuralNARX')">
+                <span class="tab-title">Neural NARX</span>
+                <span class="tab-subtitle">Deep Learning</span>
+            </button>
+            <button class="tablinks" onclick="openTab(event, 'BayesianNARX')">
+                <span class="tab-title">Bayesian NARX</span>
+                <span class="tab-subtitle">Uncertainty Quantification</span>
+            </button>
+            <button class="tablinks" onclick="openTab(event, 'CatboostNARX')">
+                <span class="tab-title">Catboost NARX</span>
+                <span class="tab-subtitle">Gradient Boosting</span>
+            </button>
+        </nav>
+        <main>
+            <div id="PolynomialNARX" class="tabcontent">
+                <div class="code">
+                    <div class="code-header">
+                        <span class="code-label"><i class="fas fa-code"></i> Polynomial NARX Example</span>
+                        <a href="https://colab.research.google.com/github/wilsonrljr/sysidentpy/blob/master/examples/your-first-model.ipynb"
+                            target="_blank" class="btn-colab" title="Open in Google Colab">
+                            <i class="fab fa-google"></i> Try in Colab
+                        </a>
+                    </div>
+                    <pre>
+                <code class="language-python">
+    from sysidentpy.model_structure_selection import FROLS
+    from sysidentpy.basis_function import Polynomial
+    from sysidentpy.utils.generate_data import get_siso_data
+
+    x_train, x_valid, y_train, y_valid = get_siso_data(
+        n=1000, colored_noise=False, sigma=0.0001, train_percentage=90
+    )
+
+    basis_function = Polynomial(degree=2)
+    model = FROLS(ylag=2, xlag=2, basis_function=basis_function)
+
+    model.fit(X=x_train, y=y_train)
+    yhat = model.predict(X=x_valid, y=y_valid)
+                </code>
+              </pre>
+                </div>
+                <div class="chart">
+                    <div id="chart1"></div>
+                </div>
+            </div>
+
+            <div id="LegendreNARX" class="tabcontent">
+                <div class="code">
+                    <pre>
+                <code class="language-python">
+    from sysidentpy.model_structure_selection import FROLS
+    from sysidentpy.basis_function import Legendre
+    from sysidentpy.utils.generate_data import get_siso_data
+
+    x_train, x_valid, y_train, y_valid = get_siso_data(
+        n=1000, colored_noise=False, sigma=0.0001, train_percentage=90
+    )
+
+    basis_function = Legendre(degree=2)
+    model = FROLS(ylag=2, xlag=2, basis_function=basis_function)
+
+    model.fit(X=x_train, y=y_train)
+    yhat = model.predict(X=x_valid, y=y_valid)
+                </code>
+              </pre>
+                </div>
+                <div class="chart">
+                    <div id="chart2"></div>
+                </div>
+            </div>
+
+            <div id="FourierNARX" class="tabcontent">
+                <div class="code">
+                    <pre>
+                <code class="language-python">
+    from sysidentpy.model_structure_selection import FROLS
+    from sysidentpy.basis_function import Fourier
+    from sysidentpy.utils.generate_data import get_siso_data
+
+    x_train, x_valid, y_train, y_valid = get_siso_data(
+        n=1000, colored_noise=False, sigma=0.0001, train_percentage=90
+    )
+
+    basis_function = Fourier(degree=2)
+    model = FROLS(ylag=2, xlag=2, basis_function=basis_function)
+
+    model.fit(X=x_train, y=y_train)
+    yhat = model.predict(X=x_valid, y=y_valid)
+                </code>
+              </pre>
+                </div>
+                <div class="chart">
+                    <div id="chart3"></div>
+                </div>
+            </div>
+
+            <div id="NeuralNARX" class="tabcontent">
+                <div class="code">
+                    <pre>
+                <code class="language-python">
+    from torch import nn
+    from sysidentpy.neural_network import NARXNN
+
+    from sysidentpy.basis_function import Polynomial
+    from sysidentpy.utils.generate_data import get_siso_data
+
+    x_train, x_valid, y_train, y_valid = get_siso_data(
+        n=1000, colored_noise=False, sigma=0.01, train_percentage=80
+    )
+
+    class NARX(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.lin = nn.Linear(4, 30)
+            self.lin2 = nn.Linear(30, 1)
+            self.tanh = nn.Tanh()
+
+        def forward(self, xb):
+            z = self.lin(xb)
+            z = self.tanh(z)
+            z = self.lin2(z)
+            return z
+
+
+    narx_net2 = NARXNN(
+        net=NARX(),
+        ylag=2,
+        xlag=2,
+        basis_function=Polynomial(degree=1),
+        optimizer="Adam",
+        optim_params={
+            "betas": (0.9, 0.999),
+            "eps": 1e-05,
+        },
+    )
+
+    narx_net2.fit(X=x_train, y=y_train)
+    yhat = narx_net2.predict(X=x_valid, y=y_valid)
+                </code>
+              </pre>
+                </div>
+                <div class="chart">
+                    <div id="chart4"></div>
+                </div>
+            </div>
+
+            <div id="BayesianNARX" class="tabcontent">
+                <div class="code">
+                    <pre>
+                <code class="language-python">
+    from sysidentpy.utils.generate_data import get_siso_data
+    from sysidentpy.general_estimators import NARX
+    from sklearn.linear_model import BayesianRidge
+    from sysidentpy.basis_function import Polynomial
+
+    x_train, x_valid, y_train, y_valid = get_siso_data(
+        n=1000, colored_noise=False, sigma=0.0001, train_percentage=90
+    )
+
+    BayesianRidge_narx = NARX(
+        base_estimator=BayesianRidge(),
+        xlag=2,
+        ylag=2,
+        basis_function=Polynomial(degree=2),
+        model_type="NARMAX",
+    )
+
+    BayesianRidge_narx.fit(X=x_train, y=y_train)
+    yhat = BayesianRidge_narx.predict(X=x_valid, y=y_valid)
+                </code>
+              </pre>
+                </div>
+                <div class="chart">
+                    <div id="chart5"></div>
+                </div>
+            </div>
+
+            <div id="CatboostNARX" class="tabcontent">
+                <div class="code">
+                    <pre>
+                <code class="language-python">
+    from catboost import CatBoostRegressor
+    from sysidentpy.utils.generate_data import get_siso_data
+    from sysidentpy.general_estimators import NARX
+    from sysidentpy.basis_function import Polynomial
+
+    x_train, x_valid, y_train, y_valid = get_siso_data(
+        n=1000, colored_noise=False, sigma=0.0001, train_percentage=90
+    )
+
+    catboost_narx = NARX(
+        base_estimator=CatBoostRegressor(
+            iterations=300,
+            learning_rate=0.1
+        ),
+        xlag=2,
+        ylag=2,
+        basis_function=Polynomial(degree=2),
+        model_type="NARMAX",
+        fit_params={"verbose": False},
+    )
+
+    catboost_narx.fit(X=x_train, y=y_train)
+    yhat = catboost_narx.predict(X=x_valid, y=y_valid, steps_ahead=None)
+                </code>
+              </pre>
+                </div>
+                <div class="chart">
+                    <div id="chart6"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+</section>
+
+<section id="companies">
+    <div class="container">
+        <div class="row">
+            <div class="col text-center">
+                <h3>Trusted by <strong>Leading Companies</strong></h3>
+                <p class="section-subtitle">Organizations worldwide rely on SysIdentPy for their dynamic modeling needs
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="logos-container">
+                    <div>
+                        <div class="logo-card dark-bg">
+                            <img src="overrides/assets/img/logos/logo-01.png" alt="A3Data" class="company-logo" />
+                        </div>
+                        <div class="logo-card">
+                            <img src="overrides/assets/img/logos/coer.png" alt="COER" class="company-logo" />
+                        </div>
+                        <div class="logo-card dark-bg">
+                            <img src="overrides/assets/img/logos/logo-02.png" alt="Gcom" class="company-logo" />
+                        </div>
+                        <div class="logo-card">
+                            <img src="overrides/assets/img/logos/maynooth.png" alt="Maynooth University"
+                                class="company-logo" />
+                        </div>
+                        <div class="logo-card dark-bg">
+                            <img src="overrides/assets/img/logos/logo-03.png" alt="Technium" class="company-logo" />
+                        </div>
+                        <div class="logo-card">
+                            <img src="overrides/assets/img/logos/rdsaude.png" alt="RD Saúde" class="company-logo" />
+                        </div>
+                        <!-- Duplicated for seamless loop -->
+                        <div class="logo-card dark-bg">
+                            <img src="overrides/assets/img/logos/logo-01.png" alt="A3Data" class="company-logo" />
+                        </div>
+                        <div class="logo-card">
+                            <img src="overrides/assets/img/logos/coer.png" alt="COER" class="company-logo" />
+                        </div>
+                        <div class="logo-card dark-bg">
+                            <img src="overrides/assets/img/logos/logo-02.png" alt="Gcom" class="company-logo" />
+                        </div>
+                        <div class="logo-card">
+                            <img src="overrides/assets/img/logos/maynooth.png" alt="Maynooth University"
+                                class="company-logo" />
+                        </div>
+                        <div class="logo-card dark-bg">
+                            <img src="overrides/assets/img/logos/logo-03.png" alt="Technium" class="company-logo" />
+                        </div>
+                        <div class="logo-card">
+                            <img src="overrides/assets/img/logos/rdsaude.png" alt="RD Saúde" class="company-logo" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="content">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <img src="overrides/assets/img/content/img-mockup-book.png" />
+            </div>
+            <div class="col">
+                <div class="text-box">
+                    <span class="badge-free">FREE</span>
+                    <h2>
+                        <strong>Nonlinear</strong> System Identification and
+                        Forecasting
+                    </h2>
+                    <p>
+                        Welcome to our comprehensive companion book on System Identification!
+                        Master dynamic models and forecasting with practical, real-world examples.
+                    </p>
+                    <div class="book-stats">
+                        <span><i class="fas fa-book-open"></i> 300+ pages</span>
+                        <span><i class="fas fa-list"></i> 10+ chapters</span>
+                        <span><i class="fas fa-code"></i> 50+ examples</span>
+                    </div>
+                    <p>
+                        Learn comprehensive algorithms for identification, forecasting,
+                        and analysis of nonlinear systems. From theory to practice.
+                    </p>
+                    <a href="https://sysidentpy.org/book/0-Preface/" class="btn light-border"><img
+                            src="overrides/assets/img/icon/fi-rr-book-alt.svg" alt="Ebook Icon" />
+                        Get Your Free Guide</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="features">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col">
+                <h2>Everything You Need to <strong>Master System Identification</strong></h2>
+                <p class="section-subtitle">Comprehensive resources, from beginner tutorials to advanced techniques</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="grid-features">
+                    <div class="item feature-intro">
+                        <h3>
+                            <strong>Comprehensive</strong><br />
+                            Documentation & Examples
+                        </h3>
+                        <p>
+                            Explore dozens of practical examples and in-depth tutorials.
+                            Everything you need to build powerful models is at your fingertips!
+                        </p>
+                    </div>
+                    <div class="item">
+                        <a href="https://sysidentpy.org/getting-started/getting-started/"
+                            class="card-feature category-start">
+                            <div class="card-icon">
+                                <i class="fas fa-compass"></i>
+                            </div>
+                            <h4>Overview</h4>
+                            <p>
+                                Discover SysIdentPy's capabilities and learn how to
+                                integrate it into your projects seamlessly.
+                            </p>
+                            <span class="card-arrow"><i class="fas fa-arrow-right"></i></span>
+                        </a>
+                    </div>
+                    <div class="item">
+                        <a href="https://sysidentpy.org/book/0-Preface/" class="card-feature category-learn">
+                            <div class="card-icon">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <h4>Comprehensive Book</h4>
+                            <p>
+                                Master system identification with our free 300+ page guide,
+                                covering theory and practical applications.
+                            </p>
+                            <span class="card-arrow"><i class="fas fa-arrow-right"></i></span>
+                        </a>
+                    </div>
+                    <div class="item">
+                        <a href="https://sysidentpy.org/book/10-Case-Studies/" class="card-feature category-learn">
+                            <div class="card-icon">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <h4>Real-World Case Studies</h4>
+                            <p>
+                                Explore practical applications across industries including
+                                aerospace, renewable energy, and industrial systems.
+                            </p>
+                            <span class="card-arrow"><i class="fas fa-arrow-right"></i></span>
+                        </a>
+                    </div>
+                    <div class="item">
+                        <a href="https://sysidentpy.org/getting-started/getting-started/#installation"
+                            class="card-feature category-start">
+                            <div class="card-icon">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <h4>Quick Installation</h4>
+                            <p>
+                                Get started in seconds with pip or conda.
+                                Compatible with Python 3.8+.
+                            </p>
+                            <span class="card-arrow"><i class="fas fa-arrow-right"></i></span>
+                        </a>
+                    </div>
+                    <div class="item">
+                        <a href="https://sysidentpy.org/user-guide/how-to/create-a-narx-neural-network/"
+                            class="card-feature category-advanced">
+                            <div class="card-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h4>Neural NARX Networks</h4>
+                            <p>
+                                Combine deep learning with system identification.
+                                PyTorch integration for powerful neural models.
+                            </p>
+                            <span class="card-arrow"><i class="fas fa-arrow-right"></i></span>
+                        </a>
+                    </div>
+                    <div class="item">
+                        <a href="https://sysidentpy.org/user-guide/tutorials/general-NARX-models/"
+                            class="card-feature category-advanced">
+                            <div class="card-icon">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <h4>ML Estimators</h4>
+                            <p>
+                                Use any scikit-learn estimator: Random Forest, XGBoost,
+                                CatBoost, and more for system identification.
+                            </p>
+                            <span class="card-arrow"><i class="fas fa-arrow-right"></i></span>
+                        </a>
+                    </div>
+                    <div class="item">
+                        <a href="https://sysidentpy.org/getting-started/narmax-intro/"
+                            class="card-feature category-start">
+                            <div class="card-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <h4>NARMAX Introduction</h4>
+                            <p>
+                                Understand the foundations of NARMAX modeling and
+                                start building your first dynamic model.
+                            </p>
+                            <span class="card-arrow"><i class="fas fa-arrow-right"></i></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="contributors">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h3>Main <strong>Developer</strong></h3>
+                <div class="card-maintainer">
+                    <img src="https://github.com/wilsonrljr.png" alt="Wilson Rocha" />
+                    <div>
+                        <h6>Wilson Rocha</h6>
+                        <p>
+                            Head of Data Science at RD. Master in Electrical
+                            Engineering. Professor. Member of Control and
+                            Modelling Group (GCOM)
+                        </p>
+                        <ul>
+                            <li>
+                                <a href="https://github.com/wilsonrljr"><i class="fab fa-github"></i></a>
+                            </li>
+                            <li>
+                                <a href="https://www.linkedin.com/in/wilsonrljr"><i class="fab fa-linkedin"></i></a>
+                            </li>
+                            <li>
+                                <a href="https://x.com/wilsonrljr"><i class="fab fa-twitter"></i></a>
+                            </li>
+                            <li>
+                                <a href="https://discord.gg/8eGE3PQ"><i class="fab fa-discord"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <h3>Our <strong>Contributors</strong></h3>
+                <ul class="list-contributors" id="contributorsList">
+                    <li>
+                        <a target="_blank" href="https://github.com/wilsonrljr/sysidentpy" class="btn-contributors"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    async function fetchContributors() {
+        const url = `https://api.github.com/repos/wilsonrljr/sysidentpy/contributors`;
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Error");
+
+            const contributors = await response.json();
+            const container = document.getElementById("contributorsList");
+
+            contributors.forEach((user) => {
+                const li = document.createElement("li");
+                const img = document.createElement("img");
+
+                img.src = user.avatar_url;
+                img.alt = `@${user.login}`;
+                img.title = `@${user.login}`;
+                img.onclick = () => window.open(user.html_url, "_blank");
+
+                li.appendChild(img);
+                container.insertBefore(li, container.lastElementChild);
+            });
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+
+    fetchContributors();
+
+    let pepyApiKey = "";
+
+    function formatStatValue(value, labelText = "") {
+        if (!Number.isFinite(value)) {
+            return "0";
+        }
+        const normalizedLabel = labelText.toLowerCase();
+        if (normalizedLabel.includes("coverage")) {
+            return `${Math.round(value)}%`;
+        }
+        if (value >= 1000000) {
+            return `${parseFloat((value / 1000000).toFixed(1))}M`;
+        }
+        if (value >= 1000) {
+            return `${parseFloat((value / 1000).toFixed(1))}K`;
+        }
+        return Math.round(value).toString();
+    }
+
+    function updateHeroDownloads(value) {
+        const badge = document.getElementById('downloads-count');
+        if (!badge || value === undefined || value === null || isNaN(value)) {
+            return;
+        }
+        badge.textContent = `${formatStatValue(Number(value))}+`;
+    }
+
+    function updateStatNumber(statKey, value) {
+        const statElement = document.querySelector(`.stat-number[data-stat="${statKey}"]`);
+        if (!statElement || value === undefined || value === null || isNaN(value)) {
+            return;
+        }
+        const numericValue = Math.max(0, Number(value));
+        statElement.setAttribute('data-target', Math.round(numericValue));
+        if (statElement.classList.contains('animated')) {
+            const labelText = statElement.closest('.stat-card')?.querySelector('.stat-label')?.textContent || '';
+            statElement.textContent = formatStatValue(numericValue, labelText);
+        }
+    }
+
+    function parseDatasetNumber(value) {
+        if (typeof value !== 'string' || value.trim() === '') {
+            return null;
+        }
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    function hydratePepyStats(section) {
+        if (!section) {
+            return;
+        }
+        const totalDownloads = parseDatasetNumber(section.dataset.pepyTotal);
+        const monthlyDownloads = parseDatasetNumber(section.dataset.pepyMonth);
+        if (totalDownloads !== null) {
+            updateStatNumber('downloads-total', totalDownloads);
+            updateHeroDownloads(totalDownloads);
+        }
+        if (monthlyDownloads !== null) {
+            updateStatNumber('downloads-month', monthlyDownloads);
+        }
+    }
+
+    // Fetch GitHub stats for badges and numbers
+    async function fetchGitHubStats() {
+        const repoUrl = "https://api.github.com/repos/wilsonrljr/sysidentpy";
+        const pepyUrl = "https://api.pepy.tech/api/v2/projects/sysidentpy";
+        try {
+            const repoPromise = fetch(repoUrl);
+            const pepyPromise = pepyApiKey
+                ? fetch(pepyUrl, {
+                    headers: {
+                        "X-Api-Key": pepyApiKey,
+                        Accept: "application/json",
+                    },
+                }).catch(() => null)
+                : Promise.resolve(null);
+
+            const [repoResponse, pepyResponse] = await Promise.all([
+                repoPromise,
+                pepyPromise,
+            ]);
+
+            if (!repoResponse.ok) throw new Error("Error fetching GitHub data");
+            const repoData = await repoResponse.json();
+            const pepyData = pepyResponse && pepyResponse.ok ? await pepyResponse.json() : null;
+
+            // Update hero badges
+            const starsElement = document.getElementById("stars-count");
+            if (starsElement && typeof repoData.stargazers_count === "number") {
+                starsElement.textContent = repoData.stargazers_count.toLocaleString();
+            }
+
+            updateStatNumber('stars', repoData.stargazers_count);
+
+            const createdYear = new Date(repoData.created_at).getFullYear();
+            const currentYear = new Date().getFullYear();
+            const yearsActive = Math.max(1, currentYear - createdYear);
+            updateStatNumber('years-active', yearsActive);
+
+            if (pepyData) {
+                updateStatNumber('downloads-total', pepyData.total_downloads);
+                updateHeroDownloads(pepyData.total_downloads);
+                const monthlyDownloads = pepyData.downloads?.last_month ?? pepyData.downloads?.last_week ?? pepyData.downloads?.last_day ?? 0;
+                updateStatNumber('downloads-month', monthlyDownloads);
+            }
+        } catch (error) {
+            console.error("Error fetching GitHub stats:", error);
+        }
+    }
+
+    // Animate numbers on scroll
+    function animateNumbers() {
+        const stats = document.querySelectorAll('.stat-number');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !entry.target.classList.contains('animated')) {
+                    entry.target.classList.add('animated');
+                    const target = parseInt(entry.target.getAttribute('data-target'), 10) || 0;
+                    const duration = 2000;
+                    const step = target / (duration / 16 || 1);
+                    let current = 0;
+                    const labelText = entry.target.closest('.stat-card').querySelector('.stat-label').textContent;
+
+                    const timer = setInterval(() => {
+                        current += step;
+                        if (current >= target) {
+                            current = target;
+                            clearInterval(timer);
+                        }
+
+                        entry.target.textContent = formatStatValue(current, labelText);
+                    }, 16);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        stats.forEach(stat => observer.observe(stat));
+    }
+
+    // Update contributors count
+    const originalFetchContributors = fetchContributors;
+    fetchContributors = async function () {
+        await originalFetchContributors();
+        const url = `https://api.github.com/repos/wilsonrljr/sysidentpy/contributors`;
+        try {
+            const response = await fetch(url);
+            if (response.ok) {
+                const contributors = await response.json();
+                updateStatNumber('contributors', contributors.length);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
+
+    // Initialize animations and fetch data
+    document.addEventListener('DOMContentLoaded', () => {
+        const bigNumbersSection = document.getElementById('big-numbers');
+        hydratePepyStats(bigNumbersSection);
+        pepyApiKey = (bigNumbersSection?.dataset.pepyKey || '').trim();
+        fetchGitHubStats().finally(() => {
+            animateNumbers();
+        });
+
+        // Add smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href !== '#') {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            });
+        });
+
+        // Add animation to elements on scroll
+        const animateOnScroll = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.card-feature, .box-testimonial, .box-recent-post').forEach(el => {
+            animateOnScroll.observe(el);
+        });
+    });
+</script>
+
+<section id="big-numbers" data-pepy-key="{{ config.extra.pepy_api_key | default('', true) }}"
+    data-pepy-total="{{ pepy_total | default('', true) }}" data-pepy-month="{{ pepy_month | default('', true) }}"
+    data-pepy-updated="{{ pepy_updated | default('', true) }}">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col">
+                <h2>Trusted by the <strong>Community</strong></h2>
+                <p class="section-subtitle">Join thousands of developers and researchers worldwide</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h6 class="stat-number" data-stat="stars" data-target="800">0</h6>
+                        <p class="stat-label">GitHub Stars</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <h6 class="stat-number" data-stat="downloads-total" data-target="56000">0</h6>
+                        <p class="stat-label">Total Downloads</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h6 class="stat-number" data-stat="downloads-month" data-target="1500">0</h6>
+                        <p class="stat-label">Downloads/Month</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-code-branch"></i>
+                        </div>
+                        <h6 class="stat-number" data-stat="coverage" data-target="90">0</h6>
+                        <p class="stat-label">Test Coverage</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h6 class="stat-number" data-stat="contributors" data-target="30" id="contributors-count">0</h6>
+                        <p class="stat-label">Contributors</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h6 class="stat-number" data-stat="years-active" data-target="7">0</h6>
+                        <p class="stat-label">Years Active</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="users">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col">
+                <h2>What <strong>Users Say</strong> About SysIdentPy</h2>
+                <p class="section-subtitle">Real feedback from data scientists and engineers</p>
+            </div>
+        </div>
+        <div class="carousel-container">
+            <div class="swiper mySwiper">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <div class="box-testimonial">
+                            <div class="testimonial-header">
+                                <img src="overrides/assets/img/avatar/user-01.jpg" alt="David Quintão" />
+                                <div>
+                                    <h5>David Quintão</h5>
+                                    <p>
+                                        <small>COO, Technium - AI for EveryOne</small>
+                                    </p>
+                                    <div class="rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            <p>
+                                <i>SysidentPy is a high-performance solution
+                                    that can be used in highly challenging
+                                    scenarios for non-linear dynamic modeling.
+                                    At Technium - IA For EveryOne we recommend
+                                    its use in our projects.</i>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="box-testimonial">
+                            <div class="testimonial-header">
+                                <img src="overrides/assets/img/avatar/user-02.jpg" alt="Neylson Crepalde" />
+                                <div>
+                                    <h5>Neylson Crepalde</h5>
+                                    <p><small>Generative AI Strategist, AWS</small></p>
+                                    <div class="rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            <p>
+                                <i>The greatest thing about SysidentPy is that
+                                    it solves complex problems in a simple and
+                                    elegant way. Also it has great performance
+                                    and is very user friendly. We have it now
+                                    running in production.</i>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="box-testimonial">
+                            <div class="testimonial-header">
+                                <img src="overrides/assets/img/avatar/user-03.jpg" alt="Nath Keles" />
+                                <div>
+                                    <h5>Nath Keles</h5>
+                                    <p><small>Data Scientist Coordinator, RD</small></p>
+                                    <div class="rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            <p>
+                                <i>SysIdentPy is an great to work with time
+                                    series and dynamic systems, providing native
+                                    methods and supporting many different
+                                    estimators from packages like sklearn and
+                                    Catboost to build different NARMAX
+                                    models.</i>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="box-testimonial">
+                            <div class="testimonial-header">
+                                <img src="overrides/assets/img/avatar/user-04.jpg" alt="Mehran Shahpari" />
+                                <div>
+                                    <h5>Mehran Shahpari</h5>
+                                    <p>
+                                        <small>MSc. Civil - Earthquake engineering |
+                                            University of Science and Culture, Tehran,
+                                            Iran</small>
+                                    </p>
+                                    <div class="rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            <p>
+                                <i>In my experience, SysIdentPy is the best
+                                    python package for System Identification
+                                    which uses NARMAX models.</i>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="recents-post">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h2>Latest <strong>Community Posts</strong></h2>
+                <p class="section-subtitle">Stay updated with tutorials, meetups, and community events</p>
+            </div>
+            <div class="col text-right">
+                <a href="https://sysidentpy.org/community-support/community-overview/" class="btn-light"><i
+                        class="fas fa-newspaper"></i> Explore All Posts</a>
+            </div>
+        </div>
+        <div class="row blog-posts-grid">
+            <div class="col">
+                <div class="box-recent-post">
+                    <span class="post-badge portuguese">PT</span>
+                    <span class="post-category">Tutorial</span>
+                    <h3>Open Source Packages</h3>
+                    <p class="post-excerpt">Learn about open source development and contribution</p>
+                    <div class="post-meta">
+                        <span class="author">
+                            <i class="fas fa-user"></i> Wilson Rocha
+                        </span>
+                        <span class="read-time">
+                            <i class="fas fa-clock"></i> 8 min read
+                        </span>
+                    </div>
+                    <a href="https://sysidentpy.org/community-support/meetups/nubank-meetup-open-source/"
+                        class="post-link">Read More <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="col">
+                <div class="box-recent-post">
+                    <span class="post-badge portuguese">PT</span>
+                    <span class="post-category">Meetup</span>
+                    <h3>Nubank Meetup Presentation</h3>
+                    <p class="post-excerpt">Community presentation about SysIdentPy at Nubank</p>
+                    <div class="post-meta">
+                        <span class="author">
+                            <i class="fas fa-user"></i> Wilson Rocha
+                        </span>
+                        <span class="read-time">
+                            <i class="fas fa-clock"></i> 5 min read
+                        </span>
+                    </div>
+                    <a href="https://sysidentpy.org/community-support/meetups/nubank-meetup/" class="post-link">Read
+                        More <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="col">
+                <div class="box-recent-post">
+                    <span class="post-badge portuguese">PT</span>
+                    <span class="post-category">Event</span>
+                    <h3>GCoM Meetup</h3>
+                    <p class="post-excerpt">System identification workshop with the GCoM research group</p>
+                    <div class="post-meta">
+                        <span class="author">
+                            <i class="fas fa-user"></i> Wilson Rocha
+                        </span>
+                        <span class="read-time">
+                            <i class="fas fa-clock"></i> 6 min read
+                        </span>
+                    </div>
+                    <a href="https://sysidentpy.org/community-support/meetups/gcom-meetup/" class="post-link">Read More
+                        <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col footer-brand">
+                <img src="overrides/assets/img/logotype-sysidentpy.svg" alt="Logotype SysIdentPy" />
+                <p>
+                    Open-source Python library for system identification.
+                    From classical approaches to neural networks.
+                </p>
+                <div class="newsletter-box">
+                    <h4><i class="fas fa-envelope"></i> Stay Updated</h4>
+                    <p>Get the latest news and updates</p>
+                    <form class="newsletter-form" onsubmit="return false;">
+                        <input type="email" placeholder="Enter your email" required />
+                        <button type="submit" class="btn-newsletter">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+                <ul class="social-links">
+                    <li>
+                        <a href="https://github.com/wilsonrljr/sysidentpy" target="_blank" title="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.linkedin.com/in/wilsonrljr/" target="_blank" title="LinkedIn">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://x.com/wilsonrljr" target="_blank" title="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://discord.gg/8eGE3PQ" target="_blank" title="Discord">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col footer-links">
+                <h4>Community</h4>
+                <ul class="footer-nav">
+                    <li><a href="https://discord.gg/8eGE3PQ">Discord</a></li>
+                    <li><a href="https://github.com/wilsonrljr/sysidentpy/discussions">Github Discussion</a></li>
+                    <li><a href="https://github.com/wilsonrljr/sysidentpy/graphs/contributors">Contributors</a></li>
+                    <li><a href="https://github.com/wilsonrljr/sysidentpy/blob/main/CODE_OF_CONDUCT.md">Code of
+                            Conduct</a></li>
+                    <li><a href="https://sysidentpy.org/developer-guide/contribute/">Contribute</a></li>
+                    <li><a href="https://sysidentpy.org/landing-page/sponsor/">Sponsor</a></li>
+                </ul>
+            </div>
+            <div class="col footer-links">
+                <h4>Resources</h4>
+                <ul class="footer-nav">
+                    <li><a href="https://sysidentpy.org/book/0-Preface/">Book</a></li>
+                    <li><a href="https://sysidentpy.org/getting-started/quickstart-guide/">Documentation</a></li>
+                    <li><a href="https://sysidentpy.org/landing-page/about-us/#citation">Citing SysIdentPy</a></li>
+                    <li><a href="https://sysidentpy.org/community-support/community-overview/">Meetups</a></li>
+                </ul>
+            </div>
+            <div class="col footer-links footer-repo">
+                <h4>Github Repo</h4>
+                <div id="github-repo-card" class="repo-card" aria-live="polite">
+                    <a class="repo-card-link" href="https://github.com/wilsonrljr/sysidentpy" target="_blank"
+                        rel="noopener noreferrer">
+                        <h2 data-repo-title><i class="fab fa-github"></i> wilsonrljr/sysidentpy</h2>
+                        <p data-repo-description>Open-source Python library for system identification.</p>
+                        <p class="numbers-repo" data-repo-stats>
+                            <i class="fas fa-star"></i> --
+                            <i class="fas fa-network-wired"></i> --
+                        </p>
+                        <span class="repo-cta">View on GitHub</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col text-center">
+                <p>
+                    Copyright © 2018 - 2025 SysIdentPy - From Classical
+                    Approaches to Neural Networks.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    const repoUrl = "https://api.github.com/repos/wilsonrljr/sysidentpy";
+
+    function updateRepoCard(card, data) {
+        const link = card.querySelector('.repo-card-link');
+        if (link && data?.html_url) {
+            link.href = data.html_url;
+        }
+
+        const title = card.querySelector('[data-repo-title]');
+        if (title && data?.owner?.login && data?.name) {
+            title.innerHTML = `<i class="fab fa-github"></i> ${data.owner.login}/${data.name}`;
+        }
+
+        const description = card.querySelector('[data-repo-description]');
+        if (description && data?.description) {
+            description.textContent = data.description;
+        }
+
+        const stats = card.querySelector('[data-repo-stats]');
+        if (stats) {
+            const stars = typeof data?.stargazers_count === 'number'
+                ? data.stargazers_count.toLocaleString()
+                : '--';
+            const forks = typeof data?.forks_count === 'number'
+                ? data.forks_count.toLocaleString()
+                : '--';
+            stats.innerHTML = `
+                <i class="fas fa-star"></i> ${stars}
+                <i class="fas fa-network-wired"></i> ${forks}
+            `;
+        }
+    }
+
+    fetch(repoUrl)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`GitHub API error: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((data) => {
+            document.querySelectorAll("#github-repo-card").forEach((card) => updateRepoCard(card, data));
+        })
+        .catch((error) => console.error("Error fetching repository:", error));
+</script>
+
 {% endblock %} {% block content %}{% endblock %} {% block footer %}{% endblock
 %}
