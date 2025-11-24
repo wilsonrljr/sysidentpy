@@ -86,6 +86,10 @@ extra_css:
   - overrides/assets/vendor/css/prism.css
   - overrides/assets/css/style.css
 
+# Custom build hooks
+hooks:
+  - scripts/mkdocs_hooks.py
+
 # Plugins
 plugins:
   - search
@@ -158,6 +162,8 @@ extra:
       link: https://pypi.org/project/sysidentpy/
     - icon: fontawesome/brands/twitter
       link: https://twitter.com/wilsonrljr
+  pepy_api_key: !!python/object/apply:os.getenv
+    - PEPY_API_KEY
 
 # Extensions
 markdown_extensions:

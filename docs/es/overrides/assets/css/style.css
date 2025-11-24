@@ -116,8 +116,8 @@ html {
 
 #hero .container {
     max-width: 70vw;
-    padding: 5rem 3rem 5rem 3rem;
-    margin: 3rem auto 4rem auto;
+    padding: 2rem 3rem;
+    margin: 2rem auto;
     position: relative;
 }
 #hero .container::after {
@@ -357,7 +357,7 @@ line#SvgjsLine1017 {
 }
 
 #companeis {
-    padding: 5rem 0;
+    padding: 2.5rem 0;
 }
 #companeis .row {
     align-items: center;
@@ -412,8 +412,8 @@ line#SvgjsLine1017 {
 
 #features .container {
     max-width: 60vw;
-    padding: 5rem 3rem 5rem 3rem;
-    margin: 3rem auto 4rem auto;
+    padding: 2rem 3rem;
+    margin: 2rem auto;
     position: relative;
 }
 #features .container::after {
@@ -473,7 +473,7 @@ line#SvgjsLine1017 {
 
 #contributors {
     background-color: var(--new-color-background);
-    padding: 80px 0;
+    padding: 2.5rem 0;
 }
 #contributors h3 {
     font-weight: 500;
@@ -546,50 +546,127 @@ ul.list-contributors li:nth-last-child(1) a::after {
 }
 
 #big-numbers {
-    background-color: var(--new-color-background);
-    padding: 50px;
-}
-#big-numbers ul {
-    padding: 0;
-    list-style: none;
-    margin: 0;
-    display: flex;
-}
-#big-numbers ul li {
-    display: inline-flex;
-    padding: 5px;
-    align-items: center;
-    gap: 12px;
-    margin: 0 auto;
-}
-#big-numbers ul li i {
-    color: #ee771b;
-    font-size: 2rem;
-    line-height: 1;
-}
-#big-numbers ul li h6 {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 300;
-}
-#big-numbers ul li h6 strong {
-    font-weight: 700;
+    padding: 1.5rem 0;
+    background: linear-gradient(135deg, rgba(240, 126, 25, 0.05) 0%, rgba(255, 168, 0, 0.05) 100%);
 }
 #big-numbers .row {
-    display: flex;
-    align-items: center;
+    flex-direction: column;
+    gap: 0.5rem;
 }
-#big-numbers .row .col:nth-child(1) {
-    flex: 0 0 30%;
+#big-numbers .row .col {
+    flex: 1 1 100%;
 }
 #big-numbers h3 {
     margin: 0;
-    font-size: 1.8rem;
-    line-height: 1;
+    font-size: 2rem;
+    line-height: 1.2;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.8rem;
+    margin: 0.5rem auto 0;
+    width: 100%;
+    justify-items: center;
+}
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 205px;
+    padding: 1rem 0.9rem;
+    background: var(--new-color-background);
+    border: 2px solid rgba(240, 126, 25, 0.2);
+    border-radius: 12px;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #f07e19, #ffa800);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+}
+
+.stat-card:hover::before {
+    transform: scaleX(1);
+}
+
+.stat-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px rgba(240, 126, 25, 0.2);
+    border-color: rgba(240, 126, 25, 0.5);
+}
+
+.stat-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(240, 126, 25, 0.1) 0%, rgba(255, 168, 0, 0.1) 100%);
+    border-radius: 50%;
+    margin-bottom: 0.75rem;
+    transition: all 0.4s ease;
+}
+
+.stat-icon i {
+    font-size: 1.2rem;
+    color: #f07e19;
+}
+
+.stat-card:hover .stat-icon {
+    transform: scale(1.1) rotate(10deg);
+    background: linear-gradient(135deg, rgba(240, 126, 25, 0.2) 0%, rgba(255, 168, 0, 0.2) 100%);
+}
+
+.stat-number {
+    font-size: 1.65rem;
+    font-weight: 700;
+    margin: 0.2rem 0;
+    background: linear-gradient(135deg, #f07e19 0%, #ffa800 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--new-color-details);
+    text-align: center;
+    font-weight: 500;
+}
+
+@media (max-width: 1200px) {
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 #users {
-    margin: 80px 0;
+    margin: 2.5rem 0;
 
     .container {
         @media (max-width: 425px) {
@@ -655,8 +732,8 @@ ul.list-contributors li:nth-last-child(1) a::after {
 
 #recents-post .container {
     max-width: 60vw;
-    padding: 5rem 3rem 5rem 3rem;
-    margin: 3rem auto 4rem auto;
+    padding: 1rem 3rem;
+    margin: 1rem auto;
     position: relative;
 }
 #recents-post .row {
@@ -723,7 +800,7 @@ ul.list-contributors li:nth-last-child(1) a::after {
 footer {
     background-image: url(../img/footer/bg-footer.svg);
     background-size: cover;
-    padding: 200px 0 25px 0;
+    padding: 4rem 0 25px 0;
 }
 footer img {
     width: 225px;
@@ -771,12 +848,64 @@ footer .row {
     margin-top: 10px;
     margin-bottom: 10px;
 }
-#github-repo-card span {
+#github-repo-card .repo-cta {
     display: inline;
     position: absolute;
     right: 25px;
     bottom: 25px;
     font-size: 15px;
+}
+#github-repo-card a {
+    color: inherit;
+}
+footer #github-repo-card {
+    background: transparent;
+    padding: 0;
+    border: none;
+    margin-top: 0;
+}
+footer #github-repo-card a {
+    display: block;
+    padding: 1.5rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+footer #github-repo-card a:hover {
+    border-color: rgba(240, 126, 25, 0.8);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+}
+footer #github-repo-card h2,
+footer #github-repo-card p {
+    color: rgba(255, 255, 255, 0.8);
+}
+footer #github-repo-card h2 {
+    font-size: 1rem;
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+footer #github-repo-card p {
+    margin: 0 0 0.75rem 0;
+}
+footer #github-repo-card .repo-cta {
+    position: static;
+    font-weight: 600;
+    color: #f07e19;
+}
+footer #github-repo-card .repo-cta::after {
+    content: '\2197';
+    margin-left: 0.35rem;
+    font-size: 0.85rem;
+}
+footer #github-repo-card p.numbers-repo {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    color: #ffffff;
+    font-weight: 600;
 }
 #github-repo-card p.numbers-repo i {
     color: #ee771b;
@@ -795,7 +924,7 @@ footer .row {
 #header #github-repo-card p {
     display: none;
 }
-#header #github-repo-card span {
+#header #github-repo-card .repo-cta {
     right: 20px;
     bottom: 20px;
     font-size: 14px;
