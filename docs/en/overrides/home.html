@@ -1,5 +1,11 @@
 {#- This file was automatically generated - do not edit -#} {% extends
-"overrides/main.html" %} {% block tabs %} {{ super() }}
+"overrides/main.html" %}
+{% set pepy_stats = config.extra.pepy_stats | default({}) %}
+{% set pepy_total = pepy_stats.total_downloads %}
+{% set pepy_month = pepy_stats.downloads_month %}
+{% set pepy_updated = pepy_stats.last_updated %}
+{% set pepy_formatted = pepy_stats.formatted_total | default('56K+') %}
+{% block tabs %} {{ super() }}
 
 <link rel="stylesheet" href="overrides/assets/css/modern-enhancements.css">
 
@@ -12,7 +18,7 @@
                         <i class="fas fa-star"></i> <span id="stars-count">...</span> stars
                     </span>
                     <span class="badge" id="downloads-badge">
-                        <i class="fas fa-download"></i> <span id="downloads-count">56K+</span> downloads
+                        <i class="fas fa-download"></i> <span id="downloads-count">{{ pepy_formatted }}</span> downloads
                     </span>
                     <span class="badge">
                         <i class="fas fa-check-circle"></i> 80%+ coverage
@@ -591,6 +597,14 @@
         return Math.round(value).toString();
     }
 
+    function updateHeroDownloads(value) {
+        const badge = document.getElementById('downloads-count');
+        if (!badge || value === undefined || value === null || isNaN(value)) {
+            return;
+        }
+        badge.textContent = `${formatStatValue(Number(value))}+`;
+    }
+
     function updateStatNumber(statKey, value) {
         const statElement = document.querySelector(`.stat-number[data-stat="${statKey}"]`);
         if (!statElement || value === undefined || value === null || isNaN(value)) {
@@ -601,6 +615,29 @@
         if (statElement.classList.contains('animated')) {
             const labelText = statElement.closest('.stat-card')?.querySelector('.stat-label')?.textContent || '';
             statElement.textContent = formatStatValue(numericValue, labelText);
+        }
+    }
+
+    function parseDatasetNumber(value) {
+        if (typeof value !== 'string' || value.trim() === '') {
+            return null;
+        }
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    function hydratePepyStats(section) {
+        if (!section) {
+            return;
+        }
+        const totalDownloads = parseDatasetNumber(section.dataset.pepyTotal);
+        const monthlyDownloads = parseDatasetNumber(section.dataset.pepyMonth);
+        if (totalDownloads !== null) {
+            updateStatNumber('downloads-total', totalDownloads);
+            updateHeroDownloads(totalDownloads);
+        }
+        if (monthlyDownloads !== null) {
+            updateStatNumber('downloads-month', monthlyDownloads);
         }
     }
 
@@ -643,6 +680,7 @@
 
             if (pepyData) {
                 updateStatNumber('downloads-total', pepyData.total_downloads);
+                updateHeroDownloads(pepyData.total_downloads);
                 const monthlyDownloads = pepyData.downloads?.last_month ?? pepyData.downloads?.last_week ?? pepyData.downloads?.last_day ?? 0;
                 updateStatNumber('downloads-month', monthlyDownloads);
             }
@@ -699,6 +737,7 @@
     // Initialize animations and fetch data
     document.addEventListener('DOMContentLoaded', () => {
         const bigNumbersSection = document.getElementById('big-numbers');
+        hydratePepyStats(bigNumbersSection);
         pepyApiKey = (bigNumbersSection?.dataset.pepyKey || '').trim();
         fetchGitHubStats().finally(() => {
             animateNumbers();
@@ -733,7 +772,9 @@
     });
 </script>
 
-<section id="big-numbers" data-pepy-key="{{ config.extra.pepy_api_key | default('', true) }}">
+<section id="big-numbers" data-pepy-key="{{ config.extra.pepy_api_key | default('', true) }}"
+    data-pepy-total="{{ pepy_total | default('', true) }}" data-pepy-month="{{ pepy_month | default('', true) }}"
+    data-pepy-updated="{{ pepy_updated | default('', true) }}">
     <div class="container">
         <div class="row text-center">
             <div class="col">

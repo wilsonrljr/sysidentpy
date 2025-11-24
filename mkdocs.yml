@@ -86,6 +86,10 @@ extra_css:
   - overrides/assets/vendor/css/prism.css
   - overrides/assets/css/style.css
 
+# Custom build hooks
+hooks:
+  - scripts/mkdocs_hooks.py
+
 # Plugins
 plugins:
   - search
