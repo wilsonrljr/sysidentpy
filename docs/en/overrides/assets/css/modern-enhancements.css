@@ -854,6 +854,37 @@ footer .row {
     row-gap: 2rem;
 }
 
+footer .container {
+    padding-left: clamp(1.5rem, 5vw, 4rem);
+    padding-right: clamp(1.5rem, 5vw, 4rem);
+}
+
+.footer-columns {
+    display: grid;
+    grid-template-columns: minmax(320px, 1.35fr) repeat(2, minmax(210px, 0.95fr)) minmax(320px, 1.25fr);
+    column-gap: clamp(1.75rem, 3.5vw, 4rem);
+    row-gap: 2rem;
+    align-items: flex-start;
+}
+
+@media (max-width: 1200px) {
+    .footer-columns {
+        grid-template-columns: repeat(2, minmax(240px, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+    .footer-columns {
+        grid-template-columns: 1fr;
+        padding-inline: 0;
+    }
+}
+
+.footer-brand,
+.footer-repo {
+    padding-inline: clamp(0.5rem, 2vw, 1.5rem);
+}
+
 .footer-links {
     display: flex;
     flex-direction: column;
@@ -934,6 +965,9 @@ footer .row {
     align-items: center;
     gap: 0.5rem;
     color: #ffffff;
+    flex-wrap: wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
 .repo-card p {
@@ -963,7 +997,7 @@ footer .row {
 }
 
 .footer-brand {
-    max-width: 350px;
+    max-width: 420px;
 }
 
 .newsletter-box {
@@ -991,11 +1025,14 @@ footer .row {
 
 .newsletter-form {
     display: flex;
-    gap: 8px;
+    gap: 6px;
+    width: 100%;
+    flex-wrap: nowrap;
 }
 
 .newsletter-form input {
-    flex: 1;
+    flex: 1 1 auto;
+    min-width: 0;
     padding: 12px 16px;
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -1016,13 +1053,17 @@ footer .row {
 }
 
 .btn-newsletter {
-    padding: 12px 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 18px;
     background: linear-gradient(135deg, #f07e19 0%, #ffa800 100%);
     border: none;
     border-radius: 6px;
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
+    flex: 0 0 auto;
 }
 
 .btn-newsletter:hover {
