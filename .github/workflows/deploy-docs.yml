@@ -8,6 +8,9 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      PEPY_API_KEY: ${{ secrets.PEPY_API_KEY }}
+      cache_id: ""
     steps:
       - uses: actions/checkout@v4
       - name: Configure Git Credentials

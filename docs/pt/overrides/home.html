@@ -4,8 +4,8 @@
 {% set pepy_total = pepy_stats.total_downloads %}
 {% set pepy_month = pepy_stats.downloads_month %}
 {% set pepy_updated = pepy_stats.last_updated %}
-{% set pepy_formatted = pepy_stats.formatted_total | default('56K+') %}
-{% set pypi_version = config.extra.pypi_version | default('', true) %}
+{% set pepy_formatted = pepy_stats.formatted_total | default('74K+') %}
+{% set pypi_version = config.extra.pypi_version | default('0.6.0', true) %}
 {% block tabs %} {{ super() }}
 
 <link rel="stylesheet" href="overrides/assets/css/modern-enhancements.css">
@@ -26,7 +26,7 @@
                     </span>
                     <span class="badge" id="pypi-badge">
                         <i class="fab fa-python"></i> <span id="pypi-version">v{{ pypi_version if pypi_version else
-                            '0.4.0' }}</span>
+                            '0.6.0' }}</span>
                     </span>
                 </div>
                 <h1>
@@ -768,7 +768,7 @@
 </script>
 
 <section id="big-numbers" data-pepy-key="{{ config.extra.pepy_api_key | default('', true) }}"
-    data-pepy-total="{{ pepy_total | default('', true) }}" data-pepy-month="{{ pepy_month | default('', true) }}"
+    data-pepy-total="{{ pepy_total | default('74000', true) }}" data-pepy-month="{{ pepy_month | default('', true) }}"
     data-pepy-updated="{{ pepy_updated | default('', true) }}">
     <div class="container">
         <div class="row text-center">
@@ -791,7 +791,7 @@
                         <div class="stat-icon">
                             <i class="fas fa-download"></i>
                         </div>
-                        <h6 class="stat-number" data-stat="downloads-total" data-target="56000">0</h6>
+                        <h6 class="stat-number" data-stat="downloads-total" data-target="74000">0</h6>
                         <p class="stat-label">Total Downloads</p>
                     </div>
                     <div class="stat-card">
