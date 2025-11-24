@@ -29,6 +29,7 @@ def _fetch_pepy_stats(api_key: str | None) -> Dict[str, Any]:
         "total_downloads": None,
         "downloads_month": None,
         "last_updated": None,
+        "latest_version": None,
     }
 
     if not api_key:
@@ -58,6 +59,9 @@ def _fetch_pepy_stats(api_key: str | None) -> Dict[str, Any]:
         or downloads.get("last_week")
         or downloads.get("last_day")
     )
+    versions = data.get("versions") or []
+    if isinstance(versions, list) and versions:
+        stats["latest_version"] = str(versions[-1])
     stats["last_updated"] = _dt.datetime.utcnow().isoformat() + "Z"
     return stats
 
@@ -69,4 +73,7 @@ def on_config(config):
     pepy_stats["formatted_total"] = _format_compact(pepy_stats["total_downloads"])
 
     config.extra.setdefault("pepy_stats", pepy_stats)
+    latest_version = pepy_stats.get("latest_version")
+    if latest_version:
+        config.extra["pypi_version"] = latest_version
     return config

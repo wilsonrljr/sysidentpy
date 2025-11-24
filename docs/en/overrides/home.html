@@ -5,6 +5,7 @@
 {% set pepy_month = pepy_stats.downloads_month %}
 {% set pepy_updated = pepy_stats.last_updated %}
 {% set pepy_formatted = pepy_stats.formatted_total | default('56K+') %}
+{% set pypi_version = config.extra.pypi_version | default('', true) %}
 {% block tabs %} {{ super() }}
 
 <link rel="stylesheet" href="overrides/assets/css/modern-enhancements.css">
@@ -24,7 +25,8 @@
                         <i class="fas fa-check-circle"></i> 80%+ coverage
                     </span>
                     <span class="badge" id="pypi-badge">
-                        <i class="fab fa-python"></i> <span id="pypi-version">v0.4.0</span>
+                        <i class="fab fa-python"></i> <span id="pypi-version">v{{ pypi_version if pypi_version else
+                            '0.4.0' }}</span>
                     </span>
                 </div>
                 <h1>
