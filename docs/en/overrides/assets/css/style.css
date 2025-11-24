@@ -116,8 +116,8 @@ html {
 
 #hero .container {
     max-width: 70vw;
-    padding: 5rem 3rem 5rem 3rem;
-    margin: 3rem auto 4rem auto;
+    padding: 2rem 3rem;
+    margin: 2rem auto;
     position: relative;
 }
 #hero .container::after {
@@ -357,7 +357,7 @@ line#SvgjsLine1017 {
 }
 
 #companeis {
-    padding: 5rem 0;
+    padding: 2.5rem 0;
 }
 #companeis .row {
     align-items: center;
@@ -412,8 +412,8 @@ line#SvgjsLine1017 {
 
 #features .container {
     max-width: 60vw;
-    padding: 5rem 3rem 5rem 3rem;
-    margin: 3rem auto 4rem auto;
+    padding: 2rem 3rem;
+    margin: 2rem auto;
     position: relative;
 }
 #features .container::after {
@@ -546,7 +546,7 @@ ul.list-contributors li:nth-last-child(1) a::after {
 }
 
 #big-numbers {
-    padding: 3.2rem 0;
+    padding: 2rem 0;
     background: linear-gradient(135deg, rgba(240, 126, 25, 0.05) 0%, rgba(255, 168, 0, 0.05) 100%);
 }
 #big-numbers .row {
@@ -666,7 +666,7 @@ ul.list-contributors li:nth-last-child(1) a::after {
 }
 
 #users {
-    margin: 80px 0;
+    margin: 2.5rem 0;
 
     .container {
         @media (max-width: 425px) {
@@ -732,8 +732,8 @@ ul.list-contributors li:nth-last-child(1) a::after {
 
 #recents-post .container {
     max-width: 60vw;
-    padding: 5rem 3rem 5rem 3rem;
-    margin: 3rem auto 4rem auto;
+    padding: 2rem 3rem;
+    margin: 2rem auto;
     position: relative;
 }
 #recents-post .row {
@@ -800,7 +800,7 @@ ul.list-contributors li:nth-last-child(1) a::after {
 footer {
     background-image: url(../img/footer/bg-footer.svg);
     background-size: cover;
-    padding: 200px 0 25px 0;
+    padding: 4rem 0 25px 0;
 }
 footer img {
     width: 225px;
