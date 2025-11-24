@@ -851,7 +851,19 @@ footer h4 {
 }
 
 footer .row {
-    row-gap: 2rem;
+    row-gap: 2.5rem;
+}
+
+footer .row:last-child {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+footer .row:last-child p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.75;
 }
 
 footer .container {
@@ -859,37 +871,40 @@ footer .container {
     padding-right: clamp(1.5rem, 5vw, 4rem);
 }
 
-.footer-columns {
+footer .row:first-child {
     display: grid;
-    grid-template-columns: minmax(320px, 1.35fr) repeat(2, minmax(210px, 0.95fr)) minmax(320px, 1.25fr);
-    column-gap: clamp(1.75rem, 3.5vw, 4rem);
-    row-gap: 2rem;
+    grid-template-columns: minmax(320px, 1.35fr) repeat(2, minmax(180px, 0.85fr)) minmax(320px, 1.25fr);
+    column-gap: clamp(2rem, 4vw, 3rem);
+    row-gap: 2.5rem;
     align-items: flex-start;
 }
 
 @media (max-width: 1200px) {
-    .footer-columns {
+    footer .row:first-child {
         grid-template-columns: repeat(2, minmax(240px, 1fr));
+        column-gap: 2.5rem;
     }
 }
 
 @media (max-width: 720px) {
-    .footer-columns {
+    footer .row:first-child {
         grid-template-columns: 1fr;
-        padding-inline: 0;
+        column-gap: 0;
     }
 }
 
-.footer-brand,
+.footer-brand {
+    padding-left: 0;
+}
+
 .footer-repo {
-    padding-inline: clamp(0.5rem, 2vw, 1.5rem);
+    padding-right: 0;
 }
 
 .footer-links {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    min-width: 220px;
 }
 
 .footer-nav {
@@ -998,6 +1013,10 @@ footer .container {
 
 .footer-brand {
     max-width: 420px;
+}
+
+.footer-brand img {
+    margin-bottom: 1rem;
 }
 
 .newsletter-box {
