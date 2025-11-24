@@ -572,30 +572,80 @@
 
     fetchContributors();
 
+    let pepyApiKey = "";
+
+    function formatStatValue(value, labelText = "") {
+        if (!Number.isFinite(value)) {
+            return "0";
+        }
+        const normalizedLabel = labelText.toLowerCase();
+        if (normalizedLabel.includes("coverage")) {
+            return `${Math.round(value)}%`;
+        }
+        if (value >= 1000000) {
+            return `${parseFloat((value / 1000000).toFixed(1))}M`;
+        }
+        if (value >= 1000) {
+            return `${parseFloat((value / 1000).toFixed(1))}K`;
+        }
+        return Math.round(value).toString();
+    }
+
+    function updateStatNumber(statKey, value) {
+        const statElement = document.querySelector(`.stat-number[data-stat="${statKey}"]`);
+        if (!statElement || value === undefined || value === null || isNaN(value)) {
+            return;
+        }
+        const numericValue = Math.max(0, Number(value));
+        statElement.setAttribute('data-target', Math.round(numericValue));
+        if (statElement.classList.contains('animated')) {
+            const labelText = statElement.closest('.stat-card')?.querySelector('.stat-label')?.textContent || '';
+            statElement.textContent = formatStatValue(numericValue, labelText);
+        }
+    }
+
     // Fetch GitHub stats for badges and numbers
     async function fetchGitHubStats() {
         const repoUrl = "https://api.github.com/repos/wilsonrljr/sysidentpy";
+        const pepyUrl = "https://api.pepy.tech/api/v2/projects/sysidentpy";
         try {
-            const response = await fetch(repoUrl);
-            if (!response.ok) throw new Error("Error fetching GitHub data");
-            const data = await response.json();
+            const repoPromise = fetch(repoUrl);
+            const pepyPromise = pepyApiKey
+                ? fetch(pepyUrl, {
+                      headers: {
+                          "X-Api-Key": pepyApiKey,
+                          Accept: "application/json",
+                      },
+                  }).catch(() => null)
+                : Promise.resolve(null);
+
+            const [repoResponse, pepyResponse] = await Promise.all([
+                repoPromise,
+                pepyPromise,
+            ]);
+
+            if (!repoResponse.ok) throw new Error("Error fetching GitHub data");
+            const repoData = await repoResponse.json();
+            const pepyData = pepyResponse && pepyResponse.ok ? await pepyResponse.json() : null;
 
             // Update hero badges
             const starsElement = document.getElementById("stars-count");
-            if (starsElement) {
-                starsElement.textContent = data.stargazers_count;
+            if (starsElement && typeof repoData.stargazers_count === "number") {
+                starsElement.textContent = repoData.stargazers_count.toLocaleString();
             }
 
-            // Update stats numbers
-            const statsCards = document.querySelectorAll('.stat-number');
-            statsCards.forEach(card => {
-                const target = card.getAttribute('data-target');
-                if (card.id === 'contributors-count') {
-                    // Will be updated by fetchContributors
-                } else if (card.closest('.stat-card') && card.closest('.stat-card').querySelector('.fa-star')) {
-                    card.setAttribute('data-target', data.stargazers_count);
-                }
-            });
+            updateStatNumber('stars', repoData.stargazers_count);
+
+            const createdYear = new Date(repoData.created_at).getFullYear();
+            const currentYear = new Date().getFullYear();
+            const yearsActive = Math.max(1, currentYear - createdYear);
+            updateStatNumber('years-active', yearsActive);
+
+            if (pepyData) {
+                updateStatNumber('downloads-total', pepyData.total_downloads);
+                const monthlyDownloads = pepyData.downloads?.last_month ?? pepyData.downloads?.last_week ?? pepyData.downloads?.last_day ?? 0;
+                updateStatNumber('downloads-month', monthlyDownloads);
+            }
         } catch (error) {
             console.error("Error fetching GitHub stats:", error);
         }
@@ -608,10 +658,11 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting && !entry.target.classList.contains('animated')) {
                     entry.target.classList.add('animated');
-                    const target = parseInt(entry.target.getAttribute('data-target'));
+                    const target = parseInt(entry.target.getAttribute('data-target'), 10) || 0;
                     const duration = 2000;
-                    const step = target / (duration / 16);
+                    const step = target / (duration / 16 || 1);
                     let current = 0;
+                    const labelText = entry.target.closest('.stat-card').querySelector('.stat-label').textContent;
 
                     const timer = setInterval(() => {
                         current += step;
@@ -620,16 +671,7 @@
                             clearInterval(timer);
                         }
 
-                        // Format number
-                        let displayValue = Math.floor(current);
-                        if (target >= 1000) {
-                            displayValue = (displayValue / 1000).toFixed(1) + 'K';
-                        }
-                        if (entry.target.closest('.stat-card').querySelector('.stat-label').textContent.includes('Coverage')) {
-                            displayValue = Math.floor(current) + '%';
-                        }
-
-                        entry.target.textContent = displayValue;
+                        entry.target.textContent = formatStatValue(current, labelText);
                     }, 16);
                 }
             });
@@ -647,10 +689,7 @@
             const response = await fetch(url);
             if (response.ok) {
                 const contributors = await response.json();
-                const countElement = document.getElementById('contributors-count');
-                if (countElement) {
-                    countElement.setAttribute('data-target', contributors.length);
-                }
+                updateStatNumber('contributors', contributors.length);
             }
         } catch (error) {
             console.error("Error:", error);
@@ -659,6 +698,8 @@
 
     // Initialize animations and fetch data
     document.addEventListener('DOMContentLoaded', () => {
+        const bigNumbersSection = document.getElementById('big-numbers');
+        pepyApiKey = (bigNumbersSection?.dataset.pepyKey || '').trim();
         fetchGitHubStats();
         animateNumbers();
 
@@ -691,7 +732,7 @@
     });
 </script>
 
-<section id="big-numbers">
+<section id="big-numbers" data-pepy-key="{{ config.extra.pepy_api_key | default('', true) }}">
     <div class="container">
         <div class="row text-center">
             <div class="col">
@@ -706,42 +747,42 @@
                         <div class="stat-icon">
                             <i class="fas fa-star"></i>
                         </div>
-                        <h6 class="stat-number" data-target="800">0</h6>
+                        <h6 class="stat-number" data-stat="stars" data-target="800">0</h6>
                         <p class="stat-label">GitHub Stars</p>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">
                             <i class="fas fa-download"></i>
                         </div>
-                        <h6 class="stat-number" data-target="56000">0</h6>
+                        <h6 class="stat-number" data-stat="downloads-total" data-target="56000">0</h6>
                         <p class="stat-label">Total Downloads</p>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">
                             <i class="fas fa-chart-line"></i>
                         </div>
-                        <h6 class="stat-number" data-target="1500">0</h6>
+                        <h6 class="stat-number" data-stat="downloads-month" data-target="1500">0</h6>
                         <p class="stat-label">Downloads/Month</p>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">
                             <i class="fas fa-code-branch"></i>
                         </div>
-                        <h6 class="stat-number" data-target="80">0</h6>
+                        <h6 class="stat-number" data-stat="coverage" data-target="80">0</h6>
                         <p class="stat-label">Test Coverage</p>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">
                             <i class="fas fa-users"></i>
                         </div>
-                        <h6 class="stat-number" data-target="30" id="contributors-count">0</h6>
+                        <h6 class="stat-number" data-stat="contributors" data-target="30" id="contributors-count">0</h6>
                         <p class="stat-label">Contributors</p>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">
                             <i class="fas fa-calendar-alt"></i>
                         </div>
-                        <h6 class="stat-number" data-target="7">0</h6>
+                        <h6 class="stat-number" data-stat="years-active" data-target="7">0</h6>
                         <p class="stat-label">Years Active</p>
                     </div>
                 </div>
