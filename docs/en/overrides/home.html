@@ -612,11 +612,11 @@
             const repoPromise = fetch(repoUrl);
             const pepyPromise = pepyApiKey
                 ? fetch(pepyUrl, {
-                      headers: {
-                          "X-Api-Key": pepyApiKey,
-                          Accept: "application/json",
-                      },
-                  }).catch(() => null)
+                    headers: {
+                        "X-Api-Key": pepyApiKey,
+                        Accept: "application/json",
+                    },
+                }).catch(() => null)
                 : Promise.resolve(null);
 
             const [repoResponse, pepyResponse] = await Promise.all([
@@ -700,8 +700,9 @@
     document.addEventListener('DOMContentLoaded', () => {
         const bigNumbersSection = document.getElementById('big-numbers');
         pepyApiKey = (bigNumbersSection?.dataset.pepyKey || '').trim();
-        fetchGitHubStats();
-        animateNumbers();
+        fetchGitHubStats().finally(() => {
+            animateNumbers();
+        });
 
         // Add smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
