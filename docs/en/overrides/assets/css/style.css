@@ -546,7 +546,7 @@ ul.list-contributors li:nth-last-child(1) a::after {
 }
 
 #big-numbers {
-    padding: 4rem 0;
+    padding: 3.2rem 0;
     background: linear-gradient(135deg, rgba(240, 126, 25, 0.05) 0%, rgba(255, 168, 0, 0.05) 100%);
 }
 #big-numbers .row {
@@ -564,19 +564,23 @@ ul.list-contributors li:nth-last-child(1) a::after {
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.8rem;
+    margin: 1rem auto 0;
+    width: 100%;
+    justify-items: center;
 }
 
 .stat-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 1.8rem 1.5rem;
+    width: 100%;
+    max-width: 205px;
+    padding: 1rem 0.9rem;
     background: var(--new-color-background);
     border: 2px solid rgba(240, 126, 25, 0.2);
-    border-radius: 14px;
+    border-radius: 12px;
     transition: all 0.4s ease;
     position: relative;
     overflow: hidden;
@@ -588,7 +592,7 @@ ul.list-contributors li:nth-last-child(1) a::after {
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
+    height: 3px;
     background: linear-gradient(90deg, #f07e19, #ffa800);
     transform: scaleX(0);
     transition: transform 0.4s ease;
@@ -605,19 +609,19 @@ ul.list-contributors li:nth-last-child(1) a::after {
 }
 
 .stat-icon {
-    width: 56px;
-    height: 56px;
+    width: 42px;
+    height: 42px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, rgba(240, 126, 25, 0.1) 0%, rgba(255, 168, 0, 0.1) 100%);
     border-radius: 50%;
-    margin-bottom: 1.2rem;
+    margin-bottom: 0.75rem;
     transition: all 0.4s ease;
 }
 
 .stat-icon i {
-    font-size: 1.6rem;
+    font-size: 1.2rem;
     color: #f07e19;
 }
 
@@ -627,9 +631,9 @@ ul.list-contributors li:nth-last-child(1) a::after {
 }
 
 .stat-number {
-    font-size: 2.1rem;
+    font-size: 1.65rem;
     font-weight: 700;
-    margin: 0.4rem 0;
+    margin: 0.2rem 0;
     background: linear-gradient(135deg, #f07e19 0%, #ffa800 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -637,10 +641,16 @@ ul.list-contributors li:nth-last-child(1) a::after {
 }
 
 .stat-label {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: var(--new-color-details);
     text-align: center;
     font-weight: 500;
+}
+
+@media (max-width: 1200px) {
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
 }
 
 @media (max-width: 768px) {
