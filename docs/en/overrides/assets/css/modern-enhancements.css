@@ -837,6 +837,131 @@ footer::before {
     background: linear-gradient(90deg, #f07e19, #ffa800);
 }
 
+.footer-brand p,
+footer .col p {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+footer h4 {
+    margin-bottom: 1rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #ffffff;
+}
+
+footer .row {
+    row-gap: 2rem;
+}
+
+.footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 220px;
+}
+
+.footer-nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.footer-nav li {
+    margin: 0;
+}
+
+.footer-nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.footer-nav a::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(240, 126, 25, 0.85);
+    opacity: 0;
+    transform: scale(0.4);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.footer-nav a:hover {
+    color: #ffffff;
+    transform: translateX(6px);
+}
+
+.footer-nav a:hover::before {
+    opacity: 1;
+    transform: scale(1);
+}
+
+#github-repo-card.repo-card {
+    width: 100%;
+}
+
+.repo-card a {
+    display: block;
+    padding: 1.5rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    text-decoration: none;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.repo-card a:hover {
+    transform: translateY(-4px);
+    border-color: rgba(240, 126, 25, 0.8);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+}
+
+.repo-card h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #ffffff;
+}
+
+.repo-card p {
+    margin: 0 0 0.75rem 0;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.repo-card .numbers-repo {
+    display: flex;
+    gap: 1.5rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 0.75rem;
+}
+
+.repo-card .repo-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    color: #f07e19;
+}
+
+.repo-card .repo-cta::after {
+    content: '\2197';
+    font-size: 0.85rem;
+}
+
 .footer-brand {
     max-width: 350px;
 }

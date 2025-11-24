@@ -651,7 +651,18 @@
       </div>
       <div class="col">
         <h4>Repositorio Github</h4>
-        <div id="github-repo-card"></div>
+        <div id="github-repo-card" class="repo-card" aria-live="polite">
+          <a class="repo-card-link" href="https://github.com/wilsonrljr/sysidentpy" target="_blank"
+            rel="noopener noreferrer">
+            <h2 data-repo-title><i class="fab fa-github"></i> wilsonrljr/sysidentpy</h2>
+            <p data-repo-description>Biblioteca open-source para identificación de sistemas.</p>
+            <p class="numbers-repo" data-repo-stats>
+              <i class="fas fa-star"></i> --
+              <i class="fas fa-network-wired"></i> --
+            </p>
+            <span class="repo-cta">Ver en GitHub</span>
+          </a>
+        </div>
       </div>
     </div>
     <div class="row">
@@ -667,20 +678,47 @@
 
 <script>
   const repoUrl = "https://api.github.com/repos/wilsonrljr/sysidentpy";
+
+  function updateRepoCard(card, data) {
+    const link = card.querySelector('.repo-card-link');
+    if (link && data?.html_url) {
+      link.href = data.html_url;
+    }
+
+    const title = card.querySelector('[data-repo-title]');
+    if (title && data?.owner?.login && data?.name) {
+      title.innerHTML = `<i class="fab fa-github"></i> ${data.owner.login}/${data.name}`;
+    }
+
+    const description = card.querySelector('[data-repo-description]');
+    if (description && data?.description) {
+      description.textContent = data.description;
+    }
+
+    const stats = card.querySelector('[data-repo-stats]');
+    if (stats) {
+      const stars = typeof data?.stargazers_count === 'number'
+        ? data.stargazers_count.toLocaleString()
+        : '--';
+      const forks = typeof data?.forks_count === 'number'
+        ? data.forks_count.toLocaleString()
+        : '--';
+      stats.innerHTML = `
+                <i class="fas fa-star"></i> ${stars}
+                <i class="fas fa-network-wired"></i> ${forks}
+            `;
+    }
+  }
+
   fetch(repoUrl)
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Error de la API de GitHub: ${response.status}`);
+      }
+      return response.json();
+    })
     .then((data) => {
-      const repoCard = `
-                  <a href="${data.html_url}" target="_blank">
-                    <h2><i class="fab fa-github"></i> ${data.owner.login}/${data.name}</h2>
-                    <p>${data.description}</p>
-                    <p class="numbers-repo"><i class="fas fa-star"></i> ${data.stargazers_count} <i class="fas fa-network-wired"></i> ${data.forks_count}</p>
-                    <span>Ver en GitHub</span>
-                  </a>
-                `;
-      document.querySelectorAll("#github-repo-card").forEach((card) => {
-        card.innerHTML = repoCard;
-      });
+      document.querySelectorAll("#github-repo-card").forEach((card) => updateRepoCard(card, data));
     })
     .catch((error) => console.error("Error al obtener el repositorio:", error));
 </script>

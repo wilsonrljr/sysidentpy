@@ -1079,25 +1079,41 @@
                     </li>
                 </ul>
             </div>
-            <div class="col">
+            <div class="col footer-links">
                 <h4>Community</h4>
-                <a href="https://discord.gg/8eGE3PQ">Discord</a>
-                <a href="https://github.com/wilsonrljr/sysidentpy/discussions">Github Discussion</a>
-                <a href="https://github.com/wilsonrljr/sysidentpy/graphs/contributors">Contributors</a>
-                <a href="https://github.com/wilsonrljr/sysidentpy/blob/main/CODE_OF_CONDUCT.md">Code of Conduct</a>
-                <a href="https://sysidentpy.org/developer-guide/contribute/">Contribute</a>
-                <a href="https://sysidentpy.org/landing-page/sponsor/">Sponsor</a>
+                <ul class="footer-nav">
+                    <li><a href="https://discord.gg/8eGE3PQ">Discord</a></li>
+                    <li><a href="https://github.com/wilsonrljr/sysidentpy/discussions">Github Discussion</a></li>
+                    <li><a href="https://github.com/wilsonrljr/sysidentpy/graphs/contributors">Contributors</a></li>
+                    <li><a href="https://github.com/wilsonrljr/sysidentpy/blob/main/CODE_OF_CONDUCT.md">Code of
+                            Conduct</a></li>
+                    <li><a href="https://sysidentpy.org/developer-guide/contribute/">Contribute</a></li>
+                    <li><a href="https://sysidentpy.org/landing-page/sponsor/">Sponsor</a></li>
+                </ul>
             </div>
-            <div class="col">
+            <div class="col footer-links">
                 <h4>Resources</h4>
-                <a href="https://sysidentpy.org/book/0-Preface/">Book</a>
-                <a href="https://sysidentpy.org/getting-started/quickstart-guide/">Documentation</a>
-                <a href="https://sysidentpy.org/landing-page/about-us/#citation">Citing SysIdentPy</a>
-                <a href="https://sysidentpy.org/community-support/community-overview/">Meetups</a>
+                <ul class="footer-nav">
+                    <li><a href="https://sysidentpy.org/book/0-Preface/">Book</a></li>
+                    <li><a href="https://sysidentpy.org/getting-started/quickstart-guide/">Documentation</a></li>
+                    <li><a href="https://sysidentpy.org/landing-page/about-us/#citation">Citing SysIdentPy</a></li>
+                    <li><a href="https://sysidentpy.org/community-support/community-overview/">Meetups</a></li>
+                </ul>
             </div>
-            <div class="col">
+            <div class="col footer-links footer-repo">
                 <h4>Github Repo</h4>
-                <div id="github-repo-card"></div>
+                <div id="github-repo-card" class="repo-card" aria-live="polite">
+                    <a class="repo-card-link" href="https://github.com/wilsonrljr/sysidentpy" target="_blank"
+                        rel="noopener noreferrer">
+                        <h2 data-repo-title><i class="fab fa-github"></i> wilsonrljr/sysidentpy</h2>
+                        <p data-repo-description>Open-source Python library for system identification.</p>
+                        <p class="numbers-repo" data-repo-stats>
+                            <i class="fas fa-star"></i> --
+                            <i class="fas fa-network-wired"></i> --
+                        </p>
+                        <span class="repo-cta">View on GitHub</span>
+                    </a>
+                </div>
             </div>
         </div>
         <div class="row">
@@ -1113,20 +1129,47 @@
 
 <script>
     const repoUrl = "https://api.github.com/repos/wilsonrljr/sysidentpy";
+
+    function updateRepoCard(card, data) {
+        const link = card.querySelector('.repo-card-link');
+        if (link && data?.html_url) {
+            link.href = data.html_url;
+        }
+
+        const title = card.querySelector('[data-repo-title]');
+        if (title && data?.owner?.login && data?.name) {
+            title.innerHTML = `<i class="fab fa-github"></i> ${data.owner.login}/${data.name}`;
+        }
+
+        const description = card.querySelector('[data-repo-description]');
+        if (description && data?.description) {
+            description.textContent = data.description;
+        }
+
+        const stats = card.querySelector('[data-repo-stats]');
+        if (stats) {
+            const stars = typeof data?.stargazers_count === 'number'
+                ? data.stargazers_count.toLocaleString()
+                : '--';
+            const forks = typeof data?.forks_count === 'number'
+                ? data.forks_count.toLocaleString()
+                : '--';
+            stats.innerHTML = `
+                <i class="fas fa-star"></i> ${stars}
+                <i class="fas fa-network-wired"></i> ${forks}
+            `;
+        }
+    }
+
     fetch(repoUrl)
-        .then((response) => response.json())
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`GitHub API error: ${response.status}`);
+            }
+            return response.json();
+        })
         .then((data) => {
-            const repoCard = `
-                  <a href="${data.html_url}" target="_blank">
-                    <h2><i class="fab fa-github"></i> ${data.owner.login}/${data.name}</h2>
-                    <p>${data.description}</p>
-                    <p class="numbers-repo"><i class="fas fa-star"></i> ${data.stargazers_count} <i class="fas fa-network-wired"></i> ${data.forks_count}</p>
-                    <span>View on GitHub</span>
-                  </a>
-                `;
-            document.querySelectorAll("#github-repo-card").forEach((card) => {
-                card.innerHTML = repoCard;
-            });
+            document.querySelectorAll("#github-repo-card").forEach((card) => updateRepoCard(card, data));
         })
         .catch((error) => console.error("Error fetching repository:", error));
 </script>

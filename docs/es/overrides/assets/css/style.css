@@ -848,12 +848,64 @@ footer .row {
     margin-top: 10px;
     margin-bottom: 10px;
 }
-#github-repo-card span {
+#github-repo-card .repo-cta {
     display: inline;
     position: absolute;
     right: 25px;
     bottom: 25px;
     font-size: 15px;
+}
+#github-repo-card a {
+    color: inherit;
+}
+footer #github-repo-card {
+    background: transparent;
+    padding: 0;
+    border: none;
+    margin-top: 0;
+}
+footer #github-repo-card a {
+    display: block;
+    padding: 1.5rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+footer #github-repo-card a:hover {
+    border-color: rgba(240, 126, 25, 0.8);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+}
+footer #github-repo-card h2,
+footer #github-repo-card p {
+    color: rgba(255, 255, 255, 0.8);
+}
+footer #github-repo-card h2 {
+    font-size: 1rem;
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+footer #github-repo-card p {
+    margin: 0 0 0.75rem 0;
+}
+footer #github-repo-card .repo-cta {
+    position: static;
+    font-weight: 600;
+    color: #f07e19;
+}
+footer #github-repo-card .repo-cta::after {
+    content: '\2197';
+    margin-left: 0.35rem;
+    font-size: 0.85rem;
+}
+footer #github-repo-card p.numbers-repo {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    color: #ffffff;
+    font-weight: 600;
 }
 #github-repo-card p.numbers-repo i {
     color: #ee771b;
@@ -872,7 +924,7 @@ footer .row {
 #header #github-repo-card p {
     display: none;
 }
-#header #github-repo-card span {
+#header #github-repo-card .repo-cta {
     right: 20px;
     bottom: 20px;
     font-size: 14px;
