@@ -281,13 +281,19 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
         return exponents
 
-    def _one_step_ahead_prediction(self, x_base: np.ndarray) -> np.ndarray:
+    def _one_step_ahead_prediction(
+        self,
+        x_base: np.ndarray,
+        y: Optional[np.ndarray] = None,
+    ) -> np.ndarray:
         """Perform the 1-step-ahead prediction of a model.
 
         Parameters
         ----------
         x_base : ndarray of floats of shape = n_samples
             Regressor matrix with input-output arrays.
+        y : ndarray, optional
+            Unused placeholder to keep signature compatible with subclasses.
 
         Returns
         -------
@@ -295,6 +301,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
                The 1-step-ahead predicted values of the model.
 
         """
+        _ = y  # keeps signature aligned with subclasses
         yhat = np.dot(x_base, self.theta.flatten())
         return yhat.reshape(-1, 1)
 
@@ -318,10 +325,12 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
 
-        model_exponents = [
-            self._code2exponents(code=model) for model in self.final_model
-        ]
-        raw_regressor = np.zeros(len(model_exponents[0]), dtype=float)
+        model_exponents = np.vstack(
+            [self._code2exponents(code=model) for model in self.final_model]
+        )
+        raw_regressor = np.zeros(model_exponents.shape[1], dtype=float)
+        regressor_powers = np.empty_like(model_exponents)
+        theta = self.theta.ravel()
         for i in range(self.max_lag, forecast_horizon):
             init = 0
             final = self.max_lag
@@ -332,11 +341,9 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
                 final += self.max_lag
                 raw_regressor[init:final] = x[k:i, j]
 
-            regressor_value = np.zeros(len(model_exponents))
-            for j, model_exponent in enumerate(model_exponents):
-                regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
-
-            y_output[i] = np.dot(regressor_value, self.theta.flatten())
+            np.power(raw_regressor, model_exponents, out=regressor_powers)
+            regressor_value = np.prod(regressor_powers, axis=1)
+            y_output[i] = regressor_value @ theta
         return y_output[self.max_lag : :].reshape(-1, 1)
 
     @abstractmethod
@@ -346,10 +353,12 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
         x = x.reshape(-1, self.n_inputs)
-        model_exponents = [
-            self._code2exponents(code=model) for model in self.final_model
-        ]
-        raw_regressor = np.zeros(len(model_exponents[0]), dtype=float)
+        model_exponents = np.vstack(
+            [self._code2exponents(code=model) for model in self.final_model]
+        )
+        raw_regressor = np.zeros(model_exponents.shape[1], dtype=float)
+        regressor_powers = np.empty_like(model_exponents)
+        theta = self.theta.ravel()
         for i in range(self.max_lag, x.shape[0]):
             init = 0
             final = self.max_lag
@@ -360,11 +369,9 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
                 final += self.max_lag
                 raw_regressor[init:final] = x[k:i, j]
 
-            regressor_value = np.zeros(len(model_exponents))
-            for j, model_exponent in enumerate(model_exponents):
-                regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
-
-            y_output[i] = np.dot(regressor_value, self.theta.flatten())
+            np.power(raw_regressor, model_exponents, out=regressor_powers)
+            regressor_value = np.prod(regressor_powers, axis=1)
+            y_output[i] = regressor_value @ theta
         return y_output[self.max_lag : :].reshape(-1, 1)
 
     def _nar_step_ahead(self, y: np.ndarray, steps_ahead: int) -> np.ndarray:

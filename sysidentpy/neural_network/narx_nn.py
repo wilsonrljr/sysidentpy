@@ -529,7 +529,7 @@ class NARXNN(BaseMSS):
             X, y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
         )
 
-    def _one_step_ahead_prediction(self, x, y):
+    def _one_step_ahead_prediction(self, x_base, y=None):
         """Perform the 1-step-ahead prediction of a model.
 
         Parameters
@@ -546,7 +546,12 @@ class NARXNN(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        lagged_data = build_lagged_matrix(x, y, self.xlag, self.ylag, self.model_type)
+        if y is None:
+            raise ValueError("y cannot be None")
+
+        lagged_data = build_lagged_matrix(
+            x_base, y, self.xlag, self.ylag, self.model_type
+        )
 
         if isinstance(self.basis_function, Polynomial):
             x_base = self.basis_function.transform(
@@ -558,7 +563,7 @@ class NARXNN(BaseMSS):
                 lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type
             )
 
-        yhat = np.zeros(x.shape[0], dtype=float)
+        yhat = np.zeros(x_base.shape[0], dtype=float)
         x_base = np.atleast_1d(x_base).astype(np.float32)
         yhat = yhat.astype(np.float32)
         x_valid, _ = map(torch.tensor, (x_base, yhat))
@@ -635,7 +640,7 @@ class NARXNN(BaseMSS):
             f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
         )
 
-    def _narmax_predict(self, x, y_initial, forecast_horizon):
+    def _narmax_predict(self, x, y_initial, forecast_horizon=None):
         if len(y_initial) < self.max_lag:
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
@@ -645,6 +650,10 @@ class NARXNN(BaseMSS):
         if x is not None:
             forecast_horizon = x.shape[0]
         else:
+            if forecast_horizon is None:
+                raise ValueError(
+                    "forecast_horizon cannot be None when x is None for NARXNN prediction"
+                )
             forecast_horizon = forecast_horizon + self.max_lag
 
         if self.model_type == "NAR":
@@ -654,10 +663,11 @@ class NARXNN(BaseMSS):
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
 
-        model_exponents = [
-            self._code2exponents(code=model) for model in self.final_model
-        ]
-        raw_regressor = np.zeros(len(model_exponents[0]), dtype=float)
+        model_exponents = np.vstack(
+            [self._code2exponents(code=model) for model in self.final_model]
+        )
+        raw_regressor = np.zeros(model_exponents.shape[1], dtype=float)
+        regressor_powers = np.empty_like(model_exponents)
         for i in range(self.max_lag, forecast_horizon):
             init = 0
             final = self.max_lag
@@ -668,10 +678,8 @@ class NARXNN(BaseMSS):
                 final += self.max_lag
                 raw_regressor[init:final] = x[k:i, j]
 
-            regressor_value = np.zeros(len(model_exponents))
-            for j, model_exponent in enumerate(model_exponents):
-                regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
-
+            np.power(raw_regressor, model_exponents, out=regressor_powers)
+            regressor_value = np.prod(regressor_powers, axis=1)
             regressor_value = np.atleast_1d(regressor_value).astype(np.float32)
             y_output = y_output.astype(np.float32)
             x_valid, _ = map(torch.tensor, (regressor_value, y_output))
@@ -683,10 +691,11 @@ class NARXNN(BaseMSS):
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
         x = x.reshape(-1, self.n_inputs)
-        model_exponents = [
-            self._code2exponents(code=model) for model in self.final_model
-        ]
-        raw_regressor = np.zeros(len(model_exponents[0]), dtype=float)
+        model_exponents = np.vstack(
+            [self._code2exponents(code=model) for model in self.final_model]
+        )
+        raw_regressor = np.zeros(model_exponents.shape[1], dtype=float)
+        regressor_powers = np.empty_like(model_exponents)
         for i in range(self.max_lag, x.shape[0]):
             init = 0
             final = self.max_lag
@@ -696,10 +705,8 @@ class NARXNN(BaseMSS):
                 init += self.max_lag
                 final += self.max_lag
 
-            regressor_value = np.zeros(len(model_exponents))
-            for j, model_exponent in enumerate(model_exponents):
-                regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
-
+            np.power(raw_regressor, model_exponents, out=regressor_powers)
+            regressor_value = np.prod(regressor_powers, axis=1)
             regressor_value = np.atleast_1d(regressor_value).astype(np.float32)
             y_output = y_output.astype(np.float32)
             x_valid, _ = map(torch.tensor, (regressor_value, y_output))
