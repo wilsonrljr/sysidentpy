@@ -279,7 +279,9 @@ class NARX(BaseMSS):
         if y is None:
             raise ValueError("y cannot be None")
 
-        lagged_data = build_lagged_matrix(x_base, y, self.xlag, self.ylag, self.model_type)
+        lagged_data = build_lagged_matrix(
+            x_base, y, self.xlag, self.ylag, self.model_type
+        )
         x_base = self.basis_function.transform(
             lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type
         )
