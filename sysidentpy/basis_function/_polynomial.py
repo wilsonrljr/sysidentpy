@@ -1,7 +1,8 @@
 """Polynomial Basis Function for NARMAX models."""
 
 from itertools import combinations_with_replacement
-from typing import Optional
+from typing import Optional, Tuple, Dict
+
 import numpy as np
 
 from .basis_function_base import BaseBasisFunction
@@ -39,6 +40,43 @@ class Polynomial(BaseBasisFunction):
         degree: int = 2,
     ):
         self.degree = degree
+        # Cache combination indices per (n_features, degree) to avoid rebuilding
+        self._combination_cache: Dict[Tuple[int, int], np.ndarray] = {}
+
+    def _get_combination_indices(self, n_features: int) -> np.ndarray:
+        """Return cached column-index combinations for the current degree."""
+        key = (n_features, self.degree)
+        if key not in self._combination_cache:
+            iterable = range(n_features)
+            combos = np.array(
+                list(combinations_with_replacement(iterable, self.degree)),
+                dtype=np.int32,
+            )
+            self._combination_cache[key] = combos
+        return self._combination_cache[key]
+
+    def _evaluate_terms(
+        self,
+        data: np.ndarray,
+        predefined_regressors: Optional[np.ndarray] = None,
+    ) -> np.ndarray:
+        """Vectorized polynomial feature construction without Python loops."""
+        n_features = data.shape[1]
+        combos = self._get_combination_indices(n_features)
+        if predefined_regressors is not None:
+            combos = combos[np.asarray(predefined_regressors, dtype=int)]
+
+        # Start with ones so we can multiply each degree slice in place
+        n_samples = data.shape[0]
+        n_terms = combos.shape[0]
+        psi = np.ones((n_samples, n_terms), dtype=data.dtype)
+
+        # Multiply column-wise using the cached combination indices
+        for degree_idx in range(self.degree):
+            cols = combos[:, degree_idx]
+            psi *= data[:, cols]
+
+        return psi
 
     def fit(
         self,
@@ -78,23 +116,8 @@ class Polynomial(BaseBasisFunction):
 
         """
         # Create combinations of all columns based on its index
-        iterable_list = range(data.shape[1])
-        combination_list = list(
-            combinations_with_replacement(iterable_list, self.degree)
-        )
-        if predefined_regressors is not None:
-            combination_list = [
-                combination_list[index] for index in predefined_regressors
-            ]
-
-        psi = np.column_stack(
-            [
-                np.prod(data[:, combination_list[i]], axis=1)
-                for i in range(len(combination_list))
-            ]
-        )
-        psi = psi[max_lag:, :]
-        return psi
+        psi = self._evaluate_terms(data, predefined_regressors)
+        return psi[max_lag:, :]
 
     def transform(
         self,
