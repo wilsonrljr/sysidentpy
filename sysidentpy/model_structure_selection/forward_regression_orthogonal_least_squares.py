@@ -11,8 +11,6 @@ from typing import Union, Tuple, Optional
 
 import numpy as np
 
-from sysidentpy.narmax_base import house, rowhouse
-
 from ..basis_function import Fourier, Polynomial
 from .ofr_base import OFRBase, get_info_criteria
 
@@ -203,90 +201,6 @@ class FROLS(OFRBase):
         self.final_model = None
         self.theta = None
         self.pivv = None
-
-    def error_reduction_ratio(
-        self, psi: np.ndarray, y: np.ndarray, process_term_number: int
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """Perform the Error Reduction Ration algorithm.
-
-        Parameters
-        ----------
-        y : array-like of shape = n_samples
-            The target data used in the identification process.
-        psi : ndarray of floats
-            The information matrix of the model.
-        process_term_number : int
-            Number of Process Terms defined by the user.
-
-        Returns
-        -------
-        err : array-like of shape = number_of_model_elements
-            The respective ERR calculated for each regressor.
-        piv : array-like of shape = number_of_model_elements
-            Contains the index to put the regressors in the correct order
-            based on err values.
-        psi_orthogonal : ndarray of floats
-            The updated and orthogonal information matrix.
-
-        References
-        ----------
-        - Manuscript: Orthogonal least squares methods and their application
-           to non-linear system identification
-           https://eprints.soton.ac.uk/251147/1/778742007_content.pdf
-        - Manuscript (portuguese): Identificação de Sistemas não Lineares
-           Utilizando Modelos NARMAX Polinomiais - Uma Revisão
-           e Novos Resultados
-
-        """
-        squared_y = np.dot(y[self.max_lag :].T, y[self.max_lag :])
-        tmp_psi = psi.copy()
-        y = y[self.max_lag :, 0].reshape(-1, 1)
-        tmp_y = y.copy()
-        dimension = tmp_psi.shape[1]
-        piv = np.arange(dimension)
-        tmp_err = np.zeros(dimension)
-        err = np.zeros(dimension)
-
-        for i in np.arange(0, dimension):
-            for j in np.arange(i, dimension):
-                # Add `eps` in the denominator to omit division by zero if
-                # denominator is zero
-                # To implement regularized regression (ridge regression), add
-                # alpha to psi.T @ psi.   See S. Chen, Local regularization assisted
-                # orthogonal least squares regression, Neurocomputing 69 (2006) 559-585.
-                # The version implemented below uses the same regularization for every
-                # feature, # What Chen refers to Uniform regularized orthogonal least
-                # squares (UROLS) Set to tiny (self.eps) when you are not regularizing.
-                # alpha = eps is the default.
-                tmp_err[j] = (
-                    (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2)
-                    / (
-                        (np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) + self.alpha)
-                        * squared_y
-                    )
-                    + self.eps
-                )[0, 0]
-
-            piv_index = np.argmax(tmp_err[i:]) + i
-            err[i] = tmp_err[piv_index]
-            if i == process_term_number:
-                break
-
-            if (self.err_tol is not None) and (err.cumsum()[i] >= self.err_tol):
-                self.n_terms = i + 1
-                process_term_number = i + 1
-                break
-
-            tmp_psi[:, [piv_index, i]] = tmp_psi[:, [i, piv_index]]
-            piv[[piv_index, i]] = piv[[i, piv_index]]
-            v = house(tmp_psi[i:, i])
-            row_result = rowhouse(tmp_psi[i:, i:], v)
-            tmp_y[i:] = rowhouse(tmp_y[i:], v)
-            tmp_psi[i:, i:] = np.copy(row_result)
-
-        tmp_piv = piv[0:process_term_number]
-        psi_orthogonal = psi[:, tmp_piv]
-        return err, tmp_piv, psi_orthogonal
 
     def run_mss_algorithm(
         self, psi: np.ndarray, y: np.ndarray, process_term_number: int

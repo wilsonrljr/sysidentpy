@@ -245,6 +245,33 @@ def get_info_criteria(info_criteria: str):
     return info_criteria_options.get(info_criteria)
 
 
+def _compute_err_slice(
+    tmp_psi: np.ndarray,
+    tmp_y: np.ndarray,
+    start_idx: int,
+    squared_y: float,
+    alpha: float,
+    eps: float,
+) -> np.ndarray:
+    """Compute ERR values for remaining regressors using vectorized math."""
+    psi_block = tmp_psi[start_idx:, start_idx:]
+    if psi_block.size == 0:
+        return np.empty(0)
+
+    y_block = tmp_y[start_idx:]
+    numerators = psi_block.T @ y_block
+    denominators = np.einsum("ij,ij->j", psi_block, psi_block)
+    denominators = denominators + alpha
+    denominators = np.where(
+        denominators == 0,
+        np.finfo(np.float64).eps,
+        denominators,
+    )
+
+    err_slice = (np.square(numerators.ravel()) / (denominators * squared_y)) + eps
+    return err_slice
+
+
 class OFRBase(BaseMSS, metaclass=ABCMeta):
     """Base class for Model Structure Selection."""
 
@@ -377,6 +404,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
 
         """
         squared_y = np.dot(y[self.max_lag :].T, y[self.max_lag :])
+        squared_y = float(np.maximum(squared_y, np.finfo(np.float64).eps))
         tmp_psi = psi.copy()
         y = y[self.max_lag :, 0].reshape(-1, 1)
         tmp_y = y.copy()
@@ -386,24 +414,14 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
         err = np.zeros(dimension)
 
         for i in np.arange(0, dimension):
-            for j in np.arange(i, dimension):
-                # Add `eps` in the denominator to omit division by zero if
-                # denominator is zero
-                # To implement regularized regression (ridge regression), add
-                # alpha to psi.T @ psi.   See S. Chen, Local regularization assisted
-                # orthogonal least squares regression, Neurocomputing 69 (2006) 559-585.
-                # The version implemented below uses the same regularization for every
-                # feature, # What Chen refers to Uniform regularized orthogonal least
-                # squares (UROLS) Set to tiny (self.eps) when you are not regularizing.
-                # alpha = eps is the default.
-                tmp_err[j] = (
-                    (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2)
-                    / (
-                        (np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) + self.alpha)
-                        * squared_y
-                    )
-                    + self.eps
-                )[0, 0]
+            tmp_err[i:] = _compute_err_slice(
+                tmp_psi,
+                tmp_y,
+                i,
+                squared_y,
+                self.alpha,
+                self.eps,
+            )
 
             piv_index = np.argmax(tmp_err[i:]) + i
             err[i] = tmp_err[piv_index]
