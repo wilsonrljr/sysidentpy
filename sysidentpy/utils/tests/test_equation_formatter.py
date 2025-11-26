@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 import warnings
 
 from sysidentpy.basis_function import (
@@ -6,6 +7,8 @@ from sysidentpy.basis_function import (
     Fourier,
     Bilinear,
     Legendre,
+    Hermite,
+    Laguerre,
 )
 from sysidentpy.utils.equation_formatter import (
     results_general,
@@ -14,6 +17,12 @@ from sysidentpy.utils.equation_formatter import (
     RendererRegistry,
     _warned_unknown_bases,
     _format_coefficient,
+    _normalize_xlag,
+    _ensure_input_names,
+    _as_sequence,
+    _is_pure_y_combo,
+    _is_pure_single_x_combo,
+    _is_polynomial_model,
 )
 
 
@@ -303,3 +312,371 @@ def test__format_coefficient_negative_non_first_still_negative():
         _format_coefficient(-5, coef_format=".0f", leading=True, first_sign=True)
         == "-5"
     )
+
+
+# =====================================================================
+# Additional tests for 100% coverage
+# =====================================================================
+
+
+class TestNormalizeXlag:
+    """Tests for _normalize_xlag edge cases."""
+
+    def test_n_inputs_zero_returns_empty(self):
+        """Line 138: n_inputs <= 0 returns []."""
+        assert _normalize_xlag([1, 2], n_inputs=0) == []
+        assert _normalize_xlag(2, n_inputs=-1) == []
+
+    def test_xlag_none_returns_empty_lists(self):
+        """Line 144: xlag=None returns empty lists per input."""
+        assert _normalize_xlag(None, n_inputs=2) == [[], []]
+        assert _normalize_xlag(None, n_inputs=3) == [[], [], []]
+
+    def test_xlag_single_integer_entry_in_list(self):
+        """Lines 154-155: when entry in seq is Integral, wrap in list."""
+        # Each integer in list becomes [int]
+        result = _normalize_xlag([1, 2, 3], n_inputs=3)
+        assert result == [[1], [2], [3]]
+
+    def test_xlag_fewer_than_n_inputs_pads(self):
+        """Line 160: pad with empty lists when normalized < n_inputs."""
+        result = _normalize_xlag([[1, 2]], n_inputs=3)
+        assert result == [[1, 2], [], []]
+
+    def test_xlag_more_than_n_inputs_trims(self):
+        """Line 162: trim when normalized > n_inputs."""
+        result = _normalize_xlag([[1], [2], [3], [4]], n_inputs=2)
+        assert result == [[1], [2]]
+
+
+class TestEnsureInputNames:
+    """Tests for _ensure_input_names edge cases."""
+
+    def test_pad_input_names_when_fewer_than_n_inputs(self):
+        """Line 120: pad with x{i+1} when len(names) < n_inputs."""
+        result = _ensure_input_names(n_inputs=3, input_names=["a"])
+        assert result == ["a", "x2", "x3"]
+
+    def test_trim_input_names_when_more_than_n_inputs(self):
+        """Line 120: trim when len(names) > n_inputs."""
+        result = _ensure_input_names(n_inputs=2, input_names=["a", "b", "c", "d"])
+        assert result == ["a", "b"]
+
+
+class TestAsSequence:
+    """Tests for _as_sequence edge cases."""
+
+    def test_as_sequence_with_generator(self):
+        """Line 129: handles generic iterables via list()."""
+
+        def gen():
+            yield 1
+            yield 2
+
+        result = _as_sequence(gen())
+        assert result == [1, 2]
+
+    def test_as_sequence_with_range(self):
+        """_as_sequence handles range objects."""
+        result = _as_sequence(range(3))
+        assert result == [0, 1, 2]
+
+
+class TestIsPureCombo:
+    """Tests for _is_pure_y_combo and _is_pure_single_x_combo."""
+
+    def test_is_pure_y_combo_empty_returns_false(self):
+        """Line 93 (via _is_pure_single_x_combo empty check)."""
+        assert _is_pure_y_combo([], [1, 2]) is False
+
+    def test_is_pure_y_combo_true(self):
+        """_is_pure_y_combo returns True when all in y_indices."""
+        assert _is_pure_y_combo([1, 2, 1], [1, 2, 3]) is True
+
+    def test_is_pure_y_combo_false(self):
+        """_is_pure_y_combo returns False when not all in y_indices."""
+        assert _is_pure_y_combo([1, 4], [1, 2]) is False
+
+    def test_is_pure_single_x_combo_empty_returns_false(self):
+        """Line 93: empty combo returns False."""
+        assert _is_pure_single_x_combo([], [[3, 4], [5, 6]]) is False
+
+    def test_is_pure_single_x_combo_true(self):
+        """_is_pure_single_x_combo returns True for single block match."""
+        assert _is_pure_single_x_combo([3, 4, 3], [[3, 4], [5, 6]]) is True
+
+    def test_is_pure_single_x_combo_false(self):
+        """_is_pure_single_x_combo returns False when crossing blocks."""
+        assert _is_pure_single_x_combo([3, 5], [[3, 4], [5, 6]]) is False
+
+
+class TestIsPolynomialModel:
+    """Tests for _is_polynomial_model."""
+
+    def test_is_polynomial_model_true(self):
+        """Lines 531-532: returns True for Polynomial basis."""
+        model = DummyModel(
+            basis_function=Polynomial(degree=2),
+            xlag=1,
+            ylag=1,
+            n_inputs=1,
+            pivv=None,
+            theta=[1.0],
+        )
+        assert _is_polynomial_model(model) is True
+
+    def test_is_polynomial_model_false_for_other_basis(self):
+        """_is_polynomial_model returns False for non-Polynomial."""
+        model = DummyModel(
+            basis_function=Legendre(degree=2),
+            xlag=1,
+            ylag=1,
+            n_inputs=1,
+            pivv=None,
+            theta=[1.0],
+        )
+        assert _is_polynomial_model(model) is False
+
+    def test_is_polynomial_model_false_no_basis(self):
+        """_is_polynomial_model returns False when no basis_function."""
+        model = DummyModel(
+            basis_function=None,
+            xlag=1,
+            ylag=1,
+            n_inputs=1,
+            pivv=None,
+            theta=[1.0],
+        )
+        assert _is_polynomial_model(model) is False
+
+
+class TestRenderersWithoutNInputs:
+    """Test renderers when model has no n_inputs attribute (lines 386-387, 403-404, etc)."""
+
+    def test_polynomial_renderer_infers_n_inputs_from_xlag_int(self):
+        """Lines 386-387: infer n_inputs=1 from int xlag."""
+
+        class ModelNoNInputs:
+            basis_function = Polynomial(degree=1)
+            xlag = 2
+            ylag = 1
+            pivv = np.array([0, 1])
+            theta = np.array([[1.0], [0.5]])
+
+        model = ModelNoNInputs()
+        items = results_general(model)
+        assert len(items) == 2
+
+    def test_polynomial_renderer_infers_n_inputs_from_xlag_list(self):
+        """Lines 386-387: infer n_inputs from len(xlag) when list."""
+
+        class ModelNoNInputs:
+            basis_function = Polynomial(degree=1)
+            xlag = [[1], [1, 2]]  # 2 inputs
+            ylag = 1
+            pivv = np.array([0, 3, 4])  # indices 3,4 are v(k-1), v(k-2)
+            theta = np.array([[1.0], [0.5], [0.3]])
+
+        model = ModelNoNInputs()
+        items = results_general(model, input_names=["u", "v"])
+        names = [it.name for it in items]
+        assert "v(k-1)" in names or "v(k-2)" in names
+
+    def test_fourier_renderer_infers_n_inputs(self):
+        """Lines 403-404: Fourier renderer infers n_inputs."""
+
+        class ModelNoNInputs:
+            basis_function = Fourier(n=1, degree=1, ensemble=False)
+            xlag = 1
+            ylag = 1
+            pivv = np.array([0, 1])
+            theta = np.array([[1.0], [0.5]])
+
+        model = ModelNoNInputs()
+        items = results_general(model)
+        assert len(items) == 2
+        assert any("cos(" in it.name or "sin(" in it.name for it in items)
+
+    def test_legendre_renderer_infers_n_inputs(self):
+        """Lines 421-422: Legendre renderer infers n_inputs."""
+
+        class ModelNoNInputs:
+            basis_function = Legendre(degree=2, include_bias=True)
+            xlag = 1
+            ylag = 1
+            pivv = np.array([0, 1])
+            theta = np.array([[1.0], [0.5]])
+
+        model = ModelNoNInputs()
+        items = results_general(model)
+        assert len(items) == 2
+
+    def test_bilinear_renderer_infers_n_inputs(self):
+        """Lines 440-441: Bilinear renderer infers n_inputs."""
+
+        class ModelNoNInputs:
+            basis_function = Bilinear(degree=2)
+            xlag = 1
+            ylag = 1
+            pivv = np.array([0, 1])
+            theta = np.array([[1.0], [0.5]])
+
+        model = ModelNoNInputs()
+        items = results_general(model)
+        assert len(items) == 2
+
+    def test_fallback_renderer_infers_n_inputs(self):
+        """Lines 474-475: Fallback renderer infers n_inputs."""
+
+        class UnknownBasis:
+            degree = 1
+
+        class ModelNoNInputs:
+            basis_function = UnknownBasis()
+            xlag = [[1], [2]]  # 2 inputs
+            ylag = 1
+            pivv = None
+            theta = np.array([[1.0], [0.5], [0.3]])
+
+        _warned_unknown_bases.clear()
+        model = ModelNoNInputs()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            items = results_general(model)
+        assert len(items) == 3
+
+
+class TestRegisterEquationRendererValidation:
+    """Tests for register_equation_renderer validation errors."""
+
+    def test_register_empty_name_raises(self):
+        """Line 519: empty name raises ValueError."""
+        with pytest.raises(ValueError, match="non-empty string"):
+            register_equation_renderer("", lambda m, i, o: [])
+
+    def test_register_none_name_raises(self):
+        """Line 519: None name raises ValueError."""
+        with pytest.raises(ValueError, match="non-empty string"):
+            register_equation_renderer(None, lambda m, i, o: [])
+
+    def test_register_non_callable_raises(self):
+        """Line 521: non-callable renderer raises ValueError."""
+        with pytest.raises(ValueError, match="must be callable"):
+            register_equation_renderer("TestBasis", "not_a_function")
+
+    def test_register_duplicate_without_overwrite_raises(self):
+        """Lines 523-525: duplicate without overwrite raises ValueError."""
+        # Polynomial is already registered
+        with pytest.raises(ValueError, match="already registered"):
+            register_equation_renderer("Polynomial", lambda m, i, o: [])
+
+
+class TestResultsGeneralEdgeCases:
+    """Tests for results_general edge cases."""
+
+    def test_theta_none_returns_empty(self):
+        """Line 554: theta=None returns []."""
+        model = DummyModel(
+            basis_function=Polynomial(degree=1),
+            xlag=1,
+            ylag=1,
+            n_inputs=1,
+            pivv=None,
+            theta=None,
+        )
+        assert results_general(model) == []
+
+    def test_theta_empty_returns_empty(self):
+        """Line 557: theta with size 0 returns []."""
+        model = DummyModel(
+            basis_function=Polynomial(degree=1),
+            xlag=1,
+            ylag=1,
+            n_inputs=1,
+            pivv=None,
+            theta=np.array([]),
+        )
+        assert results_general(model) == []
+
+
+class TestFormatEquationStyles:
+    """Tests for format_equation style options."""
+
+    def test_format_equation_empty_model_returns_empty_string(self):
+        """Line 601: empty items returns ''."""
+        model = DummyModel(
+            basis_function=Polynomial(degree=1),
+            xlag=1,
+            ylag=1,
+            n_inputs=1,
+            pivv=None,
+            theta=None,
+        )
+        assert format_equation(model) == ""
+
+    def test_format_equation_latex_style(self):
+        r"""Line 616: latex style uses \, separator."""
+        basis = Polynomial(degree=1)
+        pivv = np.array([1, 2])
+        theta = np.array([[0.5], [-0.3]])
+        model = DummyModel(
+            basis_function=basis,
+            xlag=1,
+            ylag=1,
+            n_inputs=1,
+            pivv=pivv,
+            theta=theta,
+        )
+        eq = format_equation(model, style="latex")
+        # latex uses \, as thin space separator
+        assert "\\," in eq
+
+    def test_format_equation_latex_with_intercept(self):
+        """Latex style with intercept term (name='1')."""
+        basis = Polynomial(degree=1)
+        pivv = np.array([0, 1])  # 0 is intercept
+        theta = np.array([[2.5], [0.8]])
+        model = DummyModel(
+            basis_function=basis,
+            xlag=1,
+            ylag=1,
+            n_inputs=1,
+            pivv=pivv,
+            theta=theta,
+        )
+        eq = format_equation(model, style="latex")
+        assert "2.5" in eq
+        # Intercept should appear without multiplication
+        assert "\\,1" not in eq
+
+
+class TestHermiteAndLaguerreRenderers:
+    """Tests for Hermite and Laguerre basis functions."""
+
+    def test_hermite_renderer(self):
+        """Test Hermite basis function rendering."""
+        model = DummyModel(
+            basis_function=Hermite(degree=2, include_bias=True),
+            xlag=1,
+            ylag=1,
+            n_inputs=1,
+            pivv=None,
+            theta=[0.1] * 10,
+        )
+        items = results_general(model)
+        names = [it.name for it in items]
+        assert any("H1(" in n or "H2(" in n for n in names)
+
+    def test_laguerre_renderer(self):
+        """Test Laguerre basis function rendering."""
+        model = DummyModel(
+            basis_function=Laguerre(degree=2, include_bias=True),
+            xlag=1,
+            ylag=1,
+            n_inputs=1,
+            pivv=None,
+            theta=[0.1] * 10,
+        )
+        items = results_general(model)
+        names = [it.name for it in items]
+        assert any("L1(" in n or "L2(" in n for n in names)

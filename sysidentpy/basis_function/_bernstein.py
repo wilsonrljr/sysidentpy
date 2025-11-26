@@ -141,7 +141,7 @@ class Bernstein(BaseBasisFunction):
         model_type: str = "NARMAX",
         predefined_regressors: Optional[np.ndarray] = None,
     ):
-        """Build Bersntein Basis Functions.
+        """Build Bernstein Basis Functions.
 
         Parameters
         ----------
