@@ -1,6 +1,30 @@
 import numpy as np
+from numpy.lib.stride_tricks import as_strided
 
 from sysidentpy.utils.lags import _process_xlag, _process_ylag
+
+
+def _normalize_lag_input(lag_value):
+    """Return lag values as a numpy array while preserving user order."""
+
+    if isinstance(lag_value, (list, tuple, np.ndarray)):
+        return np.asarray(lag_value, dtype=int)
+
+    return np.asarray([lag_value], dtype=int)
+
+
+def _build_sliding_windows(data: np.ndarray, max_lag: int) -> np.ndarray:
+    """Create a sliding window view along time for efficient lag reuse."""
+
+    if max_lag < 1:
+        raise ValueError("max_lag must be >= 1 to build lagged windows")
+
+    padded = np.vstack([np.zeros((max_lag, data.shape[1])), data])
+    n_samples = data.shape[0]
+    window = max_lag + 1
+    shape = (n_samples, window, data.shape[1])
+    strides = (padded.strides[0], padded.strides[0], padded.strides[1])
+    return as_strided(padded, shape=shape, strides=strides, writeable=False)
 
 
 def shift_column(col_to_shift: np.ndarray, lag: int) -> np.ndarray:
@@ -29,10 +53,16 @@ def shift_column(col_to_shift: np.ndarray, lag: int) -> np.ndarray:
            [4]])
 
     """
+    if lag < 0:
+        raise ValueError("lag must be non-negative")
+
     n_samples = col_to_shift.shape[0]
     tmp_column = np.zeros((n_samples, 1))
-    aux = col_to_shift[0 : n_samples - lag].reshape(-1, 1)
-    tmp_column[lag:, 0] = aux[:, 0]
+    if lag == 0:
+        return col_to_shift.copy()
+
+    if lag < n_samples:
+        tmp_column[lag:, 0] = col_to_shift[: n_samples - lag, 0]
     return tmp_column
 
 
@@ -52,23 +82,39 @@ def _create_lagged_x(x: np.ndarray, n_inputs: int, xlag) -> np.ndarray:
         A matrix where each column represents a lagged version of an input variable.
 
     """
+    x = np.asarray(x, dtype=float)
+    if x.ndim == 1:
+        x = x.reshape(-1, 1)
+
     if n_inputs == 1:
-        x_lagged = np.column_stack([shift_column(x[:, 0], lag) for lag in xlag])
+        lag_list = _normalize_lag_input(xlag)
     else:
-        x_lagged = np.zeros([len(x), 1])  # just to stack other columns
-        # if user input a nested list like [[1, 2], 4], the following
-        # line convert it to [[1, 2], [4]].
-        # Remember, for multiple inputs all lags must be entered explicitly
-        xlag = [[i] if isinstance(i, int) else i for i in xlag]
+        normalized = []
+        for lag_value in xlag:
+            normalized.append(_normalize_lag_input(lag_value))
+        lag_list = normalized
+
+    max_lag = (
+        int(max(l.max() for l in lag_list))
+        if isinstance(lag_list, list)
+        else int(np.max(lag_list))
+    )
+    windows = _build_sliding_windows(x, max_lag)
+    lagged_columns = []
+
+    if n_inputs == 1:
+        indices = max_lag - lag_list
+        lagged_columns.append(windows[:, indices, 0])
+    else:
         for col in range(n_inputs):
-            x_lagged_col = np.column_stack(
-                [shift_column(x[:, col], lag) for lag in xlag[col]]
-            )
-            x_lagged = np.column_stack([x_lagged, x_lagged_col])
+            lags = lag_list[col]
+            indices = max_lag - lags
+            lagged_columns.append(windows[:, indices, col])
 
-        x_lagged = x_lagged[:, 1:]  # remove the column of 0 created above
+    if len(lagged_columns) == 1:
+        return lagged_columns[0]
 
-    return x_lagged
+    return np.concatenate(lagged_columns, axis=1)
 
 
 def _create_lagged_y(y: np.ndarray, ylag) -> np.ndarray:
@@ -86,8 +132,15 @@ def _create_lagged_y(y: np.ndarray, ylag) -> np.ndarray:
         variable.
 
     """
-    y_lagged = np.column_stack([shift_column(y[:, 0], lag) for lag in ylag])
-    return y_lagged
+    y = np.asarray(y, dtype=float)
+    if y.ndim == 1:
+        y = y.reshape(-1, 1)
+
+    lag_array = _normalize_lag_input(ylag)
+    max_lag = int(np.max(lag_array))
+    windows = _build_sliding_windows(y, max_lag)
+    indices = max_lag - lag_array
+    return windows[:, indices, 0]
 
 
 def initial_lagged_matrix(x: np.ndarray, y: np.ndarray, xlag, ylag) -> np.ndarray:

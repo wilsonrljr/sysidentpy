@@ -11,7 +11,7 @@ import numpy as np
 from sysidentpy.narmax_base import house, rowhouse
 
 from ..basis_function import Fourier, Polynomial
-from .ofr_base import OFRBase, get_info_criteria
+from .ofr_base import OFRBase, get_info_criteria, _compute_err_slice
 
 from ..parameter_estimation.estimators import (
     LeastSquares,
@@ -258,6 +258,7 @@ class UOFR(OFRBase):
         y_augmented = y_augmented.reshape(-1, 1)
         # Compute ERR on the augmented ULS matrix
         squared_y = np.dot(y_augmented.T, y_augmented)
+        squared_y = float(np.maximum(squared_y, np.finfo(np.float64).eps))
         psi_working = psi_augmented.copy()
         y_working = y_augmented.copy()
         num_terms = psi_working.shape[1]
@@ -266,24 +267,14 @@ class UOFR(OFRBase):
         err = np.zeros(num_terms)
 
         for step_idx in np.arange(0, num_terms):
-            for term_idx in np.arange(step_idx, num_terms):
-                candidate_err[term_idx] = (
-                    (
-                        np.dot(psi_working[step_idx:, term_idx].T, y_working[step_idx:])
-                        ** 2
-                    )
-                    / (
-                        (
-                            np.dot(
-                                psi_working[step_idx:, term_idx].T,
-                                psi_working[step_idx:, term_idx],
-                            )
-                            + self.alpha
-                        )
-                        * squared_y
-                    )
-                    + self.eps
-                )[0, 0]
+            candidate_err[step_idx:] = _compute_err_slice(
+                psi_working,
+                y_working,
+                step_idx,
+                squared_y,
+                self.alpha,
+                self.eps,
+            )
 
             max_err_idx = np.argmax(candidate_err[step_idx:]) + step_idx
             err[step_idx] = candidate_err[max_err_idx]

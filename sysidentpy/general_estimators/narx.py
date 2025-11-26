@@ -259,7 +259,7 @@ class NARX(BaseMSS):
         yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
         return yhat
 
-    def _one_step_ahead_prediction(self, x, y):
+    def _one_step_ahead_prediction(self, x_base, y=None):
         """Perform the 1-step-ahead prediction of a model.
 
         Parameters
@@ -276,7 +276,12 @@ class NARX(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        lagged_data = build_lagged_matrix(x, y, self.xlag, self.ylag, self.model_type)
+        if y is None:
+            raise ValueError("y cannot be None")
+
+        lagged_data = build_lagged_matrix(
+            x_base, y, self.xlag, self.ylag, self.model_type
+        )
         x_base = self.basis_function.transform(
             lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type
         )
@@ -408,7 +413,7 @@ class NARX(BaseMSS):
             f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
         )
 
-    def _narmax_predict(self, x, y_initial, forecast_horizon):
+    def _narmax_predict(self, x, y_initial, forecast_horizon=None):
         if len(y_initial) < self.max_lag:
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
@@ -418,6 +423,10 @@ class NARX(BaseMSS):
         if x is not None:
             forecast_horizon = x.shape[0]
         else:
+            if forecast_horizon is None:
+                raise ValueError(
+                    "forecast_horizon cannot be None when x is None for NARX prediction"
+                )
             forecast_horizon = forecast_horizon + self.max_lag
 
         if self.model_type == "NAR":
@@ -427,10 +436,11 @@ class NARX(BaseMSS):
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
 
-        model_exponents = [
-            self._code2exponents(code=model) for model in self.final_model
-        ]
-        raw_regressor = np.zeros(len(model_exponents[0]), dtype=float)
+        model_exponents = np.vstack(
+            [self._code2exponents(code=model) for model in self.final_model]
+        )
+        raw_regressor = np.zeros(model_exponents.shape[1], dtype=float)
+        regressor_powers = np.empty_like(model_exponents)
         for i in range(self.max_lag, forecast_horizon):
             init = 0
             final = self.max_lag
@@ -440,11 +450,8 @@ class NARX(BaseMSS):
                 init += self.max_lag
                 final += self.max_lag
                 raw_regressor[init:final] = x[k:i, j]
-
-            regressor_value = np.zeros(len(model_exponents))
-            for j, model_exponent in enumerate(model_exponents):
-                regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
-
+            np.power(raw_regressor, model_exponents, out=regressor_powers)
+            regressor_value = np.prod(regressor_powers, axis=1)
             y_output[i] = self.base_estimator.predict(regressor_value.reshape(1, -1))[0]
         return y_output[self.max_lag : :].reshape(-1, 1)
 
@@ -453,10 +460,11 @@ class NARX(BaseMSS):
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
         x = x.reshape(-1, self.n_inputs)
-        model_exponents = [
-            self._code2exponents(code=model) for model in self.final_model
-        ]
-        raw_regressor = np.zeros(len(model_exponents[0]), dtype=float)
+        model_exponents = np.vstack(
+            [self._code2exponents(code=model) for model in self.final_model]
+        )
+        raw_regressor = np.zeros(model_exponents.shape[1], dtype=float)
+        regressor_powers = np.empty_like(model_exponents)
         for i in range(self.max_lag, x.shape[0]):
             init = 0
             final = self.max_lag
@@ -466,11 +474,8 @@ class NARX(BaseMSS):
                 init += self.max_lag
                 final += self.max_lag
                 raw_regressor[init:final] = x[k:i, j]
-
-            regressor_value = np.zeros(len(model_exponents))
-            for j, model_exponent in enumerate(model_exponents):
-                regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
-
+            np.power(raw_regressor, model_exponents, out=regressor_powers)
+            regressor_value = np.prod(regressor_powers, axis=1)
             y_output[i] = self.base_estimator.predict(regressor_value.reshape(1, -1))[0]
         return y_output[self.max_lag : :].reshape(-1, 1)
 
