@@ -66,13 +66,14 @@ def test_default_values():
         "xlag": 1,
         "model_type": "NARMAX",
         "batch_size": 100,
+        "shuffle_batches": False,
         "learning_rate": 0.01,
         "epochs": 200,
         "optimizer": "Adam",
         "net": None,
         "train_percentage": 80,
         "verbose": False,
-        "optim_params": None,
+        "optim_params": {},
     }
     model = NARXNN(basis_function=Polynomial())
     model_values = [
@@ -80,6 +81,7 @@ def test_default_values():
         model.xlag,
         model.model_type,
         model.batch_size,
+        model.shuffle_batches,
         model.learning_rate,
         model.epochs,
         model.optimizer,
@@ -96,6 +98,36 @@ def test_validate():
     assert_raises(ValueError, NARXNN, ylag=1.3, basis_function=Polynomial(degree=1))
     assert_raises(ValueError, NARXNN, xlag=1.3, basis_function=Polynomial(degree=1))
     assert_raises(ValueError, NARXNN, xlag=-1, basis_function=Polynomial(degree=1))
+    assert_raises(
+        ValueError, NARXNN, train_percentage=0, basis_function=Polynomial(degree=1)
+    )
+    assert_raises(
+        ValueError, NARXNN, train_percentage=101, basis_function=Polynomial(degree=1)
+    )
+    assert_raises(
+        ValueError,
+        NARXNN,
+        basis_function=Polynomial(degree=1),
+        optimizer="NotAnOpt",
+    )
+    assert_raises(
+        ValueError,
+        NARXNN,
+        basis_function=Polynomial(degree=1),
+        loss_func="not_a_loss",
+    )
+    assert_raises(
+        TypeError,
+        NARXNN,
+        basis_function=Polynomial(degree=1),
+        optim_params=[("lr", 0.1)],
+    )
+    assert_raises(
+        TypeError,
+        NARXNN,
+        basis_function=Polynomial(degree=1),
+        shuffle_batches="yes",
+    )
 
 
 def test_fit_raise():

@@ -8,6 +8,7 @@
 import logging
 import sys
 import warnings
+from collections.abc import Mapping
 
 import numpy as np
 import torch
@@ -71,8 +72,9 @@ def convert_to_tensor(reg_matrix, y):
         tensors that have the same size of the first dimension.
 
     """
-    reg_matrix, y = map(torch.tensor, (reg_matrix, y))
-    return TensorDataset(reg_matrix, y)
+    reg_matrix = np.ascontiguousarray(np.asarray(reg_matrix, dtype=np.float32))
+    y = np.ascontiguousarray(np.asarray(y, dtype=np.float32))
+    return TensorDataset(torch.from_numpy(reg_matrix), torch.from_numpy(y))
 
 
 class NARXNN(BaseMSS):
@@ -112,6 +114,8 @@ class NARXNN(BaseMSS):
         The user can choose "NARMAX", "NAR" and "NFIR" models
     batch_size : int, default=100
         Size of mini-batches of data for stochastic optimizers
+    shuffle_batches : bool, default=False
+        Whether to shuffle mini-batches during training.
     learning_rate : float, default=0.01
         Learning rate schedule for weight updates
     epochs : int, default=100
@@ -203,6 +207,7 @@ class NARXNN(BaseMSS):
         verbose=False,
         optim_params=None,
         device="cpu",
+        shuffle_batches=False,
     ):
         self.ylag = ylag
         self.xlag = xlag
@@ -213,12 +218,21 @@ class NARXNN(BaseMSS):
         self.batch_size = batch_size
         self.learning_rate = learning_rate
         self.epochs = epochs
-        self.loss_func = getattr(F, loss_func)
+        self.loss_func_name = loss_func
+        self.loss_func = None
+        self.optimizer_name = optimizer
         self.optimizer = optimizer
+        self.optimizer_cls = None
         self.net = net
         self.train_percentage = train_percentage
         self.verbose = verbose
-        self.optim_params = optim_params
+        self.shuffle_batches = shuffle_batches
+        if optim_params is None:
+            self.optim_params = {}
+        elif isinstance(optim_params, Mapping):
+            self.optim_params = dict(optim_params)
+        else:
+            self.optim_params = optim_params
         self.device = _check_cuda(device)
         self.regressor_code = None
         self.train_loss = None
@@ -227,6 +241,8 @@ class NARXNN(BaseMSS):
         self.n_inputs = None
         self.final_model = None
         self._validate_params()
+        self.loss_func = getattr(F, self.loss_func_name)
+        self.optimizer_cls = getattr(optim, self.optimizer_name)
 
     def _validate_params(self):
         """Validate input params."""
@@ -238,35 +254,103 @@ class NARXNN(BaseMSS):
         if not isinstance(self.epochs, int) or self.epochs < 1:
             raise ValueError(f"epochs must be integer and > zero. Got {self.epochs}")
 
-        if not isinstance(self.train_percentage, int) or self.train_percentage < 0:
+        if (
+            not isinstance(self.train_percentage, int)
+            or self.train_percentage <= 0
+            or self.train_percentage > 100
+        ):
             raise ValueError(
-                f"bacth_size must be integer and > zero. Got {self.train_percentage}"
+                "train_percentage must be an integer between 1 and 100. "
+                f"Got {self.train_percentage}"
             )
 
         if not isinstance(self.verbose, bool):
             raise TypeError(f"verbose must be False or True. Got {self.verbose}")
 
-        if isinstance(self.ylag, int) and self.ylag < 1:
-            raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
+        if not isinstance(self.shuffle_batches, bool):
+            raise TypeError(
+                f"shuffle_batches must be False or True. Got {self.shuffle_batches}"
+            )
 
-        if isinstance(self.xlag, int) and self.xlag < 1:
-            raise ValueError(f"xlag must be integer and > zero. Got {self.xlag}")
-
-        if not isinstance(self.xlag, (int, list)):
-            raise ValueError(f"xlag must be integer and > zero. Got {self.xlag}")
-
-        if not isinstance(self.ylag, (int, list)):
-            raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
+        self.ylag = self._sanitize_lag(self.ylag, "ylag")
+        self.xlag = self._sanitize_lag(self.xlag, "xlag")
 
         if self.model_type not in ["NARMAX", "NAR", "NFIR"]:
             raise ValueError(
                 f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
             )
 
+        if not isinstance(self.optim_params, dict):
+            raise TypeError(
+                "optim_params must be a mapping (e.g. dict). "
+                f"Got {type(self.optim_params).__name__}"
+            )
+
+        if not isinstance(self.loss_func_name, str):
+            raise TypeError(
+                f"loss_func must be provided as string. Got {self.loss_func_name}"
+            )
+        if not hasattr(F, self.loss_func_name):
+            raise ValueError(
+                f"loss_func {self.loss_func_name} not available in torch.nn.functional"
+            )
+
+        if not isinstance(self.optimizer_name, str):
+            raise TypeError(
+                f"optimizer must be provided as string. Got {self.optimizer_name}"
+            )
+        if not hasattr(optim, self.optimizer_name):
+            raise ValueError(
+                f"optimizer {self.optimizer_name} not available in torch.optim"
+            )
+
+    @staticmethod
+    def _sanitize_lag(value, name):
+        if isinstance(value, int):
+            if value < 1:
+                raise ValueError(f"{name} must be >= 1. Got {value}")
+            return value
+
+        if isinstance(value, (list, tuple, np.ndarray)):
+            if len(value) == 0:
+                raise ValueError(f"{name} list cannot be empty")
+            sanitized = []
+            for idx, lag in enumerate(value):
+                if not isinstance(lag, (int, np.integer)):
+                    raise ValueError(
+                        f"All elements of {name} must be integers. "
+                        f"Found {type(lag).__name__} at position {idx}"
+                    )
+                if lag < 1:
+                    raise ValueError(
+                        f"All elements of {name} must be >= 1. "
+                        f"Found {lag} at position {idx}"
+                    )
+                sanitized.append(int(lag))
+            return sanitized
+
+        raise ValueError(
+            f"{name} must be an int or a sequence of ints. Got {type(value).__name__}"
+        )
+
+    @staticmethod
+    def _as_float_array(array):
+        return np.ascontiguousarray(np.asarray(array, dtype=np.float32))
+
+    def _forward_numpy(self, array):
+        tensor = torch.from_numpy(self._as_float_array(array))
+        if self.device.type != "cpu":
+            tensor = tensor.to(self.device, non_blocking=True)
+        return self.net(tensor).detach().cpu().numpy()
+
+    def _scalar_forward(self, array):
+        return float(self._forward_numpy(array).reshape(-1)[0])
+
     def define_opt(self):
         """Define the optimizer using the user parameters."""
-        opt = getattr(optim, self.optimizer)
-        return opt(self.net.parameters(), lr=self.learning_rate, **self.optim_params)
+        return self.optimizer_cls(
+            self.net.parameters(), lr=self.learning_rate, **self.optim_params
+        )
 
     def loss_batch(self, x, y, opt=None):
         """Compute the loss for one batch.
@@ -363,7 +447,7 @@ class NARXNN(BaseMSS):
         y = np.atleast_1d(y[self.max_lag :]).astype(np.float32)
         return reg_matrix, y
 
-    def get_data(self, train_ds):
+    def get_data(self, train_ds, *, shuffle=None):
         """Return the lagged matrix and the y values given the maximum lags.
 
         Based on Pytorch official docs:
@@ -381,11 +465,16 @@ class NARXNN(BaseMSS):
 
         """
         pin_memory = False if self.device.type == "cpu" else True
+        if shuffle is None:
+            shuffle = self.shuffle_batches
         return DataLoader(
-            train_ds, batch_size=self.batch_size, pin_memory=pin_memory, shuffle=False
+            train_ds,
+            batch_size=self.batch_size,
+            pin_memory=pin_memory,
+            shuffle=shuffle,
         )
 
-    def data_transform(self, x, y):
+    def data_transform(self, x, y, *, shuffle=None):
         """Return the data transformed in tensors using Dataloader.
 
         Parameters
@@ -405,7 +494,7 @@ class NARXNN(BaseMSS):
 
         x_train, y_train = self.split_data(x, y)
         train_ds = convert_to_tensor(x_train, y_train)
-        train_dl = self.get_data(train_ds)
+        train_dl = self.get_data(train_ds, shuffle=shuffle)
         return train_dl
 
     def fit(self, *, X=None, y=None, X_test=None, y_test=None):
@@ -436,43 +525,45 @@ class NARXNN(BaseMSS):
             The validation loss of each batch
 
         """
-        train_dl = self.data_transform(X, y)
+        train_dl = self.data_transform(X, y, shuffle=self.shuffle_batches)
         if self.verbose:
             if X_test is None or y_test is None:
                 raise ValueError(
                     "X_test and y_test cannot be None if you set verbose=True"
                 )
-            valid_dl = self.data_transform(X_test, y_test)
+            valid_dl = self.data_transform(X_test, y_test, shuffle=False)
 
         opt = self.define_opt()
         self.val_loss = []
         self.train_loss = []
         for epoch in range(self.epochs):
             self.net.train()
+            epoch_loss = 0.0
+            seen_samples = 0
             for input_data, output_data in train_dl:
-                X, y = input_data.to(self.device), output_data.to(self.device)
-                self.loss_batch(X, y, opt=opt)
+                X_batch = input_data.to(self.device, non_blocking=True)
+                y_batch = output_data.to(self.device, non_blocking=True)
+                batch_loss, batch_size = self.loss_batch(X_batch, y_batch, opt=opt)
+                if self.verbose:
+                    epoch_loss += batch_loss * batch_size
+                    seen_samples += batch_size
 
             if self.verbose:
-                train_losses, train_nums = zip(
-                    *[
-                        self.loss_batch(X.to(self.device), y.to(self.device))
-                        for X, y in train_dl
-                    ]
-                )
-                self.train_loss.append(
-                    np.sum(np.multiply(train_losses, train_nums)) / np.sum(train_nums)
-                )
+                train_metric = epoch_loss / max(seen_samples, 1)
+                self.train_loss.append(train_metric)
 
                 self.net.eval()
+                val_loss = 0.0
+                val_count = 0
                 with torch.no_grad():
-                    losses, nums = zip(
-                        *[
-                            self.loss_batch(X.to(self.device), y.to(self.device))
-                            for X, y in valid_dl
-                        ]
-                    )
-                self.val_loss.append(np.sum(np.multiply(losses, nums)) / np.sum(nums))
+                    for X_val, y_val in valid_dl:
+                        loss_val, batch_size = self.loss_batch(
+                            X_val.to(self.device, non_blocking=True),
+                            y_val.to(self.device, non_blocking=True),
+                        )
+                        val_loss += loss_val * batch_size
+                        val_count += batch_size
+                self.val_loss.append(val_loss / max(val_count, 1))
                 logging.info(
                     "Train metrics: %s | Validation metrics: %s",
                     self.train_loss[epoch],
@@ -511,23 +602,45 @@ class NARXNN(BaseMSS):
             The predicted values of the model.
 
         """
-        if isinstance(self.basis_function, Polynomial):
-            if steps_ahead is None:
-                return self._model_prediction(X, y, forecast_horizon=forecast_horizon)
-            if steps_ahead == 1:
-                return self._one_step_ahead_prediction(X, y)
+        if self.net is None:
+            raise ValueError("The neural network must be defined before prediction")
 
-            check_positive_int(steps_ahead, "steps_ahead")
-            return self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
+        was_training = self.net.training
+        self.net.eval()
+        try:
+            with torch.no_grad():
+                if isinstance(self.basis_function, Polynomial):
+                    if steps_ahead is None:
+                        result = self._model_prediction(
+                            X, y, forecast_horizon=forecast_horizon
+                        )
+                    elif steps_ahead == 1:
+                        result = self._one_step_ahead_prediction(X, y)
+                    else:
+                        check_positive_int(steps_ahead, "steps_ahead")
+                        result = self._n_step_ahead_prediction(
+                            X, y, steps_ahead=steps_ahead
+                        )
+                else:
+                    if steps_ahead is None:
+                        result = self._basis_function_predict(
+                            X, y, forecast_horizon=forecast_horizon
+                        )
+                    elif steps_ahead == 1:
+                        result = self._one_step_ahead_prediction(X, y)
+                    else:
+                        check_positive_int(steps_ahead, "steps_ahead")
+                        result = self._basis_function_n_step_prediction(
+                            X,
+                            y,
+                            steps_ahead=steps_ahead,
+                            forecast_horizon=forecast_horizon,
+                        )
+        finally:
+            if was_training:
+                self.net.train()
 
-        if steps_ahead is None:
-            return self._basis_function_predict(X, y, forecast_horizon=forecast_horizon)
-        if steps_ahead == 1:
-            return self._one_step_ahead_prediction(X, y)
-
-        return self._basis_function_n_step_prediction(
-            X, y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
-        )
+        return result
 
     def _one_step_ahead_prediction(self, x_base, y=None):
         """Perform the 1-step-ahead prediction of a model.
@@ -563,13 +676,11 @@ class NARXNN(BaseMSS):
                 lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type
             )
 
-        yhat = np.zeros(x_base.shape[0], dtype=float)
-        x_base = np.atleast_1d(x_base).astype(np.float32)
-        yhat = yhat.astype(np.float32)
-        x_valid, _ = map(torch.tensor, (x_base, yhat))
-        yhat = self.net(x_valid.to(self.device)).detach().cpu().numpy()
-        yhat = np.concatenate([y.ravel()[: self.max_lag].flatten(), yhat.ravel()])
-        return yhat.reshape(-1, 1)
+        predictions = self._forward_numpy(x_base)
+        yhat = np.concatenate(
+            [y.ravel()[: self.max_lag].flatten(), predictions.ravel()]
+        )
+        return yhat.astype(np.float32).reshape(-1, 1)
 
     def _n_step_ahead_prediction(self, x, y, steps_ahead):
         """Perform the n-steps-ahead prediction of a model.
@@ -648,6 +759,7 @@ class NARXNN(BaseMSS):
             )
 
         if x is not None:
+            x = self._as_float_array(x).reshape(-1, self.n_inputs)
             forecast_horizon = x.shape[0]
         else:
             if forecast_horizon is None:
@@ -659,15 +771,15 @@ class NARXNN(BaseMSS):
         if self.model_type == "NAR":
             self.n_inputs = 0
 
-        y_output = np.zeros(forecast_horizon, dtype=float)
-        y_output.fill(np.nan)
+        y_output = np.full(forecast_horizon, np.nan, dtype=np.float32)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
 
         model_exponents = np.vstack(
             [self._code2exponents(code=model) for model in self.final_model]
         )
-        raw_regressor = np.zeros(model_exponents.shape[1], dtype=float)
-        regressor_powers = np.empty_like(model_exponents)
+        raw_regressor = np.zeros(model_exponents.shape[1], dtype=np.float32)
+        regressor_powers = np.empty(model_exponents.shape, dtype=np.float32)
+        regressor_value = np.empty(model_exponents.shape[0], dtype=np.float32)
         for i in range(self.max_lag, forecast_horizon):
             init = 0
             final = self.max_lag
@@ -679,23 +791,20 @@ class NARXNN(BaseMSS):
                 raw_regressor[init:final] = x[k:i, j]
 
             np.power(raw_regressor, model_exponents, out=regressor_powers)
-            regressor_value = np.prod(regressor_powers, axis=1)
-            regressor_value = np.atleast_1d(regressor_value).astype(np.float32)
-            y_output = y_output.astype(np.float32)
-            x_valid, _ = map(torch.tensor, (regressor_value, y_output))
-            y_output[i] = self.net(x_valid.to(self.device))[0].detach().cpu().numpy()
+            np.prod(regressor_powers, axis=1, out=regressor_value)
+            y_output[i] = self._scalar_forward(regressor_value)
         return y_output.reshape(-1, 1)
 
     def _nfir_predict(self, x, y_initial):
-        y_output = np.zeros(x.shape[0], dtype=float)
-        y_output.fill(np.nan)
+        x = self._as_float_array(x).reshape(-1, self.n_inputs)
+        y_output = np.full(x.shape[0], np.nan, dtype=np.float32)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
-        x = x.reshape(-1, self.n_inputs)
         model_exponents = np.vstack(
             [self._code2exponents(code=model) for model in self.final_model]
         )
-        raw_regressor = np.zeros(model_exponents.shape[1], dtype=float)
-        regressor_powers = np.empty_like(model_exponents)
+        raw_regressor = np.zeros(model_exponents.shape[1], dtype=np.float32)
+        regressor_powers = np.empty(model_exponents.shape, dtype=np.float32)
+        regressor_value = np.empty(model_exponents.shape[0], dtype=np.float32)
         for i in range(self.max_lag, x.shape[0]):
             init = 0
             final = self.max_lag
@@ -706,11 +815,8 @@ class NARXNN(BaseMSS):
                 final += self.max_lag
 
             np.power(raw_regressor, model_exponents, out=regressor_powers)
-            regressor_value = np.prod(regressor_powers, axis=1)
-            regressor_value = np.atleast_1d(regressor_value).astype(np.float32)
-            y_output = y_output.astype(np.float32)
-            x_valid, _ = map(torch.tensor, (regressor_value, y_output))
-            y_output[i] = self.net(x_valid.to(self.device))[0].detach().cpu().numpy()
+            np.prod(regressor_powers, axis=1, out=regressor_value)
+            y_output[i] = self._scalar_forward(regressor_value)
         return y_output.reshape(-1, 1)
 
     def _basis_function_predict(self, x, y_initial, forecast_horizon=None):
@@ -722,8 +828,7 @@ class NARXNN(BaseMSS):
         if self.model_type == "NAR":
             self.n_inputs = 0
 
-        yhat = np.zeros(forecast_horizon, dtype=float)
-        yhat.fill(np.nan)
+        yhat = np.full(forecast_horizon, np.nan, dtype=np.float32)
         yhat[: self.max_lag] = y_initial[: self.max_lag, 0]
 
         analyzed_elements_number = self.max_lag + 1
@@ -753,12 +858,7 @@ class NARXNN(BaseMSS):
             x_tmp = self.basis_function.transform(
                 lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type
             )
-            x_tmp = np.atleast_1d(x_tmp).astype(np.float32)
-            yhat = yhat.astype(np.float32)
-            x_valid, _ = map(torch.tensor, (x_tmp, yhat))
-            yhat[i + self.max_lag] = (
-                self.net(x_valid.to(self.device))[0].detach().cpu().numpy()
-            )[0]
+            yhat[i + self.max_lag] = self._scalar_forward(x_tmp)
         return yhat.reshape(-1, 1)
 
     def _basis_function_n_step_prediction(self, x, y, steps_ahead, forecast_horizon):
