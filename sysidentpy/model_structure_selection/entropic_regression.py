@@ -267,6 +267,7 @@ class ER(BaseMSS):
             cdist(joint_space, joint_space, "minkowski", p=self.p).T
         )
         idx = np.argpartition(smallest_distance[-1, :], self.k + 1)[: self.k + 1]
+        idx = idx[np.argsort(smallest_distance[-1, idx])]
         smallest_distance = smallest_distance[:, idx]
         epsilon = smallest_distance[:, -1].reshape(-1, 1)
         smallest_distance_y = cdist(y, y, "minkowski", p=self.p)
@@ -443,6 +444,7 @@ class ER(BaseMSS):
             cdist(joint_space, joint_space, "minkowski", p=self.p).T
         )
         idx = np.argpartition(smallest_distance[-1, :], self.k + 1)[: self.k + 1]
+        idx = idx[np.argsort(smallest_distance[-1, idx])]
         smallest_distance = smallest_distance[:, idx]
         epsilon = smallest_distance[:, -1].reshape(-1, 1)
         # Find number of points from (y,f2), (f1,f2), and (f2,f2) that lies withing the

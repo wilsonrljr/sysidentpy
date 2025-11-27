@@ -115,6 +115,34 @@ def test_mutual_information_knn():
     assert_almost_equal(r, 0.6000, decimal=3)
 
 
+def test_mutual_information_knn_argpartition_order(monkeypatch):
+    model = ER(
+        ylag=2,
+        xlag=2,
+        estimator=LeastSquares(),
+        basis_function=Polynomial(degree=1),
+    )
+    signal = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)
+
+    expected = model.mutual_information_knn(signal, signal)
+
+    original_argpartition = np.argpartition
+    head = model.k + 1
+
+    def shuffled_argpartition(array, kth, axis=-1, kind="introselect", order=None):
+        result = original_argpartition(array, kth, axis=axis, kind=kind, order=order)
+        if axis != -1 or not np.isscalar(kth) or kth < head:
+            return result
+        leading = result[..., :head]
+        trailing = result[..., head:]
+        leading = leading[..., ::-1]
+        return np.concatenate([leading, trailing], axis=axis)
+
+    monkeypatch.setattr(np, "argpartition", shuffled_argpartition)
+
+    assert_almost_equal(model.mutual_information_knn(signal, signal), expected)
+
+
 def test_conditional_mutual_information_knn():
     model = ER(
         ylag=2,
