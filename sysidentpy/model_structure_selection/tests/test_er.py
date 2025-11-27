@@ -158,7 +158,7 @@ def test_conditional_mutual_information_knn():
     assert_almost_equal(r, 0.2, decimal=3)
 
 
-def test_tolerance_estimator():
+def test_tolerance_estimator(monkeypatch):
     basis_function = Polynomial(degree=1)
     model = ER(
         ylag=2,
@@ -166,7 +166,16 @@ def test_tolerance_estimator():
         estimator=LeastSquares(),
         basis_function=basis_function,
         random_state=42,
+        q=0.8,
+        n_perm=5,
     )
     a = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)
+
+    samples = iter([0.1, 0.2, 0.3, 0.4, 0.4])
+
+    def fake_mutual_information(_, __):
+        return next(samples)
+
+    monkeypatch.setattr(model, "mutual_information_knn", fake_mutual_information)
     r = model.tolerance_estimator(a)
-    assert_almost_equal(r, 2.6833, decimal=4)
+    assert_almost_equal(r, 0.4, decimal=4)
