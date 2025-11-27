@@ -9,6 +9,7 @@ import logging
 import sys
 import warnings
 from collections.abc import Mapping
+from typing import Optional
 
 import numpy as np
 import torch
@@ -130,6 +131,10 @@ class NARXNN(BaseMSS):
         The defined network using nn.Module
     verbose : bool, default=False
         Show the training and validation loss at each iteration
+    random_state : int or None, default=None
+        Controls the seeding used to reset the neural network parameters before
+        training. When provided, the model weights are reinitialized with the
+        same seed at every call to ``fit`` to guarantee deterministic behaviour.
 
     Examples
     --------
@@ -208,6 +213,7 @@ class NARXNN(BaseMSS):
         optim_params=None,
         device="cpu",
         shuffle_batches=False,
+        random_state: Optional[int] = None,
     ):
         self.ylag = ylag
         self.xlag = xlag
@@ -227,6 +233,7 @@ class NARXNN(BaseMSS):
         self.train_percentage = train_percentage
         self.verbose = verbose
         self.shuffle_batches = shuffle_batches
+        self.random_state = random_state
         if optim_params is None:
             self.optim_params = {}
         elif isinstance(optim_params, Mapping):
@@ -351,6 +358,23 @@ class NARXNN(BaseMSS):
         return self.optimizer_cls(
             self.net.parameters(), lr=self.learning_rate, **self.optim_params
         )
+
+    def _seed_torch_generators(self):
+        if self.random_state is None:
+            return
+        torch.manual_seed(self.random_state)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(self.random_state)
+
+    def _reset_network_parameters(self):
+        if self.net is None:
+            raise ValueError("The neural network must be defined before training")
+
+        def _reset_fn(module):
+            if hasattr(module, "reset_parameters"):
+                module.reset_parameters()
+
+        self.net.apply(_reset_fn)
 
     def loss_batch(self, x, y, opt=None):
         """Compute the loss for one batch.
@@ -525,6 +549,10 @@ class NARXNN(BaseMSS):
             The validation loss of each batch
 
         """
+        if self.random_state is not None:
+            self._seed_torch_generators()
+            self._reset_network_parameters()
+
         train_dl = self.data_transform(X, y, shuffle=self.shuffle_batches)
         if self.verbose:
             if X_test is None or y_test is None:
