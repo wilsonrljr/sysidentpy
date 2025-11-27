@@ -12,6 +12,8 @@
 [![discord](https://img.shields.io/discord/711610087700955176?color=%23FF7800&label=discord)](https://discord.gg/7afBSzU4)
 [![contributors](https://img.shields.io/github/contributors/wilsonrljr/sysidentpy?color=%23FF7800)](https://github.com/wilsonrljr/sysidentpy/graphs/contributors)
 [![stars](https://img.shields.io/github/stars/wilsonrljr/sysidentpy?style=social)](https://github.com/wilsonrljr/sysidentpy/stargazers)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/bd1a6d1572984ced98a549b3f4919748)](https://app.codacy.com/gh/wilsonrljr/sysidentpy/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/bd1a6d1572984ced98a549b3f4919748)](https://app.codacy.com/gh/wilsonrljr/sysidentpy/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
 
 <h1 align="center"> NARMAX Methods For System Identification and TimeSeries Forecasting </h1>
 <h3 align="center">From Classical Approaches to Neural Networks</h3>
@@ -335,3 +337,4 @@ The documentation and structure (even this section) is openly inspired by Scikit
 [![PyCharm logo](https://resources.jetbrains.com/storage/products/company/brand/logos/PyCharm.svg)](https://jb.gg/OpenSourceSupport)
 
 <hr />
+
