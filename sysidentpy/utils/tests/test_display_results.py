@@ -45,3 +45,63 @@ def test_results_invalid_dtype():
     """Test results function with an invalid dtype."""
     with pytest.raises(ValueError, match="dtype must be dec or sci"):
         results(dtype="invalid")
+
+
+def test_results_scientific_notation():
+    """Ensure scientific formatting is applied when requested."""
+    final_model = np.array([[1001, 0]])
+    theta = np.array([[1.23456789]])
+    err = np.array([0.00001234])
+    output = results(
+        final_model=final_model,
+        theta=theta,
+        err=err,
+        n_terms=1,
+        dtype="sci",
+        theta_precision=2,
+        err_precision=2,
+    )
+    assert output[0][1].upper().endswith("E+00")
+    assert output[0][2].upper().endswith("E-05")
+
+
+def test_results_constant_regressor_representation():
+    """Regressors with only constants should be rendered as '1'."""
+    final_model = np.array([[0, 0]])
+    theta = np.array([[2.0]])
+    err = np.array([0.1])
+    output = results(
+        final_model=final_model,
+        theta=theta,
+        err=err,
+        n_terms=1,
+    )
+    assert output[0][0] == "1"
+
+
+def test_results_handles_zero_regressor_key_inside_term():
+    """Keys lower than 1 inside a term should be ignored gracefully."""
+    final_model = np.array([[0, 1001]])
+    theta = np.array([[0.5]])
+    err = np.array([0.2])
+    output = results(
+        final_model=final_model,
+        theta=theta,
+        err=err,
+        n_terms=1,
+    )
+    # Constant element should be dropped while y term remains
+    assert output[0][0] == "y(k-1)"
+
+
+def test_results_renders_exponent_for_repeated_regressors():
+    final_model = np.array([[1001, 1001]])
+    theta = np.array([[1.0]])
+    err = np.array([0.1])
+    output = results(
+        final_model=final_model,
+        theta=theta,
+        err=err,
+        n_terms=1,
+    )
+    assert output[0][0].startswith("y(k-1)^2")

@@ -1,14 +1,25 @@
+"""Tests for OFRBase internals."""
+
+# pylint: disable=protected-access,redefined-outer-name
+
 from typing import Tuple
+import types
 
 import pytest
 import numpy as np
 
 from sysidentpy.model_structure_selection.ofr_base import (
     OFRBase,
+    _compute_err_slice,
+    get_min_info_value,
 )
-from sysidentpy.parameter_estimation import RecursiveLeastSquares
+from sysidentpy.parameter_estimation import (
+    LeastSquares,
+    RecursiveLeastSquares,
+    RidgeRegression,
+)
 from sysidentpy.basis_function import Polynomial
-from sysidentpy.parameter_estimation import RidgeRegression
+from sysidentpy.narmax_base import BaseMSS
 
 
 # Create a subclass to instantiate the abstract class
@@ -229,3 +240,219 @@ def test_error_reduction_ratio_with_small_eps(setup_data):
     assert err.shape[0] == psi.shape[1]
     assert piv.shape[0] == process_term_number
     assert psi_orthogonal.shape[1] == process_term_number
+
+
+class SimpleOFR(OFRBase):
+    def __init__(self, **kwargs):
+        estimator = kwargs.pop("estimator", LeastSquares())
+        basis = kwargs.pop("basis_function", Polynomial(degree=1))
+        super().__init__(estimator=estimator, basis_function=basis, **kwargs)
+
+    def run_mss_algorithm(self, psi, y, process_term_number):
+        return self.error_reduction_ratio(psi, y, process_term_number)
+
+
+class _FakeBasis:
+    degree = 1
+    ensemble = False
+
+    def fit(self, lagged_data, *args, **kwargs):
+        _ = args
+        _ = kwargs
+        return np.ones((lagged_data.shape[0], 1), dtype=np.float64)
+
+    def transform(self, lagged_data, *args, **kwargs):
+        _ = args
+        _ = kwargs
+        return np.ones((lagged_data.shape[0], 1), dtype=np.float64)
+
+
+@pytest.fixture
+def series_data():
+    x = np.arange(10, dtype=np.float64).reshape(-1, 1)
+    y = (np.arange(10, dtype=np.float64) * 0.5).reshape(-1, 1)
+    return x, y
+
+
+def test_get_min_info_value_returns_length_when_no_increase():
+    assert get_min_info_value(np.array([3.0, 2.0, 2.0])) == 3
+
+
+def test_compute_err_slice_handles_empty_block():
+    psi = np.ones((3, 3), dtype=np.float64)
+    y = np.ones((3, 1), dtype=np.float64)
+    result = _compute_err_slice(psi, y, start_idx=3, squared_y=1.0, alpha=0.0, eps=0.0)
+    assert result.size == 0
+
+
+def test_validate_params_rejects_invalid_model_type():
+    with pytest.raises(ValueError, match="model_type"):
+        SimpleOFR(model_type="UNKNOWN")
+
+
+def test_error_reduction_ratio_updates_n_terms_with_err_tol():
+    model = SimpleOFR(err_tol=0.0)
+    model.max_lag = 0
+    psi = np.eye(3, dtype=np.float64)
+    y = np.arange(3, dtype=np.float64).reshape(-1, 1)
+    _, piv, _ = model.error_reduction_ratio(psi, y, process_term_number=2)
+    assert model.n_terms == 1
+    assert piv.shape[0] == 1
+
+
+def test_fit_requires_y_argument():
+    model = SimpleOFR()
+    with pytest.raises(ValueError, match="y cannot be None"):
+        model.fit(X=None, y=None)
+
+
+def test_fit_requires_n_terms_when_order_selection_disabled(series_data):
+    model = SimpleOFR(order_selection=False, n_terms=None)
+    x, y = series_data
+    with pytest.raises(ValueError, match="define n_terms value"):
+        model.fit(X=x, y=y)
+
+
+def test_predict_non_polynomial_uses_basis_function_paths():
+    model = SimpleOFR(basis_function=_FakeBasis())
+    model.max_lag = 1
+    model.final_model = np.array([[0]])
+    model.pivv = np.array([0])
+
+    calls = {}
+
+    def fake_n_step(self, _x, _y, steps_ahead, forecast_horizon):
+        _ = self
+        calls["args"] = (steps_ahead, forecast_horizon)
+        return np.ones((4, 1), dtype=np.float64)
+
+    model._basis_function_n_step_prediction = types.MethodType(fake_n_step, model)
+    y_data = np.ones((4, 1), dtype=np.float64)
+    result = model.predict(X=None, y=y_data, steps_ahead=2, forecast_horizon=1)
+    assert calls["args"] == (2, 1)
+    assert result.shape == (y_data.shape[0] + 1, 1)
+
+
+def test_model_prediction_raises_for_invalid_type():
+    model = SimpleOFR()
+    model.model_type = "UNKNOWN"
+    with pytest.raises(ValueError, match="model_type must be"):
+        model._model_prediction(np.ones((3, 1)), np.ones((3, 1)))
+
+
+def test_narmax_predict_sets_inputs_to_zero(monkeypatch):
+    model = SimpleOFR(model_type="NAR")
+    model.max_lag = 1
+    model.n_inputs = 2
+
+    def fake_super(self, _x, _y, horizon):
+        _ = self
+        return np.ones((horizon, 1), dtype=np.float64)
+
+    monkeypatch.setattr(BaseMSS, "_narmax_predict", fake_super)
+    result = model._narmax_predict(
+        x=None, y_initial=np.ones((1, 1)), forecast_horizon=2
+    )
+    assert result.shape == (3, 1)
+    assert model.n_inputs == 0
+
+
+def test_basis_function_predict_extends_horizon(monkeypatch):
+    model = SimpleOFR(model_type="NAR")
+    model.max_lag = 2
+    model.n_inputs = 3
+
+    def fake_super(self, _x, _y, horizon):
+        _ = self
+        return np.ones((horizon, 1), dtype=np.float64)
+
+    monkeypatch.setattr(BaseMSS, "_basis_function_predict", fake_super)
+    result = model._basis_function_predict(
+        x=None, y_initial=np.ones((2, 1)), forecast_horizon=1
+    )
+    assert result.shape == (3, 1)
+    assert model.n_inputs == 0
+
+
+def test_basis_function_n_step_prediction_requires_initial_conditions():
+    model = SimpleOFR()
+    model.max_lag = 3
+    with pytest.raises(ValueError, match="Insufficient initial condition"):
+        model._basis_function_n_step_prediction(
+            None, np.ones((2, 1)), steps_ahead=1, forecast_horizon=1
+        )
+
+
+def test_basis_function_n_step_prediction_extends_horizon(monkeypatch):
+    model = SimpleOFR()
+    model.max_lag = 1
+
+    def fake_super(self, _x, _y, _steps, horizon):
+        _ = self
+        return np.ones((horizon, 1), dtype=np.float64)
+
+    monkeypatch.setattr(BaseMSS, "_basis_function_n_step_prediction", fake_super)
+    result = model._basis_function_n_step_prediction(
+        None, np.ones((4, 1)), steps_ahead=1, forecast_horizon=2
+    )
+    assert result.shape == (3, 1)
+
+
+def test_basis_function_n_steps_horizon_returns_column(monkeypatch):
+    model = SimpleOFR()
+
+    def fake_super(self, *_args, **_kwargs):
+        _ = self
+        return np.array([1.0, 2.0, 3.0])
+
+    monkeypatch.setattr(BaseMSS, "_basis_function_n_steps_horizon", fake_super)
+    result = model._basis_function_n_steps_horizon(
+        None, None, steps_ahead=1, forecast_horizon=1
+    )
+    assert result.shape == (3, 1)
+
+
+def test_information_criterion_clamps_n_info_values(monkeypatch):
+    model = SimpleOFR(n_info_values=5)
+    model.max_lag = 0
+    x = np.ones((4, 3), dtype=np.float64)
+    y = np.ones((4, 1), dtype=np.float64)
+
+    def fake_run(self, psi, y_vals, process_term_number):
+        _ = self
+        _ = y_vals
+        cols = min(process_term_number, psi.shape[1])
+        reg = np.ones((psi.shape[0], cols), dtype=np.float64)
+        err = np.zeros(psi.shape[1], dtype=np.float64)
+        piv = np.arange(cols)
+        return err, piv, reg
+
+    monkeypatch.setattr(SimpleOFR, "run_mss_algorithm", fake_run)
+    with pytest.warns(UserWarning):
+        output = model.information_criterion(x, y)
+    assert len(output) == 3
+    assert model.n_info_values == 3
+
+
+def test_basis_function_branch_in_predict_uses_n_step(monkeypatch):
+    model = SimpleOFR(basis_function=_FakeBasis())
+    model.max_lag = 1
+    model.final_model = np.array([[0]])
+    model.pivv = np.array([0])
+    called = {}
+
+    def fake_predict(self, *_args, **_kwargs):
+        _ = self
+        called["mode"] = "basis_n_step"
+        return np.ones((4, 1), dtype=np.float64)
+
+    monkeypatch.setattr(
+        model,
+        "_basis_function_n_step_prediction",
+        types.MethodType(fake_predict, model),
+        raising=False,
+    )
+    y_data = np.ones((4, 1))
+    res = model.predict(X=None, y=y_data, steps_ahead=3, forecast_horizon=1)
+    assert called["mode"] == "basis_n_step"
+    assert res.shape == (y_data.shape[0] + 1, 1)

@@ -4,11 +4,9 @@ import numpy as np
 from sysidentpy.multiobjective_parameter_estimation.estimators import AILS
 from sysidentpy.multiobjective_parameter_estimation.estimators import (
     get_term_clustering,
-    get_cost_function,
 )
 from sysidentpy.utils.narmax_tools import set_weights
 from numpy.testing import assert_array_equal, assert_almost_equal, assert_allclose
-
 
 df_train = np.genfromtxt(
     "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/buck/buck_id.csv",
@@ -305,6 +303,17 @@ def test_build_static_gain_information():
     assert HR.shape == (50, 8)
 
 
+def test_build_psi_expands_lags_for_multiple_inputs():
+    final_model_multi = np.array([[3001, 1001]])
+    estimator = AILS(final_model=final_model_multi)
+    X = np.column_stack([np.arange(6.0), np.arange(6.0) + 1])
+    y = np.arange(6.0).reshape(-1, 1)
+    psi = estimator.build_psi(X, y)
+    expected = y[:-1, 0] * X[:-1, 1]
+    assert psi.shape == (X.shape[0] - estimator.max_lag, 1)
+    assert_allclose(psi.ravel(), expected)
+
+
 def test_estimate():
     mo_estimator = AILS(final_model=final_model)
     J, E, theta, _, _, position = mo_estimator.estimate(
@@ -326,3 +335,41 @@ def test_estimate():
     assert J.shape == (3, 2295)
     assert E.shape == (2295,)
     assert position == 1065
+
+
+def test_build_system_data_branching():
+    y = np.arange(4).reshape(-1, 1)
+    gain_sample = np.ones_like(y)
+    static_sample = 2 * np.ones_like(y)
+
+    model_gain_only = AILS(static_gain=True, static_function=False)
+    parts_gain = model_gain_only.build_system_data(y, gain_sample, static_sample)
+    assert len(parts_gain) == 2
+    assert_array_equal(parts_gain[0], y)
+    assert_array_equal(parts_gain[1], gain_sample)
+
+    model_function_only = AILS(static_gain=False, static_function=True)
+    parts_function = model_function_only.build_system_data(
+        y, gain_sample, static_sample
+    )
+    assert len(parts_function) == 2
+    assert_array_equal(parts_function[0], y)
+    assert_array_equal(parts_function[1], static_sample)
+
+
+def test_build_affine_data_branching():
+    psi = np.ones((3, 2))
+    HR = np.full((2, 2), 2.0)
+    QR = np.full((2, 2), 3.0)
+
+    model_gain_only = AILS(static_gain=True, static_function=False)
+    affine_gain = model_gain_only.build_affine_data(psi, HR, QR)
+    assert len(affine_gain) == 2
+    assert_array_equal(affine_gain[0], psi)
+    assert_array_equal(affine_gain[1], HR)
+
+    model_function_only = AILS(static_gain=False, static_function=True)
+    affine_function = model_function_only.build_affine_data(psi, HR, QR)
+    assert len(affine_function) == 2
+    assert_array_equal(affine_function[0], psi)
+    assert_array_equal(affine_function[1], QR)

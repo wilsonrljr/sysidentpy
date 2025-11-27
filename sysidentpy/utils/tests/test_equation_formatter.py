@@ -9,6 +9,7 @@ from sysidentpy.basis_function import (
     Legendre,
     Hermite,
     Laguerre,
+    Bernstein,
 )
 from sysidentpy.utils.equation_formatter import (
     results_general,
@@ -132,6 +133,21 @@ def test_legendre_bias_and_ensemble_order():
     assert any(n.startswith("P1(") for n in post_bias)
 
 
+def test_bernstein_uses_short_symbol_token():
+    basis = Bernstein(degree=2)
+    model = DummyModel(
+        basis_function=basis,
+        xlag=1,
+        ylag=1,
+        n_inputs=1,
+        pivv=np.array([0, 1, 2]),
+        theta=np.ones((3, 1)),
+    )
+    items = results_general(model)
+    names = [it.name for it in items]
+    assert any(name.startswith("B1(") for name in names)
+
+
 def test_bilinear_generates_cross_terms():
     basis = Bilinear(degree=2)
     model = DummyModel(
@@ -249,6 +265,7 @@ def test_dynamic_renderer_registration_avoids_fallback_warning():
     basis = CustomBasis()
 
     # Ensure no prior renderer is registered (defensive cleanup)
+    RendererRegistry["CustomBasis"] = lambda *_args, **_kwargs: []
     if "CustomBasis" in RendererRegistry:
         del RendererRegistry["CustomBasis"]
 

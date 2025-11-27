@@ -1,9 +1,15 @@
+# ruff: noqa: SLF001
+# pylint: disable=protected-access,unused-variable
 import numpy as np
+from unittest.mock import MagicMock
 from numpy.testing import assert_almost_equal, assert_raises
 
 from sysidentpy.basis_function import Fourier, Polynomial
 from sysidentpy.simulation import SimulateNARMAX
-from sysidentpy.parameter_estimation.estimators import RecursiveLeastSquares
+from sysidentpy.parameter_estimation.estimators import (
+    LeastSquares,
+    RecursiveLeastSquares,
+)
 from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
 
 
@@ -497,3 +503,148 @@ def test_estimate_parameter_els():
     assert_almost_equal(
         s.theta, np.array([[0.19999698], [0.90011667], [0.10080975]]), decimal=3
     )
+
+
+def _small_siso_dataset():
+    return get_siso_data(n=200, colored_noise=False, sigma=0.0, train_percentage=80)
+
+
+def test_simulate_unbiased_estimator_called_without_err():
+    x_train, x_valid, y_train, y_valid = _small_siso_dataset()
+    estimator = LeastSquares(unbiased=True, uiter=1)
+    estimator.unbiased_estimator = MagicMock(wraps=estimator.unbiased_estimator)
+    simulator = SimulateNARMAX(
+        basis_function=Polynomial(),
+        estimator=estimator,
+        estimate_parameter=True,
+        calculate_err=False,
+    )
+    model = np.array([[1001, 0], [2001, 1001], [2002, 0]])
+    simulator.simulate(
+        X_train=x_train,
+        y_train=y_train,
+        X_test=x_valid,
+        y_test=y_valid,
+        model_code=model,
+    )
+    assert estimator.unbiased_estimator.called
+
+
+def test_simulate_unbiased_estimator_called_with_err():
+    x_train, x_valid, y_train, y_valid = _small_siso_dataset()
+    estimator = LeastSquares(unbiased=True, uiter=1)
+    estimator.unbiased_estimator = MagicMock(wraps=estimator.unbiased_estimator)
+    simulator = SimulateNARMAX(
+        basis_function=Polynomial(),
+        estimator=estimator,
+        estimate_parameter=True,
+        calculate_err=True,
+    )
+    model = np.array([[1001, 0], [2001, 1001], [2002, 0]])
+    simulator.simulate(
+        X_train=x_train,
+        y_train=y_train,
+        X_test=x_valid,
+        y_test=y_valid,
+        model_code=model,
+    )
+    assert estimator.unbiased_estimator.called
+
+
+def test_predict_paths_cover_all_branches():
+    _, x_valid, _, y_valid = _small_siso_dataset()
+    simulator = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
+    model = np.array([[1001, 0], [2001, 1001], [2002, 0]])
+    theta = np.array([[0.2, 0.9, 0.1]]).T
+    simulator.simulate(X_test=x_valid, y_test=y_valid, model_code=model, theta=theta)
+    free_run = simulator.predict(X=x_valid, y=y_valid)
+    one_step = simulator.predict(X=x_valid, y=y_valid, steps_ahead=1)
+    multi_step = simulator.predict(X=x_valid, y=y_valid, steps_ahead=3)
+    assert free_run.shape == y_valid.shape
+    assert one_step.shape == y_valid.shape
+    assert multi_step.shape == y_valid.shape
+
+
+def test_model_prediction_invalid_type_raises():
+    simulator = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
+    simulator.model_type = "UNKNOWN"
+    simulator.max_lag = 1
+    x = np.ones((3, 1))
+    y = np.ones((3, 1))
+    assert_raises(ValueError, simulator._model_prediction, x, y, 1)
+
+
+def test_error_reduction_ratio_honors_process_term_limit():
+    simulator = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
+    simulator.max_lag = 1
+    psi = np.ones((3, 2))
+    y = np.ones((4, 1))
+    regressor_code = np.array([[1001, 0], [1002, 0]])
+    model_code, err, _, psi_orth = simulator.error_reduction_ratio(
+        psi, y, 0, regressor_code
+    )
+    assert model_code.size == 0
+    assert err[0] == 0
+    assert psi_orth.shape[1] == 0
+
+
+class _FourierPredictStub(SimulateNARMAX):
+    """Stub that bypasses basis function NotImplemented branches."""
+
+    def __init__(self):
+        super().__init__(basis_function=Fourier(), estimate_parameter=False)
+        self.max_lag = 1
+        self.calls = []
+
+    def _basis_function_predict(self, *_args, **_kwargs):
+        self.calls.append("predict")
+        return np.array([[0.25]])
+
+    def _basis_function_n_step_prediction(self, *_args, **_kwargs):
+        self.calls.append("n_step")
+        return np.array([[0.75]])
+
+    def _one_step_ahead_prediction(self, *_args, **_kwargs):
+        self.calls.append("one_step")
+        return np.array([[0.5]])
+
+    def _basis_function_n_steps_horizon(self, *_args, **_kwargs):
+        self.calls.append("n_steps_horizon")
+        return np.array([[0.0]])
+
+    def fit(self, *, X=None, y=None):  # noqa: ARG002
+        raise NotImplementedError
+
+
+def test_predict_with_fourier_basis_raises_not_implemented():
+    simulator = SimulateNARMAX(basis_function=Fourier(), estimate_parameter=False)
+    simulator.max_lag = 1
+    y = np.ones((2, 1))
+    assert_raises(NotImplementedError, simulator.predict, X=None, y=y)
+
+
+def test_non_polynomial_predict_free_run_uses_stub_result():
+    simulator = _FourierPredictStub()
+    y = np.array([[1.0], [0.0]])
+    result = simulator.predict(X=None, y=y)
+    expected = np.concatenate([y[: simulator.max_lag], np.array([[0.25]])], axis=0)
+    assert np.allclose(result, expected)
+    assert simulator.calls == ["predict"]
+
+
+def test_non_polynomial_predict_one_step_uses_stub_result():
+    simulator = _FourierPredictStub()
+    y = np.array([[2.0], [0.0]])
+    result = simulator.predict(X=None, y=y, steps_ahead=1)
+    expected = np.concatenate([y[: simulator.max_lag], np.array([[0.5]])], axis=0)
+    assert np.allclose(result, expected)
+    assert simulator.calls == ["one_step"]
+
+
+def test_non_polynomial_predict_n_step_uses_stub_result():
+    simulator = _FourierPredictStub()
+    y = np.array([[3.0], [0.0]])
+    result = simulator.predict(X=None, y=y, steps_ahead=3)
+    expected = np.concatenate([y[: simulator.max_lag], np.array([[0.75]])], axis=0)
+    assert np.allclose(result, expected)
+    assert simulator.calls == ["n_step"]
