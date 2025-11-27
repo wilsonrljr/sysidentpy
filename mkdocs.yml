@@ -252,6 +252,7 @@ nav:
               - Lorenz System: user-guide/tutorials/chaotic-systems/lorenz-system.md
               - Logistic Map: user-guide/tutorials/chaotic-systems/logistic-map.md
       - How to:
+          - Create a Custom Basis Function: user-guide/how-to/create-custom-basis-function.md
           - Create a Neural NARX Network: user-guide/how-to/create-a-narx-neural-network.md
           - Save and Load Models: user-guide/how-to/save-and-load-models.md
           - Set Specific Lags: user-guide/how-to/set-specific-lags.md
