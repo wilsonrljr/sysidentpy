@@ -586,3 +586,65 @@ def test_error_reduction_ratio_honors_process_term_limit():
     assert model_code.size == 0
     assert err[0] == 0
     assert psi_orth.shape[1] == 0
+
+
+class _FourierPredictStub(SimulateNARMAX):
+    """Stub that bypasses basis function NotImplemented branches."""
+
+    def __init__(self):
+        super().__init__(basis_function=Fourier(), estimate_parameter=False)
+        self.max_lag = 1
+        self.calls = []
+
+    def _basis_function_predict(self, *_args, **_kwargs):
+        self.calls.append("predict")
+        return np.array([[0.25]])
+
+    def _basis_function_n_step_prediction(self, *_args, **_kwargs):
+        self.calls.append("n_step")
+        return np.array([[0.75]])
+
+    def _one_step_ahead_prediction(self, *_args, **_kwargs):
+        self.calls.append("one_step")
+        return np.array([[0.5]])
+
+    def _basis_function_n_steps_horizon(self, *_args, **_kwargs):
+        self.calls.append("n_steps_horizon")
+        return np.array([[0.0]])
+
+    def fit(self, *, X=None, y=None):  # noqa: ARG002
+        raise NotImplementedError
+
+
+def test_predict_with_fourier_basis_raises_not_implemented():
+    simulator = SimulateNARMAX(basis_function=Fourier(), estimate_parameter=False)
+    simulator.max_lag = 1
+    y = np.ones((2, 1))
+    assert_raises(NotImplementedError, simulator.predict, X=None, y=y)
+
+
+def test_non_polynomial_predict_free_run_uses_stub_result():
+    simulator = _FourierPredictStub()
+    y = np.array([[1.0], [0.0]])
+    result = simulator.predict(X=None, y=y)
+    expected = np.concatenate([y[: simulator.max_lag], np.array([[0.25]])], axis=0)
+    assert np.allclose(result, expected)
+    assert simulator.calls == ["predict"]
+
+
+def test_non_polynomial_predict_one_step_uses_stub_result():
+    simulator = _FourierPredictStub()
+    y = np.array([[2.0], [0.0]])
+    result = simulator.predict(X=None, y=y, steps_ahead=1)
+    expected = np.concatenate([y[: simulator.max_lag], np.array([[0.5]])], axis=0)
+    assert np.allclose(result, expected)
+    assert simulator.calls == ["one_step"]
+
+
+def test_non_polynomial_predict_n_step_uses_stub_result():
+    simulator = _FourierPredictStub()
+    y = np.array([[3.0], [0.0]])
+    result = simulator.predict(X=None, y=y, steps_ahead=3)
+    expected = np.concatenate([y[: simulator.max_lag], np.array([[0.75]])], axis=0)
+    assert np.allclose(result, expected)
+    assert simulator.calls == ["n_step"]

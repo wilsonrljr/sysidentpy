@@ -1,3 +1,5 @@
+# ruff: noqa: SLF001,ARG002
+# pylint: disable=protected-access,unused-argument,redefined-outer-name,useless-super-delegation,arguments-renamed,abstract-class-instantiated
 from typing import Optional
 
 import numpy as np
@@ -62,7 +64,9 @@ def create_test_data():
 
 
 x, y, _ = create_test_data()
+
 train_percentage = 90
+
 split_data = int(len(x) * (train_percentage / 100))
 
 X_train = x[0:split_data, 0]
@@ -472,6 +476,102 @@ def test_model_predict_fourier_horizon_error():
     )
 
 
+def test_basis_function_predict_nfir_branch():
+    model = FROLS(
+        order_selection=True,
+        ylag=[1, 2],
+        xlag=2,
+        estimator=RecursiveLeastSquares(),
+        basis_function=Fourier(degree=2, n=1),
+        model_type="NFIR",
+    )
+    model.fit(X=X_train, y=y_train)
+
+    horizon = model.max_lag + 5
+    y_segment = y_test[:horizon]
+    x_segment = X_test[:horizon]
+    result = model._basis_function_predict(
+        x=x_segment, y_initial=y_segment, forecast_horizon=horizon
+    )
+
+    assert result.shape[0] == horizon - model.max_lag
+
+
+def test_basis_function_predict_invalid_type():
+    model = FROLS(
+        order_selection=True,
+        ylag=[1, 2],
+        xlag=2,
+        estimator=RecursiveLeastSquares(),
+        basis_function=Fourier(degree=2, n=1),
+        model_type="NFIR",
+    )
+    model.fit(X=X_train, y=y_train)
+    model.model_type = "UNKNOWN"
+
+    with pytest.raises(ValueError, match="model_type must be NARMAX, NAR or NFIR"):
+        model._basis_function_predict(
+            x=X_test[: model.max_lag + 5],
+            y_initial=y_test[: model.max_lag + 5],
+            forecast_horizon=model.max_lag + 5,
+        )
+
+
+def test_basis_function_n_step_prediction_nfir_branch():
+    model = FROLS(
+        order_selection=True,
+        ylag=[1, 2],
+        xlag=2,
+        estimator=RecursiveLeastSquares(),
+        basis_function=Fourier(degree=2, n=1),
+        model_type="NFIR",
+    )
+    model.fit(X=X_train, y=y_train)
+
+    horizon = model.max_lag + 6
+    y_segment = y_test[:horizon]
+    x_segment = X_test[:horizon]
+    result = model._basis_function_n_step_prediction(
+        x=x_segment,
+        y=y_segment,
+        steps_ahead=2,
+        forecast_horizon=horizon,
+    )
+
+    assert result.shape[0] == horizon - model.max_lag
+
+
+def test_basis_function_n_steps_horizon_adjusts_step_nar():
+    model = PredictableMSS(model_type="NAR")
+    horizon = model.max_lag + 4
+    y_segment = np.arange(horizon, dtype=float).reshape(-1, 1)
+
+    result = model._basis_function_n_steps_horizon(
+        x=None,
+        y=y_segment,
+        steps_ahead=horizon,
+        forecast_horizon=horizon,
+    )
+
+    assert result.shape == (horizon - model.max_lag, 1)
+
+
+def test_basis_function_n_steps_horizon_adjusts_step_nfir():
+    model = PredictableMSS(model_type="NFIR")
+    horizon = model.max_lag + 4
+    y_segment = np.arange(horizon, dtype=float).reshape(-1, 1)
+    x_segment = np.ones((horizon, 1))
+
+    result = model._basis_function_n_steps_horizon(
+        x=x_segment,
+        y=y_segment,
+        steps_ahead=horizon,
+        forecast_horizon=horizon,
+    )
+
+    assert result.shape == (horizon - model.max_lag, 1)
+
+
 def test_nar_step_ahead_insufficient_initial_conditions():
     """Test that _nar_step_ahead raises an error if input is too short."""
     model = FROLS(
@@ -487,6 +587,26 @@ def test_nar_step_ahead_insufficient_initial_conditions():
         model._nar_step_ahead(y[0], steps_ahead=2)
 
 
+def test_nar_step_ahead_handles_multiple_segments():
+    model = PredictableMSS(model_type="NAR")
+    y_segment = np.arange(model.max_lag + 4, dtype=float).reshape(-1, 1)
+
+    result = model._nar_step_ahead(y_segment, steps_ahead=2)
+
+    expected_rows = y_segment.shape[0] + 2 - model.max_lag
+    assert result.shape == (expected_rows, 1)
+
+
+def test_nar_step_ahead_handles_single_segment():
+    model = PredictableMSS(model_type="NAR")
+    y_segment = np.arange(model.max_lag + 1, dtype=float).reshape(-1, 1)
+
+    result = model._nar_step_ahead(y_segment, steps_ahead=y_segment.shape[0])
+
+    expected_rows = y_segment.shape[0] * 2 - model.max_lag
+    assert result.shape == (expected_rows, 1)
+
+
 def test_narmarx_step_ahead_insufficient_initial_conditions():
     """Test that _narmax_step_ahead raises an error if input is too short."""
     model = FROLS(
@@ -500,6 +620,17 @@ def test_narmarx_step_ahead_insufficient_initial_conditions():
 
     with pytest.raises(ValueError, match="Insufficient initial condition elements!"):
         model.narmax_n_step_ahead(X_train, y[0], steps_ahead=2)
+
+
+def test_narmax_n_step_ahead_handles_single_segment():
+    model = PredictableMSS(model_type="NARMAX")
+    horizon = model.max_lag + 4
+    x_data = np.ones((horizon, 1))
+    y_data = np.arange(horizon, dtype=float).reshape(-1, 1)
+
+    result = model.narmax_n_step_ahead(x_data, y_data, steps_ahead=horizon)
+
+    assert result.shape == (horizon - model.max_lag, 1)
 
 
 def test_miso_x_lag_list_single_input_int():
@@ -545,6 +676,18 @@ def test_miso_x_lag_list_single_input_list():
     assert np.array_equal(
         result, expected_output
     ), f"Expected {expected_output}, got {result}"
+
+
+def test_miso_x_lag_list_accepts_int_entries_per_input():
+    """Ensure integer xlag entries are expanded when n_inputs > 1."""
+    regressor = RegressorDictionary(
+        xlag=[2, 3], ylag=1, basis_function=Polynomial(degree=1)
+    )
+
+    expected = np.array([2001, 2002, 3001, 3002, 3003])
+    result = regressor.get_miso_x_lag_list(n_inputs=2)
+
+    assert_array_equal(result, expected)
 
 
 class ConcreteMSS(BaseMSS):
@@ -608,6 +751,78 @@ class ConcreteMSS(BaseMSS):
         pass
 
 
+class PredictableMSS(BaseMSS):
+    """Minimal implementation to exercise BaseMSS helpers deterministically."""
+
+    def __init__(self, model_type="NAR"):
+        super().__init__()
+        self.model_type = model_type
+        self.max_lag = 2
+        self.n_inputs = 1
+        self.theta = np.ones((1, 1))
+        self.final_model = np.array([[1001]])
+        self.pivv = np.array([0])
+        self.xlag = [1, 2]
+        self.ylag = [1, 2]
+
+    def _basis_function_n_step_prediction(
+        self,
+        x: Optional[np.ndarray],
+        y: np.ndarray,
+        steps_ahead: int,
+        forecast_horizon: int,
+    ) -> np.ndarray:
+        return super()._basis_function_n_step_prediction(
+            x, y, steps_ahead, forecast_horizon
+        )
+
+    def _basis_function_predict(
+        self,
+        x: Optional[np.ndarray],
+        y_initial: np.ndarray,
+        forecast_horizon: int = 1,
+    ) -> np.ndarray:
+        _ = x
+        horizon = int(forecast_horizon or len(y_initial))
+        data = np.arange(horizon, dtype=float).reshape(-1, 1)
+        return data
+
+    def _model_prediction(
+        self,
+        x: Optional[np.ndarray],
+        y_initial: np.ndarray,
+        forecast_horizon: int = 1,
+    ) -> np.ndarray:
+        _ = x
+        horizon = int(forecast_horizon or len(y_initial))
+        return np.arange(horizon, dtype=float).reshape(-1, 1)
+
+    def _nfir_predict(self, x: np.ndarray, y_initial: np.ndarray) -> np.ndarray:
+        _ = y_initial
+        length = max(x.shape[0] - self.max_lag, 0)
+        return np.arange(length, dtype=float).reshape(-1, 1)
+
+    def _n_step_ahead_prediction(self, x, y, steps_ahead):
+        return super()._n_step_ahead_prediction(x, y, steps_ahead)
+
+    def narmax_n_step_ahead(self, x, y, steps_ahead):
+        return super().narmax_n_step_ahead(x, y, steps_ahead)
+
+    def fit(self, *, X, y):
+        _ = (X, y)
+
+    def predict(
+        self,
+        *,
+        X: Optional[np.ndarray] = None,
+        y: np.ndarray,
+        steps_ahead: Optional[int] = None,
+        forecast_horizon: int = 1,
+    ) -> np.ndarray:
+        _ = (X, y, steps_ahead, forecast_horizon)
+        return np.zeros((1, 1))
+
+
 def test_base_mss_initialization():
     """Test if BaseMSS initializes correctly."""
     model = ConcreteMSS()
@@ -631,7 +846,7 @@ def test_base_mss_is_instance_of_regressor_dict():
 def test_base_mss_abstract_methods():
     """Test if instantiating BaseMSS directly raises an error."""
     with pytest.raises(TypeError):
-        BaseMSS()  # Should fail because it's an abstract class
+        BaseMSS()  # type: ignore[arg-type]
 
 
 def test_n_step_ahead_prediction_narmax():
