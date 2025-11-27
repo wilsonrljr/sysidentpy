@@ -1,4 +1,3 @@
-import pytest
 import numpy as np
 from sysidentpy.basis_function import Bernstein
 
@@ -60,3 +59,13 @@ def test_bernstein_transform():
     transformed_transform = b.transform(data)
 
     np.testing.assert_array_equal(transformed_fit, transformed_transform)
+
+
+def test_bernstein_fit_with_predefined_regressors():
+    """Selected regressors should filter the full feature matrix."""
+    b = Bernstein(degree=2, include_bias=True)
+    data = np.random.rand(12, 4)
+    subset = np.array([0, 2, 4])
+    filtered = b.fit(data, predefined_regressors=subset)
+    full = b.fit(data)
+    np.testing.assert_array_equal(filtered, full[:, subset])

@@ -25,6 +25,11 @@ from sysidentpy.parameter_estimation.estimators import (
     LeastSquaresMinimalResidual,
 )
 
+from sysidentpy.parameter_estimation.estimators_base import (
+    BaseEstimator,
+    _validate_params,
+)
+
 
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_raises
@@ -32,30 +37,30 @@ from numpy.testing import assert_almost_equal, assert_raises
 
 def create_test_data(n=1000):
     np.random.seed(42)
-    x = np.random.uniform(-1, 1, n).T
-    y = np.zeros((n, 1))
-    theta = np.array([[0.6], [-0.5], [0.7], [-0.7], [0.2]])
+    input_signal = np.random.uniform(-1, 1, n).T
+    output_signal = np.zeros((n, 1))
+    theta_values = np.array([[0.6], [-0.5], [0.7], [-0.7], [0.2]])
     lag = 2
-    for k in range(lag, len(x)):
-        y[k] = (
-            theta[4] * y[k - 1] ** 2
-            + theta[2] * y[k - 1] * x[k - 1]
-            + theta[0] * x[k - 2]
-            + theta[3] * y[k - 2] * x[k - 2]
-            + theta[1] * y[k - 2]
+    for k in range(lag, len(input_signal)):
+        output_signal[k] = (
+            theta_values[4] * output_signal[k - 1] ** 2
+            + theta_values[2] * output_signal[k - 1] * input_signal[k - 1]
+            + theta_values[0] * input_signal[k - 2]
+            + theta_values[3] * output_signal[k - 2] * input_signal[k - 2]
+            + theta_values[1] * output_signal[k - 2]
         )
 
-    y = np.reshape(y, (len(y), 1))
-    x = np.reshape(x, (len(x), 1))
+    output_signal = np.reshape(output_signal, (len(output_signal), 1))
+    input_signal = np.reshape(input_signal, (len(input_signal), 1))
 
-    return x, y, theta
+    return input_signal, output_signal, theta_values
 
 
 x, y, theta = create_test_data()
 max_lag = 2
 lagged_data = build_input_output_matrix(x=x, y=y, xlag=2, ylag=2)[:, :]
 
-psi = Polynomial(degree=2).fit(lagged_data, max_lag, predefined_regressors=None)
+psi_matrix = Polynomial(degree=2).fit(lagged_data, max_lag, predefined_regressors=None)
 
 
 def test_least_squares():
@@ -70,6 +75,28 @@ def test_least_squares():
     )
     model.fit(X=x, y=y)
     assert_almost_equal(model.theta, theta, decimal=2)
+
+
+def test_base_estimator_init_sets_attributes():
+    class DummyEstimator(BaseEstimator):
+        def __init__(self, unbiased=False, uiter=30):
+            super().__init__(unbiased=unbiased, uiter=uiter)
+
+        def optimize(self, psi, y):  # noqa: F811
+            del y
+            return psi[:1].T
+
+    estimator = DummyEstimator(unbiased=True, uiter=5)
+    assert estimator.unbiased is True
+    assert estimator.uiter == 5
+
+
+def test_validate_params_rejects_unknown_attribute():
+    assert_raises(ValueError, _validate_params, {"nonexistent": 1})
+
+
+def test_validate_params_invalid_solver():
+    assert_raises(ValueError, _validate_params, {"solver": "unknown"})
 
 
 def test_ridge_regression():

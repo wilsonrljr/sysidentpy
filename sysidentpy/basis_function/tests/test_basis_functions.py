@@ -2,6 +2,7 @@ import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
 
 from sysidentpy.basis_function import Polynomial, Fourier
+from sysidentpy.basis_function.basis_function_base import BaseBasisFunction
 
 
 def test_fit_polynomial():
@@ -170,3 +171,37 @@ def test_transform_fourier():
     r = basis_function.transform(data=data, max_lag=max_lag)
 
     assert_almost_equal(output, r, decimal=7)
+
+
+class _DummyBasis(BaseBasisFunction):
+    def __init__(self, degree=3):
+        super().__init__(degree=degree)
+
+    def fit(
+        self,
+        data,
+        max_lag=1,
+        ylag=1,
+        xlag=1,
+        model_type="NARMAX",
+        predefined_regressors=None,
+    ):
+        return data
+
+    def transform(
+        self,
+        data,
+        max_lag=1,
+        ylag=1,
+        xlag=1,
+        model_type="NARMAX",
+        predefined_regressors=None,
+    ):
+        return data
+
+
+def test_base_basis_function_init_sets_degree():
+    dummy = _DummyBasis(degree=5)
+    assert dummy.degree == 5
+    data = np.eye(2)
+    assert_array_equal(dummy.transform(data), data)

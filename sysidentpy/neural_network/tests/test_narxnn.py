@@ -95,6 +95,13 @@ def test_default_values():
     assert list(default.values()) == model_values
 
 
+def test_reference_network_forward_pass_yields_single_output():
+    net = NARX()
+    sample = torch.zeros((2, n_features), dtype=torch.float32)
+    output = net(sample)
+    assert_equal(tuple(output.shape), (2, 1))
+
+
 def test_validate():
     assert_raises(ValueError, NARXNN, ylag=-1, basis_function=Polynomial(degree=1))
     assert_raises(ValueError, NARXNN, ylag=1.3, basis_function=Polynomial(degree=1))
@@ -130,6 +137,86 @@ def test_validate():
         basis_function=Polynomial(degree=1),
         shuffle_batches="yes",
     )
+
+
+def test_sanitize_lag_sequence_conversion():
+    sanitized = NARXNN._sanitize_lag([1, 2, 3], "ylag")
+    assert sanitized == [1, 2, 3]
+
+
+def test_seed_torch_generators_sets_seed(monkeypatch):
+    model = NARXNN(basis_function=Polynomial(degree=1), random_state=7)
+    recorded = {}
+
+    def fake_manual_seed(value):
+        recorded["cpu"] = value
+
+    monkeypatch.setattr(torch, "manual_seed", fake_manual_seed)
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
+    model._seed_torch_generators()
+    assert recorded["cpu"] == 7
+
+
+def test_reset_network_parameters_requires_net():
+    model = NARXNN(basis_function=Polynomial(degree=1))
+    assert_raises(ValueError, model._reset_network_parameters)
+
+
+def test_reset_network_parameters_invokes_reset():
+    class TinyNet(nn.Linear):
+        def __init__(self):
+            super().__init__(1, 1)
+            self.reset_called = False
+
+        def reset_parameters(self):
+            self.reset_called = True
+            super().reset_parameters()
+
+    net = TinyNet()
+    model = NARXNN(net=net, basis_function=Polynomial(degree=1))
+    model._reset_network_parameters()
+    assert net.reset_called is True
+
+
+def test_data_transform_allows_shuffle_override(monkeypatch):
+    model = NARXNN(basis_function=Polynomial(degree=1))
+    captured = {}
+
+    def fake_get_data(train_ds, *, shuffle=None):
+        captured["shuffle"] = shuffle
+        return (train_ds, shuffle)
+
+    monkeypatch.setattr(model, "get_data", fake_get_data)
+    dataloader = model.data_transform(X_train[:10], y_train[:10], shuffle=False)
+    assert captured["shuffle"] is False
+    assert isinstance(dataloader, tuple)
+
+
+def test_fit_verbose_requires_validation_data():
+    model = NARXNN(
+        net=NARX(),
+        basis_function=Polynomial(degree=1),
+        verbose=True,
+        epochs=1,
+    )
+    assert_raises(ValueError, model.fit, X=X_train[:50], y=y_train[:50])
+
+
+def test_predict_requires_defined_network():
+    model = NARXNN(basis_function=Polynomial(degree=1))
+    assert_raises(ValueError, model.predict, X=X_test, y=y_test)
+
+
+def test_narmax_predict_requires_forecast_horizon_when_no_input():
+    model = NARXNN(basis_function=Polynomial(degree=1))
+    model.max_lag = 2
+    model.n_inputs = 1
+    model.final_model = np.array([[1001]])
+    model.theta = np.array([[0.1]])
+    model._scalar_forward = lambda arr: float(np.sum(arr))
+    y_initial = np.ones((model.max_lag, 1))
+    with pytest.raises(ValueError, match="forecast_horizon cannot be None"):
+        model._narmax_predict(x=None, y_initial=y_initial, forecast_horizon=None)
 
 
 def test_fit_raise():
@@ -723,15 +810,12 @@ def test_fit_verbose_false_does_not_raise():
             "eps": 1e-05,
         },  # optional parameters of the optimizer
     )
-    try:
-        model.fit(
-            X=X_train[:30].reshape(-1, 1),
-            y=y_train[:30].reshape(-1, 1),
-            X_test=None,
-            y_test=None,
-        )
-    except ValueError:
-        pytest.fail("fit() raised ValueError unexpectedly with verbose=False")
+    model.fit(
+        X=X_train[:30].reshape(-1, 1),
+        y=y_train[:30].reshape(-1, 1),
+        X_test=None,
+        y_test=None,
+    )
 
 
 def test_nfir():
