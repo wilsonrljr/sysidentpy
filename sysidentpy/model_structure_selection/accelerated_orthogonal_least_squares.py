@@ -86,8 +86,8 @@ class AOLS(BaseMSS):
         The sparsity level.
     L : int, default=1
         Number of selected indices per iteration.
-    threshold : float, default=10e10
-        The desired accuracy.
+    threshold : float, default=1e-9
+        The desired accuracy used to stop the iterative selection.
 
     Examples
     --------
@@ -182,7 +182,7 @@ class AOLS(BaseMSS):
             raise ValueError(f"k must be integer and > zero. Got {self.k}")
 
         if not isinstance(self.L, int) or self.L < 1:
-            raise ValueError(f"k must be integer and > zero. Got {self.L}")
+            raise ValueError(f"L must be integer and > zero. Got {self.L}")
 
         if not isinstance(self.threshold, (int, float)) or self.threshold < 0:
             raise ValueError(
@@ -204,7 +204,7 @@ class AOLS(BaseMSS):
         Returns
         -------
         theta : array-like of shape = number_of_model_elements
-            The respective ERR calculated for each regressor.
+            The estimated coefficients for the selected regressors.
         piv : array-like of shape = number_of_model_elements
             Contains the index to put the regressors in the correct order
             based on err values.
@@ -223,51 +223,80 @@ class AOLS(BaseMSS):
         r = y[self.max_lag :].reshape(-1, 1).copy()
         it = 0
         max_iter = int(min(self.k, np.floor(n / self.L)))
-        selected_indices = np.zeros(max_iter * self.L)
+        selected_indices = np.full(max_iter * self.L, -1, dtype=np.int64)
         basis_matrix = np.zeros([n, max_iter * self.L])
         transformed_psi = psi.copy()
+        eps = np.finfo(float).eps
+        numerator = (r.T @ psi).ravel()
+        denominator = np.sum(psi * transformed_psi, axis=0)
+        q = np.zeros_like(numerator)
+        np.divide(numerator, denominator, out=q, where=np.abs(denominator) > eps)
         while norm(r) > self.threshold and it < max_iter:
             it = it + 1
             offset = (it - 1) * self.L
             if it > 1:
-                transformed_psi = transformed_psi - basis_matrix[:, offset].reshape(
-                    -1, 1
-                ) @ (basis_matrix[:, offset].reshape(-1, 1).T @ psi)
-
-            q = ((r.T @ psi) / np.sum(psi * transformed_psi, axis=0)).ravel()
-            contribution = np.sum(transformed_psi**2, axis=0) * (q**2)
-            sub_ind = list(selected_indices[:offset].astype(int))
-            contribution[sub_ind] = 0
-            sorted_indices = np.argsort(contribution)[::-1].ravel()
-            selected_indices[offset : offset + self.L] = sorted_indices[: self.L]
-            for i in range(self.L):
-                temp = (
-                    transformed_psi[:, sorted_indices[i]].reshape(-1, 1)
-                    * q[sorted_indices[i]]
+                basis_vec = basis_matrix[:, offset].reshape(-1, 1)
+                np.subtract(
+                    transformed_psi,
+                    basis_vec @ (basis_vec.T @ psi),
+                    out=transformed_psi,
                 )
-                basis_matrix[:, offset + i] = (
-                    temp / np.linalg.norm(temp, axis=0)
-                ).ravel()
-                r = r - temp
-                if i == self.L:
-                    break
 
-                transformed_psi = transformed_psi - basis_matrix[:, offset + i].reshape(
-                    -1, 1
-                ) @ (basis_matrix[:, offset + i].reshape(-1, 1).T @ psi)
-                q = ((r.T @ psi) / np.sum(psi * transformed_psi, axis=0)).ravel()
+            contribution = np.einsum("ij,ij->j", transformed_psi, transformed_psi) * (
+                q**2
+            )
+            previous = selected_indices[:offset]
+            sub_ind = list(previous[previous >= 0].astype(int))
+            contribution[sub_ind] = 0
+            contribution[~np.isfinite(contribution)] = 0
+            block_size = min(self.L, len(contribution))
+            if block_size == 0:
+                break
+            top_candidates = np.argpartition(contribution, -block_size)[-block_size:]
+            current_indices = top_candidates[
+                contribution[top_candidates].argsort()[::-1]
+            ]
+            selected_indices[offset : offset + block_size] = current_indices
+            for i, idx in enumerate(current_indices):
+                temp = transformed_psi[:, idx].reshape(-1, 1) * q[idx]
+                temp_norm = norm(temp)
+                if temp_norm <= eps:
+                    continue
+                basis_matrix[:, offset + i] = (temp / temp_norm).ravel()
+                np.subtract(r, temp, out=r)
 
-        selected_indices = selected_indices[selected_indices > 0].ravel().astype(int)
+                basis_vec = basis_matrix[:, offset + i].reshape(-1, 1)
+                np.subtract(
+                    transformed_psi,
+                    basis_vec @ (basis_vec.T @ psi),
+                    out=transformed_psi,
+                )
+
+                numerator = (r.T @ psi).ravel()
+                denominator = np.sum(psi * transformed_psi, axis=0)
+                np.divide(
+                    numerator,
+                    denominator,
+                    out=q,
+                    where=np.abs(denominator) > eps,
+                )
+
+        selected_indices = selected_indices[selected_indices >= 0].ravel().astype(int)
         residual_norm = norm(r)
         theta[selected_indices] = self.estimator.optimize(
             psi[:, selected_indices], y[self.max_lag :, 0].reshape(-1, 1)
         )
-        if self.L > 1:
-            sorted_indices = np.argsort(np.abs(theta))[::-1]
-            selected_indices = sorted_indices[: self.k].ravel().astype(int)
-            theta[selected_indices] = self.estimator.optimize(
-                psi[:, selected_indices], y[self.max_lag :, 0].reshape(-1, 1)
+        if self.L > 1 and len(selected_indices) > self.k:
+            sorted_local = np.argsort(np.abs(theta[selected_indices]).ravel())[::-1][
+                : self.k
+            ]
+            top_indices = selected_indices[sorted_local]
+            theta_filtered = np.zeros_like(theta)
+            theta_filtered[top_indices] = self.estimator.optimize(
+                psi[:, top_indices], y[self.max_lag :, 0].reshape(-1, 1)
             )
+            theta = theta_filtered
+            selected_indices = top_indices
             residual_norm = norm(
                 y[self.max_lag :].reshape(-1, 1)
                 - psi[:, selected_indices] @ theta[selected_indices]
@@ -412,7 +441,7 @@ class AOLS(BaseMSS):
         return yhat
 
     def _one_step_ahead_prediction(
-        self, x: Optional[np.ndarray], y: Optional[np.ndarray]
+        self, x_base: Optional[np.ndarray], y: Optional[np.ndarray] = None
     ) -> np.ndarray:
         """Perform the 1-step-ahead prediction of a model.
 
@@ -430,7 +459,9 @@ class AOLS(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        lagged_data = build_lagged_matrix(x, y, self.xlag, self.ylag, self.model_type)
+        lagged_data = build_lagged_matrix(
+            x_base, y, self.xlag, self.ylag, self.model_type
+        )
         x_base = self.basis_function.transform(
             lagged_data,
             self.max_lag,
