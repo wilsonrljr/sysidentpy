@@ -148,6 +148,18 @@ plugins:
             community-overview: Visão Geral da Comunidade
             Get Help: Obter Ajuda
             Meetups: Palestras
+            Features: Funcionalidades
+            Your First Model: Seu Primeiro Modelo
+            Model with Multiple Inputs: Modelo com Múltiplas Entradas
+            Parameter Estimation - Overview: Estimação de Parâmetros - Visão Geral
+            Basis Function - Overview: Funções Base - Visão Geral
+            Information Criteria - Overview: Critérios de Informação - Visão Geral
+            Create a Custom Basis Function: Criar uma Função Base Customizada
+            Create a Neural NARX Network: Criar uma Rede Neural NARX
+            Save and Load Models: Salvar e Carregar Modelos
+            Set Specific Lags: Definir Lags Específicos
+            Simulating Existing Models: Simular Modelos Existentes
+            Use Extended Least Squares: Usar Extended Least Squares
         - locale: es
           name: Español
           build: true
