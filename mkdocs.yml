@@ -118,9 +118,36 @@ plugins:
           site_description: De Métodos Clássicos a Redes Neurais
           theme:
             docs_dir: docs/pt/
-            custom_dir: docs/pt/
+            custom_dir: docs/en/
             site_dir: site/pt/
             logo: overrides/assets/img/logotype-sysidentpy.svg
+            language: pt
+          nav_translations:
+            Home: Início
+            Getting started: Primeiros Passos
+            User guide: Guia
+            Companion Book: Livro
+            Developer guide: Contribuir
+            Community & Support: Comunidade
+            About: Sobre
+            Changelog: Changelog
+            Sponsors: Apoie
+            Overview: Visão Geral
+            Quickstart Guide: Guia Rápido
+            Introduction to NARMAX: Introdução ao NARMAX
+            License: Licença
+            Tutorials: Tutoriais
+            How to: Como fazer
+            API: API
+            How to contribute: Como contribuir
+            Documentation: Documentação
+            Documentation Overview: Visão Geral da Documentação
+            How To Write a Tutorial: Como Escrever um Tutorial
+            How To Write a How-to Guide: Como Escrever um Guia How-to
+            How to Add a Translation: Como Adicionar uma Tradução
+            community-overview: Visão Geral da Comunidade
+            Get Help: Obter Ajuda
+            Meetups: Palestras
         - locale: es
           name: Español
           build: true
