@@ -160,6 +160,30 @@ plugins:
             Set Specific Lags: Definir Lags Específicos
             Simulating Existing Models: Simular Modelos Existentes
             Use Extended Least Squares: Usar Extended Least Squares
+            General NARX Models - Overview: Modelos NARX Gerais - Visão Geral
+            Fourier NARX - Overview: Fourier NARX - Visão Geral
+            AOLS - Overview: AOLS - Visão Geral
+            NFIR - Overview: NFIR - Visão Geral
+            Importance of Extended Least Squares: Importância do Extended Least Squares
+            Electrical and Mechanical Systems: Sistemas Elétricos e Mecânicos
+            Modeling a Magneto-Rheological Damper Device: Modelagem de um Dispositivo Amortecedor Magneto-Reológico
+            Silver Box System: Sistema Silver Box
+            Coupled Electric Device: Dispositivo Elétrico Acoplado
+            Wiener-Hammerstein System: Sistema Wiener-Hammerstein
+            F-16 Aircraft: Aeronave F-16
+            F-16 Aircraft - N-Steps Ahead Prediction: Aeronave F-16 - Previsão N Passos à Frente
+            Electromechanical System Identification - Overview: Identificação de Sistema Eletromecânico - Visão Geral
+            Electromechanical System Identification - MetaMSS: Identificação de Sistema Eletromecânico - MetaMSS
+            Electromechanical System Identification - Entropic Regression: Identificação de Sistema Eletromecânico - Entropic Regression
+            Multiobjective Parameter Estimation - Overview: Estimação de Parâmetros Multiobjetivo - Visão Geral
+            Industrial and Corporate: Industriais e Corporativos
+            M4 Benchmark: M4 Benchmark
+            Air Passenger Benchmark: Air Passenger Benchmark
+            Load Forecasting Benchmark: Previsão de Carga - Benchmark
+            PV Forecasting Benchmark: Previsão Fotovoltaica - Benchmark
+            Chaotic Systems: Sistemas Caóticos
+            Lorenz System: Sistema de Lorenz
+            Logistic Map: Mapa Logístico
         - locale: es
           name: Español
           build: true
