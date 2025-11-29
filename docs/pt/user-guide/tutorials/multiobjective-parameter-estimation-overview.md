@@ -219,6 +219,153 @@ pd.DataFrame(result)
 ```
 
 
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>w1</th>
+      <th>w2</th>
+      <th>w3</th>
+      <th>J_ls</th>
+      <th>J_sg</th>
+      <th>J_sf</th>
+      <th>||J||:</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.006842</td>
+      <td>0.003078</td>
+      <td>0.990080</td>
+      <td>0.999970</td>
+      <td>1.095020e-05</td>
+      <td>0.000013</td>
+      <td>0.245244</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.007573</td>
+      <td>0.002347</td>
+      <td>0.990080</td>
+      <td>0.999938</td>
+      <td>2.294665e-05</td>
+      <td>0.000016</td>
+      <td>0.245236</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.008382</td>
+      <td>0.001538</td>
+      <td>0.990080</td>
+      <td>0.999885</td>
+      <td>6.504913e-05</td>
+      <td>0.000018</td>
+      <td>0.245223</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.009277</td>
+      <td>0.000642</td>
+      <td>0.990080</td>
+      <td>0.999717</td>
+      <td>4.505541e-04</td>
+      <td>0.000021</td>
+      <td>0.245182</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.006842</td>
+      <td>0.098663</td>
+      <td>0.894495</td>
+      <td>1.000000</td>
+      <td>7.393246e-08</td>
+      <td>0.000015</td>
+      <td>0.245251</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2290</th>
+      <td>0.659632</td>
+      <td>0.333527</td>
+      <td>0.006842</td>
+      <td>0.995896</td>
+      <td>3.965699e-04</td>
+      <td>1.000000</td>
+      <td>0.244489</td>
+    </tr>
+    <tr>
+      <th>2291</th>
+      <td>0.730119</td>
+      <td>0.263039</td>
+      <td>0.006842</td>
+      <td>0.995632</td>
+      <td>5.602981e-04</td>
+      <td>0.972842</td>
+      <td>0.244412</td>
+    </tr>
+    <tr>
+      <th>2292</th>
+      <td>0.808139</td>
+      <td>0.185020</td>
+      <td>0.006842</td>
+      <td>0.995364</td>
+      <td>8.321071e-04</td>
+      <td>0.868299</td>
+      <td>0.244300</td>
+    </tr>
+    <tr>
+      <th>2293</th>
+      <td>0.894495</td>
+      <td>0.098663</td>
+      <td>0.006842</td>
+      <td>0.995100</td>
+      <td>1.364999e-03</td>
+      <td>0.660486</td>
+      <td>0.244160</td>
+    </tr>
+    <tr>
+      <th>2294</th>
+      <td>0.990080</td>
+      <td>0.003078</td>
+      <td>0.006842</td>
+      <td>0.992584</td>
+      <td>9.825987e-02</td>
+      <td>0.305492</td>
+      <td>0.261455</td>
+    </tr>
+  </tbody>
+</table>
+<p>2295 rows × 7 columns</p>
+</div>
+
+
+
 Agora podemos definir $\theta$ associado a qualquer combinação de pesos.
 
 
@@ -243,6 +390,86 @@ r = pd.DataFrame(
 )
 r
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Regressors</th>
+      <th>Parameters</th>
+      <th>ERR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>2.2930E+00</td>
+      <td>9.999E-01</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>y(k-1)</td>
+      <td>2.3307E-01</td>
+      <td>2.042E-05</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>y(k-2)</td>
+      <td>6.3209E-01</td>
+      <td>1.108E-06</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>x1(k-1)</td>
+      <td>-5.9333E-01</td>
+      <td>4.688E-06</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>y(k-1)^2</td>
+      <td>2.7673E-01</td>
+      <td>3.922E-07</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>y(k-2)y(k-1)</td>
+      <td>-5.3228E-01</td>
+      <td>8.389E-07</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>x1(k-1)y(k-1)</td>
+      <td>1.6667E-02</td>
+      <td>5.690E-07</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>y(k-2)^2</td>
+      <td>2.5766E-01</td>
+      <td>3.827E-06</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 
 ### Os resultados dinâmicos para esse $\theta$ escolhido são
@@ -383,6 +610,17 @@ plt.legend()
 plt.show()
 ```
 
+          Regressors   Parameters        ERR
+    0              1   1.5405E+00  9.999E-01
+    1         y(k-1)   2.9687E-01  2.042E-05
+    2         y(k-2)   6.4693E-01  1.108E-06
+    3        x1(k-1)  -4.1302E-01  4.688E-06
+    4       y(k-1)^2   2.7671E-01  3.922E-07
+    5   y(k-2)y(k-1)  -5.3474E-01  8.389E-07
+    6  x1(k-1)y(k-1)   4.0624E-03  5.690E-07
+    7       y(k-2)^2   2.5832E-01  3.827E-06
+
+
 
 ![png](../../../en/user-guide/tutorials/multiobjective-parameter-estimation-overview_files/multiobjective-parameter-estimation-overview_27_1.png)
 
@@ -502,6 +740,20 @@ print("qit matrix:")
 print(qit)
 ```
 
+    R matrix:
+    [[1 0 0 0 0 0 0 0]
+     [0 1 1 0 0 0 0 0]
+     [0 0 0 1 0 0 0 0]
+     [0 0 0 0 1 1 0 1]
+     [0 0 0 0 0 0 1 0]]
+    qit matrix:
+    [[0 0]
+     [1 0]
+     [0 1]
+     [2 0]
+     [1 1]]
+
+
 Assim,
 
 $$
@@ -589,6 +841,20 @@ final_model
 ```
 
 
+
+
+    array([[1001,    0],
+           [1002,    0],
+           [   0,    0],
+           [2001,    0],
+           [2001, 2001],
+           [2002, 2001],
+           [2002,    0],
+           [2002, 2002]])
+
+
+
+
 ```python
 mult2 = AILS(final_model=final_model)
 ```
@@ -652,6 +918,52 @@ pd.DataFrame(result)
 ```
 
 
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>w1</th>
+      <th>w2</th>
+      <th>w3</th>
+      <th>J_ls</th>
+      <th>J_sg</th>
+      <th>J_sf</th>
+      <th>||J||:</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.361234</td>
+      <td>0.35487</td>
+      <td>0.283896</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 Resultados dinâmicos
 
 
@@ -673,6 +985,87 @@ r = pd.DataFrame(
 )
 r
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Regressors</th>
+      <th>Parameters</th>
+      <th>ERR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>1.4287E+00</td>
+      <td>9.999E-01</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>y(k-1)</td>
+      <td>5.5147E-01</td>
+      <td>2.042E-05</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>y(k-2)</td>
+      <td>4.0449E-01</td>
+      <td>1.108E-06</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>x1(k-1)</td>
+      <td>-1.2605E+01</td>
+      <td>4.688E-06</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>x1(k-2)</td>
+      <td>1.2257E+01</td>
+      <td>3.922E-07</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>x1(k-1)^2</td>
+      <td>8.3274E+00</td>
+      <td>8.389E-07</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>x1(k-2)x1(k-1)</td>
+      <td>-1.1416E+01</td>
+      <td>5.690E-07</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>x1(k-2)^2</td>
+      <td>3.0846E+00</td>
+      <td>3.827E-06</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 
 ```python
@@ -764,6 +1157,13 @@ theta[position, :]
 ```
 
 
+
+
+    array([  1.42867821,   0.55147249,   0.40449005, -12.60549001,
+            12.25730092,   8.32739876, -11.41573694,   3.08460955])
+
+
+
 A tabela a seguir mostra os resultados reportados em `IniciacaoCientifica2007` e aqueles obtidos com a implementação do SysIdentPy:
 
 | Theta       | SysIdentPy   | IniciacaoCientifica2007       |
@@ -799,6 +1199,18 @@ print(R)
 print("qit matrix:")
 print(qit)
 ```
+
+    R matrix:
+    [[1 0 0 0 0 0 0 0]
+     [0 1 1 0 0 0 0 0]
+     [0 0 0 1 1 0 0 0]
+     [0 0 0 0 0 1 1 1]]
+    qit matrix:
+    [[0 0]
+     [1 0]
+     [0 1]
+     [0 2]]
+
 
 A estrutura do modelo que será utilizada (`IniciacaoCientifica2007`):
 
@@ -890,6 +1302,130 @@ pd.DataFrame(result)
 ```
 
 
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>w1</th>
+      <th>w2</th>
+      <th>J_ls</th>
+      <th>J_sg</th>
+      <th>||J||:</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.990080</td>
+      <td>0.009920</td>
+      <td>0.990863</td>
+      <td>1.000000</td>
+      <td>0.990939</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.987127</td>
+      <td>0.012873</td>
+      <td>0.990865</td>
+      <td>0.987032</td>
+      <td>0.990939</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.984182</td>
+      <td>0.015818</td>
+      <td>0.990867</td>
+      <td>0.974307</td>
+      <td>0.990939</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.981247</td>
+      <td>0.018753</td>
+      <td>0.990870</td>
+      <td>0.961803</td>
+      <td>0.990940</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.978320</td>
+      <td>0.021680</td>
+      <td>0.990873</td>
+      <td>0.949509</td>
+      <td>0.990941</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1995</th>
+      <td>0.002555</td>
+      <td>0.997445</td>
+      <td>0.999993</td>
+      <td>0.000072</td>
+      <td>0.999993</td>
+    </tr>
+    <tr>
+      <th>1996</th>
+      <td>0.002547</td>
+      <td>0.997453</td>
+      <td>0.999994</td>
+      <td>0.000072</td>
+      <td>0.999994</td>
+    </tr>
+    <tr>
+      <th>1997</th>
+      <td>0.002540</td>
+      <td>0.997460</td>
+      <td>0.999996</td>
+      <td>0.000071</td>
+      <td>0.999996</td>
+    </tr>
+    <tr>
+      <th>1998</th>
+      <td>0.002532</td>
+      <td>0.997468</td>
+      <td>0.999998</td>
+      <td>0.000071</td>
+      <td>0.999998</td>
+    </tr>
+    <tr>
+      <th>1999</th>
+      <td>0.002525</td>
+      <td>0.997475</td>
+      <td>1.000000</td>
+      <td>0.000070</td>
+      <td>1.000000</td>
+    </tr>
+  </tbody>
+</table>
+<p>2000 rows × 5 columns</p>
+</div>
+
+
+
+
 ```python
 model.theta = theta[position, :].reshape(-1, 1)
 model.final_model = bi_objective.final_model
@@ -908,6 +1444,87 @@ r = pd.DataFrame(
 )
 r
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Regressors</th>
+      <th>Parameters</th>
+      <th>ERR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>1.3873E+00</td>
+      <td>9.999E-01</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>y(k-1)</td>
+      <td>5.4941E-01</td>
+      <td>2.042E-05</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>y(k-2)</td>
+      <td>4.0804E-01</td>
+      <td>1.108E-06</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>x1(k-1)</td>
+      <td>-1.2515E+01</td>
+      <td>4.688E-06</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>x1(k-2)</td>
+      <td>1.2227E+01</td>
+      <td>3.922E-07</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>x1(k-1)^2</td>
+      <td>8.1171E+00</td>
+      <td>8.389E-07</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>x1(k-2)x1(k-1)</td>
+      <td>-1.1047E+01</td>
+      <td>5.690E-07</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>x1(k-2)^2</td>
+      <td>2.9043E+00</td>
+      <td>3.827E-06</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 
 ```python
@@ -1014,6 +1631,130 @@ pd.DataFrame(result)
 ```
 
 
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>w1</th>
+      <th>w2</th>
+      <th>J_ls</th>
+      <th>J_sg</th>
+      <th>||J||:</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.000000</td>
+      <td>0.000000</td>
+      <td>17.407256</td>
+      <td>3.579461e+01</td>
+      <td>39.802849</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.997012</td>
+      <td>0.002988</td>
+      <td>17.407528</td>
+      <td>2.109260e-01</td>
+      <td>17.408806</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.994033</td>
+      <td>0.005967</td>
+      <td>17.407540</td>
+      <td>2.082067e-01</td>
+      <td>17.408785</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.991063</td>
+      <td>0.008937</td>
+      <td>17.407559</td>
+      <td>2.056636e-01</td>
+      <td>17.408774</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.988102</td>
+      <td>0.011898</td>
+      <td>17.407585</td>
+      <td>2.031788e-01</td>
+      <td>17.408771</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1995</th>
+      <td>0.002555</td>
+      <td>0.997445</td>
+      <td>17.511596</td>
+      <td>3.340081e-07</td>
+      <td>17.511596</td>
+    </tr>
+    <tr>
+      <th>1996</th>
+      <td>0.002547</td>
+      <td>0.997453</td>
+      <td>17.511596</td>
+      <td>3.320125e-07</td>
+      <td>17.511596</td>
+    </tr>
+    <tr>
+      <th>1997</th>
+      <td>0.002540</td>
+      <td>0.997460</td>
+      <td>17.511597</td>
+      <td>3.300289e-07</td>
+      <td>17.511597</td>
+    </tr>
+    <tr>
+      <th>1998</th>
+      <td>0.002532</td>
+      <td>0.997468</td>
+      <td>17.511598</td>
+      <td>3.280571e-07</td>
+      <td>17.511598</td>
+    </tr>
+    <tr>
+      <th>1999</th>
+      <td>0.002525</td>
+      <td>0.997475</td>
+      <td>17.511599</td>
+      <td>3.260972e-07</td>
+      <td>17.511599</td>
+    </tr>
+  </tbody>
+</table>
+<p>2000 rows × 5 columns</p>
+</div>
+
+
+
+
 ```python
 # Escrevendo os resultados
 model.theta = theta[position, :].reshape(-1, 1)
@@ -1033,6 +1774,87 @@ r = pd.DataFrame(
 )
 r
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Regressors</th>
+      <th>Parameters</th>
+      <th>ERR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>1.4853E+00</td>
+      <td>9.999E-01</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>y(k-1)</td>
+      <td>5.4940E-01</td>
+      <td>2.042E-05</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>y(k-2)</td>
+      <td>4.0806E-01</td>
+      <td>1.108E-06</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>x1(k-1)</td>
+      <td>-1.2581E+01</td>
+      <td>4.688E-06</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>x1(k-2)</td>
+      <td>1.2210E+01</td>
+      <td>3.922E-07</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>x1(k-1)^2</td>
+      <td>8.1686E+00</td>
+      <td>8.389E-07</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>x1(k-2)x1(k-1)</td>
+      <td>-1.1122E+01</td>
+      <td>5.690E-07</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>x1(k-2)^2</td>
+      <td>2.9455E+00</td>
+      <td>3.827E-06</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 
 ```python
@@ -1122,10 +1944,51 @@ bi_objective_gain.build_static_function_information(Uo, Yo)[1]
 ```
 
 
+
+
+    array([[   50.        ,   800.        ,   800.        ,   100.        ,
+              100.        ,   269.3877551 ,   269.3877551 ,   269.3877551 ],
+           [  800.        , 17240.81632653, 17240.81632653,  1044.89795918,
+             1044.89795918,  2089.79591837,  2089.79591837,  2089.79591837],
+           [  800.        , 17240.81632653, 17240.81632653,  1044.89795918,
+             1044.89795918,  2089.79591837,  2089.79591837,  2089.79591837],
+           [  100.        ,  1044.89795918,  1044.89795918,   269.3877551 ,
+              269.3877551 ,   816.32653061,   816.32653061,   816.32653061],
+           [  100.        ,  1044.89795918,  1044.89795918,   269.3877551 ,
+              269.3877551 ,   816.32653061,   816.32653061,   816.32653061],
+           [  269.3877551 ,  2089.79591837,  2089.79591837,   816.32653061,
+              816.32653061,  2638.54142407,  2638.54142407,  2638.54142407],
+           [  269.3877551 ,  2089.79591837,  2089.79591837,   816.32653061,
+              816.32653061,  2638.54142407,  2638.54142407,  2638.54142407],
+           [  269.3877551 ,  2089.79591837,  2089.79591837,   816.32653061,
+              816.32653061,  2638.54142407,  2638.54142407,  2638.54142407]])
+
+
+
 Matriz H+R:
 
 
 ```python
 bi_objective_gain.build_static_gain_information(Uo, Yo, gain)[1]
 ```
+
+
+
+
+    array([[    0.        ,     0.        ,     0.        ,     0.        ,
+                0.        ,     0.        ,     0.        ,     0.        ],
+           [    0.        ,  3200.        ,  3200.        ,  -400.        ,
+             -400.        , -1600.        , -1600.        , -1600.        ],
+           [    0.        ,  3200.        ,  3200.        ,  -400.        ,
+             -400.        , -1600.        , -1600.        , -1600.        ],
+           [    0.        ,  -400.        ,  -400.        ,    50.        ,
+               50.        ,   200.        ,   200.        ,   200.        ],
+           [    0.        ,  -400.        ,  -400.        ,    50.        ,
+               50.        ,   200.        ,   200.        ,   200.        ],
+           [    0.        , -1600.        , -1600.        ,   200.        ,
+              200.        ,  1077.55102041,  1077.55102041,  1077.55102041],
+           [    0.        , -1600.        , -1600.        ,   200.        ,
+              200.        ,  1077.55102041,  1077.55102041,  1077.55102041],
+           [    0.        , -1600.        , -1600.        ,   200.        ,
+              200.        ,  1077.55102041,  1077.55102041,  1077.55102041]])
 
