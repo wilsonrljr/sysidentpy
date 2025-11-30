@@ -1,5 +1,51 @@
 # Changes in SysIdentPy
 
+## v0.7.0
+
+### CONTRIBUTORS
+
+- Wilson Rocha Lacerda Junior (wilsonrljr)
+- aryan
+
+### CHANGES
+
+This release introduces human-readable equation exports, reproducible neural workflows, major runtime improvements, and the largest documentation refresh in the project's history with localized content and a redesigned site.
+
+- **New Features:**
+    - Added `sysidentpy.utils.equation_formatter` with helper APIs such as `format_equation` so any trained model can output a symbolic equation that respects the selected basis function, lags, and `pivv` ordering.
+    - `NeuralNarx` now exposes a `random_state` argument, normalizes constructor parameters, reuses pinned tensors across devices, and reports verbose metrics in a single pass, making experiments deterministic and lighter on GPU/CPU memory.
+    - The formatter returns structured `EquationItem` objects, making it easy for documentation, notebooks, and external tools to embed the exact set of regressors and coefficients that define the fitted model.
+
+- **Performance Improvements:**
+    - Polynomial basis functions cache column-combination indices and evaluate terms with vectorized multiplications and preallocated buffers; large NARX/NARMAX fits with degree ≥3 run several times faster.
+    - `predict` and internal regressor builders reuse exponent matrices and exponent buffers, drastically reducing allocations for long simulations.
+    - UOFR, ERR, and helper routines such as `shift_column` were rewritten around BLAS-friendly slices/einsum, while Accelerated OLS is now fully vectorized.
+
+- **API Changes:**
+    - Official support now targets Python 3.10–3.14 (and the CI test matrix reflects it); Python 3.8/3.9 were removed in order to guarantee compatibility with NumPy ≥2.0 and the newest PyTorch.
+    - Mutual information metrics (`mutual_information_knn` and `conditional_mutual_information`) sort indices before slicing distance matrices, making epsilon selection deterministic across NumPy releases.
+    - Torch dependencies were bumped and workflows updated so coverage results are published automatically on pull requests.
+
+- **Documentation & Website:**
+    - Docs were reorganized under `docs/en`, `docs/es`, and `docs/pt`; Material for MkDocs now uses `mkdocs-static-i18n`, a brand-new translation guide, and full Portuguese translations (book, developer guide, quickstart, landing pages). Spanish landing/home pages and assets were added too.
+    - Every tutorial and how-to notebook was converted to Markdown so the site renders reliably on mobile, diffs stay readable, and translators can work straight from text.
+    - Added new how-to guides (custom basis functions, Neural NARX walkthrough, saving/loading models, simulating existing models, extended least squares, etc.) plus refreshed community support pages and READMEs.
+    - Landing pages received a fresh layout with new CSS, organization logos, color-aware logo variants, refined “Trusted by” blocks, and per-language home templates.
+    - MkDocs now runs custom hooks (`scripts/mkdocs_hooks.py`) that call the PePy API to inject live download counters and the latest PyPI version into the site.
+
+- **Testing, Tooling & CI:**
+    - Added extensive tests covering MetaMSS, OFRBase, AOLS, ERR, Neural NARX branches, simulation helpers, general estimators, and the new equation formatter; regression spaces now have deterministic fixtures.
+    - GitHub Actions gained a coverage publishing workflow and pass secrets needed to hydrate download metrics during docs builds.
+    - `.gitignore` and dev tooling were updated to tolerate `.venv`, `uv` artifacts, and modern linters, simplifying local setups.
+
+### IMPACT
+
+Equation exports make it trivial to audit the final model, reproducible neural training unlocks fair benchmarks, and the performance work shortens both fitting and simulation time for high-order models. Localized documentation (English, Spanish, Portuguese) plus the translated book dramatically expand the community that can learn SysIdentPy.
+
+### TESTING
+
+The CI matrix now runs against Python 3.10–3.14, publishes coverage, and the expanded pytest suite exercises the new formatter, MetaMSS, OFR/AOLS flows, simulation utilities, neural branches, and documentation hooks.
+
 ## v0.6.0
 
 ### CONTRIBUTORS

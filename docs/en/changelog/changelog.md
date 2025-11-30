@@ -5,6 +5,48 @@ template: overrides/main.html
 
 # Changes in SysIdentPy
 
+## v0.7.0
+### CONTRIBUTORS
+- Wilson Rocha Lacerda Junior (wilsonrljr)
+- aryan
+
+### CHANGES
+This release brings human-readable equation exports, reproducible neural workflows, sizable performance wins, and the largest documentation update so far, complete with localized sites.
+
+#### New Features
+- Added `sysidentpy.utils.equation_formatter` and helpers such as `format_equation`, allowing any fitted model to emit a symbolic equation that honors the chosen basis function, lags, and `pivv` ordering.
+- `NeuralNarx` now accepts a `random_state`, normalizes constructor parameters, reuses pinned tensors across devices, and emits verbose metrics in a single pass so experiments stay deterministic and lighter on hardware.
+- The formatter exposes structured `EquationItem` objects, enabling docs, notebooks, and external tooling to embed the exact regressors and coefficients that define the trained model.
+
+#### Performance Improvements
+- Polynomial basis functions cache combination indices and build terms with vectorized multiplications and preallocated buffers, making high-degree NARX/NARMAX fits several times faster.
+- `predict` and regressor builders reuse exponent matrices and buffers, slashing allocations during simulations and long forecasts.
+- UOFR, ERR, `shift_column`, and Accelerated OLS now rely on BLAS-friendly slices/einsum operations, drastically reducing wall time on large datasets.
+
+#### API Changes
+- Official support now targets Python 3.10–3.14; Python 3.8/3.9 were removed to align with NumPy ≥2.0 and the latest PyTorch wheels, and CI matches the new matrix.
+- Mutual information metrics (`mutual_information_knn`, `conditional_mutual_information`) explicitly sort index selections, so epsilon computations remain deterministic across NumPy releases.
+- GitHub workflows were refreshed: PyTorch dependencies were bumped and coverage artifacts are published automatically for every pull request.
+
+#### Documentation & Website
+- Docs were reorganized under `docs/en`, `docs/es`, and `docs/pt`, now powered by `mkdocs-static-i18n`; the full book, developer guide, quickstart, and landing pages were translated into Portuguese, and Spanish home/landing pages received their own overrides.
+- Every tutorial/how-to notebook was migrated to Markdown so pages render consistently on mobile and translators can work directly on text diffs.
+- Added fresh how-to guides (custom basis functions, Neural NARX, saving/loading models, simulating existing models, extended least squares) plus expanded community support pages and README updates.
+- Landing pages feature brand-new CSS, color-aware sponsor logos, polished “Trusted by” blocks, and dedicated per-language templates.
+- Custom MkDocs hooks fetch live PePy download statistics and the latest PyPI version so the site surfaces up-to-date metrics automatically.
+
+#### Testing, Tooling & CI
+- Hundreds of new tests cover MetaMSS, OFRBase, AOLS, ERR, Neural NARX branches, simulation helpers, general estimators, and the equation formatter, ensuring deterministic fixtures.
+- Coverage results are now uploaded by CI, and secrets required to pull download metrics are wired into the docs pipeline.
+- Tooling updates (.gitignore, uv/venv allowances, refreshed linters) simplify local development.
+
+### IMPACT
+- Model equations can now be audited and embedded anywhere, Neural NARX experiments are reproducible, and vectorized regressors dramatically cut training and simulation time.
+- Localized documentation (English, Spanish, Portuguese) plus the translated book lower the entry barrier for new users around the world.
+
+### TESTING
+- The CI matrix exercises Python 3.10–3.14, pushes coverage summaries, and the enlarged pytest suite validates the formatter, MetaMSS, OFR/AOLS flows, simulation utilities, neural branches, and the MkDocs hooks.
+
 ## v0.6.0
 ### CONTRIBUTORS
 - wilsonrljr
