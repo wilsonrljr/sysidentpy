@@ -11,6 +11,12 @@ title: Histórico de Alterações
 
 ## Resumo das Versões Recentes
 
+### v0.7.0
+- Nova API `format_equation` para exportar as equações dos modelos de forma legível e consistente com a base usada.
+- Neural NARX ganhou `random_state` e fluxo de treinamento determinístico, facilitando comparações.
+- Ganhos expressivos de performance em Polynomial, ERR, UOFR e AOLS graças à vetorização completa.
+- Documentação totalmente reorganizada com suporte oficial a inglês, espanhol e português (incluindo livro traduzido e novos guias).
+
 ### v0.6.0
 - Introdução da classe `OFRBase` para algoritmos baseados em Error Reduction Ratio (ERR)
 - Implementação do algoritmo Ultra Orthogonal Forward Regression (UOFR)
