@@ -1,0 +1,1971 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://sysidentpy.org/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/book/0-Preface/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/0-Preface/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/0-Preface/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/0-Preface/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/book/0.1-Contents/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/0.1-Contents/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/0.1-Contents/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/0.1-Contents/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/book/1-Introduction/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/1-Introduction/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/1-Introduction/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/1-Introduction/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/book/10-Case-Studies/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/10-Case-Studies/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/10-Case-Studies/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/10-Case-Studies/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/book/2-NARMAX-Model-Representation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/2-NARMAX-Model-Representation/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/2-NARMAX-Model-Representation/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/2-NARMAX-Model-Representation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/book/3-Parameter-Estimation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/3-Parameter-Estimation/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/3-Parameter-Estimation/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/3-Parameter-Estimation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/book/4-Model-Structure-Selection/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/4-Model-Structure-Selection/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/4-Model-Structure-Selection/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/4-Model-Structure-Selection/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/book/5-Multiobjective-Parameter-Estimation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/5-Multiobjective-Parameter-Estimation/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/5-Multiobjective-Parameter-Estimation/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/5-Multiobjective-Parameter-Estimation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/book/6-Multiobjective-Model-Structure-Selection/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/6-Multiobjective-Model-Structure-Selection/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/6-Multiobjective-Model-Structure-Selection/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/6-Multiobjective-Model-Structure-Selection/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/book/7-NARX-Neural-Network/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/7-NARX-Neural-Network/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/7-NARX-Neural-Network/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/7-NARX-Neural-Network/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/book/8-Severely-Nonlinear-System-Identification/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/8-Severely-Nonlinear-System-Identification/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/8-Severely-Nonlinear-System-Identification/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/8-Severely-Nonlinear-System-Identification/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/book/9-Validation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/9-Validation/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/9-Validation/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/9-Validation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/changelog/changelog/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/changelog/changelog/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/changelog/changelog/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/changelog/changelog/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/community-support/community-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/community-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/community-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/community-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/community-support/get-help/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/get-help/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/get-help/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/get-help/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/community-support/meetups/ai-networks-meetup/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/meetups/ai-networks-meetup/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/meetups/ai-networks-meetup/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/meetups/ai-networks-meetup/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/community-support/meetups/estatidados/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/meetups/estatidados/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/meetups/estatidados/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/meetups/estatidados/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/community-support/meetups/gcom-meetup/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/meetups/gcom-meetup/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/meetups/gcom-meetup/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/meetups/gcom-meetup/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/community-support/meetups/nubank-meetup-open-source/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/meetups/nubank-meetup-open-source/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/meetups/nubank-meetup-open-source/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/meetups/nubank-meetup-open-source/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/community-support/meetups/nubank-meetup/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/meetups/nubank-meetup/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/meetups/nubank-meetup/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/meetups/nubank-meetup/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/developer-guide/contribute/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/developer-guide/contribute/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/developer-guide/contribute/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/developer-guide/contribute/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/developer-guide/documentation-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/developer-guide/documentation-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/developer-guide/documentation-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/developer-guide/documentation-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/developer-guide/how-to-add-a-translation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/developer-guide/how-to-add-a-translation/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/developer-guide/how-to-add-a-translation/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/developer-guide/how-to-add-a-translation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/developer-guide/how-to-write-a-how-to-guide/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/developer-guide/how-to-write-a-how-to-guide/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/developer-guide/how-to-write-a-how-to-guide/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/developer-guide/how-to-write-a-how-to-guide/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/developer-guide/how-to-write-a-tutorial/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/developer-guide/how-to-write-a-tutorial/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/developer-guide/how-to-write-a-tutorial/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/developer-guide/how-to-write-a-tutorial/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/getting-started/getting-started/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/getting-started/getting-started/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/getting-started/getting-started/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/getting-started/getting-started/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/getting-started/license/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/getting-started/license/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/getting-started/license/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/getting-started/license/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/getting-started/narmax-intro/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/getting-started/narmax-intro/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/getting-started/narmax-intro/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/getting-started/narmax-intro/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/getting-started/quickstart-guide/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/getting-started/quickstart-guide/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/getting-started/quickstart-guide/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/getting-started/quickstart-guide/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/landing-page/about-us/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/landing-page/about-us/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/landing-page/about-us/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/landing-page/about-us/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/landing-page/sponsor/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/landing-page/sponsor/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/landing-page/sponsor/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/landing-page/sponsor/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/API/aols/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/aols/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/aols/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/aols/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/API/basis-function/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/basis-function/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/basis-function/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/basis-function/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/API/entropic-regression/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/entropic-regression/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/entropic-regression/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/entropic-regression/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/API/frols/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/frols/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/frols/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/frols/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/API/general-estimators/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/general-estimators/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/general-estimators/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/general-estimators/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/API/metaheuristics/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/metaheuristics/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/metaheuristics/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/metaheuristics/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/API/metamss/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/metamss/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/metamss/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/metamss/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/API/metrics/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/metrics/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/metrics/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/metrics/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/API/multiobjective-parameter-estimation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/multiobjective-parameter-estimation/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/multiobjective-parameter-estimation/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/multiobjective-parameter-estimation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/API/narmax-base/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/narmax-base/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/narmax-base/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/narmax-base/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/API/neural-narx/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/neural-narx/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/neural-narx/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/neural-narx/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/API/ofr-base/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/ofr-base/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/ofr-base/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/ofr-base/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/API/parameter-estimation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/parameter-estimation/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/parameter-estimation/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/parameter-estimation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/API/residues/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/residues/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/residues/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/residues/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/API/simulation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/simulation/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/simulation/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/simulation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/API/uofr/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/uofr/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/uofr/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/uofr/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/API/utils/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/utils/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/utils/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/utils/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/how-to/create-a-narx-neural-network/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/how-to/create-a-narx-neural-network/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/how-to/create-a-narx-neural-network/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/how-to/create-a-narx-neural-network/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/how-to/create-custom-basis-function/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/how-to/create-custom-basis-function/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/how-to/create-custom-basis-function/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/how-to/create-custom-basis-function/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/how-to/save-and-load-models/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/how-to/save-and-load-models/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/how-to/save-and-load-models/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/how-to/save-and-load-models/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/how-to/set-specific-lags/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/how-to/set-specific-lags/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/how-to/set-specific-lags/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/how-to/set-specific-lags/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/how-to/simulating-existing-models/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/how-to/simulating-existing-models/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/how-to/simulating-existing-models/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/how-to/simulating-existing-models/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/how-to/use-extended-least-squares/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/how-to/use-extended-least-squares/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/how-to/use-extended-least-squares/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/how-to/use-extended-least-squares/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/NFIR-model-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/NFIR-model-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/NFIR-model-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/NFIR-model-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/PV-forecasting-benchmark/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/PV-forecasting-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/PV-forecasting-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/PV-forecasting-benchmark/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/air-passenger-benchmark/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/air-passenger-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/air-passenger-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/air-passenger-benchmark/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/aols-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/aols-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/aols-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/aols-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/basis-function-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/basis-function-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/basis-function-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/basis-function-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/coupled-eletric-device/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/coupled-eletric-device/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/coupled-eletric-device/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/coupled-eletric-device/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/electromechanical-system-identification-entropic-regression/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/electromechanical-system-identification-entropic-regression/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/electromechanical-system-identification-entropic-regression/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/electromechanical-system-identification-entropic-regression/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/electromechanical-system-identification-metamss/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/electromechanical-system-identification-metamss/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/electromechanical-system-identification-metamss/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/electromechanical-system-identification-metamss/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/electromechanical-system-identification-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/electromechanical-system-identification-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/electromechanical-system-identification-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/electromechanical-system-identification-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/f-16-aircraft-n-steps-ahead-prediction/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/f-16-aircraft-n-steps-ahead-prediction/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/f-16-aircraft-n-steps-ahead-prediction/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/f-16-aircraft-n-steps-ahead-prediction/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/f-16-aircraft/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/f-16-aircraft/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/f-16-aircraft/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/f-16-aircraft/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/fourier-NARX-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/fourier-NARX-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/fourier-NARX-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/fourier-NARX-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/general-NARX-models/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/general-NARX-models/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/general-NARX-models/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/general-NARX-models/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/importance-of-extended-least-squares/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/importance-of-extended-least-squares/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/importance-of-extended-least-squares/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/importance-of-extended-least-squares/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/information-criteria-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/information-criteria-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/information-criteria-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/information-criteria-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/load-forecasting-benchmark/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/load-forecasting-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/load-forecasting-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/load-forecasting-benchmark/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/m4-benchmark/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/m4-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/m4-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/m4-benchmark/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/model-with-multiple-inputs/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/model-with-multiple-inputs/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/model-with-multiple-inputs/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/model-with-multiple-inputs/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/modeling-a-magneto-rheological-damper-device/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/modeling-a-magneto-rheological-damper-device/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/modeling-a-magneto-rheological-damper-device/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/modeling-a-magneto-rheological-damper-device/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/multiobjective-parameter-estimation-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/multiobjective-parameter-estimation-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/multiobjective-parameter-estimation-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/multiobjective-parameter-estimation-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/parameter-estimation-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/parameter-estimation-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/parameter-estimation-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/parameter-estimation-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/silver-box-system/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/silver-box-system/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/silver-box-system/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/silver-box-system/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/wiener-hammerstein-system/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/wiener-hammerstein-system/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/wiener-hammerstein-system/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/wiener-hammerstein-system/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/your-first-model/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/your-first-model/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/your-first-model/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/your-first-model/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/chaotic-systems/logistic-map/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/chaotic-systems/logistic-map/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/chaotic-systems/logistic-map/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/chaotic-systems/logistic-map/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/user-guide/tutorials/chaotic-systems/lorenz-system/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/chaotic-systems/lorenz-system/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/chaotic-systems/lorenz-system/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/chaotic-systems/lorenz-system/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/book/0-Preface/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/0-Preface/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/0-Preface/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/0-Preface/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/book/0.1-Contents/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/0.1-Contents/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/0.1-Contents/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/0.1-Contents/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/book/1-Introduction/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/1-Introduction/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/1-Introduction/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/1-Introduction/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/book/10-Case-Studies/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/10-Case-Studies/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/10-Case-Studies/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/10-Case-Studies/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/book/2-NARMAX-Model-Representation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/2-NARMAX-Model-Representation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/2-NARMAX-Model-Representation/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/2-NARMAX-Model-Representation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/book/3-Parameter-Estimation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/3-Parameter-Estimation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/3-Parameter-Estimation/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/3-Parameter-Estimation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/book/4-Model-Structure-Selection/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/4-Model-Structure-Selection/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/4-Model-Structure-Selection/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/4-Model-Structure-Selection/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/book/5-Multiobjective-Parameter-Estimation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/5-Multiobjective-Parameter-Estimation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/5-Multiobjective-Parameter-Estimation/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/5-Multiobjective-Parameter-Estimation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/book/6-Multiobjective-Model-Structure-Selection/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/6-Multiobjective-Model-Structure-Selection/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/6-Multiobjective-Model-Structure-Selection/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/6-Multiobjective-Model-Structure-Selection/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/book/7-NARX-Neural-Network/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/7-NARX-Neural-Network/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/7-NARX-Neural-Network/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/7-NARX-Neural-Network/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/book/8-Severely-Nonlinear-System-Identification/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/8-Severely-Nonlinear-System-Identification/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/8-Severely-Nonlinear-System-Identification/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/8-Severely-Nonlinear-System-Identification/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/book/9-Validation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/9-Validation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/9-Validation/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/9-Validation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/changelog/changelog/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/changelog/changelog/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/changelog/changelog/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/changelog/changelog/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/community-support/community-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/community-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/community-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/community-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/community-support/get-help/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/get-help/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/get-help/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/get-help/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/community-support/meetups/ai-networks-meetup/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/meetups/ai-networks-meetup/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/meetups/ai-networks-meetup/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/meetups/ai-networks-meetup/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/community-support/meetups/estatidados/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/meetups/estatidados/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/meetups/estatidados/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/meetups/estatidados/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/community-support/meetups/gcom-meetup/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/meetups/gcom-meetup/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/meetups/gcom-meetup/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/meetups/gcom-meetup/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/community-support/meetups/nubank-meetup-open-source/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/meetups/nubank-meetup-open-source/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/meetups/nubank-meetup-open-source/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/meetups/nubank-meetup-open-source/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/community-support/meetups/nubank-meetup/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/meetups/nubank-meetup/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/meetups/nubank-meetup/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/meetups/nubank-meetup/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/developer-guide/contribute/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/developer-guide/contribute/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/developer-guide/contribute/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/developer-guide/contribute/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/developer-guide/documentation-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/developer-guide/documentation-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/developer-guide/documentation-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/developer-guide/documentation-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/developer-guide/how-to-add-a-translation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/developer-guide/how-to-add-a-translation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/developer-guide/how-to-add-a-translation/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/developer-guide/how-to-add-a-translation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/developer-guide/how-to-write-a-how-to-guide/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/developer-guide/how-to-write-a-how-to-guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/developer-guide/how-to-write-a-how-to-guide/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/developer-guide/how-to-write-a-how-to-guide/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/developer-guide/how-to-write-a-tutorial/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/developer-guide/how-to-write-a-tutorial/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/developer-guide/how-to-write-a-tutorial/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/developer-guide/how-to-write-a-tutorial/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/getting-started/getting-started/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/getting-started/getting-started/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/getting-started/getting-started/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/getting-started/getting-started/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/getting-started/license/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/getting-started/license/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/getting-started/license/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/getting-started/license/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/getting-started/narmax-intro/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/getting-started/narmax-intro/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/getting-started/narmax-intro/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/getting-started/narmax-intro/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/getting-started/quickstart-guide/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/getting-started/quickstart-guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/getting-started/quickstart-guide/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/getting-started/quickstart-guide/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/landing-page/about-us/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/landing-page/about-us/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/landing-page/about-us/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/landing-page/about-us/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/landing-page/sponsor/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/landing-page/sponsor/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/landing-page/sponsor/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/landing-page/sponsor/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/API/aols/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/aols/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/aols/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/aols/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/API/basis-function/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/basis-function/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/basis-function/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/basis-function/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/API/entropic-regression/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/entropic-regression/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/entropic-regression/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/entropic-regression/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/API/frols/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/frols/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/frols/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/frols/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/API/general-estimators/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/general-estimators/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/general-estimators/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/general-estimators/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/API/metaheuristics/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/metaheuristics/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/metaheuristics/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/metaheuristics/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/API/metamss/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/metamss/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/metamss/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/metamss/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/API/metrics/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/metrics/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/metrics/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/metrics/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/API/multiobjective-parameter-estimation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/multiobjective-parameter-estimation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/multiobjective-parameter-estimation/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/multiobjective-parameter-estimation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/API/narmax-base/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/narmax-base/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/narmax-base/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/narmax-base/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/API/neural-narx/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/neural-narx/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/neural-narx/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/neural-narx/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/API/ofr-base/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/ofr-base/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/ofr-base/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/ofr-base/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/API/parameter-estimation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/parameter-estimation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/parameter-estimation/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/parameter-estimation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/API/residues/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/residues/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/residues/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/residues/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/API/simulation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/simulation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/simulation/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/simulation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/API/uofr/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/uofr/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/uofr/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/uofr/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/API/utils/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/utils/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/utils/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/utils/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/how-to/create-a-narx-neural-network/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/how-to/create-a-narx-neural-network/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/how-to/create-a-narx-neural-network/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/how-to/create-a-narx-neural-network/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/how-to/create-custom-basis-function/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/how-to/create-custom-basis-function/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/how-to/create-custom-basis-function/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/how-to/create-custom-basis-function/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/how-to/save-and-load-models/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/how-to/save-and-load-models/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/how-to/save-and-load-models/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/how-to/save-and-load-models/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/how-to/set-specific-lags/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/how-to/set-specific-lags/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/how-to/set-specific-lags/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/how-to/set-specific-lags/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/how-to/simulating-existing-models/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/how-to/simulating-existing-models/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/how-to/simulating-existing-models/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/how-to/simulating-existing-models/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/how-to/use-extended-least-squares/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/how-to/use-extended-least-squares/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/how-to/use-extended-least-squares/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/how-to/use-extended-least-squares/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/NFIR-model-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/NFIR-model-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/NFIR-model-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/NFIR-model-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/PV-forecasting-benchmark/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/PV-forecasting-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/PV-forecasting-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/PV-forecasting-benchmark/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/air-passenger-benchmark/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/air-passenger-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/air-passenger-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/air-passenger-benchmark/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/aols-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/aols-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/aols-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/aols-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/basis-function-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/basis-function-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/basis-function-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/basis-function-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/coupled-eletric-device/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/coupled-eletric-device/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/coupled-eletric-device/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/coupled-eletric-device/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/electromechanical-system-identification-entropic-regression/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/electromechanical-system-identification-entropic-regression/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/electromechanical-system-identification-entropic-regression/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/electromechanical-system-identification-entropic-regression/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/electromechanical-system-identification-metamss/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/electromechanical-system-identification-metamss/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/electromechanical-system-identification-metamss/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/electromechanical-system-identification-metamss/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/electromechanical-system-identification-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/electromechanical-system-identification-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/electromechanical-system-identification-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/electromechanical-system-identification-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/f-16-aircraft-n-steps-ahead-prediction/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/f-16-aircraft-n-steps-ahead-prediction/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/f-16-aircraft-n-steps-ahead-prediction/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/f-16-aircraft-n-steps-ahead-prediction/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/f-16-aircraft/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/f-16-aircraft/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/f-16-aircraft/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/f-16-aircraft/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/fourier-NARX-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/fourier-NARX-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/fourier-NARX-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/fourier-NARX-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/general-NARX-models/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/general-NARX-models/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/general-NARX-models/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/general-NARX-models/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/importance-of-extended-least-squares/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/importance-of-extended-least-squares/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/importance-of-extended-least-squares/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/importance-of-extended-least-squares/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/information-criteria-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/information-criteria-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/information-criteria-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/information-criteria-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/load-forecasting-benchmark/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/load-forecasting-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/load-forecasting-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/load-forecasting-benchmark/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/m4-benchmark/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/m4-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/m4-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/m4-benchmark/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/model-with-multiple-inputs/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/model-with-multiple-inputs/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/model-with-multiple-inputs/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/model-with-multiple-inputs/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/modeling-a-magneto-rheological-damper-device/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/modeling-a-magneto-rheological-damper-device/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/modeling-a-magneto-rheological-damper-device/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/modeling-a-magneto-rheological-damper-device/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/multiobjective-parameter-estimation-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/multiobjective-parameter-estimation-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/multiobjective-parameter-estimation-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/multiobjective-parameter-estimation-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/parameter-estimation-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/parameter-estimation-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/parameter-estimation-overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/parameter-estimation-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/silver-box-system/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/silver-box-system/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/silver-box-system/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/silver-box-system/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/wiener-hammerstein-system/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/wiener-hammerstein-system/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/wiener-hammerstein-system/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/wiener-hammerstein-system/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/your-first-model/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/your-first-model/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/your-first-model/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/your-first-model/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/chaotic-systems/logistic-map/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/chaotic-systems/logistic-map/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/chaotic-systems/logistic-map/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/chaotic-systems/logistic-map/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/pt/user-guide/tutorials/chaotic-systems/lorenz-system/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/chaotic-systems/lorenz-system/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/chaotic-systems/lorenz-system/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/chaotic-systems/lorenz-system/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/book/0-Preface/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/0-Preface/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/0-Preface/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/0-Preface/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/book/0.1-Contents/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/0.1-Contents/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/0.1-Contents/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/0.1-Contents/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/book/1-Introduction/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/1-Introduction/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/1-Introduction/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/1-Introduction/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/book/10-Case-Studies/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/10-Case-Studies/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/10-Case-Studies/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/10-Case-Studies/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/book/2-NARMAX-Model-Representation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/2-NARMAX-Model-Representation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/2-NARMAX-Model-Representation/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/2-NARMAX-Model-Representation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/book/3-Parameter-Estimation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/3-Parameter-Estimation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/3-Parameter-Estimation/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/3-Parameter-Estimation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/book/4-Model-Structure-Selection/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/4-Model-Structure-Selection/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/4-Model-Structure-Selection/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/4-Model-Structure-Selection/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/book/5-Multiobjective-Parameter-Estimation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/5-Multiobjective-Parameter-Estimation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/5-Multiobjective-Parameter-Estimation/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/5-Multiobjective-Parameter-Estimation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/book/6-Multiobjective-Model-Structure-Selection/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/6-Multiobjective-Model-Structure-Selection/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/6-Multiobjective-Model-Structure-Selection/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/6-Multiobjective-Model-Structure-Selection/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/book/7-NARX-Neural-Network/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/7-NARX-Neural-Network/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/7-NARX-Neural-Network/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/7-NARX-Neural-Network/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/book/8-Severely-Nonlinear-System-Identification/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/8-Severely-Nonlinear-System-Identification/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/8-Severely-Nonlinear-System-Identification/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/8-Severely-Nonlinear-System-Identification/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/book/9-Validation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/book/9-Validation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/book/9-Validation/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/book/9-Validation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/changelog/changelog/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/changelog/changelog/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/changelog/changelog/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/changelog/changelog/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/community-support/community-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/community-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/community-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/community-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/community-support/get-help/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/get-help/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/get-help/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/get-help/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/community-support/meetups/ai-networks-meetup/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/meetups/ai-networks-meetup/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/meetups/ai-networks-meetup/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/meetups/ai-networks-meetup/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/community-support/meetups/estatidados/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/meetups/estatidados/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/meetups/estatidados/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/meetups/estatidados/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/community-support/meetups/gcom-meetup/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/meetups/gcom-meetup/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/meetups/gcom-meetup/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/meetups/gcom-meetup/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/community-support/meetups/nubank-meetup-open-source/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/meetups/nubank-meetup-open-source/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/meetups/nubank-meetup-open-source/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/meetups/nubank-meetup-open-source/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/community-support/meetups/nubank-meetup/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/community-support/meetups/nubank-meetup/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/community-support/meetups/nubank-meetup/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/community-support/meetups/nubank-meetup/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/developer-guide/contribute/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/developer-guide/contribute/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/developer-guide/contribute/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/developer-guide/contribute/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/developer-guide/documentation-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/developer-guide/documentation-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/developer-guide/documentation-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/developer-guide/documentation-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/developer-guide/how-to-add-a-translation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/developer-guide/how-to-add-a-translation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/developer-guide/how-to-add-a-translation/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/developer-guide/how-to-add-a-translation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/developer-guide/how-to-write-a-how-to-guide/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/developer-guide/how-to-write-a-how-to-guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/developer-guide/how-to-write-a-how-to-guide/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/developer-guide/how-to-write-a-how-to-guide/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/developer-guide/how-to-write-a-tutorial/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/developer-guide/how-to-write-a-tutorial/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/developer-guide/how-to-write-a-tutorial/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/developer-guide/how-to-write-a-tutorial/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/getting-started/getting-started/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/getting-started/getting-started/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/getting-started/getting-started/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/getting-started/getting-started/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/getting-started/license/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/getting-started/license/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/getting-started/license/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/getting-started/license/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/getting-started/narmax-intro/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/getting-started/narmax-intro/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/getting-started/narmax-intro/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/getting-started/narmax-intro/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/getting-started/quickstart-guide/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/getting-started/quickstart-guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/getting-started/quickstart-guide/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/getting-started/quickstart-guide/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/landing-page/about-us/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/landing-page/about-us/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/landing-page/about-us/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/landing-page/about-us/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/landing-page/sponsor/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/landing-page/sponsor/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/landing-page/sponsor/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/landing-page/sponsor/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/API/aols/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/aols/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/aols/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/aols/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/API/basis-function/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/basis-function/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/basis-function/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/basis-function/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/API/entropic-regression/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/entropic-regression/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/entropic-regression/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/entropic-regression/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/API/frols/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/frols/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/frols/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/frols/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/API/general-estimators/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/general-estimators/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/general-estimators/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/general-estimators/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/API/metaheuristics/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/metaheuristics/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/metaheuristics/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/metaheuristics/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/API/metamss/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/metamss/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/metamss/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/metamss/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/API/metrics/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/metrics/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/metrics/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/metrics/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/API/multiobjective-parameter-estimation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/multiobjective-parameter-estimation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/multiobjective-parameter-estimation/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/multiobjective-parameter-estimation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/API/narmax-base/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/narmax-base/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/narmax-base/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/narmax-base/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/API/neural-narx/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/neural-narx/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/neural-narx/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/neural-narx/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/API/ofr-base/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/ofr-base/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/ofr-base/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/ofr-base/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/API/parameter-estimation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/parameter-estimation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/parameter-estimation/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/parameter-estimation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/API/residues/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/residues/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/residues/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/residues/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/API/simulation/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/simulation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/simulation/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/simulation/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/API/uofr/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/uofr/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/uofr/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/uofr/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/API/utils/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/API/utils/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/API/utils/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/API/utils/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/how-to/create-a-narx-neural-network/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/how-to/create-a-narx-neural-network/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/how-to/create-a-narx-neural-network/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/how-to/create-a-narx-neural-network/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/how-to/create-custom-basis-function/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/how-to/create-custom-basis-function/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/how-to/create-custom-basis-function/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/how-to/create-custom-basis-function/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/how-to/save-and-load-models/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/how-to/save-and-load-models/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/how-to/save-and-load-models/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/how-to/save-and-load-models/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/how-to/set-specific-lags/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/how-to/set-specific-lags/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/how-to/set-specific-lags/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/how-to/set-specific-lags/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/how-to/simulating-existing-models/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/how-to/simulating-existing-models/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/how-to/simulating-existing-models/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/how-to/simulating-existing-models/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/how-to/use-extended-least-squares/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/how-to/use-extended-least-squares/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/how-to/use-extended-least-squares/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/how-to/use-extended-least-squares/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/NFIR-model-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/NFIR-model-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/NFIR-model-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/NFIR-model-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/PV-forecasting-benchmark/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/PV-forecasting-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/PV-forecasting-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/PV-forecasting-benchmark/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/air-passenger-benchmark/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/air-passenger-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/air-passenger-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/air-passenger-benchmark/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/aols-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/aols-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/aols-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/aols-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/basis-function-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/basis-function-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/basis-function-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/basis-function-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/coupled-eletric-device/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/coupled-eletric-device/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/coupled-eletric-device/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/coupled-eletric-device/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/electromechanical-system-identification-entropic-regression/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/electromechanical-system-identification-entropic-regression/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/electromechanical-system-identification-entropic-regression/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/electromechanical-system-identification-entropic-regression/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/electromechanical-system-identification-metamss/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/electromechanical-system-identification-metamss/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/electromechanical-system-identification-metamss/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/electromechanical-system-identification-metamss/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/electromechanical-system-identification-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/electromechanical-system-identification-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/electromechanical-system-identification-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/electromechanical-system-identification-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/f-16-aircraft-n-steps-ahead-prediction/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/f-16-aircraft-n-steps-ahead-prediction/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/f-16-aircraft-n-steps-ahead-prediction/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/f-16-aircraft-n-steps-ahead-prediction/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/f-16-aircraft/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/f-16-aircraft/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/f-16-aircraft/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/f-16-aircraft/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/fourier-NARX-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/fourier-NARX-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/fourier-NARX-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/fourier-NARX-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/general-NARX-models/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/general-NARX-models/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/general-NARX-models/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/general-NARX-models/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/importance-of-extended-least-squares/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/importance-of-extended-least-squares/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/importance-of-extended-least-squares/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/importance-of-extended-least-squares/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/information-criteria-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/information-criteria-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/information-criteria-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/information-criteria-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/load-forecasting-benchmark/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/load-forecasting-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/load-forecasting-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/load-forecasting-benchmark/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/m4-benchmark/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/m4-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/m4-benchmark/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/m4-benchmark/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/model-with-multiple-inputs/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/model-with-multiple-inputs/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/model-with-multiple-inputs/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/model-with-multiple-inputs/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/modeling-a-magneto-rheological-damper-device/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/modeling-a-magneto-rheological-damper-device/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/modeling-a-magneto-rheological-damper-device/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/modeling-a-magneto-rheological-damper-device/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/multiobjective-parameter-estimation-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/multiobjective-parameter-estimation-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/multiobjective-parameter-estimation-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/multiobjective-parameter-estimation-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/parameter-estimation-overview/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/parameter-estimation-overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/parameter-estimation-overview/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/parameter-estimation-overview/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/silver-box-system/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/silver-box-system/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/silver-box-system/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/silver-box-system/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/wiener-hammerstein-system/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/wiener-hammerstein-system/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/wiener-hammerstein-system/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/wiener-hammerstein-system/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/your-first-model/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/your-first-model/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/your-first-model/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/your-first-model/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/chaotic-systems/logistic-map/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/chaotic-systems/logistic-map/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/chaotic-systems/logistic-map/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/chaotic-systems/logistic-map/"/>
+    </url>
+    <url>
+        <loc>https://sysidentpy.org/es/user-guide/tutorials/chaotic-systems/lorenz-system/</loc>
+        <lastmod>2025-11-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://sysidentpy.org/es/user-guide/tutorials/chaotic-systems/lorenz-system/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sysidentpy.org/user-guide/tutorials/chaotic-systems/lorenz-system/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://sysidentpy.org/pt/user-guide/tutorials/chaotic-systems/lorenz-system/"/>
+    </url>
+</urlset>
