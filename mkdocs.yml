@@ -118,9 +118,89 @@ plugins:
           site_description: De Métodos Clássicos a Redes Neurais
           theme:
             docs_dir: docs/pt/
-            custom_dir: docs/pt/
+            custom_dir: docs/en/
             site_dir: site/pt/
             logo: overrides/assets/img/logotype-sysidentpy.svg
+            language: pt
+          nav_translations:
+            Home: Início
+            Getting started: Primeiros Passos
+            User guide: Guia
+            Companion Book: Livro
+            Developer guide: Contribuir
+            Community & Support: Comunidade
+            About: Sobre
+            Changelog: Changelog
+            Sponsors: Apoie
+            Overview: Visão Geral
+            Quickstart Guide: Guia Rápido
+            Introduction to NARMAX: Introdução ao NARMAX
+            License: Licença
+            Tutorials: Tutoriais
+            How to: Como fazer
+            API: API
+            How to contribute: Como contribuir
+            Documentation: Documentação
+            Documentation Overview: Visão Geral da Documentação
+            How To Write a Tutorial: Como Escrever um Tutorial
+            How To Write a How-to Guide: Como Escrever um Guia How-to
+            How to Add a Translation: Como Adicionar uma Tradução
+            community-overview: Visão Geral da Comunidade
+            Get Help: Obter Ajuda
+            Meetups: Palestras
+            AI Networks Meetup: AI Networks Meetup
+            Nubank Timeseries Meetup: Nubank Meetup - Séries Temporais
+            Nubank Open Source Talk: Nubank Meetup - Open Source
+            GCoM Meetup: GCoM Meetup
+            Estatidados Meetup: Estatidados Meetup
+            Features: Funcionalidades
+            Your First Model: Seu Primeiro Modelo
+            Model with Multiple Inputs: Modelo com Múltiplas Entradas
+            Parameter Estimation - Overview: Estimação de Parâmetros - Visão Geral
+            Basis Function - Overview: Funções Base - Visão Geral
+            Information Criteria - Overview: Critérios de Informação - Visão Geral
+            Create a Custom Basis Function: Criar uma Função Base Customizada
+            Create a Neural NARX Network: Criar uma Rede Neural NARX
+            Save and Load Models: Salvar e Carregar Modelos
+            Set Specific Lags: Definir Lags Específicos
+            Simulating Existing Models: Simular Modelos Existentes
+            Use Extended Least Squares: Usar Extended Least Squares
+            General NARX Models - Overview: Modelos NARX Gerais - Visão Geral
+            Fourier NARX - Overview: Fourier NARX - Visão Geral
+            AOLS - Overview: AOLS - Visão Geral
+            NFIR - Overview: NFIR - Visão Geral
+            Importance of Extended Least Squares: Importância do Extended Least Squares
+            Electrical and Mechanical Systems: Sistemas Elétricos e Mecânicos
+            Modeling a Magneto-Rheological Damper Device: Modelagem de um Dispositivo Amortecedor Magneto-Reológico
+            Silver Box System: Sistema Silver Box
+            Coupled Electric Device: Dispositivo Elétrico Acoplado
+            Wiener-Hammerstein System: Sistema Wiener-Hammerstein
+            F-16 Aircraft: Aeronave F-16
+            F-16 Aircraft - N-Steps Ahead Prediction: Aeronave F-16 - Previsão N Passos à Frente
+            Electromechanical System Identification - Overview: Identificação de Sistema Eletromecânico - Visão Geral
+            Electromechanical System Identification - MetaMSS: Identificação de Sistema Eletromecânico - MetaMSS
+            Electromechanical System Identification - Entropic Regression: Identificação de Sistema Eletromecânico - Entropic Regression
+            Multiobjective Parameter Estimation - Overview: Estimação de Parâmetros Multiobjetivo - Visão Geral
+            Industrial and Corporate: Industriais e Corporativos
+            M4 Benchmark: M4 Benchmark
+            Air Passenger Benchmark: Air Passenger Benchmark
+            Load Forecasting Benchmark: Previsão de Carga - Benchmark
+            PV Forecasting Benchmark: Previsão Fotovoltaica - Benchmark
+            Chaotic Systems: Sistemas Caóticos
+            Lorenz System: Sistema de Lorenz
+            Logistic Map: Mapa Logístico
+            Preface: Prefácio
+            Contents: Sumário
+            Introduction: Introdução
+            2. NARMAX Model Representation: 2. Representação do Modelo NARMAX
+            3. Parameter Estimation: 3. Estimação de Parâmetros
+            4. Model Structure Selection: 4. Seleção de Estrutura de Modelo
+            5. Multiobjective Parameter Estimation: 5. Estimação de Parâmetros Multiobjetivo
+            6. Multiobjective Model Structure Selection: 6. Seleção de Estrutura de Modelo Multiobjetivo
+            7. NARX Neural Network: 7. Rede Neural NARX
+            8. Severely Nonlinear System Identification: 8. Identificação de Sistemas Severamente Não Lineares
+            9. Validation: 9. Validação
+            10. Case Studies: 10. Estudos de Caso
         - locale: es
           name: Español
           build: true
