@@ -189,6 +189,18 @@ plugins:
             Chaotic Systems: Sistemas Caóticos
             Lorenz System: Sistema de Lorenz
             Logistic Map: Mapa Logístico
+            Preface: Prefácio
+            Contents: Sumário
+            Introduction: Introdução
+            2. NARMAX Model Representation: 2. Representação do Modelo NARMAX
+            3. Parameter Estimation: 3. Estimação de Parâmetros
+            4. Model Structure Selection: 4. Seleção de Estrutura de Modelo
+            5. Multiobjective Parameter Estimation: 5. Estimação de Parâmetros Multiobjetivo
+            6. Multiobjective Model Structure Selection: 6. Seleção de Estrutura de Modelo Multiobjetivo
+            7. NARX Neural Network: 7. Rede Neural NARX
+            8. Severely Nonlinear System Identification: 8. Identificação de Sistemas Severamente Não Lineares
+            9. Validation: 9. Validação
+            10. Case Studies: 10. Estudos de Caso
         - locale: es
           name: Español
           build: true
