@@ -42,7 +42,9 @@ You can also define advanced NARX models such as Bayesian and Gradient Boosting 
 - Meta-model Structure Selection (MeMoSS)
 - Accelerated Orthogonal Least Squares (AOLS)
 - Entropic Regression
-- Ultra Orthogonal Least Squares (UOLS)
+- Ultra Orthogonal Forward Regression (UOFR)
+- Robust Model Structure Selection (RMSS)
+- Orthogonal Floating Search (OSF, OIF, OOS/O2S)
 
 ### Parameter Estimation Methods
 - Least Squares (LS)

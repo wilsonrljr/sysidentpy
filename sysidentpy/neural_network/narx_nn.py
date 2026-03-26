@@ -12,10 +12,14 @@ from collections.abc import Mapping
 from typing import Optional
 
 import numpy as np
-import torch
-import torch.nn.functional as F
-from torch import optim
-from torch.utils.data import DataLoader, TensorDataset
+
+try:
+    import torch
+    import torch.nn.functional as F
+    from torch import optim
+    from torch.utils.data import DataLoader, TensorDataset
+except ImportError:
+    torch = None  # type: ignore[assignment]
 
 from ..narmax_base import BaseMSS
 from ..basis_function import Polynomial
@@ -215,6 +219,12 @@ class NARXNN(BaseMSS):
         shuffle_batches=False,
         random_state: Optional[int] = None,
     ):
+        if torch is None:
+            raise ImportError(
+                "PyTorch is required for NARXNN. "
+                "Install it with: pip install sysidentpy[all]"
+            )
+
         self.ylag = ylag
         self.xlag = xlag
         self.basis_function = basis_function
@@ -649,21 +659,20 @@ class NARXNN(BaseMSS):
                         result = self._n_step_ahead_prediction(
                             X, y, steps_ahead=steps_ahead
                         )
+                elif steps_ahead is None:
+                    result = self._basis_function_predict(
+                        X, y, forecast_horizon=forecast_horizon
+                    )
+                elif steps_ahead == 1:
+                    result = self._one_step_ahead_prediction(X, y)
                 else:
-                    if steps_ahead is None:
-                        result = self._basis_function_predict(
-                            X, y, forecast_horizon=forecast_horizon
-                        )
-                    elif steps_ahead == 1:
-                        result = self._one_step_ahead_prediction(X, y)
-                    else:
-                        check_positive_int(steps_ahead, "steps_ahead")
-                        result = self._basis_function_n_step_prediction(
-                            X,
-                            y,
-                            steps_ahead=steps_ahead,
-                            forecast_horizon=forecast_horizon,
-                        )
+                    check_positive_int(steps_ahead, "steps_ahead")
+                    result = self._basis_function_n_step_prediction(
+                        X,
+                        y,
+                        steps_ahead=steps_ahead,
+                        forecast_horizon=forecast_horizon,
+                    )
         finally:
             if was_training:
                 self.net.train()
@@ -792,7 +801,8 @@ class NARXNN(BaseMSS):
         else:
             if forecast_horizon is None:
                 raise ValueError(
-                    "forecast_horizon cannot be None when x is None for NARXNN prediction"
+                    "forecast_horizon cannot be None when x is None"
+                    " for NARXNN prediction"
                 )
             forecast_horizon = forecast_horizon + self.max_lag
 

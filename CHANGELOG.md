@@ -1,5 +1,47 @@
 # Changes in SysIdentPy
 
+## v0.8.0
+
+### CONTRIBUTORS
+
+- Wilson Rocha Lacerda Junior (wilsonrljr)
+
+### CHANGES
+
+This release adds two new families of model structure selection algorithms, fixes to UOFR, and comprehensive documentation and configuration updates.
+
+- **New Features:**
+    - Added `RMSS` (Robust Model Structure Selection), a new algorithm for selecting model structure using the Overall Mean Absolute Error (OMAE) criterion with leave-one-out resampling by default. Designed for robustness on small sample sizes and multiple datasets. Based on the paper by Gu, Y., & Wei, H.-L., "A Robust Model Structure Selection Method for Small Sample Size and Multiple Datasets Problems." Fully compatible with existing SysIdentPy estimators and basis functions.
+    - Added the Orthogonal Floating Search family of algorithms: `OSF` (Orthogonal Sequential Floating Forward), `OIF` (Orthogonal Insertion-removal Floating search), `OOS` (Orthogonal Oscillating Search), and `O2S` (alias for OOS). These algorithms combine orthogonal projections with the Error Reduction Ratio (ERR) criterion and floating feature selection strategies. Drop-in compatible with existing SysIdentPy API.
+
+- **Bug Fixes / Improvements:**
+    - Fixed UOFR Sobolev augmentation to match the original paper equations.
+    - Improved UOFR performance with BLAS-level block operations and einsum.
+
+- **Testing:**
+    - Added comprehensive test suites for RMSS and OFS algorithms.
+    - Expanded UOFR tests including depth-based coverage for repeated swing failures.
+
+- **Documentation & Configuration:**
+    - Added API documentation pages for RMSS and Orthogonal Floating Search algorithms.
+    - Updated quickstart guides (EN, PT, ES) to list all available MSS algorithms.
+    - Fixed outdated Python and NumPy version requirements in README.
+    - Fixed changelog URL in pyproject.toml (master → main).
+    - Updated Black target_version to match supported Python versions (3.10–3.14).
+    - Removed deprecated Ruff `ignore-init-module-imports` setting.
+    - Widened dev dependency version pins for pytest and pytest-cov.
+    - Added graceful import guard for optional PyTorch dependency.
+    - Upgraded `actions/setup-python` to v5 in CI workflow.
+    - Updated copyright year to 2026.
+
+### IMPACT
+
+Two new families of model structure selection algorithms expand the toolkit available to researchers and practitioners. RMSS addresses the important problem of robust model selection with small datasets, while the OFS family provides flexible floating search strategies for model term selection.
+
+### TESTING
+
+Expanded test suites cover all new algorithms. The CI matrix continues to test against Python 3.10–3.14.
+
 ## v0.7.0
 
 ### CONTRIBUTORS

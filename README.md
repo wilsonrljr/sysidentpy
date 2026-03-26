@@ -67,8 +67,8 @@ pip install sysidentpy
 
 `SysIdentPy` requires:
 
-- Python (>= 3.8) (3.7 works for everything except for 3 parameter estimation methods)
-- NumPy (>= 1.9.2) for numerical algorithms
+- Python (>= 3.10)
+- NumPy (>= 1.19.2) for numerical algorithms
 - Matplotlib >= 3.3.2 for static plotting and visualizations
 - Pytorch (>=1.7.1) for building NARX neural networks
 - scipy (>= 1.8.0) for numerical and optimization algorithms
@@ -82,7 +82,7 @@ For more details, check our [installation guide](https://sysidentpy.org/getting-
 | Feature | What is this? |
 |----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | NARMAX philosophy | You can build variations of NARMAX models like NARX, NAR, NARMA, NFIR, ARMA, ARX, AR, and others. |
-| Model Structure Selection | Easy-to-use methods to select the best terms to build your models, including FROLS and MetaMSS and several combinations with parameter estimation techniques to select the model terms. |
+| Model Structure Selection | Easy-to-use methods to select the best terms to build your models, including FROLS, MetaMSS, AOLS, UOFR, Entropic Regression, RMSS, and Orthogonal Floating Search (OSF, OIF, OOS/O2S), with several combinations with parameter estimation techniques to select the model terms. |
 | Basis Function | You can use up to 8 different basis functions to build your models. You can set linear and nonlinear basis functions and ensemble them to get custom NARMAX models. |
 | Parameter Estimation | More than 15 methods to estimate the model parameters and test different structure selection scenarios. |
 | Multiobjective Parameter Estimation | You can use affine information to estimate the model parameters minimizing different objective functions. |

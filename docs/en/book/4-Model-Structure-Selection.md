@@ -1506,3 +1506,48 @@ plot_results(y=y_valid, yhat=yhat, n=1000)
 
 ![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/er_example_c4.png?raw=true)
 > Figure 19. Free Run Simulation for the model fitted using Entropic Regression algorithm.
+
+## Additional Model Structure Selection Methods
+
+In addition to the methods described above, SysIdentPy provides two more families of model structure selection algorithms.
+
+### Robust Model Structure Selection (RMSS)
+
+The RMSS algorithm addresses the challenge of model structure selection when working with small sample sizes or multiple datasets. Rather than relying on a single training/validation split, RMSS uses a resampling strategy (leave-one-out by default) to evaluate candidate model structures across multiple data partitions. The final model is selected based on the Overall Mean Absolute Error (OMAE), which provides a more robust assessment of model quality than single-split approaches.
+
+This method is particularly useful in scenarios where data is scarce or when the model needs to generalize across different operating conditions. For details, see: Gu, Y., & Wei, H.-L., "A Robust Model Structure Selection Method for Small Sample Size and Multiple Datasets Problems."
+
+```python
+from sysidentpy.model_structure_selection import RMSS
+
+model = RMSS(
+    ylag=2,
+    xlag=2,
+    basis_function=basis_function,
+)
+model.fit(X=x_train, y=y_train)
+yhat = model.predict(X=x_valid, y=y_valid)
+```
+
+### Orthogonal Floating Search (OSF, OIF, OOS/O2S)
+
+The Orthogonal Floating Search family combines orthogonal projections with floating feature selection strategies. Unlike FROLS, which adds terms greedily one at a time, floating search methods can revisit and remove previously selected terms, potentially finding better model structures.
+
+SysIdentPy implements four variants:
+
+- **OSF** (Orthogonal Sequential Floating Forward): adds terms sequentially and conditionally removes the least significant ones.
+- **OIF** (Orthogonal Insertion-removal Floating search): extends OSF with a swap step that can replace existing terms.
+- **OOS** (Orthogonal Oscillating Search): alternates between forward addition and backward removal phases.
+- **O2S**: an alias for OOS.
+
+```python
+from sysidentpy.model_structure_selection import OSF
+
+model = OSF(
+    ylag=2,
+    xlag=2,
+    basis_function=basis_function,
+)
+model.fit(X=x_train, y=y_train)
+yhat = model.predict(X=x_valid, y=y_valid)
+```

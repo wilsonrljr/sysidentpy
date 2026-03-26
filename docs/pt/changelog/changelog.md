@@ -5,6 +5,43 @@ title: Histórico de Alterações
 
 # Alterações no SysIdentPy
 
+## v0.8.0
+### COLABORADORES
+- Wilson Rocha Lacerda Junior (wilsonrljr)
+
+### MUDANÇAS
+Esta versão adiciona duas novas famílias de algoritmos de seleção de estrutura de modelo, correções no UOFR e atualizações abrangentes de documentação e configuração.
+
+#### Novos Recursos
+- Adicionado `RMSS` (Robust Model Structure Selection), um novo algoritmo para seleção de estrutura de modelo usando o critério OMAE (Overall Mean Absolute Error) com reamostragem leave-one-out por padrão. Projetado para robustez em amostras pequenas e múltiplos conjuntos de dados. Baseado no artigo de Gu, Y., & Wei, H.-L., "A Robust Model Structure Selection Method for Small Sample Size and Multiple Datasets Problems."
+- Adicionada a família de algoritmos Orthogonal Floating Search: `OSF` (Orthogonal Sequential Floating Forward), `OIF` (Orthogonal Insertion-removal Floating search), `OOS` (Orthogonal Oscillating Search) e `O2S` (alias para OOS). Esses algoritmos combinam projeções ortogonais com o critério ERR (Error Reduction Ratio) e estratégias de busca flutuante.
+
+#### Correções / Melhorias
+- Corrigida a aumentação de Sobolev no UOFR para corresponder às equações do artigo original.
+- Melhorado o desempenho do UOFR com operações em bloco BLAS e einsum.
+
+#### Testes
+- Adicionados conjuntos de testes abrangentes para RMSS e algoritmos OFS.
+- Expandidos testes do UOFR incluindo cobertura baseada em profundidade para falhas de swing repetidas.
+
+#### Documentação & Configuração
+- Adicionadas páginas de documentação da API para RMSS e Orthogonal Floating Search.
+- Atualizados guias de início rápido (EN, PT, ES) para listar todos os algoritmos MSS disponíveis.
+- Corrigidos requisitos de versão desatualizados de Python e NumPy no README.
+- Corrigida URL do changelog no pyproject.toml (master → main).
+- Atualizado Black target_version para corresponder às versões suportadas de Python (3.10–3.14).
+- Removida configuração deprecada `ignore-init-module-imports` do Ruff.
+- Ampliados limites de versão de dependências de desenvolvimento para pytest e pytest-cov.
+- Adicionado guard de importação para dependência opcional do PyTorch.
+- Atualizado `actions/setup-python` para v5 no workflow de CI.
+- Atualizado ano de copyright para 2026.
+
+### IMPACTO
+Duas novas famílias de algoritmos de seleção de estrutura de modelo expandem o conjunto de ferramentas disponíveis para pesquisadores e profissionais. O RMSS aborda o importante problema de seleção robusta de modelos com conjuntos de dados pequenos, enquanto a família OFS fornece estratégias flexíveis de busca flutuante para seleção de termos do modelo.
+
+### TESTES
+Conjuntos de testes expandidos cobrem todos os novos algoritmos. A matriz de CI continua testando contra Python 3.10–3.14.
+
 ## v0.7.0
 ### COLABORADORES
 - Wilson Rocha Lacerda Junior (wilsonrljr)
