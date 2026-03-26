@@ -363,7 +363,7 @@ The following example is a polynomial ARX model:
 
 $$
 \begin{align}
-  y_k =& 0.7213y_{k-1}-0.5692y_{k-2}+0.1139x_{k-1} -0.1691x_{k-1}
+  y_k =& 0.7213y_{k-1}-0.5692y_{k-2}+0.1139x_{k-1} -0.1691x_{k-2}
 \end{align}
 \tag{2.9}
 $$
