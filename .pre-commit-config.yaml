@@ -35,8 +35,8 @@ repos:
         # pre-commit's default_language_version, see
         # https://pre-commit.com/#top_level-default_language_version
         language_version: python3.12
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.11.0
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.12
     hooks:
       - id: ruff
         types_or: [python] # you can add notebook and other files using pyi, jupyter

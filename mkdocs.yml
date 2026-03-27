@@ -8,7 +8,7 @@ repo_url: https://github.com/wilsonrljr/sysidentpy
 edit_uri: edit/main/docs/
 
 # Copyright
-copyright: Copyright &copy; 2016 - 2025 Wilson Rocha
+copyright: Copyright &copy; 2016 - 2026 Wilson Rocha
 
 # Configuration
 theme:
@@ -347,6 +347,8 @@ nav:
           - AOLS: user-guide/API/aols.md
           - UOFR: user-guide/API/uofr.md
           - Entropic Regression: user-guide/API/entropic-regression.md
+          - RMSS: user-guide/API/rmss.md
+          - Orthogonal Floating Search: user-guide/API/orthogonal-floating-search.md
           - Neural NARX: user-guide/API/neural-narx.md
           - General Estimators: user-guide/API/general-estimators.md
           - Parameter Estimation: user-guide/API/parameter-estimation.md

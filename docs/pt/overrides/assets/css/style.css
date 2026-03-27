@@ -48,8 +48,9 @@ html {
 }
 .container {
     width: 100%;
-    max-width: 90vw;
+    max-width: 1200px;
     margin: 0 auto;
+    padding: 0 2rem;
 }
 .row {
     display: flex;
@@ -115,26 +116,9 @@ html {
 }
 
 #hero .container {
-    max-width: 70vw;
     padding: 2rem 3rem;
     margin: 2rem auto;
     position: relative;
-}
-#hero .container::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    height: 100%;
-    width: 2px;
-    background: linear-gradient(
-        transparent 0%,
-        #ef7e16 25%,
-        #f7930f 50%,
-        #ffa802 75%,
-        transparent 100%
-    );
 }
 #hero .row {
     display: flex;
@@ -200,7 +184,7 @@ html {
 }
 .browser {
     background: #1f2123;
-    max-width: 60vw;
+    max-width: 1100px;
     margin: 0 auto;
     position: relative;
     border-radius: 5px;
@@ -411,26 +395,9 @@ line#SvgjsLine1017 {
 }
 
 #features .container {
-    max-width: 60vw;
     padding: 2rem 3rem;
     margin: 2rem auto;
     position: relative;
-}
-#features .container::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    height: 100%;
-    width: 2px;
-    background: linear-gradient(
-        transparent 0%,
-        #ef7e16 25%,
-        #f7930f 50%,
-        #ffa802 75%,
-        transparent 100%
-    );
 }
 .grid-features {
     display: flex;
@@ -547,7 +514,7 @@ ul.list-contributors li:nth-last-child(1) a::after {
 
 #big-numbers {
     padding: 1.5rem 0;
-    background: linear-gradient(135deg, rgba(240, 126, 25, 0.05) 0%, rgba(255, 168, 0, 0.05) 100%);
+    background: rgba(130, 139, 149, 0.03);
 }
 #big-numbers .row {
     flex-direction: column;
@@ -579,33 +546,17 @@ ul.list-contributors li:nth-last-child(1) a::after {
     max-width: 205px;
     padding: 1rem 0.9rem;
     background: var(--new-color-background);
-    border: 2px solid rgba(240, 126, 25, 0.2);
+    border: 2px solid rgba(130, 139, 149, 0.15);
     border-radius: 12px;
     transition: all 0.4s ease;
     position: relative;
     overflow: hidden;
 }
 
-.stat-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #f07e19, #ffa800);
-    transform: scaleX(0);
-    transition: transform 0.4s ease;
-}
-
-.stat-card:hover::before {
-    transform: scaleX(1);
-}
-
 .stat-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 50px rgba(240, 126, 25, 0.2);
-    border-color: rgba(240, 126, 25, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border-color: rgba(130, 139, 149, 0.3);
 }
 
 .stat-icon {
@@ -626,8 +577,7 @@ ul.list-contributors li:nth-last-child(1) a::after {
 }
 
 .stat-card:hover .stat-icon {
-    transform: scale(1.1) rotate(10deg);
-    background: linear-gradient(135deg, rgba(240, 126, 25, 0.2) 0%, rgba(255, 168, 0, 0.2) 100%);
+    background: linear-gradient(135deg, rgba(240, 126, 25, 0.15) 0%, rgba(255, 168, 0, 0.15) 100%);
 }
 
 .stat-number {
@@ -731,29 +681,12 @@ ul.list-contributors li:nth-last-child(1) a::after {
 }
 
 #recents-post .container {
-    max-width: 60vw;
     padding: 1rem 3rem;
     margin: 1rem auto;
     position: relative;
 }
 #recents-post .row {
     align-items: center;
-}
-#recents-post .container::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    height: 100%;
-    width: 2px;
-    background: linear-gradient(
-        transparent 0%,
-        #ef7e16 25%,
-        #f7930f 50%,
-        #ffa802 75%,
-        transparent 100%
-    );
 }
 #recents-post h2 {
     font-weight: 500;
@@ -1093,29 +1026,16 @@ footer a {
     padding: 2rem;
 }
 @media (min-width: 1440px) {
-    .browser {
-        max-width: 1400px !important;
-    }
-
     .container {
-        max-width: 1600px !important;
+        max-width: 1400px;
     }
-    #features .container {
-        max-width: 1300px !important;
+    .browser {
+        max-width: 1300px;
     }
 }
 @media (max-width: 1440px) {
-    .browser {
-        max-width: 70vw;
-    }
-    #hero .container {
-        max-width: 80vw;
-    }
     #hero .col:nth-child(1) {
         flex: 0 0 70%;
-    }
-    #features .container {
-        max-width: 80vw;
     }
     ul.list-contributors img {
         width: 70px;
@@ -1128,9 +1048,6 @@ footer a {
     .box-testimonial img {
         width: 125px;
         height: 125px;
-    }
-    #recents-post .container {
-        max-width: 80vw;
     }
     footer .row:nth-child(2) {
         margin-top: 25px;

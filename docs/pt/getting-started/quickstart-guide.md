@@ -42,7 +42,9 @@ Você também pode definir modelos NARX como Bayesian e Gradient Boosting usando
 - Meta-model Structure Selection (MeMoSS / MetaMSS)
 - Accelerated Orthogonal Least Squares (AOLS)
 - Entropic Regression (ER)
-- Ultra Orthogonal Least Squares (UOLS)
+- Ultra Orthogonal Forward Regression (UOFR)
+- Robust Model Structure Selection (RMSS)
+- Orthogonal Floating Search (OSF, OIF, OOS/O2S)
 
 ### Métodos de Estimação de Parâmetros
 - Mínimos Quadrados (MQ)
