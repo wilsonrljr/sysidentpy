@@ -11,6 +11,7 @@ from .._lib._array_api import (
     _concat,
     _copy,
     _is_numpy_namespace,
+    _set_element,
     _to_numpy,
     _vector_norm,
     get_namespace,
@@ -262,7 +263,7 @@ class AOLS(BaseMSS):
                 contribution[~np.isfinite(contribution)] = 0
             else:
                 for si in sub_ind:
-                    contribution = contribution.at[si].set(0.0)
+                    contribution = _set_element(xp, contribution, si, 0.0)
                 contribution = xp.where(
                     xp.isfinite(contribution), contribution,
                     xp.zeros_like(contribution)

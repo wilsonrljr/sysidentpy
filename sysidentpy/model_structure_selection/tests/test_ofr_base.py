@@ -480,3 +480,21 @@ def test_predict_polynomial_preserves_array_api_namespace():
         _to_numpy(result),
         np.array([[0.0], [2.0], [2.0], [2.0]]),
     )
+
+
+def test_error_reduction_ratio_accepts_torch_tensors():
+    torch = pytest.importorskip("torch")
+    rng = np.random.default_rng(12345)
+    psi = torch.tensor(rng.normal(size=(24, 6)), dtype=torch.float64)
+    y = torch.tensor(rng.normal(size=(26, 1)), dtype=torch.float64)
+    model = MockOFRBase()
+
+    with config_context(array_api_dispatch=True):
+        err, piv, psi_orthogonal = model.error_reduction_ratio(psi, y, 4)
+
+    assert isinstance(err, torch.Tensor)
+    assert isinstance(piv, torch.Tensor)
+    assert isinstance(psi_orthogonal, torch.Tensor)
+    assert err.shape == (psi.shape[1],)
+    assert piv.shape == (4,)
+    assert psi_orthogonal.shape == (psi.shape[0], 4)

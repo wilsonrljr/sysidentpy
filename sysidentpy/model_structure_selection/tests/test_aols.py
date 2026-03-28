@@ -219,6 +219,23 @@ def test_predict_polynomial_preserves_array_api_namespace():
     )
 
 
+def test_fit_predict_accepts_torch_tensors_under_array_api_dispatch():
+    torch = pytest.importorskip("torch")
+    model = AOLS(ylag=[1, 2], xlag=2, basis_function=Polynomial(degree=2))
+    x_train_t = torch.tensor(X_train, dtype=torch.float64)
+    y_train_t = torch.tensor(y_train, dtype=torch.float64)
+    x_test_t = torch.tensor(X_test, dtype=torch.float64)
+    y_test_t = torch.tensor(y_test, dtype=torch.float64)
+
+    with config_context(array_api_dispatch=True):
+        model.fit(X=x_train_t, y=y_train_t)
+        yhat = model.predict(X=x_test_t, y=y_test_t)
+
+    assert isinstance(yhat, torch.Tensor)
+    assert_equal(tuple(yhat.shape), y_test.shape)
+    assert_equal(_to_numpy(yhat[: model.max_lag]), y_test[: model.max_lag])
+
+
 def test_predict_polynomial_multi_step_returns_prediction():
     model = AOLS(ylag=[1, 2], xlag=2, basis_function=Polynomial(degree=2))
     model.fit(X=X_train, y=y_train)

@@ -14,7 +14,13 @@ from sysidentpy.narmax_base import house, rowhouse
 from sysidentpy.utils.information_matrix import build_lagged_matrix
 from sysidentpy.utils.check_arrays import check_positive_int, num_features
 
-from .._lib._array_api import get_namespace, _is_numpy_namespace, _copy, _concat
+from .._lib._array_api import (
+    _concat,
+    _copy,
+    _is_numpy_namespace,
+    _set_element,
+    get_namespace,
+)
 from .._lib._err import _compute_err_slice
 from ..basis_function import Fourier, Polynomial
 from ..narmax_base import BaseMSS
@@ -491,8 +497,8 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
             if _is_numpy_namespace(xp):
                 piv[[piv_index, i]] = piv[[i, piv_index]]
             else:
-                piv = piv.at[piv_index].set(piv_i)
-                piv = piv.at[i].set(piv_p)
+                piv = _set_element(xp, piv, piv_index, piv_i)
+                piv = _set_element(xp, piv, i, piv_p)
             v = house(tmp_psi[i:, i])
             row_result = rowhouse(tmp_psi[i:, i:], v)
             tmp_y[i:] = rowhouse(tmp_y[i:], v)

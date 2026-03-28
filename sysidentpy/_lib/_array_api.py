@@ -16,6 +16,7 @@ from typing import Any
 import numpy as np
 
 from .._config import get_config
+from ._vendor.array_api_extra import at as _at
 from ._vendor.array_api_compat import (
     array_namespace as _array_namespace,
     device as _compat_device,
@@ -330,7 +331,7 @@ def _diag(xp, v):
     raise ValueError(f"Input must be 1-D or 2-D, got {v.ndim}-D")
 
 
-def _set_element(_xp, arr, idx, val):
+def _set_element(xp, arr, idx, val):
     """Set a single element of an array.
 
     Handles both mutable (NumPy, CuPy, PyTorch) and immutable (JAX) arrays.
@@ -338,9 +339,11 @@ def _set_element(_xp, arr, idx, val):
     try:
         arr[idx] = val
         return arr
-    except TypeError:
-        # JAX arrays are immutable; use .at[].set()
-        return arr.at[idx].set(val)
+    except (RuntimeError, TypeError, ValueError):
+        if hasattr(arr, "at"):
+            return arr.at[idx].set(val)
+
+        return _at(arr, idx).set(val, xp=xp)
 
 
 def _copy(xp, arr):
