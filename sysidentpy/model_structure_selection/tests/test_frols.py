@@ -1,6 +1,9 @@
 import numpy as np
+import pytest
 from numpy.testing import assert_almost_equal, assert_array_equal
 from numpy.testing import assert_raises
+from sysidentpy import config_context
+from sysidentpy._lib._array_api import _to_numpy
 from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation.estimators import (
@@ -232,3 +235,30 @@ def test_information_criteria_lilc():
     model.fit(X=x, y=y)
     info_values = np.array([-1767.926, -2326.183, -2985.514, -4474.072, -72860.973])
     assert_almost_equal(model.info_values[:4], info_values[:4], decimal=3)
+
+
+def test_fit_predict_accepts_torch_cuda_tensors_when_available():
+    torch = pytest.importorskip("torch")
+    if not torch.cuda.is_available():
+        pytest.skip("CUDA not available")
+
+    model = FROLS(
+        ylag=[1, 2],
+        xlag=2,
+        n_terms=5,
+        estimator=LeastSquares(),
+        basis_function=Polynomial(degree=2),
+    )
+    x_train_t = torch.tensor(X_train, dtype=torch.float64, device="cuda")
+    y_train_t = torch.tensor(y_train, dtype=torch.float64, device="cuda")
+    x_test_t = torch.tensor(X_test, dtype=torch.float64, device="cuda")
+    y_test_t = torch.tensor(y_test, dtype=torch.float64, device="cuda")
+
+    with config_context(array_api_dispatch=True):
+        model.fit(X=x_train_t, y=y_train_t)
+        yhat = model.predict(X=x_test_t, y=y_test_t)
+
+    assert isinstance(yhat, torch.Tensor)
+    assert yhat.device.type == "cuda"
+    assert yhat.shape == y_test_t.shape
+    assert_almost_equal(_to_numpy(yhat[: model.max_lag]), y_test[: model.max_lag])

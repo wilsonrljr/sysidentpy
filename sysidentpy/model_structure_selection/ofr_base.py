@@ -15,10 +15,14 @@ from sysidentpy.utils.information_matrix import build_lagged_matrix
 from sysidentpy.utils.check_arrays import check_positive_int, num_features
 
 from .._lib._array_api import (
+    _asarray,
     _concat,
     _copy,
+    _full,
     _is_numpy_namespace,
     _set_element,
+    _zeros,
+    device as _device,
     get_namespace,
 )
 from .._lib._err import _compute_err_slice
@@ -446,6 +450,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
 
         """
         xp = get_namespace(psi, y)
+        target_device = _device(psi, y)
         squared_y = xp.sum(y[self.max_lag :, :] ** 2)
         squared_y = float(
             xp.asarray(max(float(squared_y), float(np.finfo(np.float64).eps)))
@@ -454,9 +459,13 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
         y = xp.reshape(y[self.max_lag :, 0], (-1, 1))
         tmp_y = _copy(xp, y)
         dimension = tmp_psi.shape[1]
-        piv = xp.arange(dimension)
-        tmp_err = xp.zeros(dimension, dtype=tmp_psi.dtype)
-        err = xp.zeros(dimension, dtype=tmp_psi.dtype)
+        piv = _asarray(np.arange(dimension), xp=xp, target_device=target_device)
+        tmp_err = _zeros(
+            xp, dimension, dtype=tmp_psi.dtype, target_device=target_device
+        )
+        err = _zeros(
+            xp, dimension, dtype=tmp_psi.dtype, target_device=target_device
+        )
 
         for i in range(dimension):
             tmp_err_slice = _compute_err_slice(
@@ -478,7 +487,19 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
             if _is_numpy_namespace(xp):
                 err[i] = err_val
             else:
-                err = xp.concat([err[:i], xp.reshape(xp.asarray(err_val), (1,)), err[i + 1:]])
+                err = xp.concat([
+                    err[:i],
+                    xp.reshape(
+                        _asarray(
+                            err_val,
+                            xp=xp,
+                            dtype=err.dtype,
+                            target_device=target_device,
+                        ),
+                        (1,),
+                    ),
+                    err[i + 1:],
+                ])
             if i == process_term_number:
                 break
 
@@ -545,7 +566,13 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
             )
 
         xp = get_namespace(x, y)
-        output_vector = xp.full(self.n_info_values, xp.nan, dtype=xp.float64)
+        output_vector = _full(
+            xp,
+            self.n_info_values,
+            xp.nan,
+            dtype=xp.float64,
+            target_device=_device(x),
+        )
 
         n_samples = y.shape[0] - self.max_lag
 

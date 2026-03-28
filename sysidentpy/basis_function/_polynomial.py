@@ -8,7 +8,9 @@ import numpy as np
 from sysidentpy._lib._array_api import (
     _column_stack,
     _is_numpy_namespace,
+    _ones,
     _to_numpy,
+    device as _device,
     get_namespace,
 )
 from .basis_function_base import BaseBasisFunction
@@ -87,9 +89,15 @@ class Polynomial(BaseBasisFunction):
             combos = combos[predefined_regressors]
 
         if not _is_numpy_namespace(xp):
+            target_device = _device(data)
             terms = []
             for combo in combos:
-                term = xp.ones((data.shape[0],), dtype=data.dtype)
+                term = _ones(
+                    xp,
+                    (data.shape[0],),
+                    dtype=data.dtype,
+                    target_device=target_device,
+                )
                 for col in combo:
                     term = term * data[:, int(col)]
                 terms.append(term)
@@ -98,7 +106,7 @@ class Polynomial(BaseBasisFunction):
         # Start with ones so we can multiply each degree slice in place
         n_samples = data.shape[0]
         n_terms = combos.shape[0]
-        psi = xp.ones((n_samples, n_terms), dtype=data.dtype)
+        psi = _ones(xp, (n_samples, n_terms), dtype=data.dtype)
 
         # Multiply column-wise using the cached combination indices
         for degree_idx in range(self.degree):

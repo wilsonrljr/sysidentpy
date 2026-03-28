@@ -14,6 +14,8 @@ from .._lib._array_api import (
     _set_element,
     _to_numpy,
     _vector_norm,
+    _zeros,
+    device as _device,
     get_namespace,
 )
 from ..narmax_base import BaseMSS
@@ -227,14 +229,20 @@ class AOLS(BaseMSS):
 
         """
         xp = get_namespace(psi, y)
+        target_device = _device(psi, y)
         n, m = psi.shape
-        theta = xp.zeros((m, 1), dtype=psi.dtype)
+        theta = _zeros(xp, (m, 1), dtype=psi.dtype, target_device=target_device)
         r = _copy(xp, xp.reshape(y[self.max_lag :, :], (-1, 1)))
         it = 0
         max_iter = int(min(self.k, np.floor(n / self.L)))
         # selected_indices is a small bookkeeping array; keep as numpy
         selected_indices = np.full(max_iter * self.L, -1, dtype=np.int64)
-        basis_matrix = xp.zeros((n, max_iter * self.L), dtype=psi.dtype)
+        basis_matrix = _zeros(
+            xp,
+            (n, max_iter * self.L),
+            dtype=psi.dtype,
+            target_device=target_device,
+        )
         transformed_psi = _copy(xp, psi)
         eps = np.finfo(float).eps
         numerator = xp.reshape(r.T @ psi, (-1,))

@@ -16,6 +16,7 @@ import numpy as np
 from sysidentpy._lib._array_api import (
     _asarray,
     _concat,
+    _zeros,
     _pow,
     _to_numpy,
     _vector_norm,
@@ -345,8 +346,10 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         xp = get_namespace(x, y_initial)
         _dtype = x.dtype if x is not None else y_initial.dtype
         target_device = _device(x, y_initial)
-        y_output = xp.zeros(forecast_horizon, dtype=_dtype)
-        y_output = y_output * float('nan')
+        y_output = _zeros(
+            xp, forecast_horizon, dtype=_dtype, target_device=target_device
+        )
+        y_output = y_output * float("nan")
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
 
         model_exponents = _vstack(
@@ -360,7 +363,12 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
                 for model in self.final_model
             ]
         )
-        raw_regressor = xp.zeros(model_exponents.shape[1], dtype=_dtype)
+        raw_regressor = _zeros(
+            xp,
+            model_exponents.shape[1],
+            dtype=_dtype,
+            target_device=target_device,
+        )
         theta = xp.reshape(
             _asarray(
                 self.theta,
@@ -390,8 +398,8 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         """Nfir predict method."""
         xp = get_namespace(x, y_initial)
         target_device = _device(x, y_initial)
-        y_output = xp.zeros(x.shape[0], dtype=x.dtype)
-        y_output = y_output * float('nan')
+        y_output = _zeros(xp, x.shape[0], dtype=x.dtype, target_device=target_device)
+        y_output = y_output * float("nan")
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
         x = xp.reshape(x, (-1, self.n_inputs))
         model_exponents = _vstack(
@@ -405,7 +413,12 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
                 for model in self.final_model
             ]
         )
-        raw_regressor = xp.zeros(model_exponents.shape[1], dtype=x.dtype)
+        raw_regressor = _zeros(
+            xp,
+            model_exponents.shape[1],
+            dtype=x.dtype,
+            target_device=target_device,
+        )
         theta = xp.reshape(
             _asarray(
                 self.theta,
@@ -440,8 +453,8 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
         to_remove = int(math.ceil((len(y) - self.max_lag) / steps_ahead))
         yhat_length = len(y) + steps_ahead
-        yhat = xp.zeros(yhat_length, dtype=y.dtype)
-        yhat = yhat * float('nan')
+        yhat = _zeros(xp, yhat_length, dtype=y.dtype, target_device=_device(y))
+        yhat = yhat * float("nan")
         yhat[: self.max_lag] = y[: self.max_lag, 0]
         i = self.max_lag
 
@@ -481,8 +494,8 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
         to_remove = int(math.ceil((len(y) - self.max_lag) / steps_ahead))
         x = xp.reshape(x, (-1, self.n_inputs))
-        yhat = xp.zeros(x.shape[0], dtype=x.dtype)
-        yhat = yhat * float('nan')
+        yhat = _zeros(xp, x.shape[0], dtype=x.dtype, target_device=_device(x, y))
+        yhat = yhat * float("nan")
         yhat[: self.max_lag] = y[: self.max_lag, 0]
         i = self.max_lag
         steps = [step for step in range(0, to_remove * steps_ahead, steps_ahead)]
@@ -552,8 +565,13 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
     ) -> np.ndarray:
         """Basis function prediction."""
         xp = get_namespace(y_initial)
-        yhat = xp.zeros(forecast_horizon, dtype=y_initial.dtype)
-        yhat = yhat * float('nan')
+        yhat = _zeros(
+            xp,
+            forecast_horizon,
+            dtype=y_initial.dtype,
+            target_device=_device(x, y_initial),
+        )
+        yhat = yhat * float("nan")
         yhat[: self.max_lag] = y_initial[: self.max_lag, 0]
 
         # Discard unnecessary initial values
@@ -605,8 +623,10 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
     ) -> np.ndarray:
         """Basis function n step ahead."""
         xp = get_namespace(y)
-        yhat = xp.zeros(forecast_horizon, dtype=y.dtype)
-        yhat = yhat * float('nan')
+        yhat = _zeros(
+            xp, forecast_horizon, dtype=y.dtype, target_device=_device(x, y)
+        )
+        yhat = yhat * float("nan")
         yhat[: self.max_lag] = y[: self.max_lag, 0]
 
         # Discard unnecessary initial values
@@ -653,8 +673,10 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
     ) -> np.ndarray:
         """Basis n steps horizon."""
         xp = get_namespace(y)
-        yhat = xp.zeros(forecast_horizon, dtype=y.dtype)
-        yhat = yhat * float('nan')
+        yhat = _zeros(
+            xp, forecast_horizon, dtype=y.dtype, target_device=_device(x, y)
+        )
+        yhat = yhat * float("nan")
         yhat[: self.max_lag] = y[: self.max_lag, 0]
 
         # Discard unnecessary initial values
@@ -719,7 +741,13 @@ def house(x: np.ndarray) -> np.ndarray:
         eps_value = float(np.finfo(np.float64).eps)
         aux_b = x[0] + xp.sign(x[0]) * u
         x = x[1:] / (aux_b + eps_value)
-        x = _concat(xp, [xp.asarray([1.0], dtype=x.dtype), x])
+        x = _concat(
+            xp,
+            [
+                _asarray([1.0], xp=xp, dtype=x.dtype, target_device=_device(x)),
+                x,
+            ],
+        )
     return x
 
 

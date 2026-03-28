@@ -2,9 +2,13 @@ import numpy as np
 from numpy.lib.stride_tricks import as_strided
 
 from sysidentpy._lib._array_api import (
+    _asarray,
     _concat,
     _copy,
     _is_numpy_namespace,
+    _ones,
+    _zeros,
+    device as _device,
     get_namespace,
 )
 from sysidentpy.utils.lags import _process_xlag, _process_ylag
@@ -19,7 +23,7 @@ def _ensure_2d_array(data, xp):
             return array.reshape(-1, 1)
         return array
 
-    array = xp.asarray(data)
+    array = _asarray(data, xp=xp, target_device=_device(data))
     if array.ndim == 1:
         return xp.reshape(array, (-1, 1))
     return array
@@ -52,7 +56,16 @@ def _build_sliding_windows(data: np.ndarray, max_lag: int) -> np.ndarray:
 
     padded = _concat(
         xp,
-        [xp.zeros((max_lag, data.shape[1]), dtype=data.dtype), data], axis=0
+        [
+            _zeros(
+                xp,
+                (max_lag, data.shape[1]),
+                dtype=data.dtype,
+                target_device=_device(data),
+            ),
+            data,
+        ],
+        axis=0,
     )
     n_samples = data.shape[0]
     window = max_lag + 1
@@ -95,7 +108,12 @@ def shift_column(col_to_shift: np.ndarray, lag: int) -> np.ndarray:
 
     xp = get_namespace(col_to_shift)
     n_samples = col_to_shift.shape[0]
-    tmp_column = xp.zeros((n_samples, 1), dtype=col_to_shift.dtype)
+    tmp_column = _zeros(
+        xp,
+        (n_samples, 1),
+        dtype=col_to_shift.dtype,
+        target_device=_device(col_to_shift),
+    )
     if lag == 0:
         return _copy(xp, col_to_shift)
 
@@ -249,7 +267,12 @@ def build_output_matrix(y, ylag: np.ndarray) -> np.ndarray:
     xp = get_namespace(y)
     ylag = _process_ylag(ylag)
     y_lagged = _create_lagged_y(y, ylag)
-    constant = xp.ones((y_lagged.shape[0], 1), dtype=y_lagged.dtype)
+    constant = _ones(
+        xp,
+        (y_lagged.shape[0], 1),
+        dtype=y_lagged.dtype,
+        target_device=_device(y_lagged),
+    )
     data = _concat(xp, [constant, y_lagged], axis=1)
     return data
 
@@ -282,7 +305,12 @@ def build_input_matrix(x, xlag: np.ndarray) -> np.ndarray:
     xp = get_namespace(x)
     n_inputs, xlag = _process_xlag(x, xlag)
     x_lagged = _create_lagged_x(x, n_inputs, xlag)
-    constant = xp.ones((x_lagged.shape[0], 1), dtype=x_lagged.dtype)
+    constant = _ones(
+        xp,
+        (x_lagged.shape[0], 1),
+        dtype=x_lagged.dtype,
+        target_device=_device(x_lagged),
+    )
     data = _concat(xp, [constant, x_lagged], axis=1)
     return data
 
@@ -317,7 +345,12 @@ def build_input_output_matrix(x: np.ndarray, y: np.ndarray, xlag, ylag) -> np.nd
     # the columns as a product in the iterations
     xp = get_namespace(x, y)
     lagged_data = initial_lagged_matrix(x, y, xlag, ylag)
-    constant = xp.ones((lagged_data.shape[0], 1), dtype=lagged_data.dtype)
+    constant = _ones(
+        xp,
+        (lagged_data.shape[0], 1),
+        dtype=lagged_data.dtype,
+        target_device=_device(lagged_data),
+    )
     data = _concat(xp, [constant, lagged_data], axis=1)
     return data
 

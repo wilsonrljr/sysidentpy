@@ -286,3 +286,24 @@ def test_build_input_output_matrix_preserves_array_api_namespace():
     )
     assert result.__array_namespace__().__name__ == xp.__name__
     assert_almost_equal(_to_numpy(result), expected)
+
+
+def test_build_input_output_matrix_preserves_torch_cuda_device_when_available():
+    torch = pytest.importorskip("torch")
+    if not torch.cuda.is_available():
+        pytest.skip("CUDA not available")
+
+    x_data = torch.tensor(
+        [[1.0, 2.0], [3.0, 4.0], [5.0, 6.0], [7.0, 8.0]],
+        dtype=torch.float64,
+        device="cuda",
+    )
+    y_data = torch.tensor(
+        [[10.0], [20.0], [30.0], [40.0]], dtype=torch.float64, device="cuda"
+    )
+
+    with config_context(array_api_dispatch=True):
+        result = build_input_output_matrix(x_data, y_data, [[1], [1]], [1])
+
+    assert isinstance(result, torch.Tensor)
+    assert result.device.type == "cuda"

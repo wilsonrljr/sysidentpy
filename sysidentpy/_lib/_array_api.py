@@ -181,6 +181,36 @@ def _asarray(data, *, xp, dtype=None, target_device=None):
     return xp.asarray(data, **kwargs)
 
 
+def _zeros(xp, shape, *, dtype=None, target_device=None):
+    """Create a zero-filled array while preserving the target device."""
+    kwargs: dict[str, Any] = {}
+    if dtype is not None:
+        kwargs["dtype"] = dtype
+    if target_device is not None and not _is_numpy_namespace(xp):
+        kwargs["device"] = target_device
+    return xp.zeros(shape, **kwargs)
+
+
+def _ones(xp, shape, *, dtype=None, target_device=None):
+    """Create a one-filled array while preserving the target device."""
+    kwargs: dict[str, Any] = {}
+    if dtype is not None:
+        kwargs["dtype"] = dtype
+    if target_device is not None and not _is_numpy_namespace(xp):
+        kwargs["device"] = target_device
+    return xp.ones(shape, **kwargs)
+
+
+def _full(xp, shape, fill_value, *, dtype=None, target_device=None):
+    """Create a filled array while preserving the target device."""
+    kwargs: dict[str, Any] = {}
+    if dtype is not None:
+        kwargs["dtype"] = dtype
+    if target_device is not None and not _is_numpy_namespace(xp):
+        kwargs["device"] = target_device
+    return xp.full(shape, fill_value, **kwargs)
+
+
 def _vector_norm(xp, x):
     """Return a vector norm for namespaces with or without ``vector_norm``."""
     if hasattr(xp.linalg, "vector_norm"):
@@ -228,6 +258,22 @@ def _concat(xp, arrays, axis=0):
     """Equivalent of ``np.concatenate`` using Array API-compatible backends."""
     if _is_numpy_namespace(xp):
         return np.concatenate(arrays, axis=axis)
+
+    arrays = list(arrays)
+    target_device = None
+    for arr in arrays:
+        if is_array_api_obj(arr):
+            target_device = _compat_device(arr)
+            break
+
+    if target_device is not None:
+        arrays = [
+            _asarray(arr, xp=xp, target_device=target_device)
+            if not is_array_api_obj(arr)
+            or str(_compat_device(arr)) != str(target_device)
+            else arr
+            for arr in arrays
+        ]
 
     return xp.concat(arrays, axis=axis)
 
@@ -365,6 +411,9 @@ __all__ = [
     "device",
     "_to_numpy",
     "_asarray",
+    "_zeros",
+    "_ones",
+    "_full",
     "_vector_norm",
     "_pow",
     "_lstsq",
