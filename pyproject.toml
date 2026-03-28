@@ -65,6 +65,7 @@ dev = [
     "isort >=5.0.6,<6.0.0",
     "pre-commit",
     "ruff >=0.2.2,<3.0.0",
+    "array-api-strict >=2.0",
 ]
 
 examples = ["scikit-learn", "catboost"]
@@ -98,7 +99,7 @@ repository = "https://github.com/wilsonrljr/sysidentpy"
 changelog = "https://github.com/wilsonrljr/sysidentpy/blob/main/CHANGELOG.md"
 
 [tool.setuptools]
-packages = ["sysidentpy"]
+packages = { find = { where = ["."], include = ["sysidentpy*"] } }
 
 [tool.setuptools.dynamic]
 version = { attr = "sysidentpy.__version__" }

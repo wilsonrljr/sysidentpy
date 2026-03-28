@@ -7,6 +7,14 @@
 
 import numpy as np
 
+from sysidentpy._lib._array_api import (
+    get_namespace,
+    _is_numpy_namespace,
+    _copy,
+    _vstack,
+    _to_numpy,
+)
+
 
 def compute_residues_autocorrelation(y, yhat):
     """Compute the autocorrelation of the residues.
@@ -27,16 +35,17 @@ def compute_residues_autocorrelation(y, yhat):
     lower_bound : float
         Lower bound for the confidence interval.
     """
+    xp = get_namespace(y, yhat)
     e = calculate_residues(y, yhat)
     unnormalized_e_acf = get_unnormalized_e_acf(e)
-    half_of_symmetry_autocorr = int(np.floor(unnormalized_e_acf.size / 2))
+    half_of_symmetry_autocorr = int(unnormalized_e_acf.shape[0] / 2)
 
     e_acf = (
         unnormalized_e_acf[half_of_symmetry_autocorr:]
         / unnormalized_e_acf[half_of_symmetry_autocorr]
     )
 
-    upper_bound = 1.96 / np.sqrt(len(unnormalized_e_acf))
+    upper_bound = 1.96 / float(xp.sqrt(xp.asarray(float(unnormalized_e_acf.shape[0]))))
     lower_bound = upper_bound * (-1)
     return e_acf, upper_bound, lower_bound
 
@@ -56,7 +65,8 @@ def calculate_residues(y, yhat):
     residues : ndarray of shape (n_samples,)
         Residues (errors) between true and predicted values.
     """
-    return (y - yhat).flatten()
+    xp = get_namespace(y, yhat)
+    return xp.reshape(y - yhat, (-1,))
 
 
 def get_unnormalized_e_acf(e):
@@ -72,7 +82,15 @@ def get_unnormalized_e_acf(e):
     unnormalized_e_acf : ndarray of shape (2*n_samples-1,)
         Unnormalized autocorrelation function of the residues.
     """
-    return np.correlate(e, e, mode="full")
+    xp = get_namespace(e)
+    if _is_numpy_namespace(xp):
+        return np.correlate(e, e, mode="full")
+
+    # np.correlate is not in the Array API standard.
+    # Convert to numpy, compute, convert back.
+    e_np = _to_numpy(e)
+    result_np = np.correlate(e_np, e_np, mode="full")
+    return xp.asarray(result_np)
 
 
 def compute_cross_correlation(y, yhat, arr):
@@ -123,8 +141,9 @@ def _input_ccf(e, a, n):
     lower_bound : float
         Lower bound for the confidence interval.
     """
+    xp = get_namespace(e, a)
     ccf = _normalized_correlation(a, e)
-    upper_bound = 1.96 / np.sqrt(n)
+    upper_bound = 1.96 / float(xp.sqrt(xp.asarray(float(n))))
     lower_bound = upper_bound * (-1)
     return ccf, upper_bound, lower_bound
 
@@ -157,17 +176,21 @@ def _normalized_correlation(a, b):
     where $\bar{a}$ and $\bar{b}$ are the means of $a$ and $b$, respectively.
 
     """
-    y = (a - np.mean(a)).flatten()
-    u = (b - np.mean(b)).flatten()
-    t = int(np.floor(len(a) / 2))
-    ruy = np.array(np.zeros(t))
-    ruy[0] = np.sum(y * u) / (np.sqrt(np.sum(y**2)) * np.sqrt(np.sum(u**2)))
+    xp = get_namespace(a, b)
+    y = xp.reshape(a - xp.mean(a), (-1,))
+    u = xp.reshape(b - xp.mean(b), (-1,))
+    t = int(a.shape[0] / 2)
+    ruy = xp.zeros((t,), dtype=xp.float64)
+    ruy[0] = float(xp.sum(y * u)) / (
+        float(xp.sqrt(xp.sum(y**2))) * float(xp.sqrt(xp.sum(u**2)))
+    )
 
     for i in range(1, t):
-        y = (a - np.mean(a[:i])).flatten()
-        u = (b - np.mean(b[i:])).flatten()
-        ruy[i] = np.sum(y[:-i] * u[i:]) / (
-            np.sqrt(np.sum(y[:-i] ** 2)) * np.sqrt(np.sum(u[i:] ** 2))
+        y = xp.reshape(a - xp.mean(a[:i]), (-1,))
+        u = xp.reshape(b - xp.mean(b[i:]), (-1,))
+        ruy[i] = float(xp.sum(y[:-i] * u[i:])) / (
+            float(xp.sqrt(xp.sum(y[:-i] ** 2)))
+            * float(xp.sqrt(xp.sum(u[i:] ** 2)))
         )
 
     return ruy

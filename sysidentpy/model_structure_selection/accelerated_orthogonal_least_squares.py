@@ -6,8 +6,15 @@
 from typing import Tuple, Union, Optional
 
 import numpy as np
-from numpy.linalg import norm
 
+from .._lib._array_api import (
+    _concat,
+    _copy,
+    _is_numpy_namespace,
+    _to_numpy,
+    _vector_norm,
+    get_namespace,
+)
 from ..narmax_base import BaseMSS
 from sysidentpy.utils.information_matrix import build_lagged_matrix
 from ..basis_function import Fourier, Polynomial
@@ -218,93 +225,129 @@ class AOLS(BaseMSS):
            https://www.sciencedirect.com/science/article/abs/pii/S1051200418305311
 
         """
+        xp = get_namespace(psi, y)
         n, m = psi.shape
-        theta = np.zeros([m, 1])
-        r = y[self.max_lag :].reshape(-1, 1).copy()
+        theta = xp.zeros((m, 1), dtype=psi.dtype)
+        r = _copy(xp, xp.reshape(y[self.max_lag :, :], (-1, 1)))
         it = 0
         max_iter = int(min(self.k, np.floor(n / self.L)))
+        # selected_indices is a small bookkeeping array; keep as numpy
         selected_indices = np.full(max_iter * self.L, -1, dtype=np.int64)
-        basis_matrix = np.zeros([n, max_iter * self.L])
-        transformed_psi = psi.copy()
+        basis_matrix = xp.zeros((n, max_iter * self.L), dtype=psi.dtype)
+        transformed_psi = _copy(xp, psi)
         eps = np.finfo(float).eps
-        numerator = (r.T @ psi).ravel()
-        denominator = np.sum(psi * transformed_psi, axis=0)
-        q = np.zeros_like(numerator)
-        np.divide(numerator, denominator, out=q, where=np.abs(denominator) > eps)
-        while norm(r) > self.threshold and it < max_iter:
+        numerator = xp.reshape(r.T @ psi, (-1,))
+        denominator = xp.sum(psi * transformed_psi, axis=0)
+        mask = xp.abs(denominator) > eps
+        q = xp.where(mask, numerator / denominator, xp.zeros_like(numerator))
+        while (
+            float(_to_numpy(_vector_norm(xp, xp.reshape(r, (-1,)))))
+            > self.threshold
+            and it < max_iter
+        ):
             it = it + 1
             offset = (it - 1) * self.L
             if it > 1:
-                basis_vec = basis_matrix[:, offset].reshape(-1, 1)
-                np.subtract(
-                    transformed_psi,
-                    basis_vec @ (basis_vec.T @ psi),
-                    out=transformed_psi,
-                )
+                basis_vec = xp.reshape(basis_matrix[:, offset], (-1, 1))
+                transformed_psi = transformed_psi - basis_vec @ (basis_vec.T @ psi)
 
-            contribution = np.einsum("ij,ij->j", transformed_psi, transformed_psi) * (
+            contribution = xp.sum(transformed_psi * transformed_psi, axis=0) * (
                 q**2
             )
             previous = selected_indices[:offset]
             sub_ind = list(previous[previous >= 0].astype(int))
-            contribution[sub_ind] = 0
-            contribution[~np.isfinite(contribution)] = 0
-            block_size = min(self.L, len(contribution))
+            # Zero out already-selected and non-finite contributions
+            if _is_numpy_namespace(xp):
+                contribution[sub_ind] = 0
+                contribution[~np.isfinite(contribution)] = 0
+            else:
+                for si in sub_ind:
+                    contribution = contribution.at[si].set(0.0)
+                contribution = xp.where(
+                    xp.isfinite(contribution), contribution,
+                    xp.zeros_like(contribution)
+                )
+            block_size = min(self.L, contribution.shape[0])
             if block_size == 0:
                 break
-            top_candidates = np.argpartition(contribution, -block_size)[-block_size:]
-            current_indices = top_candidates[
-                contribution[top_candidates].argsort()[::-1]
-            ]
-            selected_indices[offset : offset + block_size] = current_indices
-            for i, idx in enumerate(current_indices):
-                temp = transformed_psi[:, idx].reshape(-1, 1) * q[idx]
-                temp_norm = norm(temp)
+            # argpartition is numpy-specific; convert for this small operation
+            if _is_numpy_namespace(xp):
+                top_candidates = np.argpartition(
+                    contribution, -block_size
+                )[-block_size:]
+                current_indices = top_candidates[
+                    contribution[top_candidates].argsort()[::-1]
+                ]
+            else:
+                # Fallback: full argsort for non-numpy backends
+                sorted_idx = xp.flip(xp.argsort(contribution))
+                current_indices = sorted_idx[:block_size]
+            selected_indices[offset : offset + block_size] = (
+                np.asarray(current_indices) if not _is_numpy_namespace(xp)
+                else current_indices
+            )
+            for i, idx in enumerate(np.asarray(current_indices) if not _is_numpy_namespace(xp) else current_indices):
+                idx = int(idx)
+                temp = xp.reshape(transformed_psi[:, idx], (-1, 1)) * q[idx]
+                temp_norm = float(_to_numpy(_vector_norm(xp, xp.reshape(temp, (-1,)))))
                 if temp_norm <= eps:
                     continue
-                basis_matrix[:, offset + i] = (temp / temp_norm).ravel()
-                np.subtract(r, temp, out=r)
+                basis_matrix[:, offset + i] = xp.reshape(temp / temp_norm, (-1,))
+                r = r - temp
 
-                basis_vec = basis_matrix[:, offset + i].reshape(-1, 1)
-                np.subtract(
-                    transformed_psi,
-                    basis_vec @ (basis_vec.T @ psi),
-                    out=transformed_psi,
-                )
+                basis_vec = xp.reshape(basis_matrix[:, offset + i], (-1, 1))
+                transformed_psi = transformed_psi - basis_vec @ (basis_vec.T @ psi)
 
-                numerator = (r.T @ psi).ravel()
-                denominator = np.sum(psi * transformed_psi, axis=0)
-                np.divide(
-                    numerator,
-                    denominator,
-                    out=q,
-                    where=np.abs(denominator) > eps,
+                numerator = xp.reshape(r.T @ psi, (-1,))
+                denominator = xp.sum(psi * transformed_psi, axis=0)
+                mask = xp.abs(denominator) > eps
+                q = xp.where(
+                    mask, numerator / denominator, xp.zeros_like(numerator)
                 )
 
         selected_indices = selected_indices[selected_indices >= 0].ravel().astype(int)
-        residual_norm = norm(r)
+        residual_norm = float(_to_numpy(_vector_norm(xp, xp.reshape(r, (-1,)))))
         theta[selected_indices] = self.estimator.optimize(
-            psi[:, selected_indices], y[self.max_lag :, 0].reshape(-1, 1)
+            psi[:, selected_indices], xp.reshape(y[self.max_lag :, 0], (-1, 1))
         )
         if self.L > 1 and len(selected_indices) > self.k:
-            sorted_local = np.argsort(np.abs(theta[selected_indices]).ravel())[::-1][
-                : self.k
-            ]
+            if _is_numpy_namespace(xp):
+                sorted_local = np.argsort(
+                    np.abs(theta[selected_indices]).ravel()
+                )[::-1][: self.k]
+            else:
+                abs_vals = xp.abs(xp.reshape(theta[selected_indices], (-1,)))
+                sorted_local = np.asarray(
+                    xp.flip(xp.argsort(abs_vals))
+                )[: self.k]
             top_indices = selected_indices[sorted_local]
-            theta_filtered = np.zeros_like(theta)
+            theta_filtered = xp.zeros_like(theta)
             theta_filtered[top_indices] = self.estimator.optimize(
-                psi[:, top_indices], y[self.max_lag :, 0].reshape(-1, 1)
+                psi[:, top_indices],
+                xp.reshape(y[self.max_lag :, 0], (-1, 1)),
             )
             theta = theta_filtered
             selected_indices = top_indices
-            residual_norm = norm(
-                y[self.max_lag :].reshape(-1, 1)
-                - psi[:, selected_indices] @ theta[selected_indices]
+            residual_norm = float(
+                _to_numpy(
+                    _vector_norm(
+                        xp,
+                        xp.reshape(
+                            xp.reshape(y[self.max_lag :, :], (-1, 1))
+                            - psi[:, selected_indices] @ theta[selected_indices],
+                            (-1,),
+                        ),
+                    )
+                )
             )
 
-        pivv = np.argwhere(theta.ravel() != 0).ravel()
-        theta = theta[theta != 0]
-        return theta.reshape(-1, 1), pivv, residual_norm
+        if _is_numpy_namespace(xp):
+            pivv = np.argwhere(theta.ravel() != 0).ravel()
+        else:
+            flat = xp.reshape(theta, (-1,))
+            pivv = np.asarray(xp.nonzero(flat != 0)[0])
+        theta_vals = theta[theta != 0]
+        return xp.reshape(theta_vals, (-1, 1)), pivv, residual_norm
 
     def fit(self, *, X: Optional[np.ndarray] = None, y: Optional[np.ndarray] = None):
         """Fit polynomial NARMAX model using AOLS algorithm.
@@ -357,7 +400,7 @@ class AOLS(BaseMSS):
 
         self.regressor_code = self.regressor_space(self.n_inputs)
         (self.theta, self.pivv, self.res) = self.aols(reg_matrix, y)
-        repetition = len(reg_matrix)
+        repetition = reg_matrix.shape[0]
         if isinstance(self.basis_function, Polynomial):
             self.final_model = self.regressor_code[self.pivv, :].copy()
         else:
@@ -367,8 +410,8 @@ class AOLS(BaseMSS):
             )
             self.final_model = self.regressor_code[self.pivv, :].copy()
 
-        self.n_terms = len(
-            self.theta
+        self.n_terms = (
+            self.theta.shape[0]
         )  # the number of terms we selected (necessary in the 'results' methods)
         self.err = self.n_terms * [
             0
@@ -410,34 +453,36 @@ class AOLS(BaseMSS):
             The predicted values of the model.
 
         """
+        xp = get_namespace(y)
+        prefix = y[: self.max_lag, ...]
         if isinstance(self.basis_function, Polynomial):
             if steps_ahead is None:
                 yhat = self._model_prediction(X, y, forecast_horizon=forecast_horizon)
-                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+                yhat = _concat(xp, [prefix, yhat], axis=0)
                 return yhat
             if steps_ahead == 1:
                 yhat = self._one_step_ahead_prediction(X, y)
-                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+                yhat = _concat(xp, [prefix, yhat], axis=0)
                 return yhat
 
             check_positive_int(steps_ahead, "steps_ahead")
             yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
-            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+            yhat = _concat(xp, [prefix, yhat], axis=0)
             return yhat
 
         if steps_ahead is None:
             yhat = self._basis_function_predict(X, y, forecast_horizon=forecast_horizon)
-            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+            yhat = _concat(xp, [prefix, yhat], axis=0)
             return yhat
         if steps_ahead == 1:
             yhat = self._one_step_ahead_prediction(X, y)
-            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+            yhat = _concat(xp, [prefix, yhat], axis=0)
             return yhat
 
         yhat = self._basis_function_n_step_prediction(
             X, y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
         )
-        yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+        yhat = _concat(xp, [prefix, yhat], axis=0)
         return yhat
 
     def _one_step_ahead_prediction(

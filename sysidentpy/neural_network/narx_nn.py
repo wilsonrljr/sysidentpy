@@ -21,6 +21,7 @@ try:
 except ImportError:
     torch = None  # type: ignore[assignment]
 
+from .._lib._array_api import get_namespace, _require_numpy_namespace
 from ..narmax_base import BaseMSS
 from ..basis_function import Polynomial
 from sysidentpy.utils.information_matrix import (
@@ -559,6 +560,9 @@ class NARXNN(BaseMSS):
             The validation loss of each batch
 
         """
+        xp = get_namespace(y) if X is None else get_namespace(X, y)
+        _require_numpy_namespace(xp, feature="NARXNN", dependency="PyTorch/NumPy")
+
         if self.random_state is not None:
             self._seed_torch_generators()
             self._reset_network_parameters()

@@ -11,7 +11,9 @@ from numpy.testing import (
     assert_raises,
 )
 
+from sysidentpy import config_context
 from sysidentpy.basis_function import Polynomial, Fourier
+from sysidentpy._lib._array_api import _to_numpy
 from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.narmax_base import RegressorDictionary, BaseMSS
 from sysidentpy.parameter_estimation.estimators import (
@@ -823,6 +825,13 @@ class PredictableMSS(BaseMSS):
         return np.zeros((1, 1))
 
 
+class ArrayAPIPredictableMSS(PredictableMSS):
+    """Predictable BaseMSS variant that delegates NFIR prediction to the base path."""
+
+    def _nfir_predict(self, x: np.ndarray, y_initial: np.ndarray) -> np.ndarray:
+        return BaseMSS._nfir_predict(self, x, y_initial)
+
+
 def test_base_mss_initialization():
     """Test if BaseMSS initializes correctly."""
     model = ConcreteMSS()
@@ -876,6 +885,49 @@ def test_n_step_ahead_prediction_nar():
     np.testing.assert_array_almost_equal(
         result, expected, err_msg="NAR prediction incorrect"
     )
+
+
+def test_one_step_ahead_prediction_preserves_array_api_namespace():
+    xp = pytest.importorskip("array_api_strict")
+    model = PredictableMSS(model_type="NARMAX")
+    model.theta = np.array([[2.0]])
+    x_base = xp.asarray(np.array([[1.0], [2.0], [3.0]]))
+
+    with config_context(array_api_dispatch=True):
+        result = model._one_step_ahead_prediction(x_base)
+
+    assert result.__array_namespace__().__name__ == xp.__name__
+    assert_array_equal(_to_numpy(result), np.array([[2.0], [4.0], [6.0]]))
+
+
+def test_narmax_predict_preserves_array_api_namespace_with_numpy_theta():
+    xp = pytest.importorskip("array_api_strict")
+    model = PredictableMSS(model_type="NARMAX")
+    model.final_model = np.array([[0]])
+    model.theta = np.array([[2.0]])
+    x_data = xp.asarray(np.ones((6, 1)))
+    y_initial = xp.asarray(np.arange(6.0).reshape(-1, 1))
+
+    with config_context(array_api_dispatch=True):
+        result = model._narmax_predict(x_data, y_initial, forecast_horizon=6)
+
+    assert result.__array_namespace__().__name__ == xp.__name__
+    assert_array_equal(_to_numpy(result), np.full((4, 1), 2.0))
+
+
+def test_nfir_predict_preserves_array_api_namespace_with_numpy_theta():
+    xp = pytest.importorskip("array_api_strict")
+    model = ArrayAPIPredictableMSS(model_type="NFIR")
+    model.final_model = np.array([[0]])
+    model.theta = np.array([[2.0]])
+    x_data = xp.asarray(np.ones((6, 1)))
+    y_initial = xp.asarray(np.arange(6.0).reshape(-1, 1))
+
+    with config_context(array_api_dispatch=True):
+        result = model._nfir_predict(x_data, y_initial)
+
+    assert result.__array_namespace__().__name__ == xp.__name__
+    assert_array_equal(_to_numpy(result), np.full((4, 1), 2.0))
 
 
 def test_n_step_ahead_prediction_invalid_model():

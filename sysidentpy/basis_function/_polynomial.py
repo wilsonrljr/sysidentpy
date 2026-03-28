@@ -5,6 +5,12 @@ from typing import Optional, Tuple, Dict
 
 import numpy as np
 
+from sysidentpy._lib._array_api import (
+    _column_stack,
+    _is_numpy_namespace,
+    _to_numpy,
+    get_namespace,
+)
 from .basis_function_base import BaseBasisFunction
 
 
@@ -55,26 +61,49 @@ class Polynomial(BaseBasisFunction):
             self._combination_cache[key] = combos
         return self._combination_cache[key]
 
+    @staticmethod
+    def _normalize_predefined_regressors(
+        predefined_regressors: Optional[np.ndarray],
+    ) -> Optional[np.ndarray]:
+        """Normalize regressor indices to NumPy metadata for cached lookups."""
+        if predefined_regressors is None:
+            return None
+
+        return np.asarray(_to_numpy(predefined_regressors), dtype=np.intp).reshape(-1)
+
     def _evaluate_terms(
         self,
         data: np.ndarray,
         predefined_regressors: Optional[np.ndarray] = None,
     ) -> np.ndarray:
         """Vectorized polynomial feature construction without Python loops."""
+        xp = get_namespace(data)
         n_features = data.shape[1]
         combos = self._get_combination_indices(n_features)
+        predefined_regressors = self._normalize_predefined_regressors(
+            predefined_regressors
+        )
         if predefined_regressors is not None:
-            combos = combos[np.asarray(predefined_regressors, dtype=int)]
+            combos = combos[predefined_regressors]
+
+        if not _is_numpy_namespace(xp):
+            terms = []
+            for combo in combos:
+                term = xp.ones((data.shape[0],), dtype=data.dtype)
+                for col in combo:
+                    term = term * data[:, int(col)]
+                terms.append(term)
+            return _column_stack(xp, terms)
 
         # Start with ones so we can multiply each degree slice in place
         n_samples = data.shape[0]
         n_terms = combos.shape[0]
-        psi = np.ones((n_samples, n_terms), dtype=data.dtype)
+        psi = xp.ones((n_samples, n_terms), dtype=data.dtype)
 
         # Multiply column-wise using the cached combination indices
         for degree_idx in range(self.degree):
             cols = combos[:, degree_idx]
-            psi *= data[:, cols]
+            psi = psi * data[:, cols]
 
         return psi
 

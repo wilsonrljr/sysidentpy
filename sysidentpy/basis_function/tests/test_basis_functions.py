@@ -1,6 +1,10 @@
+import pytest
+
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
 
+from sysidentpy import config_context
+from sysidentpy._lib._array_api import _to_numpy
 from sysidentpy.basis_function import Polynomial, Fourier
 from sysidentpy.basis_function.basis_function_base import BaseBasisFunction
 
@@ -28,6 +32,26 @@ def test_fit_polynomial_predefined():
     )
 
     assert_array_equal(output, r)
+
+
+def test_fit_polynomial_predefined_accepts_array_api_inputs():
+    xp = pytest.importorskip("array_api_strict")
+    basis_function = Polynomial(degree=2)
+    data = xp.asarray(
+        np.array(([1.0, 1.0, 1.0], [2.0, 3.0, 4.0], [3.0, 3.0, 3.0]))
+    )
+    predefined_regressors = xp.asarray(np.array([0, 2, 4]))
+    output = np.array([[4.0, 8.0, 12.0], [9.0, 9.0, 9.0]])
+
+    with config_context(array_api_dispatch=True):
+        result = basis_function.fit(
+            data=data,
+            max_lag=1,
+            predefined_regressors=predefined_regressors,
+        )
+
+    assert result.__array_namespace__().__name__ == xp.__name__
+    assert_array_equal(_to_numpy(result), output)
 
 
 def test_transform_polynomial():

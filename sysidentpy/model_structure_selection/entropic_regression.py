@@ -12,6 +12,7 @@ from numpy.linalg import pinv
 from scipy.spatial.distance import cdist
 from scipy.special import psi
 
+from .._lib._array_api import get_namespace, _require_numpy_namespace
 from ..narmax_base import BaseMSS
 from sysidentpy.utils.information_matrix import build_lagged_matrix
 from ..basis_function import Fourier, Polynomial
@@ -557,6 +558,9 @@ class ER(BaseMSS):
         """
         if y is None:
             raise ValueError("y cannot be None")
+
+        xp = get_namespace(y) if X is None else get_namespace(X, y)
+        _require_numpy_namespace(xp, feature="ER", dependency="SciPy")
 
         self.max_lag = self._get_max_lag()
         lagged_data = build_lagged_matrix(X, y, self.xlag, self.ylag, self.model_type)

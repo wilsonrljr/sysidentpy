@@ -1,8 +1,11 @@
 # ruff: noqa: SLF001
 # pylint: disable=protected-access
 import numpy as np
+import pytest
 from numpy.testing import assert_almost_equal, assert_equal, assert_raises
 
+from sysidentpy import config_context
+from sysidentpy._lib._array_api import _to_numpy
 from sysidentpy.basis_function import Fourier, Polynomial
 from sysidentpy.parameter_estimation.estimators import LeastSquares
 from sysidentpy.model_structure_selection.accelerated_orthogonal_least_squares import (
@@ -195,6 +198,25 @@ def test_predict_polynomial_returns_concatenated_output():
     yhat = model.predict(X=X_test, y=y_test)
     assert_equal(yhat.shape, y_test.shape)
     assert_equal(yhat[: model.max_lag], y_test[: model.max_lag])
+
+
+def test_predict_polynomial_preserves_array_api_namespace():
+    xp = pytest.importorskip("array_api_strict")
+    model = AOLS(basis_function=Polynomial(degree=2))
+    model.max_lag = 1
+    model._model_prediction = lambda _x, _y, forecast_horizon=0: xp.asarray(
+        np.full((3, 1), 1.5)
+    )
+    y_data = xp.asarray(np.arange(4.0).reshape(-1, 1))
+
+    with config_context(array_api_dispatch=True):
+        yhat = model.predict(X=None, y=y_data)
+
+    assert yhat.__array_namespace__().__name__ == xp.__name__
+    assert_equal(
+        _to_numpy(yhat),
+        np.array([[0.0], [1.5], [1.5], [1.5]]),
+    )
 
 
 def test_predict_polynomial_multi_step_returns_prediction():

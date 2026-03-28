@@ -1,7 +1,28 @@
 import numpy as np
 from numpy.lib.stride_tricks import as_strided
 
+from sysidentpy._lib._array_api import (
+    _concat,
+    _copy,
+    _is_numpy_namespace,
+    get_namespace,
+)
 from sysidentpy.utils.lags import _process_xlag, _process_ylag
+
+
+def _ensure_2d_array(data, xp):
+    """Convert input data to a 2D array without changing its namespace."""
+
+    if _is_numpy_namespace(xp):
+        array = np.asarray(data, dtype=float)
+        if array.ndim == 1:
+            return array.reshape(-1, 1)
+        return array
+
+    array = xp.asarray(data)
+    if array.ndim == 1:
+        return xp.reshape(array, (-1, 1))
+    return array
 
 
 def _normalize_lag_input(lag_value):
@@ -19,12 +40,28 @@ def _build_sliding_windows(data: np.ndarray, max_lag: int) -> np.ndarray:
     if max_lag < 1:
         raise ValueError("max_lag must be >= 1 to build lagged windows")
 
-    padded = np.vstack([np.zeros((max_lag, data.shape[1])), data])
+    xp = get_namespace(data)
+
+    if _is_numpy_namespace(xp):
+        padded = np.vstack([np.zeros((max_lag, data.shape[1])), data])
+        n_samples = data.shape[0]
+        window = max_lag + 1
+        shape = (n_samples, window, data.shape[1])
+        strides = (padded.strides[0], padded.strides[0], padded.strides[1])
+        return as_strided(padded, shape=shape, strides=strides, writeable=False)
+
+    padded = _concat(
+        xp,
+        [xp.zeros((max_lag, data.shape[1]), dtype=data.dtype), data], axis=0
+    )
     n_samples = data.shape[0]
     window = max_lag + 1
-    shape = (n_samples, window, data.shape[1])
-    strides = (padded.strides[0], padded.strides[0], padded.strides[1])
-    return as_strided(padded, shape=shape, strides=strides, writeable=False)
+    windows = []
+    for offset in range(window):
+        current_window = padded[offset : offset + n_samples, :]
+        windows.append(xp.reshape(current_window, (n_samples, 1, data.shape[1])))
+
+    return _concat(xp, windows, axis=1)
 
 
 def shift_column(col_to_shift: np.ndarray, lag: int) -> np.ndarray:
@@ -56,10 +93,11 @@ def shift_column(col_to_shift: np.ndarray, lag: int) -> np.ndarray:
     if lag < 0:
         raise ValueError("lag must be non-negative")
 
+    xp = get_namespace(col_to_shift)
     n_samples = col_to_shift.shape[0]
-    tmp_column = np.zeros((n_samples, 1))
+    tmp_column = xp.zeros((n_samples, 1), dtype=col_to_shift.dtype)
     if lag == 0:
-        return col_to_shift.copy()
+        return _copy(xp, col_to_shift)
 
     if lag < n_samples:
         tmp_column[lag:, 0] = col_to_shift[: n_samples - lag, 0]
@@ -82,9 +120,8 @@ def _create_lagged_x(x: np.ndarray, n_inputs: int, xlag) -> np.ndarray:
         A matrix where each column represents a lagged version of an input variable.
 
     """
-    x = np.asarray(x, dtype=float)
-    if x.ndim == 1:
-        x = x.reshape(-1, 1)
+    xp = get_namespace(x)
+    x = _ensure_2d_array(x, xp)
 
     if n_inputs == 1:
         lag_list = _normalize_lag_input(xlag)
@@ -103,18 +140,20 @@ def _create_lagged_x(x: np.ndarray, n_inputs: int, xlag) -> np.ndarray:
     lagged_columns = []
 
     if n_inputs == 1:
-        indices = max_lag - lag_list
-        lagged_columns.append(windows[:, indices, 0])
+        for lag in lag_list:
+            index = max_lag - int(lag)
+            lagged_columns.append(xp.reshape(windows[:, index, 0], (-1, 1)))
     else:
         for col in range(n_inputs):
             lags = lag_list[col]
-            indices = max_lag - lags
-            lagged_columns.append(windows[:, indices, col])
+            for lag in lags:
+                index = max_lag - int(lag)
+                lagged_columns.append(xp.reshape(windows[:, index, col], (-1, 1)))
 
     if len(lagged_columns) == 1:
         return lagged_columns[0]
 
-    return np.concatenate(lagged_columns, axis=1)
+    return _concat(xp, lagged_columns, axis=1)
 
 
 def _create_lagged_y(y: np.ndarray, ylag) -> np.ndarray:
@@ -132,15 +171,21 @@ def _create_lagged_y(y: np.ndarray, ylag) -> np.ndarray:
         variable.
 
     """
-    y = np.asarray(y, dtype=float)
-    if y.ndim == 1:
-        y = y.reshape(-1, 1)
+    xp = get_namespace(y)
+    y = _ensure_2d_array(y, xp)
 
     lag_array = _normalize_lag_input(ylag)
     max_lag = int(np.max(lag_array))
     windows = _build_sliding_windows(y, max_lag)
-    indices = max_lag - lag_array
-    return windows[:, indices, 0]
+    lagged_columns = []
+    for lag in lag_array:
+        index = max_lag - int(lag)
+        lagged_columns.append(xp.reshape(windows[:, index, 0], (-1, 1)))
+
+    if len(lagged_columns) == 1:
+        return lagged_columns[0]
+
+    return _concat(xp, lagged_columns, axis=1)
 
 
 def initial_lagged_matrix(x: np.ndarray, y: np.ndarray, xlag, ylag) -> np.ndarray:
@@ -168,11 +213,12 @@ def initial_lagged_matrix(x: np.ndarray, y: np.ndarray, xlag, ylag) -> np.ndarra
     Y[k-1], Y[k-2], x[k-1], x[k-2].
 
     """
+    xp = get_namespace(x, y)
     n_inputs, xlag = _process_xlag(x, xlag)
     ylag = _process_ylag(ylag)
     x_lagged = _create_lagged_x(x, n_inputs, xlag)
     y_lagged = _create_lagged_y(y, ylag)
-    lagged_data = np.concatenate([y_lagged, x_lagged], axis=1)
+    lagged_data = _concat(xp, [y_lagged, x_lagged], axis=1)
     return lagged_data
 
 
@@ -200,10 +246,11 @@ def build_output_matrix(y, ylag: np.ndarray) -> np.ndarray:
     # related to its respective lags. With this approach we can create
     # the information matrix by using all possible combination of
     # the columns as a product in the iterations
+    xp = get_namespace(y)
     ylag = _process_ylag(ylag)
     y_lagged = _create_lagged_y(y, ylag)
-    constant = np.ones([y_lagged.shape[0], 1])
-    data = np.concatenate([constant, y_lagged], axis=1)
+    constant = xp.ones((y_lagged.shape[0], 1), dtype=y_lagged.dtype)
+    data = _concat(xp, [constant, y_lagged], axis=1)
     return data
 
 
@@ -232,10 +279,11 @@ def build_input_matrix(x, xlag: np.ndarray) -> np.ndarray:
     # the information matrix by using all possible combination of
     # the columns as a product in the iterations
 
+    xp = get_namespace(x)
     n_inputs, xlag = _process_xlag(x, xlag)
     x_lagged = _create_lagged_x(x, n_inputs, xlag)
-    constant = np.ones([x_lagged.shape[0], 1])
-    data = np.concatenate([constant, x_lagged], axis=1)
+    constant = xp.ones((x_lagged.shape[0], 1), dtype=x_lagged.dtype)
+    data = _concat(xp, [constant, x_lagged], axis=1)
     return data
 
 
@@ -267,9 +315,10 @@ def build_input_output_matrix(x: np.ndarray, y: np.ndarray, xlag, ylag) -> np.nd
     # related to its respective lags. With this approach we can create
     # the information matrix by using all possible combination of
     # the columns as a product in the iterations
+    xp = get_namespace(x, y)
     lagged_data = initial_lagged_matrix(x, y, xlag, ylag)
-    constant = np.ones([lagged_data.shape[0], 1])
-    data = np.concatenate([constant, lagged_data], axis=1)
+    constant = xp.ones((lagged_data.shape[0], 1), dtype=lagged_data.dtype)
+    data = _concat(xp, [constant, lagged_data], axis=1)
     return data
 
 

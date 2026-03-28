@@ -5,6 +5,8 @@ from numpy.testing import (
     assert_equal,
 )
 
+from sysidentpy import config_context
+from sysidentpy._lib._array_api import _to_numpy
 from sysidentpy.basis_function import Polynomial
 from sysidentpy.utils.information_matrix import (
     shift_column,
@@ -257,3 +259,30 @@ def test_create_lagged_x_handles_lag_larger_than_series():
     lagged = _create_lagged_x(x=X, n_inputs=1, xlag=[4])
     # First four entries must be zeros due to insufficient history
     assert_equal(lagged[:4, 0], np.zeros(4))
+
+
+def test_build_sliding_windows_preserves_array_api_namespace():
+    xp = pytest.importorskip("array_api_strict")
+    data = xp.asarray(np.arange(6.0).reshape(-1, 1))
+
+    with config_context(array_api_dispatch=True):
+        windows = _build_sliding_windows(data, 2)
+
+    assert windows.shape == (6, 3, 1)
+    assert windows.__array_namespace__().__name__ == xp.__name__
+    assert_almost_equal(_to_numpy(windows)[2, :, 0], np.array([0.0, 1.0, 2.0]))
+
+
+def test_build_input_output_matrix_preserves_array_api_namespace():
+    xp = pytest.importorskip("array_api_strict")
+    x_data = xp.asarray(np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0], [7.0, 8.0]]))
+    y_data = xp.asarray(np.array([[10.0], [20.0], [30.0], [40.0]]))
+
+    with config_context(array_api_dispatch=True):
+        result = build_input_output_matrix(x_data, y_data, [[1], [1]], [1])
+
+    expected = np.array(
+        [[1.0, 0.0, 0.0, 0.0], [1.0, 10.0, 1.0, 2.0], [1.0, 20.0, 3.0, 4.0], [1.0, 30.0, 5.0, 6.0]]
+    )
+    assert result.__array_namespace__().__name__ == xp.__name__
+    assert_almost_equal(_to_numpy(result), expected)

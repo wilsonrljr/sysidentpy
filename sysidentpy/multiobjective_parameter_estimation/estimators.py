@@ -4,6 +4,7 @@ from typing import Tuple, List
 
 import numpy as np
 
+from sysidentpy._lib._array_api import get_namespace, _require_numpy_namespace
 from sysidentpy.basis_function import Polynomial
 from sysidentpy.utils.information_matrix import build_input_output_matrix
 from sysidentpy.narmax_base import RegressorDictionary
@@ -442,6 +443,9 @@ class AILS:
 
         """
         psi = self.build_psi(X, y)
+        xp = get_namespace(psi, y)
+        _require_numpy_namespace(xp, feature="AILS", dependency="SciPy")
+
         y = y[self.max_lag :]
         HR, QR = np.zeros((1, 1)), np.zeros((1, 1))
         n_parameters = weighing_matrix.shape[1]

@@ -7,7 +7,7 @@
 
 import warnings
 
-from typing import Union, Optional
+from typing import Optional
 
 import numpy as np
 
@@ -19,6 +19,14 @@ from .estimators_base import BaseEstimator
 from .estimators_base import _validate_params, _initial_values
 from ..utils.deprecation import deprecated
 from ..utils.check_arrays import check_linear_dependence_rows
+from .._lib._array_api import (
+    _concat,
+    _diag,
+    _lstsq,
+    _require_numpy_namespace,
+    _to_numpy,
+    get_namespace,
+)
 
 
 class EstimatorError(Exception):
@@ -92,8 +100,9 @@ class LeastSquares(BaseEstimator):
         theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
         """
+        xp = get_namespace(psi, y)
         check_linear_dependence_rows(psi)
-        theta = np.linalg.lstsq(psi, y, rcond=None)[0]
+        theta = _lstsq(xp, psi, y)
         return theta
 
 
@@ -193,10 +202,11 @@ class RidgeRegression(BaseEstimator):
         https://www.nature.com/articles/s41467-021-25801-2
 
         """
+        xp = get_namespace(psi, y)
         check_linear_dependence_rows(psi)
 
         theta = (
-            np.linalg.pinv(psi.T @ psi + self.alpha * np.eye(psi.shape[1])) @ psi.T @ y
+            xp.linalg.pinv(psi.T @ psi + self.alpha * xp.eye(psi.shape[1], dtype=psi.dtype)) @ psi.T @ y
         )
         return theta
 
@@ -226,12 +236,13 @@ class RidgeRegression(BaseEstimator):
                          Cross Validated, accessed 21 September 2023,
                          https://stats.stackexchange.com/q/220324
         """
+        xp = get_namespace(psi, y)
         check_linear_dependence_rows(psi)
         try:
-            U, S, Vh = np.linalg.svd(psi, full_matrices=False)
-            S = np.diag(S)
-            i = np.identity(len(S))
-            theta = Vh.T @ np.linalg.inv(S**2 + self.alpha * i) @ S @ U.T @ y
+            U, S, Vh = xp.linalg.svd(psi, full_matrices=False)
+            S = _diag(xp, S)
+            i = xp.eye(S.shape[0], dtype=psi.dtype)
+            theta = Vh.T @ xp.linalg.inv(S**2 + self.alpha * i) @ S @ U.T @ y
         except EstimatorError:
             warnings.warn(
                 "The SVD computation did not converge."
@@ -306,12 +317,13 @@ class TotalLeastSquares(BaseEstimator):
         theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
         """
+        xp = get_namespace(psi, y)
         check_linear_dependence_rows(psi)
-        full = np.hstack((psi, y))
+        full = _concat(xp, [psi, y], axis=1)
         n = psi.shape[1]
-        _, _, v = np.linalg.svd(full, full_matrices=True)
+        _, _, v = xp.linalg.svd(full, full_matrices=True)
         theta = -v.T[:n, n:] / v.T[n:, n:]
-        return theta.reshape(-1, 1)
+        return xp.reshape(theta, (-1, 1))
 
 
 class RecursiveLeastSquares(BaseEstimator):
@@ -420,29 +432,31 @@ class RecursiveLeastSquares(BaseEstimator):
            de sistemas: técnicas lineares e não-lineares aplicadas a sistemas
            reais. Editora da UFMG. 3a edição.
         """
+        xp = get_namespace(psi, y)
         n_theta, n, theta, self.xi = _initial_values(psi)
-        p = np.eye(n_theta) / self.delta
+        p = xp.eye(n_theta, dtype=psi.dtype) / self.delta
 
         for i in range(2, n):
-            psi_tmp = psi[i, :].reshape(-1, 1)
-            k_numerator = self.lam ** (-1) * p.dot(psi_tmp)
-            k_denominator = 1 + self.lam ** (-1) * psi_tmp.T.dot(p).dot(psi_tmp)
-            k = np.divide(k_numerator, k_denominator)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
-            tmp_list = theta[:, i - 1].reshape(-1, 1) + k.dot(self.xi[i, 0])
-            theta[:, i] = tmp_list.flatten()
+            psi_tmp = xp.reshape(psi[i, :], (-1, 1))
+            k_numerator = self.lam ** (-1) * (p @ psi_tmp)
+            k_denominator = 1 + self.lam ** (-1) * (psi_tmp.T @ p @ psi_tmp)
+            k = k_numerator / k_denominator
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + k * self.xi[i, 0]
+            theta[:, i] = xp.reshape(tmp_list, (-1,))
 
-            p1 = p.dot(psi[i, :].reshape(-1, 1)).dot(psi[i, :].reshape(-1, 1).T).dot(p)
+            psi_col = xp.reshape(psi[i, :], (-1, 1))
+            p1 = (p @ psi_col) @ (psi_col.T @ p)
             p2 = (
-                psi[i, :].reshape(-1, 1).T.dot(p).dot(psi[i, :].reshape(-1, 1))
+                psi_col.T @ p @ psi_col
                 + self.lam
             )
 
-            p_numerator = p - np.divide(p1, p2)
-            p = np.divide(p_numerator, self.lam)
+            p_numerator = p - p1 / p2
+            p = p_numerator / self.lam
 
         self.theta_evolution = theta.copy()
-        return theta[:, -1].reshape(-1, 1)
+        return xp.reshape(theta[:, -1], (-1, 1))
 
 
 class AffineLeastMeanSquares(BaseEstimator):
@@ -534,19 +548,20 @@ class AffineLeastMeanSquares(BaseEstimator):
         A more in-depth documentation of all methods for parameters estimation
         will be available soon. For now, please refer to the mentioned references.
         """
+        xp = get_namespace(psi, y)
         n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
-            self.xi = y - psi.dot(theta[:, i - 1].reshape(-1, 1))
+            self.xi = y - psi @ xp.reshape(theta[:, i - 1], (-1, 1))
             aux = (
                 self.mu
                 * psi
-                @ np.linalg.pinv(psi.T @ psi + self.offset_covariance * np.eye(n_theta))
+                @ xp.linalg.pinv(psi.T @ psi + self.offset_covariance * xp.eye(n_theta, dtype=psi.dtype))
             )
-            tmp_list = theta[:, i - 1].reshape(-1, 1) + aux.T.dot(self.xi)
-            theta[:, i] = tmp_list.flatten()
+            tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + aux.T @ self.xi
+            theta[:, i] = xp.reshape(tmp_list, (-1,))
 
-        return theta[:, -1].reshape(-1, 1)
+        return xp.reshape(theta[:, -1], (-1, 1))
 
 
 class LeastMeanSquares(BaseEstimator):
@@ -626,17 +641,18 @@ class LeastMeanSquares(BaseEstimator):
         theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
         """
+        xp = get_namespace(psi, y)
         n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
-            psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
+            psi_tmp = xp.reshape(psi[i, :], (-1, 1))
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
             tmp_list = (
-                theta[:, i - 1].reshape(-1, 1) + 2 * self.mu * self.xi[i, 0] * psi_tmp
+                xp.reshape(theta[:, i - 1], (-1, 1)) + 2 * self.mu * self.xi[i, 0] * psi_tmp
             )
-            theta[:, i] = tmp_list.flatten()
+            theta[:, i] = xp.reshape(tmp_list, (-1,))
 
-        return theta[:, -1].reshape(-1, 1)
+        return xp.reshape(theta[:, -1], (-1, 1))
 
 
 class LeastMeanSquaresSignError(BaseEstimator):
@@ -714,18 +730,19 @@ class LeastMeanSquaresSignError(BaseEstimator):
             The estimated parameters of the model.
 
         """
+        xp = get_namespace(psi, y)
         n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
-            psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
+            psi_tmp = xp.reshape(psi[i, :], (-1, 1))
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
             tmp_list = (
-                theta[:, i - 1].reshape(-1, 1)
-                + self.mu * np.sign(self.xi[i, 0]) * psi_tmp
+                xp.reshape(theta[:, i - 1], (-1, 1))
+                + self.mu * xp.sign(self.xi[i, 0]) * psi_tmp
             )
-            theta[:, i] = tmp_list.flatten()
+            theta[:, i] = xp.reshape(tmp_list, (-1,))
 
-        return theta[:, -1].reshape(-1, 1)
+        return xp.reshape(theta[:, -1], (-1, 1))
 
 
 class NormalizedLeastMeanSquares(BaseEstimator):
@@ -813,17 +830,18 @@ class NormalizedLeastMeanSquares(BaseEstimator):
             The estimated parameters of the model.
 
         """
+        xp = get_namespace(psi, y)
         n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
-            psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
-            tmp_list = theta[:, i - 1].reshape(-1, 1) + 2 * self.mu * self.xi[i, 0] * (
-                psi_tmp / (self.eps + np.dot(psi_tmp.T, psi_tmp))
+            psi_tmp = xp.reshape(psi[i, :], (-1, 1))
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + 2 * self.mu * self.xi[i, 0] * (
+                psi_tmp / (self.eps + (psi_tmp.T @ psi_tmp))
             )
-            theta[:, i] = tmp_list.flatten()
+            theta[:, i] = xp.reshape(tmp_list, (-1,))
 
-        return theta[:, -1].reshape(-1, 1)
+        return xp.reshape(theta[:, -1], (-1, 1))
 
 
 class NormalizedLeastMeanSquaresSignError(BaseEstimator):
@@ -915,17 +933,18 @@ class NormalizedLeastMeanSquaresSignError(BaseEstimator):
         the estimated parameters and the sign of the error vector is used to
         change the filter coefficients.
         """
+        xp = get_namespace(psi, y)
         n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
-            psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
-            tmp_list = theta[:, i - 1].reshape(-1, 1) + 2 * self.mu * np.sign(
+            psi_tmp = xp.reshape(psi[i, :], (-1, 1))
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + 2 * self.mu * xp.sign(
                 self.xi[i, 0]
-            ) * (psi_tmp / (self.eps + np.dot(psi_tmp.T, psi_tmp)))
-            theta[:, i] = tmp_list.flatten()
+            ) * (psi_tmp / (self.eps + (psi_tmp.T @ psi_tmp)))
+            theta[:, i] = xp.reshape(tmp_list, (-1,))
 
-        return theta[:, -1].reshape(-1, 1)
+        return xp.reshape(theta[:, -1], (-1, 1))
 
 
 class LeastMeanSquaresSignRegressor(BaseEstimator):
@@ -1006,17 +1025,18 @@ class LeastMeanSquaresSignRegressor(BaseEstimator):
         theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
         """
+        xp = get_namespace(psi, y)
         n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
-            psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
-            tmp_list = theta[:, i - 1].reshape(-1, 1) + self.mu * self.xi[
+            psi_tmp = xp.reshape(psi[i, :], (-1, 1))
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + self.mu * self.xi[
                 i, 0
-            ] * np.sign(psi_tmp)
-            theta[:, i] = tmp_list.flatten()
+            ] * xp.sign(psi_tmp)
+            theta[:, i] = xp.reshape(tmp_list, (-1,))
 
-        return theta[:, -1].reshape(-1, 1)
+        return xp.reshape(theta[:, -1], (-1, 1))
 
 
 class LeastMeanSquaresNormalizedSignRegressor(BaseEstimator):
@@ -1108,17 +1128,18 @@ class LeastMeanSquaresNormalizedSignRegressor(BaseEstimator):
         theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
         """
+        xp = get_namespace(psi, y)
         n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
-            psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
-            tmp_list = theta[:, i - 1].reshape(-1, 1) + self.mu * self.xi[i, 0] * (
-                np.sign(psi_tmp) / (self.eps + np.dot(psi_tmp.T, psi_tmp))
+            psi_tmp = xp.reshape(psi[i, :], (-1, 1))
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + self.mu * self.xi[i, 0] * (
+                xp.sign(psi_tmp) / (self.eps + (psi_tmp.T @ psi_tmp))
             )
-            theta[:, i] = tmp_list.flatten()
+            theta[:, i] = xp.reshape(tmp_list, (-1,))
 
-        return theta[:, -1].reshape(-1, 1)
+        return xp.reshape(theta[:, -1], (-1, 1))
 
 
 class LeastMeanSquaresSignSign(BaseEstimator):
@@ -1195,17 +1216,18 @@ class LeastMeanSquaresSignSign(BaseEstimator):
         theta : array-like of shape (n_features, 1)
             The estimated parameters of the model.
         """
+        xp = get_namespace(psi, y)
         n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
-            psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
-            tmp_list = theta[:, i - 1].reshape(-1, 1) + 2 * self.mu * np.sign(
+            psi_tmp = xp.reshape(psi[i, :], (-1, 1))
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + 2 * self.mu * xp.sign(
                 self.xi[i, 0]
-            ) * np.sign(psi_tmp)
-            theta[:, i] = tmp_list.flatten()
+            ) * xp.sign(psi_tmp)
+            theta[:, i] = xp.reshape(tmp_list, (-1,))
 
-        return theta[:, -1].reshape(-1, 1)
+        return xp.reshape(theta[:, -1], (-1, 1))
 
 
 class LeastMeanSquaresNormalizedSignSign(BaseEstimator):
@@ -1305,17 +1327,18 @@ class LeastMeanSquaresNormalizedSignSign(BaseEstimator):
         de algoritmos LMS de passo variável.
         - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
         """
+        xp = get_namespace(psi, y)
         n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
-            psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
-            tmp_list = theta[:, i - 1].reshape(-1, 1) + 2 * self.mu * np.sign(
+            psi_tmp = xp.reshape(psi[i, :], (-1, 1))
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + 2 * self.mu * xp.sign(
                 self.xi[i, 0]
-            ) * (np.sign(psi_tmp) / (self.eps + np.dot(psi_tmp.T, psi_tmp)))
-            theta[:, i] = tmp_list.flatten()
+            ) * (xp.sign(psi_tmp) / (self.eps + (psi_tmp.T @ psi_tmp)))
+            theta[:, i] = xp.reshape(tmp_list, (-1,))
 
-        return theta[:, -1].reshape(-1, 1)
+        return xp.reshape(theta[:, -1], (-1, 1))
 
 
 class LeastMeanSquaresNormalizedLeaky(BaseEstimator):
@@ -1419,19 +1442,20 @@ class LeastMeanSquaresNormalizedLeaky(BaseEstimator):
           de algoritmos LMS de passo variável.
         - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
         """
+        xp = get_namespace(psi, y)
         n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
-            psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
-            tmp_list = theta[:, i - 1].reshape(-1, 1) * (
+            psi_tmp = xp.reshape(psi[i, :], (-1, 1))
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) * (
                 1 - self.mu * self.gama
             ) + self.mu * self.xi[i, 0] * psi_tmp / (
-                self.eps + np.dot(psi_tmp.T, psi_tmp)
+                self.eps + (psi_tmp.T @ psi_tmp)
             )
-            theta[:, i] = tmp_list.flatten()
+            theta[:, i] = xp.reshape(tmp_list, (-1,))
 
-        return theta[:, -1].reshape(-1, 1)
+        return xp.reshape(theta[:, -1], (-1, 1))
 
 
 class LeastMeanSquaresLeaky(BaseEstimator):
@@ -1531,18 +1555,19 @@ class LeastMeanSquaresLeaky(BaseEstimator):
           de algoritmos LMS de passo variável.
         - Wikipedia entry on Least Mean Squares: https://en.wikipedia.org/wiki/Least_mean_squares_filter
         """
+        xp = get_namespace(psi, y)
         n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
-            psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
+            psi_tmp = xp.reshape(psi[i, :], (-1, 1))
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
             tmp_list = (
-                theta[:, i - 1].reshape(-1, 1) * (1 - self.mu * self.gama)
+                xp.reshape(theta[:, i - 1], (-1, 1)) * (1 - self.mu * self.gama)
                 + self.mu * self.xi[i, 0] * psi_tmp
             )
-            theta[:, i] = tmp_list.flatten()
+            theta[:, i] = xp.reshape(tmp_list, (-1,))
 
-        return theta[:, -1].reshape(-1, 1)
+        return xp.reshape(theta[:, -1], (-1, 1))
 
 
 class LeastMeanSquaresFourth(BaseEstimator):
@@ -1629,17 +1654,18 @@ class LeastMeanSquaresFourth(BaseEstimator):
         theta : ndarray of floats of shape (n_features, 1)
             The estimated parameters of the model.
         """
+        xp = get_namespace(psi, y)
         n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
-            psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
+            psi_tmp = xp.reshape(psi[i, :], (-1, 1))
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
             tmp_list = (
-                theta[:, i - 1].reshape(-1, 1) + self.mu * psi_tmp * self.xi[i, 0] ** 3
+                xp.reshape(theta[:, i - 1], (-1, 1)) + self.mu * psi_tmp * self.xi[i, 0] ** 3
             )
-            theta[:, i] = tmp_list.flatten()
+            theta[:, i] = xp.reshape(tmp_list, (-1,))
 
-        return theta[:, -1].reshape(-1, 1)
+        return xp.reshape(theta[:, -1], (-1, 1))
 
 
 class LeastMeanSquareMixedNorm(BaseEstimator):
@@ -1740,17 +1766,18 @@ class LeastMeanSquareMixedNorm(BaseEstimator):
         A more in-depth documentation of all methods for parameter estimation
         will be available soon. For now, please refer to the mentioned references.
         """
+        xp = get_namespace(psi, y)
         n_theta, n, theta, self.xi = _initial_values(psi)
 
         for i in range(n_theta, n):
-            psi_tmp = psi[i, :].reshape(-1, 1)
-            self.xi[i, 0] = y[i, 0] - np.dot(psi_tmp.T, theta[:, i - 1])[0]
-            tmp_list = theta[:, i - 1].reshape(-1, 1) + self.mu * psi_tmp * self.xi[
+            psi_tmp = xp.reshape(psi[i, :], (-1, 1))
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + self.mu * psi_tmp * self.xi[
                 i, 0
             ] * (self.weight + (1 - self.weight) * self.xi[i, 0] ** 2)
-            theta[:, i] = tmp_list.flatten()
+            theta[:, i] = xp.reshape(tmp_list, (-1,))
 
-        return theta[:, -1].reshape(-1, 1)
+        return xp.reshape(theta[:, -1], (-1, 1))
 
 
 class NonNegativeLeastSquares(BaseEstimator):
@@ -1849,8 +1876,13 @@ class NonNegativeLeastSquares(BaseEstimator):
         ----------
         .. [1] scipy, https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.nnls.html
         """
-        theta, _ = nnls(psi, y.ravel(), maxiter=self.maxiter, atol=self.atol)
-        return theta.reshape(-1, 1)
+        xp = get_namespace(psi, y)
+        _require_numpy_namespace(xp, feature=self.__class__.__name__)
+        psi_np = _to_numpy(psi)
+        y_np = _to_numpy(y)
+        theta_np, _ = nnls(psi_np, y_np.ravel(), maxiter=self.maxiter, atol=self.atol)
+        theta_np = theta_np.reshape(-1, 1)
+        return xp.asarray(theta_np)
 
 
 class BoundedVariableLeastSquares(BaseEstimator):
@@ -2019,9 +2051,13 @@ class BoundedVariableLeastSquares(BaseEstimator):
         ----------
         .. [1] scipy, https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.lsq_linear.html
         """
+        xp = get_namespace(psi, y)
+        _require_numpy_namespace(xp, feature=self.__class__.__name__)
+        psi_np = _to_numpy(psi)
+        y_np = _to_numpy(y)
         theta = lsq_linear(
-            psi,
-            y.ravel(),
+            psi_np,
+            y_np.ravel(),
             bounds=self.bounds,
             method=self.method,
             tol=self.tol,
@@ -2031,7 +2067,8 @@ class BoundedVariableLeastSquares(BaseEstimator):
             verbose=self.verbose,
             lsmr_maxiter=self.lsmr_maxiter,
         )
-        return theta.x.reshape(-1, 1)
+        theta_np = theta.x.reshape(-1, 1)
+        return xp.asarray(theta_np)
 
 
 class LeastSquaresMinimalResidual(BaseEstimator):
@@ -2162,9 +2199,13 @@ class LeastSquaresMinimalResidual(BaseEstimator):
         ----------
         .. [1] scipy, https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.lsmr.html
         """
-        theta = lsmr(
-            psi,
-            y.ravel(),
+        xp = get_namespace(psi, y)
+        _require_numpy_namespace(xp, feature=self.__class__.__name__)
+        psi_np = _to_numpy(psi)
+        y_np = _to_numpy(y)
+        theta_np = lsmr(
+            psi_np,
+            y_np.ravel(),
             damp=self.damp,
             atol=self.atol,
             btol=self.btol,
@@ -2173,4 +2214,5 @@ class LeastSquaresMinimalResidual(BaseEstimator):
             show=self.show,
             x0=self.x0,
         )[0]
-        return theta.reshape(-1, 1)
+        theta_np = theta_np.reshape(-1, 1)
+        return xp.asarray(theta_np)

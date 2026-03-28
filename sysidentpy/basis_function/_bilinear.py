@@ -6,6 +6,7 @@ from itertools import combinations_with_replacement, chain
 from typing import Optional
 import numpy as np
 
+from sysidentpy._lib._array_api import get_namespace, _is_numpy_namespace, _column_stack
 from .basis_function_base import BaseBasisFunction
 
 from sysidentpy.utils.lags import get_max_xlag, get_max_ylag
@@ -130,11 +131,13 @@ class Bilinear(BaseBasisFunction):
                 combination_list[index] for index in predefined_regressors
             ]
 
-        psi = np.column_stack(
+        xp = get_namespace(data)
+        psi = _column_stack(
+            xp,
             [
-                np.prod(data[:, combination_list[i]], axis=1)
+                xp.prod(data[:, combination_list[i]], axis=1)
                 for i in range(len(combination_list))
-            ]
+            ],
         )
         psi = psi[max_lag:, :]
         return psi

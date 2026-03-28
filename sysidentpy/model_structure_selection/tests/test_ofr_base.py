@@ -8,6 +8,8 @@ import types
 import pytest
 import numpy as np
 
+from sysidentpy import config_context
+from sysidentpy._lib._array_api import _to_numpy
 from sysidentpy.model_structure_selection.ofr_base import (
     OFRBase,
     _compute_err_slice,
@@ -459,3 +461,22 @@ def test_basis_function_branch_in_predict_uses_n_step(monkeypatch):
     res = model.predict(X=None, y=y_data, steps_ahead=3, forecast_horizon=1)
     assert called["mode"] == "basis_n_step"
     assert res.shape == (y_data.shape[0] + 1, 1)
+
+
+def test_predict_polynomial_preserves_array_api_namespace():
+    xp = pytest.importorskip("array_api_strict")
+    model = SimpleOFR()
+    model.max_lag = 1
+    model._model_prediction = lambda _x, _y, forecast_horizon=None: xp.asarray(
+        np.full((3, 1), 2.0)
+    )
+    y_data = xp.asarray(np.arange(4.0).reshape(-1, 1))
+
+    with config_context(array_api_dispatch=True):
+        result = model.predict(X=None, y=y_data)
+
+    assert result.__array_namespace__().__name__ == xp.__name__
+    np.testing.assert_array_equal(
+        _to_numpy(result),
+        np.array([[0.0], [2.0], [2.0], [2.0]]),
+    )

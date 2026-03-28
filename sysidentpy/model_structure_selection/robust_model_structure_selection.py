@@ -32,6 +32,12 @@ from typing import List, Literal, Optional, Tuple, Union
 
 import numpy as np
 
+from .._lib._array_api import (
+    get_namespace,
+    _is_numpy_namespace,
+    _copy,
+    _require_numpy_namespace,
+)
 from ..basis_function import Fourier, Polynomial
 from ..parameter_estimation.estimators import RecursiveLeastSquares
 from ..utils.check_arrays import num_features
@@ -322,24 +328,29 @@ class RMSS(OFRBase):
         np.ndarray
             Computed error metric values.
         """
+        xp = get_namespace(errors)
+        _eps_val = xp.asarray(self.eps, dtype=errors.dtype)
+
         if self.error_measure == "mae":
-            return np.abs(errors).mean(axis=axis)
+            return xp.mean(xp.abs(errors), axis=axis)
 
         if self.error_measure == "mse":
-            return np.square(errors).mean(axis=axis)
+            return xp.mean(errors ** 2, axis=axis)
 
         if self.error_measure == "phi3":
-            numerator = np.abs(errors).sum(axis=axis)
-            denom = np.abs(y_ref).sum(axis=axis) + np.abs(preds).sum(axis=axis)
-            denom = np.where(np.abs(denom) < self.eps, self.eps, denom)
+            numerator = xp.sum(xp.abs(errors), axis=axis)
+            denom = xp.sum(xp.abs(y_ref), axis=axis) + xp.sum(
+                xp.abs(preds), axis=axis
+            )
+            denom = xp.where(xp.abs(denom) < self.eps, _eps_val, denom)
             return numerator / denom
 
         # rmse_ratio
-        rmse = np.sqrt(np.square(errors).mean(axis=axis))
-        y_rmse = np.sqrt(np.square(y_ref).mean(axis=axis))
-        pred_rmse = np.sqrt(np.square(preds).mean(axis=axis))
+        rmse = xp.sqrt(xp.mean(errors ** 2, axis=axis))
+        y_rmse = xp.sqrt(xp.mean(y_ref ** 2, axis=axis))
+        pred_rmse = xp.sqrt(xp.mean(preds ** 2, axis=axis))
         denom = y_rmse + pred_rmse
-        denom = np.where(np.abs(denom) < self.eps, self.eps, denom)
+        denom = xp.where(xp.abs(denom) < self.eps, _eps_val, denom)
         return rmse / denom
 
     def _overall_error(self, psi_views: np.ndarray, y_views: np.ndarray) -> np.ndarray:
@@ -359,9 +370,16 @@ class RMSS(OFRBase):
         np.ndarray
             Overall error for each candidate regressor (shape: M,).
         """
-        numerators = np.einsum("knm,kn->km", psi_views, y_views)
-        denominators = np.einsum("knm,knm->km", psi_views, psi_views)
-        denominators = np.where(np.abs(denominators) < self.eps, self.eps, denominators)
+        xp = get_namespace(psi_views, y_views)
+        _eps_val = xp.asarray(self.eps, dtype=psi_views.dtype)
+        # einsum("knm,kn->km") -> sum(psi * y[..., None], axis=-2)
+        y_expanded_for_mul = xp.reshape(y_views, y_views.shape + (1,))
+        numerators = xp.sum(psi_views * y_expanded_for_mul, axis=-2)
+        # einsum("knm,knm->km") -> sum(psi * psi, axis=-2)
+        denominators = xp.sum(psi_views * psi_views, axis=-2)
+        denominators = xp.where(
+            xp.abs(denominators) < self.eps, _eps_val, denominators
+        )
         alphas = numerators / denominators
 
         preds = psi_views * alphas[:, None, :]
@@ -371,7 +389,7 @@ class RMSS(OFRBase):
         y_expanded = y_views[:, :, None]
         metric = self._compute_error_metric(errors, y_expanded, preds, axis=1)
 
-        return metric.mean(axis=0)
+        return xp.mean(metric, axis=0)
 
     def _overall_error_multi(
         self, psi_list: List[np.ndarray], y_list: List[np.ndarray]
@@ -416,10 +434,15 @@ class RMSS(OFRBase):
         np.ndarray
             Error metric for each candidate (shape: M,).
         """
-        y_vec = y.reshape(-1)
+        xp = get_namespace(psi, y)
+        _eps_val = xp.asarray(self.eps, dtype=psi.dtype)
+        y_vec = xp.reshape(y, (-1,))
         numerators = psi.T @ y_vec
-        denominators = np.einsum("ij,ij->j", psi, psi)
-        denominators = np.where(np.abs(denominators) < self.eps, self.eps, denominators)
+        # einsum("ij,ij->j") -> sum(psi * psi, axis=0)
+        denominators = xp.sum(psi * psi, axis=0)
+        denominators = xp.where(
+            xp.abs(denominators) < self.eps, _eps_val, denominators
+        )
         alphas = numerators / denominators
 
         preds = psi * alphas[None, :]
@@ -447,10 +470,16 @@ class RMSS(OFRBase):
         np.ndarray
             Orthogonalized regressor views with same shape as input.
         """
-        denom = np.einsum("kn,kn->k", selected_q, selected_q)
-        denom = np.where(np.abs(denom) < self.eps, self.eps, denom)
+        xp = get_namespace(psi_views, selected_q)
+        _eps_val = xp.asarray(self.eps, dtype=psi_views.dtype)
+        # einsum("kn,kn->k") -> sum(q * q, axis=-1)
+        denom = xp.sum(selected_q * selected_q, axis=-1)
+        denom = xp.where(xp.abs(denom) < self.eps, _eps_val, denom)
 
-        projection = np.einsum("kn,knm->km", selected_q, psi_views)
+        # einsum("kn,knm->km") -> sum(q[..., None] * psi, axis=-2)
+        projection = xp.sum(
+            xp.reshape(selected_q, selected_q.shape + (1,)) * psi_views, axis=-2
+        )
         coeff = projection / denom[:, None]
         return psi_views - selected_q[:, :, None] * coeff[:, None, :]
 
@@ -474,11 +503,13 @@ class RMSS(OFRBase):
         np.ndarray
             Orthogonalized regressor matrix with same shape as input.
         """
-        denom = np.dot(selected_q, selected_q)
-        denom = self.eps if np.abs(denom) < self.eps else denom
+        xp = get_namespace(psi_matrix, selected_q)
+        denom = float(xp.sum(selected_q * selected_q))
+        denom = self.eps if abs(denom) < self.eps else denom
         projection = psi_matrix.T @ selected_q
         coeff = projection / denom
-        return psi_matrix - np.outer(selected_q, coeff)
+        # outer product: q[:, None] @ coeff[None, :]
+        return psi_matrix - xp.reshape(selected_q, (-1, 1)) @ xp.reshape(coeff, (1, -1))
 
     def _orthogonalize_remaining_multi(
         self, psi_list: List[np.ndarray], selected_q_list: List[np.ndarray]
@@ -983,6 +1014,9 @@ class RMSS(OFRBase):
         """
         if y is None:
             raise ValueError("y cannot be None")
+
+        xp = get_namespace(y) if X is None else get_namespace(X, y)
+        _require_numpy_namespace(xp, feature="RMSS", dependency="SciPy")
 
         self.max_lag = self._get_max_lag()
 
