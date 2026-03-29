@@ -9,7 +9,7 @@ import pytest
 import numpy as np
 
 from sysidentpy import config_context
-from sysidentpy._lib._array_api import _to_numpy
+from sysidentpy._lib._array_api import _to_numpy, get_namespace
 from sysidentpy.model_structure_selection.ofr_base import (
     OFRBase,
     _compute_err_slice,
@@ -142,7 +142,7 @@ def test_ofrbase_initialization_with_n_terms():
 
 def test_ofrbase_invalid_eps():
     """Test invalid eps value for OFRBase initialization."""
-    with pytest.raises(ValueError, match="eps must be float and > zero. Got -1"):
+    with pytest.raises(ValueError, match=r"eps must be float and > zero\. Got -1"):
         TestOFRBase(
             ylag=2,
             xlag=2,
@@ -433,7 +433,7 @@ def test_information_criterion_clamps_n_info_values(monkeypatch):
         return err, piv, reg
 
     monkeypatch.setattr(SimpleOFR, "run_mss_algorithm", fake_run)
-    with pytest.warns(UserWarning):
+    with pytest.warns(UserWarning, match="n_info_values"):
         output = model.information_criterion(x, y)
     assert len(output) == 3
     assert model.n_info_values == 3
@@ -467,9 +467,9 @@ def test_predict_polynomial_preserves_array_api_namespace():
     xp = pytest.importorskip("array_api_strict")
     model = SimpleOFR()
     model.max_lag = 1
-    model._model_prediction = lambda _x, _y, forecast_horizon=None: xp.asarray(
-        np.full((3, 1), 2.0)
-    )
+    model._model_prediction = lambda _x, _y, forecast_horizon=None: get_namespace(
+        _y
+    ).asarray(np.full((3, 1), 2.0))
     y_data = xp.asarray(np.arange(4.0).reshape(-1, 1))
 
     with config_context(array_api_dispatch=True):
@@ -498,3 +498,28 @@ def test_error_reduction_ratio_accepts_torch_tensors():
     assert err.shape == (psi.shape[1],)
     assert piv.shape == (4,)
     assert psi_orthogonal.shape == (psi.shape[0], 4)
+
+
+def test_error_reduction_ratio_matches_numpy_for_torch_tensors():
+    torch = pytest.importorskip("torch")
+    rng = np.random.default_rng(12345)
+    psi_np = rng.normal(size=(24, 6))
+    y_np = rng.normal(size=(26, 1))
+
+    baseline = MockOFRBase()
+    err_np, piv_np, psi_orth_np = baseline.error_reduction_ratio(
+        psi_np, y_np, process_term_number=4
+    )
+
+    model = MockOFRBase()
+    psi_t = torch.tensor(psi_np, dtype=torch.float64)
+    y_t = torch.tensor(y_np, dtype=torch.float64)
+
+    with config_context(array_api_dispatch=True):
+        err_t, piv_t, psi_orth_t = model.error_reduction_ratio(
+            psi_t, y_t, process_term_number=4
+        )
+
+    np.testing.assert_array_equal(_to_numpy(piv_t), piv_np)
+    np.testing.assert_allclose(_to_numpy(err_t), err_np, rtol=1e-7, atol=1e-9)
+    np.testing.assert_allclose(_to_numpy(psi_orth_t), psi_orth_np, rtol=1e-7, atol=1e-9)

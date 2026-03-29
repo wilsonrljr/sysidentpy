@@ -1,4 +1,3 @@
-# ruff: noqa: SLF001
 # pylint: disable=protected-access
 # pyright: reportMissingTypeStubs=false
 import numpy as np

@@ -341,12 +341,14 @@ class UOFR(OFRBase):
                 )
             if self.modulating_function == "bspline" and self.sobolev_order > 3:
                 raise ValueError(
-                    "B-spline modulating function currently supports derivatives up to order 3. "
-                    "Use a custom callable if higher Sobolev orders are required."
+                    "B-spline modulating function currently supports"
+                    " derivatives up to order 3. Use a custom callable"
+                    " if higher Sobolev orders are required."
                 )
         elif not callable(self.modulating_function):
             raise TypeError(
-                "modulating_function must be a callable or one of the supported strings."
+                "modulating_function must be a callable"
+                " or one of the supported strings."
             )
 
         if (

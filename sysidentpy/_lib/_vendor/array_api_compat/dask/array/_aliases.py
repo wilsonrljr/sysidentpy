@@ -164,7 +164,9 @@ def asarray(
             if copy is False:
                 raise ValueError("Unable to avoid copy when changing dtype")
             obj = obj.astype(dtype)
-        return obj.copy() if copy else obj  # pyright: ignore[reportAttributeAccessIssue]
+        return (
+            obj.copy() if copy else obj
+        )  # pyright: ignore[reportAttributeAccessIssue]
 
     if copy is False:
         raise ValueError(
@@ -364,6 +366,7 @@ __all__ = [
     "bitwise_left_shift", "bitwise_right_shift", "bitwise_invert",
 ]  # fmt: skip
 __all__ += _aliases.__all__
+
 
 def __dir__() -> list[str]:
     return __all__

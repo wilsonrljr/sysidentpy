@@ -8,7 +8,7 @@ from sysidentpy.utils.check_arrays import check_infinity, check_nan
 
 def test_check_random_state_invalid_seed():
     """Invalid types should raise when seeding random state."""
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="seed"):
         check_random_state(object())
 
 

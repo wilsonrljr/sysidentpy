@@ -306,16 +306,15 @@ class ER(BaseMSS):
 
         """
         min_value = -np.inf
-        piv = np.array(piv)
+        piv = np.asarray(piv, dtype=np.intp)
         ix = []
         while (min_value <= self.tol) and (len(piv) > 1):
             initial_array = np.full((1, len(piv)), np.inf)
             for i in range(initial_array.shape[1]):
-                if piv[i] not in []:  # if you want to keep any regressor
-                    rem = np.setdiff1d(piv, piv[i])
-                    f1 = reg_matrix[:, piv] @ pinv(reg_matrix[:, piv]) @ y
-                    f2 = reg_matrix[:, rem] @ pinv(reg_matrix[:, rem]) @ y
-                    initial_array[0, i] = self.conditional_mutual_information(y, f1, f2)
+                rem = np.setdiff1d(piv, piv[i])
+                f1 = reg_matrix[:, piv] @ pinv(reg_matrix[:, piv]) @ y
+                f2 = reg_matrix[:, rem] @ pinv(reg_matrix[:, rem]) @ y
+                initial_array[0, i] = self.conditional_mutual_information(y, f1, f2)
 
             ix = np.argmin(initial_array)
             min_value = initial_array[0, ix]

@@ -7,6 +7,7 @@ https://data-apis.org/array-api/latest/API_specification/inspection.html for
 more details.
 
 """
+
 from __future__ import annotations
 
 from numpy import bool_ as bool
@@ -63,7 +64,7 @@ class __array_namespace_info__:
 
     """
 
-    __module__ = 'numpy'
+    __module__ = "numpy"
 
     def capabilities(self):
         """
@@ -183,7 +184,7 @@ class __array_namespace_info__:
         if device not in ["cpu", None]:
             raise ValueError(
                 'Device not understood. Only "cpu" is allowed, but received:'
-                f' {device}'
+                f" {device}"
             )
         return {
             "real floating": dtype(float64),
@@ -255,7 +256,7 @@ class __array_namespace_info__:
         if device not in ["cpu", None]:
             raise ValueError(
                 'Device not understood. Only "cpu" is allowed, but received:'
-                f' {device}'
+                f" {device}"
             )
         if kind is None:
             return {

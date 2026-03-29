@@ -468,7 +468,7 @@ class TestIsPolynomialModel:
 
 
 class TestRenderersWithoutNInputs:
-    """Test renderers when model has no n_inputs attribute (lines 386-387, 403-404, etc)."""
+    """Test renderers when model has no n_inputs attribute."""
 
     def test_polynomial_renderer_infers_n_inputs_from_xlag_int(self):
         """Lines 386-387: infer n_inputs=1 from int xlag."""
@@ -489,7 +489,7 @@ class TestRenderersWithoutNInputs:
 
         class ModelNoNInputs:
             basis_function = Polynomial(degree=1)
-            xlag = [[1], [1, 2]]  # 2 inputs
+            xlag = [[1], [1, 2]]  # noqa: RUF012
             ylag = 1
             pivv = np.array([0, 3, 4])  # indices 3,4 are v(k-1), v(k-2)
             theta = np.array([[1.0], [0.5], [0.3]])
@@ -550,7 +550,7 @@ class TestRenderersWithoutNInputs:
 
         class ModelNoNInputs:
             basis_function = UnknownBasis()
-            xlag = [[1], [2]]  # 2 inputs
+            xlag = [[1], [2]]  # noqa: RUF012
             ylag = 1
             pivv = None
             theta = np.array([[1.0], [0.5], [0.3]])

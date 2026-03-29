@@ -11,6 +11,7 @@ import numpy as np
 from sysidentpy._lib._array_api import (
     _asarray,
     _concat,
+    _is_numpy_namespace,
     get_namespace,
     _copy,
     device as _device,
@@ -79,8 +80,8 @@ def _swap_vector_entries(xp, values, left_idx, right_idx):
     if left_idx == right_idx:
         return values
 
-    left_value = values[left_idx]
-    right_value = values[right_idx]
+    left_value = _copy(xp, values[left_idx])
+    right_value = _copy(xp, values[right_idx])
     values = _set_element(xp, values, left_idx, right_value)
     values = _set_element(xp, values, right_idx, left_value)
     return values
@@ -520,7 +521,7 @@ class SimulateNARMAX(BaseMSS):
         tmp_err = xp.zeros((dimension,), dtype=psi.dtype)
         err = xp.zeros((dimension,), dtype=psi.dtype)
 
-        for i in range(0, dimension):
+        for i in range(dimension):
             tmp_err_slice = _compute_err_slice(
                 tmp_psi,
                 tmp_y,
@@ -534,7 +535,7 @@ class SimulateNARMAX(BaseMSS):
             if i == process_term_number:
                 break
 
-            piv_index = int(xp.argmax(tmp_err[i:])) + i
+            piv_index = int(_to_numpy(xp.argmax(tmp_err[i:]))) + i
             err = _set_element(xp, err, i, tmp_err[piv_index])
             tmp_psi = _swap_matrix_columns(xp, tmp_psi, piv_index, i)
             piv = _swap_vector_entries(xp, piv, piv_index, i)
@@ -596,6 +597,16 @@ class SimulateNARMAX(BaseMSS):
 
         """
         xp = get_namespace(X, y)
+        if steps_ahead != 1 and not _is_numpy_namespace(xp):
+            return self._predict_on_cpu(
+                X=X,
+                y=y,
+                steps_ahead=steps_ahead,
+                forecast_horizon=forecast_horizon,
+                original_xp=xp,
+                target_device=_device(y),
+            )
+
         if isinstance(self.basis_function, Polynomial):
             if steps_ahead is None:
                 yhat = self._model_prediction(X, y, forecast_horizon=forecast_horizon)

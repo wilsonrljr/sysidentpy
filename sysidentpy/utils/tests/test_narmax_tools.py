@@ -64,8 +64,10 @@ def test_train_test_split():
 def test_train_test_split_without_inputs():
     """When X is None the splitter must return None for both feature sets."""
     X_train, X_test, y_train, y_test = train_test_split(None, np.arange(10), 0.3)
-    assert X_train is None and X_test is None
-    assert y_train.shape[0] == 7 and y_test.shape[0] == 3
+    assert X_train is None
+    assert X_test is None
+    assert y_train.shape[0] == 7
+    assert y_test.shape[0] == 3
 
 
 def test_train_test_split_invalid_test_size():

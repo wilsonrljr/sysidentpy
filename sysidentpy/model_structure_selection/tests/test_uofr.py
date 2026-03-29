@@ -289,7 +289,9 @@ def test_test_function_grid_gaussian_span_matches_sigma():
 
 
 def test_test_function_grid_with_callable_uses_unit_span():
-    custom_phi = lambda t, order: np.ones_like(t)
+    def custom_phi(t, order):
+        return np.ones_like(t)
+
     model = UOFR(modulating_function=custom_phi, basis_function=Polynomial(degree=1))
     grid = model._test_function_grid()
     assert_almost_equal(grid[0], -1.0)
@@ -297,7 +299,9 @@ def test_test_function_grid_with_callable_uses_unit_span():
 
 
 def test_evaluate_test_function_with_callable_uses_custom_function():
-    custom_phi = lambda t, order: np.full_like(t, fill_value=float(order))
+    def custom_phi(t, order):
+        return np.full_like(t, fill_value=float(order))
+
     model = UOFR(modulating_function=custom_phi, basis_function=Polynomial(degree=1))
     grid = model._test_function_grid()
     values = model._evaluate_test_function(grid, 2)
@@ -391,7 +395,7 @@ def test_sobolev_error_reduction_ratio_respects_err_tol():
             np.linspace(0.6, 1.0, 5),
         )
     )
-    err, piv, psi_ortho, y_aug = model.sobolev_error_reduction_ratio(
+    _err, piv, psi_ortho, _y_aug = model.sobolev_error_reduction_ratio(
         psi_sample,
         y_sample,
         process_term_number=2,

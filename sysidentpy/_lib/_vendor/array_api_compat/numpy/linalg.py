@@ -13,7 +13,7 @@ from ..common import _linalg
 __all__ = clone_module("numpy.linalg", globals())
 
 # These functions are in both the main and linalg namespaces
-from ._aliases import matmul, matrix_transpose, tensordot, vecdot  # noqa: F401
+from ._aliases import matmul, matrix_transpose, tensordot, vecdot
 from ._typing import Array
 
 cross = get_xp(np)(_linalg.cross)
@@ -100,6 +100,7 @@ def solve(x1: Array, x2: Array, /) -> Array:
 
 # Unlike numpy.linalg.eig, Array API version always returns complex results
 
+
 def eig(x: Array, /) -> tuple[Array, Array]:
     try:
         from numpy.linalg._linalg import (  # type: ignore[attr-defined]
@@ -128,10 +129,14 @@ def eig(x: Array, /) -> tuple[Array, Array]:
     _assert_finite(x)
     t, result_t = _commonType(x)
 
-    signature = 'D->DD' if isComplexType(t) else 'd->DD'
-    with np.errstate(call=_raise_linalgerror_eigenvalues_nonconvergence,
-                  invalid='call', over='ignore', divide='ignore',
-                  under='ignore'):
+    signature = "D->DD" if isComplexType(t) else "d->DD"
+    with np.errstate(
+        call=_raise_linalgerror_eigenvalues_nonconvergence,
+        invalid="call",
+        over="ignore",
+        divide="ignore",
+        under="ignore",
+    ):
         w, vt = _umath_linalg.eig(x, signature=signature)
 
     result_t = _complexType(result_t)
@@ -167,10 +172,14 @@ def eigvals(x: Array, /) -> Array:
     _assert_finite(x)
     t, result_t = _commonType(x)
 
-    signature = 'D->D' if isComplexType(t) else 'd->D'
-    with np.errstate(call=_raise_linalgerror_eigenvalues_nonconvergence,
-                  invalid='call', over='ignore', divide='ignore',
-                  under='ignore'):
+    signature = "D->D" if isComplexType(t) else "d->D"
+    with np.errstate(
+        call=_raise_linalgerror_eigenvalues_nonconvergence,
+        invalid="call",
+        over="ignore",
+        divide="ignore",
+        under="ignore",
+    ):
         w = _umath_linalg.eigvals(x, signature=signature)
 
     result_t = _complexType(result_t)
@@ -197,12 +206,13 @@ _all = [
     "matrix_power",
     "multi_dot",
     "norm",
-    "solve", 
+    "solve",
     "tensorinv",
     "tensorsolve",
     "vector_norm",
 ]
 __all__ = sorted(set(__all__) | set(_linalg.__all__) | set(_all))
+
 
 def __dir__() -> list[str]:
     return __all__

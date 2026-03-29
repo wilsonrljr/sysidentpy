@@ -172,7 +172,6 @@ def _apply_where(  # numpydoc ignore=PR01,RT01
     xp: ModuleType,
 ) -> Array:
     """Helper of `apply_where`. On Dask, this runs on a single chunk."""
-
     nargs = len(args) - len(kwkeys)
     kwargs = dict(zip(kwkeys, args[nargs:], strict=True))
     args = args[:nargs]
@@ -211,7 +210,6 @@ def _apply_where(  # numpydoc ignore=PR01,RT01
 def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType) -> Array:
     # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
-
     if x.ndim < ndim:
         x = xp.expand_dims(x, axis=0)
         x = atleast_nd(x, ndim=ndim, xp=xp)
@@ -268,7 +266,7 @@ def broadcast_shapes(*shapes: tuple[float | None, ...]) -> tuple[int | None, ...
     for axis in range(-ndim, 0):
         sizes = {shape[axis] for shape in shapes if axis >= -len(shape)}
         # Dask uses NaN for unknown shape, which predates the Array API spec for None
-        none_size = None in sizes or math.nan in sizes  # noqa: PLW0177
+        none_size = None in sizes or math.nan in sizes
         sizes -= {1, None, math.nan}
         if len(sizes) > 1:
             msg = (
@@ -412,9 +410,14 @@ def isclose(
         out = apply_where(
             xp.isinf(a) | xp.isinf(b),
             (a, b),
-            lambda a, b: mxp.isinf(a) & mxp.isinf(b) & (mxp.sign(a) == mxp.sign(b)),  # pyright: ignore[reportUnknownArgumentType]
+            lambda a, b: mxp.isinf(a)
+            & mxp.isinf(b)
+            & (
+                mxp.sign(a) == mxp.sign(b)
+            ),  # pyright: ignore[reportUnknownArgumentType]
             # Note: inf <= inf is True!
-            lambda a, b: mxp.abs(a - b) <= (atol + rtol * mxp.abs(b)),  # pyright: ignore[reportUnknownArgumentType]
+            lambda a, b: mxp.abs(a - b)
+            <= (atol + rtol * mxp.abs(b)),  # pyright: ignore[reportUnknownArgumentType]
             xp=xp,
         )
         if equal_nan:
@@ -741,7 +744,6 @@ def setdiff1d(
     xp: ModuleType,
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._delegation.py`."""
-
     # https://github.com/microsoft/pyright/issues/10103
     x1_, x2_ = asarrays(x1, x2, xp=xp)
 
@@ -758,7 +760,6 @@ def setdiff1d(
 def sinc(x: Array, /, *, xp: ModuleType) -> Array:
     # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._delegation.py`."""
-
     # no scalars in `where` - array-api#807
     y = xp.pi * xp.where(
         xp.astype(x, xp.bool),
@@ -770,7 +771,7 @@ def sinc(x: Array, /, *, xp: ModuleType) -> Array:
 
 def partition(  # numpydoc ignore=PR01,RT01
     x: Array,
-    kth: int,  # noqa: ARG001
+    kth: int,
     /,
     axis: int = -1,
     *,
@@ -782,7 +783,7 @@ def partition(  # numpydoc ignore=PR01,RT01
 
 def argpartition(  # numpydoc ignore=PR01,RT01
     x: Array,
-    kth: int,  # noqa: ARG001
+    kth: int,
     /,
     axis: int = -1,
     *,

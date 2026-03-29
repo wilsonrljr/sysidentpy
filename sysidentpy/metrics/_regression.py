@@ -457,6 +457,4 @@ def symmetric_mean_absolute_percentage_error(y: NDArray, yhat: NDArray) -> NDArr
     """
     xp = get_namespace(y, yhat)
     n = y.shape[0]
-    return float(
-        100 / n * xp.sum(2 * xp.abs(yhat - y) / (xp.abs(y) + xp.abs(yhat)))
-    )
+    return float(100 / n * xp.sum(2 * xp.abs(yhat - y) / (xp.abs(y) + xp.abs(yhat))))

@@ -33,7 +33,10 @@ from sysidentpy.parameter_estimation.estimators import (
     LeastSquaresMinimalResidual,
 )
 
-from sysidentpy.parameter_estimation.estimators_base import BaseEstimator, _validate_params
+from sysidentpy.parameter_estimation.estimators_base import (
+    BaseEstimator,
+    _validate_params,
+)
 
 
 def create_test_data(n=1000):

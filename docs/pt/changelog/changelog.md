@@ -5,6 +5,68 @@ title: Histórico de Alterações
 
 # Alterações no SysIdentPy
 
+## v0.9.0
+
+### COLABORADORES
+
+- Wilson Rocha Lacerda Junior (wilsonrljr)
+
+### MUDANÇAS
+
+Esta versão introduz **suporte ao padrão Array API**, permitindo que o SysIdentPy funcione nativamente com NumPy, PyTorch (CPU e CUDA), CuPy, JAX e qualquer outra biblioteca de arrays que implemente o [padrão Python Array API](https://data-apis.org/array-api/latest/). Esta é uma mudança arquitetural significativa que traz aceleração por GPU e flexibilidade de backend para fluxos de trabalho de identificação de sistemas sem alterar o comportamento de nenhum algoritmo.
+
+#### Funcionalidade Principal — Suporte ao Padrão Array API
+
+- O SysIdentPy agora suporta o padrão Array API através de um mecanismo de despacho opt-in. Os usuários podem habilitá-lo globalmente com `set_config(array_api_dispatch=True)` ou temporariamente com `config_context(array_api_dispatch=True)`. Quando desabilitado (o padrão), o SysIdentPy se comporta exatamente como antes, usando exclusivamente NumPy.
+- O sistema de despacho é construído sobre cópias vendorizadas de `array-api-compat` (v1.14.0) e `array-api-extra` (v0.10.1), seguindo a mesma abordagem usada pelo scikit-learn e SciPy.
+- Um novo módulo interno `sysidentpy._lib._array_api` fornece a camada de compatibilidade principal com funções como `get_namespace()`, `_to_numpy()`, `_lstsq()`, `_zeros()`, `_ones()`, `_concat()`, `_diag()`, `_set_element()`, `_copy()`, `_median()`, `_nanargmin()`, `_vector_norm()`, `_pow()` e outras.
+- Um novo módulo `sysidentpy._lib._err` fornece uma implementação agnóstica de backend para o cálculo do ERR (Error Reduction Ratio).
+- Configuração thread-safe via `sysidentpy._config` garante isolamento em workloads multi-threaded.
+
+#### Integração Array API nos Módulos
+
+- **Seleção de Estrutura de Modelo**: FROLS, AOLS, OFRBase, UOFR e a família Orthogonal Floating Search (OSF, OIF, OOS/O2S) suportam completamente o despacho Array API. MetaMSS, Entropic Regression (ER) e RMSS requerem NumPy devido a dependências do SciPy.
+- **Estimação de Parâmetros**: 18 estimadores suportam o despacho Array API (LeastSquares, RidgeRegression, TotalLeastSquares, RecursiveLeastSquares, AffineLeastMeanSquares e todas as 12 variantes da família LMS). 3 estimadores requerem NumPy (NonNegativeLeastSquares, BoundedVariableLeastSquares, LeastSquaresMinimalResidual).
+- **Funções Base**: Todas as 8 funções base funcionam com despacho Array API.
+- **Simulação**: Todo o módulo de simulação suporta despacho Array API.
+- **Métricas**: Todas as métricas de regressão suportam despacho Array API.
+- **Utilitários**: `check_arrays`, `information_matrix` e análise residual suportam despacho Array API.
+- **NARMAX Base**: O pipeline de predição suporta despacho Array API com um fast-path vetorizado para Polynomial NARMAX habilitando predição free-run acelerada por GPU.
+
+#### Nova API Pública
+
+- `sysidentpy.set_config(array_api_dispatch=True/False)` — definir configuração global.
+- `sysidentpy.get_config()` — obter configuração atual.
+- `sysidentpy.config_context(array_api_dispatch=True/False)` — gerenciador de contexto para configuração temporária.
+
+#### Correções de Bugs
+
+- Corrigido indexação escalar no Entropic Regression ao usar NumPy 2.x.
+- Corrigido `_prepare_datasets` do RMSS para validar consistência de dimensões de entrada antes do loop de construção do modelo.
+- Removido código morto no backward elimination do Entropic Regression.
+
+#### Testes
+
+- Adicionados testes de despacho Array API em todos os módulos principais usando `array_api_strict` e backends PyTorch.
+- Adicionados testes de equivalência numérica cross-backend (NumPy vs PyTorch) para computação ERR.
+- Adicionado novo notebook de exemplo `array-api-benchmark.ipynb`.
+
+#### Ferramentas e Configuração
+
+- Atualizado Ruff de v0.2.2 para v0.15.8 (local e pre-commit).
+- Atualizado hook id do pre-commit de `ruff` para `ruff-check`.
+- Substituído prefixo de regra deprecado `TCH` por `TC` na configuração do Ruff.
+- Removido `isort` das dependências de desenvolvimento.
+- Adicionado `array-api-strict >=2.0` às dependências de desenvolvimento.
+
+### IMPACTO
+
+O suporte ao Array API é uma das mudanças arquiteturais mais significativas na história do SysIdentPy. Permite que pesquisadores e profissionais executem fluxos de trabalho de identificação de sistemas em GPUs usando PyTorch ou CuPy sem alterar o código do modelo (apenas alternando uma flag de configuração). O design opt-in preserva total compatibilidade retroativa. A implementação segue os padrões estabelecidos pelo scikit-learn e SciPy, garantindo alinhamento com a direção do ecossistema Scientific Python em direção à computação agnóstica de hardware.
+
+### TESTES
+
+A matriz de CI continua testando contra Python 3.10–3.14. O despacho Array API é testado com `array_api_strict` e backends PyTorch. Todos os 672 testes passam com 18 ignorados (todos devido à dependência opcional `array_api_strict`).
+
 ## v0.8.0
 ### COLABORADORES
 - Wilson Rocha Lacerda Junior (wilsonrljr)

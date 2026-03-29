@@ -1,4 +1,3 @@
-# ruff: noqa: SLF001
 # pylint: disable=protected-access,unused-variable
 import numpy as np
 import pytest
@@ -229,7 +228,7 @@ def test_estimate_parameter_conditions():
 
 
 def test_input_dimension():
-    x_train, x_valid, y_train, y_valid = get_siso_data(
+    _x_train, _x_valid, _y_train, y_valid = get_siso_data(
         n=1000, colored_noise=False, sigma=0.001, train_percentage=90
     )
 
@@ -647,6 +646,36 @@ def test_error_reduction_ratio_preserves_array_api_namespace():
     np.testing.assert_array_equal(_to_numpy(psi_orth), psi_np[:, :1])
 
 
+def test_error_reduction_ratio_matches_numpy_for_torch_tensors():
+    torch = pytest.importorskip("torch")
+    psi_np = np.array([[1.0, 0.0], [0.0, 1.0], [0.0, 0.0]])
+    y_np = np.array([[0.0], [2.0], [1.0], [0.0]])
+    regressor_code = np.array([[1001, 0], [1002, 0]])
+
+    baseline = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
+    baseline.max_lag = 1
+    model_code_np, err_np, piv_np, psi_orth_np = baseline.error_reduction_ratio(
+        psi_np, y_np, 1, regressor_code
+    )
+
+    simulator = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
+    simulator.max_lag = 1
+    psi_t = torch.tensor(psi_np, dtype=torch.float64)
+    y_t = torch.tensor(y_np, dtype=torch.float64)
+
+    with config_context(array_api_dispatch=True):
+        model_code_t, err_t, piv_t, psi_orth_t = simulator.error_reduction_ratio(
+            psi_t, y_t, 1, regressor_code
+        )
+
+    np.testing.assert_array_equal(_to_numpy(model_code_t), model_code_np)
+    np.testing.assert_array_equal(_to_numpy(piv_t), piv_np)
+    np.testing.assert_allclose(_to_numpy(err_t), err_np, rtol=1e-10, atol=1e-12)
+    np.testing.assert_allclose(
+        _to_numpy(psi_orth_t), psi_orth_np, rtol=1e-10, atol=1e-12
+    )
+
+
 class _FourierPredictStub(SimulateNARMAX):
     """Stub that bypasses basis function NotImplemented branches."""
 
@@ -671,7 +700,7 @@ class _FourierPredictStub(SimulateNARMAX):
         self.calls.append("n_steps_horizon")
         return np.array([[0.0]])
 
-    def fit(self, *, X=None, y=None):  # noqa: ARG002
+    def fit(self, *, X=None, y=None):
         raise NotImplementedError
 
 

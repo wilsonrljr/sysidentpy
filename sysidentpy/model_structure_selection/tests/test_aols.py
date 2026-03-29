@@ -1,11 +1,11 @@
-# ruff: noqa: SLF001
+# pyright: reportPrivateUsage=false
 # pylint: disable=protected-access
 import numpy as np
 import pytest
 from numpy.testing import assert_almost_equal, assert_equal, assert_raises
 
 from sysidentpy import config_context
-from sysidentpy._lib._array_api import _to_numpy
+from sysidentpy._lib._array_api import _to_numpy, get_namespace
 from sysidentpy.basis_function import Fourier, Polynomial
 from sysidentpy.parameter_estimation.estimators import LeastSquares
 from sysidentpy.model_structure_selection.accelerated_orthogonal_least_squares import (
@@ -29,6 +29,18 @@ X_train = np.reshape(X_train, (len(X_train), 1))
 
 y_test = np.reshape(y_test, (len(y_test), 1))
 X_test = np.reshape(X_test, (len(X_test), 1))
+
+
+class _AOLSProbe(AOLS):
+    def narmax_predict_reference(self, x_data, y_data, forecast_horizon):
+        return self._narmax_predict_reference(x_data, y_data, forecast_horizon)
+
+    def polynomial_narmax_predict_fast(self, x_data, y_data, forecast_horizon):
+        return self._polynomial_narmax_predict_fast(
+            x_data,
+            y_data,
+            forecast_horizon,
+        )
 
 
 class _NullEstimator:
@@ -204,9 +216,9 @@ def test_predict_polynomial_preserves_array_api_namespace():
     xp = pytest.importorskip("array_api_strict")
     model = AOLS(basis_function=Polynomial(degree=2))
     model.max_lag = 1
-    model._model_prediction = lambda _x, _y, forecast_horizon=0: xp.asarray(
-        np.full((3, 1), 1.5)
-    )
+    model._model_prediction = lambda _x, _y, forecast_horizon=0: get_namespace(
+        _y
+    ).asarray(np.full((3, 1), 1.5))
     y_data = xp.asarray(np.arange(4.0).reshape(-1, 1))
 
     with config_context(array_api_dispatch=True):
@@ -234,6 +246,68 @@ def test_fit_predict_accepts_torch_tensors_under_array_api_dispatch():
     assert isinstance(yhat, torch.Tensor)
     assert_equal(tuple(yhat.shape), y_test.shape)
     assert_equal(_to_numpy(yhat[: model.max_lag]), y_test[: model.max_lag])
+
+
+def test_fit_predict_accepts_torch_cuda_tensors_under_array_api_dispatch():
+    torch = pytest.importorskip("torch")
+    if not torch.cuda.is_available():
+        pytest.skip("CUDA not available")
+
+    model = AOLS(ylag=[1, 2], xlag=2, basis_function=Polynomial(degree=2))
+    x_train_t = torch.tensor(X_train, dtype=torch.float64, device="cuda")
+    y_train_t = torch.tensor(y_train, dtype=torch.float64, device="cuda")
+    x_test_t = torch.tensor(X_test, dtype=torch.float64, device="cuda")
+    y_test_t = torch.tensor(y_test, dtype=torch.float64, device="cuda")
+
+    with config_context(array_api_dispatch=True):
+        model.fit(X=x_train_t, y=y_train_t)
+        yhat = model.predict(X=x_test_t, y=y_test_t)
+
+    assert isinstance(yhat, torch.Tensor)
+    assert yhat.device.type == "cuda"
+    assert_equal(tuple(yhat.shape), y_test.shape)
+    assert_equal(_to_numpy(yhat[: model.max_lag]), y_test[: model.max_lag])
+
+
+def test_polynomial_narmax_fast_path_matches_reference_for_aols_model():
+    model = _AOLSProbe(ylag=[1, 2], xlag=2, basis_function=Polynomial(degree=2))
+    model.fit(X=X_train, y=y_train)
+
+    reference = model.narmax_predict_reference(
+        X_test,
+        y_test,
+        forecast_horizon=X_test.shape[0],
+    )
+    fast = model.polynomial_narmax_predict_fast(
+        X_test,
+        y_test,
+        forecast_horizon=X_test.shape[0],
+    )
+
+    np.testing.assert_allclose(fast, reference, rtol=1e-10, atol=1e-12)
+
+
+def test_predict_repeated_calls_are_stable_under_array_api_dispatch_for_aols():
+    torch = pytest.importorskip("torch")
+    model = AOLS(ylag=[1, 2], xlag=2, basis_function=Polynomial(degree=2))
+    x_train_t = torch.tensor(X_train, dtype=torch.float64)
+    y_train_t = torch.tensor(y_train, dtype=torch.float64)
+    x_test_t = torch.tensor(X_test, dtype=torch.float64)
+    y_test_t = torch.tensor(y_test, dtype=torch.float64)
+
+    with config_context(array_api_dispatch=True):
+        model.fit(X=x_train_t, y=y_train_t)
+        yhat_first = model.predict(X=x_test_t, y=y_test_t)
+        final_model_first = model.final_model.copy()
+        yhat_second = model.predict(X=x_test_t, y=y_test_t)
+
+    np.testing.assert_allclose(
+        _to_numpy(yhat_first),
+        _to_numpy(yhat_second),
+        rtol=1e-10,
+        atol=1e-12,
+    )
+    np.testing.assert_array_equal(model.final_model, final_model_first)
 
 
 def test_predict_polynomial_multi_step_returns_prediction():

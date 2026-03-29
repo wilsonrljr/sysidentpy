@@ -88,6 +88,7 @@ def _is_jax_zero_gradient_array(x: object) -> TypeGuard[_ZeroGradientArray]:
         return False
 
     import jax
+
     # jax.float0 is a np.dtype([('float0', 'V')])
     return dtype == jax.float0
 
@@ -103,7 +104,6 @@ def is_numpy_array(x: object) -> TypeIs[npt.NDArray[Any]]:
 
     See Also
     --------
-
     array_namespace
     is_array_api_obj
     is_cupy_array
@@ -116,7 +116,7 @@ def is_numpy_array(x: object) -> TypeIs[npt.NDArray[Any]]:
     # TODO: Should we reject ndarray subclasses?
     cls = cast(Hashable, type(x))
     return (
-        _issubclass_fast(cls, "numpy", "ndarray") 
+        _issubclass_fast(cls, "numpy", "ndarray")
         or _issubclass_fast(cls, "numpy", "generic")
     ) and not _is_jax_zero_gradient_array(x)
 
@@ -132,7 +132,6 @@ def is_cupy_array(x: object) -> bool:
 
     See Also
     --------
-
     array_namespace
     is_array_api_obj
     is_numpy_array
@@ -155,7 +154,6 @@ def is_torch_array(x: object) -> TypeIs[torch.Tensor]:
 
     See Also
     --------
-
     array_namespace
     is_array_api_obj
     is_numpy_array
@@ -177,7 +175,6 @@ def is_ndonnx_array(x: object) -> TypeIs[ndx.Array]:
 
     See Also
     --------
-
     array_namespace
     is_array_api_obj
     is_numpy_array
@@ -200,7 +197,6 @@ def is_dask_array(x: object) -> TypeIs[da.Array]:
 
     See Also
     --------
-
     array_namespace
     is_array_api_obj
     is_numpy_array
@@ -224,7 +220,6 @@ def is_jax_array(x: object) -> TypeIs[jax.Array]:
 
     See Also
     --------
-
     array_namespace
     is_array_api_obj
     is_numpy_array
@@ -258,7 +253,6 @@ def is_pydata_sparse_array(x: object) -> TypeIs[sparse.SparseArray]:
 
     See Also
     --------
-
     array_namespace
     is_array_api_obj
     is_numpy_array
@@ -279,7 +273,6 @@ def is_array_api_obj(x: object) -> TypeGuard[_ArrayApiObj]:
 
     See Also
     --------
-
     array_namespace
     is_numpy_array
     is_cupy_array
@@ -288,9 +281,8 @@ def is_array_api_obj(x: object) -> TypeGuard[_ArrayApiObj]:
     is_dask_array
     is_jax_array
     """
-    return (
-        hasattr(x, '__array_namespace__') 
-        or _is_array_api_cls(cast(Hashable, type(x)))
+    return hasattr(x, "__array_namespace__") or _is_array_api_cls(
+        cast(Hashable, type(x))
     )
 
 
@@ -306,7 +298,9 @@ def _is_array_api_cls(cls: type) -> bool:
         or _issubclass_fast(cls, "sparse", "SparseArray")
         # TODO: drop support for jax<0.4.32 which didn't have __array_namespace__
         or _issubclass_fast(cls, "jax", "Array")
-        or _issubclass_fast(cls, "jax.core", "Tracer")  # see is_jax_array for limitations
+        or _issubclass_fast(
+            cls, "jax.core", "Tracer"
+        )  # see is_jax_array for limitations
     )
 
 
@@ -324,7 +318,6 @@ def is_numpy_namespace(xp: Namespace) -> bool:
 
     See Also
     --------
-
     array_namespace
     is_cupy_namespace
     is_torch_namespace
@@ -346,7 +339,6 @@ def is_cupy_namespace(xp: Namespace) -> bool:
 
     See Also
     --------
-
     array_namespace
     is_numpy_namespace
     is_torch_namespace
@@ -368,7 +360,6 @@ def is_torch_namespace(xp: Namespace) -> bool:
 
     See Also
     --------
-
     array_namespace
     is_numpy_namespace
     is_cupy_namespace
@@ -387,7 +378,6 @@ def is_ndonnx_namespace(xp: Namespace) -> bool:
 
     See Also
     --------
-
     array_namespace
     is_numpy_namespace
     is_cupy_namespace
@@ -409,7 +399,6 @@ def is_dask_namespace(xp: Namespace) -> bool:
 
     See Also
     --------
-
     array_namespace
     is_numpy_namespace
     is_cupy_namespace
@@ -431,7 +420,6 @@ def is_jax_namespace(xp: Namespace) -> bool:
 
     See Also
     --------
-
     array_namespace
     is_numpy_namespace
     is_cupy_namespace
@@ -450,7 +438,6 @@ def is_pydata_sparse_namespace(xp: Namespace) -> bool:
 
     See Also
     --------
-
     array_namespace
     is_numpy_namespace
     is_cupy_namespace
@@ -469,7 +456,6 @@ def is_array_api_strict_namespace(xp: Namespace) -> bool:
 
     See Also
     --------
-
     array_namespace
     is_numpy_namespace
     is_cupy_namespace
@@ -509,9 +495,8 @@ def _cls_to_namespace(
     _use_compat = use_compat in (None, True)
     cls_ = cast(Hashable, cls)  # Make mypy happy
 
-    if (
-        _issubclass_fast(cls_, "numpy", "ndarray") 
-        or _issubclass_fast(cls_, "numpy", "generic")
+    if _issubclass_fast(cls_, "numpy", "ndarray") or _issubclass_fast(
+        cls_, "numpy", "generic"
     ):
         if use_compat is True:
             _check_api_version(api_version)
@@ -564,11 +549,12 @@ def _jax_namespace(api_version: str | None, use_compat: bool | None) -> Namespac
     if use_compat:
         raise ValueError("JAX does not have an array-api-compat wrapper")
     import jax.numpy as jnp
+
     if not hasattr(jnp, "__array_namespace_info__"):
         # JAX v0.4.32 and newer implements the array API directly in jax.numpy.
         # For older JAX versions, it is available via jax.experimental.array_api.
         # jnp.Array objects gain the __array_namespace__ method.
-        import jax.experimental.array_api  # noqa: F401
+        import jax.experimental.array_api
     # Test api_version
     return jnp.empty(0).__array_namespace__(api_version=api_version)
 
@@ -599,7 +585,6 @@ def array_namespace(
 
     Returns
     -------
-
     out: namespace
         The array API compatible namespace corresponding to the arrays in `xs`.
 
@@ -631,7 +616,6 @@ def array_namespace(
 
     See Also
     --------
-
     is_array_api_obj
     is_numpy_array
     is_cupy_array
@@ -680,7 +664,9 @@ def array_namespace(
 get_namespace = array_namespace
 
 
-def _check_device(bare_xp: Namespace, device: Device) -> None:  # pyright: ignore[reportUnusedFunction]
+def _check_device(
+    bare_xp: Namespace, device: Device
+) -> None:  # pyright: ignore[reportUnusedFunction]
     """
     Validate dummy device on device-less array backends.
 
@@ -741,13 +727,11 @@ def device(x: _ArrayApiObj, /) -> Device:
 
     Notes
     -----
-
     For NumPy the device is always `"cpu"`. For Dask, the device is always a
     special `DASK_DEVICE` object.
 
     See Also
     --------
-
     to_device : Move array data to a different device.
 
     """
@@ -845,7 +829,6 @@ def to_device(x: Array, device: Device, /, *, stream: int | Any | None = None) -
 
     Parameters
     ----------
-
     x: array
         array instance from an array API compatible library.
 
@@ -861,14 +844,12 @@ def to_device(x: Array, device: Device, /, *, stream: int | Any | None = None) -
 
     Returns
     -------
-
     out: array
         an array with the same data and data type as ``x`` and located on the
         specified ``device``.
 
     Notes
     -----
-
     For NumPy, this function effectively does nothing since the only supported
     device is the CPU. For CuPy, this method supports CuPy CUDA
     :external+cupy:class:`Device <cupy.cuda.Device>` and
@@ -878,7 +859,6 @@ def to_device(x: Array, device: Device, /, *, stream: int | Any | None = None) -
 
     See Also
     --------
-
     device : Hardware device the array data resides on.
 
     """
@@ -903,7 +883,7 @@ def to_device(x: Array, device: Device, /, *, stream: int | Any | None = None) -
     elif is_jax_array(x):
         if not hasattr(x, "__array_namespace__"):
             # In JAX v0.4.31 and older, this import adds to_device method to x...
-            import jax.experimental.array_api  # noqa: F401  # pyright: ignore
+            import jax.experimental.array_api  # pyright: ignore
 
             # ... but only on eager JAX. It won't work inside jax.jit.
             if not hasattr(x, "to_device"):
@@ -945,7 +925,9 @@ def _is_writeable_cls(cls: type) -> bool | None:
     if (
         _issubclass_fast(cls, "numpy", "generic")
         or _issubclass_fast(cls, "jax", "Array")
-        or _issubclass_fast(cls, "jax.core", "Tracer")  # see is_jax_array for limitations
+        or _issubclass_fast(
+            cls, "jax.core", "Tracer"
+        )  # see is_jax_array for limitations
         or _issubclass_fast(cls, "sparse", "SparseArray")
     ):
         return False
@@ -970,7 +952,7 @@ def is_writeable_array(x: object) -> TypeGuard[_ArrayApiObj]:
     res = _is_writeable_cls(cls)
     if res is not None:
         return res
-    return hasattr(x, '__array_namespace__')
+    return hasattr(x, "__array_namespace__")
 
 
 @lru_cache(100)
@@ -985,12 +967,14 @@ def _is_lazy_cls(cls: type) -> bool | None:
         return False
     if (
         _issubclass_fast(cls, "jax", "Array")
-        or _issubclass_fast(cls, "jax.core", "Tracer")  # see is_jax_array for limitations
+        or _issubclass_fast(
+            cls, "jax.core", "Tracer"
+        )  # see is_jax_array for limitations
         or _issubclass_fast(cls, "dask.array", "Array")
         or _issubclass_fast(cls, "ndonnx", "Array")
     ):
         return True
-    return  None
+    return None
 
 
 def is_lazy_array(x: object) -> TypeGuard[_ArrayApiObj]:
@@ -1074,6 +1058,7 @@ __all__ = [
     "size",
     "to_device",
 ]
+
 
 def __dir__() -> list[str]:
     return __all__

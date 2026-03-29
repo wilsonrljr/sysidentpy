@@ -12,5 +12,6 @@ rfftfreq = get_xp(da)(_fft.rfftfreq)
 
 __all__ += ["fftfreq", "rfftfreq"]
 
+
 def __dir__() -> list[str]:
     return __all__

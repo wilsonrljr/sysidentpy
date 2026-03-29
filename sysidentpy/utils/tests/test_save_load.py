@@ -29,7 +29,7 @@ def test_save_model(tmp_path):
 
 
 def test_save_model_without_model():
-    with pytest.raises(TypeError, match="model cannot be None."):
+    with pytest.raises(TypeError, match=r"model cannot be None\."):
         save_model(model=None, file_name="should_fail.syspy")
 
 

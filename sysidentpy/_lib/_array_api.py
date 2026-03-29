@@ -108,7 +108,7 @@ def device(*arrays) -> Any:
         return None
 
     devices = [_compat_device(a) for a in arrays]
-    unique = set(str(d) for d in devices)
+    unique = {str(d) for d in devices}
     if len(unique) > 1:
         raise ValueError(
             f"Input arrays reside on different devices: {unique}. "
@@ -268,10 +268,12 @@ def _concat(xp, arrays, axis=0):
 
     if target_device is not None:
         arrays = [
-            _asarray(arr, xp=xp, target_device=target_device)
-            if not is_array_api_obj(arr)
-            or str(_compat_device(arr)) != str(target_device)
-            else arr
+            (
+                _asarray(arr, xp=xp, target_device=target_device)
+                if not is_array_api_obj(arr)
+                or str(_compat_device(arr)) != str(target_device)
+                else arr
+            )
             for arr in arrays
         ]
 
@@ -286,9 +288,8 @@ def _column_stack(xp, arrays):
     """
     result = []
     for a in arrays:
-        if a.ndim == 1:
-            a = xp.reshape(a, (-1, 1))
-        result.append(a)
+        col = xp.reshape(a, (-1, 1)) if a.ndim == 1 else a
+        result.append(col)
     return _concat(xp, result, axis=1)
 
 
@@ -296,9 +297,8 @@ def _vstack(xp, arrays):
     """Equivalent of ``np.vstack`` using Array API."""
     result = []
     for a in arrays:
-        if a.ndim == 1:
-            a = xp.reshape(a, (1, -1))
-        result.append(a)
+        row = xp.reshape(a, (1, -1)) if a.ndim == 1 else a
+        result.append(row)
     return _concat(xp, result, axis=0)
 
 
@@ -405,28 +405,28 @@ def _copy(xp, arr):
 
 
 __all__ = [
-    "get_namespace",
-    "_is_numpy_namespace",
-    "_require_numpy_namespace",
-    "device",
-    "_to_numpy",
     "_asarray",
-    "_zeros",
-    "_ones",
-    "_full",
-    "_vector_norm",
-    "_pow",
-    "_lstsq",
-    "_concat",
     "_column_stack",
-    "_vstack",
-    "_hstack",
-    "_nanargmin",
-    "_median",
-    "_einsum_ij_ij_j",
-    "_diag",
-    "_set_element",
+    "_concat",
     "_copy",
+    "_diag",
+    "_einsum_ij_ij_j",
+    "_full",
+    "_hstack",
+    "_is_numpy_namespace",
+    "_lstsq",
+    "_median",
+    "_nanargmin",
+    "_ones",
+    "_pow",
+    "_require_numpy_namespace",
+    "_set_element",
+    "_to_numpy",
+    "_vector_norm",
+    "_vstack",
+    "_zeros",
+    "device",
+    "get_namespace",
     "is_array_api_obj",
     "size",
     "to_device",

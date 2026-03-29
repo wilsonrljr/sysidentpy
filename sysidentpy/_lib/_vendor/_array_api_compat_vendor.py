@@ -1,6 +1,6 @@
 """Hook for array-api-extra to find the vendored array-api-compat."""
 
-from .array_api_compat import (  # noqa: F401
+from .array_api_compat import (
     array_namespace,
     device,
     is_array_api_obj,

@@ -189,8 +189,7 @@ def _normalized_correlation(a, b):
         y = xp.reshape(a - xp.mean(a[:i]), (-1,))
         u = xp.reshape(b - xp.mean(b[i:]), (-1,))
         ruy[i] = float(xp.sum(y[:-i] * u[i:])) / (
-            float(xp.sqrt(xp.sum(y[:-i] ** 2)))
-            * float(xp.sqrt(xp.sum(u[i:] ** 2)))
+            float(xp.sqrt(xp.sum(y[:-i] ** 2))) * float(xp.sqrt(xp.sum(u[i:] ** 2)))
         )
 
     return ruy

@@ -90,10 +90,10 @@ class Array(Protocol):  # pylint: disable=missing-class-docstring
     # def to_device(device: Device, /, *, stream: int | Any | None = None) -> Array: ...
 
 class DType(Protocol):  # pylint: disable=missing-class-docstring
-    pass
+    ...
 
 class Device(Protocol):  # pylint: disable=missing-class-docstring
-    pass
+    ...
 
 SetIndex: TypeAlias = (
     int | slice | EllipsisType | Array | tuple[int | slice | EllipsisType | Array, ...]

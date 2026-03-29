@@ -1,4 +1,3 @@
-# ruff: noqa: SLF001
 # pylint: disable=protected-access,redefined-outer-name
 import numpy as np
 import pytest

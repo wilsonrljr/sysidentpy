@@ -240,7 +240,9 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
     if is_dask_namespace(xp):
         import dask
 
-        metas: list[Array] = [arg._meta for arg in array_args]  # pylint: disable=protected-access    # pyright: ignore[reportAttributeAccessIssue]
+        metas: list[Array] = [
+            arg._meta for arg in array_args
+        ]  # pylint: disable=protected-access    # pyright: ignore[reportAttributeAccessIssue]
         meta_xp = array_namespace(*metas)
 
         wrapped = dask.delayed(  # type: ignore[attr-defined]  # pyright: ignore[reportPrivateImportUsage]
@@ -287,7 +289,9 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
             jax.pure_callback(
                 wrapped,
                 tuple(
-                    jax.ShapeDtypeStruct(shape, dtype)  # pyright: ignore[reportUnknownArgumentType]
+                    jax.ShapeDtypeStruct(
+                        shape, dtype
+                    )  # pyright: ignore[reportUnknownArgumentType]
                     for shape, dtype in zip(shapes, dtypes, strict=True)
                 ),
                 *args,
@@ -343,7 +347,9 @@ def _lazy_apply_wrapper(  # numpydoc ignore=PR01,RT01
                 if as_numpy:
                     import numpy as np
 
-                    arg = cast(Array, np.asarray(arg))  # pyright: ignore[reportInvalidCast] # noqa: PLW2901
+                    arg = cast(
+                        Array, np.asarray(arg)
+                    )  # pyright: ignore[reportInvalidCast] # noqa: PLW2901
             args_list.append(arg)
         assert device is not None
 

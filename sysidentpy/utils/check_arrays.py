@@ -30,9 +30,8 @@ def _invalid_index_positions(mask):
 def _is_numpy_random_state(seed):
     """Return True when *seed* is a legacy NumPy RandomState instance."""
     seed_class = seed.__class__
-    return (
-        seed_class.__name__ == "RandomState"
-        and seed_class.__module__.startswith("numpy.random")
+    return seed_class.__name__ == "RandomState" and seed_class.__module__.startswith(
+        "numpy.random"
     )
 
 
@@ -238,9 +237,11 @@ def check_linear_dependence_rows(psi):
     else:
         # SVD-based rank estimation for non-NumPy backends
         sv = xp.linalg.svdvals(psi)
-        tol = float(xp.max(xp.asarray(psi.shape, dtype=psi.dtype))) * float(
-            xp.finfo(psi.dtype).eps
-        ) * float(sv[0])
+        tol = (
+            float(xp.max(xp.asarray(psi.shape, dtype=psi.dtype)))
+            * float(xp.finfo(psi.dtype).eps)
+            * float(sv[0])
+        )
         rank = int(xp.sum(xp.astype(sv > tol, xp.int32)))
 
     if rank != psi.shape[1]:

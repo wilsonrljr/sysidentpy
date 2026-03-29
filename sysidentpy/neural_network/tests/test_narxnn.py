@@ -750,8 +750,9 @@ def test_check_cuda_available():
 
 def test_check_cuda_unavailable():
     """Test if _check_cuda falls back to 'cpu' when CUDA is unavailable."""
-    with patch("torch.cuda.is_available", return_value=False), pytest.warns(
-        UserWarning, match="No CUDA available"
+    with (
+        patch("torch.cuda.is_available", return_value=False),
+        pytest.warns(UserWarning, match="No CUDA available"),
     ):
         assert _check_cuda("cuda") == torch.device("cpu")
 

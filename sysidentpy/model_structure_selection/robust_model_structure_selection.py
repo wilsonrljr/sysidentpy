@@ -335,20 +335,18 @@ class RMSS(OFRBase):
             return xp.mean(xp.abs(errors), axis=axis)
 
         if self.error_measure == "mse":
-            return xp.mean(errors ** 2, axis=axis)
+            return xp.mean(errors**2, axis=axis)
 
         if self.error_measure == "phi3":
             numerator = xp.sum(xp.abs(errors), axis=axis)
-            denom = xp.sum(xp.abs(y_ref), axis=axis) + xp.sum(
-                xp.abs(preds), axis=axis
-            )
+            denom = xp.sum(xp.abs(y_ref), axis=axis) + xp.sum(xp.abs(preds), axis=axis)
             denom = xp.where(xp.abs(denom) < self.eps, _eps_val, denom)
             return numerator / denom
 
         # rmse_ratio
-        rmse = xp.sqrt(xp.mean(errors ** 2, axis=axis))
-        y_rmse = xp.sqrt(xp.mean(y_ref ** 2, axis=axis))
-        pred_rmse = xp.sqrt(xp.mean(preds ** 2, axis=axis))
+        rmse = xp.sqrt(xp.mean(errors**2, axis=axis))
+        y_rmse = xp.sqrt(xp.mean(y_ref**2, axis=axis))
+        pred_rmse = xp.sqrt(xp.mean(preds**2, axis=axis))
         denom = y_rmse + pred_rmse
         denom = xp.where(xp.abs(denom) < self.eps, _eps_val, denom)
         return rmse / denom
@@ -377,9 +375,7 @@ class RMSS(OFRBase):
         numerators = xp.sum(psi_views * y_expanded_for_mul, axis=-2)
         # einsum("knm,knm->km") -> sum(psi * psi, axis=-2)
         denominators = xp.sum(psi_views * psi_views, axis=-2)
-        denominators = xp.where(
-            xp.abs(denominators) < self.eps, _eps_val, denominators
-        )
+        denominators = xp.where(xp.abs(denominators) < self.eps, _eps_val, denominators)
         alphas = numerators / denominators
 
         preds = psi_views * alphas[:, None, :]
@@ -440,9 +436,7 @@ class RMSS(OFRBase):
         numerators = psi.T @ y_vec
         # einsum("ij,ij->j") -> sum(psi * psi, axis=0)
         denominators = xp.sum(psi * psi, axis=0)
-        denominators = xp.where(
-            xp.abs(denominators) < self.eps, _eps_val, denominators
-        )
+        denominators = xp.where(xp.abs(denominators) < self.eps, _eps_val, denominators)
         alphas = numerators / denominators
 
         preds = psi * alphas[None, :]
@@ -572,7 +566,13 @@ class RMSS(OFRBase):
 
             reg_matrices: List[np.ndarray] = []
             targets: List[np.ndarray] = []
-            self.n_inputs = None
+
+            n_input_dims = [num_features(Xi) if Xi is not None else 1 for Xi in X_list]
+            if len(set(n_input_dims)) != 1:
+                raise ValueError(
+                    "All datasets must have the same number of input dimensions."
+                )
+            self.n_inputs = n_input_dims[0]
 
             for Xi, yi in zip(X_list, y_list, strict=True):
                 lagged_data = build_lagged_matrix(
@@ -590,13 +590,6 @@ class RMSS(OFRBase):
                 target = self._default_estimation_target(yi)
                 reg_matrices.append(reg_matrix)
                 targets.append(target)
-
-                if self.n_inputs is None:
-                    self.n_inputs = num_features(Xi) if Xi is not None else 1
-                elif self.n_inputs != (num_features(Xi) if Xi is not None else 1):
-                    raise ValueError(
-                        "All datasets must share the same input dimension."
-                    )
 
             n_features = {rm.shape[1] for rm in reg_matrices}
             if len(n_features) != 1:

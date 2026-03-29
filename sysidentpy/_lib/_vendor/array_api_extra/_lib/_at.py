@@ -377,7 +377,6 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] += y`` and return the updated array."""
-
         # Note for this and all other methods based on _iop:
         # operator.iadd and operator.add subtly differ in behaviour, as
         # only iadd will trigger exceptions when y has an incompatible dtype.

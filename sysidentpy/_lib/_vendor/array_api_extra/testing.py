@@ -363,9 +363,9 @@ def patch_lazy_xp_functions(
         # Enable using patch_lazy_xp_function not as a context manager
         temp_setattr = monkeypatch.setattr  # type: ignore[assignment]  # pyright: ignore[reportAssignmentType]
 
-    def iter_tagged() -> Iterator[
-        tuple[ModuleType | type, str, Any, Callable[..., Any], dict[str, Any]]
-    ]:
+    def iter_tagged() -> (
+        Iterator[tuple[ModuleType | type, str, Any, Callable[..., Any], dict[str, Any]]]
+    ):
         for target in search_targets:
             for name, attr in target.__dict__.items():
                 # attr might be a staticmethod or classmethod. If so we need
@@ -503,7 +503,9 @@ def _dask_wrap(
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:  # numpydoc ignore=GL08
         scheduler = CountingDaskScheduler(n, msg)
-        with dask.config.set({"scheduler": scheduler}):  # pyright: ignore[reportPrivateImportUsage]
+        with dask.config.set(
+            {"scheduler": scheduler}
+        ):  # pyright: ignore[reportPrivateImportUsage]
             out = func(*args, **kwargs)
 
         # Block until the graph materializes and reraise exceptions. This allows
@@ -511,6 +513,8 @@ def _dask_wrap(
         # not work on scheduler='distributed', as it would not block.
         arrays, rest = pickle_flatten(out, da.Array)
         arrays = dask.persist(arrays, scheduler="threads")[0]  # type: ignore[attr-defined,no-untyped-call]  # pyright: ignore[reportPrivateImportUsage]
-        return pickle_unflatten(arrays, rest)  # pyright: ignore[reportUnknownArgumentType]
+        return pickle_unflatten(
+            arrays, rest
+        )  # pyright: ignore[reportUnknownArgumentType]
 
     return wrapper

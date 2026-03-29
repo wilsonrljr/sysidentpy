@@ -551,8 +551,12 @@ class _AutoJITWrapper(Generic[T]):  # numpydoc ignore=PR01
 
             jax.tree_util.register_pytree_node(
                 cls,
-                lambda instance: pickle_flatten(instance, jax.Array),  # pyright: ignore[reportUnknownArgumentType]
-                lambda aux_data, children: pickle_unflatten(children, aux_data),  # pyright: ignore[reportUnknownArgumentType]
+                lambda instance: pickle_flatten(
+                    instance, jax.Array
+                ),  # pyright: ignore[reportUnknownArgumentType]
+                lambda aux_data, children: pickle_unflatten(
+                    children, aux_data
+                ),  # pyright: ignore[reportUnknownArgumentType]
             )
             cls._registered = True
 

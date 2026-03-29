@@ -5,6 +5,68 @@ template: overrides/main.html
 
 # Changes in SysIdentPy
 
+## v0.9.0
+
+### CONTRIBUTORS
+
+- Wilson Rocha Lacerda Junior (wilsonrljr)
+
+### CHANGES
+
+This release introduces **Array API standard support**, enabling SysIdentPy to work seamlessly with NumPy, PyTorch (CPU and CUDA), CuPy, JAX, and any other array library that implements the [Python Array API standard](https://data-apis.org/array-api/latest/). This is a major architectural milestone that brings GPU acceleration and backend flexibility to system identification workflows without changing any algorithm behavior.
+
+#### Major Feature — Array API Standard Support
+
+- SysIdentPy now supports the Array API standard through an opt-in dispatch mechanism. Users can enable it globally with `set_config(array_api_dispatch=True)` or temporarily with `config_context(array_api_dispatch=True)`. When disabled (the default), SysIdentPy behaves exactly as before, using NumPy exclusively.
+- The dispatch system is built on vendored copies of `array-api-compat` (v1.14.0) and `array-api-extra` (v0.10.1), following the same approach used by scikit-learn and SciPy. The vendoring strategy avoids adding runtime dependencies and ensures version stability.
+- A new internal module `sysidentpy._lib._array_api` provides the core compatibility layer with functions like `get_namespace()`, `_to_numpy()`, `_lstsq()`, `_zeros()`, `_ones()`, `_concat()`, `_diag()`, `_set_element()`, `_copy()`, `_median()`, `_nanargmin()`, `_vector_norm()`, `_pow()`, and others.
+- A new `sysidentpy._lib._err` module provides a backend-agnostic ERR slice computation.
+- Thread-safe configuration via `sysidentpy._config` ensures isolation in multi-threaded workloads.
+
+#### Array API Integration Across Modules
+
+- **Model Structure Selection**: FROLS, AOLS, OFRBase, UOFR, and the Orthogonal Floating Search family (OSF, OIF, OOS/O2S) fully support Array API dispatch. MetaMSS, Entropic Regression (ER), and RMSS require NumPy due to SciPy dependencies.
+- **Parameter Estimation**: 18 estimators support Array API dispatch (LeastSquares, RidgeRegression, TotalLeastSquares, RecursiveLeastSquares, AffineLeastMeanSquares, and all 12 LMS family variants). 3 estimators require NumPy (NonNegativeLeastSquares, BoundedVariableLeastSquares, LeastSquaresMinimalResidual).
+- **Basis Functions**: All 8 basis functions work with Array API dispatch.
+- **Simulation**: The entire simulation module supports Array API dispatch.
+- **Metrics**: All regression metrics support Array API dispatch.
+- **Utilities**: `check_arrays`, `information_matrix`, and residual analysis support Array API dispatch.
+- **NARMAX Base**: The prediction pipeline supports Array API dispatch with a vectorized Polynomial NARMAX fast-path for GPU-accelerated free-run prediction.
+
+#### New Public API
+
+- `sysidentpy.set_config(array_api_dispatch=True/False)` — set global configuration.
+- `sysidentpy.get_config()` — retrieve current configuration.
+- `sysidentpy.config_context(array_api_dispatch=True/False)` — context manager for temporary configuration.
+
+#### Bug Fixes
+
+- Fixed scalar indexing in Entropic Regression when using NumPy 2.x.
+- Fixed RMSS `_prepare_datasets` to validate input dimension consistency before the model building loop.
+- Removed dead-code guard in Entropic Regression backward elimination.
+
+#### Testing
+
+- Added Array API dispatch tests across all major modules using `array_api_strict` and PyTorch backends.
+- Added cross-backend numerical equivalence tests (NumPy vs PyTorch) for ERR computation.
+- Added new example notebook `array-api-benchmark.ipynb`.
+
+#### Tooling & Configuration
+
+- Updated Ruff from v0.2.2 to v0.15.8 (local and pre-commit).
+- Updated pre-commit hook id from `ruff` to `ruff-check`.
+- Replaced deprecated `TCH` rule prefix with `TC` in Ruff configuration.
+- Removed `isort` from dev dependencies.
+- Added `array-api-strict >=2.0` to dev dependencies.
+
+### IMPACT
+
+Array API support is one of the most significant architectural changes in SysIdentPy's history. It enables researchers and practitioners to run system identification workflows on GPUs using PyTorch or CuPy without changing their model code (only toggling a configuration flag). The opt-in design preserves full backward compatibility. The implementation follows the patterns established by scikit-learn and SciPy, ensuring alignment with the broader Scientific Python ecosystem's direction toward hardware-agnostic computing.
+
+### TESTING
+
+The CI matrix continues to test against Python 3.10–3.14. Array API dispatch is tested with `array_api_strict` and PyTorch backends. All 672 tests pass with 18 skipped (all due to optional `array_api_strict` dependency).
+
 ## v0.8.0
 ### CONTRIBUTORS
 - Wilson Rocha Lacerda Junior (wilsonrljr)

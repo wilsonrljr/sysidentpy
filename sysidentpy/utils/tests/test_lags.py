@@ -75,7 +75,7 @@ def test_process_xlag():
 def test_process_xlag_invalid():
     X = np.array([[1, 2], [3, 4]])
     with pytest.raises(
-        ValueError, match="If n_inputs > 1, xlag must be a nested list. Got 3"
+        ValueError, match=r"If n_inputs > 1, xlag must be a nested list\. Got 3"
     ):
         _process_xlag(X, 3)  # Should raise an error for multiple inputs
 

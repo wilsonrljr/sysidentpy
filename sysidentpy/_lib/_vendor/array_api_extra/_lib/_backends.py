@@ -69,4 +69,6 @@ class Backend(Enum):  # numpydoc ignore=PR02
             # Monkey-patched by lazy_xp_function
             marks.append(pytest.mark.thread_unsafe)
 
-        return pytest.param(self, id=id_, marks=marks)  # pyright: ignore[reportUnknownArgumentType]
+        return pytest.param(
+            self, id=id_, marks=marks
+        )  # pyright: ignore[reportUnknownArgumentType]

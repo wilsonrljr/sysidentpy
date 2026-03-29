@@ -282,7 +282,12 @@ def test_build_input_output_matrix_preserves_array_api_namespace():
         result = build_input_output_matrix(x_data, y_data, [[1], [1]], [1])
 
     expected = np.array(
-        [[1.0, 0.0, 0.0, 0.0], [1.0, 10.0, 1.0, 2.0], [1.0, 20.0, 3.0, 4.0], [1.0, 30.0, 5.0, 6.0]]
+        [
+            [1.0, 0.0, 0.0, 0.0],
+            [1.0, 10.0, 1.0, 2.0],
+            [1.0, 20.0, 3.0, 4.0],
+            [1.0, 30.0, 5.0, 6.0],
+        ]
     )
     assert result.__array_namespace__().__name__ == xp.__name__
     assert_almost_equal(_to_numpy(result), expected)

@@ -1,7 +1,9 @@
 import numpy as np
 import pytest
 
-import sysidentpy.model_structure_selection.robust_model_structure_selection as rmss_module
+from sysidentpy.model_structure_selection import (
+    robust_model_structure_selection as rmss_module,
+)
 
 from sysidentpy.model_structure_selection import RMSS
 from sysidentpy.basis_function import Polynomial
@@ -38,7 +40,7 @@ def test_rmss_basic_fit():
 
 
 def test_rmss_invalid_error_measure():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="error_measure"):
         RMSS(error_measure="invalid", basis_function=Polynomial(degree=2))
 
 
@@ -133,7 +135,7 @@ def test_rmss_invalid_resampling():
 
 
 def test_rmss_smape_warning_sets_phi3():
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match="smape"):
         model = RMSS(error_measure="smape")
     assert model.error_measure == "phi3"
 
@@ -219,7 +221,7 @@ def test_prepare_datasets_input_dim_mismatch():
     model = RMSS()
     X_list = [np.ones((5, 1)), np.ones((5, 2))]
     y_list = [np.ones((5, 1)), np.ones((5, 1))]
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="same number"):
         model._prepare_datasets(X_list, y_list)
 
 
@@ -363,7 +365,8 @@ def test_prepare_datasets_single_path_sets_n_inputs_none():
 
     reg_matrices, targets = model._prepare_datasets(None, y)
     assert model.n_inputs == 1
-    assert len(reg_matrices) == 1 and len(targets) == 1
+    assert len(reg_matrices) == 1
+    assert len(targets) == 1
 
     # restore
     rmss_module.build_lagged_matrix = rmss_module_build
@@ -375,7 +378,8 @@ def test_run_mss_algorithm_single_feature_breaks():
     psi = np.array([[1.0], [0.5], [0.2]])
     y = np.array([[1.0], [0.0], [0.5]])
     err, piv, _, _ = model.run_mss_algorithm(psi, y, process_term_number=2)
-    assert err.size == 1 and piv.size == 1
+    assert err.size == 1
+    assert piv.size == 1
 
 
 def test_run_mss_algorithm_multi_err_tol():
@@ -385,7 +389,8 @@ def test_run_mss_algorithm_multi_err_tol():
     tgt1 = np.array([[1.0], [0.0]])
     tgt2 = np.array([[0.5], [0.5]])
     err, piv, _, _ = model.run_mss_algorithm([rm1, rm2], [tgt1, tgt2], 2)
-    assert err.size == 1 and piv.size == 1
+    assert err.size == 1
+    assert piv.size == 1
 
 
 def test_estimate_theta_empty_piv():

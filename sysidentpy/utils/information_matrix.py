@@ -16,7 +16,6 @@ from sysidentpy.utils.lags import _process_xlag, _process_ylag
 
 def _ensure_2d_array(data, xp):
     """Convert input data to a 2D array without changing its namespace."""
-
     if _is_numpy_namespace(xp):
         array = np.asarray(data, dtype=float)
         if array.ndim == 1:
@@ -31,7 +30,6 @@ def _ensure_2d_array(data, xp):
 
 def _normalize_lag_input(lag_value):
     """Return lag values as a numpy array while preserving user order."""
-
     if isinstance(lag_value, (list, tuple, np.ndarray)):
         return np.asarray(lag_value, dtype=int)
 
@@ -40,7 +38,6 @@ def _normalize_lag_input(lag_value):
 
 def _build_sliding_windows(data: np.ndarray, max_lag: int) -> np.ndarray:
     """Create a sliding window view along time for efficient lag reuse."""
-
     if max_lag < 1:
         raise ValueError("max_lag must be >= 1 to build lagged windows")
 
@@ -144,13 +141,10 @@ def _create_lagged_x(x: np.ndarray, n_inputs: int, xlag) -> np.ndarray:
     if n_inputs == 1:
         lag_list = _normalize_lag_input(xlag)
     else:
-        normalized = []
-        for lag_value in xlag:
-            normalized.append(_normalize_lag_input(lag_value))
-        lag_list = normalized
+        lag_list = [_normalize_lag_input(lag_value) for lag_value in xlag]
 
     max_lag = (
-        int(max(l.max() for l in lag_list))
+        int(max(lag.max() for lag in lag_list))
         if isinstance(lag_list, list)
         else int(np.max(lag_list))
     )

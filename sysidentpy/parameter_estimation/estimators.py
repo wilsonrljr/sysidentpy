@@ -206,7 +206,11 @@ class RidgeRegression(BaseEstimator):
         check_linear_dependence_rows(psi)
 
         theta = (
-            xp.linalg.pinv(psi.T @ psi + self.alpha * xp.eye(psi.shape[1], dtype=psi.dtype)) @ psi.T @ y
+            xp.linalg.pinv(
+                psi.T @ psi + self.alpha * xp.eye(psi.shape[1], dtype=psi.dtype)
+            )
+            @ psi.T
+            @ y
         )
         return theta
 
@@ -441,16 +445,13 @@ class RecursiveLeastSquares(BaseEstimator):
             k_numerator = self.lam ** (-1) * (p @ psi_tmp)
             k_denominator = 1 + self.lam ** (-1) * (psi_tmp.T @ p @ psi_tmp)
             k = k_numerator / k_denominator
-            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1 : i])[0, 0]
             tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + k * self.xi[i, 0]
             theta[:, i] = xp.reshape(tmp_list, (-1,))
 
             psi_col = xp.reshape(psi[i, :], (-1, 1))
             p1 = (p @ psi_col) @ (psi_col.T @ p)
-            p2 = (
-                psi_col.T @ p @ psi_col
-                + self.lam
-            )
+            p2 = psi_col.T @ p @ psi_col + self.lam
 
             p_numerator = p - p1 / p2
             p = p_numerator / self.lam
@@ -556,7 +557,10 @@ class AffineLeastMeanSquares(BaseEstimator):
             aux = (
                 self.mu
                 * psi
-                @ xp.linalg.pinv(psi.T @ psi + self.offset_covariance * xp.eye(n_theta, dtype=psi.dtype))
+                @ xp.linalg.pinv(
+                    psi.T @ psi
+                    + self.offset_covariance * xp.eye(n_theta, dtype=psi.dtype)
+                )
             )
             tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + aux.T @ self.xi
             theta[:, i] = xp.reshape(tmp_list, (-1,))
@@ -646,9 +650,10 @@ class LeastMeanSquares(BaseEstimator):
 
         for i in range(n_theta, n):
             psi_tmp = xp.reshape(psi[i, :], (-1, 1))
-            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1 : i])[0, 0]
             tmp_list = (
-                xp.reshape(theta[:, i - 1], (-1, 1)) + 2 * self.mu * self.xi[i, 0] * psi_tmp
+                xp.reshape(theta[:, i - 1], (-1, 1))
+                + 2 * self.mu * self.xi[i, 0] * psi_tmp
             )
             theta[:, i] = xp.reshape(tmp_list, (-1,))
 
@@ -735,7 +740,7 @@ class LeastMeanSquaresSignError(BaseEstimator):
 
         for i in range(n_theta, n):
             psi_tmp = xp.reshape(psi[i, :], (-1, 1))
-            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1 : i])[0, 0]
             tmp_list = (
                 xp.reshape(theta[:, i - 1], (-1, 1))
                 + self.mu * xp.sign(self.xi[i, 0]) * psi_tmp
@@ -835,10 +840,10 @@ class NormalizedLeastMeanSquares(BaseEstimator):
 
         for i in range(n_theta, n):
             psi_tmp = xp.reshape(psi[i, :], (-1, 1))
-            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
-            tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + 2 * self.mu * self.xi[i, 0] * (
-                psi_tmp / (self.eps + (psi_tmp.T @ psi_tmp))
-            )
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1 : i])[0, 0]
+            tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + 2 * self.mu * self.xi[
+                i, 0
+            ] * (psi_tmp / (self.eps + (psi_tmp.T @ psi_tmp)))
             theta[:, i] = xp.reshape(tmp_list, (-1,))
 
         return xp.reshape(theta[:, -1], (-1, 1))
@@ -938,7 +943,7 @@ class NormalizedLeastMeanSquaresSignError(BaseEstimator):
 
         for i in range(n_theta, n):
             psi_tmp = xp.reshape(psi[i, :], (-1, 1))
-            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1 : i])[0, 0]
             tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + 2 * self.mu * xp.sign(
                 self.xi[i, 0]
             ) * (psi_tmp / (self.eps + (psi_tmp.T @ psi_tmp)))
@@ -1030,7 +1035,7 @@ class LeastMeanSquaresSignRegressor(BaseEstimator):
 
         for i in range(n_theta, n):
             psi_tmp = xp.reshape(psi[i, :], (-1, 1))
-            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1 : i])[0, 0]
             tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + self.mu * self.xi[
                 i, 0
             ] * xp.sign(psi_tmp)
@@ -1133,10 +1138,10 @@ class LeastMeanSquaresNormalizedSignRegressor(BaseEstimator):
 
         for i in range(n_theta, n):
             psi_tmp = xp.reshape(psi[i, :], (-1, 1))
-            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
-            tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + self.mu * self.xi[i, 0] * (
-                xp.sign(psi_tmp) / (self.eps + (psi_tmp.T @ psi_tmp))
-            )
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1 : i])[0, 0]
+            tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + self.mu * self.xi[
+                i, 0
+            ] * (xp.sign(psi_tmp) / (self.eps + (psi_tmp.T @ psi_tmp)))
             theta[:, i] = xp.reshape(tmp_list, (-1,))
 
         return xp.reshape(theta[:, -1], (-1, 1))
@@ -1221,7 +1226,7 @@ class LeastMeanSquaresSignSign(BaseEstimator):
 
         for i in range(n_theta, n):
             psi_tmp = xp.reshape(psi[i, :], (-1, 1))
-            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1 : i])[0, 0]
             tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + 2 * self.mu * xp.sign(
                 self.xi[i, 0]
             ) * xp.sign(psi_tmp)
@@ -1332,7 +1337,7 @@ class LeastMeanSquaresNormalizedSignSign(BaseEstimator):
 
         for i in range(n_theta, n):
             psi_tmp = xp.reshape(psi[i, :], (-1, 1))
-            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1 : i])[0, 0]
             tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + 2 * self.mu * xp.sign(
                 self.xi[i, 0]
             ) * (xp.sign(psi_tmp) / (self.eps + (psi_tmp.T @ psi_tmp)))
@@ -1447,12 +1452,10 @@ class LeastMeanSquaresNormalizedLeaky(BaseEstimator):
 
         for i in range(n_theta, n):
             psi_tmp = xp.reshape(psi[i, :], (-1, 1))
-            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1 : i])[0, 0]
             tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) * (
                 1 - self.mu * self.gama
-            ) + self.mu * self.xi[i, 0] * psi_tmp / (
-                self.eps + (psi_tmp.T @ psi_tmp)
-            )
+            ) + self.mu * self.xi[i, 0] * psi_tmp / (self.eps + (psi_tmp.T @ psi_tmp))
             theta[:, i] = xp.reshape(tmp_list, (-1,))
 
         return xp.reshape(theta[:, -1], (-1, 1))
@@ -1560,7 +1563,7 @@ class LeastMeanSquaresLeaky(BaseEstimator):
 
         for i in range(n_theta, n):
             psi_tmp = xp.reshape(psi[i, :], (-1, 1))
-            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1 : i])[0, 0]
             tmp_list = (
                 xp.reshape(theta[:, i - 1], (-1, 1)) * (1 - self.mu * self.gama)
                 + self.mu * self.xi[i, 0] * psi_tmp
@@ -1659,9 +1662,10 @@ class LeastMeanSquaresFourth(BaseEstimator):
 
         for i in range(n_theta, n):
             psi_tmp = xp.reshape(psi[i, :], (-1, 1))
-            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1 : i])[0, 0]
             tmp_list = (
-                xp.reshape(theta[:, i - 1], (-1, 1)) + self.mu * psi_tmp * self.xi[i, 0] ** 3
+                xp.reshape(theta[:, i - 1], (-1, 1))
+                + self.mu * psi_tmp * self.xi[i, 0] ** 3
             )
             theta[:, i] = xp.reshape(tmp_list, (-1,))
 
@@ -1771,10 +1775,12 @@ class LeastMeanSquareMixedNorm(BaseEstimator):
 
         for i in range(n_theta, n):
             psi_tmp = xp.reshape(psi[i, :], (-1, 1))
-            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1:i])[0, 0]
-            tmp_list = xp.reshape(theta[:, i - 1], (-1, 1)) + self.mu * psi_tmp * self.xi[
-                i, 0
-            ] * (self.weight + (1 - self.weight) * self.xi[i, 0] ** 2)
+            self.xi[i, 0] = y[i, 0] - (psi_tmp.T @ theta[:, i - 1 : i])[0, 0]
+            tmp_list = xp.reshape(
+                theta[:, i - 1], (-1, 1)
+            ) + self.mu * psi_tmp * self.xi[i, 0] * (
+                self.weight + (1 - self.weight) * self.xi[i, 0] ** 2
+            )
             theta[:, i] = xp.reshape(tmp_list, (-1,))
 
         return xp.reshape(theta[:, -1], (-1, 1))

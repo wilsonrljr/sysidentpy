@@ -1,21 +1,22 @@
-from cupy.linalg import * # noqa: F403
+from cupy.linalg import *  # noqa: F403
 
 # https://github.com/cupy/cupy/issues/9749
-from cupy.linalg import lstsq  # noqa: F401
+from cupy.linalg import lstsq
 
 # cupy.linalg doesn't have __all__ in cupy<14. If it is added, replace this with
 #
 # from cupy.linalg import __all__ as linalg_all
 _n: dict[str, object] = {}
-exec('from cupy.linalg import *', _n)
-del _n['__builtins__']
-linalg_all = list(_n)  + ['lstsq']
+exec("from cupy.linalg import *", _n)
+del _n["__builtins__"]
+linalg_all = list(_n) + ["lstsq"]
 del _n
 
 try:
     # cupy 14 exports it, cupy 13 does not
-    from cupy.linalg import annotations   # noqa: F401
-    linalg_all += ['annotations']
+    from cupy.linalg import annotations
+
+    linalg_all += ["annotations"]
 except ImportError:
     pass
 
@@ -26,7 +27,7 @@ from .._internal import get_xp
 import cupy as cp
 
 # These functions are in both the main and linalg namespaces
-from ._aliases import matmul, matrix_transpose, tensordot, vecdot # noqa: F401
+from ._aliases import matmul, matrix_transpose, tensordot, vecdot
 
 cross = get_xp(cp)(_linalg.cross)
 outer = get_xp(cp)(_linalg.outer)
@@ -48,7 +49,7 @@ trace = get_xp(cp)(_linalg.trace)
 
 # These functions are completely new here. If the library already has them
 # (i.e., numpy 2.0), use the library version instead of our wrapper.
-if hasattr(cp.linalg, 'vector_norm'):
+if hasattr(cp.linalg, "vector_norm"):
     vector_norm = cp.linalg.vector_norm
 else:
     vector_norm = get_xp(cp)(_linalg.vector_norm)
@@ -57,6 +58,7 @@ __all__ = linalg_all + _linalg.__all__
 
 # cupy 13 does not have __all__, cupy 14 has it: remove duplicates
 __all__ = sorted(list(set(__all__)))
+
 
 def __dir__() -> list[str]:
     return __all__

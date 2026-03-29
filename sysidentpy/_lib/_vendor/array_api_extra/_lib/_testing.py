@@ -81,8 +81,12 @@ def _check_ns_shape_dtype(
         # Ignore shape, but check flattened size. This is normally done by
         # np.testing.assert_array_equal etc even when strict=False, but not for
         # non-materializable arrays.
-        actual_size = math.prod(actual_shape)  # pyright: ignore[reportUnknownArgumentType]
-        desired_size = math.prod(desired_shape)  # pyright: ignore[reportUnknownArgumentType]
+        actual_size = math.prod(
+            actual_shape
+        )  # pyright: ignore[reportUnknownArgumentType]
+        desired_size = math.prod(
+            desired_shape
+        )  # pyright: ignore[reportUnknownArgumentType]
         msg = f"sizes do not match: {actual_size} != f{desired_size}"
         assert actual_size == desired_size, msg
 

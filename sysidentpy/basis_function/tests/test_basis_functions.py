@@ -37,9 +37,7 @@ def test_fit_polynomial_predefined():
 def test_fit_polynomial_predefined_accepts_array_api_inputs():
     xp = pytest.importorskip("array_api_strict")
     basis_function = Polynomial(degree=2)
-    data = xp.asarray(
-        np.array(([1.0, 1.0, 1.0], [2.0, 3.0, 4.0], [3.0, 3.0, 3.0]))
-    )
+    data = xp.asarray(np.array(([1.0, 1.0, 1.0], [2.0, 3.0, 4.0], [3.0, 3.0, 3.0])))
     predefined_regressors = xp.asarray(np.array([0, 2, 4]))
     output = np.array([[4.0, 8.0, 12.0], [9.0, 9.0, 9.0]])
 

@@ -160,7 +160,6 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
            [[ 46.84      , -17.144     ],
             [-17.144     ,   8.57653333]]], dtype=array_api_strict.float64)
     """
-
     if xp is None:
         xp = array_namespace(m)
 
@@ -754,7 +753,6 @@ def setdiff1d(
     >>> xpx.setdiff1d(x1, x2, xp=xp)
     Array([1, 2], dtype=array_api_strict.int64)
     """
-
     if xp is None:
         xp = array_namespace(x1, x2)
 
@@ -839,7 +837,6 @@ def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
            -8.40918587e-02, -4.92362781e-02,
            -3.89817183e-17], dtype=array_api_strict.float64)
     """
-
     if xp is None:
         xp = array_namespace(x)
 

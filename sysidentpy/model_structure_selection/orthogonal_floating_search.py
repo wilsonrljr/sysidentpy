@@ -134,8 +134,7 @@ class _OrthogonalFloatingBase(OFRBase):
             remaining = [t for t in subset if t != idx]
             score, _ = self._subset_err(psi, target, remaining, squared_y)
             if score > best_score or (
-                abs(score - best_score) < 1e-9 * max(abs(score), 1.0)
-                and idx < best_idx
+                abs(score - best_score) < 1e-9 * max(abs(score), 1.0) and idx < best_idx
             ):
                 best_score = score
                 best_idx = idx

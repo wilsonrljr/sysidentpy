@@ -8,6 +8,7 @@ from typing import Tuple, Union, Optional
 import numpy as np
 
 from .._lib._array_api import (
+    _asarray,
     _concat,
     _copy,
     _is_numpy_namespace,
@@ -250,8 +251,7 @@ class AOLS(BaseMSS):
         mask = xp.abs(denominator) > eps
         q = xp.where(mask, numerator / denominator, xp.zeros_like(numerator))
         while (
-            float(_to_numpy(_vector_norm(xp, xp.reshape(r, (-1,)))))
-            > self.threshold
+            float(_to_numpy(_vector_norm(xp, xp.reshape(r, (-1,))))) > self.threshold
             and it < max_iter
         ):
             it = it + 1
@@ -260,9 +260,7 @@ class AOLS(BaseMSS):
                 basis_vec = xp.reshape(basis_matrix[:, offset], (-1, 1))
                 transformed_psi = transformed_psi - basis_vec @ (basis_vec.T @ psi)
 
-            contribution = xp.sum(transformed_psi * transformed_psi, axis=0) * (
-                q**2
-            )
+            contribution = xp.sum(transformed_psi * transformed_psi, axis=0) * (q**2)
             previous = selected_indices[:offset]
             sub_ind = list(previous[previous >= 0].astype(int))
             # Zero out already-selected and non-finite contributions
@@ -273,17 +271,16 @@ class AOLS(BaseMSS):
                 for si in sub_ind:
                     contribution = _set_element(xp, contribution, si, 0.0)
                 contribution = xp.where(
-                    xp.isfinite(contribution), contribution,
-                    xp.zeros_like(contribution)
+                    xp.isfinite(contribution), contribution, xp.zeros_like(contribution)
                 )
             block_size = min(self.L, contribution.shape[0])
             if block_size == 0:
                 break
             # argpartition is numpy-specific; convert for this small operation
             if _is_numpy_namespace(xp):
-                top_candidates = np.argpartition(
-                    contribution, -block_size
-                )[-block_size:]
+                top_candidates = np.argpartition(contribution, -block_size)[
+                    -block_size:
+                ]
                 current_indices = top_candidates[
                     contribution[top_candidates].argsort()[::-1]
                 ]
@@ -291,13 +288,15 @@ class AOLS(BaseMSS):
                 # Fallback: full argsort for non-numpy backends
                 sorted_idx = xp.flip(xp.argsort(contribution))
                 current_indices = sorted_idx[:block_size]
-            selected_indices[offset : offset + block_size] = (
-                np.asarray(current_indices) if not _is_numpy_namespace(xp)
+            current_indices_np = (
+                np.asarray(_to_numpy(current_indices), dtype=np.intp)
+                if not _is_numpy_namespace(xp)
                 else current_indices
             )
-            for i, idx in enumerate(np.asarray(current_indices) if not _is_numpy_namespace(xp) else current_indices):
-                idx = int(idx)
-                temp = xp.reshape(transformed_psi[:, idx], (-1, 1)) * q[idx]
+            selected_indices[offset : offset + block_size] = current_indices_np
+            for i, idx in enumerate(current_indices_np):
+                col = int(idx)
+                temp = xp.reshape(transformed_psi[:, col], (-1, 1)) * q[col]
                 temp_norm = float(_to_numpy(_vector_norm(xp, xp.reshape(temp, (-1,)))))
                 if temp_norm <= eps:
                     continue
@@ -310,9 +309,7 @@ class AOLS(BaseMSS):
                 numerator = xp.reshape(r.T @ psi, (-1,))
                 denominator = xp.sum(psi * transformed_psi, axis=0)
                 mask = xp.abs(denominator) > eps
-                q = xp.where(
-                    mask, numerator / denominator, xp.zeros_like(numerator)
-                )
+                q = xp.where(mask, numerator / denominator, xp.zeros_like(numerator))
 
         selected_indices = selected_indices[selected_indices >= 0].ravel().astype(int)
         residual_norm = float(_to_numpy(_vector_norm(xp, xp.reshape(r, (-1,)))))
@@ -321,13 +318,13 @@ class AOLS(BaseMSS):
         )
         if self.L > 1 and len(selected_indices) > self.k:
             if _is_numpy_namespace(xp):
-                sorted_local = np.argsort(
-                    np.abs(theta[selected_indices]).ravel()
-                )[::-1][: self.k]
+                sorted_local = np.argsort(np.abs(theta[selected_indices]).ravel())[
+                    ::-1
+                ][: self.k]
             else:
                 abs_vals = xp.abs(xp.reshape(theta[selected_indices], (-1,)))
                 sorted_local = np.asarray(
-                    xp.flip(xp.argsort(abs_vals))
+                    _to_numpy(xp.flip(xp.argsort(abs_vals))), dtype=np.intp
                 )[: self.k]
             top_indices = selected_indices[sorted_local]
             theta_filtered = xp.zeros_like(theta)
@@ -354,7 +351,7 @@ class AOLS(BaseMSS):
             pivv = np.argwhere(theta.ravel() != 0).ravel()
         else:
             flat = xp.reshape(theta, (-1,))
-            pivv = np.asarray(xp.nonzero(flat != 0)[0])
+            pivv = np.asarray(_to_numpy(xp.nonzero(flat != 0)[0]), dtype=np.intp)
         theta_vals = theta[theta != 0]
         return xp.reshape(theta_vals, (-1, 1)), pivv, residual_norm
 
@@ -409,6 +406,7 @@ class AOLS(BaseMSS):
 
         self.regressor_code = self.regressor_space(self.n_inputs)
         (self.theta, self.pivv, self.res) = self.aols(reg_matrix, y)
+        self.pivv = np.asarray(_to_numpy(self.pivv), dtype=np.intp).reshape(-1)
         repetition = reg_matrix.shape[0]
         if isinstance(self.basis_function, Polynomial):
             self.final_model = self.regressor_code[self.pivv, :].copy()
@@ -419,9 +417,9 @@ class AOLS(BaseMSS):
             )
             self.final_model = self.regressor_code[self.pivv, :].copy()
 
-        self.n_terms = (
-            self.theta.shape[0]
-        )  # the number of terms we selected (necessary in the 'results' methods)
+        self.n_terms = self.theta.shape[
+            0
+        ]  # the number of terms we selected (necessary in the 'results' methods)
         self.err = self.n_terms * [
             0
         ]  # just to use the `results` method. Will be changed in future updates.
@@ -463,6 +461,16 @@ class AOLS(BaseMSS):
 
         """
         xp = get_namespace(y)
+        if steps_ahead != 1 and not _is_numpy_namespace(xp):
+            return self._predict_on_cpu(
+                X=X,
+                y=y,
+                steps_ahead=steps_ahead,
+                forecast_horizon=forecast_horizon,
+                original_xp=xp,
+                target_device=_device(y),
+            )
+
         prefix = y[: self.max_lag, ...]
         if isinstance(self.basis_function, Polynomial):
             if steps_ahead is None:

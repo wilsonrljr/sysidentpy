@@ -31,6 +31,6 @@ ifftshift = get_xp(cp)(_fft.ifftshift)
 
 __all__ = fft_all + _fft.__all__
 
+
 def __dir__() -> list[str]:
     return __all__
-

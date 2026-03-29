@@ -69,6 +69,7 @@ def _two_arg(f):
     def _f(x1, x2, /, **kwargs):
         x1, x2 = _fix_promotion(x1, x2)
         return f(x1, x2, **kwargs)
+
     if _f.__doc__ is None:
         _f.__doc__ = f"""\
 Array API compatibility wrapper for torch.{f.__name__}.
@@ -78,6 +79,7 @@ for more details.
 
 """
     return _f
+
 
 def _fix_promotion(x1, x2, only_scalar=True):
     if not isinstance(x1, torch.Tensor) or not isinstance(x2, torch.Tensor):
@@ -151,6 +153,7 @@ def can_cast(from_: DType | Array, to: DType, /) -> bool:
         from_ = from_.dtype
     return torch.can_cast(from_, to)
 
+
 # Basic renames
 bitwise_invert = torch.bitwise_not
 newaxis = None
@@ -208,18 +211,25 @@ def asarray(
 # These wrappers are mostly based on the fact that pytorch uses 'dim' instead
 # of 'axis'.
 
+
 # torch.min and torch.max return a tuple and don't support multiple axes https://github.com/pytorch/pytorch/issues/58745
-def max(x: Array, /, *, axis: int | tuple[int, ...] | None = None, keepdims: bool = False) -> Array:
+def max(
+    x: Array, /, *, axis: int | tuple[int, ...] | None = None, keepdims: bool = False
+) -> Array:
     # https://github.com/pytorch/pytorch/issues/29137
     if axis == ():
         return torch.clone(x)
     return torch.amax(x, axis, keepdims=keepdims)
 
-def min(x: Array, /, *, axis: int | tuple[int, ...] |None = None, keepdims: bool = False) -> Array:
+
+def min(
+    x: Array, /, *, axis: int | tuple[int, ...] | None = None, keepdims: bool = False
+) -> Array:
     # https://github.com/pytorch/pytorch/issues/29137
     if axis == ():
         return torch.clone(x)
     return torch.amin(x, axis, keepdims=keepdims)
+
 
 unstack = get_xp(torch)(_aliases.unstack)
 cumulative_sum = get_xp(torch)(_aliases.cumulative_sum)
@@ -239,7 +249,9 @@ def sort(
     stable: bool = True,
     **kwargs: object,
 ) -> Array:
-    return torch.sort(x, dim=axis, descending=descending, stable=stable, **kwargs).values
+    return torch.sort(
+        x, dim=axis, descending=descending, stable=stable, **kwargs
+    ).values
 
 
 # Wrap torch.argsort to set stable=True by default
@@ -264,7 +276,9 @@ def _normalize_axes(axis, ndim):
     for a in axis:
         if a < lower or a > upper:
             # Match torch error message (e.g., from sum())
-            raise IndexError(f"Dimension out of range (expected to be in range of [{lower}, {upper}], but got {a}")
+            raise IndexError(
+                f"Dimension out of range (expected to be in range of [{lower}, {upper}], but got {a}"
+            )
         if a < 0:
             a = a + ndim
         if a in axes:
@@ -272,6 +286,7 @@ def _normalize_axes(axis, ndim):
             raise IndexError(f"Axis {a} appears multiple times in the list of axes")
         axes.append(a)
     return sorted(axes)
+
 
 def _axis_none_keepdims(x, ndim, keepdims):
     # Apply keepdims when axis=None
@@ -281,6 +296,7 @@ def _axis_none_keepdims(x, ndim, keepdims):
         for i in range(ndim):
             x = torch.unsqueeze(x, 0)
     return x
+
 
 def _reduce_multiple_axes(f, x, axis, keepdims=False, **kwargs):
     # Some reductions don't support multiple axes
@@ -301,7 +317,7 @@ def _reduce_multiple_axes(f, x, axis, keepdims=False, **kwargs):
 def _sum_prod_no_axis(x: Array, dtype: DType | None) -> Array:
     """
     Implements `sum(..., axis=())` and `prod(..., axis=())`.
-    
+
     Works around https://github.com/pytorch/pytorch/issues/29137
     """
     if dtype is not None:
@@ -316,20 +332,24 @@ def _sum_prod_no_axis(x: Array, dtype: DType | None) -> Array:
     return x.clone()
 
 
-def prod(x: Array,
-         /,
-         *,
-         axis: int | tuple[int, ...] | None = None,
-         dtype: DType | None = None,
-         keepdims: bool = False,
-         **kwargs: object) -> Array:
+def prod(
+    x: Array,
+    /,
+    *,
+    axis: int | tuple[int, ...] | None = None,
+    dtype: DType | None = None,
+    keepdims: bool = False,
+    **kwargs: object,
+) -> Array:
 
     if axis == ():
         return _sum_prod_no_axis(x, dtype)
     # torch.prod doesn't support multiple axes
     # (https://github.com/pytorch/pytorch/issues/56586).
     if isinstance(axis, tuple):
-        return _reduce_multiple_axes(torch.prod, x, axis, keepdims=keepdims, dtype=dtype, **kwargs)
+        return _reduce_multiple_axes(
+            torch.prod, x, axis, keepdims=keepdims, dtype=dtype, **kwargs
+        )
     if axis is None:
         # torch doesn't support keepdims with axis=None
         # (https://github.com/pytorch/pytorch/issues/71209)
@@ -340,13 +360,15 @@ def prod(x: Array,
     return torch.prod(x, axis, dtype=dtype, keepdims=keepdims, **kwargs)
 
 
-def sum(x: Array,
-         /,
-         *,
-         axis: int | tuple[int, ...] | None = None,
-         dtype: DType | None = None,
-         keepdims: bool = False,
-         **kwargs: object) -> Array:
+def sum(
+    x: Array,
+    /,
+    *,
+    axis: int | tuple[int, ...] | None = None,
+    dtype: DType | None = None,
+    keepdims: bool = False,
+    **kwargs: object,
+) -> Array:
 
     if axis == ():
         return _sum_prod_no_axis(x, dtype)
@@ -359,12 +381,15 @@ def sum(x: Array,
 
     return torch.sum(x, axis, dtype=dtype, keepdims=keepdims, **kwargs)
 
-def any(x: Array,
-        /,
-        *,
-        axis: int | tuple[int, ...] | None = None,
-        keepdims: bool = False,
-        **kwargs: object) -> Array:
+
+def any(
+    x: Array,
+    /,
+    *,
+    axis: int | tuple[int, ...] | None = None,
+    keepdims: bool = False,
+    **kwargs: object,
+) -> Array:
 
     if axis == ():
         return x.to(torch.bool)
@@ -383,12 +408,15 @@ def any(x: Array,
     # torch.any doesn't return bool for uint8
     return torch.any(x, axis, keepdims=keepdims).to(torch.bool)
 
-def all(x: Array,
-        /,
-        *,
-        axis: int | tuple[int, ...] | None = None,
-        keepdims: bool = False,
-        **kwargs: object) -> Array:
+
+def all(
+    x: Array,
+    /,
+    *,
+    axis: int | tuple[int, ...] | None = None,
+    keepdims: bool = False,
+    **kwargs: object,
+) -> Array:
 
     if axis == ():
         return x.to(torch.bool)
@@ -407,12 +435,15 @@ def all(x: Array,
     # torch.all doesn't return bool for uint8
     return torch.all(x, axis, keepdims=keepdims).to(torch.bool)
 
-def mean(x: Array,
-         /,
-         *,
-         axis: int | tuple[int, ...] | None = None,
-         keepdims: bool = False,
-         **kwargs: object) -> Array:
+
+def mean(
+    x: Array,
+    /,
+    *,
+    axis: int | tuple[int, ...] | None = None,
+    keepdims: bool = False,
+    **kwargs: object,
+) -> Array:
     # https://github.com/pytorch/pytorch/issues/29137
     if axis == ():
         return torch.clone(x)
@@ -424,13 +455,16 @@ def mean(x: Array,
         return res
     return torch.mean(x, axis, keepdims=keepdims, **kwargs)
 
-def std(x: Array,
-        /,
-        *,
-        axis: int | tuple[int, ...] | None = None,
-        correction: float = 0.0,
-        keepdims: bool = False,
-        **kwargs: object) -> Array:
+
+def std(
+    x: Array,
+    /,
+    *,
+    axis: int | tuple[int, ...] | None = None,
+    correction: float = 0.0,
+    keepdims: bool = False,
+    **kwargs: object,
+) -> Array:
     # Note, float correction is not supported
     # https://github.com/pytorch/pytorch/issues/61492. We don't try to
     # implement it here for now.
@@ -438,7 +472,9 @@ def std(x: Array,
     if isinstance(correction, float):
         _correction = int(correction)
         if correction != _correction:
-            raise NotImplementedError("float correction in torch std() is not yet supported")
+            raise NotImplementedError(
+                "float correction in torch std() is not yet supported"
+            )
     else:
         _correction = correction
 
@@ -455,13 +491,16 @@ def std(x: Array,
         return res
     return torch.std(x, axis, correction=_correction, keepdims=keepdims, **kwargs)
 
-def var(x: Array,
-        /,
-        *,
-        axis: int | tuple[int, ...] | None = None,
-        correction: float = 0.0,
-        keepdims: bool = False,
-        **kwargs: object) -> Array:
+
+def var(
+    x: Array,
+    /,
+    *,
+    axis: int | tuple[int, ...] | None = None,
+    correction: float = 0.0,
+    keepdims: bool = False,
+    **kwargs: object,
+) -> Array:
     # Note, float correction is not supported
     # https://github.com/pytorch/pytorch/issues/61492. We don't try to
     # implement it here for now.
@@ -482,17 +521,21 @@ def var(x: Array,
         return res
     return torch.var(x, axis, correction=correction, keepdims=keepdims, **kwargs)
 
+
 # torch.concat doesn't support dim=None
 # https://github.com/pytorch/pytorch/issues/70925
-def concat(arrays: tuple[Array, ...] | list[Array],
-           /,
-           *,
-           axis: int | None = 0,
-           **kwargs: object) -> Array:
+def concat(
+    arrays: tuple[Array, ...] | list[Array],
+    /,
+    *,
+    axis: int | None = 0,
+    **kwargs: object,
+) -> Array:
     if axis is None:
         arrays = tuple(ar.flatten() for ar in arrays)
         axis = 0
     return torch.concat(arrays, axis, **kwargs)
+
 
 # torch.squeeze only accepts int dim and doesn't require it
 # https://github.com/pytorch/pytorch/issues/70924. Support for tuple dim was
@@ -510,26 +553,40 @@ def squeeze(x: Array, /, axis: int | tuple[int, ...]) -> Array:
         x = torch.squeeze(x, a)
     return x
 
+
 # torch.broadcast_to uses size instead of shape
 def broadcast_to(x: Array, /, shape: tuple[int, ...], **kwargs: object) -> Array:
     return torch.broadcast_to(x, shape, **kwargs)
+
 
 # torch.permute uses dims instead of axes
 def permute_dims(x: Array, /, axes: tuple[int, ...]) -> Array:
     return torch.permute(x, axes)
 
+
 # The axis parameter doesn't work for flip() and roll()
 # https://github.com/pytorch/pytorch/issues/71210. Also torch.flip() doesn't
 # accept axis=None
-def flip(x: Array, /, *, axis: int | tuple[int, ...] | None = None, **kwargs: object) -> Array:
+def flip(
+    x: Array, /, *, axis: int | tuple[int, ...] | None = None, **kwargs: object
+) -> Array:
     if axis is None:
         axis = tuple(range(x.ndim))
     # torch.flip doesn't accept dim as an int but the method does
     # https://github.com/pytorch/pytorch/issues/18095
     return x.flip(axis, **kwargs)
 
-def roll(x: Array, /, shift: int | tuple[int, ...], *, axis: int | tuple[int, ...] | None = None, **kwargs: object) -> Array:
+
+def roll(
+    x: Array,
+    /,
+    shift: int | tuple[int, ...],
+    *,
+    axis: int | tuple[int, ...] | None = None,
+    **kwargs: object,
+) -> Array:
     return torch.roll(x, shift, axis, **kwargs)
+
 
 def nonzero(x: Array, /, **kwargs: object) -> tuple[Array, ...]:
     if x.ndim == 0:
@@ -586,28 +643,28 @@ def where(condition: Array, x1: Array | complex, x2: Array | complex, /) -> Arra
 
 
 # torch.reshape doesn't have the copy keyword
-def reshape(x: Array,
-            /,
-            shape: tuple[int, ...],
-            *,
-            copy: bool | None = None,
-            **kwargs: object) -> Array:
+def reshape(
+    x: Array, /, shape: tuple[int, ...], *, copy: bool | None = None, **kwargs: object
+) -> Array:
     if copy is not None:
         raise NotImplementedError("torch.reshape doesn't yet support the copy keyword")
     return torch.reshape(x, shape, **kwargs)
+
 
 # torch.arange doesn't support returning empty arrays
 # (https://github.com/pytorch/pytorch/issues/70915), and doesn't support some
 # keyword argument combinations
 # (https://github.com/pytorch/pytorch/issues/70914)
-def arange(start: float,
-           /,
-           stop: float | None = None,
-           step: float = 1,
-           *,
-           dtype: DType | None = None,
-           device: Device | None = None,
-           **kwargs: object) -> Array:
+def arange(
+    start: float,
+    /,
+    stop: float | None = None,
+    step: float = 1,
+    *,
+    dtype: DType | None = None,
+    device: Device | None = None,
+    **kwargs: object,
+) -> Array:
     if stop is None:
         start, stop = 0, start
     if step > 0 and stop <= start or step < 0 and stop >= start:
@@ -619,16 +676,19 @@ def arange(start: float,
         return torch.empty(0, dtype=dtype, device=device, **kwargs)
     return torch.arange(start, stop, step, dtype=dtype, device=device, **kwargs)
 
+
 # torch.eye does not accept None as a default for the second argument and
 # doesn't support off-diagonals (https://github.com/pytorch/pytorch/issues/70910)
-def eye(n_rows: int,
-        n_cols: int | None = None,
-        /,
-        *,
-        k: int = 0,
-        dtype: DType | None = None,
-        device: Device | None = None,
-        **kwargs: object) -> Array:
+def eye(
+    n_rows: int,
+    n_cols: int | None = None,
+    /,
+    *,
+    k: int = 0,
+    dtype: DType | None = None,
+    device: Device | None = None,
+    **kwargs: object,
+) -> Array:
     if n_cols is None:
         n_cols = n_rows
     z = torch.zeros(n_rows, n_cols, dtype=dtype, device=device, **kwargs)
@@ -636,62 +696,83 @@ def eye(n_rows: int,
         z.diagonal(k).fill_(1)
     return z
 
+
 # torch.linspace doesn't have the endpoint parameter
-def linspace(start: float,
-             stop: float,
-             /,
-             num: int,
-             *,
-             dtype: DType | None = None,
-             device: Device | None = None,
-             endpoint: bool = True,
-             **kwargs: object) -> Array:
+def linspace(
+    start: float,
+    stop: float,
+    /,
+    num: int,
+    *,
+    dtype: DType | None = None,
+    device: Device | None = None,
+    endpoint: bool = True,
+    **kwargs: object,
+) -> Array:
     if not endpoint:
-        return torch.linspace(start, stop, num+1, dtype=dtype, device=device, **kwargs)[:-1]
+        return torch.linspace(
+            start, stop, num + 1, dtype=dtype, device=device, **kwargs
+        )[:-1]
     return torch.linspace(start, stop, num, dtype=dtype, device=device, **kwargs)
+
 
 # torch.full does not accept an int size
 # https://github.com/pytorch/pytorch/issues/70906
-def full(shape: int | tuple[int, ...],
-         fill_value: complex,
-         *,
-         dtype: DType | None = None,
-         device: Device | None = None,
-         **kwargs: object) -> Array:
+def full(
+    shape: int | tuple[int, ...],
+    fill_value: complex,
+    *,
+    dtype: DType | None = None,
+    device: Device | None = None,
+    **kwargs: object,
+) -> Array:
     if isinstance(shape, int):
         shape = (shape,)
 
     return torch.full(shape, fill_value, dtype=dtype, device=device, **kwargs)
 
+
 # ones, zeros, and empty do not accept shape as a keyword argument
-def ones(shape: int | tuple[int, ...],
-         *,
-         dtype: DType | None = None,
-         device: Device | None = None,
-         **kwargs: object) -> Array:
+def ones(
+    shape: int | tuple[int, ...],
+    *,
+    dtype: DType | None = None,
+    device: Device | None = None,
+    **kwargs: object,
+) -> Array:
     return torch.ones(shape, dtype=dtype, device=device, **kwargs)
 
-def zeros(shape: int | tuple[int, ...],
-         *,
-         dtype: DType | None = None,
-         device: Device | None = None,
-         **kwargs: object) -> Array:
+
+def zeros(
+    shape: int | tuple[int, ...],
+    *,
+    dtype: DType | None = None,
+    device: Device | None = None,
+    **kwargs: object,
+) -> Array:
     return torch.zeros(shape, dtype=dtype, device=device, **kwargs)
 
-def empty(shape: int | tuple[int, ...],
-         *,
-         dtype: DType | None = None,
-         device: Device | None = None,
-         **kwargs: object) -> Array:
+
+def empty(
+    shape: int | tuple[int, ...],
+    *,
+    dtype: DType | None = None,
+    device: Device | None = None,
+    **kwargs: object,
+) -> Array:
     return torch.empty(shape, dtype=dtype, device=device, **kwargs)
 
+
 # tril and triu do not call the keyword argument k
+
 
 def tril(x: Array, /, *, k: int = 0) -> Array:
     return torch.tril(x, k)
 
+
 def triu(x: Array, /, *, k: int = 0) -> Array:
     return torch.triu(x, k)
+
 
 # Functions that aren't in torch https://github.com/pytorch/pytorch/issues/58742
 def expand_dims(x: Array, /, axis: int | tuple[int, ...]) -> Array:
@@ -703,8 +784,8 @@ def expand_dims(x: Array, /, axis: int | tuple[int, ...]) -> Array:
 
         # normalize
         n_axis = tuple(ax + y_ndim if ax < 0 else ax for ax in axis)
-        if (len(n_axis) != len(set(n_axis)) or
-            _builtin_any(ax < 0 or ax >= y_ndim for ax in n_axis)
+        if len(n_axis) != len(set(n_axis)) or _builtin_any(
+            ax < 0 or ax >= y_ndim for ax in n_axis
         ):
             raise ValueError(f"{axis=} not allowed for {x.shape = }")
 
@@ -712,6 +793,7 @@ def expand_dims(x: Array, /, axis: int | tuple[int, ...]) -> Array:
         shape = [1 if ax in n_axis else next(shape_it) for ax in range(y_ndim)]
 
         return torch.reshape(x, shape)
+
 
 def astype(
     x: Array,
@@ -730,10 +812,11 @@ def broadcast_arrays(*arrays: Array) -> tuple[Array, ...]:
     shape = torch.broadcast_shapes(*[a.shape for a in arrays])
     return tuple(torch.broadcast_to(a, shape) for a in arrays)
 
+
 # Note that these named tuples aren't actually part of the standard namespace,
 # but I don't see any issue with exporting the names here regardless.
-from ..common._aliases import (UniqueAllResult, UniqueCountsResult,
-                               UniqueInverseResult)
+from ..common._aliases import UniqueAllResult, UniqueCountsResult, UniqueInverseResult
+
 
 # https://github.com/pytorch/pytorch/issues/70920
 def unique_all(x: Array) -> UniqueAllResult:
@@ -741,13 +824,16 @@ def unique_all(x: Array) -> UniqueAllResult:
     # https://github.com/pytorch/pytorch/issues/36748. The workaround
     # suggested in that issue doesn't actually function correctly (it relies
     # on non-deterministic behavior of scatter()).
-    raise NotImplementedError("unique_all() not yet implemented for pytorch (see https://github.com/pytorch/pytorch/issues/36748)")
+    raise NotImplementedError(
+        "unique_all() not yet implemented for pytorch (see https://github.com/pytorch/pytorch/issues/36748)"
+    )
 
     # values, inverse_indices, counts = torch.unique(x, return_counts=True, return_inverse=True)
     # # torch.unique incorrectly gives a 0 count for nan values.
     # # https://github.com/pytorch/pytorch/issues/94106
     # counts[torch.isnan(values)] = 1
     # return UniqueAllResult(values, indices, inverse_indices, counts)
+
 
 def unique_counts(x: Array) -> UniqueCountsResult:
     values, counts = torch.unique(x, return_counts=True)
@@ -757,32 +843,38 @@ def unique_counts(x: Array) -> UniqueCountsResult:
     counts[torch.isnan(values)] = 1
     return UniqueCountsResult(values, counts)
 
+
 def unique_inverse(x: Array) -> UniqueInverseResult:
     values, inverse = torch.unique(x, return_inverse=True)
     return UniqueInverseResult(values, inverse)
 
+
 def unique_values(x: Array) -> Array:
     return torch.unique(x)
+
 
 def matmul(x1: Array, x2: Array, /, **kwargs: object) -> Array:
     # torch.matmul doesn't type promote (but differently from _fix_promotion)
     x1, x2 = _fix_promotion(x1, x2, only_scalar=False)
     return torch.matmul(x1, x2, **kwargs)
 
+
 matrix_transpose = get_xp(torch)(_aliases.matrix_transpose)
 _vecdot = get_xp(torch)(_aliases.vecdot)
+
 
 def vecdot(x1: Array, x2: Array, /, *, axis: int = -1) -> Array:
     x1, x2 = _fix_promotion(x1, x2, only_scalar=False)
     return _vecdot(x1, x2, axis=axis)
+
 
 # torch.tensordot uses dims instead of axes
 def tensordot(
     x1: Array,
     x2: Array,
     /,
-    *, 
-    axes: int | tuple[Sequence[int], Sequence[int]] = 2, 
+    *,
+    axes: int | tuple[Sequence[int], Sequence[int]] = 2,
     **kwargs: object,
 ) -> Array:
     # Note: torch.tensordot fails with integer dtypes when there is only 1
@@ -792,10 +884,10 @@ def tensordot(
 
 
 def isdtype(
-    dtype: DType, 
+    dtype: DType,
     kind: DType | str | tuple[DType | str, ...],
     *,
-    _tuple: bool = True, # Disallow nested tuples
+    _tuple: bool = True,  # Disallow nested tuples
 ) -> bool:
     """
     Returns a boolean indicating whether a provided dtype is of a specified data type ``kind``.
@@ -810,26 +902,29 @@ def isdtype(
     if isinstance(kind, tuple) and _tuple:
         return _builtin_any(isdtype(dtype, k, _tuple=False) for k in kind)
     elif isinstance(kind, str):
-        if kind == 'bool':
+        if kind == "bool":
             return dtype == torch.bool
-        elif kind == 'signed integer':
+        elif kind == "signed integer":
             return dtype in _int_dtypes and dtype.is_signed
-        elif kind == 'unsigned integer':
+        elif kind == "unsigned integer":
             return dtype in _int_dtypes and not dtype.is_signed
-        elif kind == 'integral':
+        elif kind == "integral":
             return dtype in _int_dtypes
-        elif kind == 'real floating':
+        elif kind == "real floating":
             return dtype.is_floating_point
-        elif kind == 'complex floating':
+        elif kind == "complex floating":
             return dtype.is_complex
-        elif kind == 'numeric':
-            return isdtype(dtype, ('integral', 'real floating', 'complex floating'))
+        elif kind == "numeric":
+            return isdtype(dtype, ("integral", "real floating", "complex floating"))
         else:
             raise ValueError(f"Unrecognized data type kind: {kind!r}")
     else:
         return dtype == kind
 
-def take(x: Array, indices: Array, /, *, axis: int | None = None, **kwargs: object) -> Array:
+
+def take(
+    x: Array, indices: Array, /, *, axis: int | None = None, **kwargs: object
+) -> Array:
     if axis is None:
         if x.ndim != 1:
             raise ValueError("axis must be specified when ndim > 1")
@@ -837,10 +932,7 @@ def take(x: Array, indices: Array, /, *, axis: int | None = None, **kwargs: obje
     # torch does not support negative indices,
     # see https://github.com/pytorch/pytorch/issues/146211
     return torch.index_select(
-        x,
-        axis,
-        torch.where(indices < 0, indices + x.shape[axis], indices),
-        **kwargs
+        x, axis, torch.where(indices < 0, indices + x.shape[axis], indices), **kwargs
     )
 
 
@@ -848,9 +940,7 @@ def take_along_axis(x: Array, indices: Array, /, *, axis: int = -1) -> Array:
     # torch does not support negative indices,
     # see https://github.com/pytorch/pytorch/issues/146211
     return torch.take_along_dim(
-        x,
-        torch.where(indices < 0, indices + x.shape[axis], indices),
-        dim=axis
+        x, torch.where(indices < 0, indices + x.shape[axis], indices), dim=axis
     )
 
 
@@ -859,7 +949,7 @@ def clip(
     /,
     min: int | float | Array | None = None,
     max: int | float | Array | None = None,
-    **kwargs
+    **kwargs,
 ) -> Array:
     def _isscalar(a: object):
         return isinstance(a, int | float) or a is None
@@ -878,7 +968,9 @@ def clip(
     max_is_scalar = _isscalar(max)
 
     if min_is_scalar and max_is_scalar:
-        if (min is not None and math.isnan(min)) or (max is not None and math.isnan(max)):
+        if (min is not None and math.isnan(min)) or (
+            max is not None and math.isnan(max)
+        ):
             # edge case: torch.clamp(torch.zeros(1), float('nan')) -> tensor(0.)
             # https://github.com/pytorch/pytorch/issues/172067
             return torch.full_like(x, fill_value=torch.nan)
@@ -901,9 +993,9 @@ def sign(x: Array, /) -> Array:
     # torch sign() does not support complex numbers and does not propagate
     # nans. See https://github.com/data-apis/array-api-compat/issues/136
     if x.dtype.is_complex:
-        out = x/torch.abs(x)
+        out = x / torch.abs(x)
         # sign(0) = 0 but the above formula would give nan
-        out[x == 0+0j] = 0+0j
+        out[x == 0 + 0j] = 0 + 0j
         return out
     else:
         out = torch.sign(x)
@@ -912,27 +1004,99 @@ def sign(x: Array, /) -> Array:
         return out
 
 
-def meshgrid(*arrays: Array, indexing: Literal['xy', 'ij'] = 'xy') -> tuple[Array, ...]:
+def meshgrid(*arrays: Array, indexing: Literal["xy", "ij"] = "xy") -> tuple[Array, ...]:
     # torch <= 2.9 emits a UserWarning: "torch.meshgrid: in an upcoming release, it
     # will be required to pass the indexing argument."
     # Thus always pass it explicitly.
     return torch.meshgrid(*arrays, indexing=indexing)
 
 
-__all__ = ['asarray', 'result_type', 'can_cast',
-           'permute_dims', 'bitwise_invert', 'newaxis', 'conj', 'add',
-           'atan2', 'bitwise_and', 'bitwise_left_shift', 'bitwise_or',
-           'bitwise_right_shift', 'bitwise_xor', 'copysign', 'count_nonzero',
-           'diff', 'divide',
-           'equal', 'floor_divide', 'greater', 'greater_equal', 'hypot',
-           'less', 'less_equal', 'logaddexp', 'maximum', 'minimum',
-           'multiply', 'not_equal', 'pow', 'remainder', 'subtract', 'max',
-           'min', 'clip', 'unstack', 'cumulative_sum', 'cumulative_prod', 'sort',
-           'argsort', 'prod', 'sum', 'any', 'all', 'mean', 'std', 'var', 'concat',
-           'squeeze', 'broadcast_to', 'flip', 'roll', 'nonzero', 'where', 'reshape',
-           'arange', 'eye', 'linspace', 'full', 'ones', 'zeros', 'empty',
-           'tril', 'triu', 'expand_dims', 'astype', 'broadcast_arrays',
-           'UniqueAllResult', 'UniqueCountsResult', 'UniqueInverseResult',
-           'unique_all', 'unique_counts', 'unique_inverse', 'unique_values',
-           'matmul', 'matrix_transpose', 'vecdot', 'tensordot', 'isdtype',
-           'take', 'take_along_axis', 'sign', 'finfo', 'iinfo', 'repeat', 'meshgrid']
+__all__ = [
+    "asarray",
+    "result_type",
+    "can_cast",
+    "permute_dims",
+    "bitwise_invert",
+    "newaxis",
+    "conj",
+    "add",
+    "atan2",
+    "bitwise_and",
+    "bitwise_left_shift",
+    "bitwise_or",
+    "bitwise_right_shift",
+    "bitwise_xor",
+    "copysign",
+    "count_nonzero",
+    "diff",
+    "divide",
+    "equal",
+    "floor_divide",
+    "greater",
+    "greater_equal",
+    "hypot",
+    "less",
+    "less_equal",
+    "logaddexp",
+    "maximum",
+    "minimum",
+    "multiply",
+    "not_equal",
+    "pow",
+    "remainder",
+    "subtract",
+    "max",
+    "min",
+    "clip",
+    "unstack",
+    "cumulative_sum",
+    "cumulative_prod",
+    "sort",
+    "argsort",
+    "prod",
+    "sum",
+    "any",
+    "all",
+    "mean",
+    "std",
+    "var",
+    "concat",
+    "squeeze",
+    "broadcast_to",
+    "flip",
+    "roll",
+    "nonzero",
+    "where",
+    "reshape",
+    "arange",
+    "eye",
+    "linspace",
+    "full",
+    "ones",
+    "zeros",
+    "empty",
+    "tril",
+    "triu",
+    "expand_dims",
+    "astype",
+    "broadcast_arrays",
+    "UniqueAllResult",
+    "UniqueCountsResult",
+    "UniqueInverseResult",
+    "unique_all",
+    "unique_counts",
+    "unique_inverse",
+    "unique_values",
+    "matmul",
+    "matrix_transpose",
+    "vecdot",
+    "tensordot",
+    "isdtype",
+    "take",
+    "take_along_axis",
+    "sign",
+    "finfo",
+    "iinfo",
+    "repeat",
+    "meshgrid",
+]

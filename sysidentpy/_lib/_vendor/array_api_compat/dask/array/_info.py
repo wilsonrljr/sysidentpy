@@ -49,6 +49,7 @@ from ...common._typing import (
     DTypesSigned,
     DTypesUnsigned,
 )
+
 Device: TypeAlias = Literal["cpu"] | _dask_device
 
 

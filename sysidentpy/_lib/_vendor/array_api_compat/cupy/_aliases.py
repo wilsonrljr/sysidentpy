@@ -84,7 +84,9 @@ def asarray(
         else:
             res = cp.array(obj, dtype=dtype, copy=copy, **kwargs)
             if not copy and res is not obj:
-                raise ValueError("Unable to avoid copy while creating an array as requested")
+                raise ValueError(
+                    "Unable to avoid copy while creating an array as requested"
+                )
             return res
 
 
@@ -108,14 +110,16 @@ def count_nonzero(
     axis: int | tuple[int, ...] | None = None,
     keepdims: py_bool = False,
 ) -> Array:
-   result = cp.count_nonzero(x, axis)
-   if keepdims:
-       if axis is None:
-            return cp.reshape(result, [1]*x.ndim)
-       return cp.expand_dims(result, axis)
-   return result
+    result = cp.count_nonzero(x, axis)
+    if keepdims:
+        if axis is None:
+            return cp.reshape(result, [1] * x.ndim)
+        return cp.expand_dims(result, axis)
+    return result
+
 
 # ceil, floor, and trunc return integers for integer inputs
+
 
 def ceil(x: Array, /) -> Array:
     if cp.issubdtype(x.dtype, cp.integer):
@@ -145,7 +149,7 @@ def broadcast_arrays(*arrays: Array) -> tuple[Array, ...]:
     return tuple(cp.broadcast_arrays(*arrays))
 
 
-def meshgrid(*arrays: Array, indexing: Literal['xy', 'ij'] = 'xy') -> tuple[Array, ...]:
+def meshgrid(*arrays: Array, indexing: Literal["xy", "ij"] = "xy") -> tuple[Array, ...]:
     return tuple(cp.meshgrid(*arrays, indexing=indexing))
 
 
@@ -156,13 +160,14 @@ def searchsorted(
     x2: Array | int | float,
     /,
     *,
-    side: Literal['left', 'right'] = 'left',
-    sorter: Array | None = None
+    side: Literal["left", "right"] = "left",
+    sorter: Array | None = None,
 ) -> Array:
     if not isinstance(x2, cp.ndarray):
         if not isinstance(x2, int | float | complex):
             raise NotImplementedError(
-                'Only python scalars or ndarrays are supported for x2')
+                "Only python scalars or ndarrays are supported for x2"
+            )
         x2 = cp.asarray(x2)
     return cp.searchsorted(x1, x2, side, sorter)
 
@@ -178,29 +183,47 @@ def isin(x1: Array | int, x2: Array | int, /, *, invert: bool = False, **kwds) -
 
 # These functions are completely new here. If the library already has them
 # (i.e., numpy 2.0), use the library version instead of our wrapper.
-if hasattr(cp, 'vecdot'):
+if hasattr(cp, "vecdot"):
     vecdot = cp.vecdot
 else:
     vecdot = get_xp(cp)(_aliases.vecdot)
 
-if hasattr(cp, 'isdtype'):
+if hasattr(cp, "isdtype"):
     isdtype = cp.isdtype
 else:
     isdtype = get_xp(cp)(_aliases.isdtype)
 
-if hasattr(cp, 'unstack'):
+if hasattr(cp, "unstack"):
     unstack = cp.unstack
 else:
     unstack = get_xp(cp)(_aliases.unstack)
 
-__all__ = _aliases.__all__ + ['asarray', 'astype',
-                              'acos', 'acosh', 'asin', 'asinh', 'atan',
-                              'atan2', 'atanh', 'bitwise_left_shift',
-                              'bitwise_invert', 'bitwise_right_shift',
-                              'bool', 'concat', 'count_nonzero', 'pow', 'sign',
-                              'ceil', 'floor', 'trunc', 'take_along_axis',
-                              'broadcast_arrays', 'meshgrid',
-                              'searchsorted', 'isin',
+__all__ = _aliases.__all__ + [
+    "asarray",
+    "astype",
+    "acos",
+    "acosh",
+    "asin",
+    "asinh",
+    "atan",
+    "atan2",
+    "atanh",
+    "bitwise_left_shift",
+    "bitwise_invert",
+    "bitwise_right_shift",
+    "bool",
+    "concat",
+    "count_nonzero",
+    "pow",
+    "sign",
+    "ceil",
+    "floor",
+    "trunc",
+    "take_along_axis",
+    "broadcast_arrays",
+    "meshgrid",
+    "searchsorted",
+    "isin",
 ]
 
 
