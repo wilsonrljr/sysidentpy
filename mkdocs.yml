@@ -161,6 +161,7 @@ plugins:
             Information Criteria - Overview: Critérios de Informação - Visão Geral
             Create a Custom Basis Function: Criar uma Função Base Customizada
             Array API Standard Support: Suporte ao Padrão Array API
+            Array API Standard - Benchmark: Benchmark do Padrão Array API
             Create a Neural NARX Network: Criar uma Rede Neural NARX
             Save and Load Models: Salvar e Carregar Modelos
             Set Specific Lags: Definir Lags Específicos
@@ -229,6 +230,7 @@ plugins:
             Overview: Resumen
             Quickstart Guide: Guía rápida
             Introduction to NARMAX: Introducción a NARMAX
+            Array API Standard - Benchmark: Benchmark del Estándar Array API
             License: Licencia
 
 # Customization
@@ -334,6 +336,7 @@ nav:
               - Logistic Map: user-guide/tutorials/chaotic-systems/logistic-map.md
       - How to:
           - Array API Standard Support: user-guide/how-to/array-api-dispatch.md
+          - Array API Standard - Benchmark: user-guide/how-to/array-api-benchmark.md
           - Create a Custom Basis Function: user-guide/how-to/create-custom-basis-function.md
           - Create a Neural NARX Network: user-guide/how-to/create-a-narx-neural-network.md
           - Save and Load Models: user-guide/how-to/save-and-load-models.md
