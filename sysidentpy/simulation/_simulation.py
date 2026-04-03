@@ -11,6 +11,7 @@ import numpy as np
 from sysidentpy._lib._array_api import (
     _asarray,
     _concat,
+    _get_namespace_and_device,
     _is_numpy_namespace,
     get_namespace,
     _copy,
@@ -596,7 +597,7 @@ class SimulateNARMAX(BaseMSS):
             The predicted values of the model.
 
         """
-        xp = get_namespace(X, y)
+        xp, target_device = _get_namespace_and_device(X, y)
         if steps_ahead != 1 and not _is_numpy_namespace(xp):
             return self._predict_on_cpu(
                 X=X,
@@ -604,7 +605,7 @@ class SimulateNARMAX(BaseMSS):
                 steps_ahead=steps_ahead,
                 forecast_horizon=forecast_horizon,
                 original_xp=xp,
-                target_device=_device(y),
+                target_device=target_device,
             )
 
         if isinstance(self.basis_function, Polynomial):
@@ -637,7 +638,7 @@ class SimulateNARMAX(BaseMSS):
         yhat = _concat(xp, [y[: self.max_lag, ...], yhat], axis=0)
         return yhat
 
-    def _one_step_ahead_prediction(self, x, y):
+    def _one_step_ahead_prediction(self, x_base, y=None):
         """Perform the 1-step-ahead prediction of a model.
 
         Parameters
@@ -654,9 +655,11 @@ class SimulateNARMAX(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        xp = get_namespace(x, y)
-        lagged_data = build_lagged_matrix(x, y, self.xlag, self.ylag, self.model_type)
-        x_base = self.basis_function.transform(
+        xp = get_namespace(x_base, y)
+        lagged_data = build_lagged_matrix(
+            x_base, y, self.xlag, self.ylag, self.model_type
+        )
+        x_tmp = self.basis_function.transform(
             lagged_data,
             self.max_lag,
             self.ylag,
@@ -665,7 +668,7 @@ class SimulateNARMAX(BaseMSS):
             predefined_regressors=self.pivv[: len(self.final_model)],
         )
 
-        yhat = super()._one_step_ahead_prediction(x_base)
+        yhat = super()._one_step_ahead_prediction(x_tmp)
         return xp.reshape(yhat, (-1, 1))
 
     def _n_step_ahead_prediction(self, x, y, steps_ahead):
@@ -714,7 +717,7 @@ class SimulateNARMAX(BaseMSS):
             f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
         )
 
-    def _narmax_predict(self, x, y_initial, forecast_horizon):
+    def _narmax_predict(self, x, y_initial, forecast_horizon=1):
         if y_initial.shape[0] < self.max_lag:
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"

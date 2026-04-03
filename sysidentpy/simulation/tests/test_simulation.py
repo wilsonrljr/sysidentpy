@@ -598,6 +598,52 @@ def test_predict_preserves_array_api_namespace_with_numpy_metadata():
     np.testing.assert_allclose(_to_numpy(result), expected)
 
 
+def test_predict_n_step_preserves_array_api_namespace_via_cpu_fallback():
+    array_api_strict = pytest.importorskip("array_api_strict")
+    _, x_valid_np, _, y_valid_np = _small_siso_dataset()
+    model = np.array([[1001, 0], [2001, 1001], [2002, 0]])
+    theta = np.array([[0.2, 0.9, 0.1]]).T
+
+    baseline = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
+    baseline.simulate(
+        X_test=x_valid_np,
+        y_test=y_valid_np,
+        model_code=model,
+        theta=theta,
+    )
+    expected = baseline.predict(X=x_valid_np, y=y_valid_np, steps_ahead=3)
+
+    simulator = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
+    with config_context(array_api_dispatch=True):
+        x_valid = array_api_strict.asarray(x_valid_np, dtype=array_api_strict.float64)
+        y_valid = array_api_strict.asarray(y_valid_np, dtype=array_api_strict.float64)
+        simulator.simulate(
+            X_test=x_valid,
+            y_test=y_valid,
+            model_code=model,
+            theta=theta,
+        )
+        result = simulator.predict(X=x_valid, y=y_valid, steps_ahead=3)
+
+    assert result.__array_namespace__() is array_api_strict
+    np.testing.assert_allclose(_to_numpy(result), expected)
+
+
+def test_predict_rejects_mixed_array_api_namespaces():
+    array_api_strict = pytest.importorskip("array_api_strict")
+    torch = pytest.importorskip("torch")
+    simulator = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
+
+    x_data = torch.tensor(np.arange(4.0).reshape(-1, 1), dtype=torch.float64)
+    y_data = array_api_strict.asarray(
+        np.arange(4.0).reshape(-1, 1), dtype=array_api_strict.float64
+    )
+
+    with config_context(array_api_dispatch=True):
+        with pytest.raises(ValueError, match="same Array API namespace"):
+            simulator.predict(X=x_data, y=y_data)
+
+
 def test_model_prediction_invalid_type_raises():
     simulator = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
     simulator.model_type = "UNKNOWN"

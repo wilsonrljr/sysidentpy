@@ -6,6 +6,7 @@
 
 import warnings
 from abc import ABCMeta, abstractmethod
+from functools import partial
 from typing import Union, Tuple, Optional
 
 import numpy as np
@@ -19,6 +20,7 @@ from .._lib._array_api import (
     _concat,
     _copy,
     _full,
+    _get_namespace_and_device,
     _is_numpy_namespace,
     _nanargmin,
     _set_element,
@@ -310,7 +312,7 @@ def get_info_criteria(info_criteria: str, apress_lambda: float = 1.0):
         "bic": bic,
         "fpe": fpe,
         "lilc": lilc,
-        "apress": apress,
+        "apress": partial(apress, apress_lambda=apress_lambda),
     }
     return info_criteria_options.get(info_criteria)
 
@@ -786,7 +788,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
             The predicted values of the model.
 
         """
-        xp = get_namespace(y)
+        xp, target_device = _get_namespace_and_device(X, y)
         # Sequential predict (free-run / n-step) on GPU backends is dominated
         # by kernel-launch overhead.  Fall back to the fast NumPy path and
         # convert the result back to the original device.
@@ -797,7 +799,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
                 steps_ahead=steps_ahead,
                 forecast_horizon=forecast_horizon,
                 original_xp=xp,
-                target_device=_device(y),
+                target_device=target_device,
             )
 
         prefix = y[: self.max_lag, ...]
@@ -832,7 +834,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
         return yhat
 
     def _one_step_ahead_prediction(
-        self, x: Optional[np.ndarray], y: Optional[np.ndarray]
+        self, x_base: np.ndarray, y: Optional[np.ndarray] = None
     ) -> np.ndarray:
         """Perform the 1-step-ahead prediction of a model.
 
@@ -850,9 +852,11 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
                The 1-step-ahead predicted values of the model.
 
         """
-        lagged_data = build_lagged_matrix(x, y, self.xlag, self.ylag, self.model_type)
+        lagged_data = build_lagged_matrix(
+            x_base, y, self.xlag, self.ylag, self.model_type
+        )
 
-        x_base = self.basis_function.transform(
+        x_tmp = self.basis_function.transform(
             lagged_data,
             self.max_lag,
             self.ylag,
@@ -861,7 +865,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
             predefined_regressors=self.pivv[: len(self.final_model)],
         )
 
-        yhat = super()._one_step_ahead_prediction(x_base)
+        yhat = super()._one_step_ahead_prediction(x_tmp)
         return yhat.reshape(-1, 1)
 
     def _n_step_ahead_prediction(

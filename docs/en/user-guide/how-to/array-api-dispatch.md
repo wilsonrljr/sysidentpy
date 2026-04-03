@@ -1,6 +1,6 @@
 # Array API Standard Support
 
-SysIdentPy provides experimental, opt-in support for the [Python Array API standard](https://data-apis.org/array-api/latest/), enabling users to run supported system identification workflows with different array backends, including PyTorch (CPU and CUDA), CuPy, JAX, and any other library that conforms to the standard, without modifying model code.
+SysIdentPy provides experimental, opt-in support for the [Python Array API standard](https://data-apis.org/array-api/latest/). The strongest automated coverage today is for NumPy, PyTorch (CPU and CUDA), and `array_api_strict`; CuPy and JAX remain experimental compatibility targets that follow the same dispatch layer but are not yet exercised in the main automated test matrix.
 
 This page explains what the Array API standard is, why SysIdentPy adopted it, how the implementation works, which modules and algorithms are currently supported, and how to use it in practice.
 
@@ -69,7 +69,7 @@ def some_operation(X, y):
     # ...
 ```
 
-When `array_api_dispatch` is `False` (the default), `get_namespace()` always returns NumPy, regardless of what the input arrays are. When `True`, it inspects the input arrays and returns the corresponding namespace module. If the inputs are PyTorch tensors, it returns the `torch` module; if they are CuPy arrays, it returns the `cupy` module; and so on.
+When `array_api_dispatch` is `False` (the default), `get_namespace()` always returns NumPy, regardless of what the input arrays are. When `True`, it inspects the input arrays, validates that they all belong to the same namespace, and returns the corresponding namespace module. If the inputs are PyTorch tensors, it returns the `torch` module; if they are CuPy arrays, it returns the `cupy` module; and so on. Mixed namespaces raise `ValueError` instead of silently coercing inputs.
 
 The function filters out `None` values and scalar arguments, so it is safe to call with optional parameters. If no valid array is found and dispatch is enabled, it falls back to NumPy.
 
@@ -219,7 +219,7 @@ with config_context(array_api_dispatch=True):
         basis_function=Polynomial(degree=2),
     )
     model.fit(X=X_train, y=y_train)
-    yhat = model.predict(X=X_test, y=y_test)
+    yhat = model.predict(X=X_test, y=y_test, steps_ahead=1)
 
 # yhat is a PyTorch tensor
 print(type(yhat))  # <class 'torch.Tensor'>
@@ -243,7 +243,7 @@ y_train = torch.tensor(y_train_np, dtype=torch.float64, device=device)
 X_test = torch.tensor(X_test_np, dtype=torch.float64, device=device)
 y_test = torch.tensor(y_test_np, dtype=torch.float64, device=device)
 
-# All computation happens on the GPU
+# fit() and 1-step prediction stay on the GPU
 model = FROLS(
     order_selection=True,
     ylag=2,
@@ -252,7 +252,7 @@ model = FROLS(
     basis_function=Polynomial(degree=2),
 )
 model.fit(X=X_train, y=y_train)
-yhat = model.predict(X=X_test, y=y_test)
+yhat = model.predict(X=X_test, y=y_test, steps_ahead=1)
 
 # Result is on the same GPU device
 print(yhat.device)  # cuda:0
@@ -282,7 +282,7 @@ model = FROLS(
     basis_function=Polynomial(degree=2),
 )
 model.fit(X=X_train, y=y_train)
-yhat = model.predict(X=X_test, y=y_test)
+yhat = model.predict(X=X_test, y=y_test, steps_ahead=1)
 
 # Result is a CuPy array on the GPU
 print(type(yhat))  # <class 'cupy.ndarray'>
@@ -308,7 +308,7 @@ model_np = FROLS(
     basis_function=Polynomial(degree=2),
 )
 model_np.fit(X=X_train_np, y=y_train_np)
-yhat_np = model_np.predict(X=X_test_np, y=y_test_np)
+yhat_np = model_np.predict(X=X_test_np, y=y_test_np, steps_ahead=1)
 
 # Fit with PyTorch
 X_train_torch = torch.tensor(X_train_np, dtype=torch.float64)
@@ -325,7 +325,7 @@ with config_context(array_api_dispatch=True):
         basis_function=Polynomial(degree=2),
     )
     model_torch.fit(X=X_train_torch, y=y_train_torch)
-    yhat_torch = model_torch.predict(X=X_test_torch, y=y_test_torch)
+    yhat_torch = model_torch.predict(X=X_test_torch, y=y_test_torch, steps_ahead=1)
 
 # Convert PyTorch result to NumPy for comparison
 yhat_torch_np = _to_numpy(yhat_torch)
@@ -356,7 +356,7 @@ with config_context(array_api_dispatch=True):
         basis_function=Polynomial(degree=2),
     )
     model.fit(X=X_train, y=y_train)
-    yhat = model.predict(X=X_test, y=y_test)
+    yhat = model.predict(X=X_test, y=y_test, steps_ahead=1)
 
     # yhat is a torch.Tensor on cuda:0 — can be used directly in the pipeline
     loss = torch.nn.functional.mse_loss(yhat, y_target)
@@ -435,15 +435,15 @@ Basis functions marked with ❌ raise `NotImplementedError` when Array API dispa
 
 ## Supported Backends
 
-SysIdentPy's Array API dispatch works with any library that implements the Array API standard. The following backends are explicitly supported and tested through the vendored `array-api-compat` (v1.14.0) layer:
+SysIdentPy's Array API dispatch is designed around the Array API standard, so other conforming libraries may work. The table below distinguishes the backends covered by the current automated evidence from compatibility targets that are still experimental.
 
 | Backend | Status | Devices | Notes |
 |---------|--------|---------|-------|
-| **NumPy** | ✅ Fully tested | CPU | Default backend. Always works regardless of dispatch setting. |
-| **PyTorch** | ✅ Fully tested | CPU, CUDA (all GPU devices) | Tested in CI and benchmarks. Recommended for GPU acceleration. |
-| **CuPy** | ✅ Supported | GPU (NVIDIA) | Requires CUDA-enabled GPU and CuPy installation. |
-| **JAX** | ✅ Supported | CPU, GPU, TPU | Supports immutable arrays via `.at[idx].set()` pattern. |
-| **array_api_strict** | ✅ Tested in CI | CPU | Reference implementation for spec conformance testing. |
+| **NumPy** | ✅ Core backend | CPU | Default backend. Always works regardless of dispatch setting. |
+| **PyTorch** | ✅ Tested in CI | CPU, CUDA (all GPU devices) | Main non-NumPy backend coverage today. Recommended for GPU acceleration. |
+| **array_api_strict** | ✅ Tested in CI | CPU | Reference implementation used for spec-style conformance testing. |
+| **CuPy** | ⚠️ Experimental | GPU (NVIDIA) | Benchmarked and documented, but not yet part of the main automated test matrix. |
+| **JAX** | ⚠️ Experimental | CPU, GPU, TPU | Compatibility layer handles immutable updates, but automated coverage is still limited. |
 | **Dask** | Experimental | Distributed | Via `array-api-compat` support. Not yet tested with SysIdentPy. |
 
 ## Implementation Design Decisions
@@ -587,6 +587,7 @@ The following functions are available in `sysidentpy._lib._array_api` for intern
 | Function | Purpose |
 |----------|---------|
 | `get_namespace(*arrays)` | Returns the array namespace (`xp`) for the given arrays |
+| `_get_namespace_and_device(*arrays)` | Returns a validated namespace/device pair for Array API public boundaries |
 | `_is_numpy_namespace(xp)` | Returns `True` if `xp` is NumPy |
 | `_require_numpy_namespace(xp, *, feature, dependency)` | Raises `NotImplementedError` if `xp` is not NumPy |
 | `device(*arrays)` | Returns the shared device of the input arrays |

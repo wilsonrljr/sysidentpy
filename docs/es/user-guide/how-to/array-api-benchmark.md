@@ -283,7 +283,7 @@ from sysidentpy import config_context
 # Opción 1: gestor de contexto
 with config_context(array_api_dispatch=True):
     model.fit(X=x_gpu, y=y_gpu)
-    yhat = model.predict(X=x_test_gpu, y=y_test_gpu)
+    yhat = model.predict(X=x_test_gpu, y=y_test_gpu, steps_ahead=1)
 
 # Opción 2: configuración global
 from sysidentpy import set_config

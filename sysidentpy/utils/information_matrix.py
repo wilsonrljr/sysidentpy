@@ -5,6 +5,7 @@ from sysidentpy._lib._array_api import (
     _asarray,
     _concat,
     _copy,
+    _get_namespace_and_device,
     _is_numpy_namespace,
     _ones,
     _zeros,
@@ -225,7 +226,7 @@ def initial_lagged_matrix(x: np.ndarray, y: np.ndarray, xlag, ylag) -> np.ndarra
     Y[k-1], Y[k-2], x[k-1], x[k-2].
 
     """
-    xp = get_namespace(x, y)
+    xp, _ = _get_namespace_and_device(x, y)
     n_inputs, xlag = _process_xlag(x, xlag)
     ylag = _process_ylag(ylag)
     x_lagged = _create_lagged_x(x, n_inputs, xlag)
@@ -337,7 +338,7 @@ def build_input_output_matrix(x: np.ndarray, y: np.ndarray, xlag, ylag) -> np.nd
     # related to its respective lags. With this approach we can create
     # the information matrix by using all possible combination of
     # the columns as a product in the iterations
-    xp = get_namespace(x, y)
+    xp, _ = _get_namespace_and_device(x, y)
     lagged_data = initial_lagged_matrix(x, y, xlag, ylag)
     constant = _ones(
         xp,

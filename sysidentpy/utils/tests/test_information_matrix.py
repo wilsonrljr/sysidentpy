@@ -293,6 +293,39 @@ def test_build_input_output_matrix_preserves_array_api_namespace():
     assert_almost_equal(_to_numpy(result), expected)
 
 
+def test_build_input_output_matrix_rejects_mixed_array_api_namespaces():
+    xp = pytest.importorskip("array_api_strict")
+    torch = pytest.importorskip("torch")
+
+    x_data = torch.tensor(
+        [[1.0, 2.0], [3.0, 4.0], [5.0, 6.0], [7.0, 8.0]], dtype=torch.float64
+    )
+    y_data = xp.asarray(np.array([[10.0], [20.0], [30.0], [40.0]]), dtype=xp.float64)
+
+    with config_context(array_api_dispatch=True):
+        with pytest.raises(ValueError, match="same Array API namespace"):
+            build_input_output_matrix(x_data, y_data, [[1], [1]], [1])
+
+
+def test_build_input_output_matrix_rejects_mixed_torch_devices_when_available():
+    torch = pytest.importorskip("torch")
+    if not torch.cuda.is_available():
+        pytest.skip("CUDA not available")
+
+    x_data = torch.tensor(
+        [[1.0, 2.0], [3.0, 4.0], [5.0, 6.0], [7.0, 8.0]],
+        dtype=torch.float64,
+        device="cpu",
+    )
+    y_data = torch.tensor(
+        [[10.0], [20.0], [30.0], [40.0]], dtype=torch.float64, device="cuda"
+    )
+
+    with config_context(array_api_dispatch=True):
+        with pytest.raises(ValueError, match="same device"):
+            build_input_output_matrix(x_data, y_data, [[1], [1]], [1])
+
+
 def test_build_input_output_matrix_preserves_torch_cuda_device_when_available():
     torch = pytest.importorskip("torch")
     if not torch.cuda.is_available():

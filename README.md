@@ -83,6 +83,7 @@ SysIdentPy includes experimental, opt-in Array API support following the same ge
 
 - Enable dispatch with `set_config(array_api_dispatch=True)` or `config_context(array_api_dispatch=True)`.
 - Current backend-native support includes the supported model structure selection algorithms, simulation, metrics, utilities, and the `Polynomial`, `Fourier`, and `Bilinear` basis functions.
+- Current automated coverage is strongest for NumPy, PyTorch, and `array_api_strict`. CuPy and JAX remain experimental compatibility targets.
 - On non-NumPy backends, 1-step prediction stays backend-native. Sequential prediction (`steps_ahead=None` and `steps_ahead > 1`) currently runs through a NumPy/CPU fallback and converts predictions back to the original namespace/device.
 
 See the [Array API dispatch guide](https://sysidentpy.org/user-guide/how-to/array-api-dispatch/) for the exact support matrix and current limitations.

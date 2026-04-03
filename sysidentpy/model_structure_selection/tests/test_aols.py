@@ -248,6 +248,19 @@ def test_fit_predict_accepts_torch_tensors_under_array_api_dispatch():
     assert_equal(_to_numpy(yhat[: model.max_lag]), y_test[: model.max_lag])
 
 
+def test_predict_rejects_mixed_array_api_namespaces_for_aols():
+    xp = pytest.importorskip("array_api_strict")
+    torch = pytest.importorskip("torch")
+    model = AOLS(basis_function=Polynomial(degree=2))
+
+    x_data = torch.tensor(np.arange(4.0).reshape(-1, 1), dtype=torch.float64)
+    y_data = xp.asarray(np.arange(4.0).reshape(-1, 1), dtype=xp.float64)
+
+    with config_context(array_api_dispatch=True):
+        with pytest.raises(ValueError, match="same Array API namespace"):
+            model.predict(X=x_data, y=y_data)
+
+
 def test_fit_predict_accepts_torch_cuda_tensors_under_array_api_dispatch():
     torch = pytest.importorskip("torch")
     if not torch.cuda.is_available():

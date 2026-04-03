@@ -8,9 +8,9 @@ from typing import Tuple, Union, Optional
 import numpy as np
 
 from .._lib._array_api import (
-    _asarray,
     _concat,
     _copy,
+    _get_namespace_and_device,
     _is_numpy_namespace,
     _set_element,
     _to_numpy,
@@ -460,7 +460,7 @@ class AOLS(BaseMSS):
             The predicted values of the model.
 
         """
-        xp = get_namespace(y)
+        xp, target_device = _get_namespace_and_device(X, y)
         if steps_ahead != 1 and not _is_numpy_namespace(xp):
             return self._predict_on_cpu(
                 X=X,
@@ -468,7 +468,7 @@ class AOLS(BaseMSS):
                 steps_ahead=steps_ahead,
                 forecast_horizon=forecast_horizon,
                 original_xp=xp,
-                target_device=_device(y),
+                target_device=target_device,
             )
 
         prefix = y[: self.max_lag, ...]

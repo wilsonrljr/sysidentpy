@@ -20,13 +20,47 @@ from ._vendor.array_api_extra import at as _at
 from ._vendor.array_api_compat import (
     array_namespace as _array_namespace,
     device as _compat_device,
-    is_numpy_namespace as _is_numpy_ns,
     is_array_api_obj,
-    is_torch_namespace as _is_torch_ns,
     is_cupy_namespace as _is_cupy_ns,
+    is_jax_namespace as _is_jax_ns,
+    is_numpy_namespace as _is_numpy_ns,
+    is_torch_namespace as _is_torch_ns,
     size,
     to_device,
 )
+
+
+def _array_api_arrays(*arrays):
+    """Return the Array API objects from *arrays*."""
+    return [a for a in arrays if a is not None and is_array_api_obj(a)]
+
+
+def _namespace_key(xp) -> str:
+    """Return a normalized backend identifier for *xp*."""
+    if _is_numpy_namespace(xp):
+        return "numpy"
+    if _is_torch_ns(xp):
+        return "torch"
+    if _is_cupy_ns(xp):
+        return "cupy"
+    if _is_jax_ns(xp):
+        return "jax"
+
+    return getattr(xp, "__name__", xp.__class__.__name__)
+
+
+def _validate_namespace_consistency(arrays) -> None:
+    """Ensure all Array API objects use the same backend namespace."""
+    namespace_keys = sorted(
+        {_namespace_key(_array_namespace(array)) for array in arrays}
+    )
+    if len(namespace_keys) <= 1:
+        return
+
+    raise ValueError(
+        "Input arrays must use the same Array API namespace when "
+        f"array_api_dispatch=True. Got {namespace_keys!r}."
+    )
 
 
 def get_namespace(*arrays):
@@ -59,12 +93,29 @@ def get_namespace(*arrays):
     if not get_config()["array_api_dispatch"]:
         return np
 
-    # Filter out None and scalar values
-    arrays = [a for a in arrays if a is not None and is_array_api_obj(a)]
+    arrays = _array_api_arrays(*arrays)
     if not arrays:
         return np
 
+    _validate_namespace_consistency(arrays)
     return _array_namespace(*arrays)
+
+
+def _get_namespace_and_device(*arrays):
+    """Return a validated namespace/device pair for the given inputs.
+
+    When Array API dispatch is enabled, all Array API inputs must belong to the
+    same namespace and live on the same device.
+    """
+    xp = get_namespace(*arrays)
+    if not get_config()["array_api_dispatch"]:
+        return xp, None
+
+    arrays = _array_api_arrays(*arrays)
+    if not arrays:
+        return xp, None
+
+    return xp, device(*arrays)
 
 
 def _is_numpy_namespace(xp) -> bool:
@@ -412,6 +463,7 @@ __all__ = [
     "_diag",
     "_einsum_ij_ij_j",
     "_full",
+    "_get_namespace_and_device",
     "_hstack",
     "_is_numpy_namespace",
     "_lstsq",

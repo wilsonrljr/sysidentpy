@@ -13,7 +13,9 @@ from sysidentpy._lib._array_api import _to_numpy, get_namespace
 from sysidentpy.model_structure_selection.ofr_base import (
     OFRBase,
     _compute_err_slice,
+    apress,
     get_min_info_value,
+    get_info_criteria,
 )
 from sysidentpy.parameter_estimation import (
     LeastSquares,
@@ -290,6 +292,12 @@ def test_compute_err_slice_handles_empty_block():
     assert result.size == 0
 
 
+def test_get_info_criteria_apress_uses_custom_lambda():
+    criterion = get_info_criteria("apress", apress_lambda=2.5)
+
+    assert criterion(2, 10, 0.5) == apress(2, 10, 0.5, apress_lambda=2.5)
+
+
 def test_validate_params_rejects_invalid_model_type():
     with pytest.raises(ValueError, match="model_type"):
         SimpleOFR(model_type="UNKNOWN")
@@ -480,6 +488,19 @@ def test_predict_polynomial_preserves_array_api_namespace():
         _to_numpy(result),
         np.array([[0.0], [2.0], [2.0], [2.0]]),
     )
+
+
+def test_predict_rejects_mixed_array_api_namespaces():
+    xp = pytest.importorskip("array_api_strict")
+    torch = pytest.importorskip("torch")
+    model = SimpleOFR()
+
+    x_data = torch.tensor(np.arange(4.0).reshape(-1, 1), dtype=torch.float64)
+    y_data = xp.asarray(np.arange(4.0).reshape(-1, 1), dtype=xp.float64)
+
+    with config_context(array_api_dispatch=True):
+        with pytest.raises(ValueError, match="same Array API namespace"):
+            model.predict(X=x_data, y=y_data)
 
 
 def test_error_reduction_ratio_accepts_torch_tensors():
