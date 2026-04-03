@@ -4,6 +4,7 @@ from typing import Optional
 import numpy as np
 from scipy.stats import binom
 
+from .._lib._array_api import _require_numpy_namespace, get_namespace
 from .basis_function_base import BaseBasisFunction
 from ..utils.deprecation import deprecated
 
@@ -112,6 +113,9 @@ class Bernstein(BaseBasisFunction):
         model_type: str = "NARMAX",
         predefined_regressors: Optional[np.ndarray] = None,
     ):
+        xp = get_namespace(data)
+        _require_numpy_namespace(xp, feature=self.__class__.__name__)
+
         # remove intercept (because the data always have the intercept)
         data = data[max_lag:, 1:]
 

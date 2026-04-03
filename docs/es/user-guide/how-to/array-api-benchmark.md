@@ -192,7 +192,7 @@ PyTorch CUDA           0.00191513      6.66e-16            True
 
 Entrenamiento del mismo modelo en cada backend disponible y comparación de los **valores predichos reales** para tres modos: simulación libre (`steps_ahead=None`), 1 paso adelante (`steps_ahead=1`), y n pasos adelante (`steps_ahead=3`).
 
-El objetivo es confirmar que la estrategia de fallback a CPU produce resultados **idénticos** (o casi idénticos, hasta la precisión de punto flotante) comparados con el baseline de NumPy puro.
+El objetivo es confirmar dos modos de ejecución: la predicción 1-step permanece nativa en el backend seleccionado, mientras que la predicción secuencial (free-run y n-step) en backends no NumPy usa el fallback a CPU. En ambos casos, las predicciones deben permanecer **idénticas** (o casi idénticas, hasta la precisión de punto flotante) al baseline de NumPy puro.
 
 ### FROLS — Superposición de predicciones
 
@@ -219,7 +219,7 @@ All assertions passed: predictions are equivalent across all backends.
 
 ### Equivalencia AOLS
 
-Repetición de la misma validación con AOLS para confirmar que el fallback a CPU funciona consistentemente en diferentes algoritmos de selección de estructura de modelo.
+Repetición de la misma validación con AOLS para confirmar que la misma división se mantiene en diferentes algoritmos de selección de estructura de modelo: predicción 1-step nativa en el backend y predicción secuencial con fallback a CPU.
 
 ![AOLS: salida de predicción en todos los backends (primeras 200 muestras)](../../../en/user-guide/how-to/figures/array-api-benchmark-6.png)
 
@@ -271,7 +271,7 @@ ALL PASSED: local dev == PyPI v0.8.0 (within machine epsilon)
 
 **PyTorch CUDA / CuPy**: Las ganancias reales aparecen en datasets más grandes (ej.: >10k muestras) y/o modelos con altos grados polinomiales (grado ≥ 3), donde las operaciones matriciales dominan el tiempo de ejecución. El costo de transferencia CPU→GPU se amortiza por la ejecución paralela en el dispositivo.
 
-**Equivalencia de predicción**: Como se muestra en la Sección 8, la estrategia de fallback a CPU para predicción secuencial (free-run, n-step) produce resultados **idénticos** en todos los backends — la diferencia absoluta máxima está dentro de la precisión de punto flotante (~1e-15). Las predicciones son numéricamente equivalentes independientemente de si `fit()` se ejecutó en NumPy, PyTorch CPU, PyTorch CUDA o CuPy.
+**Equivalencia de predicción**: Como se muestra en la Sección 8, la predicción 1-step permanece nativa en el backend, mientras que la predicción secuencial (free-run, n-step) en backends no NumPy usa fallback a CPU y convierte la salida de vuelta al namespace/dispositivo original. Ambos modos permanecen numéricamente equivalentes entre backends, con diferencias máximas dentro de la precisión de punto flotante (~1e-15).
 
 **Equivalencia de versión**: La Sección 9 confirma que la versión de desarrollo local produce predicciones NumPy byte-idénticas comparadas con la versión publicada en PyPI (v0.8.0).
 

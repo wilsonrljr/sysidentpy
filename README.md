@@ -77,6 +77,16 @@ The library is compatible with Linux, Windows, and macOS. Some examples may also
 
 For more details, check our [installation guide](https://sysidentpy.org/getting-started/getting-started/)
 
+## Experimental Array API Support
+
+SysIdentPy includes experimental, opt-in Array API support following the same general approach used by SciPy and scikit-learn.
+
+- Enable dispatch with `set_config(array_api_dispatch=True)` or `config_context(array_api_dispatch=True)`.
+- Current backend-native support includes the supported model structure selection algorithms, simulation, metrics, utilities, and the `Polynomial`, `Fourier`, and `Bilinear` basis functions.
+- On non-NumPy backends, 1-step prediction stays backend-native. Sequential prediction (`steps_ahead=None` and `steps_ahead > 1`) currently runs through a NumPy/CPU fallback and converts predictions back to the original namespace/device.
+
+See the [Array API dispatch guide](https://sysidentpy.org/user-guide/how-to/array-api-dispatch/) for the exact support matrix and current limitations.
+
 ## What are the main features of SysIdentPy?
 
 | Feature | What is this? |

@@ -13,11 +13,11 @@ title: Histórico de Alterações
 
 ### MUDANÇAS
 
-Esta versão introduz **suporte ao padrão Array API**, permitindo que o SysIdentPy funcione nativamente com NumPy, PyTorch (CPU e CUDA), CuPy, JAX e qualquer outra biblioteca de arrays que implemente o [padrão Python Array API](https://data-apis.org/array-api/latest/). Esta é uma mudança arquitetural significativa que traz aceleração por GPU e flexibilidade de backend para fluxos de trabalho de identificação de sistemas sem alterar o comportamento de nenhum algoritmo.
+Esta versão introduz suporte experimental e opt-in ao **padrão Array API**, permitindo que o SysIdentPy funcione com NumPy, PyTorch (CPU e CUDA), CuPy, JAX e outras bibliotecas de arrays que implementem o [padrão Python Array API](https://data-apis.org/array-api/latest/). Esta é uma mudança arquitetural significativa que traz flexibilidade de backend e execução em GPU para os caminhos nativos de backend já suportados, sem alterar o comportamento padrão com NumPy.
 
 #### Funcionalidade Principal — Suporte ao Padrão Array API
 
-- O SysIdentPy agora suporta o padrão Array API através de um mecanismo de despacho opt-in. Os usuários podem habilitá-lo globalmente com `set_config(array_api_dispatch=True)` ou temporariamente com `config_context(array_api_dispatch=True)`. Quando desabilitado (o padrão), o SysIdentPy se comporta exatamente como antes, usando exclusivamente NumPy.
+- O SysIdentPy agora oferece suporte experimental ao padrão Array API através de um mecanismo de despacho opt-in. Os usuários podem habilitá-lo globalmente com `set_config(array_api_dispatch=True)` ou temporariamente com `config_context(array_api_dispatch=True)`. Quando desabilitado (o padrão), o SysIdentPy se comporta exatamente como antes, usando exclusivamente NumPy.
 - O sistema de despacho é construído sobre cópias vendorizadas de `array-api-compat` (v1.14.0) e `array-api-extra` (v0.10.1), seguindo a mesma abordagem usada pelo scikit-learn e SciPy.
 - Um novo módulo interno `sysidentpy._lib._array_api` fornece a camada de compatibilidade principal com funções como `get_namespace()`, `_to_numpy()`, `_lstsq()`, `_zeros()`, `_ones()`, `_concat()`, `_diag()`, `_set_element()`, `_copy()`, `_median()`, `_nanargmin()`, `_vector_norm()`, `_pow()` e outras.
 - Um novo módulo `sysidentpy._lib._err` fornece uma implementação agnóstica de backend para o cálculo do ERR (Error Reduction Ratio).
@@ -25,13 +25,13 @@ Esta versão introduz **suporte ao padrão Array API**, permitindo que o SysIden
 
 #### Integração Array API nos Módulos
 
-- **Seleção de Estrutura de Modelo**: FROLS, AOLS, OFRBase, UOFR e a família Orthogonal Floating Search (OSF, OIF, OOS/O2S) suportam completamente o despacho Array API. MetaMSS, Entropic Regression (ER) e RMSS requerem NumPy devido a dependências do SciPy.
+- **Seleção de Estrutura de Modelo**: FROLS, AOLS, OFRBase, UOFR e a família Orthogonal Floating Search (OSF, OIF, OOS/O2S) suportam despacho Array API. `fit()` e a predição 1-step permanecem nativos no backend, enquanto a predição sequencial em backends não NumPy segue o fallback documentado para NumPy/CPU. MetaMSS, Entropic Regression (ER) e RMSS requerem NumPy devido a dependências do SciPy.
 - **Estimação de Parâmetros**: 18 estimadores suportam o despacho Array API (LeastSquares, RidgeRegression, TotalLeastSquares, RecursiveLeastSquares, AffineLeastMeanSquares e todas as 12 variantes da família LMS). 3 estimadores requerem NumPy (NonNegativeLeastSquares, BoundedVariableLeastSquares, LeastSquaresMinimalResidual).
-- **Funções Base**: Todas as 8 funções base funcionam com despacho Array API.
+- **Funções Base**: `Polynomial`, `Fourier` e `Bilinear` funcionam com despacho Array API. `Bernstein`, `Legendre`, `Hermite`, `Hermite Normalized` e `Laguerre` continuam restritas ao NumPy porque dependem de avaliadores polinomiais do SciPy.
 - **Simulação**: Todo o módulo de simulação suporta despacho Array API.
 - **Métricas**: Todas as métricas de regressão suportam despacho Array API.
 - **Utilitários**: `check_arrays`, `information_matrix` e análise residual suportam despacho Array API.
-- **NARMAX Base**: O pipeline de predição suporta despacho Array API com um fast-path vetorizado para Polynomial NARMAX habilitando predição free-run acelerada por GPU.
+- **NARMAX Base**: O pipeline de predição suporta despacho Array API. `fit()` e predição 1-step permanecem nativos no backend, enquanto a predição sequencial em backends não NumPy (`steps_ahead=None` ou `steps_ahead > 1`) usa fallback para NumPy/CPU e converte as predições de volta para o namespace e dispositivo originais.
 
 #### Nova API Pública
 
@@ -49,6 +49,7 @@ Esta versão introduz **suporte ao padrão Array API**, permitindo que o SysIden
 
 - Adicionados testes de despacho Array API em todos os módulos principais usando `array_api_strict` e backends PyTorch.
 - Adicionados testes de equivalência numérica cross-backend (NumPy vs PyTorch) para computação ERR.
+- Adicionados testes confirmando que `Fourier` e `Bilinear` aceitam entradas Array API e que funções base dependentes de SciPy falham rapidamente sob dispatch.
 - Adicionado novo notebook de exemplo `array-api-benchmark.ipynb`.
 
 #### Ferramentas e Configuração
@@ -61,11 +62,11 @@ Esta versão introduz **suporte ao padrão Array API**, permitindo que o SysIden
 
 ### IMPACTO
 
-O suporte ao Array API é uma das mudanças arquiteturais mais significativas na história do SysIdentPy. Permite que pesquisadores e profissionais executem fluxos de trabalho de identificação de sistemas em GPUs usando PyTorch ou CuPy sem alterar o código do modelo (apenas alternando uma flag de configuração). O design opt-in preserva total compatibilidade retroativa. A implementação segue os padrões estabelecidos pelo scikit-learn e SciPy, garantindo alinhamento com a direção do ecossistema Scientific Python em direção à computação agnóstica de hardware.
+O suporte ao Array API é uma das mudanças arquiteturais mais significativas na história do SysIdentPy. Ele permite que pesquisadores e profissionais usem backends com GPU, como PyTorch ou CuPy, nos caminhos nativos de backend já suportados, sem alterar o código do modelo além de alternar uma flag de configuração. O design opt-in preserva total compatibilidade retroativa, e os caminhos ainda dependentes de SciPy agora falham de forma explícita em vez de sugerir compatibilidade inexistente. A implementação segue os padrões estabelecidos pelo scikit-learn e SciPy, garantindo alinhamento com a direção do ecossistema Scientific Python em direção à computação agnóstica de hardware.
 
 ### TESTES
 
-A matriz de CI continua testando contra Python 3.10–3.14. O despacho Array API é testado com `array_api_strict` e backends PyTorch. Todos os 672 testes passam com 18 ignorados (todos devido à dependência opcional `array_api_strict`).
+A matriz de CI continua testando contra Python 3.10–3.14. O despacho Array API é exercitado com `array_api_strict` e backends PyTorch, incluindo verificações de preservação de namespace e cobertura de fail-fast para caminhos restritos ao NumPy.
 
 ## v0.8.0
 ### COLABORADORES

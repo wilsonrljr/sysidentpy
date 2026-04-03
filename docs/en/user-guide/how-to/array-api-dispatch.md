@@ -1,8 +1,8 @@
 # Array API Standard Support
 
-SysIdentPy implements support for the [Python Array API standard](https://data-apis.org/array-api/latest/), enabling users to run system identification workflows with different array backends, including PyTorch (CPU and CUDA), CuPy, JAX, and any other library that conforms to the standard, without modifying model code.
+SysIdentPy provides experimental, opt-in support for the [Python Array API standard](https://data-apis.org/array-api/latest/), enabling users to run supported system identification workflows with different array backends, including PyTorch (CPU and CUDA), CuPy, JAX, and any other library that conforms to the standard, without modifying model code.
 
-This page explains what the Array API standard is, why SysIdentPy adopted it, how the implementation works, which modules and algorithms are supported, and how to use it in practice.
+This page explains what the Array API standard is, why SysIdentPy adopted it, how the implementation works, which modules and algorithms are currently supported, and how to use it in practice.
 
 ## What is the Array API Standard?
 
@@ -22,7 +22,7 @@ These are the same types of operations that benefit most from GPU acceleration a
 
 **GPU Acceleration**
 
-PyTorch tensors on CUDA or CuPy arrays reside on GPU memory. When SysIdentPy receives these arrays, all matrix multiplications, SVD decompositions, element-wise operations, and reductions run on the GPU. For large-scale identification problems (many regressors, long time series, high polynomial degrees), this can provide substantial speedups compared to CPU-only NumPy.
+PyTorch tensors on CUDA or CuPy arrays reside on GPU memory. During supported backend-native paths, matrix multiplications, SVD decompositions, element-wise operations, and reductions run on the GPU. For large-scale identification problems (many regressors, long time series, high polynomial degrees), this can provide substantial speedups compared to CPU-only NumPy.
 
 **Backend Flexibility**
 
@@ -30,7 +30,9 @@ Researchers working in different ecosystems (PyTorch for deep learning pipelines
 
 **Device Preservation**
 
-When the input data lives on a specific device (e.g., `cuda:0` for PyTorch, or a specific GPU for CuPy), SysIdentPy preserves that device throughout the entire computation. Intermediate arrays, results, and predictions are created on the same device as the inputs. There is no implicit data transfer between CPU and GPU, which avoids the performance penalty of memory copies.
+When the input data lives on a specific device (e.g., `cuda:0` for PyTorch, or a specific GPU for CuPy), SysIdentPy preserves that device on backend-native paths such as `fit()` and 1-step prediction. Intermediate arrays created through the helper layer stay on the same device as the inputs.
+
+For non-NumPy backends, sequential prediction modes (`steps_ahead=None` and `steps_ahead > 1`) currently execute through a NumPy/CPU fallback and then convert the final predictions back to the original namespace and device. This keeps the public result aligned with the caller backend without pretending that those sequential paths are end-to-end GPU executions today.
 
 **Ecosystem Alignment**
 
@@ -379,6 +381,8 @@ with config_context(array_api_dispatch=True):
 
 Algorithms marked with ❌ raise `NotImplementedError` with a descriptive message when called with non-NumPy backends. They continue to work normally with NumPy arrays regardless of the `array_api_dispatch` setting.
 
+For the supported model structure selection algorithms, `fit()` and 1-step prediction remain backend-native. Sequential prediction on non-NumPy backends follows the documented NumPy/CPU fallback described in the limitations section below.
+
 ### Parameter Estimation
 
 | Estimator | Array API Support | Notes |
@@ -406,16 +410,18 @@ Algorithms marked with ❌ raise `NotImplementedError` with a descriptive messag
 
 ### Basis Functions
 
-| Basis Function | Array API Support |
-|----------------|:-:|
-| Polynomial | ✅ |
-| Fourier | ✅ |
-| Bilinear | ✅ |
-| Bernstein | ✅ |
-| Legendre | ✅ |
-| Hermite | ✅ |
-| Hermite Normalized | ✅ |
-| Laguerre | ✅ |
+| Basis Function | Array API Support | Notes |
+|----------------|:-:|-------|
+| Polynomial | ✅ | Full support |
+| Fourier | ✅ | Full support |
+| Bilinear | ✅ | Full support |
+| Bernstein | ❌ | Requires NumPy (SciPy dependency) |
+| Legendre | ❌ | Requires NumPy (SciPy dependency) |
+| Hermite | ❌ | Requires NumPy (SciPy dependency) |
+| Hermite Normalized | ❌ | Requires NumPy (SciPy dependency) |
+| Laguerre | ❌ | Requires NumPy (SciPy dependency) |
+
+Basis functions marked with ❌ raise `NotImplementedError` when Array API dispatch is enabled with non-NumPy inputs.
 
 ### Other Modules
 
@@ -491,7 +497,7 @@ GPU acceleration is most beneficial for:
 
 ### When GPU Acceleration Does Not Help
 
-For small problems (few lags, low degree, short time series), the overhead of GPU kernel launches and CPU-GPU memory copies may outweigh the computational benefit. SysIdentPy includes an internal fast-path for Polynomial NARMAX prediction that automatically decides whether to use the GPU or fall back to CPU based on the problem size and backend characteristics.
+For small problems (few lags, low degree, short time series), the overhead of GPU kernel launches and CPU-GPU memory copies may outweigh the computational benefit. SysIdentPy therefore keeps 1-step prediction backend-native, but currently routes sequential prediction (`steps_ahead=None` and `steps_ahead > 1`) on non-NumPy backends through a NumPy/CPU implementation and converts the final output back to the original namespace and device.
 
 ### Numerical Equivalence
 
@@ -515,10 +521,17 @@ Algorithms that rely on SciPy operations (sparse solvers, constrained optimizati
 - **NonNegativeLeastSquares**: Wraps `scipy.optimize.nnls`.
 - **BoundedVariableLeastSquares**: Wraps `scipy.optimize.lsq_linear`.
 - **LeastSquaresMinimalResidual**: Wraps `scipy.sparse.linalg.lsmr`.
+- **Bernstein, Legendre, Hermite, Hermite Normalized, and Laguerre basis functions**: Use SciPy polynomial evaluators.
 - **Neural NARX**: Uses PyTorch directly (not through Array API).
 - **Multiobjective Parameter Estimation (AILS)**: Uses SciPy for the augmented inverse least-squares computation.
 
 These algorithms raise `NotImplementedError` with specific messages indicating which dependency prevents Array API support. As SciPy expands its own Array API support, these restrictions will be progressively removed.
+
+### Sequential Prediction on Non-NumPy Backends
+
+When dispatch is enabled, `fit()` and 1-step prediction stay on the selected backend. Sequential prediction (`steps_ahead=None` and `steps_ahead > 1`) on non-NumPy backends currently uses a NumPy/CPU implementation and then converts the result back to the original namespace and device.
+
+This behavior is intentional and documented because those sequential paths are dominated by control flow rather than large batched kernels. The current design favors numerical equivalence and an explicit contract over claiming end-to-end GPU execution where SysIdentPy is not actually doing it.
 
 ### All Input Arrays Must Share the Same Backend and Device
 
