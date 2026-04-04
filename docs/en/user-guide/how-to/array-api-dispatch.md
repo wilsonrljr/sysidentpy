@@ -458,6 +458,10 @@ SysIdentPy vendors `array-api-compat` and `array-api-extra` instead of declaring
 
 The vendored versions are tracked in `sysidentpy/_lib/_vendor/VENDORED_VERSIONS`.
 
+### Testing and Coverage
+
+SysIdentPy tests its own Array API integration layer rather than re-testing the vendored upstream projects. In practice, this means the project coverage report excludes `sysidentpy/_lib/_vendor/`, while Array API tests focus on first-party behavior such as namespace and device validation, NumPy-only fail-fast paths, and namespace-preserving `fit()`/`predict()` behavior.
+
 ### Opt-in Dispatch
 
 Array API dispatch is disabled by default (`array_api_dispatch=False`). This design decision guarantees:

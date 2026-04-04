@@ -121,6 +121,7 @@ disable_warnings = ['no-data-collected']
 [tool.coverage.report]
 omit = [
     "sysidentpy/utils/plotting.py",
+    "sysidentpy/_lib/_vendor/*",
     "sysidentpy/basis_function/tests/*",
     "sysidentpy/tests/*",
     "sysidentpy/general_estimators/tests/*",

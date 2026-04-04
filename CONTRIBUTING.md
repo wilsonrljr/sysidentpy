@@ -168,6 +168,9 @@ If it shows the `pip` binary at `env/bin/pip` then it worked.
 !!! note
 	We use the `pytest` package for testing. The test functions are located in tests subdirectories at each folder inside SysIdentPy, which check the validity of the algorithms.
 
+!!! note
+    The vendored Array API support code in `sysidentpy/_lib/_vendor/` is treated as third-party source and is excluded from the project's coverage report. When adding or updating Array API tests, prefer exercising SysIdentPy's first-party boundaries such as `sysidentpy/_lib/_array_api.py`, `sysidentpy/_config.py`, and public `fit`/`predict` paths instead of testing `array-api-compat` or `array-api-extra` internals directly.
+
 #### Dependencies
 
 Install SysIdentPy with the `dev` and `docs` option to get all the necessary dependencies to run the tests
