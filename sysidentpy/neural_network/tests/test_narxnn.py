@@ -140,7 +140,8 @@ def test_validate():
 
 
 def test_sanitize_lag_sequence_conversion():
-    sanitized = NARXNN._sanitize_lag([1, 2, 3], "ylag")
+    model = NARXNN(basis_function=Polynomial(degree=1))
+    sanitized = model._sanitize_lag([1, 2, 3], "ylag")
     assert sanitized == [1, 2, 3]
 
 

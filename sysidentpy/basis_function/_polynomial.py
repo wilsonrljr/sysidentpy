@@ -12,6 +12,7 @@ from sysidentpy._lib._array_api import (
     _to_numpy,
     device as _device,
     get_namespace,
+    is_array_api_obj,
 )
 from .basis_function_base import BaseBasisFunction
 
@@ -63,15 +64,18 @@ class Polynomial(BaseBasisFunction):
             self._combination_cache[key] = combos
         return self._combination_cache[key]
 
-    @staticmethod
     def _normalize_predefined_regressors(
+        self,
         predefined_regressors: Optional[np.ndarray],
     ) -> Optional[np.ndarray]:
         """Normalize regressor indices to NumPy metadata for cached lookups."""
         if predefined_regressors is None:
             return None
 
-        return np.asarray(_to_numpy(predefined_regressors), dtype=np.intp).reshape(-1)
+        if is_array_api_obj(predefined_regressors):
+            predefined_regressors = _to_numpy(predefined_regressors)
+
+        return np.asarray(predefined_regressors, dtype=np.intp).reshape(-1)
 
     def _evaluate_terms(
         self,

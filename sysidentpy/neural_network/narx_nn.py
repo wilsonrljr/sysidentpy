@@ -322,8 +322,7 @@ class NARXNN(BaseMSS):
                 f"optimizer {self.optimizer_name} not available in torch.optim"
             )
 
-    @staticmethod
-    def _sanitize_lag(value, name):
+    def _sanitize_lag(self, value, name):
         if isinstance(value, int):
             if value < 1:
                 raise ValueError(f"{name} must be >= 1. Got {value}")
@@ -351,8 +350,7 @@ class NARXNN(BaseMSS):
             f"{name} must be an int or a sequence of ints. Got {type(value).__name__}"
         )
 
-    @staticmethod
-    def _as_float_array(array):
+    def _as_float_array(self, array):
         return np.ascontiguousarray(np.asarray(array, dtype=np.float32))
 
     def _forward_numpy(self, array):

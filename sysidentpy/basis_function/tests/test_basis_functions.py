@@ -179,6 +179,34 @@ def test_fit_bilinear_accepts_array_api_inputs():
     assert_almost_equal(_to_numpy(result), expected, decimal=12)
 
 
+def test_fit_bilinear_predefined_accepts_array_api_inputs():
+    xp = pytest.importorskip("array_api_strict")
+    basis_function = Bilinear(degree=2)
+    data_np = np.array(
+        ([1.0, 1.0, 1.0], [2.0, 3.0, 4.0], [3.0, 3.0, 3.0], [4.0, 5.0, 6.0])
+    )
+    predefined_regressors = np.array([0, 2])
+    expected = basis_function.fit(
+        data=data_np,
+        max_lag=1,
+        ylag=2,
+        xlag=2,
+        predefined_regressors=predefined_regressors,
+    )
+
+    with config_context(array_api_dispatch=True):
+        result = basis_function.fit(
+            data=xp.asarray(data_np),
+            max_lag=1,
+            ylag=2,
+            xlag=2,
+            predefined_regressors=xp.asarray(predefined_regressors),
+        )
+
+    assert result.__array_namespace__().__name__ == xp.__name__
+    assert_almost_equal(_to_numpy(result), expected, decimal=12)
+
+
 def test_transform_fourier():
     basis_function = Fourier(n=5, ensemble=False)
     data = np.array(([1, 1, 1], [2, 3, 4], [3, 3, 3]))
