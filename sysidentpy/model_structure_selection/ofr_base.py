@@ -6,6 +6,7 @@
 
 import warnings
 from abc import ABCMeta, abstractmethod
+from functools import partial
 from typing import Union, Tuple, Optional
 
 import numpy as np
@@ -14,6 +15,21 @@ from sysidentpy.narmax_base import house, rowhouse
 from sysidentpy.utils.information_matrix import build_lagged_matrix
 from sysidentpy.utils.check_arrays import check_positive_int, num_features
 
+from .._lib._array_api import (
+    _asarray,
+    _concat,
+    _copy,
+    _full,
+    _get_namespace_and_device,
+    _is_numpy_namespace,
+    _nanargmin,
+    _set_element,
+    _to_numpy,
+    _zeros,
+    device as _device,
+    get_namespace,
+)
+from .._lib._err import _compute_err_slice
 from ..basis_function import Fourier, Polynomial
 from ..narmax_base import BaseMSS
 from ..parameter_estimation.estimators import (
@@ -55,6 +71,25 @@ Estimators = Union[
     NormalizedLeastMeanSquaresSignError,
     LeastMeanSquaresSignRegressor,
 ]
+
+
+def _swap_matrix_columns(xp, matrix, left_idx, right_idx):
+    if left_idx == right_idx:
+        return matrix
+
+    left_column = _copy(xp, matrix[:, left_idx])
+    right_column = _copy(xp, matrix[:, right_idx])
+    matrix = _set_element(xp, matrix, (slice(None), left_idx), right_column)
+    matrix = _set_element(xp, matrix, (slice(None), right_idx), left_column)
+    return matrix
+
+
+def _take_columns_by_index(xp, matrix, indices):
+    index_values = _to_numpy(indices).astype(int, copy=False).tolist()
+    if not index_values:
+        return _zeros(xp, (matrix.shape[0], 0), dtype=matrix.dtype)
+
+    return _concat(xp, [matrix[:, idx : idx + 1] for idx in index_values], axis=1)
 
 
 def fpe(n_theta: int, n_samples: int, e_var: float) -> float:
@@ -147,10 +182,19 @@ def get_min_info_value(info_values):
     >>> instance.get_min_info_value()
     3
     """
-    is_monotonique = np.diff(info_values) > 0
-    if any(is_monotonique):
-        return np.where(is_monotonique)[0][0] + 1
-    return len(info_values)
+    xp = get_namespace(info_values)
+
+    if _is_numpy_namespace(xp):
+        is_monotonique = np.diff(info_values) > 0
+        if any(is_monotonique):
+            return np.where(is_monotonique)[0][0] + 1
+        return info_values.shape[0]
+
+    is_monotonique = info_values[1:] > info_values[:-1]
+    if bool(_to_numpy(xp.any(is_monotonique))):
+        first_increase = xp.nonzero(is_monotonique)[0][0]
+        return int(_to_numpy(first_increase)) + 1
+    return info_values.shape[0]
 
 
 def aic(n_theta: int, n_samples: int, e_var: float) -> float:
@@ -252,7 +296,6 @@ def apress(n_theta: int, n_samples: int, mse: float, apress_lambda: float) -> fl
     float
         The APRESS score for the current model size.
     """
-
     denom = n_samples - apress_lambda * n_theta
     if denom <= 0:
         # Prevent division by zero/negative scaling; fall back to large penalty.
@@ -269,36 +312,9 @@ def get_info_criteria(info_criteria: str, apress_lambda: float = 1.0):
         "bic": bic,
         "fpe": fpe,
         "lilc": lilc,
-        "apress": apress,
+        "apress": partial(apress, apress_lambda=apress_lambda),
     }
     return info_criteria_options.get(info_criteria)
-
-
-def _compute_err_slice(
-    tmp_psi: np.ndarray,
-    tmp_y: np.ndarray,
-    start_idx: int,
-    squared_y: float,
-    alpha: float,
-    eps: float,
-) -> np.ndarray:
-    """Compute ERR values for remaining regressors using vectorized math."""
-    psi_block = tmp_psi[start_idx:, start_idx:]
-    if psi_block.size == 0:
-        return np.empty(0)
-
-    y_block = tmp_y[start_idx:]
-    numerators = psi_block.T @ y_block
-    denominators = np.einsum("ij,ij->j", psi_block, psi_block)
-    denominators = denominators + alpha
-    denominators = np.where(
-        denominators == 0,
-        np.finfo(np.float64).eps,
-        denominators,
-    )
-
-    err_slice = (np.square(numerators.ravel()) / (denominators * squared_y)) + eps
-    return err_slice
 
 
 class OFRBase(BaseMSS, metaclass=ABCMeta):
@@ -354,7 +370,8 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
 
     def _default_estimation_target(self, y: np.ndarray) -> np.ndarray:
         """Compute the standard estimation target used across MSS algorithms."""
-        return y[self.max_lag :, 0].reshape(-1, 1)
+        xp = get_namespace(y)
+        return xp.reshape(y[self.max_lag :, 0], (-1, 1))
 
     def _unpack_mss_output(
         self,
@@ -369,7 +386,8 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
             err, piv, psi, estimation_target = mss_output
         else:
             raise ValueError(
-                "run_mss_algorithm must return (err, piv, psi) or (err, piv, psi, target)."
+                "run_mss_algorithm must return"
+                " (err, piv, psi) or (err, piv, psi, target)."
             )
         return err, piv, psi, estimation_target
 
@@ -399,13 +417,15 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
 
         if self.info_criteria not in ["aic", "aicc", "bic", "fpe", "lilc", "apress"]:
             raise ValueError(
-                f"info_criteria must be aic, aicc, bic, fpe, lilc or apress. Got {self.info_criteria}"
+                "info_criteria must be aic, aicc, bic, fpe, lilc"
+                f" or apress. Got {self.info_criteria}"
             )
 
         if self.info_criteria == "apress":
             if not isinstance(self.apress_lambda, (int, float)):
                 raise TypeError(
-                    f"apress_lambda must be a numeric value. Got {type(self.apress_lambda)}"
+                    "apress_lambda must be a numeric value."
+                    f" Got {type(self.apress_lambda)}"
                 )
             if self.apress_lambda <= 0:
                 raise ValueError(f"apress_lambda must be > 0. Got {self.apress_lambda}")
@@ -463,18 +483,24 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
            e Novos Resultados
 
         """
-        squared_y = np.dot(y[self.max_lag :].T, y[self.max_lag :])
-        squared_y = float(np.maximum(squared_y, np.finfo(np.float64).eps))
-        tmp_psi = psi.copy()
-        y = y[self.max_lag :, 0].reshape(-1, 1)
-        tmp_y = y.copy()
+        xp = get_namespace(psi, y)
+        target_device = _device(psi, y)
+        squared_y = xp.sum(y[self.max_lag :, :] ** 2)
+        squared_y = float(
+            xp.asarray(max(float(squared_y), float(np.finfo(np.float64).eps)))
+        )
+        tmp_psi = _copy(xp, psi)
+        y = xp.reshape(y[self.max_lag :, 0], (-1, 1))
+        tmp_y = _copy(xp, y)
         dimension = tmp_psi.shape[1]
-        piv = np.arange(dimension)
-        tmp_err = np.zeros(dimension)
-        err = np.zeros(dimension)
+        piv = _asarray(np.arange(dimension), xp=xp, target_device=target_device)
+        tmp_err = _zeros(
+            xp, dimension, dtype=tmp_psi.dtype, target_device=target_device
+        )
+        err = _zeros(xp, dimension, dtype=tmp_psi.dtype, target_device=target_device)
 
-        for i in np.arange(0, dimension):
-            tmp_err[i:] = _compute_err_slice(
+        for i in range(dimension):
+            tmp_err_slice = _compute_err_slice(
                 tmp_psi,
                 tmp_y,
                 i,
@@ -482,26 +508,72 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
                 self.alpha,
                 self.eps,
             )
+            # Use index assignment for the slice
+            if _is_numpy_namespace(xp):
+                tmp_err[i:] = tmp_err_slice
+            else:
+                tmp_err = xp.concat([tmp_err[:i], tmp_err_slice])
 
-            piv_index = np.argmax(tmp_err[i:]) + i
-            err[i] = tmp_err[piv_index]
+            piv_index = int(_to_numpy(xp.argmax(tmp_err[i:]))) + i
+            err_val = tmp_err[piv_index]
+            if _is_numpy_namespace(xp):
+                err[i] = err_val
+            else:
+                err = xp.concat(
+                    [
+                        err[:i],
+                        xp.reshape(
+                            _asarray(
+                                err_val,
+                                xp=xp,
+                                dtype=err.dtype,
+                                target_device=target_device,
+                            ),
+                            (1,),
+                        ),
+                        err[i + 1 :],
+                    ]
+                )
             if i == process_term_number:
                 break
 
-            if (self.err_tol is not None) and (err.cumsum()[i] >= self.err_tol):
+            if _is_numpy_namespace(xp):
+                cumsum_val = float(err.cumsum()[i])
+            else:
+                cumsum_val = float(xp.sum(err[: i + 1]))
+            if (self.err_tol is not None) and (cumsum_val >= self.err_tol):
                 self.n_terms = i + 1
                 process_term_number = i + 1
                 break
 
-            tmp_psi[:, [piv_index, i]] = tmp_psi[:, [i, piv_index]]
-            piv[[piv_index, i]] = piv[[i, piv_index]]
+            if _is_numpy_namespace(xp):
+                tmp_psi[:, [piv_index, i]] = tmp_psi[:, [i, piv_index]]
+            else:
+                tmp_psi = _swap_matrix_columns(xp, tmp_psi, piv_index, i)
+            if _is_numpy_namespace(xp):
+                piv_i = piv[i]
+                piv_p = piv[piv_index]
+                piv[[piv_index, i]] = piv[[i, piv_index]]
+            else:
+                piv_i = _copy(xp, piv[i])
+                piv_p = _copy(xp, piv[piv_index])
+                piv = _set_element(xp, piv, piv_index, piv_i)
+                piv = _set_element(xp, piv, i, piv_p)
             v = house(tmp_psi[i:, i])
             row_result = rowhouse(tmp_psi[i:, i:], v)
-            tmp_y[i:] = rowhouse(tmp_y[i:], v)
-            tmp_psi[i:, i:] = np.copy(row_result)
+            y_slice = (slice(i, None), slice(None))
+            transformed_y = rowhouse(tmp_y[y_slice], v)
+            if _is_numpy_namespace(xp):
+                tmp_y[y_slice] = transformed_y
+            else:
+                tmp_y = _set_element(xp, tmp_y, y_slice, transformed_y)
+            tmp_psi[i:, i:] = _copy(xp, row_result)
 
         tmp_piv = piv[0:process_term_number]
-        psi_orthogonal = psi[:, tmp_piv]
+        if _is_numpy_namespace(xp):
+            psi_orthogonal = psi[:, tmp_piv]
+        else:
+            psi_orthogonal = _take_columns_by_index(xp, psi, tmp_piv)
         return err, tmp_piv, psi_orthogonal
 
     def information_criterion(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -531,6 +603,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
             vector position + 1).
 
         """
+        xp = get_namespace(x, y)
         if self.n_info_values is not None and self.n_info_values > x.shape[1]:
             self.n_info_values = x.shape[1]
             warnings.warn(
@@ -539,11 +612,15 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
                 f" non_degree. We set as {x.shape[1]}",
                 stacklevel=2,
             )
+        output_vector = _full(
+            xp,
+            self.n_info_values,
+            xp.nan,
+            dtype=xp.float64,
+            target_device=_device(x),
+        )
 
-        output_vector = np.zeros(self.n_info_values)
-        output_vector[:] = np.nan
-
-        n_samples = len(y) - self.max_lag
+        n_samples = y.shape[0] - self.max_lag
 
         for i in range(self.n_info_values):
             n_theta = i + 1
@@ -554,14 +631,20 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
 
             tmp_theta = self.estimator.optimize(regressor_matrix, estimation_target)
 
-            tmp_yhat = np.dot(regressor_matrix, tmp_theta)
+            tmp_yhat = regressor_matrix @ tmp_theta
             tmp_residual = estimation_target - tmp_yhat
 
             if self.info_criteria == "apress":
-                mse = np.mean(np.square(tmp_residual))
+                mse = float(xp.mean(tmp_residual**2))
                 output_vector[i] = apress(n_theta, n_samples, mse, self.apress_lambda)
             else:
-                e_var = np.var(tmp_residual, ddof=1)
+                if _is_numpy_namespace(xp):
+                    e_var = float(np.var(tmp_residual, ddof=1))
+                else:
+                    n = tmp_residual.shape[0]
+                    e_var = float(
+                        xp.sum((tmp_residual - xp.mean(tmp_residual)) ** 2) / (n - 1)
+                    )
                 output_vector[i] = self.info_criteria_function(
                     n_theta, n_samples, e_var
                 )
@@ -627,7 +710,8 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
         if self.n_terms is None and self.order_selection is True:
             if self.info_criteria == "apress":
                 # APRESS uses the minimizer of the criterion (eq. 10)
-                model_length = int(np.nanargmin(self.info_values)) + 1
+                xp = get_namespace(self.info_values)
+                model_length = int(_to_numpy(_nanargmin(xp, self.info_values))) + 1
             else:
                 model_length = get_min_info_value(self.info_values)
             self.n_terms = model_length
@@ -642,9 +726,10 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
         self.err, self.pivv, psi, estimation_target = self._unpack_mss_output(
             mss_result, y
         )
+        self.pivv = np.asarray(_to_numpy(self.pivv), dtype=np.intp).reshape(-1)
 
         tmp_piv = self.pivv[0:model_length]
-        repetition = len(reg_matrix)
+        repetition = reg_matrix.shape[0]
         if isinstance(self.basis_function, Polynomial):
             self.final_model = self.regressor_code[tmp_piv, :].copy()
         else:
@@ -703,38 +788,53 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
             The predicted values of the model.
 
         """
+        xp, target_device = _get_namespace_and_device(X, y)
+        # Sequential predict (free-run / n-step) on GPU backends is dominated
+        # by kernel-launch overhead.  Fall back to the fast NumPy path and
+        # convert the result back to the original device.
+        if steps_ahead != 1 and not _is_numpy_namespace(xp):
+            return self._predict_on_cpu(
+                X=X,
+                y=y,
+                steps_ahead=steps_ahead,
+                forecast_horizon=forecast_horizon,
+                original_xp=xp,
+                target_device=target_device,
+            )
+
+        prefix = y[: self.max_lag, ...]
         if isinstance(self.basis_function, Polynomial):
             if steps_ahead is None:
                 yhat = self._model_prediction(X, y, forecast_horizon=forecast_horizon)
-                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+                yhat = _concat(xp, [prefix, yhat], axis=0)
                 return yhat
             if steps_ahead == 1:
                 yhat = self._one_step_ahead_prediction(X, y)
-                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+                yhat = _concat(xp, [prefix, yhat], axis=0)
                 return yhat
 
             check_positive_int(steps_ahead, "steps_ahead")
             yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
-            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+            yhat = _concat(xp, [prefix, yhat], axis=0)
             return yhat
 
         if steps_ahead is None:
             yhat = self._basis_function_predict(X, y, forecast_horizon)
-            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+            yhat = _concat(xp, [prefix, yhat], axis=0)
             return yhat
         if steps_ahead == 1:
             yhat = self._one_step_ahead_prediction(X, y)
-            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+            yhat = _concat(xp, [prefix, yhat], axis=0)
             return yhat
 
         yhat = self._basis_function_n_step_prediction(
             X, y, steps_ahead, forecast_horizon
         )
-        yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+        yhat = _concat(xp, [prefix, yhat], axis=0)
         return yhat
 
     def _one_step_ahead_prediction(
-        self, x: Optional[np.ndarray], y: Optional[np.ndarray]
+        self, x_base: np.ndarray, y: Optional[np.ndarray] = None
     ) -> np.ndarray:
         """Perform the 1-step-ahead prediction of a model.
 
@@ -752,9 +852,11 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
                The 1-step-ahead predicted values of the model.
 
         """
-        lagged_data = build_lagged_matrix(x, y, self.xlag, self.ylag, self.model_type)
+        lagged_data = build_lagged_matrix(
+            x_base, y, self.xlag, self.ylag, self.model_type
+        )
 
-        x_base = self.basis_function.transform(
+        x_tmp = self.basis_function.transform(
             lagged_data,
             self.max_lag,
             self.ylag,
@@ -763,7 +865,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
             predefined_regressors=self.pivv[: len(self.final_model)],
         )
 
-        yhat = super()._one_step_ahead_prediction(x_base)
+        yhat = super()._one_step_ahead_prediction(x_tmp)
         return yhat.reshape(-1, 1)
 
     def _n_step_ahead_prediction(
@@ -826,7 +928,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
         y_initial: np.ndarray,
         forecast_horizon: int = 0,
     ) -> np.ndarray:
-        if len(y_initial) < self.max_lag:
+        if y_initial.shape[0] < self.max_lag:
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
                 f" {self.max_lag} elements."
@@ -889,7 +991,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
                The n-steps-ahead predicted values of the model.
 
         """
-        if len(y) < self.max_lag:
+        if y.shape[0] < self.max_lag:
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
                 f" {self.max_lag} elements."

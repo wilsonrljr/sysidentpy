@@ -22,10 +22,8 @@ from .estimators import (
 )
 
 __all__ = [
-    "LeastSquares",
-    "RidgeRegression",
-    "RecursiveLeastSquares",
-    "TotalLeastSquares",
+    "AffineLeastMeanSquares",
+    "BoundedVariableLeastSquares",
     "LeastMeanSquareMixedNorm",
     "LeastMeanSquares",
     "LeastMeanSquaresFourth",
@@ -34,12 +32,14 @@ __all__ = [
     "LeastMeanSquaresNormalizedSignRegressor",
     "LeastMeanSquaresNormalizedSignSign",
     "LeastMeanSquaresSignError",
+    "LeastMeanSquaresSignRegressor",
     "LeastMeanSquaresSignSign",
-    "AffineLeastMeanSquares",
+    "LeastSquares",
+    "LeastSquaresMinimalResidual",
+    "NonNegativeLeastSquares",
     "NormalizedLeastMeanSquares",
     "NormalizedLeastMeanSquaresSignError",
-    "LeastMeanSquaresSignRegressor",
-    "NonNegativeLeastSquares",
-    "LeastSquaresMinimalResidual",
-    "BoundedVariableLeastSquares",
+    "RecursiveLeastSquares",
+    "RidgeRegression",
+    "TotalLeastSquares",
 ]

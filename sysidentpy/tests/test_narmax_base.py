@@ -1,4 +1,3 @@
-# ruff: noqa: SLF001,ARG002
 # pylint: disable=protected-access,unused-argument,redefined-outer-name,useless-super-delegation,arguments-renamed,abstract-class-instantiated
 from typing import Optional
 
@@ -11,7 +10,9 @@ from numpy.testing import (
     assert_raises,
 )
 
+from sysidentpy import config_context
 from sysidentpy.basis_function import Polynomial, Fourier
+from sysidentpy._lib._array_api import _to_numpy
 from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.narmax_base import RegressorDictionary, BaseMSS
 from sysidentpy.parameter_estimation.estimators import (
@@ -759,6 +760,7 @@ class PredictableMSS(BaseMSS):
         self.model_type = model_type
         self.max_lag = 2
         self.n_inputs = 1
+        self.basis_function = Polynomial(degree=1)
         self.theta = np.ones((1, 1))
         self.final_model = np.array([[1001]])
         self.pivv = np.array([0])
@@ -823,6 +825,13 @@ class PredictableMSS(BaseMSS):
         return np.zeros((1, 1))
 
 
+class ArrayAPIPredictableMSS(PredictableMSS):
+    """Predictable BaseMSS variant that delegates NFIR prediction to the base path."""
+
+    def _nfir_predict(self, x: np.ndarray, y_initial: np.ndarray) -> np.ndarray:
+        return BaseMSS._nfir_predict(self, x, y_initial)
+
+
 def test_base_mss_initialization():
     """Test if BaseMSS initializes correctly."""
     model = ConcreteMSS()
@@ -878,12 +887,134 @@ def test_n_step_ahead_prediction_nar():
     )
 
 
+def test_one_step_ahead_prediction_preserves_array_api_namespace():
+    xp = pytest.importorskip("array_api_strict")
+    model = PredictableMSS(model_type="NARMAX")
+    model.theta = np.array([[2.0]])
+    x_base = xp.asarray(np.array([[1.0], [2.0], [3.0]]))
+
+    with config_context(array_api_dispatch=True):
+        result = model._one_step_ahead_prediction(x_base)
+
+    assert result.__array_namespace__().__name__ == xp.__name__
+    assert_array_equal(_to_numpy(result), np.array([[2.0], [4.0], [6.0]]))
+
+
+def test_narmax_predict_preserves_array_api_namespace_with_numpy_theta():
+    xp = pytest.importorskip("array_api_strict")
+    model = PredictableMSS(model_type="NARMAX")
+    model.final_model = np.array([[0]])
+    model.theta = np.array([[2.0]])
+    x_data = xp.asarray(np.ones((6, 1)))
+    y_initial = xp.asarray(np.arange(6.0).reshape(-1, 1))
+
+    with config_context(array_api_dispatch=True):
+        result = model._narmax_predict(x_data, y_initial, forecast_horizon=6)
+
+    assert result.__array_namespace__().__name__ == xp.__name__
+    assert_array_equal(_to_numpy(result), np.full((4, 1), 2.0))
+
+
+def test_polynomial_narmax_predict_fast_matches_reference_with_interactions():
+    model = PredictableMSS(model_type="NARMAX")
+    model.max_lag = 2
+    model.n_inputs = 2
+    model.basis_function = Polynomial(degree=2)
+    model.final_model = np.array(
+        [
+            [0, 0],
+            [1001, 1001],
+            [2002, 1001],
+            [3001, 1002],
+            [3002, 2001],
+        ]
+    )
+    model.theta = np.array([[0.3], [-0.1], [0.4], [-0.2], [0.15]])
+    x_data = np.array(
+        [
+            [1.0, 0.5],
+            [2.0, 1.5],
+            [3.0, 2.5],
+            [4.0, 3.5],
+            [5.0, 4.5],
+            [6.0, 5.5],
+        ]
+    )
+    y_initial = np.array([[0.2], [0.4], [0.6], [0.8], [1.0], [1.2]])
+
+    reference = model._narmax_predict_reference(
+        x_data,
+        y_initial,
+        forecast_horizon=x_data.shape[0],
+    )
+    fast = model._polynomial_narmax_predict_fast(
+        x_data,
+        y_initial,
+        forecast_horizon=x_data.shape[0],
+    )
+
+    assert_array_equal(fast.shape, reference.shape)
+    assert_almost_equal(fast, reference, decimal=12)
+
+
+def test_polynomial_narmax_predict_cache_preserves_final_model_order():
+    model = PredictableMSS(model_type="NARMAX")
+    model.max_lag = 2
+    model.n_inputs = 1
+    model.basis_function = Polynomial(degree=2)
+    model.final_model = np.array(
+        [
+            [2002, 1001],
+            [1001, 1001],
+            [0, 0],
+        ]
+    )
+
+    exponent_matrix = model._get_polynomial_narmax_predict_exponents()
+    expected = np.vstack([model._code2exponents(code=row) for row in model.final_model])
+
+    assert_array_equal(exponent_matrix, expected)
+
+
+def test_polynomial_narmax_fast_path_is_disabled_for_short_initial_conditions():
+    model = PredictableMSS(model_type="NARMAX")
+    model.max_lag = 2
+    model.n_inputs = 1
+    model.basis_function = Polynomial(degree=2)
+    model.final_model = np.array([[1001]])
+    model.theta = np.array([[1.0]])
+    x_data = np.ones((4, 1))
+    y_initial = np.arange(model.max_lag, dtype=float).reshape(-1, 1)
+
+    assert not model._should_use_polynomial_narmax_fast_path(
+        x_data,
+        y_initial,
+        forecast_horizon=x_data.shape[0],
+    )
+
+
+def test_nfir_predict_preserves_array_api_namespace_with_numpy_theta():
+    xp = pytest.importorskip("array_api_strict")
+    model = ArrayAPIPredictableMSS(model_type="NFIR")
+    model.final_model = np.array([[0]])
+    model.theta = np.array([[2.0]])
+    x_data = xp.asarray(np.ones((6, 1)))
+    y_initial = xp.asarray(np.arange(6.0).reshape(-1, 1))
+
+    with config_context(array_api_dispatch=True):
+        result = model._nfir_predict(x_data, y_initial)
+
+    assert result.__array_namespace__().__name__ == xp.__name__
+    assert_array_equal(_to_numpy(result), np.full((4, 1), 2.0))
+
+
 def test_n_step_ahead_prediction_invalid_model():
     """Test `_n_step_ahead_prediction` with an invalid model type."""
     model = ConcreteMSS(model_type="NFIR")
 
     with pytest.raises(
         ValueError,
-        match="n_steps_ahead prediction will be implemented for NFIR models in v0.4.*",
+        match=r"n_steps_ahead prediction will be implemented"
+        r" for NFIR models in v0\.4\..*",
     ):
         model._n_step_ahead_prediction(None, np.array([1, 2, 3]), 2)

@@ -12,6 +12,7 @@ from numpy.linalg import pinv
 from scipy.spatial.distance import cdist
 from scipy.special import psi
 
+from .._lib._array_api import get_namespace, _require_numpy_namespace
 from ..narmax_base import BaseMSS
 from sysidentpy.utils.information_matrix import build_lagged_matrix
 from ..basis_function import Fourier, Polynomial
@@ -305,16 +306,15 @@ class ER(BaseMSS):
 
         """
         min_value = -np.inf
-        piv = np.array(piv)
+        piv = np.asarray(piv, dtype=np.intp)
         ix = []
         while (min_value <= self.tol) and (len(piv) > 1):
             initial_array = np.full((1, len(piv)), np.inf)
             for i in range(initial_array.shape[1]):
-                if piv[i] not in []:  # if you want to keep any regressor
-                    rem = np.setdiff1d(piv, piv[i])
-                    f1 = reg_matrix[:, piv] @ pinv(reg_matrix[:, piv]) @ y
-                    f2 = reg_matrix[:, rem] @ pinv(reg_matrix[:, rem]) @ y
-                    initial_array[0, i] = self.conditional_mutual_information(y, f1, f2)
+                rem = np.setdiff1d(piv, piv[i])
+                f1 = reg_matrix[:, piv] @ pinv(reg_matrix[:, piv]) @ y
+                f2 = reg_matrix[:, rem] @ pinv(reg_matrix[:, rem]) @ y
+                initial_array[0, i] = self.conditional_mutual_information(y, f1, f2)
 
             ix = np.argmin(initial_array)
             min_value = initial_array[0, ix]
@@ -557,6 +557,9 @@ class ER(BaseMSS):
         """
         if y is None:
             raise ValueError("y cannot be None")
+
+        xp = get_namespace(y) if X is None else get_namespace(X, y)
+        _require_numpy_namespace(xp, feature="ER", dependency="SciPy")
 
         self.max_lag = self._get_max_lag()
         lagged_data = build_lagged_matrix(X, y, self.xlag, self.ylag, self.model_type)

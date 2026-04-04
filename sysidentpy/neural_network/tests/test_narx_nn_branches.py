@@ -42,14 +42,16 @@ def test_optimizer_must_be_string():
 
 
 def test_sanitize_lag_validations():
+    model = _make_model()
+
     with pytest.raises(ValueError, match="list cannot be empty"):
-        NARXNN._sanitize_lag([], "ylag")
+        model._sanitize_lag([], "ylag")
 
     with pytest.raises(ValueError, match="All elements of ylag must be integers"):
-        NARXNN._sanitize_lag([1, "a"], "ylag")
+        model._sanitize_lag([1, "a"], "ylag")
 
     with pytest.raises(ValueError, match="must be >= 1"):
-        NARXNN._sanitize_lag([0, 1], "ylag")
+        model._sanitize_lag([0, 1], "ylag")
 
 
 def test_forward_numpy_moves_tensor_to_device(monkeypatch):

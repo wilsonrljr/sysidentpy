@@ -1,14 +1,23 @@
 """Bilinear Basis Function for NARMAX models."""
 
 import warnings
-
-from itertools import combinations_with_replacement, chain
+from itertools import chain, combinations_with_replacement
 from typing import Optional
+
 import numpy as np
 
-from .basis_function_base import BaseBasisFunction
-
+from sysidentpy._lib._array_api import (
+    _column_stack,
+    _is_numpy_namespace,
+    _ones,
+    _to_numpy,
+    device as _device,
+    get_namespace,
+    is_array_api_obj,
+)
 from sysidentpy.utils.lags import get_max_xlag, get_max_ylag
+
+from .basis_function_base import BaseBasisFunction
 
 
 class Bilinear(BaseBasisFunction):
@@ -53,6 +62,94 @@ class Bilinear(BaseBasisFunction):
     ):
         self.degree = degree
 
+    def _normalize_predefined_regressors(
+        self,
+        predefined_regressors: Optional[np.ndarray],
+    ) -> Optional[np.ndarray]:
+        """Normalize regressor indices to NumPy metadata for Python indexing."""
+        if predefined_regressors is None:
+            return None
+
+        if is_array_api_obj(predefined_regressors):
+            predefined_regressors = _to_numpy(predefined_regressors)
+
+        return np.asarray(predefined_regressors, dtype=np.intp).reshape(-1)
+
+    def _get_combination_list(
+        self,
+        data: np.ndarray,
+        ylag: int,
+        xlag: int,
+        predefined_regressors: Optional[np.ndarray] = None,
+    ) -> list[tuple[int, ...]]:
+        """Return bilinear term combinations filtered by lag configuration."""
+        iterable_list = range(data.shape[1])
+        combination_list = list(
+            combinations_with_replacement(iterable_list, self.degree)
+        )
+
+        ny = get_max_ylag(ylag)
+        combination_ylag = list(
+            combinations_with_replacement(list(range(1, ny + 1)), self.degree)
+        )
+        if isinstance(xlag, int):
+            xlag = [xlag]
+
+        combination_xlag = []
+        ni = 0
+        for lag in xlag:
+            nx = get_max_xlag(lag)
+            combination_lag = list(
+                combinations_with_replacement(
+                    list(range(ny + 1 + ni, nx + ny + 1 + ni)), self.degree
+                )
+            )
+            combination_xlag.append(combination_lag)
+            ni += nx
+
+        combination_xlag = list(chain.from_iterable(combination_xlag))
+        combinations_xy = combination_xlag + combination_ylag
+        combination_list = list(set(combination_list) - set(combinations_xy))
+
+        predefined_regressors = self._normalize_predefined_regressors(
+            predefined_regressors
+        )
+        if predefined_regressors is None:
+            return combination_list
+
+        return [combination_list[index] for index in predefined_regressors]
+
+    def _evaluate_terms(
+        self,
+        data: np.ndarray,
+        combination_list: list[tuple[int, ...]],
+    ) -> np.ndarray:
+        """Build the bilinear terms while preserving backend/device."""
+        xp = get_namespace(data)
+        if _is_numpy_namespace(xp):
+            return _column_stack(
+                xp,
+                [
+                    xp.prod(data[:, combination], axis=1)
+                    for combination in combination_list
+                ],
+            )
+
+        target_device = _device(data)
+        terms = []
+        for combination in combination_list:
+            term = _ones(
+                xp,
+                (data.shape[0],),
+                dtype=data.dtype,
+                target_device=target_device,
+            )
+            for col in combination:
+                term = term * data[:, int(col)]
+            terms.append(term)
+
+        return _column_stack(xp, terms)
+
     def fit(
         self,
         data: np.ndarray,
@@ -90,11 +187,6 @@ class Bilinear(BaseBasisFunction):
             The lagged matrix built in respect with each lag and column.
 
         """
-        # Create combinations of all columns based on its index
-        iterable_list = range(data.shape[1])
-        combination_list = list(
-            combinations_with_replacement(iterable_list, self.degree)
-        )
         if self.degree == 1:
             warnings.warn(
                 "You choose a bilinear basis function and nonlinear degree = 1."
@@ -102,40 +194,13 @@ class Bilinear(BaseBasisFunction):
                 stacklevel=2,
             )
 
-        ny = get_max_ylag(ylag)
-        combination_ylag = list(
-            combinations_with_replacement(list(range(1, ny + 1)), self.degree)
+        combination_list = self._get_combination_list(
+            data,
+            ylag,
+            xlag,
+            predefined_regressors,
         )
-        if isinstance(xlag, int):
-            xlag = [xlag]
-
-        combination_xlag = []
-        ni = 0
-        for lag in xlag:
-            nx = get_max_xlag(lag)
-            combination_lag = list(
-                combinations_with_replacement(
-                    list(range(ny + 1 + ni, nx + ny + 1 + ni)), self.degree
-                )
-            )
-            combination_xlag.append(combination_lag)
-            ni += nx
-
-        combination_xlag = list(chain.from_iterable(combination_xlag))
-        combinations_xy = combination_xlag + combination_ylag
-        combination_list = list(set(combination_list) - set(combinations_xy))
-
-        if predefined_regressors is not None:
-            combination_list = [
-                combination_list[index] for index in predefined_regressors
-            ]
-
-        psi = np.column_stack(
-            [
-                np.prod(data[:, combination_list[i]], axis=1)
-                for i in range(len(combination_list))
-            ]
-        )
+        psi = self._evaluate_terms(data, combination_list)
         psi = psi[max_lag:, :]
         return psi
 

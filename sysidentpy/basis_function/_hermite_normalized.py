@@ -5,6 +5,7 @@ from typing import Optional
 import numpy as np
 from scipy.special import eval_hermitenorm
 
+from sysidentpy._lib._array_api import _require_numpy_namespace, get_namespace
 from sysidentpy.basis_function.basis_function_base import BaseBasisFunction
 
 
@@ -78,6 +79,9 @@ class HermiteNormalized(BaseBasisFunction):
         model_type: str = "NARMAX",
         predefined_regressors: Optional[np.ndarray] = None,
     ):
+        xp = get_namespace(data)
+        _require_numpy_namespace(xp, feature=self.__class__.__name__)
+
         # remove intercept (because data always have the intercept)
         data = data[max_lag:, 1:]
 

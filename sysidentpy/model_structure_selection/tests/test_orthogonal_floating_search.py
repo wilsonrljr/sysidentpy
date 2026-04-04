@@ -192,11 +192,8 @@ def test_swap_step_improves_and_nochange():
 
 def test_oos_no_improvement_increments_depth_and_validation():
     # max_search_depth validation
-    try:
+    with pytest.raises(ValueError, match="max_search_depth"):
         OOS(max_search_depth=0)
-        assert False, "Expected ValueError"
-    except ValueError:
-        pass
 
     model = OOS(
         n_terms=1,
@@ -209,7 +206,7 @@ def test_oos_no_improvement_increments_depth_and_validation():
     )
     psi = np.eye(2)
     target = np.array([[0.0], [0.0], [0.0]])  # aligned so target after lag has 2 rows
-    err, piv, psi_sel, tgt = model.run_mss_algorithm(psi, target, 1)
+    err, piv, psi_sel, _tgt = model.run_mss_algorithm(psi, target, 1)
     assert_equal(err.shape[0], len(piv))
     assert_equal(piv.tolist(), [0])
     assert_equal(psi_sel.shape[1], 1)
@@ -226,7 +223,7 @@ def test_osf_handles_insufficient_available_terms():
     )
     psi = np.ones((1, 1))
     target = np.array([[1.0], [1.0]])  # after lag alignment -> shape (1,1)
-    err, piv, psi_sel, tgt = model.run_mss_algorithm(psi, target, 5)
+    _err, piv, _psi_sel, _tgt = model.run_mss_algorithm(psi, target, 5)
     assert_equal(piv.tolist(), [0])
 
 
@@ -253,7 +250,7 @@ def test_select_most_significant_subset_breaks_on_base_removal(monkeypatch):
 
 
 def test_select_most_significant_subset_removal_and_stored_subset(monkeypatch):
-    model, psi, target, _ = _make_base()
+    model, _psi, target, _ = _make_base()
 
     order = iter([0, 1, 2, 3, None])
 
@@ -346,18 +343,15 @@ def test_osf_run_mss_respects_stored_subset(monkeypatch):
         "_subset_err",
         lambda *args, **kwargs: (0.0, np.zeros(len(args[2]))),
     )
-    monkeypatch.setattr(
-        model,
-        "_backtrack",
-        lambda psi, target, subset, current_score, best_by_size, squared_y, last_added: (
-            subset[:-1],
-            current_score,
-        ),
-    )
+
+    def fake_backtrack_trim(psi, target, subset, current_score, *args):
+        return subset[:-1], current_score
+
+    monkeypatch.setattr(model, "_backtrack", fake_backtrack_trim)
 
     psi = np.ones((1, 1))
     y = np.ones((1, 1))
-    err, piv, psi_sel, tgt = model.run_mss_algorithm(psi, y, 2)
+    err, piv, psi_sel, _tgt = model.run_mss_algorithm(psi, y, 2)
     assert piv.size >= 0
     assert_equal(err.shape[0], psi_sel.shape[1])
 
@@ -396,14 +390,11 @@ def test_osf_candidate_score_not_improving(monkeypatch):
         "_subset_err",
         lambda *args, **kwargs: (0.0, np.zeros(len(args[2]))),
     )
-    monkeypatch.setattr(
-        model,
-        "_backtrack",
-        lambda psi, target, subset, current_score, best_by_size, squared_y, last_added: (
-            [],
-            current_score,
-        ),
-    )
+
+    def fake_backtrack_empty(psi, target, subset, current_score, *args):
+        return [], current_score
+
+    monkeypatch.setattr(model, "_backtrack", fake_backtrack_empty)
 
     psi = np.ones((1, 2))
     y = np.ones((1, 1))
@@ -434,24 +425,21 @@ def test_oif_handles_none_addition_and_else_branch(monkeypatch):
         "_subset_err",
         lambda *args, **kwargs: (0.0, np.zeros(len(args[2]))),
     )
-    monkeypatch.setattr(
-        model,
-        "_backtrack",
-        lambda psi, target, subset, current_score, best_by_size, squared_y, last_added: (
-            subset[:-1],
-            current_score,
-        ),
-    )
+
+    def fake_backtrack_trim_oif(psi, target, subset, current_score, *args):
+        return subset[:-1], current_score
+
+    monkeypatch.setattr(model, "_backtrack", fake_backtrack_trim_oif)
 
     psi = np.ones((1, 1))
     y = np.ones((1, 1))
-    err, piv, psi_sel, _ = model.run_mss_algorithm(psi, y, 2)
+    _err, piv, psi_sel, _ = model.run_mss_algorithm(psi, y, 2)
     assert piv.size >= 0
     assert_equal(psi_sel.shape[1], piv.shape[0])
 
 
 def test_oif_swap_step_skips_none(monkeypatch):
-    model, psi, target, sqy = _make_base()
+    _model, psi, target, sqy = _make_base()
     oif = OIF()
     monkeypatch.setattr(
         oif,
@@ -500,14 +488,11 @@ def test_oif_candidate_score_not_improving(monkeypatch):
         "_subset_err",
         lambda *args, **kwargs: (0.0, np.zeros(len(args[2]))),
     )
-    monkeypatch.setattr(
-        model,
-        "_backtrack",
-        lambda psi, target, subset, current_score, best_by_size, squared_y, last_added: (
-            [],
-            current_score,
-        ),
-    )
+
+    def fake_backtrack_empty_oif(psi, target, subset, current_score, *args):
+        return [], current_score
+
+    monkeypatch.setattr(model, "_backtrack", fake_backtrack_empty_oif)
 
     psi = np.ones((1, 2))
     y = np.ones((1, 1))
@@ -608,7 +593,7 @@ def test_oos_down_and_up_swings_improve(monkeypatch):
 
     psi = np.eye(3)
     y = np.ones((3, 1))
-    err, piv, psi_sel, _ = model.run_mss_algorithm(psi, y, 1)
+    err, piv, _psi_sel, _ = model.run_mss_algorithm(psi, y, 1)
     assert err.size >= 0
     assert piv.size >= 0
 
@@ -794,7 +779,8 @@ def test_oos_respects_max_search_depth(monkeypatch):
     err, piv, _, _ = model.run_mss_algorithm(psi, y, 2)
 
     assert err.shape[0] == piv.shape[0]
-    assert depth_calls and max(depth_calls) == 1
+    assert depth_calls
+    assert max(depth_calls) == 1
 
 
 def test_down_and_up_swing_keep_score_when_no_improvement():

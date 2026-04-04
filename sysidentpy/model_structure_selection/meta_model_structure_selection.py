@@ -8,6 +8,7 @@ from typing import Tuple, Union, Optional
 import numpy as np
 from scipy.stats import t
 
+from .._lib._array_api import get_namespace, _require_numpy_namespace
 from sysidentpy.utils.information_matrix import build_lagged_matrix
 from ..basis_function import Polynomial
 from ..metaheuristics import BPSOGSA
@@ -277,6 +278,9 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             )
         if y is None:
             raise ValueError("y cannot be None")
+
+        xp = get_namespace(y) if X is None else get_namespace(X, y)
+        _require_numpy_namespace(xp, feature="MetaMSS", dependency="SciPy")
 
         if X is not None:
             check_x_y(X, y)

@@ -1,9 +1,11 @@
-# ruff: noqa: SLF001
 # pylint: disable=protected-access,unused-variable
 import numpy as np
+import pytest
 from unittest.mock import MagicMock
 from numpy.testing import assert_almost_equal, assert_raises
 
+from sysidentpy._config import config_context
+from sysidentpy._lib._array_api import _to_numpy
 from sysidentpy.basis_function import Fourier, Polynomial
 from sysidentpy.simulation import SimulateNARMAX
 from sysidentpy.parameter_estimation.estimators import (
@@ -226,7 +228,7 @@ def test_estimate_parameter_conditions():
 
 
 def test_input_dimension():
-    x_train, x_valid, y_train, y_valid = get_siso_data(
+    _x_train, _x_valid, _y_train, y_valid = get_siso_data(
         n=1000, colored_noise=False, sigma=0.001, train_percentage=90
     )
 
@@ -565,6 +567,83 @@ def test_predict_paths_cover_all_branches():
     assert multi_step.shape == y_valid.shape
 
 
+def test_predict_preserves_array_api_namespace_with_numpy_metadata():
+    array_api_strict = pytest.importorskip("array_api_strict")
+    _, x_valid_np, _, y_valid_np = _small_siso_dataset()
+    model = np.array([[1001, 0], [2001, 1001], [2002, 0]])
+    theta = np.array([[0.2, 0.9, 0.1]]).T
+
+    baseline = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
+    baseline.simulate(
+        X_test=x_valid_np,
+        y_test=y_valid_np,
+        model_code=model,
+        theta=theta,
+    )
+    expected = baseline.predict(X=x_valid_np, y=y_valid_np)
+
+    simulator = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
+    with config_context(array_api_dispatch=True):
+        x_valid = array_api_strict.asarray(x_valid_np, dtype=array_api_strict.float64)
+        y_valid = array_api_strict.asarray(y_valid_np, dtype=array_api_strict.float64)
+        simulator.simulate(
+            X_test=x_valid,
+            y_test=y_valid,
+            model_code=model,
+            theta=theta,
+        )
+        result = simulator.predict(X=x_valid, y=y_valid)
+
+    assert result.__array_namespace__() is array_api_strict
+    np.testing.assert_allclose(_to_numpy(result), expected)
+
+
+def test_predict_n_step_preserves_array_api_namespace_via_cpu_fallback():
+    array_api_strict = pytest.importorskip("array_api_strict")
+    _, x_valid_np, _, y_valid_np = _small_siso_dataset()
+    model = np.array([[1001, 0], [2001, 1001], [2002, 0]])
+    theta = np.array([[0.2, 0.9, 0.1]]).T
+
+    baseline = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
+    baseline.simulate(
+        X_test=x_valid_np,
+        y_test=y_valid_np,
+        model_code=model,
+        theta=theta,
+    )
+    expected = baseline.predict(X=x_valid_np, y=y_valid_np, steps_ahead=3)
+
+    simulator = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
+    with config_context(array_api_dispatch=True):
+        x_valid = array_api_strict.asarray(x_valid_np, dtype=array_api_strict.float64)
+        y_valid = array_api_strict.asarray(y_valid_np, dtype=array_api_strict.float64)
+        simulator.simulate(
+            X_test=x_valid,
+            y_test=y_valid,
+            model_code=model,
+            theta=theta,
+        )
+        result = simulator.predict(X=x_valid, y=y_valid, steps_ahead=3)
+
+    assert result.__array_namespace__() is array_api_strict
+    np.testing.assert_allclose(_to_numpy(result), expected)
+
+
+def test_predict_rejects_mixed_array_api_namespaces():
+    array_api_strict = pytest.importorskip("array_api_strict")
+    torch = pytest.importorskip("torch")
+    simulator = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
+
+    x_data = torch.tensor(np.arange(4.0).reshape(-1, 1), dtype=torch.float64)
+    y_data = array_api_strict.asarray(
+        np.arange(4.0).reshape(-1, 1), dtype=array_api_strict.float64
+    )
+
+    with config_context(array_api_dispatch=True):
+        with pytest.raises(ValueError, match="same Array API namespace"):
+            simulator.predict(X=x_data, y=y_data)
+
+
 def test_model_prediction_invalid_type_raises():
     simulator = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
     simulator.model_type = "UNKNOWN"
@@ -586,6 +665,61 @@ def test_error_reduction_ratio_honors_process_term_limit():
     assert model_code.size == 0
     assert err[0] == 0
     assert psi_orth.shape[1] == 0
+
+
+def test_error_reduction_ratio_preserves_array_api_namespace():
+    array_api_strict = pytest.importorskip("array_api_strict")
+    simulator = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
+    simulator.max_lag = 1
+
+    psi_np = np.array([[1.0, 0.0], [0.0, 1.0], [0.0, 0.0]])
+    y_np = np.array([[0.0], [2.0], [1.0], [0.0]])
+    regressor_code = np.array([[1001, 0], [1002, 0]])
+
+    with config_context(array_api_dispatch=True):
+        psi = array_api_strict.asarray(psi_np, dtype=array_api_strict.float64)
+        y = array_api_strict.asarray(y_np, dtype=array_api_strict.float64)
+        model_code, err, piv, psi_orth = simulator.error_reduction_ratio(
+            psi, y, 1, regressor_code
+        )
+
+    assert model_code.__array_namespace__() is array_api_strict
+    assert err.__array_namespace__() is array_api_strict
+    assert piv.__array_namespace__() is array_api_strict
+    assert psi_orth.__array_namespace__() is array_api_strict
+    np.testing.assert_array_equal(_to_numpy(model_code), regressor_code[:1])
+    np.testing.assert_allclose(_to_numpy(err)[0], 0.8)
+    np.testing.assert_array_equal(_to_numpy(psi_orth), psi_np[:, :1])
+
+
+def test_error_reduction_ratio_matches_numpy_for_torch_tensors():
+    torch = pytest.importorskip("torch")
+    psi_np = np.array([[1.0, 0.0], [0.0, 1.0], [0.0, 0.0]])
+    y_np = np.array([[0.0], [2.0], [1.0], [0.0]])
+    regressor_code = np.array([[1001, 0], [1002, 0]])
+
+    baseline = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
+    baseline.max_lag = 1
+    model_code_np, err_np, piv_np, psi_orth_np = baseline.error_reduction_ratio(
+        psi_np, y_np, 1, regressor_code
+    )
+
+    simulator = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
+    simulator.max_lag = 1
+    psi_t = torch.tensor(psi_np, dtype=torch.float64)
+    y_t = torch.tensor(y_np, dtype=torch.float64)
+
+    with config_context(array_api_dispatch=True):
+        model_code_t, err_t, piv_t, psi_orth_t = simulator.error_reduction_ratio(
+            psi_t, y_t, 1, regressor_code
+        )
+
+    np.testing.assert_array_equal(_to_numpy(model_code_t), model_code_np)
+    np.testing.assert_array_equal(_to_numpy(piv_t), piv_np)
+    np.testing.assert_allclose(_to_numpy(err_t), err_np, rtol=1e-10, atol=1e-12)
+    np.testing.assert_allclose(
+        _to_numpy(psi_orth_t), psi_orth_np, rtol=1e-10, atol=1e-12
+    )
 
 
 class _FourierPredictStub(SimulateNARMAX):
@@ -612,7 +746,7 @@ class _FourierPredictStub(SimulateNARMAX):
         self.calls.append("n_steps_horizon")
         return np.array([[0.0]])
 
-    def fit(self, *, X=None, y=None):  # noqa: ARG002
+    def fit(self, *, X=None, y=None):
         raise NotImplementedError
 
 

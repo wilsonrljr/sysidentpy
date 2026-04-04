@@ -36,7 +36,7 @@ repos:
         # https://pre-commit.com/#top_level-default_language_version
         language_version: python3.12
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.12
+    rev: v0.15.8
     hooks:
-      - id: ruff
+      - id: ruff-check
         types_or: [python] # you can add notebook and other files using pyi, jupyter

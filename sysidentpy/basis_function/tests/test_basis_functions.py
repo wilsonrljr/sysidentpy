@@ -1,7 +1,20 @@
+import pytest
+
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
 
-from sysidentpy.basis_function import Polynomial, Fourier
+from sysidentpy import config_context
+from sysidentpy._lib._array_api import _to_numpy
+from sysidentpy.basis_function import (
+    Bernstein,
+    Bilinear,
+    Fourier,
+    Hermite,
+    HermiteNormalized,
+    Laguerre,
+    Legendre,
+    Polynomial,
+)
 from sysidentpy.basis_function.basis_function_base import BaseBasisFunction
 
 
@@ -28,6 +41,24 @@ def test_fit_polynomial_predefined():
     )
 
     assert_array_equal(output, r)
+
+
+def test_fit_polynomial_predefined_accepts_array_api_inputs():
+    xp = pytest.importorskip("array_api_strict")
+    basis_function = Polynomial(degree=2)
+    data = xp.asarray(np.array(([1.0, 1.0, 1.0], [2.0, 3.0, 4.0], [3.0, 3.0, 3.0])))
+    predefined_regressors = xp.asarray(np.array([0, 2, 4]))
+    output = np.array([[4.0, 8.0, 12.0], [9.0, 9.0, 9.0]])
+
+    with config_context(array_api_dispatch=True):
+        result = basis_function.fit(
+            data=data,
+            max_lag=1,
+            predefined_regressors=predefined_regressors,
+        )
+
+    assert result.__array_namespace__().__name__ == xp.__name__
+    assert_array_equal(_to_numpy(result), output)
 
 
 def test_transform_polynomial():
@@ -115,6 +146,67 @@ def test_fit_fourier_predefined():
     assert_almost_equal(output, r, decimal=7)
 
 
+def test_fit_fourier_accepts_array_api_inputs():
+    xp = pytest.importorskip("array_api_strict")
+    basis_function = Fourier(n=5, ensemble=False)
+    data_np = np.array(([1.0, 1.0, 1.0], [2.0, 3.0, 4.0], [3.0, 3.0, 3.0]))
+    expected = basis_function.fit(data=data_np, max_lag=1)
+
+    with config_context(array_api_dispatch=True):
+        result = basis_function.fit(data=xp.asarray(data_np), max_lag=1)
+
+    assert result.__array_namespace__().__name__ == xp.__name__
+    assert_almost_equal(_to_numpy(result), expected, decimal=7)
+
+
+def test_fit_bilinear_accepts_array_api_inputs():
+    xp = pytest.importorskip("array_api_strict")
+    basis_function = Bilinear(degree=2)
+    data_np = np.array(
+        ([1.0, 1.0, 1.0], [2.0, 3.0, 4.0], [3.0, 3.0, 3.0], [4.0, 5.0, 6.0])
+    )
+    expected = basis_function.fit(data=data_np, max_lag=1, ylag=2, xlag=2)
+
+    with config_context(array_api_dispatch=True):
+        result = basis_function.fit(
+            data=xp.asarray(data_np),
+            max_lag=1,
+            ylag=2,
+            xlag=2,
+        )
+
+    assert result.__array_namespace__().__name__ == xp.__name__
+    assert_almost_equal(_to_numpy(result), expected, decimal=12)
+
+
+def test_fit_bilinear_predefined_accepts_array_api_inputs():
+    xp = pytest.importorskip("array_api_strict")
+    basis_function = Bilinear(degree=2)
+    data_np = np.array(
+        ([1.0, 1.0, 1.0], [2.0, 3.0, 4.0], [3.0, 3.0, 3.0], [4.0, 5.0, 6.0])
+    )
+    predefined_regressors = np.array([0, 2])
+    expected = basis_function.fit(
+        data=data_np,
+        max_lag=1,
+        ylag=2,
+        xlag=2,
+        predefined_regressors=predefined_regressors,
+    )
+
+    with config_context(array_api_dispatch=True):
+        result = basis_function.fit(
+            data=xp.asarray(data_np),
+            max_lag=1,
+            ylag=2,
+            xlag=2,
+            predefined_regressors=xp.asarray(predefined_regressors),
+        )
+
+    assert result.__array_namespace__().__name__ == xp.__name__
+    assert_almost_equal(_to_numpy(result), expected, decimal=12)
+
+
 def test_transform_fourier():
     basis_function = Fourier(n=5, ensemble=False)
     data = np.array(([1, 1, 1], [2, 3, 4], [3, 3, 3]))
@@ -171,6 +263,29 @@ def test_transform_fourier():
     r = basis_function.transform(data=data, max_lag=max_lag)
 
     assert_almost_equal(output, r, decimal=7)
+
+
+@pytest.mark.parametrize(
+    ("basis_cls", "basis_name"),
+    [
+        (Bernstein, "Bernstein"),
+        (Legendre, "Legendre"),
+        (Hermite, "Hermite"),
+        (HermiteNormalized, "HermiteNormalized"),
+        (Laguerre, "Laguerre"),
+    ],
+)
+def test_scipy_basis_functions_reject_array_api_dispatch(basis_cls, basis_name):
+    xp = pytest.importorskip("array_api_strict")
+    data = xp.asarray(np.array(([1.0, 1.0, 1.0], [2.0, 3.0, 4.0], [3.0, 3.0, 3.0])))
+    basis_function = basis_cls(degree=2)
+
+    with config_context(array_api_dispatch=True):
+        with pytest.raises(
+            NotImplementedError,
+            match=rf"{basis_name}.*requires NumPy inputs",
+        ):
+            basis_function.fit(data=data, max_lag=1)
 
 
 class _DummyBasis(BaseBasisFunction):

@@ -140,7 +140,8 @@ def test_validate():
 
 
 def test_sanitize_lag_sequence_conversion():
-    sanitized = NARXNN._sanitize_lag([1, 2, 3], "ylag")
+    model = NARXNN(basis_function=Polynomial(degree=1))
+    sanitized = model._sanitize_lag([1, 2, 3], "ylag")
     assert sanitized == [1, 2, 3]
 
 
@@ -750,8 +751,9 @@ def test_check_cuda_available():
 
 def test_check_cuda_unavailable():
     """Test if _check_cuda falls back to 'cpu' when CUDA is unavailable."""
-    with patch("torch.cuda.is_available", return_value=False), pytest.warns(
-        UserWarning, match="No CUDA available"
+    with (
+        patch("torch.cuda.is_available", return_value=False),
+        pytest.warns(UserWarning, match="No CUDA available"),
     ):
         assert _check_cuda("cuda") == torch.device("cpu")
 

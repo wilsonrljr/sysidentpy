@@ -8,6 +8,18 @@ from typing import Union
 
 import numpy as np
 
+from sysidentpy._lib._array_api import (
+    _asarray,
+    _concat,
+    _get_namespace_and_device,
+    _is_numpy_namespace,
+    get_namespace,
+    _copy,
+    device as _device,
+    _set_element,
+    _to_numpy,
+)
+from sysidentpy._lib._err import _compute_err_slice
 from sysidentpy.narmax_base import house, rowhouse
 from ..basis_function import Fourier, Polynomial
 from ..narmax_base import BaseMSS
@@ -21,7 +33,6 @@ from sysidentpy.utils.simulation import (
 
 from sysidentpy.utils.lags import (
     get_lag_from_regressor_code,
-    get_max_lag_from_model_code,
 )
 
 from ..utils.check_arrays import check_positive_int, num_features
@@ -64,6 +75,44 @@ Estimators = Union[
     NormalizedLeastMeanSquaresSignError,
     LeastMeanSquaresSignRegressor,
 ]
+
+
+def _swap_vector_entries(xp, values, left_idx, right_idx):
+    if left_idx == right_idx:
+        return values
+
+    left_value = _copy(xp, values[left_idx])
+    right_value = _copy(xp, values[right_idx])
+    values = _set_element(xp, values, left_idx, right_value)
+    values = _set_element(xp, values, right_idx, left_value)
+    return values
+
+
+def _swap_matrix_columns(xp, matrix, left_idx, right_idx):
+    if left_idx == right_idx:
+        return matrix
+
+    left_column = _copy(xp, matrix[:, left_idx])
+    right_column = _copy(xp, matrix[:, right_idx])
+    matrix = _set_element(xp, matrix, (slice(None), left_idx), right_column)
+    matrix = _set_element(xp, matrix, (slice(None), right_idx), left_column)
+    return matrix
+
+
+def _take_columns_by_index(xp, matrix, indices):
+    index_values = _to_numpy(indices).astype(int, copy=False).tolist()
+    if not index_values:
+        return xp.zeros((matrix.shape[0], 0), dtype=matrix.dtype)
+
+    return _concat(xp, [matrix[:, idx : idx + 1] for idx in index_values], axis=1)
+
+
+def _take_rows_by_index(xp, matrix, indices):
+    index_values = _to_numpy(indices).astype(int, copy=False).tolist()
+    if not index_values:
+        return xp.zeros((0, matrix.shape[1]), dtype=matrix.dtype)
+
+    return _concat(xp, [matrix[idx : idx + 1, :] for idx in index_values], axis=0)
 
 
 class SimulateNARMAX(BaseMSS):
@@ -347,6 +396,11 @@ class SimulateNARMAX(BaseMSS):
         self.final_model = regressor_code[self.pivv]
         # to use in the predict function
         self.n_terms = self.final_model.shape[0]
+
+        # Determine namespace from available training arrays
+        _ns_arrays = [a for a in [X_train, y_train] if a is not None]
+        xp = get_namespace(*_ns_arrays) if _ns_arrays else np
+
         if self.estimate_parameter and not self.calculate_err:
             self.max_lag = self._get_max_lag()
             lagged_data = build_lagged_matrix(
@@ -362,12 +416,12 @@ class SimulateNARMAX(BaseMSS):
             )
 
             self.theta = self.estimator.optimize(
-                psi, y_train[self.max_lag :, 0].reshape(-1, 1)
+                psi, xp.reshape(y_train[self.max_lag :, 0], (-1, 1))
             )
             if self.estimator.unbiased is True:
                 self.theta = self.estimator.unbiased_estimator(
                     psi,
-                    y_train[self.max_lag :, 0].reshape(-1, 1),
+                    xp.reshape(y_train[self.max_lag :, 0], (-1, 1)),
                     self.theta,
                     self.elag,
                     self.max_lag,
@@ -398,12 +452,12 @@ class SimulateNARMAX(BaseMSS):
                 psi, y_train, self.n_terms, self.final_model
             )
             self.theta = self.estimator.optimize(
-                psi, y_train[self.max_lag :, 0].reshape(-1, 1)
+                psi, xp.reshape(y_train[self.max_lag :, 0], (-1, 1))
             )
             if self.estimator.unbiased is True:
                 self.theta = self.estimator.unbiased_estimator(
                     psi,
-                    y_train[self.max_lag :, 0].reshape(-1, 1),
+                    xp.reshape(y_train[self.max_lag :, 0], (-1, 1)),
                     self.theta,
                     self.elag,
                     self.max_lag,
@@ -455,43 +509,64 @@ class SimulateNARMAX(BaseMSS):
            e Novos Resultados
 
         """
-        squared_y = np.dot(y[self.max_lag :].T, y[self.max_lag :])
-        tmp_psi = psi.copy()
-        y = y[self.max_lag :, 0].reshape(-1, 1)
-        tmp_y = y.copy()
+        xp = get_namespace(psi, y)
+        squared_y = xp.sum(y[self.max_lag :, :] ** 2)
+        squared_y = float(
+            max(float(_to_numpy(squared_y)), float(np.finfo(np.float64).eps))
+        )
+        tmp_psi = _copy(xp, psi)
+        y = xp.reshape(y[self.max_lag :, 0], (-1, 1))
+        tmp_y = _copy(xp, y)
         dimension = tmp_psi.shape[1]
-        piv = np.arange(dimension)
-        tmp_err = np.zeros(dimension)
-        err = np.zeros(dimension)
+        piv = xp.arange(dimension)
+        tmp_err = xp.zeros((dimension,), dtype=psi.dtype)
+        err = xp.zeros((dimension,), dtype=psi.dtype)
 
-        for i in np.arange(0, dimension):
-            for j in np.arange(i, dimension):
-                # Add `eps` in the denominator to omit division by zero if
-                # denominator is zero
-                tmp_err[j] = (
-                    (np.dot(tmp_psi[i:, j].T, tmp_y[i:]) ** 2)
-                    / (np.dot(tmp_psi[i:, j].T, tmp_psi[i:, j]) * squared_y + self.eps)
-                )[0, 0]
+        for i in range(dimension):
+            tmp_err_slice = _compute_err_slice(
+                tmp_psi,
+                tmp_y,
+                i,
+                squared_y,
+                alpha=0.0,
+                eps=self.eps,
+            )
+            tmp_err = _set_element(xp, tmp_err, slice(i, None), tmp_err_slice)
 
             if i == process_term_number:
                 break
 
-            piv_index = np.argmax(tmp_err[i:]) + i
-            err[i] = tmp_err[piv_index]
-            tmp_psi[:, [piv_index, i]] = tmp_psi[:, [i, piv_index]]
-            piv[[piv_index, i]] = piv[[i, piv_index]]
+            piv_index = int(_to_numpy(xp.argmax(tmp_err[i:]))) + i
+            err = _set_element(xp, err, i, tmp_err[piv_index])
+            tmp_psi = _swap_matrix_columns(xp, tmp_psi, piv_index, i)
+            piv = _swap_vector_entries(xp, piv, piv_index, i)
 
             v = house(tmp_psi[i:, i])
 
             row_result = rowhouse(tmp_psi[i:, i:], v)
 
-            tmp_y[i:] = rowhouse(tmp_y[i:], v)
+            tmp_y = _set_element(
+                xp,
+                tmp_y,
+                (slice(i, None), slice(None)),
+                rowhouse(tmp_y[i:, :], v),
+            )
 
-            tmp_psi[i:, i:] = np.copy(row_result)
+            tmp_psi = _set_element(
+                xp,
+                tmp_psi,
+                (slice(i, None), slice(i, None)),
+                _copy(xp, row_result),
+            )
 
         tmp_piv = piv[0:process_term_number]
-        psi_orthogonal = psi[:, tmp_piv]
-        model_code = regressor_code[tmp_piv, :].copy()
+        psi_orthogonal = _take_columns_by_index(xp, psi, tmp_piv)
+        regressor_code = _asarray(
+            regressor_code,
+            xp=xp,
+            target_device=_device(psi, y),
+        )
+        model_code = _take_rows_by_index(xp, regressor_code, tmp_piv)
         return model_code, err, piv, psi_orthogonal
 
     def predict(self, *, X=None, y=None, steps_ahead=None, forecast_horizon=None):
@@ -522,37 +597,48 @@ class SimulateNARMAX(BaseMSS):
             The predicted values of the model.
 
         """
+        xp, target_device = _get_namespace_and_device(X, y)
+        if steps_ahead != 1 and not _is_numpy_namespace(xp):
+            return self._predict_on_cpu(
+                X=X,
+                y=y,
+                steps_ahead=steps_ahead,
+                forecast_horizon=forecast_horizon,
+                original_xp=xp,
+                target_device=target_device,
+            )
+
         if isinstance(self.basis_function, Polynomial):
             if steps_ahead is None:
                 yhat = self._model_prediction(X, y, forecast_horizon=forecast_horizon)
-                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+                yhat = _concat(xp, [y[: self.max_lag, ...], yhat], axis=0)
                 return yhat
             if steps_ahead == 1:
                 yhat = self._one_step_ahead_prediction(X, y)
-                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+                yhat = _concat(xp, [y[: self.max_lag, ...], yhat], axis=0)
                 return yhat
 
             check_positive_int(steps_ahead, "steps_ahead")
             yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
-            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+            yhat = _concat(xp, [y[: self.max_lag, ...], yhat], axis=0)
             return yhat
 
         if steps_ahead is None:
             yhat = self._basis_function_predict(X, y, forecast_horizon=forecast_horizon)
-            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+            yhat = _concat(xp, [y[: self.max_lag, ...], yhat], axis=0)
             return yhat
         if steps_ahead == 1:
             yhat = self._one_step_ahead_prediction(X, y)
-            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+            yhat = _concat(xp, [y[: self.max_lag, ...], yhat], axis=0)
             return yhat
 
         yhat = self._basis_function_n_step_prediction(
             X, y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
         )
-        yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
+        yhat = _concat(xp, [y[: self.max_lag, ...], yhat], axis=0)
         return yhat
 
-    def _one_step_ahead_prediction(self, x, y):
+    def _one_step_ahead_prediction(self, x_base, y=None):
         """Perform the 1-step-ahead prediction of a model.
 
         Parameters
@@ -569,8 +655,11 @@ class SimulateNARMAX(BaseMSS):
                The 1-step-ahead predicted values of the model.
 
         """
-        lagged_data = build_lagged_matrix(x, y, self.xlag, self.ylag, self.model_type)
-        x_base = self.basis_function.transform(
+        xp = get_namespace(x_base, y)
+        lagged_data = build_lagged_matrix(
+            x_base, y, self.xlag, self.ylag, self.model_type
+        )
+        x_tmp = self.basis_function.transform(
             lagged_data,
             self.max_lag,
             self.ylag,
@@ -579,8 +668,8 @@ class SimulateNARMAX(BaseMSS):
             predefined_regressors=self.pivv[: len(self.final_model)],
         )
 
-        yhat = super()._one_step_ahead_prediction(x_base)
-        return yhat.reshape(-1, 1)
+        yhat = super()._one_step_ahead_prediction(x_tmp)
+        return xp.reshape(yhat, (-1, 1))
 
     def _n_step_ahead_prediction(self, x, y, steps_ahead):
         """Perform the n-steps-ahead prediction of a model.
@@ -628,8 +717,8 @@ class SimulateNARMAX(BaseMSS):
             f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
         )
 
-    def _narmax_predict(self, x, y_initial, forecast_horizon):
-        if len(y_initial) < self.max_lag:
+    def _narmax_predict(self, x, y_initial, forecast_horizon=1):
+        if y_initial.shape[0] < self.max_lag:
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
                 f" {self.max_lag} elements."

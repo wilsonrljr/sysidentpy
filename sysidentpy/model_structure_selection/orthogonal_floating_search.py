@@ -16,6 +16,7 @@ from itertools import combinations
 
 import numpy as np
 
+from .._lib._array_api import get_namespace, _is_numpy_namespace
 from ..basis_function import Fourier, Polynomial
 from ..parameter_estimation.estimators import RecursiveLeastSquares
 from .ofr_base import Estimators, OFRBase
@@ -67,25 +68,35 @@ class _OrthogonalFloatingBase(OFRBase):
         squared_y: float,
     ) -> Tuple[float, np.ndarray]:
         """Return ERR score and per-term ERRs for the given subset."""
+        xp = get_namespace(psi, target)
         if not subset:
-            return 0.0, np.array([], dtype=float)
+            return 0.0, xp.zeros(0, dtype=psi.dtype)
 
         psi_sel = psi[:, subset]
         if psi_sel.size == 0:
-            return 0.0, np.array([], dtype=float)
+            return 0.0, xp.zeros(0, dtype=psi.dtype)
 
-        q, _ = np.linalg.qr(psi_sel, mode="reduced")
+        q, _ = xp.linalg.qr(psi_sel)
+        # For "reduced" mode, q has shape (n, min(n, k)); Array API qr
+        # returns full by default, so slice to the reduced shape.
+        k = psi_sel.shape[1]
+        q = q[:, :k]
         g = q.T @ target
 
-        err_vals = np.zeros(len(subset), dtype=float)
+        err_vals = xp.zeros(len(subset), dtype=psi.dtype)
         mapped = g.shape[0]
-        err_vals[:mapped] = np.square(g).flatten() / squared_y
-        score = float(np.sum(err_vals))
+        if _is_numpy_namespace(xp):
+            err_vals[:mapped] = xp.reshape(g, (-1,)) ** 2 / squared_y
+        else:
+            vals = xp.reshape(g, (-1,)) ** 2 / squared_y
+            err_vals = xp.concat([vals, err_vals[mapped:]])
+        score = float(xp.sum(err_vals))
         return score, err_vals
 
     def _compute_squared_y(self, target: np.ndarray) -> float:
         """Compute ||y||^2 with numerical floor to avoid division by zero."""
-        squared_y = float(np.dot(target.T, target).item())
+        xp = get_namespace(target)
+        squared_y = float(xp.sum(target * target))
         return squared_y if squared_y > self.eps else float(self.eps)
 
     def _best_addition(
@@ -98,11 +109,12 @@ class _OrthogonalFloatingBase(OFRBase):
     ) -> Tuple[Optional[int], float]:
         """Pick the most significant term (Definition 1)."""
         best_idx: Optional[int] = None
-        best_score = -np.inf
+        best_score = float("-inf")
         for idx in available:
             score, _ = self._subset_err(psi, target, subset + [idx], squared_y)
             if score > best_score or (
-                np.isclose(score, best_score) and (best_idx is None or idx < best_idx)
+                abs(score - best_score) < 1e-9 * max(abs(score), 1.0)
+                and (best_idx is None or idx < best_idx)
             ):
                 best_score = score
                 best_idx = idx
@@ -117,11 +129,13 @@ class _OrthogonalFloatingBase(OFRBase):
     ) -> Tuple[int, float]:
         """Pick the least significant term (Definition 2)."""
         best_idx = subset[0]
-        best_score = -np.inf
+        best_score = float("-inf")
         for idx in subset:
             remaining = [t for t in subset if t != idx]
             score, _ = self._subset_err(psi, target, remaining, squared_y)
-            if score > best_score or (np.isclose(score, best_score) and idx < best_idx):
+            if score > best_score or (
+                abs(score - best_score) < 1e-9 * max(abs(score), 1.0) and idx < best_idx
+            ):
                 best_score = score
                 best_idx = idx
         return best_idx, best_score
@@ -140,13 +154,13 @@ class _OrthogonalFloatingBase(OFRBase):
         if k <= 0:
             return []
 
-        best_score = -np.inf
+        best_score = float("-inf")
         best_combo: Optional[Tuple[int, ...]] = None
 
         for combo in combinations(available, k):
             score, _ = self._subset_err(psi, target, subset + list(combo), squared_y)
             if score > best_score or (
-                np.isclose(score, best_score)
+                abs(score - best_score) < 1e-9 * max(abs(score), 1.0)
                 and (best_combo is None or combo < best_combo)
             ):
                 best_score = score
@@ -167,14 +181,14 @@ class _OrthogonalFloatingBase(OFRBase):
         if k <= 0:
             return []
 
-        best_score = -np.inf
+        best_score = float("-inf")
         best_combo: Optional[Tuple[int, ...]] = None
 
         for combo in combinations(subset, k):
             candidate_subset = [t for t in subset if t not in combo]
             score, _ = self._subset_err(psi, target, candidate_subset, squared_y)
             if score > best_score or (
-                np.isclose(score, best_score)
+                abs(score - best_score) < 1e-9 * max(abs(score), 1.0)
                 and (best_combo is None or combo < best_combo)
             ):
                 best_score = score
@@ -199,8 +213,9 @@ class _OrthogonalFloatingBase(OFRBase):
         if count <= 0 or not available:
             return []
 
+        xp = get_namespace(psi, target)
         _, base_score_arr = self._subset_err(psi, target, base_subset, squared_y)
-        base_score = float(np.sum(base_score_arr))
+        base_score = float(xp.sum(base_score_arr))
 
         best_by_size: Dict[int, Tuple[float, Tuple[int, ...]]] = {0: (base_score, ())}
         selected: List[int] = []
@@ -225,7 +240,7 @@ class _OrthogonalFloatingBase(OFRBase):
                     break
 
                 prev_best_score = best_by_size.get(
-                    len(selected_terms) - 1, (-np.inf, ())
+                    len(selected_terms) - 1, (float("-inf"), ())
                 )[0]
                 if (flag_first_removal == 1 and ls_idx == last_added_term) or (
                     ls_score <= prev_best_score
@@ -257,7 +272,7 @@ class _OrthogonalFloatingBase(OFRBase):
             )
 
             stored_score, stored_subset = best_by_size.get(
-                len(candidate_selected), (-np.inf, ())
+                len(candidate_selected), (float("-inf"), ())
             )
 
             if candidate_score > stored_score:
@@ -309,7 +324,7 @@ class _OrthogonalFloatingBase(OFRBase):
             )
 
             stored_score, stored_removed = best_by_size.get(
-                len(candidate_subset), (-np.inf, ())
+                len(candidate_subset), (float("-inf"), ())
             )
 
             if candidate_score > stored_score:
@@ -333,7 +348,7 @@ class _OrthogonalFloatingBase(OFRBase):
                     psi, target, working_subset, squared_y
                 )
                 prev_best_score = best_by_size.get(
-                    len(working_subset) - 1, (-np.inf, ())
+                    len(working_subset) - 1, (float("-inf"), ())
                 )[0]
                 if (flag_first_removal == 1 and next_idx == last_removed) or (
                     next_score <= prev_best_score
@@ -367,7 +382,7 @@ class _OrthogonalFloatingBase(OFRBase):
         flag_first_removal = 1
         while len(subset) > 2:
             ls_idx, ls_score = self._best_removal(psi, target, subset, squared_y)
-            prev_best_score = best_by_size.get(len(subset) - 1, (-np.inf, ()))[0]
+            prev_best_score = best_by_size.get(len(subset) - 1, (float("-inf"), ()))[0]
             if (flag_first_removal == 1 and ls_idx == last_added) or (
                 ls_score <= prev_best_score
             ):
@@ -414,7 +429,7 @@ class _OrthogonalFloatingBase(OFRBase):
             )
 
             stored_score, stored_subset = best_by_size.get(
-                len(candidate_subset), (-np.inf, ())
+                len(candidate_subset), (float("-inf"), ())
             )
 
             if candidate_score > stored_score:
@@ -643,7 +658,7 @@ class OOS(_OrthogonalFloatingBase):
         smaller_side = max(
             1, min(process_term_number, max(0, total_terms - process_term_number))
         )
-        depth = int(np.floor(0.25 * smaller_side))
+        depth = int(0.25 * smaller_side)
         return max(1, depth)
 
     def _down_swing(

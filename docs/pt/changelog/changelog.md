@@ -5,6 +5,71 @@ title: Histórico de Alterações
 
 # Alterações no SysIdentPy
 
+## v0.9.0
+
+### COLABORADORES
+
+- Wilson Rocha Lacerda Junior (wilsonrljr)
+
+### MUDANÇAS
+
+Esta versão introduz suporte experimental e opt-in ao **padrão Array API**. A cobertura automatizada mais forte nesta versão é para NumPy, PyTorch (CPU e CUDA) e `array_api_strict`, enquanto CuPy e JAX aparecem como alvos de compatibilidade experimentais por meio da mesma camada de despacho. Esta é uma mudança arquitetural significativa que traz flexibilidade de backend e execução em GPU para os caminhos nativos de backend já suportados, sem alterar o comportamento padrão com NumPy.
+
+#### Funcionalidade Principal — Suporte ao Padrão Array API
+
+- O SysIdentPy agora oferece suporte experimental ao padrão Array API através de um mecanismo de despacho opt-in. Os usuários podem habilitá-lo globalmente com `set_config(array_api_dispatch=True)` ou temporariamente com `config_context(array_api_dispatch=True)`. Quando desabilitado (o padrão), o SysIdentPy se comporta exatamente como antes, usando exclusivamente NumPy.
+- O sistema de despacho é construído sobre cópias vendorizadas de `array-api-compat` (v1.14.0) e `array-api-extra` (v0.10.1), seguindo a mesma abordagem usada pelo scikit-learn e SciPy.
+- Um novo módulo interno `sysidentpy._lib._array_api` fornece a camada de compatibilidade principal com funções como `get_namespace()`, `_to_numpy()`, `_lstsq()`, `_zeros()`, `_ones()`, `_concat()`, `_diag()`, `_set_element()`, `_copy()`, `_median()`, `_nanargmin()`, `_vector_norm()`, `_pow()` e outras.
+- Um novo módulo `sysidentpy._lib._err` fornece uma implementação agnóstica de backend para o cálculo do ERR (Error Reduction Ratio).
+- Configuração thread-safe via `sysidentpy._config` garante isolamento em workloads multi-threaded.
+
+#### Integração Array API nos Módulos
+
+- **Seleção de Estrutura de Modelo**: FROLS, AOLS, OFRBase, UOFR e a família Orthogonal Floating Search (OSF, OIF, OOS/O2S) suportam despacho Array API nos backends validados descritos acima. `fit()` e a predição 1-step permanecem nativos no backend, enquanto a predição sequencial em backends não NumPy segue o fallback documentado para NumPy/CPU. MetaMSS, Entropic Regression (ER) e RMSS requerem NumPy devido a dependências do SciPy.
+- **Estimação de Parâmetros**: 18 estimadores suportam o despacho Array API (LeastSquares, RidgeRegression, TotalLeastSquares, RecursiveLeastSquares, AffineLeastMeanSquares e todas as 12 variantes da família LMS). 3 estimadores requerem NumPy (NonNegativeLeastSquares, BoundedVariableLeastSquares, LeastSquaresMinimalResidual).
+- **Funções Base**: `Polynomial`, `Fourier` e `Bilinear` funcionam com despacho Array API. `Bernstein`, `Legendre`, `Hermite`, `Hermite Normalized` e `Laguerre` continuam restritas ao NumPy porque dependem de avaliadores polinomiais do SciPy.
+- **Simulação**: Todo o módulo de simulação suporta despacho Array API.
+- **Métricas**: Todas as métricas de regressão suportam despacho Array API.
+- **Utilitários**: `check_arrays`, `information_matrix` e análise residual suportam despacho Array API.
+- **NARMAX Base**: O pipeline de predição suporta despacho Array API. `fit()` e predição 1-step permanecem nativos no backend, enquanto a predição sequencial em backends não NumPy (`steps_ahead=None` ou `steps_ahead > 1`) usa fallback para NumPy/CPU e converte as predições de volta para o namespace e dispositivo originais.
+
+#### Nova API Pública
+
+- `sysidentpy.set_config(array_api_dispatch=True/False)` — definir configuração global.
+- `sysidentpy.get_config()` — obter configuração atual.
+- `sysidentpy.config_context(array_api_dispatch=True/False)` — gerenciador de contexto para configuração temporária.
+
+#### Correções de Bugs
+
+- Corrigido indexação escalar no Entropic Regression ao usar NumPy 2.x.
+- Corrigido `_prepare_datasets` do RMSS para validar consistência de dimensões de entrada antes do loop de construção do modelo.
+- As fronteiras públicas de Array API em `fit()`/`predict()` agora rejeitam explicitamente namespaces e dispositivos mistos, em vez de normalizar silenciosamente para o primeiro array.
+- Removido código morto no backward elimination do Entropic Regression.
+
+#### Testes
+
+- Adicionados testes de despacho Array API em todos os módulos principais usando `array_api_strict` e backends PyTorch.
+- Adicionados testes de equivalência numérica cross-backend (NumPy vs PyTorch) para computação ERR.
+- Adicionados testes de release para rejeição de namespace/dispositivo mistos e preservação de namespace no fallback sequencial via CPU.
+- Adicionados testes confirmando que `Fourier` e `Bilinear` aceitam entradas Array API e que funções base dependentes de SciPy falham rapidamente sob dispatch.
+- Adicionado novo notebook de exemplo `array-api-benchmark.ipynb`.
+
+#### Ferramentas e Configuração
+
+- Atualizado Ruff de v0.2.2 para v0.15.8 (local e pre-commit).
+- Atualizado hook id do pre-commit de `ruff` para `ruff-check`.
+- Substituído prefixo de regra deprecado `TCH` por `TC` na configuração do Ruff.
+- Removido `isort` das dependências de desenvolvimento.
+- Adicionado `array-api-strict >=2.0` às dependências de desenvolvimento.
+
+### IMPACTO
+
+O suporte ao Array API é uma das mudanças arquiteturais mais significativas na história do SysIdentPy. Ele permite que pesquisadores e profissionais usem backends com GPU validados, como PyTorch, nos caminhos nativos de backend já suportados, enquanto CuPy e JAX permanecem explicitamente experimentais até que a evidência automatizada acompanhe. O design opt-in preserva total compatibilidade retroativa, e os caminhos ainda dependentes de SciPy agora falham de forma explícita em vez de sugerir compatibilidade inexistente. A implementação segue os padrões estabelecidos pelo scikit-learn e SciPy, garantindo alinhamento com a direção do ecossistema Scientific Python em direção à computação agnóstica de hardware.
+
+### TESTES
+
+A matriz de CI continua testando contra Python 3.10–3.14. O despacho Array API é exercitado com `array_api_strict` e backends PyTorch, incluindo verificações de preservação de namespace, rejeição pública de entradas mistas, restauração do fallback sequencial e cobertura de fail-fast para caminhos restritos ao NumPy.
+
 ## v0.8.0
 ### COLABORADORES
 - Wilson Rocha Lacerda Junior (wilsonrljr)

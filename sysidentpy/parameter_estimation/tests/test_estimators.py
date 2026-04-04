@@ -1,3 +1,10 @@
+import pytest
+
+import numpy as np
+from numpy.testing import assert_almost_equal, assert_raises
+
+from sysidentpy import config_context
+from sysidentpy._lib._array_api import _to_numpy
 from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.basis_function import Polynomial
 from sysidentpy.utils.information_matrix import build_input_output_matrix
@@ -21,6 +28,7 @@ from sysidentpy.parameter_estimation.estimators import (
     NormalizedLeastMeanSquares,
     NormalizedLeastMeanSquaresSignError,
     LeastMeanSquaresSignRegressor,
+    NonNegativeLeastSquares,
     BoundedVariableLeastSquares,
     LeastSquaresMinimalResidual,
 )
@@ -29,10 +37,6 @@ from sysidentpy.parameter_estimation.estimators_base import (
     BaseEstimator,
     _validate_params,
 )
-
-
-import numpy as np
-from numpy.testing import assert_almost_equal, assert_raises
 
 
 def create_test_data(n=1000):
@@ -56,9 +60,9 @@ def create_test_data(n=1000):
     return input_signal, output_signal, theta_values
 
 
-x, y, theta = create_test_data()
+x, y_signal, theta = create_test_data()
 max_lag = 2
-lagged_data = build_input_output_matrix(x=x, y=y, xlag=2, ylag=2)[:, :]
+lagged_data = build_input_output_matrix(x=x, y=y_signal, xlag=2, ylag=2)[:, :]
 
 psi_matrix = Polynomial(degree=2).fit(lagged_data, max_lag, predefined_regressors=None)
 
@@ -73,8 +77,43 @@ def test_least_squares():
         basis_function=basis_function,
         err_tol=None,
     )
-    model.fit(X=x, y=y)
+    model.fit(X=x, y=y_signal)
     assert_almost_equal(model.theta, theta, decimal=2)
+
+
+def test_least_squares_preserves_array_api_namespace():
+    xp = pytest.importorskip("array_api_strict")
+    psi_np = np.array([[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]])
+    theta_true = np.array([[2.0], [3.0]])
+    psi = xp.asarray(psi_np)
+    y_data = xp.asarray(psi_np @ theta_true)
+
+    with config_context(array_api_dispatch=True):
+        theta_est = LeastSquares().optimize(psi, y_data)
+
+    assert theta_est.__array_namespace__().__name__ == xp.__name__
+    assert_almost_equal(_to_numpy(theta_est), theta_true, decimal=10)
+
+
+@pytest.mark.parametrize(
+    ("estimator_cls", "estimator_name"),
+    [
+        (NonNegativeLeastSquares, "NonNegativeLeastSquares"),
+        (BoundedVariableLeastSquares, "BoundedVariableLeastSquares"),
+        (LeastSquaresMinimalResidual, "LeastSquaresMinimalResidual"),
+    ],
+)
+def test_scipy_estimators_reject_array_api_dispatch(estimator_cls, estimator_name):
+    xp = pytest.importorskip("array_api_strict")
+    psi = xp.asarray(np.array([[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]))
+    y_data = xp.asarray(np.array([[2.0], [3.0], [5.0]]))
+
+    with config_context(array_api_dispatch=True):
+        with pytest.raises(
+            NotImplementedError,
+            match=rf"{estimator_name}.*requires NumPy inputs",
+        ):
+            estimator_cls().optimize(psi, y_data)
 
 
 def test_base_estimator_init_sets_attributes():
@@ -82,7 +121,7 @@ def test_base_estimator_init_sets_attributes():
         def __init__(self, unbiased=False, uiter=30):
             super().__init__(unbiased=unbiased, uiter=uiter)
 
-        def optimize(self, psi, y):  # noqa: F811
+        def optimize(self, psi, y):
             del y
             return psi[:1].T
 
@@ -109,7 +148,7 @@ def test_ridge_regression():
         basis_function=basis_function,
         err_tol=None,
     )
-    model.fit(X=x, y=y)
+    model.fit(X=x, y=y_signal)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
@@ -123,7 +162,7 @@ def test_ridge_regression_classic():
         basis_function=basis_function,
         err_tol=None,
     )
-    model.fit(X=x, y=y)
+    model.fit(X=x, y=y_signal)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
@@ -148,7 +187,7 @@ def test_total_least_squares():
         basis_function=Polynomial(degree=2),
         err_tol=None,
     )
-    model.fit(X=x, y=y)
+    model.fit(X=x, y=y_signal)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
@@ -161,7 +200,7 @@ def test_recursive_least_squares():
         basis_function=Polynomial(degree=2),
         err_tol=None,
     )
-    model.fit(X=x, y=y)
+    model.fit(X=x, y=y_signal)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
@@ -174,7 +213,7 @@ def test_affine_least_mean_squares():
         basis_function=Polynomial(degree=2),
         err_tol=None,
     )
-    model.fit(X=x, y=y)
+    model.fit(X=x, y=y_signal)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
@@ -187,7 +226,7 @@ def test_least_mean_squares():
         basis_function=Polynomial(degree=2),
         err_tol=None,
     )
-    model.fit(X=x, y=y)
+    model.fit(X=x, y=y_signal)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
@@ -215,7 +254,7 @@ def test_normalized_least_mean_squares():
         basis_function=Polynomial(degree=2),
         err_tol=None,
     )
-    model.fit(X=x, y=y)
+    model.fit(X=x, y=y_signal)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
@@ -230,7 +269,7 @@ def test_least_mean_squares_normalized_sign_error():
         basis_function=Polynomial(degree=2),
         err_tol=None,
     )
-    model.fit(X=x, y=y)
+    model.fit(X=x, y=y_signal)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
@@ -243,7 +282,7 @@ def test_least_mean_squares_sign_regressor():
         basis_function=Polynomial(degree=2),
         err_tol=None,
     )
-    model.fit(X=x, y=y)
+    model.fit(X=x, y=y_signal)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
@@ -256,7 +295,7 @@ def test_least_mean_squares_normalized_sign_regressor():
         basis_function=Polynomial(degree=2),
         err_tol=None,
     )
-    model.fit(X=x, y=y)
+    model.fit(X=x, y=y_signal)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
@@ -354,7 +393,7 @@ def test_unbiased_least_squares():
         basis_function=basis_function,
         err_tol=None,
     )
-    model.fit(X=x, y=y)
+    model.fit(X=x, y=y_signal)
     assert_almost_equal(model.theta.shape[0], theta.shape[0], decimal=2)
 
 
@@ -418,7 +457,7 @@ def test_bvls_results():
         basis_function=basis_function,
         err_tol=None,
     )
-    model.fit(X=x, y=y)
+    model.fit(X=x, y=y_signal)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 
@@ -432,7 +471,7 @@ def test_lsmr_results():
         basis_function=basis_function,
         err_tol=None,
     )
-    model.fit(X=x, y=y)
+    model.fit(X=x, y=y_signal)
     assert_almost_equal(model.theta, theta, decimal=2)
 
 

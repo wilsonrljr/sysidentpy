@@ -62,9 +62,9 @@ dev = [
     "pytest-cov >=2.12.0,<7.0.0",
     "flake8 >=3.8.3,<7.0.0",
     "black >= 23.3.0",
-    "isort >=5.0.6,<6.0.0",
     "pre-commit",
-    "ruff >=0.2.2,<3.0.0",
+    "ruff >=0.15.0,<1.0.0",
+    "array-api-strict >=2.0",
 ]
 
 examples = ["scikit-learn", "catboost"]
@@ -98,7 +98,7 @@ repository = "https://github.com/wilsonrljr/sysidentpy"
 changelog = "https://github.com/wilsonrljr/sysidentpy/blob/main/CHANGELOG.md"
 
 [tool.setuptools]
-packages = ["sysidentpy"]
+packages = { find = { where = ["."], include = ["sysidentpy*"] } }
 
 [tool.setuptools.dynamic]
 version = { attr = "sysidentpy.__version__" }
@@ -121,6 +121,7 @@ disable_warnings = ['no-data-collected']
 [tool.coverage.report]
 omit = [
     "sysidentpy/utils/plotting.py",
+    "sysidentpy/_lib/_vendor/*",
     "sysidentpy/basis_function/tests/*",
     "sysidentpy/tests/*",
     "sysidentpy/general_estimators/tests/*",
@@ -148,7 +149,7 @@ exclude_lines = [
 
 [tool.black]
 line-length = 88
-target_version = ["py310", "py311", "py312", "py313", "py314"]
+# target_version = ["py310", "py311", "py312", "py313", "py314"]
 preview = true
 exclude = '''
 /(
@@ -186,7 +187,7 @@ select = [
     "PYI",    # flake8-pyi
     "TID",    # tidy imports
     "ISC",    # implicit string concatenation
-    "TCH",    # type-checking imports
+    "TC",     # type-checking imports
     "C4",     # comprehensions
     "PGH",    # pygrep-hooks
     "RUF",    # Ruff-specific rules
@@ -217,6 +218,7 @@ extend-ignore = [
     "PLR0912", # Too many branches
     "PLR0915", # Too many statements
     "RUF005",  # Collection literal concatenation
+    "PLR0911", # Too many return statements (predict pattern)
 ]
 # D100, D101, D102 e D103 são recomendadas durante o desenvolvimento para lembrar
 # os usuários de comentar o código!
@@ -227,6 +229,7 @@ exclude = [
     ".eggs",
     ".git",
     ".git-rewrite",
+    "**/sysidentpy/_lib/_vendor/**",
     ".hg",
     ".ipynb_checkpoints",
     ".mypy_cache",
@@ -249,6 +252,9 @@ exclude = [
     "site-packages",
     "venv",
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["PLC0415"]
 
 [tool.ruff.lint.pyupgrade]
 # Preserve types, even if a file imports `from __future__ import annotations`.

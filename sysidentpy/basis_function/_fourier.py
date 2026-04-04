@@ -3,6 +3,7 @@
 from typing import Optional
 import numpy as np
 
+from sysidentpy._lib._array_api import get_namespace, _is_numpy_namespace, _column_stack
 from sysidentpy.basis_function import Polynomial
 from .basis_function_base import BaseBasisFunction
 
@@ -55,11 +56,14 @@ class Fourier(BaseBasisFunction):
         self.ensemble = ensemble
 
     def _fourier_expansion(self, data: np.ndarray, n: int):
-        base = np.column_stack(
+        xp = get_namespace(data)
+        angle = 2 * np.pi * n / self.p
+        base = _column_stack(
+            xp,
             [
-                np.cos(2 * np.pi * data * n / self.p),
-                np.sin(2 * np.pi * data * n / self.p),
-            ]
+                xp.cos(angle * data),
+                xp.sin(angle * data),
+            ],
         )
         return base
 
@@ -100,6 +104,8 @@ class Fourier(BaseBasisFunction):
             The lagged matrix built in respect with each lag and column.
 
         """
+        xp = get_namespace(data)
+
         # remove intercept (because the data always have the intercept)
         if self.degree > 1:
             data = Polynomial().fit(
@@ -111,17 +117,18 @@ class Fourier(BaseBasisFunction):
 
         columns = list(range(data.shape[1]))
         harmonics = list(range(1, self.n + 1))
-        psi = np.zeros([len(data), 1])
+        psi = xp.zeros((data.shape[0], 1))
 
         for col in columns:
-            base_col = np.column_stack(
-                [self._fourier_expansion(data[:, col], h) for h in harmonics]
+            base_col = _column_stack(
+                xp,
+                [self._fourier_expansion(data[:, col], h) for h in harmonics],
             )
-            psi = np.column_stack([psi, base_col])
+            psi = _column_stack(xp, [psi, base_col])
 
         if self.ensemble:
             psi = psi[:, 1:]
-            psi = np.column_stack([data, psi])
+            psi = _column_stack(xp, [data, psi])
         else:
             psi = psi[:, 1:]
 

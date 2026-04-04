@@ -50,7 +50,7 @@ def test_bilinear_fit_predefined_regressors():
 
 def test_bilinear_degree_warning():
     """Test that a warning is raised when degree=1 is chosen."""
+    b = Bilinear(degree=1)
+    data = np.random.rand(10, 3)
     with pytest.warns(UserWarning, match="linear polynomial model"):
-        b = Bilinear(degree=1)
-        data = np.random.rand(10, 3)
         b.fit(data)

@@ -2,12 +2,11 @@
 
 from abc import ABCMeta, abstractmethod
 
-import numpy as np
-
+from sysidentpy._lib._array_api import _concat, get_namespace
 from sysidentpy.utils.information_matrix import build_output_matrix
 
 
-def _initial_values(psi: np.ndarray):
+def _initial_values(psi):
     """Initialize values for the estimation process.
 
     Parameters
@@ -26,10 +25,11 @@ def _initial_values(psi: np.ndarray):
     xi : ndarray of floats
         Initial residuals.
     """
+    xp = get_namespace(psi)
     n_theta = psi.shape[1]
-    n = len(psi)
-    theta = np.zeros([n_theta, n])
-    xi = np.zeros([n, 1])
+    n = psi.shape[0]
+    theta = xp.zeros((n_theta, n), dtype=psi.dtype)
+    xi = xp.zeros((n, 1), dtype=psi.dtype)
     return n_theta, n, theta, xi
 
 
@@ -95,7 +95,7 @@ class BaseEstimator(metaclass=ABCMeta):
         self.uiter = uiter
 
     @abstractmethod
-    def optimize(self, psi: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def optimize(self, psi, y):
         """Abstract method to optimize the model parameters."""
 
     def unbiased_estimator(
@@ -146,9 +146,10 @@ class BaseEstimator(metaclass=ABCMeta):
         - Wikipedia entry on Least Squares
            https://en.wikipedia.org/wiki/Least_squares
         """
-        e = y - np.dot(psi, theta)
+        xp = get_namespace(psi, y)
+        e = y - psi @ theta
         for _ in range(uiter):
-            e = np.concatenate([np.zeros([max_lag, 1]), e], axis=0)
+            e = _concat(xp, [xp.zeros((max_lag, 1), dtype=e.dtype), e], axis=0)
 
             lagged_data = build_output_matrix(e, elag)
 
@@ -160,8 +161,8 @@ class BaseEstimator(metaclass=ABCMeta):
                 predefined_regressors=None,
             )
 
-            psi_extended = np.concatenate([psi, e_regressors], axis=1)
+            psi_extended = _concat(xp, [psi, e_regressors], axis=1)
             unbiased_theta = estimator.optimize(psi_extended, y)
-            e = y - np.dot(psi_extended, unbiased_theta.reshape(-1, 1))
+            e = y - psi_extended @ xp.reshape(unbiased_theta, (-1, 1))
 
-        return unbiased_theta[0 : theta.shape[0], 0].reshape(-1, 1)
+        return xp.reshape(unbiased_theta[0 : theta.shape[0], 0], (-1, 1))

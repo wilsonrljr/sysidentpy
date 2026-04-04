@@ -7,8 +7,20 @@
 #           Samir Angelo Milani Martins <martins@ufsj.edu.br>
 # License: BSD 3 clause
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
-from numpy.typing import NDArray
+
+from sysidentpy._lib._array_api import (
+    get_namespace,
+    _is_numpy_namespace,
+    _median,
+)
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 
 __ALL__ = [
@@ -56,7 +68,7 @@ def forecast_error(y: NDArray, yhat: NDArray) -> NDArray:
     [0.5, -0.5, 0, -1]
 
     """
-    return np.array(y - yhat)
+    return y - yhat
 
 
 def mean_forecast_error(y: NDArray, yhat: NDArray) -> NDArray:
@@ -89,7 +101,8 @@ def mean_forecast_error(y: NDArray, yhat: NDArray) -> NDArray:
     -0.25
 
     """
-    return np.average(y - yhat)
+    xp = get_namespace(y, yhat)
+    return float(xp.mean(y - yhat))
 
 
 def mean_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
@@ -121,8 +134,8 @@ def mean_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
     0.375
 
     """
-    output_error = np.average((y - yhat) ** 2)
-    return np.average(output_error)
+    xp = get_namespace(y, yhat)
+    return float(xp.mean((y - yhat) ** 2))
 
 
 def root_mean_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
@@ -154,7 +167,7 @@ def root_mean_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
     0.612
 
     """
-    return np.sqrt(mean_squared_error(y, yhat))
+    return float(mean_squared_error(y, yhat) ** 0.5)
 
 
 def normalized_root_mean_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
@@ -186,7 +199,8 @@ def normalized_root_mean_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
     0.081
 
     """
-    return root_mean_squared_error(y, yhat) / (y.max() - y.min())
+    xp = get_namespace(y, yhat)
+    return float(root_mean_squared_error(y, yhat) / (xp.max(y) - xp.min(y)))
 
 
 def root_relative_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
@@ -213,9 +227,10 @@ def root_relative_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
     0.206
 
     """
-    numerator = np.sum(np.square((yhat - y)))
-    denominator = np.sum(np.square((y - np.mean(y, axis=0))))
-    return np.sqrt(np.divide(numerator, denominator))
+    xp = get_namespace(y, yhat)
+    numerator = xp.sum((yhat - y) ** 2)
+    denominator = xp.sum((y - xp.mean(y, axis=0)) ** 2)
+    return float(xp.sqrt(numerator / denominator))
 
 
 def mean_absolute_error(y: NDArray, yhat: NDArray) -> NDArray:
@@ -247,8 +262,8 @@ def mean_absolute_error(y: NDArray, yhat: NDArray) -> NDArray:
     0.5
 
     """
-    output_errors = np.average(np.abs(y - yhat))
-    return np.average(output_errors)
+    xp = get_namespace(y, yhat)
+    return float(xp.mean(xp.abs(y - yhat)))
 
 
 def mean_squared_log_error(y: NDArray, yhat: NDArray) -> NDArray:
@@ -275,7 +290,8 @@ def mean_squared_log_error(y: NDArray, yhat: NDArray) -> NDArray:
     0.039
 
     """
-    return mean_squared_error(np.log1p(y), np.log1p(yhat))
+    xp = get_namespace(y, yhat)
+    return mean_squared_error(xp.log(y + 1), xp.log(yhat + 1))
 
 
 def median_absolute_error(y: NDArray, yhat: NDArray) -> NDArray:
@@ -307,7 +323,8 @@ def median_absolute_error(y: NDArray, yhat: NDArray) -> NDArray:
     0.5
 
     """
-    return np.median(np.abs(y - yhat))
+    xp = get_namespace(y, yhat)
+    return float(_median(xp, xp.abs(y - yhat)))
 
 
 def explained_variance_score(y: NDArray, yhat: NDArray) -> NDArray:
@@ -340,17 +357,18 @@ def explained_variance_score(y: NDArray, yhat: NDArray) -> NDArray:
     0.957
 
     """
-    y_diff_avg = np.average(y - yhat)
-    numerator = np.average((y - yhat - y_diff_avg) ** 2)
-    y_avg = np.average(y)
-    denominator = np.average((y - y_avg) ** 2)
+    xp = get_namespace(y, yhat)
+    y_diff_avg = xp.mean(y - yhat)
+    numerator = xp.mean((y - yhat - y_diff_avg) ** 2)
+    y_avg = xp.mean(y)
+    denominator = xp.mean((y - y_avg) ** 2)
     nonzero_numerator = numerator != 0
     nonzero_denominator = denominator != 0
     valid_score = nonzero_numerator & nonzero_denominator
-    output_scores = np.ones(y.shape[0])
+    output_scores = xp.ones(y.shape[0], dtype=y.dtype)
     output_scores[valid_score] = 1 - (numerator[valid_score] / denominator[valid_score])
     output_scores[nonzero_numerator & ~nonzero_denominator] = 0.0
-    return np.average(output_scores)
+    return float(xp.mean(output_scores))
 
 
 def r2_score(y: NDArray, yhat: NDArray) -> NDArray:
@@ -387,17 +405,20 @@ def r2_score(y: NDArray, yhat: NDArray) -> NDArray:
     0.948
 
     """
-    numerator = ((y - yhat) ** 2).sum(axis=0, dtype=np.float64)
-    denominator = ((y - np.average(y, axis=0)) ** 2).sum(axis=0, dtype=np.float64)
+    xp = get_namespace(y, yhat)
+    if _is_numpy_namespace(xp):
+        numerator = ((y - yhat) ** 2).sum(axis=0, dtype=np.float64)
+        denominator = ((y - np.average(y, axis=0)) ** 2).sum(axis=0, dtype=np.float64)
+    else:
+        numerator = xp.sum((y - yhat) ** 2, axis=0)
+        denominator = xp.sum((y - xp.mean(y, axis=0)) ** 2, axis=0)
     nonzero_denominator = denominator != 0
     nonzero_numerator = numerator != 0
     valid_score = nonzero_denominator & nonzero_numerator
-    output_scores = np.ones([y.shape[1]])
+    output_scores = xp.ones(y.shape[1], dtype=y.dtype)
     output_scores[valid_score] = 1 - (numerator[valid_score] / denominator[valid_score])
-    # arbitrary set to zero to avoid -inf scores, having a constant
-    # y_true is not interesting for scoring a regression anyway
     output_scores[nonzero_numerator & ~nonzero_denominator] = 0.0
-    return np.average(output_scores)
+    return float(xp.mean(output_scores))
 
 
 def symmetric_mean_absolute_percentage_error(y: NDArray, yhat: NDArray) -> NDArray:
@@ -434,4 +455,6 @@ def symmetric_mean_absolute_percentage_error(y: NDArray, yhat: NDArray) -> NDArr
     57.87
 
     """
-    return 100 / len(y) * np.sum(2 * np.abs(yhat - y) / (np.abs(y) + np.abs(yhat)))
+    xp = get_namespace(y, yhat)
+    n = y.shape[0]
+    return float(100 / n * xp.sum(2 * xp.abs(yhat - y) / (xp.abs(y) + xp.abs(yhat))))
