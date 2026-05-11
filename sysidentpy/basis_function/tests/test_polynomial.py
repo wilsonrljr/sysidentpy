@@ -10,7 +10,7 @@ def test_polynomial_init():
 
     p_default = Polynomial()
     assert p_default.degree == 2
-    assert not p_default.include_bias  # Default should be False for backward compatibility
+    assert p_default.include_bias  # Default should be True to match Legendre
 
 
 def test_polynomial_fit():

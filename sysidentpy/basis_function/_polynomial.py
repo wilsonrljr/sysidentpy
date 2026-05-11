@@ -36,9 +36,11 @@ class Polynomial(BaseBasisFunction):
     ----------
     degree : int (max_degree), default=2
         The maximum degree of the polynomial features.
-    include_bias : bool, default=False
+    include_bias : bool, default=True
         Whether to include the bias (constant) term in the output feature matrix.
-        When set to True, a column of ones is prepended to the feature matrix.
+        When set to True, the bias column from build_lagged_matrix is preserved.
+        When set to False, the bias column is removed and all-zero combinations
+        are excluded from the polynomial expansion.
 
     Notes
     -----
@@ -50,7 +52,7 @@ class Polynomial(BaseBasisFunction):
     def __init__(
         self,
         degree: int = 2,
-        include_bias: bool = False,
+        include_bias: bool = True,
     ):
         self.degree = degree
         self.include_bias = include_bias
@@ -143,6 +145,7 @@ class Polynomial(BaseBasisFunction):
         ----------
         data : ndarray of floats
             The lagged matrix built with respect to each lag and column.
+            Expected to include a bias column at index 0 (from build_lagged_matrix).
         max_lag : int
             Target data used on training phase.
         ylag : ndarray of int
@@ -163,16 +166,16 @@ class Polynomial(BaseBasisFunction):
         """
         xp = get_namespace(data)
 
-        # Create combinations of all columns based on its index
-        # Note: predefined_regressors filtering happens inside _evaluate_terms
-        # only when include_bias is False. When include_bias is True, we need
-        # to handle it after adding the bias column.
-        if self.include_bias:
-            # Evaluate all terms first, then add bias
-            psi = self._evaluate_terms(data, predefined_regressors=None)
-            psi = psi[max_lag:, :]
+        # Remove the bias column that build_lagged_matrix already added (column 0)
+        # and trim max_lag rows, following Legendre's pattern
+        data_no_bias = data[max_lag:, 1:]
 
-            # Add bias column at the beginning
+        # Generate polynomial terms from the non-bias columns
+        psi = self._evaluate_terms(data_no_bias, predefined_regressors=None)
+
+        # If include_bias=True, prepend a bias column
+        # If include_bias=False, we're done (no bias, no all-zeros combinations)
+        if self.include_bias:
             target_device = _device(data) if not _is_numpy_namespace(xp) else None
             bias_column = _ones(
                 xp,
@@ -182,16 +185,12 @@ class Polynomial(BaseBasisFunction):
             )
             psi = _column_stack(xp, [bias_column, psi])
 
-            # Apply predefined_regressors filtering after adding bias
-            if predefined_regressors is not None:
-                predefined_regressors = self._normalize_predefined_regressors(
-                    predefined_regressors
-                )
-                psi = psi[:, predefined_regressors]
-        else:
-            # Original behavior: no bias term
-            psi = self._evaluate_terms(data, predefined_regressors)
-            psi = psi[max_lag:, :]
+        # Apply predefined_regressors filtering after bias handling
+        if predefined_regressors is not None:
+            predefined_regressors = self._normalize_predefined_regressors(
+                predefined_regressors
+            )
+            psi = psi[:, predefined_regressors]
 
         return psi
 
