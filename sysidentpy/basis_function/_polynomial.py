@@ -36,6 +36,9 @@ class Polynomial(BaseBasisFunction):
     ----------
     degree : int (max_degree), default=2
         The maximum degree of the polynomial features.
+    include_bias : bool, default=False
+        Whether to include the bias (constant) term in the output feature matrix.
+        When set to True, a column of ones is prepended to the feature matrix.
 
     Notes
     -----
@@ -47,8 +50,10 @@ class Polynomial(BaseBasisFunction):
     def __init__(
         self,
         degree: int = 2,
+        include_bias: bool = False,
     ):
         self.degree = degree
+        self.include_bias = include_bias
         # Cache combination indices per (n_features, degree) to avoid rebuilding
         self._combination_cache: Dict[Tuple[int, int], np.ndarray] = {}
 
@@ -156,9 +161,39 @@ class Polynomial(BaseBasisFunction):
             The lagged matrix built in respect with each lag and column.
 
         """
+        xp = get_namespace(data)
+
         # Create combinations of all columns based on its index
-        psi = self._evaluate_terms(data, predefined_regressors)
-        return psi[max_lag:, :]
+        # Note: predefined_regressors filtering happens inside _evaluate_terms
+        # only when include_bias is False. When include_bias is True, we need
+        # to handle it after adding the bias column.
+        if self.include_bias:
+            # Evaluate all terms first, then add bias
+            psi = self._evaluate_terms(data, predefined_regressors=None)
+            psi = psi[max_lag:, :]
+
+            # Add bias column at the beginning
+            target_device = _device(data) if not _is_numpy_namespace(xp) else None
+            bias_column = _ones(
+                xp,
+                (psi.shape[0], 1),
+                dtype=psi.dtype,
+                target_device=target_device,
+            )
+            psi = _column_stack(xp, [bias_column, psi])
+
+            # Apply predefined_regressors filtering after adding bias
+            if predefined_regressors is not None:
+                predefined_regressors = self._normalize_predefined_regressors(
+                    predefined_regressors
+                )
+                psi = psi[:, predefined_regressors]
+        else:
+            # Original behavior: no bias term
+            psi = self._evaluate_terms(data, predefined_regressors)
+            psi = psi[max_lag:, :]
+
+        return psi
 
     def transform(
         self,
