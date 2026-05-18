@@ -1,85 +1,71 @@
 import numpy as np
+from numpy.testing import assert_array_equal
+
 from sysidentpy.basis_function import Polynomial
 
 
-def test_polynomial_init():
-    """Test that Polynomial class initializes correctly."""
+def _lagged_with_bias(n_rows, n_features):
+    """Build a synthetic lagged matrix with the bias column at index 0."""
+    rng = np.random.default_rng(0)
+    data = rng.uniform(size=(n_rows, n_features))
+    data[:, 0] = 1.0
+    return data
+
+
+def test_polynomial_init_defaults():
+    p = Polynomial()
+    assert p.degree == 2
+    assert p.include_bias is True
+
+
+def test_polynomial_init_explicit():
     p = Polynomial(degree=3, include_bias=False)
     assert p.degree == 3
-    assert not p.include_bias
-
-    p_default = Polynomial()
-    assert p_default.degree == 2
-    assert p_default.include_bias  # Default should be True to match Legendre
+    assert p.include_bias is False
 
 
-def test_polynomial_fit():
-    """Test that fit correctly generates the polynomial feature matrix."""
+def test_polynomial_default_matches_original_behavior():
+    """include_bias=True must preserve pre-PR fit output exactly."""
     p = Polynomial(degree=2)
-    data = np.random.rand(10, 3)  # 10 samples, 3 features
-    max_lag = 2
-
-    transformed = p.fit(data, max_lag=max_lag)
-
-    assert transformed.shape[0] == data.shape[0] - max_lag
-    assert transformed.shape[1] > 0  # Ensure non-empty feature matrix
+    data = np.array([[1, 1, 1], [2, 3, 4], [3, 3, 3]])
+    expected = np.array([[4, 6, 8, 9, 12, 16], [9, 9, 9, 9, 9, 9]])
+    assert_array_equal(p.fit(data=data, max_lag=1), expected)
 
 
-def test_polynomial_transform():
-    """Test that transform behaves identically to fit."""
-    p = Polynomial(degree=2)
-    data = np.random.rand(10, 3)
+def test_polynomial_include_bias_false_drops_constant():
+    """include_bias=False drops the (0,0,...,0) pure-bias column."""
+    p_with = Polynomial(degree=2, include_bias=True)
+    p_without = Polynomial(degree=2, include_bias=False)
+    data = np.array([[1, 1, 1], [2, 3, 4], [3, 3, 3]])
+    psi_with = p_with.fit(data=data, max_lag=1)
+    psi_without = p_without.fit(data=data, max_lag=1)
 
-    transformed_fit = p.fit(data)
-    transformed_transform = p.transform(data)
-
-    np.testing.assert_array_equal(transformed_fit, transformed_transform)
-
-
-def test_polynomial_include_bias():
-    """Test that bias is included when requested."""
-    p = Polynomial(degree=2, include_bias=True)
-    data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    max_lag = 1
-
-    transformed = p.fit(data, max_lag=max_lag)
-    # First column should be all ones (bias term)
-    assert np.all(transformed[:, 0] == 1)
-
-    p_no_bias = Polynomial(degree=2, include_bias=False)
-    transformed_no_bias = p_no_bias.fit(data, max_lag=max_lag)
-    # Should not have a bias column (no column of all ones)
-    has_bias_column = any(np.all(transformed_no_bias[:, i] == 1)
-                          for i in range(transformed_no_bias.shape[1]))
-    assert not has_bias_column
+    assert psi_with.shape[1] == psi_without.shape[1] + 1
+    assert_array_equal(psi_without, psi_with[:, 1:])
 
 
-def test_polynomial_include_bias_shapes():
-    """Test that include_bias affects the output shape correctly."""
-    data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]])
-    max_lag = 1
+def test_polynomial_include_bias_false_no_constant_column():
+    """The remaining columns under include_bias=False are not pure constants."""
+    p = Polynomial(degree=2, include_bias=False)
+    data = _lagged_with_bias(20, 4)
+    psi = p.fit(data=data, max_lag=2)
 
-    p_with_bias = Polynomial(degree=2, include_bias=True)
-    p_without_bias = Polynomial(degree=2, include_bias=False)
-
-    transformed_with = p_with_bias.fit(data, max_lag=max_lag)
-    transformed_without = p_without_bias.fit(data, max_lag=max_lag)
-
-    # With bias should have one more column
-    assert transformed_with.shape[1] == transformed_without.shape[1] + 1
-    # Same number of rows
-    assert transformed_with.shape[0] == transformed_without.shape[0]
+    constant_columns = [
+        i for i in range(psi.shape[1]) if np.allclose(psi[:, i], psi[0, i])
+    ]
+    assert constant_columns == []
 
 
-def test_polynomial_fit_predefined_regressors_with_bias():
-    """Test fit with predefined regressors when include_bias=True."""
-    p = Polynomial(degree=2, include_bias=True)
-    data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    max_lag = 1
-    predefined_regressors = np.array([0, 2])  # Selecting bias and one other regressor
+def test_polynomial_transform_matches_fit():
+    p = Polynomial(degree=2, include_bias=False)
+    data = _lagged_with_bias(10, 3)
+    assert_array_equal(p.fit(data=data, max_lag=1), p.transform(data=data, max_lag=1))
 
-    transformed = p.fit(data, max_lag=max_lag, predefined_regressors=predefined_regressors)
 
-    assert transformed.shape[1] == len(predefined_regressors)
-    # First selected regressor should be bias (all ones)
-    assert np.all(transformed[:, 0] == 1)
+def test_polynomial_predefined_regressors_index_into_candidate_set():
+    """predefined_regressors indexes the candidate set after include_bias is applied."""
+    p = Polynomial(degree=2, include_bias=False)
+    data = np.array([[1, 1, 1], [2, 3, 4], [3, 3, 3]])
+    full = p.fit(data=data, max_lag=1)
+    picked = p.fit(data=data, max_lag=1, predefined_regressors=np.array([0, 2]))
+    assert_array_equal(picked, full[:, [0, 2]])

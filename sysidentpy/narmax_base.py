@@ -217,6 +217,14 @@ class RegressorDictionary:
 
         regressor_code = np.array(regressor_code)
         regressor_code = regressor_code[:, regressor_code.shape[1] :: -1]
+        if (
+            isinstance(self.basis_function, Polynomial)
+            and not getattr(self.basis_function, "include_bias", True)
+        ):
+            # combinations_with_replacement emits the (0,0,...,0) pure-bias tuple
+            # first; Polynomial.fit drops the matching psi column, so drop the row
+            # here to keep regressor_code aligned with psi.
+            regressor_code = regressor_code[1:]
         return regressor_code
 
     def _get_max_lag(self):

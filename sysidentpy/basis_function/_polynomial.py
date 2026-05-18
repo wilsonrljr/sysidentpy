@@ -37,10 +37,11 @@ class Polynomial(BaseBasisFunction):
     degree : int (max_degree), default=2
         The maximum degree of the polynomial features.
     include_bias : bool, default=True
-        Whether to include the bias (constant) term in the output feature matrix.
-        When set to True, the bias column from build_lagged_matrix is preserved.
-        When set to False, the bias column is removed and all-zero combinations
-        are excluded from the polynomial expansion.
+        Whether the constant (pure-bias) regressor is part of the candidate set.
+        When True, behavior matches prior releases: the (0,0,...,0) combination
+        produces a column of ones at index 0 of the output. When False, that
+        column is dropped from the candidate set; ``RegressorDictionary.regressor_space``
+        drops the matching row so ``regressor_code`` and ``psi`` stay aligned.
 
     Notes
     -----
@@ -145,7 +146,7 @@ class Polynomial(BaseBasisFunction):
         ----------
         data : ndarray of floats
             The lagged matrix built with respect to each lag and column.
-            Expected to include a bias column at index 0 (from build_lagged_matrix).
+            Column 0 is the bias column added by ``build_input_output_matrix``.
         max_lag : int
             Target data used on training phase.
         ylag : ndarray of int
@@ -156,7 +157,8 @@ class Polynomial(BaseBasisFunction):
             The type of the model (NARMAX, NAR or NFIR).
         predefined_regressors : ndarray of int
             The index of the selected regressors by the Model Structure
-            Selection algorithm.
+            Selection algorithm. Indices address the candidate set after
+            ``include_bias`` has been applied.
 
         Returns
         -------
@@ -164,35 +166,21 @@ class Polynomial(BaseBasisFunction):
             The lagged matrix built in respect with each lag and column.
 
         """
-        xp = get_namespace(data)
-
-        # Remove the bias column that build_lagged_matrix already added (column 0)
-        # and trim max_lag rows, following Legendre's pattern
-        data_no_bias = data[max_lag:, 1:]
-
-        # Generate polynomial terms from the non-bias columns
-        psi = self._evaluate_terms(data_no_bias, predefined_regressors=None)
-
-        # If include_bias=True, prepend a bias column
-        # If include_bias=False, we're done (no bias, no all-zeros combinations)
         if self.include_bias:
-            target_device = _device(data) if not _is_numpy_namespace(xp) else None
-            bias_column = _ones(
-                xp,
-                (psi.shape[0], 1),
-                dtype=psi.dtype,
-                target_device=target_device,
-            )
-            psi = _column_stack(xp, [bias_column, psi])
+            psi = self._evaluate_terms(data, predefined_regressors)
+            return psi[max_lag:, :]
 
-        # Apply predefined_regressors filtering after bias handling
+        # include_bias=False: drop the pure-bias combination (0,0,...,0), which
+        # combinations_with_replacement always emits at index 0. predefined_regressors
+        # addresses the bias-dropped index space, so shift by +1 before slicing combos.
         if predefined_regressors is not None:
-            predefined_regressors = self._normalize_predefined_regressors(
-                predefined_regressors
-            )
-            psi = psi[:, predefined_regressors]
+            shifted = self._normalize_predefined_regressors(predefined_regressors) + 1
+            psi = self._evaluate_terms(data, predefined_regressors=shifted)
+        else:
+            psi = self._evaluate_terms(data, predefined_regressors=None)
+            psi = psi[:, 1:]
 
-        return psi
+        return psi[max_lag:, :]
 
     def transform(
         self,
