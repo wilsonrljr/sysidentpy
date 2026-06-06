@@ -65,7 +65,6 @@ theme:
 
 ## Custom theme additions
 extra_javascript:
-  - https://polyfill.io/v3/polyfill.min.js?features=es6
   - overrides/assets/js/katex.js
   - https://unpkg.com/katex@0/dist/katex.min.js
   - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
