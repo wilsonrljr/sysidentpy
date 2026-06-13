@@ -23,7 +23,7 @@ It is important to note that NFIR model size is generally significantly higher c
 So, if you are looking for parsimonious and compact models, consider using NARMAX models. However, when comparing NFIR and NARMAX models, it's generally more challenging to establish stability, particularly in a control-oriented context, with NARMAX models than with NFIR models.
 
 
-```python
+```bash
 pip install sysidentpy
 ```
 

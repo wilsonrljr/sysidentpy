@@ -23,7 +23,7 @@ where $x$ is a uniformly distributed random variable and $\nu$ is a gaussian dis
 
 
 
-```python
+```bash
 pip install sysidentpy
 ```
 

@@ -23,7 +23,7 @@ onde $x$ é uma variável aleatória uniformemente distribuída e $\nu$ é uma v
 
 
 
-```python
+```bash
 pip install sysidentpy
 ```
 

@@ -65,7 +65,7 @@ the help box. Install with:
     <input type="radio" id="tab-version" name="tab-group">
     <label for="tab-version">Specific Version</label>
     <div class="tab-content">
-      <pre><code>pip install sysidentpy=="0.5.3"</code></pre>
+      <pre><code>pip install sysidentpy=="{{ sysidentpy_version }}"</code></pre>
     </div>
 
     <!-- Nightly Builds -->

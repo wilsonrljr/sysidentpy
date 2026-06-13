@@ -28,7 +28,7 @@ network training](https://arxiv.org/pdf/1706.07119.pdf)
 First, just import the necessary packages
 
 
-```python
+```bash
 pip install sysidentpy
 ```
 

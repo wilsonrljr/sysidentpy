@@ -218,7 +218,7 @@ ee = compute_residues_autocorrelation(y_valid, yhat)
 plot_residues_correlation(data=ee, title="Residues", ylabel="$e^2$")
 
 # Compute and plot cross-correlation between residuals and an input
-x1e = compute_cross_correlation(y_valid, yhat, x2_val)
+x1e = compute_cross_correlation(y_valid, yhat, x_valid)
 plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 ```
 

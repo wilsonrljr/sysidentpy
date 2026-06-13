@@ -92,6 +92,8 @@ hooks:
 # Plugins
 plugins:
   - search
+  - autorefs:
+      resolve_closest: true
   - minify:
       minify_html: true
   - glightbox
@@ -117,7 +119,6 @@ plugins:
           site_description: De Métodos Clássicos a Redes Neurais
           theme:
             docs_dir: docs/pt/
-            custom_dir: docs/en/
             site_dir: site/pt/
             logo: overrides/assets/img/logotype-sysidentpy.svg
             language: pt
@@ -212,7 +213,6 @@ plugins:
             # so the Spanish site has the full theme/templates/assets.
             # Later we can copy/translate `docs/en/overrides` into
             # `docs/es/overrides` to have fully localized templates.
-            custom_dir: docs/en/
             site_dir: site/es/
             logo: overrides/assets/img/logotype-sysidentpy.svg
             language: es

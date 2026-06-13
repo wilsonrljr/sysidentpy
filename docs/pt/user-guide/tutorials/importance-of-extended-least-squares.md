@@ -16,7 +16,7 @@ Exemplo criado por Wilson Rocha Lacerda Junior
 Aqui importamos o modelo NARMAX, a métrica para avaliação do modelo e os métodos para gerar dados de amostra para testes. Também importamos pandas para uso específico.
 
 
-```python
+```bash
 pip install sysidentpy
 ```
 

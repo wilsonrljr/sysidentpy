@@ -9,6 +9,8 @@ from typing import Any, Dict
 
 import requests
 
+from sysidentpy import __version__ as _SYSIDENTPY_VERSION
+
 _PEPY_URL = "https://api.pepy.tech/api/v2/projects/sysidentpy"
 
 
@@ -73,7 +75,22 @@ def on_config(config):
     pepy_stats["formatted_total"] = _format_compact(pepy_stats["total_downloads"])
 
     config.extra.setdefault("pepy_stats", pepy_stats)
+    config.extra["sysidentpy_version"] = _SYSIDENTPY_VERSION
+    config.extra.setdefault("pypi_version", _SYSIDENTPY_VERSION)
     latest_version = pepy_stats.get("latest_version")
     if latest_version:
-        config.extra["pypi_version"] = latest_version
+        config.extra["latest_pypi_version"] = latest_version
     return config
+
+
+def on_page_markdown(markdown, page, config, files):
+    """Replace controlled documentation placeholders before rendering."""
+    replacements = {
+        "{{ sysidentpy_version }}": config.extra.get(
+            "sysidentpy_version", _SYSIDENTPY_VERSION
+        ),
+        "{{ pypi_version }}": config.extra.get("pypi_version", _SYSIDENTPY_VERSION),
+    }
+    for placeholder, value in replacements.items():
+        markdown = markdown.replace(placeholder, str(value))
+    return markdown

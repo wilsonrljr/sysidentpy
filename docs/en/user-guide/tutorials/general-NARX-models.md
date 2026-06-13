@@ -11,7 +11,7 @@ Example created by Wilson Rocha Lacerda Junior
 In this example we will create NARX models using different estimator like GradientBoostingRegressor, Bayesian Regression, Automatic Relevance Determination (ARD) Regression and Catboost
 
 
-```python
+```bash
 pip install sysidentpy
 ```
 
