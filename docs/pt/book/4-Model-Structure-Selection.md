@@ -15,17 +15,17 @@ $$
 em que $x_k \in \mathbb{R}^{n_x}$ e $y_k\in \mathbb{R}^{n_y}$ são, respectivamente, a entrada e a saída de um sistema desconhecido, e $n$ é o número de amostras no conjunto de dados. A seguir, considere dois modelos polinomiais NARX construídos para descrever esse sistema:
 
 $$
-\begin{align}
+\begin{aligned}
     y_{ak} &= 0.7077y_{ak-1} + 0.1642u_{k-1} + 0.1280u_{k-2}
-\end{align}
+\end{aligned}
 \tag{2}
 $$
 
 $$
-\begin{align}
+\begin{aligned}
     y_{bk} &= 0.7103y_{bk-1} + 0.1458u_{k-1} + 0.1631u_{k-2} \\
            &\quad - 1467y_{bk-1}^3 + 0.0710y_{bk-2}^3 + 0.0554y_{bk-3}^2u_{k-3}.
-\end{align}
+\end{aligned}
 \tag{3}
 $$
 
@@ -50,13 +50,13 @@ Esse princípio enfatiza a importância de evitar complexidade desnecessária, g
 Vimos no Capítulo 2 que a seleção de regressores não é uma tarefa simples. Se o grau de não linearidade, a ordem do modelo e o número de entradas aumentam, o número de modelos candidatos se torna grande demais para uma abordagem de força bruta. Considerando o caso MIMO, esse problema é ainda mais severo do que no caso SISO quando muitas entradas e saídas são necessárias. O número de todos os modelos distintos pode ser calculado como
 
 $$
-\begin{align}
+\begin{aligned}
     n_m =
     \begin{cases}
     2^{n_r} & \text{para modelos SISO}, \\
     2^{n_{{_{m}}r}} & \text{para modelos MIMO},
     \end{cases}
-\end{align}
+\end{aligned}
 \tag{5}
 $$
 
@@ -87,7 +87,7 @@ $$
 onde
 
 $$
-\begin{align}
+\begin{aligned}
     Y = \begin{bmatrix}
     y_1 \\
     y_2 \\
@@ -118,7 +118,7 @@ $$
     \vdots \\
     \xi_n
     \end{bmatrix}.
-\end{align}
+\end{aligned}
 \tag{8}
 $$
 
@@ -136,7 +136,7 @@ $$
 em que $A \in \mathbb{R}^{n_{\Theta}\times n_{\Theta}}$ é uma matriz triangular superior unitária, dada por
 
 $$
-\begin{align}
+\begin{aligned}
 A =
     \begin{bmatrix}
     1       & a_{12} & a_{13} & \dotsc & a_{1n_{\Theta}} \\
@@ -145,7 +145,7 @@ A =
     \vdots  & \vdots & \vdots & \ddots & a_{n_{\Theta}-1n_{\Theta}} \\
     0       &  0     &  0     &  0     & 1
     \end{bmatrix},
-\end{align}
+\end{aligned}
 \tag{10}
 $$
 
@@ -164,9 +164,9 @@ $$
 tal que $Q^\top Q = \Lambda$ e $\Lambda$ é diagonal com entradas $d_i$, que podem ser expressas como
 
 $$
-\begin{align}
+\begin{aligned}
     d_i = q_i^\top q_i = \sum^{k=1}_{n}q_{{_i}k}q_{{_i}k}, \qquad 1\leq i \leq n_{\Theta}.
-\end{align}
+\end{aligned}
 $$
 
 Como o subespaço gerado pela base ortogonal $Q$ (Equação 11) é o mesmo subespaço gerado pelo conjunto de base $\Psi$ (Equação 8) (isto é, contém todas as combinações lineares possíveis nesse subespaço), podemos reescrever a Equação 7 como
@@ -259,11 +259,11 @@ $$
 Portanto, podemos mostrar que
 
 $$
-\begin{align}
+\begin{aligned}
 & \left\langle x_1, y\right\rangle=\hat{\theta}_1\left\langle x_1, x_1\right\rangle \Rightarrow \hat{\theta}_1=\frac{\left\langle x_1, y\right\rangle}{\left\langle x_1, x_1\right\rangle}=\frac{x_1^T y}{x_1^T x_1} \\
 & \left\langle x_2, y\right\rangle=\hat{\theta}_2\left\langle x_2, x_2\right\rangle \Rightarrow \hat{\theta}_2=\frac{\left\langle x_2, y\right\rangle}{\left\langle x_2, x_2\right\rangle}=\frac{x_2^T y}{x_2^T x_2}, \ldots \\
 & \left\langle x_n, y\right\rangle=\hat{\theta}_n\left\langle x_n, x_n\right\rangle \Rightarrow \hat{\theta}_n=\frac{\left\langle x_n, y\right\rangle}{\left\langle x_n, x_n\right\rangle}=\frac{x_n^T y}{x_n^T x_n},
-\end{align}
+\end{aligned}
 \tag{22}
 $$
 
@@ -299,11 +299,11 @@ $$
 Como $\hat{\theta}_k=\frac{x_k^T y}{x_k^T x_k}=\frac{x_k^T y}{\left\|x_k\right\|^2}, k=1,2, . ., n$, temos
 
 $$
-\begin{align}
+\begin{aligned}
 \frac{\|e\|^2}{\|y\|^2} & =1-\left(\frac{x_1^T y}{\left\|x_1\right\|^2}\right)^2 \frac{\left\|x_1\right\|^2}{\|y\|^2}-\left(\frac{x_2^T y}{\left\|x_2\right\|^2}\right)^2 \frac{\left\|x_2\right\|^2}{\|y\|^2}-\ldots-\left(\frac{x_n^T y}{\left\|x_n\right\|^2}\right)^2 \frac{\left\|x_n\right\|^2}{\|y\|^2} \\
 & =1-\frac{\left(x_1^T y\right)^2}{\left\|x_1\right\|^2\| y \|^2}-\frac{\left(x_2^T y\right)^2}{\left\|x_2\right\|^2\|y\|^2}-\cdots-\frac{\left(x_n^T y\right)^2}{\left\|x_n\right\|^2\|y\|^2} \\
 & =1-ERR_1 \quad-ERR_2-\cdots-ERR_n
-\end{align}
+\end{aligned}
 \tag{27}
 $$
 
@@ -516,12 +516,12 @@ Apesar de bastante eficazes em muitos problemas de seleção de modelos lineares
 Além do AIC, o SysIdentPy disponibiliza outros quatro critérios de informação: [Bayesian Information Criteria](https://wires.onlinelibrary.wiley.com/doi/abs/10.1002/wics.199) (BIC), [Final Prediction Error](https://www.researchgate.net/publication/303679484_Introducao_a_Identificacao_de_Sistemas) (FPE), [Low of Iterated Logarithm Criteria](https://www.sciencedirect.com/science/article/abs/pii/S0169743902000515) (LILC) e [Corrected Akaike Information Criteria](https://www.sciencedirect.com/science/article/abs/pii/S0167715296001289) (AICc), definidos, respectivamente, como
 
 $$
-\begin{align}
+\begin{aligned}
 \operatorname{FPE}\left(n_\theta\right) & =N \ln \left[\sigma_{\text {erro }}^2\left(n_\theta\right)\right]+N \ln \left[\frac{N+n_\theta}{N-n_\theta}\right] \\
 BI C\left(n_\theta\right) & =N \ln \left[\sigma_{\text {erro }}^2\left(n_\theta\right)\right]+n_\theta \ln N \\
 AICc &=AIC+2 n_p * \frac{n_p+1}{N-n_p-1} \\
 LILC &= 2n_{\theta}\ln(\ln(N)) + N \ln(\left[\sigma_{\text {erro }}^2\left(n_\theta\right)\right])
-\end{align}
+\end{aligned}
 \tag{29}
 $$
 
@@ -933,10 +933,10 @@ Devido às limitações dos algoritmos baseados em Ordinary Least Squares (OLS),
 Considere $\mathcal{F}$ como uma classe de funções limitadas $\phi: \mathbf{R} \mapsto \mathbf{R}$. Se as propriedades de $\phi(x)$ satisfazem
 
 $$
-\begin{align}
+\begin{aligned}
     &\lim\limits_{x \to \infty} \phi(x) = \alpha \nonumber \\
     &\lim\limits_{x \to -\infty} \phi(x) = \beta \quad \text{com } \alpha > \beta,  \nonumber
-\end{align}
+\end{aligned}
 \tag{32}
 $$
 
@@ -1015,10 +1015,10 @@ No Gravitational Search Algorithm (GSA) [Rashedi, Esmat, Nezamabadi-Pour, Hossei
 Considere uma população de agentes descrita pelas seguintes equações. Em um instante de tempo $t$, a velocidade e a posição de cada agente são atualizadas como
 
 $$
-\begin{align}
+\begin{aligned}
     v_{i,d}^{t+1} &= \kappa_i \times v_{i,d}^t + a_{i,d}^t, \\
     x_{i,d}^{t+1} &= x_{i,d}^t + v_{i,d}^{t+1}.
-\end{align}
+\end{aligned}
 \tag{38}
 $$
 
@@ -1038,19 +1038,19 @@ em que $M_{ii}^{t}$ é a massa inercial do agente $i$ e $F_{i,d}^t$ representa a
 A combinação dos algoritmos segue a formulação descrita em [Mirjalili, S. and Hashim, S. Z. M. - A new hybrid PSOGSA algorithm for function optimization](https://ieeexplore.ieee.org/abstract/document/6141614):
 
 $$
-\begin{align}
+\begin{aligned}
     v_{i}^{t+1} = \zeta \times v_i^t + \mathrm{c}'_{1} \times \kappa \times a_i^t + \mathrm{c}'_2 \times \kappa \times (gbest - x_i^t),
-\end{align}
+\end{aligned}
 \tag{40}
 $$
 
 onde $\mathrm{c}'_j \in \mathbb{R}$ são coeficientes de aceleração. Essa formulação intensifica a fase de explotação ao incorporar a melhor posição encontrada até o momento. Por outro lado, essa mesma característica pode prejudicar a fase de exploração. Para contornar esse problema, [Mirjalili, S., Mirjalili, S. M., and Lewis, A. - Grey Wolf Optimizer](https://www.sciencedirect.com/science/article/abs/pii/S0965997813001853) propuseram valores adaptativos para $\mathrm{c}'_j$, conforme descrito em [Mirjalili, S., Wang, Gai-Ge, and Coelho, L. dos S. - Binary optimization using hybrid particle swarm optimization and gravitational search algorithm](https://dl.acm.org/doi/10.1007/s00521-014-1629-6):
 
 $$
-\begin{align}
+\begin{aligned}
     \mathrm{c}_1' &= -2 \times \frac{t^3}{\max(t)^3} + 2, \\
     \mathrm{c}_2' &= 2 \times \frac{t^3}{\max(t)^3} + 2.
-\end{align}
+\end{aligned}
 \tag{41}
 $$
 
@@ -1087,9 +1087,9 @@ O processo de uso do BPSOGSA para seleção de estrutura envolve definir as dime
 Como exemplo, considere o caso em que todos os regressores possíveis são definidos com $\ell = 1$ e $n_y = n_u = 2$. A matriz $\Psi$ é dada por
 
 $$
-\begin{align}
+\begin{aligned}
 [ \text{constant} \quad y(k-1) \quad y(k-2) \quad u(k-1) \quad u(k-2) ]
-\end{align}
+\end{aligned}
 \tag{44}
 $$
 
@@ -1216,7 +1216,7 @@ Nesta subseção, apresentamos seis exemplos de simulação para ilustrar a efic
 Os modelos de simulação são definidos como
 
 $$
-\begin{align}
+\begin{aligned}
     & S_1: \quad y_k = -1.7y_{k-1} - 0.8y_{k-2} + x_{k-1} + 0.81x_{k-2} + e_k, \\
     & \qquad \quad \text{com } x_k \sim \mathcal{U}(-2, 2) \text{ e } e_k \sim \mathcal{N}(0, 0.01^2); \\ 
     & S_2: \quad y_k = 0.8y_{k-1} + 0.4x_{k-1} + 0.4x_{k-1}^2 + 0.4x_{k-1}^3 + e_k, \\
@@ -1233,7 +1233,7 @@ $$
     & \qquad \quad \text{com } x_k \sim \mathcal{U}(-1, 1) \text{ e } e_k \sim \mathcal{N}(0, 0.02^2); \\ 
     & S_6: \quad y_k = 0.75y_{k-2} + 0.25x_{k-2} - 0.2y_{k-2}x_{k-2} + e_k \\
     & \qquad \quad \text{com } x_k \sim \mathcal{N}(0, 0.25^2) \text{ e } e_k \sim \mathcal{N}(0, 0.02^2); 
-\end{align}
+\end{aligned}
 \tag{57}
 $$
 

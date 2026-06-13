@@ -21,7 +21,7 @@ $$
 where
 
 $$
-\begin{align}
+\begin{aligned}
     Y = \begin{bmatrix}
     y_1 \\
     y_2 \\
@@ -52,7 +52,7 @@ $$
     \vdots \\
     \xi_n
     \end{bmatrix}.
-\end{align}
+\end{aligned}
 \tag{3.3}
 $$
 

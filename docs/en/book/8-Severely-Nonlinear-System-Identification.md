@@ -73,9 +73,9 @@ where $\mathcal{H}_t(\omega)^{+} \neq \mathcal{H}_t(\omega)^{-}$, $\forall t \ne
 > Rate Independent Hysteresis (RIH) ([Visintin, A., "Differential Models of Hysteresis"](https://link.springer.com/book/10.1007/978-3-662-11557-2)) - The hysteresis behavior is called to be rate independent if the path $ABCD$, which depends on pair $x(t), y(t)$, is invariant with respect to any increasing diffeomorphism~$\varphi : [0,T] \rightarrow [0,T]$, i.e.:
 
 $$
-\begin{align}
+\begin{aligned}
         F(u \ o \ \varphi, y^{0}) = F(u,y^0)\ o \ \varphi & \ em \ [0,T].
-\end{align}
+\end{aligned}
 \tag{4}
 $$
 

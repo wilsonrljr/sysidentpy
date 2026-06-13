@@ -16,17 +16,17 @@ $$
 where $x_k \in \mathbb{R}^{n_x}$ and $y_k\in \mathbb{R}^{n_y}$ are the input and output of an unknown system and $n$ is the number of samples in the dataset. The following are two polynomial NARX models built to describe that system:
 
 $$
-\begin{align}
+\begin{aligned}
     y_{ak} &= 0.7077y_{ak-1} + 0.1642u_{k-1} + 0.1280u_{k-2}
-\end{align}
+\end{aligned}
 \tag{2}
 $$
 
 $$
-\begin{align}
+\begin{aligned}
     y_{bk} &= 0.7103y_{bk-1} + 0.1458u_{k-1} + 0.1631u_{k-2} \\
            &\quad - 1467y_{bk-1}^3 + 0.0710y_{bk-2}^3 + 0.0554y_{bk-3}^2u_{k-3}.
-\end{align}
+\end{aligned}
 \tag{3}
 $$
 
@@ -51,13 +51,13 @@ This principle emphasizes the importance of avoiding unnecessary complexity whil
 We see at chapter 2 that regressors selection, however, is not a simple task. If the nonlinear degree, the order of the model and the number inputs increases, the number of candidate models becomes too large for brute force approach. Considering the MIMO case, this problem is far worse than the SISO one if many inputs and outputs are required. The number of all different models can be calculated as
 
 $$
-\begin{align}
+\begin{aligned}
     n_m =
     \begin{cases}
     2^{n_r} & \text{for SISO models}, \\
     2^{n_{{_{m}}r}} & \text{for MIMO models},
     \end{cases}
-\end{align}
+\end{aligned}
 \tag{5}
 $$
 
@@ -88,7 +88,7 @@ $$
 where
 
 $$
-\begin{align}
+\begin{aligned}
     Y = \begin{bmatrix}
     y_1 \\
     y_2 \\
@@ -119,7 +119,7 @@ $$
     \vdots \\
     \xi_n
     \end{bmatrix}.
-\end{align}
+\end{aligned}
 \tag{8}
 $$
 
@@ -137,7 +137,7 @@ $$
 where $A \in \mathbb{R}^{n_{\Theta}\times n_{\Theta}}$ is an unit upper triangular matrix according to
 
 $$
-\begin{align}
+\begin{aligned}
 A =
     \begin{bmatrix}
     1       & a_{12} & a_{13} & \dotsc & a_{1n_{\Theta}} \\
@@ -146,7 +146,7 @@ A =
     \vdots  & \vdots & \vdots & \ddots & a_{n_{\Theta}-1n_{\Theta}} \\
     0       &  0     &  0     &  0     & 1
     \end{bmatrix},
-\end{align}
+\end{aligned}
 \tag{10}
 $$
 
@@ -165,9 +165,9 @@ $$
 such that $Q^\top Q = \Lambda$ and $\Lambda$ is diagonal with entry $d_i$ and can be expressed as:
 
 $$
-\begin{align}
+\begin{aligned}
     d_i = q_i^\top q_i = \sum^{k=1}_{n}q_{{_i}k}q_{{_i}k}, \qquad 1\leq i \leq n_{\Theta}.
-\end{align}
+\end{aligned}
 $$
 
 Because the space spanned by the orthogonal basis $Q$ (Equation 11) is the same as that spanned by the basis set $\Psi$ (Equation 8) (i.e, contains every linear combination of elements of such subspace), we can define the Equation 7 as
@@ -261,11 +261,11 @@ $$
 Therefore we can show that
 
 $$
-\begin{align}
+\begin{aligned}
 & \left\langle x_1, y\right\rangle=\hat{\theta}_1\left\langle x_1, x_1\right\rangle \Rightarrow \hat{\theta}_1=\frac{\left\langle x_1, y\right\rangle}{\left\langle x_1, x_1\right\rangle}=\frac{x_1^T y}{x_1^T x_1} \\
 & \left\langle x_2, y\right\rangle=\hat{\theta}_2\left\langle x_2, x_2\right\rangle \Rightarrow \hat{\theta}_2=\frac{\left\langle x_2, y\right\rangle}{\left\langle x_2, x_2\right\rangle}=\frac{x_2^T y}{x_2^T x_2}, \ldots \\
 & \left\langle x_n, y\right\rangle=\hat{\theta}_n\left\langle x_n, x_n\right\rangle \Rightarrow \hat{\theta}_n=\frac{\left\langle x_n, y\right\rangle}{\left\langle x_n, x_n\right\rangle}=\frac{x_n^T y}{x_n^T x_n},
-\end{align}
+\end{aligned}
 \tag{22}
 $$
 
@@ -301,11 +301,11 @@ $$
 Because $\hat{\theta}_k=\frac{x_k^T y}{x_k^T x_k}=\frac{x_k^T y}{\left\|x_k\right\|^2}, k=1,2, . ., n$, we have
 
 $$
-\begin{align}
+\begin{aligned}
 \frac{\|e\|^2}{\|y\|^2} & =1-\left(\frac{x_1^T y}{\left\|x_1\right\|^2}\right)^2 \frac{\left\|x_1\right\|^2}{\|y\|^2}-\left(\frac{x_2^T y}{\left\|x_2\right\|^2}\right)^2 \frac{\left\|x_2\right\|^2}{\|y\|^2}-\ldots-\left(\frac{x_n^T y}{\left\|x_n\right\|^2}\right)^2 \frac{\left\|x_n\right\|^2}{\|y\|^2} \\
 & =1-\frac{\left(x_1^T y\right)^2}{\left\|x_1\right\|\left\|^2\right\| y \|^2}-\frac{\left(x_2^T y\right)^2}{\left\|x_2\right\|^2\|y\|^2}-\cdots-\frac{\left(x_n^T y\right)^2}{\left\|x_n\right\|^2\|y\|^2} \\
 & =1-ERR_1 \quad-ERR_2-\cdots-ERR_n
-\end{align}
+\end{aligned}
 \tag{27}
 $$
 
@@ -517,12 +517,12 @@ Despite their effectiveness in many linear model selection scenarios, informatio
 Besides AIC, SysIdentPy provides other four different information criteria: [Bayesian Information Criteria](https://wires.onlinelibrary.wiley.com/doi/abs/10.1002/wics.199) (BIC), [Final Prediction Error](https://www.researchgate.net/publication/303679484_Introducao_a_Identificacao_de_Sistemas) (FPE), [Low of Iterated Logarithm Criteria](https://www.sciencedirect.com/science/article/abs/pii/S0169743902000515) (LILC), and [Corrected Akaike Information Criteria](https://www.sciencedirect.com/science/article/abs/pii/S0167715296001289) (AICc), which can be described respectively as
 
 $$
-\begin{align}
+\begin{aligned}
 \operatorname{FPE}\left(n_\theta\right) & =N \ln \left[\sigma_{\text {erro }}^2\left(n_\theta\right)\right]+N \ln \left[\frac{N+n_\theta}{N-n_\theta}\right] \\
 B I C\left(n_\theta\right) & =N \ln \left[\sigma_{\text {erro }}^2\left(n_\theta\right)\right]+n_\theta \ln N \\
 A I C c &=A I C+2 n_p * \frac{n_p+1}{N-n_p-1} \\
 LILC &= 2n_{\theta}\ln(\ln(N)) + N \ln(\left[\sigma_{\text {erro }}^2\left(n_\theta\right)\right])
-\end{align}
+\end{aligned}
 \tag{29}
 $$
 
@@ -934,10 +934,10 @@ Due to the limitations of Ordinary Least Squares (OLS)-based algorithms, recent 
 Consider $\mathcal{F}$ as a class of bounded functions $\phi: \mathbf{R} \mapsto \mathbf{R}$. If the properties of $\phi(x)$ satisfy
 
 $$
-\begin{align}
+\begin{aligned}
     &\lim\limits_{x \to \infty} \phi(x) = \alpha \nonumber \\
     &\lim\limits_{x \to -\infty} \phi(x) = \beta \quad \text{with } \alpha > \beta,  \nonumber
-\end{align}
+\end{aligned}
 \tag{32}
 $$
 
@@ -1016,10 +1016,10 @@ In the Gravitational Search Algorithm (GSA) [Rashedi, Esmat, Nezamabadi-Pour, Ho
 Consider a population of agents as described by the following equations. At a specific time $t$, the velocity and position of each agent are updated as follows:
 
 $$
-\begin{align}
+\begin{aligned}
     v_{i,d}^{t+1} &= \kappa_i \times v_{i,d}^t + a_{i,d}^t, \\
     x_{i,d}^{t+1} &= x_{i,d}^t + v_{i,d}^{t+1}.
-\end{align}
+\end{aligned}
 \tag{38}
 $$
 
@@ -1039,19 +1039,19 @@ where $M_{ii}^{t}$ is the inertial mass of agent $i$ and $F_{i,d}^t$ represents 
 The combination of algorithms follows the approach described in [Mirjalili, S. and Hashim, S. Z. M. - A new hybrid PSOGSA algorithm for function optimization](https://ieeexplore.ieee.org/abstract/document/6141614):
 
 $$
-\begin{align}
+\begin{aligned}
     v_{i}^{t+1} = \zeta \times v_i^t + \mathrm{c}'_{1} \times \kappa \times a_i^t + \mathrm{c}'_2 \times \kappa \times (gbest - x_i^t),
-\end{align}
+\end{aligned}
 \tag{40}
 $$
 
 where $\mathrm{c}'_j \in \mathbb{R}$ are acceleration coefficients. This formulation accelerates the exploitation phase by incorporating the best mass location found so far. However, this method may negatively impact the exploration phase. To address this issue, [Mirjalili, S., Mirjalili, S. M., and Lewis, A. - Grey Wolf Optimizer](https://www.sciencedirect.com/science/article/abs/pii/S0965997813001853) proposed adaptive values for $\mathrm{c}'_j$, as described in [Mirjalili, S., Wang, Gai-Ge, and Coelho, L. dos S. - Binary optimization using hybrid particle swarm optimization and gravitational search algorithm](https://dl.acm.org/doi/10.1007/s00521-014-1629-6):
 
 $$
-\begin{align}
+\begin{aligned}
     \mathrm{c}_1' &= -2 \times \frac{t^3}{\max(t)^3} + 2, \\
     \mathrm{c}_2' &= 2 \times \frac{t^3}{\max(t)^3} + 2.
-\end{align}
+\end{aligned}
 \tag{41}
 $$
 
@@ -1088,9 +1088,9 @@ The process of using BPSOGSA for model structure selection involves defining the
 For example, consider a case where all possible regressors are defined with $\ell = 1$ and $n_y = n_u = 2$. The matrix $\Psi$ is:
 
 $$
-\begin{align}
+\begin{aligned}
 [ \text{constant} \quad y(k-1) \quad y(k-2) \quad u(k-1) \quad u(k-2) ]
-\end{align}
+\end{aligned}
 \tag{44}
 $$
 
@@ -1219,7 +1219,7 @@ In this section, six simulation examples are presented to illustrate the effecti
 The simulation models are described as:
 
 $$
-\begin{align}
+\begin{aligned}
     & S_1: \quad y_k = -1.7y_{k-1} - 0.8y_{k-2} + x_{k-1} + 0.81x_{k-2} + e_k, \\
     & \qquad \quad \text{with } x_k \sim \mathcal{U}(-2, 2) \text{ and } e_k \sim \mathcal{N}(0, 0.01^2); \nonumber \\
     & S_2: \quad y_k = 0.8y_{k-1} + 0.4x_{k-1} + 0.4x_{k-1}^2 + 0.4x_{k-1}^3 + e_k, \\
@@ -1236,7 +1236,7 @@ $$
     & \qquad \quad \text{with } x_k \sim \mathcal{U}(-1, 1) \text{ and } e_k \sim \mathcal{N}(0, 0.02^2); \nonumber \\
     & S_6: \quad y_k = 0.75y_{k-2} + 0.25x_{k-2} - 0.2y_{k-2}x_{k-2} + e_k \nonumber \\
     & \qquad \quad \text{with } x_k \sim \mathcal{N}(0, 0.25^2) \text{ and } e_k \sim \mathcal{N}(0, 0.02^2); \nonumber
-\end{align}
+\end{aligned}
 \tag{57}
 $$
 

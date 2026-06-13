@@ -279,9 +279,9 @@ em que $\sum\nolimits_{0}$, $\Theta_{y}^{i}$, $\Theta_{e}^{j}$ e $\Theta_{x}^{m}
 O exemplo a seguir é um modelo ARMAX polinomial:
 
 $$
-\begin{align}
+\begin{aligned}
   y_k =& 0.7213y_{k-1}-0.5692y_{k-2}+0.1139x_{k-1} -0.1691x_{k-1} + 0.2245e_{k-1}
-\end{align}
+\end{aligned}
 \tag{2.7}
 $$
 
@@ -360,9 +360,9 @@ $$
 O exemplo a seguir é um modelo ARX polinomial:
 
 $$
-\begin{align}
+\begin{aligned}
   y_k =& 0.7213y_{k-1}-0.5692y_{k-2}+0.1139x_{k-1} -0.1691x_{k-1}
-\end{align}
+\end{aligned}
 \tag{2.9}
 $$
 
@@ -436,9 +436,9 @@ $$
 O exemplo a seguir é um modelo ARMA polinomial:
 
 $$
-\begin{align}
+\begin{aligned}
   y_k =& 0.7213y_{k-1}-0.5692y_{k-2}+0.1139y_{k-3} -0.1691y_{k-4} + 0.2245e_{k-1}
-\end{align}
+\end{aligned}
 \tag{2.11}
 $$
 
@@ -512,9 +512,9 @@ $$
 O exemplo a seguir é um modelo AR polinomial:
 
 $$
-\begin{align}
+\begin{aligned}
   y_k =& 0.7213y_{k-1}-0.5692y_{k-2}+0.1139y_{k-3} -0.1691y_{k-4}
-\end{align}
+\end{aligned}
 \tag{2.13}
 $$
 
@@ -588,9 +588,9 @@ $$
 O exemplo a seguir é um modelo FIR polinomial:
 
 $$
-\begin{align}
+\begin{aligned}
   y_k =& 0.7213x_{k-1}-0.5692x_{k-2}+0.1139x_{k-3} -0.1691x_{k-4}
-\end{align}
+\end{aligned}
 \tag{2.15}
 $$
 
@@ -709,9 +709,9 @@ em que $n_y\in \mathbb{N}^*$, $n_x \in \mathbb{N}$, $n_e \in \mathbb{N}$ são os
 Você pode notar que a diferença entre as Equações (2.5) e (2.18) está na função que representa o sistema. Para modelos NARMAX, $\mathcal{F}$ pode ser qualquer função não linear, enquanto na Equação (2.5) apenas funções lineares são permitidas. Embora existam muitas possíveis aproximações para $\mathcal{F}(\cdot)$ (por exemplo, redes neurais, fuzzy, wavelet, Radial Basis Function), o modelo NARMAX polinomial em forma de potência é o mais amplamente utilizado ([Billings, S. A.](https://www.wiley.com/en-us/Nonlinear+System+Identification%3A+NARMAX+Methods+in+the+Time%2C+Frequency%2C+and+Spatio-Temporal+Domains-p-9781119943594); [Khandelwal, D. and Schoukens, M. and Toth, R.](https://arxiv.org/abs/2001.05320)):
 
 $$
-\begin{align}
+\begin{aligned}
   y_k = \sum_{i=1}^{p}\Theta_i \times \prod_{j=0}^{n_x}x_{k-j}^{b_i, j}\prod_{l=1}^{n_e}e_{k-l}^{d_i, l}\prod_{m=1}^{n_y}y_{k-m}^{a_i, m}
-\end{align}
+\end{aligned}
 \tag{2.19}
 $$
 
@@ -720,10 +720,10 @@ em que $p$ é o número de regressors, $\Theta_i$ são os parâmetros do modelo 
 A Equação (2.20) descreve um modelo NARMAX polinomial com grau de não linearidade igual a $2$, identificado a partir de dados experimentais de um sistema motor/gerador CC, sem conhecimento prévio da forma do modelo, extraído de [Lacerda Junior, W. R., Almeida, V. M., & Martins, S. A. M. (2017)](https://www.ufsj.edu.br/portal2-repositorio/File/gcom/LAM2017.pdf):
 
 $$
-\begin{align}
+\begin{aligned}
   y_k =& 1.7813y_{k-1}-0.7962y_{k-2}+0.0339x_{k-1} -0.1597x_{k-1} y_{k-1} +0.0338x_{k-2} + \\
   & + 0.1297x_{k-1}y_{k-2} - 0.1396x_{k-2}y_{k-1}+ 0.1086x_{k-2}y_{k-2}+0.0085y_{k-2}^2 + 0.0247e_{k-1}e_{k-2}
-\end{align}
+\end{aligned}
 \tag{2.20}
 $$
 
@@ -763,10 +763,10 @@ $$
 em que
 
 $$
-\begin{align}
+\begin{aligned}
     M = & \sum_{i=1}^{\ell}n_i \\
     n_i = & \frac{n_{i-1}(n_y+n_x+i-1)}{i}, n_{0} = 1.
-\end{align}
+\end{aligned}
 \tag{2.22}
 $$
 
@@ -907,18 +907,18 @@ Devido aos algoritmos de seleção de estrutura desenvolvidos para modelos NARMA
 Se não incluirmos termos de ruído $e_{k-n_e}$ na Equação (2.19), obtemos modelos NARX:
 
 $$
-\begin{align}
+\begin{aligned}
   y_k = \sum_{i=1}^{p}\Theta_i \times \prod_{j=0}^{n_x}x_{k-j}^{b_i, j}\prod_{m=1}^{n_y}y_{k-m}^{a_i, m}
-\end{align}
+\end{aligned}
 \tag{2.23}
 $$
 
 A Equação (2.24) descreve um modelo NARX polinomial simples:
 
 $$
-\begin{align}
+\begin{aligned}
   y_k =& 0.7213y_{k-1}-0.5692y_{k-2}^2+0.1139y_{k-1}x_{k-1}
-\end{align}
+\end{aligned}
 \tag{2.24}
 $$
 
@@ -943,18 +943,18 @@ model = FROLS(
 Se não incluirmos termos de entrada na Equação (2.19), obtemos o modelo NARMA:
 
 $$
-\begin{align}
+\begin{aligned}
   y_k = \sum_{i=1}^{p}\Theta_i \times\prod_{l=1}^{n_e}e_{k-l}^{d_i, l}\prod_{m=1}^{n_y}y_{k-m}^{a_i, m}
-\end{align}
+\end{aligned}
 \tag{2.25}
 $$
 
 O exemplo a seguir é um modelo NARMA polinomial:
 
 $$
-\begin{align}
+\begin{aligned}
   y_k =& 0.7213y_{k-1}-0.5692y_{k-2}^3+0.1139y_{k-3}y_{k-4} + 0.2245e_{k-1}
-\end{align}
+\end{aligned}
 \tag{2.26}
 $$
 
@@ -978,18 +978,18 @@ model = FROLS(
 Se não incluirmos termos de entrada e ruído na Equação (2.19), obtemos o modelo NAR:
 
 $$
-\begin{align}
+\begin{aligned}
   y_k = \sum_{i=1}^{p}\Theta_i \times\prod_{m=1}^{n_y}y_{k-m}^{a_i, m}
-\end{align}
+\end{aligned}
 \tag{2.27}
 $$
 
 O exemplo a seguir é um modelo NAR polinomial:
 
 $$
-\begin{align}
+\begin{aligned}
   y_k =& 0.7213y_{k-1}-0.5692y_{k-2}^2+0.1139y_{k-3}^3 -0.1691y_{k-4}y_{k-5}
-\end{align}
+\end{aligned}
 \tag{2.28}
 $$
 
@@ -1013,18 +1013,18 @@ model = FROLS(
 Se mantivermos apenas os termos de entrada na Equação (2.19), obtemos o modelo NFIR:
 
 $$
-\begin{align}
+\begin{aligned}
   y_k = \sum_{i=1}^{p}\Theta_i \times \prod_{j=0}^{n_x}x_{k-j}^{b_i, j}
-\end{align}
+\end{aligned}
 \tag{2.29}
 $$
 
 O exemplo a seguir é um modelo NFIR polinomial:
 
 $$
-\begin{align}
+\begin{aligned}
   y_k =& 0.7213x_{k-1}-0.5692x_{k-2}^2+0.1139x_{k-3}x_{k-4} -0.1691x_{k-4}^3
-\end{align}
+\end{aligned}
 \tag{2.30}
 $$
 
@@ -1306,17 +1306,17 @@ Você pode usar qualquer outro modelo simplesmente trocando a classe do modelo e
 Para manter as coisas simples, apenas modelos SISO foram apresentados nas seções anteriores. No entanto, modelos NARMAX podem ser estendidos de forma natural para o caso MIMO ([Billings, S. A. and Chen, S. and Korenberg, M. J.](https://www.tandfonline.com/doi/abs/10.1080/00207178908559767)):
 
 $$
-\begin{align}
+\begin{aligned}
  y_{{_i}k}=& F_{{_i}}^\ell \bigl[y_{{_1}k-1},  \dotsc, y_{{_1}k-n^i_{y{_1}}},\dotsc, y_{{_s}k-1},  \dotsc, y_{{_s}k-n^i_{y{_s}}}, x_{{_1}k-d}, \\
  & x_{{_1}k-d-1}, \dotsc, x_{{_1}k-d-n^i_{x{_1}}}, \dotsc, x_{{_r}k-d}, x_{{_r}k-d-1}, \dotsc, x_{{_r}k-d-n^i_{x{_r}}}\bigr] + \xi_{{_i}k},
-\end{align}
+\end{aligned}
 \tag{2.32}
 $$
 
 em que, para $i = 1, \dotsc, s$, cada submodelo linear nos parâmetros pode ter diferentes atrasos máximos. Mais genericamente, considerando
 
 $$
-\begin{align}
+\begin{aligned}
     Y_k = \begin{bmatrix}
     y_{{_1}k} \\
     y_{{_2}k} \\
@@ -1335,7 +1335,7 @@ $$
     \vdots \\
     \xi_{{_r}k}
     \end{bmatrix},
-\end{align}
+\end{aligned}
 \tag{2.33}
 $$
 
@@ -1360,9 +1360,9 @@ $$
 em que
 
 $$
-\begin{align}
+\begin{aligned}
     n_{ij} = \frac{ n_{ij-1} \biggl[ \sum\limits_{k=1}^{s} n^i_{y_k} + \sum\limits_{k=1}^{r} n^i_{x_k} + j - 1 \biggr]}{j}, \qquad n_{i0}=1, j=1, \dotsc, \ell_i.
-\end{align}
+\end{aligned}
 \tag{2.36}
 $$
 
