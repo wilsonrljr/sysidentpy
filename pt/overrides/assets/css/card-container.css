@@ -1,0 +1,121 @@
+/* Card container to use full width */
+.custom-card-container {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+/* Card styling with light/dark theme support */
+.custom-card {
+    background-color: var(--md-default-bg-color);
+    color: var(--md-default-fg-color);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1200px; /* Wider card for full-width effect */
+    text-align: center;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    border: 1px solid var(--md-accent-fg-color);
+}
+
+/* Dark mode adjustments */
+[data-md-color-scheme="slate"] .custom-card {
+    background-color: var(--md-default-bg-color-dark);
+    color: var(--md-default-fg-color-dark);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.custom-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Tab styling with proper visibility for inactive tabs */
+.tab-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-container input[type="radio"] {
+    display: none;
+}
+
+/* Inactive tab text color fix for light theme */
+.tab-container label {
+    padding: 0.5rem 1rem;
+    margin-right: 0.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    background-color: var(--md-default-bg-color);
+    color: var(--md-default-fg-color); /* ✅ Visible text in light theme */
+    border: 1px solid var(--md-accent-fg-color);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+    display: inline-block;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tab-container label:hover {
+    background-color: var(--md-accent-fg-color);
+    color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark mode tab label adjustments with visible text */
+[data-md-color-scheme="slate"] .tab-container label {
+    background-color: var(--md-default-bg-color-dark);
+    color: var(--md-primary-fg-color-dark); /* ✅ Visible text in dark theme */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
+}
+
+[data-md-color-scheme="slate"] .tab-container label:hover {
+    background-color: var(--md-accent-fg-color);
+    color: white;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+/* Active tab highlighting */
+#tab-latest:checked ~ label[for="tab-latest"],
+#tab-neural:checked ~ label[for="tab-neural"],
+#tab-version:checked ~ label[for="tab-version"],
+#tab-git:checked ~ label[for="tab-git"] {
+    background-color: var(--md-accent-fg-color);
+    color: white;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--md-accent-fg-color);
+}
+
+/* Dark mode active tab adjustments */
+[data-md-color-scheme="slate"] #tab-latest:checked ~ label[for="tab-latest"],
+[data-md-color-scheme="slate"] #tab-neural:checked ~ label[for="tab-neural"],
+[data-md-color-scheme="slate"] #tab-version:checked ~ label[for="tab-version"],
+[data-md-color-scheme="slate"] #tab-git:checked ~ label[for="tab-git"] {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+/* Tab content with theme support */
+.tab-content {
+    display: none;
+    padding: 1rem;
+    background-color: var(--md-code-bg-color);
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    text-align: left;
+    border: 1px solid var(--md-accent-fg-color);
+}
+
+/* Dark mode tab content adjustments */
+[data-md-color-scheme="slate"] .tab-content {
+    background-color: var(--md-code-bg-color-dark);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Show selected tab content */
+#tab-latest:checked ~ .tab-content:nth-of-type(1),
+#tab-neural:checked ~ .tab-content:nth-of-type(2),
+#tab-version:checked ~ .tab-content:nth-of-type(3),
+#tab-git:checked ~ .tab-content:nth-of-type(4) {
+    display: block;
+}

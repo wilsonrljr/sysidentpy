@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+<!-- Announcement bar -->
+{% block announce %}
+<a href="https://github.com/sponsors/wilsonrljr">
+  Sponsor <strong>SysIdentPy</strong> on
+  <span class="twemoji github">
+    {% include ".icons/fontawesome/brands/github.svg" %}
+  </span>
+  <strong>Github</strong>
+</a>
+{% endblock %}
+
+<!-- Content -->
+{% block content %}
+{% include "overrides/partials/content.html" %}
+{% endblock %}
