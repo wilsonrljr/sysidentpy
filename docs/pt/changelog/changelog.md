@@ -25,7 +25,7 @@ Esta versão introduz suporte experimental e opt-in ao **padrão Array API**. A 
 
 #### Integração Array API nos Módulos
 
-- **Seleção de Estrutura de Modelo**: FROLS, AOLS, OFRBase, UOFR e a família Orthogonal Floating Search (OSF, OIF, OOS/O2S) suportam despacho Array API nos backends validados descritos acima. `fit()` e a predição 1-step permanecem nativos no backend, enquanto a predição sequencial em backends não NumPy segue o fallback documentado para NumPy/CPU. MetaMSS, Entropic Regression (ER) e RMSS requerem NumPy devido a dependências do SciPy.
+- **Seleção de Estrutura de Modelo**: FROLS, AOLS, OFRBase e a família Orthogonal Floating Search (OSF, OIF, OOS/O2S) suportam despacho Array API nos backends validados descritos acima. `fit()` e a predição 1-step permanecem nativos no backend, enquanto a predição sequencial em backends não NumPy segue o fallback documentado para NumPy/CPU. UOFR, MetaMSS, Entropic Regression (ER) e RMSS requerem NumPy devido a dependências do NumPy/SciPy.
 - **Estimação de Parâmetros**: 18 estimadores suportam o despacho Array API (LeastSquares, RidgeRegression, TotalLeastSquares, RecursiveLeastSquares, AffineLeastMeanSquares e todas as 12 variantes da família LMS). 3 estimadores requerem NumPy (NonNegativeLeastSquares, BoundedVariableLeastSquares, LeastSquaresMinimalResidual).
 - **Funções Base**: `Polynomial`, `Fourier` e `Bilinear` funcionam com despacho Array API. `Bernstein`, `Legendre`, `Hermite`, `Hermite Normalized` e `Laguerre` continuam restritas ao NumPy porque dependem de avaliadores polinomiais do SciPy.
 - **Simulação**: Todo o módulo de simulação suporta despacho Array API.
