@@ -28,7 +28,7 @@ onde $n_x \in \mathbb{N}$ é o lag máximo para a entrada do sistema; $x_k \in \
 Portanto, se você está procurando modelos parcimoniosos e compactos, considere usar modelos NARMAX. No entanto, ao comparar modelos NFIR e NARMAX, é geralmente mais desafiador estabelecer estabilidade, particularmente em um contexto orientado a controle, com modelos NARMAX do que com modelos NFIR.
 
 
-```python
+```bash
 pip install sysidentpy
 ```
 

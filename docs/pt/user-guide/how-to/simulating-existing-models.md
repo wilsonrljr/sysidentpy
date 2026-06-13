@@ -9,7 +9,7 @@ Exemplo criado por Wilson Rocha Lacerda Junior
 > Este livro oferece orientação aprofundada para apoiar seu trabalho com o SysIdentPy.
 
 
-```python
+```bash
 pip install sysidentpy
 ```
 

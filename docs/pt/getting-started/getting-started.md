@@ -63,7 +63,7 @@ SysIdentPy é publicado como um [pacote Python] e pode ser instalado com `pip`, 
 		<input type="radio" id="tab-version" name="tab-group">
 		<label for="tab-version">Versão Específica</label>
 		<div class="tab-content">
-			<pre><code>pip install sysidentpy=="0.5.3"</code></pre>
+			<pre><code>pip install sysidentpy=="{{ sysidentpy_version }}"</code></pre>
 		</div>
 
 		<!-- Versões de Desenvolvimento -->

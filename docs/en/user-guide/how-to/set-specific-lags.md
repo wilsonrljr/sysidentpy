@@ -11,7 +11,7 @@ Example created by Wilson Rocha Lacerda Junior
 Different ways to set the maximum lag for input and output
 
 
-```python
+```bash
 pip install sysidentpy
 ```
 

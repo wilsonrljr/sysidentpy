@@ -35,11 +35,6 @@ class EstimatorError(Exception):
     General purpose exception class, derived from Python's ValueError
     class, programmatically raised in estimators functions when a Estimator-related
     condition would prevent further correct execution of the function.
-
-    Parameters
-    ----------
-    None
-
     """
 
 

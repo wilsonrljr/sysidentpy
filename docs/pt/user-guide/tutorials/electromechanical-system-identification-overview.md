@@ -11,7 +11,7 @@ Exemplo criado por Wilson Rocha Lacerda Junior
 Mais detalhes sobre estes dados podem ser encontrados no seguinte artigo (em português): https://www.researchgate.net/publication/320418710_Identificacao_de_um_motorgerador_CC_por_meio_de_modelos_polinomiais_autorregressivos_e_redes_neurais_artificiais
 
 
-```python
+```bash
 pip install sysidentpy
 ```
 

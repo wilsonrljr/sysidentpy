@@ -16,7 +16,7 @@ Example created by Wilson Rocha Lacerda Junior
 Here we import the NARMAX model, the metric for model evaluation and the methods to generate sample data for tests. Also, we import pandas for specific usage.
 
 
-```python
+```bash
 pip install sysidentpy
 ```
 

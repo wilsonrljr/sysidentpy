@@ -11,7 +11,7 @@ Exemplo criado por Wilson Rocha Lacerda Junior
 Diferentes formas de definir o lag máximo para entrada e saída
 
 
-```python
+```bash
 pip install sysidentpy
 ```
 

@@ -29,7 +29,7 @@ Exemplo criado por Wilson Rocha Lacerda Junior
 > J.P. Noël and M. Schoukens, F-16 aircraft benchmark based on ground vibration test data, 2017 Workshop on Nonlinear System Identification Benchmarks, pp. 19-23, Brussels, Belgium, April 24-26, 2017.
 
 
-```python
+```bash
 pip install sysidentpy
 ```
 

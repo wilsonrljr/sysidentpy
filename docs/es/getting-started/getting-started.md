@@ -63,7 +63,7 @@ SysIdentPy se publica como un [paquete Python] y puede instalarse con `pip`, pre
         <input type="radio" id="tab-version" name="tab-group">
         <label for="tab-version">VersiÃ³n EspecÃ­fica</label>
         <div class="tab-content">
-            <pre><code>pip install sysidentpy=="0.5.3"</code></pre>
+            <pre><code>pip install sysidentpy=="{{ sysidentpy_version }}"</code></pre>
         </div>
 
         <!-- Development Versions -->
@@ -181,3 +181,4 @@ Considera tambiÃ©n apoyar el proyecto haciÃ©ndote sponsor. Tu apoyo ayuda a 
 
 [:octicons-star-fill-24:{ .mdx-heart } &nbsp; SÃ© un <span class="mdx-sponsorship-count" data-mdx-component="sponsorship-count"></span> Patrocinador en GitHub][wilsonrljr's sponsor profile]{ .md-button .md-button--primary .mdx-sponsorship-button }
 
+  [wilsonrljr's sponsor profile]: https://github.com/sponsors/wilsonrljr
