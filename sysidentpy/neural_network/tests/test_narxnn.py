@@ -672,6 +672,7 @@ def test_steps_1_fourier():
         ylag=2,
         xlag=2,
         epochs=1000,
+        learning_rate=0.001,
         basis_function=basis_function,
         random_state=0,
         optim_params={

@@ -271,7 +271,7 @@ def test_concat_moves_inputs_to_reference_device():
 
 
 @pytest.mark.parametrize(
-    "helper, arrays_np, expected",
+    ("helper", "arrays_np", "expected"),
     [
         (
             _column_stack,
@@ -318,7 +318,7 @@ def test_nanargmin_ignores_nan_values_for_array_api_inputs():
 
 
 @pytest.mark.parametrize(
-    "values_np, axis",
+    ("values_np", "axis"),
     [
         (np.array([[1.0, 5.0, 3.0], [2.0, 4.0, 6.0], [7.0, 8.0, 9.0]]), 0),
         (np.array([[1.0, 5.0, 3.0], [2.0, 4.0, 6.0]]), 0),
