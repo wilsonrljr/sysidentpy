@@ -25,7 +25,7 @@ $$
 onde $z$ é a saída do modelo histerético, $x$ a entrada e $g[\cdot]$ uma função não linear de $x$, $z$ e $sign (dx/dt)$. ([Spencer, B. F. and Sain, M. K. - Controlling buildings: a new frontier in feedback](https://ieeexplore.ieee.org/document/642972)) propuseram o seguinte modelo fenomenológico para o dispositivo mencionado:
 
 $$
-\begin{align}
+\begin{aligned}
 f&= c_1\dot{\rho}+k_1(x-x_0),\nonumber\\
 \dot{\rho}&=\dfrac{1}{c_0+c_1}[\alpha z+c_0\dot{x}+k_0(x-\rho)],\nonumber\\
 \dot{z}&=-\gamma|\dot{x}-\dot{\rho}|z|z|^{n-1}-\beta(\dot{x}-\dot{\rho})|z|^n+A(\dot{x}-\dot{\rho}),\nonumber\\
@@ -33,7 +33,7 @@ f&= c_1\dot{\rho}+k_1(x-x_0),\nonumber\\
 c_1&=c_{1a}+c_{1b}u_{bw},\nonumber\\
 c_0&=c_{0a}+c_{0b}u_{bw},\nonumber\\
 \dot{u}_{bw}&=-\eta(u_{bw}-E).
-\end{align}
+\end{aligned}
 $$
 
 onde $f$ é a força de amortecimento, $c_1$ e $c_0$ representam os coeficientes viscosos, $E$ é a tensão de entrada, $x$ é o deslocamento e $\dot{x}$ é a velocidade do modelo. Os parâmetros do sistema (veja a tabela abaixo) foram retirados de [Leva, A. and Piroddi, L. - NARX-based technique for the modelling of magneto-rheological damping devices](https://iopscience.iop.org/article/10.1088/0964-1726/11/1/309).

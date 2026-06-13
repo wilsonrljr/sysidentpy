@@ -35,11 +35,11 @@ $$
 A relação sinal-ruído é suficientemente alta para modelar o sistema sem considerar o ruído de medição. No entanto, o ruído de medição pode ser incluído substituindo $y(t)$ pela variável artificial $x(t)$ na equação acima, e introduzindo perturbações $w(t)$ e $e(t)$ da seguinte forma:
 
 $$
-\begin{align}
+\begin{aligned}
 & m \frac{d^2 x(t)}{dt^2} + d \frac{d x(t)}{dt} + k(x(t)) x(t) = u(t) + w(t), \\
 & k(x(t)) = a + b x^2(t), \\
 & y(t) = x(t) + e(t).
-\end{align}
+\end{aligned}
 $$
 
 ### Pacotes Necessários e Versões

@@ -73,9 +73,9 @@ onde $\mathcal{H}_t(\omega)^{+} \neq \mathcal{H}_t(\omega)^{-}$, $\forall t \neq
 > Rate Independent Hysteresis (RIH) ([Visintin, A., "Differential Models of Hysteresis"](https://link.springer.com/book/10.1007/978-3-662-11557-2)) - O comportamento de histerese é chamado de *rate independent* se o caminho $ABCD$, que depende do par $x(t), y(t)$, é invariante em relação a qualquer difeomorfismo crescente $\varphi : [0,T] \rightarrow [0,T]$, ou seja:
 
 $$
-\begin{align}
+\begin{aligned}
         F(u \ o \ \varphi, y^{0}) = F(u,y^0)\ o \ \varphi & \ em \ [0,T].
-\end{align}
+\end{aligned}
 \tag{4}
 $$
 

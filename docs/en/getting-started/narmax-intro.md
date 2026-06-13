@@ -78,24 +78,24 @@ The remainder of this post contemplates methods related to the power-form polyno
 
 The polynomial NARMAX model with asymptotically stable equilibrium points can be described as:
 
-\begin{align}
+\begin{aligned}
     y_k =& \sum_{0} + \sum_{i=1}^{p}\Theta_{y}^{i}y_{k-i} + \sum_{j=1}^{q}\Theta_{e}^{j}e_{k-j} + \sum_{m=1}^{r}\Theta_{x}^{m}x_{k-m}\\
     &+ \sum_{i=1}^{p}\sum_{j=1}^{q}\Theta_{ye}^{ij}y_{k-i} e_{k-j} + \sum_{i=1}^{p}\sum_{m=1}^{r}\Theta_{yx}^{im}y_{k-i} x_{k-m} \\
     &+ \sum_{j=1}^{q}\sum_{m=1}^{r}\Theta_{e x}^{jm}e_{k-j} x_{k-m} \\
     &+ \sum_{i=1}^{p}\sum_{j=1}^{q}\sum_{m=1}^{r}\Theta_{y e x}^{ijm}y_{k-i} e_{k-j} x_{k-m} \\
     &+ \sum_{m_1=1}^{r} \sum_{m_2=m_1}^{r}\Theta_{x^2}^{m_1 m_2} x_{k-m_1} x_{k-m_2} \dotsc \\
     &+ \sum_{m_1=1}^{r} \dotsc \sum_{m_l=m_{l-1}}^{r} \Theta_{x^l}^{m_1, \dotsc, m_2} x_{k-m_1} x_{k-m_l}
-\end{align}
+\end{aligned}
 
 where $\sum\nolimits_{0}$, $c_{y}^{i}$, $c_{e}^{j}$, $c_{x}^{m}$, $c_{y\e}^{ij}$, $c_{yx}^{im}$, $c_{e x}^{jm}$, $c_{y e x}^{ijm}$, $c_{x^2}^{m_1 m_2} \dotsc c_{x^l}^{m_1, \dotsc, ml}$ are constant parameters.
 
 <br>
 Let's take a look at an example of a NARMAX model for an easy understanding. The following is a NARMAX model of degree~$2$, identified from experimental data of a DC motor/generator with no prior knowledge of the model form. If you want more information about the identification process, I wrote a paper comparing a polynomial NARMAX with a neural NARX model using that data (IN PORTUGUESE: Identificação de um motor/gerador CC por meio de modelos polinomiais autorregressivos e redes neurais artificiais)
 
-\begin{align}
+\begin{aligned}
     y_k =& 1.7813y_{k-1}-0,7962y_{k-2}+0,0339x_{k-1} -0,1597x_{k-1} y_{k-1} +0,0338x_{k-2} \\
     & + 0,1297x_{k-1}y_{k-2} - 0,1396x_{k-2}y_{k-1}+ 0,1086x_{k-2}y_{k-2}+0,0085y_{k-2}^2 + 0.1938e_{k-1}e_{k-2}
-\end{align}
+\end{aligned}
 
 But how those terms were selected? How the parameters were estimated? These questions will lead us to model structure selection and parameter estimation topics, but, for now,  let us discuss about those topics in a more simple manner.
 
@@ -108,10 +108,10 @@ In this respect, consider the case where we have the input and output data of so
 <br>
 So we have one input and one output (disregard the noise terms for now). What if we choose the $n_y = n_x = \ell = 2$? With these values, we have the following possibilities for compose the final model:
 
-\begin{align}
+\begin{aligned}
     & constant, y_{k-1}, y_{k-2}, y_{k-1}^2, y_{k-2}^2, x_{k-1}, x_{k-2}, x_{k-1}^2, x_{k-2}^2,y_{k-1}y_{k-2},\\
     & y_{k-1}x_{k-1}, y_{k-1}x_{k-2}, y_{k-2}x_{k-1}, y_{k-2}x_{k-2}, x_{k-1}x_{k-2} .
-\end{align}
+\end{aligned}
 
 So we have $15$ candidate terms to compose the final model.
 

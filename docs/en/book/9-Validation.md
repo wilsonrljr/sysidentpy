@@ -149,14 +149,14 @@ The RRSE (or any other metric) shows that validations test might be performed ca
 Statistical tests for SISO models based on the correlation functions were proposed in ([Billings, S. A. and Voon, W. S. F., "A prediction-error and stepwise-regression estimation algorithm for non-linear systems"](https://www.tandfonline.com/doi/abs/10.1080/00207178608933633)), ([Model validity tests for non-linear signal processing applications](https://www.tandfonline.com/doi/abs/10.1080/00207179108934155)). The tests are:
 
 $$
-\begin{align}
+\begin{aligned}
     \phi_{_{\xi \xi}\tau} &= E\{\xi_k \xi_{k-\tau}\} = \delta_{\tau}, \\
     \phi_{_{\xi x}\tau} &= E\{\xi_k x_{k-\tau}\} = 0 \forall \tau, \\
     \phi_{_{\xi \xi x}\tau} &= E\{\xi_k \xi_{k-\tau} x_{k-\tau}\} = 0 \forall \tau, \\
     \phi_{_{x^2 \xi}\tau} &= E\{(u^2_k - E\{x^2_k\})\xi_{k-\tau}\} = 0 \forall \tau, \\
     \phi_{_{x^2 \xi^2}\tau} &= E\{(u^2_k - E\{x^2_k\})\xi^2_{k-\tau}\} = 0 \forall \tau, \\
     \phi_{_{(y\xi) x^2}\tau} &= E\{(y_k\xi_k - E\{y_k\xi_k\})(x^2_{k-\tau} - E\{x^2_k\})\} = 0 \forall \tau,
-\end{align}
+\end{aligned}
 \tag{2}
 $$
 

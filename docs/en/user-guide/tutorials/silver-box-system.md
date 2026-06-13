@@ -35,11 +35,11 @@ $$
 The signal-to-noise ratio is sufficiently high to model the system without accounting for measurement noise. However, measurement noise can be included by replacing $y(t)$ with the artificial variable $x(t)$ in the equation above, and introducing disturbances $w(t)$ and $e(t)$ as follows:
 
 $$
-\begin{align}
+\begin{aligned}
 & m \frac{d^2 x(t)}{dt^2} + d \frac{d x(t)}{dt} + k(x(t)) x(t) = u(t) + w(t), \\
 & k(x(t)) = a + b x^2(t), \\
 & y(t) = x(t) + e(t).
-\end{align}
+\end{aligned}
 $$
 
 ### Required Packages and Versions

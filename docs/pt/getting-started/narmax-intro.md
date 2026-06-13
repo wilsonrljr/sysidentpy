@@ -78,24 +78,24 @@ O restante deste texto contempla métodos relacionados aos modelos polinomiais n
 
 O modelo NARMAX polinomial com pontos de equilíbrio assintoticamente estáveis pode ser descrito como:
 
-\begin{align}
+\begin{aligned}
     y_k =& \sum_{0} + \sum_{i=1}^{p}\Theta_{y}^{i}y_{k-i} + \sum_{j=1}^{q}\Theta_{e}^{j}e_{k-j} + \sum_{m=1}^{r}\Theta_{x}^{m}x_{k-m}\\
     &+ \sum_{i=1}^{p}\sum_{j=1}^{q}\Theta_{ye}^{ij}y_{k-i} e_{k-j} + \sum_{i=1}^{p}\sum_{m=1}^{r}\Theta_{yx}^{im}y_{k-i} x_{k-m} \\
     &+ \sum_{j=1}^{q}\sum_{m=1}^{r}\Theta_{e x}^{jm}e_{k-j} x_{k-m} \\
     &+ \sum_{i=1}^{p}\sum_{j=1}^{q}\sum_{m=1}^{r}\Theta_{y e x}^{ijm}y_{k-i} e_{k-j} x_{k-m} \\
     &+ \sum_{m_1=1}^{r} \sum_{m_2=m_1}^{r}\Theta_{x^2}^{m_1 m_2} x_{k-m_1} x_{k-m_2} \dotsc \\
     &+ \sum_{m_1=1}^{r} \dotsc \sum_{m_l=m_{l-1}}^{r} \Theta_{x^l}^{m_1, \dotsc, m_2} x_{k-m_1} x_{k-m_l}
-\end{align}
+\end{aligned}
 
 onde $\sum\nolimits_{0}$, $c_{y}^{i}$, $c_{e}^{j}$, $c_{x}^{m}$, $c_{y\e}^{ij}$, $c_{yx}^{im}$, $c_{e x}^{jm}$, $c_{y e x}^{ijm}$, $c_{x^2}^{m_1 m_2} \dotsc c_{x^l}^{m_1, \dotsc, ml}$ são parâmetros constantes.
 
 <br>
 Vamos dar uma olhada em um exemplo de modelo NARMAX para facilitar o entendimento. O seguinte é um modelo NARMAX de grau~$2$, identificado a partir de dados experimentais de um motor/gerador CC sem conhecimento prévio da forma do modelo. Se você quiser mais informações sobre o processo de identificação, escrevi um artigo comparando um NARMAX polinomial com um modelo NARX neural usando esses dados (EM PORTUGUÊS: Identificação de um motor/gerador CC por meio de modelos polinomiais autorregressivos e redes neurais artificiais)
 
-\begin{align}
+\begin{aligned}
     y_k =& 1.7813y_{k-1}-0,7962y_{k-2}+0,0339x_{k-1} -0,1597x_{k-1} y_{k-1} +0,0338x_{k-2} \\
     & + 0,1297x_{k-1}y_{k-2} - 0,1396x_{k-2}y_{k-1}+ 0,1086x_{k-2}y_{k-2}+0,0085y_{k-2}^2 + 0.1938e_{k-1}e_{k-2}
-\end{align}
+\end{aligned}
 
 Mas como esses termos foram selecionados? Como os parâmetros foram estimados? Essas perguntas nos levarão aos tópicos de seleção de estrutura do modelo e estimação de parâmetros, mas, por enquanto, vamos discutir esses tópicos de maneira mais simples.
 
@@ -108,10 +108,10 @@ Nesse sentido, considere o caso onde temos os dados de entrada e saída de algum
 <br>
 Então temos uma entrada e uma saída (desconsidere os termos de ruído por enquanto). E se escolhermos $n_y = n_x = \ell = 2$? Com esses valores, temos as seguintes possibilidades para compor o modelo final:
 
-\begin{align}
+\begin{aligned}
     & constant, y_{k-1}, y_{k-2}, y_{k-1}^2, y_{k-2}^2, x_{k-1}, x_{k-2}, x_{k-1}^2, x_{k-2}^2,y_{k-1}y_{k-2},\\
     & y_{k-1}x_{k-1}, y_{k-1}x_{k-2}, y_{k-2}x_{k-1}, y_{k-2}x_{k-2}, x_{k-1}x_{k-2} .
-\end{align}
+\end{aligned}
 
 Então temos $15$ termos candidatos para compor o modelo final.
 
