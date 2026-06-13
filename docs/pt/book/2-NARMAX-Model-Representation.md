@@ -1307,8 +1307,8 @@ Para manter as coisas simples, apenas modelos SISO foram apresentados nas seçõ
 
 $$
 \begin{align}
-\t y_{{_i}k}=& F_{{_i}}^\ell \bigl[y_{{_1}k-1},  \dotsc, y_{{_1}k-n^i_{y{_1}}},\dotsc, y_{{_s}k-1},  \dotsc, y_{{_s}k-n^i_{y{_s}}}, x_{{_1}k-d}, \\
-\t & x_{{_1}k-d-1}, \dotsc, x_{{_1}k-d-n^i_{x{_1}}}, \dotsc, x_{{_r}k-d}, x_{{_r}k-d-1}, \dotsc, x_{{_r}k-d-n^i_{x{_r}}}\bigr] + \xi_{{_i}k},
+ y_{{_i}k}=& F_{{_i}}^\ell \bigl[y_{{_1}k-1},  \dotsc, y_{{_1}k-n^i_{y{_1}}},\dotsc, y_{{_s}k-1},  \dotsc, y_{{_s}k-n^i_{y{_s}}}, x_{{_1}k-d}, \\
+ & x_{{_1}k-d-1}, \dotsc, x_{{_1}k-d-n^i_{x{_1}}}, \dotsc, x_{{_r}k-d}, x_{{_r}k-d-1}, \dotsc, x_{{_r}k-d-n^i_{x{_r}}}\bigr] + \xi_{{_i}k},
 \end{align}
 \tag{2.32}
 $$

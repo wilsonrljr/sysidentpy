@@ -228,7 +228,7 @@ array([[ 0, 0],
 
 O regressors é como o SysIdentPy codifica a função base polinomial seguindo este padrão de codificação:
 
-- $0$ é o termo constante,\n",
+- $0$ é o termo constante,
 - $[1001] = y_{k-1}$
 - $[100n] = y_{k-n}$
 - $[200n] = x1_{k-n}$

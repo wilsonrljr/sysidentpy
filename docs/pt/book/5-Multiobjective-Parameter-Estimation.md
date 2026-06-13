@@ -14,7 +14,7 @@ $$
 \begin{equation}
 	\mathrm{J}(\hat{\Theta}) = [J_1(\hat{\Theta}), J_2(\hat{\Theta}), \cdots, J_m(\hat{\Theta})]^\top,
 \end{equation}
-	ag{5.1}
+\tag{5.1}
 $$
 
 em que $\mathrm{J}(\cdot):\mathbb{R}^n \mapsto \mathbb{R}^m$, um problema geral de otimização multiobjetivo pode ser escrito como ([A. Baykasoglu, S. Owen, e N. Gindy](https://www.tandfonline.com/doi/abs/10.1080/03052159908941394))
@@ -27,7 +27,7 @@ $$
 		 & & & i = 1, \ldots, m, \quad j = 1, \ldots, n
 	\end{aligned}
 \end{equation}
-	ag{5.2}
+\tag{5.2}
 $$
 
 em que $\Theta$ é um vetor $n$-dimensional de variáveis de decisão, $\mathrm{S}$ é o conjunto de soluções factíveis limitado por $m$ restrições de desigualdade ($g_i$) e $n$ restrições de igualdade ($h_j$), e $a_i$ e $b_j$ são constantes. Para variáveis contínuas, $A = \mathbb{R}$, enquanto $A$ contém o conjunto de valores permitidos para variáveis discretas.
@@ -53,7 +53,7 @@ $$
 \begin{equation}
 	\mathrm{W} = \Bigg\{ w\mid w \in \mathbb{R}^m, w_j\geq 0 \quad \textrm{and} \quad \sum^{m}_{j=1}w_j=1 \Bigg\}
 \end{equation}
-	ag{5.3}
+\tag{5.3}
 $$
 
 como pesos não negativos. Então, o problema de otimização convexo pode ser escrito como
@@ -61,7 +61,7 @@ como pesos não negativos. Então, o problema de otimização convexo pode ser e
 $$
 \begin{equation} \begin{aligned} \Theta^* &= \underset{\Theta}{\text{argmin}} \, \langle w, \mathrm{J}(\Theta) \rangle \end{aligned}
 \end{equation}
-	ag{5.4}
+\tag{5.4}
 $$
 
 em que $w$ é uma combinação de pesos para as diferentes funções objetivo. Portanto, o conjunto de Pareto está associado ao conjunto de realizações de $w \in \mathrm{W}$. Uma estratégia computacional eficiente em passo único foi apresentada em ([Nepomuceno, E. G., Takahashi, R. H. C., and Aguirre, L. A., "Multiobjective parameter estimation for non-linear systems: affine information and least-squares formulation"](https://www.tandfonline.com/doi/abs/10.1080/00207170601185053)) para resolver a Equação 5.4 por meio de uma formulação em *Least Squares*, apresentada na próxima seção.
@@ -72,7 +72,7 @@ Considere os $m$ pares de informação afim $[\mathrm{v}_i \in \mathbb{R}^{p_i},
 
 $$
 y = \Psi\Theta + \epsilon.
-	ag{5.5}
+\tag{5.5}
 $$
 
 Então, os $m$ pares de informação afim podem ser considerados na estimação de parâmetros resolvendo
@@ -83,7 +83,7 @@ $$
 \Theta^* &= \underset{\Theta}{\text{argmin}} \sum_{i=1}^{m} w_i (\mathrm{v}_i - \mathrm{G}_i \Theta)^\top (\mathrm{v}_i - \mathrm{G}_i \Theta)
 \end{aligned}
 \end{equation}
-	ag{5.6}
+\tag{5.6}
 $$
 
 com $w = [w_i, \ldots, w_m]^\top \in \mathrm{W}$. A solução da equação acima é dada por
@@ -92,7 +92,7 @@ $$
 \begin{equation}
 	\Theta^* = \left[\sum^{m}_{i=1}w_i\mathrm{G}_i^\top\mathrm{G}_i\right]^{-1}  \left[\sum^{m}_{i=1}w_i\mathrm{G}_i^\top\mathrm{v}_i\right].
 \end{equation}
-	ag{5.7}
+\tag{5.7}
 $$
 
 Se existir apenas uma informação, o problema se reduz à solução monoobjetivo de *Least Squares*.
@@ -514,7 +514,7 @@ $$
 Assim, o objetivo ao usar as informações da função estática e do ganho estático no cenário multiobjetivo é estimar o vetor $\hat{\theta}$ com base em:
 
 $$
-		heta = [w_1\Psi^T\Psi + w_2(HR)^T(HR) + w_3(QR)(QR)^T]^{-1} [w_1\Psi^T y + w_2(HR)^T\overline{g}+w_3(QR)^T\overline{y}]
+\theta = [w_1\Psi^T\Psi + w_2(HR)^T(HR) + w_3(QR)(QR)^T]^{-1} [w_1\Psi^T y + w_2(HR)^T\overline{g}+w_3(QR)^T\overline{y}]
 $$
 
 A matriz $\Psi$ é construída usando a abordagem usual de modelagem dinâmica mono-objetivo no SysIdentPy. No entanto, ainda é necessário encontrar as matrizes Q, H e R. O AILS possui métodos para calcular todas essas matrizes. Basicamente, para isso, $q_i^T$ é primeiro estimado:$$
@@ -1265,5 +1265,4 @@ Matriz H+R:
 ```python
 bi_objective_gain.build_static_gain_information(Uo, Yo, gain)[1]
 ```
-
 
