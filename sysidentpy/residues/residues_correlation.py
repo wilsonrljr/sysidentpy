@@ -9,9 +9,9 @@ import numpy as np
 
 from sysidentpy._lib._array_api import (
     get_namespace,
+    device,
+    _asarray,
     _is_numpy_namespace,
-    _copy,
-    _vstack,
     _to_numpy,
 )
 
@@ -90,7 +90,7 @@ def get_unnormalized_e_acf(e):
     # Convert to numpy, compute, convert back.
     e_np = _to_numpy(e)
     result_np = np.correlate(e_np, e_np, mode="full")
-    return xp.asarray(result_np)
+    return _asarray(result_np, xp=xp, target_device=device(e))
 
 
 def compute_cross_correlation(y, yhat, arr):
@@ -115,7 +115,7 @@ def compute_cross_correlation(y, yhat, arr):
         Lower bound for the confidence interval.
     """
     e = calculate_residues(y, yhat)
-    n = len(e) * 2 - 1
+    n = e.shape[0] * 2 - 1
     ccf, upper_bound, lower_bound = _input_ccf(e, arr, n)
     return ccf, upper_bound, lower_bound
 

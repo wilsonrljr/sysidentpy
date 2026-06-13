@@ -1,6 +1,9 @@
 import numpy as np
-from numpy.testing import assert_almost_equal, assert_equal
+import pytest
+from numpy.testing import assert_allclose, assert_almost_equal, assert_equal
 
+from sysidentpy import config_context
+from sysidentpy._lib._array_api import _to_numpy
 from sysidentpy.residues.residues_correlation import (
     _input_ccf,
     _normalized_correlation,
@@ -58,3 +61,35 @@ def test_normalized_correlation():
     c = np.array([10, 22, 11, 9])
     ccf = _normalized_correlation(c, e)
     assert_almost_equal(ccf, np.array([0.74161985, -0.70466426]), decimal=7)
+
+
+def test_compute_cross_correlation_accepts_array_api_strict():
+    xp = pytest.importorskip("array_api_strict")
+    y = np.array([1.0, 3.0, 2.0, 4.0])
+    yhat = np.array([1.0, 2.0, 3.0, 4.0])
+    arr = np.array([10.0, 22.0, 11.0, 9.0])
+
+    with config_context(array_api_dispatch=True):
+        ccf, upper, lower = compute_cross_correlation(
+            xp.asarray(y), xp.asarray(yhat), xp.asarray(arr)
+        )
+
+    assert_allclose(_to_numpy(ccf), np.array([0.74161985, -0.70466426]), rtol=1e-7)
+    assert_almost_equal(upper, 0.7408103670980853, decimal=7)
+    assert_almost_equal(lower, -0.7408103670980853, decimal=7)
+
+
+def test_residues_autocorrelation_preserves_array_api_namespace():
+    xp = pytest.importorskip("array_api_strict")
+    y = np.array([1.0, 3.0, 2.0, 4.0])
+    yhat = np.array([1.0, 2.0, 3.0, 4.0])
+
+    with config_context(array_api_dispatch=True):
+        e_acf, upper, lower = compute_residues_autocorrelation(
+            xp.asarray(y), xp.asarray(yhat)
+        )
+
+    assert hasattr(e_acf, "__array_namespace__")
+    assert_allclose(_to_numpy(e_acf), np.array([1.0, -0.5, 0.0, 0.0]))
+    assert_almost_equal(upper, 0.7408103670980853, decimal=7)
+    assert_almost_equal(lower, -0.7408103670980853, decimal=7)

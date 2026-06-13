@@ -1,9 +1,11 @@
+import warnings
+
 import numpy as np
 import pytest
 
 from sysidentpy import config_context
-from sysidentpy.utils.check_arrays import check_random_state, check_dimension
-from sysidentpy.utils.check_arrays import check_infinity, check_nan
+from sysidentpy.utils.check_arrays import check_dimension, check_linear_dependence_rows
+from sysidentpy.utils.check_arrays import check_infinity, check_nan, check_random_state
 
 
 def test_check_random_state_invalid_seed():
@@ -62,3 +64,34 @@ def test_check_nan_accepts_array_api_inputs():
     with config_context(array_api_dispatch=True):
         with pytest.raises(ValueError, match=r"index \[\[1 0\]\]"):
             check_nan(x, y)
+
+
+def test_check_linear_dependence_rows_accepts_array_api_full_rank():
+    """Array API inputs should use the backend SVD path for full-rank matrices."""
+    xp = pytest.importorskip("array_api_strict")
+    psi = xp.asarray(np.eye(3, dtype=float))
+
+    with config_context(array_api_dispatch=True):
+        with warnings.catch_warnings(record=True) as recorded:
+            warnings.simplefilter("always")
+            check_linear_dependence_rows(psi)
+
+    assert recorded == []
+
+
+def test_check_linear_dependence_rows_warns_for_array_api_rank_deficient_matrix():
+    """Array API inputs should preserve rank-deficiency warnings."""
+    xp = pytest.importorskip("array_api_strict")
+    psi = xp.asarray(
+        np.array(
+            [
+                [1.0, 2.0, 3.0],
+                [2.0, 4.0, 6.0],
+                [1.0, 0.0, 1.0],
+            ]
+        )
+    )
+
+    with config_context(array_api_dispatch=True):
+        with pytest.warns(UserWarning, match="linearly dependent rows"):
+            check_linear_dependence_rows(psi)

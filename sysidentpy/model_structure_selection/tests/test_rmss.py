@@ -1,12 +1,12 @@
 import numpy as np
 import pytest
 
+from sysidentpy import config_context
+from sysidentpy.basis_function import Polynomial
 from sysidentpy.model_structure_selection import (
     robust_model_structure_selection as rmss_module,
 )
-
 from sysidentpy.model_structure_selection import RMSS
-from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation.estimators import LeastSquares
 from sysidentpy.tests.test_narmax_base import create_test_data
 
@@ -58,6 +58,22 @@ def test_rmss_predict_shape():
     model.fit(X=X_train, y=y_train)
     yhat = model.predict(X=X_test, y=y_test)
     assert yhat.shape == y_test.shape
+
+
+def test_rmss_rejects_array_api_dispatch_with_clear_error():
+    xp = pytest.importorskip("array_api_strict")
+    model = RMSS(
+        n_terms=2,
+        order_selection=False,
+        ylag=1,
+        xlag=1,
+        estimator=LeastSquares(),
+        basis_function=Polynomial(degree=1),
+    )
+
+    with config_context(array_api_dispatch=True):
+        with pytest.raises(NotImplementedError, match=r"RMSS.*requires NumPy"):
+            model.fit(X=xp.asarray(X_train[:10]), y=xp.asarray(y_train[:10]))
 
 
 def test_rmss_average_theta_warns():

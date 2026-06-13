@@ -3,8 +3,10 @@ import numpy as np
 import pytest
 from numpy.testing import assert_almost_equal, assert_equal
 from numpy.testing import assert_raises
+
+from sysidentpy import config_context
+from sysidentpy.basis_function import Fourier, Polynomial
 from sysidentpy.model_structure_selection import ER
-from sysidentpy.basis_function import Polynomial, Fourier
 from sysidentpy.parameter_estimation.estimators import LeastSquares
 from sysidentpy.tests.test_narmax_base import create_test_data
 
@@ -106,6 +108,21 @@ def test_model_prediction():
     )
     model.fit(X=X_train, y=y_train)
     assert_raises(Exception, model.predict, X=X_test, y=y_test[:1])
+
+
+def test_er_rejects_array_api_dispatch_with_clear_error():
+    xp = pytest.importorskip("array_api_strict")
+    model = ER(
+        ylag=1,
+        xlag=1,
+        n_perm=1,
+        random_state=0,
+        basis_function=Polynomial(degree=1),
+    )
+
+    with config_context(array_api_dispatch=True):
+        with pytest.raises(NotImplementedError, match=r"ER.*requires NumPy"):
+            model.fit(X=xp.asarray(X_train[:10]), y=xp.asarray(y_train[:10]))
 
 
 def test_fit_requires_y_argument():

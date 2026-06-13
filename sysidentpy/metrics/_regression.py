@@ -23,6 +23,20 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 
+def _safe_variance_score(xp, numerator, denominator):
+    """Return variance-style scores without boolean indexing."""
+    nonzero_numerator = numerator != 0
+    nonzero_denominator = denominator != 0
+    valid_score = nonzero_numerator & nonzero_denominator
+
+    one = xp.ones_like(denominator)
+    zero = xp.zeros_like(denominator)
+    denominator_safe = xp.where(nonzero_denominator, denominator, one)
+    output_scores = one - numerator / denominator_safe
+    output_scores = xp.where(valid_score, output_scores, one)
+    return xp.where(nonzero_numerator & ~nonzero_denominator, zero, output_scores)
+
+
 __ALL__ = [
     "forecast_error",
     "mean_forecast_error",
@@ -362,13 +376,7 @@ def explained_variance_score(y: NDArray, yhat: NDArray) -> NDArray:
     numerator = xp.mean((y - yhat - y_diff_avg) ** 2)
     y_avg = xp.mean(y)
     denominator = xp.mean((y - y_avg) ** 2)
-    nonzero_numerator = numerator != 0
-    nonzero_denominator = denominator != 0
-    valid_score = nonzero_numerator & nonzero_denominator
-    output_scores = xp.ones(y.shape[0], dtype=y.dtype)
-    output_scores[valid_score] = 1 - (numerator[valid_score] / denominator[valid_score])
-    output_scores[nonzero_numerator & ~nonzero_denominator] = 0.0
-    return float(xp.mean(output_scores))
+    return float(_safe_variance_score(xp, numerator, denominator))
 
 
 def r2_score(y: NDArray, yhat: NDArray) -> NDArray:
@@ -412,12 +420,7 @@ def r2_score(y: NDArray, yhat: NDArray) -> NDArray:
     else:
         numerator = xp.sum((y - yhat) ** 2, axis=0)
         denominator = xp.sum((y - xp.mean(y, axis=0)) ** 2, axis=0)
-    nonzero_denominator = denominator != 0
-    nonzero_numerator = numerator != 0
-    valid_score = nonzero_denominator & nonzero_numerator
-    output_scores = xp.ones(y.shape[1], dtype=y.dtype)
-    output_scores[valid_score] = 1 - (numerator[valid_score] / denominator[valid_score])
-    output_scores[nonzero_numerator & ~nonzero_denominator] = 0.0
+    output_scores = _safe_variance_score(xp, numerator, denominator)
     return float(xp.mean(output_scores))
 
 

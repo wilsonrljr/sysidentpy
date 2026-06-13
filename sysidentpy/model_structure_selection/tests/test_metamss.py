@@ -1,11 +1,14 @@
 import numpy as np
+import pytest
 from numpy.testing import assert_almost_equal, assert_array_equal
 from numpy.testing import assert_raises
-from sysidentpy.model_structure_selection import MetaMSS
+
+from sysidentpy import config_context
 from sysidentpy.basis_function import Polynomial
-from sysidentpy.utils.generate_data import get_siso_data
+from sysidentpy.model_structure_selection import MetaMSS
 from sysidentpy.parameter_estimation.estimators import LeastSquares
 from sysidentpy.tests.test_narmax_base import create_test_data
+from sysidentpy.utils.generate_data import get_siso_data
 
 x, y, _ = create_test_data()
 train_percentage = 90
@@ -136,3 +139,19 @@ def test_model_prediction():
     )
     model.fit(X=X_train, y=y_train)
     assert_raises(Exception, model.predict, X=X_test, y=y_test[:1])
+
+
+def test_metamss_rejects_array_api_dispatch_with_clear_error():
+    xp = pytest.importorskip("array_api_strict")
+    model = MetaMSS(
+        ylag=1,
+        xlag=1,
+        maxiter=1,
+        n_agents=2,
+        basis_function=Polynomial(degree=1),
+        random_state=0,
+    )
+
+    with config_context(array_api_dispatch=True):
+        with pytest.raises(NotImplementedError, match=r"MetaMSS.*requires NumPy"):
+            model.fit(X=xp.asarray(X_train[:10]), y=xp.asarray(y_train[:10]))

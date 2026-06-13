@@ -371,7 +371,7 @@ with config_context(array_api_dispatch=True):
 | FROLS | ✅ | Full support for all backends |
 | AOLS | ✅ | Full support for all backends |
 | OFRBase | ✅ | Base class for ERR-based algorithms |
-| UOFR | ✅ | Full support for all backends |
+| UOFR | ❌ | Requires NumPy (Sobolev modulation uses NumPy convolution/Householder path) |
 | OSF | ✅ | Orthogonal Sequential Floating Forward |
 | OIF | ✅ | Orthogonal Insertion-removal Floating |
 | OOS / O2S | ✅ | Orthogonal Oscillating Search |
@@ -515,13 +515,14 @@ For the standard `float64` case, the cross-backend differences are comparable to
 
 ## Limitations and Known Constraints
 
-### SciPy-Dependent Algorithms
+### NumPy/SciPy-Dependent Algorithms
 
-Algorithms that rely on SciPy operations (sparse solvers, constrained optimization, mutual information computation) currently require NumPy inputs:
+Algorithms that rely on NumPy/SciPy operations (convolution, Householder routines, sparse solvers, constrained optimization, mutual information computation) currently require NumPy inputs:
 
 - **MetaMSS**: Uses SciPy for random split generation and model evaluation.
 - **Entropic Regression (ER)**: Uses SciPy for mutual information computation.
 - **RMSS**: Uses SciPy for statistical aggregation with resampling.
+- **UOFR**: Uses NumPy convolution and Householder routines in the Sobolev-modulated selection path.
 - **NonNegativeLeastSquares**: Wraps `scipy.optimize.nnls`.
 - **BoundedVariableLeastSquares**: Wraps `scipy.optimize.lsq_linear`.
 - **LeastSquaresMinimalResidual**: Wraps `scipy.sparse.linalg.lsmr`.
@@ -644,7 +645,7 @@ yhat_numpy = _to_numpy(yhat)
 
 **Q: Why are some algorithms NumPy-only?**
 
-These algorithms depend on SciPy functions (constrained optimization, sparse linear algebra, nearest-neighbor statistics) that do not yet support the Array API standard. As SciPy adds Array API support for these functions, SysIdentPy will progressively remove the restrictions.
+These algorithms depend on NumPy/SciPy functions (convolution, constrained optimization, sparse linear algebra, nearest-neighbor statistics) that do not yet support the Array API standard. As portable equivalents become available, SysIdentPy will progressively remove the restrictions.
 
 **Q: Is the numerical result identical between backends?**
 

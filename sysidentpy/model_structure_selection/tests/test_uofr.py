@@ -1,8 +1,11 @@
 import numpy as np
+import pytest
 from numpy.testing import assert_almost_equal, assert_array_equal
 from numpy.testing import assert_raises
-from sysidentpy.model_structure_selection import UOFR
+
+from sysidentpy import config_context
 from sysidentpy.basis_function import Polynomial
+from sysidentpy.model_structure_selection import UOFR
 from sysidentpy.parameter_estimation.estimators import (
     LeastSquares,
     RecursiveLeastSquares,
@@ -403,3 +406,19 @@ def test_sobolev_error_reduction_ratio_respects_err_tol():
     assert model.n_terms == 1
     assert len(piv) == 1
     assert psi_ortho.shape[1] == 1
+
+
+def test_uofr_rejects_array_api_dispatch_with_clear_error():
+    xp = pytest.importorskip("array_api_strict")
+    model = UOFR(
+        ylag=1,
+        xlag=1,
+        n_terms=2,
+        order_selection=False,
+        basis_function=Polynomial(degree=1),
+        estimator=LeastSquares(),
+    )
+
+    with config_context(array_api_dispatch=True):
+        with pytest.raises(NotImplementedError, match=r"UOFR.*requires NumPy"):
+            model.fit(X=xp.asarray(X_train[:20]), y=xp.asarray(y_train[:20]))

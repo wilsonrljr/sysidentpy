@@ -1,3 +1,9 @@
+import numpy as np
+import pytest
+from numpy.testing import assert_allclose, assert_almost_equal, assert_array_equal
+
+from sysidentpy import config_context
+from sysidentpy._lib._array_api import _to_numpy
 from sysidentpy.metrics import (
     forecast_error,
     mean_forecast_error,
@@ -12,9 +18,6 @@ from sysidentpy.metrics import (
     r2_score,
     symmetric_mean_absolute_percentage_error,
 )
-
-import numpy as np
-from numpy.testing import assert_almost_equal, assert_array_equal
 
 
 def test_mean_forecast_error():
@@ -108,3 +111,69 @@ def test_symmetric_mean_absolute_percentage_error():
     metric = 57.878787
     result = symmetric_mean_absolute_percentage_error(y, y_predicted)
     assert_almost_equal(metric, result, decimal=6)
+
+
+@pytest.mark.parametrize(
+    "metric",
+    [
+        mean_forecast_error,
+        mean_squared_error,
+        root_mean_squared_error,
+        normalized_root_mean_squared_error,
+        root_relative_squared_error,
+        mean_absolute_error,
+        mean_squared_log_error,
+        median_absolute_error,
+        explained_variance_score,
+        r2_score,
+        symmetric_mean_absolute_percentage_error,
+    ],
+)
+def test_scalar_regression_metrics_accept_array_api_strict(metric):
+    xp = pytest.importorskip("array_api_strict")
+    y = np.array([3.0, 5.0, 2.5, 7.0]).reshape(-1, 1)
+    yhat = np.array([2.5, 5.0, 4.0, 8.0]).reshape(-1, 1)
+
+    expected = metric(y, yhat)
+
+    with config_context(array_api_dispatch=True):
+        result = metric(xp.asarray(y), xp.asarray(yhat))
+
+    assert_allclose(result, expected, rtol=1e-12, atol=1e-12)
+
+
+def test_forecast_error_accepts_array_api_strict():
+    xp = pytest.importorskip("array_api_strict")
+    y = np.array([3.0, -0.5, 2.0, 7.0])
+    yhat = np.array([2.5, 0.0, 2.0, 8.0])
+
+    with config_context(array_api_dispatch=True):
+        result = forecast_error(xp.asarray(y), xp.asarray(yhat))
+
+    assert_allclose(_to_numpy(result), forecast_error(y, yhat))
+
+
+@pytest.mark.parametrize("metric", [explained_variance_score, r2_score])
+def test_variance_metrics_do_not_require_boolean_indexing(metric):
+    xp = pytest.importorskip("array_api_strict")
+    y = np.array([3.0, -0.5, 2.0, 7.0]).reshape(-1, 1)
+    yhat = np.array([2.5, 0.0, 2.0, 8.0]).reshape(-1, 1)
+    expected = metric(y, yhat)
+
+    with config_context(array_api_dispatch=True):
+        with xp.ArrayAPIStrictFlags(boolean_indexing=False):
+            result = metric(xp.asarray(y), xp.asarray(yhat))
+
+    assert_allclose(result, expected, rtol=1e-12, atol=1e-12)
+
+
+@pytest.mark.parametrize("metric", [explained_variance_score, r2_score])
+def test_variance_metrics_handle_constant_targets_with_array_api_strict(metric):
+    xp = pytest.importorskip("array_api_strict")
+    y = np.ones((4, 1))
+    perfect = np.ones((4, 1))
+    imperfect = np.array([0.0, 1.0, 2.0, 1.0]).reshape(-1, 1)
+
+    with config_context(array_api_dispatch=True):
+        assert_allclose(metric(xp.asarray(y), xp.asarray(perfect)), 1.0)
+        assert_allclose(metric(xp.asarray(y), xp.asarray(imperfect)), 0.0)

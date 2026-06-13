@@ -25,7 +25,7 @@ This release introduces experimental, opt-in **Array API standard support**. The
 
 #### Array API Integration Across Modules
 
-- **Model Structure Selection**: FROLS, AOLS, OFRBase, UOFR, and the Orthogonal Floating Search family (OSF, OIF, OOS/O2S) support Array API dispatch on the validated backends described above. `fit()` and 1-step prediction remain backend-native, while sequential prediction on non-NumPy backends follows the documented NumPy/CPU fallback. MetaMSS, Entropic Regression (ER), and RMSS require NumPy due to SciPy dependencies.
+- **Model Structure Selection**: FROLS, AOLS, OFRBase, and the Orthogonal Floating Search family (OSF, OIF, OOS/O2S) support Array API dispatch on the validated backends described above. `fit()` and 1-step prediction remain backend-native, while sequential prediction on non-NumPy backends follows the documented NumPy/CPU fallback. UOFR, MetaMSS, Entropic Regression (ER), and RMSS require NumPy due to NumPy/SciPy-dependent algorithmic paths.
 - **Parameter Estimation**: 18 estimators support Array API dispatch (LeastSquares, RidgeRegression, TotalLeastSquares, RecursiveLeastSquares, AffineLeastMeanSquares, and all 12 LMS family variants). 3 estimators require NumPy (NonNegativeLeastSquares, BoundedVariableLeastSquares, LeastSquaresMinimalResidual).
 - **Basis Functions**: Polynomial, Fourier, and Bilinear basis functions work with Array API dispatch. Bernstein, Legendre, Hermite, Hermite Normalized, and Laguerre remain NumPy-only because they rely on SciPy polynomial evaluators.
 - **Simulation**: The entire simulation module supports Array API dispatch.

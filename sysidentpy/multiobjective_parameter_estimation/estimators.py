@@ -442,10 +442,10 @@ class AILS:
             Position of the best theta set.
 
         """
-        psi = self.build_psi(X, y)
-        xp = get_namespace(psi, y)
+        xp = get_namespace(X, y)
         _require_numpy_namespace(xp, feature="AILS", dependency="SciPy")
 
+        psi = self.build_psi(X, y)
         y = y[self.max_lag :]
         HR, QR = np.zeros((1, 1)), np.zeros((1, 1))
         n_parameters = weighing_matrix.shape[1]

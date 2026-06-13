@@ -49,6 +49,7 @@ from typing import Union, Tuple, Optional, Callable
 import numpy as np
 
 from sysidentpy.narmax_base import house, rowhouse
+from sysidentpy._lib._array_api import get_namespace, _require_numpy_namespace
 
 from ..basis_function import Fourier, Polynomial
 from .ofr_base import OFRBase, get_info_criteria, _compute_err_slice
@@ -914,6 +915,14 @@ class UOFR(OFRBase):
             vector position + 1).
 
         """
+        if y is not None:
+            xp = get_namespace(y) if X is None else get_namespace(X, y)
+            _require_numpy_namespace(
+                xp,
+                feature="UOFR",
+                dependency="NumPy convolution and Householder operations",
+            )
+
         super().fit(X=X, y=y)
         return self
 
