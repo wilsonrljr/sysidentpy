@@ -200,7 +200,7 @@ Como os vetores de parâmetros $\Theta$ e $g$ satisfazem o sistema triangular $A
 
 $$
 \begin{equation}
-    \frac{1}{n}Y^\top Y = \underbrace{\frac{1}{n}\sum^{i = 1}_{n_{\Theta}}g_{{_i}}^2q^\top_{{_i}}q_{{_i}}}_{\text{{variância explicada pelos regressores}}} + \underbrace{\frac{1}{n}\Xi^\top \Xi}_{\text{{variância não explicada}}}.
+    \frac{1}{n}Y^\top Y = \underbrace{\frac{1}{n}\sum^{i = 1}_{n_{\Theta}}g_{{_i}}^2q^\top_{{_i}}q_{{_i}}}_{\text{{variancia explicada pelos regressores}}} + \underbrace{\frac{1}{n}\Xi^\top \Xi}_{\text{{variancia nao explicada}}}.
 \end{equation}
 \tag{15}
 $$

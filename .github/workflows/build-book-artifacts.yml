@@ -1,0 +1,32 @@
+name: Build Book Artifacts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - docs/en/book/**
+      - docs/pt/book/**
+      - mkdocs.yml
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger sysidentpy-data book artifact build
+        env:
+          GH_TOKEN: ${{ secrets.SYSIDENTPY_DATA_DISPATCH_TOKEN }}
+          SYSIDENTPY_REF: ${{ github.sha }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::SYSIDENTPY_DATA_DISPATCH_TOKEN is not configured; skipping sysidentpy-data book artifact build."
+            exit 0
+          fi
+
+          gh api repos/wilsonrljr/sysidentpy-data/dispatches \
+            --method POST \
+            -f event_type=build-book-artifacts \
+            -f "client_payload[sysidentpy_ref]=$SYSIDENTPY_REF"

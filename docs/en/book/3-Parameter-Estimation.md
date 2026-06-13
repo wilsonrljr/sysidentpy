@@ -228,7 +228,7 @@ array([[ 0, 0],
 
 The regressors is how SysIdentPy encode the polynomial basis function following this  codification pattern:
 
-- $0$ is the constant term,\n",
+- $0$ is the constant term,
 - $[1001] = y_{k-1}$
 - $[100n] = y_{k-n}$
 - $[200n] = x1_{k-n}$
@@ -795,4 +795,3 @@ plt.show()
 Unlike the previous biased estimation, these KDEs in Figure 3 show that the estimated parameters are now closely aligned with the true values, demonstrating the effectiveness of the ELS algorithm in achieving unbiased parameter estimation, even in the presence of colored noise.
 
 > The Extended Least Squares algorithm is iterative by nature. In SysIdentPy, the default number of iterations is set to 30 (`uiter=30`). However, the [literature](https://www.researchgate.net/publication/303679484_Introducao_a_Identificacao_de_Sistemas) suggests that the algorithm typically converges quickly, often within 10 to 20 iterations. Therefore, you may want to test different numbers of iterations to find the optimal balance between convergence speed and computational efficiency.
-

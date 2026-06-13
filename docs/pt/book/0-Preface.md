@@ -1,4 +1,4 @@
-![](https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/Nonlinear_System_identification.png)
+![](https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/main/book/assets/Nonlinear_System_identification.png)
 
 All the world is a nonlinear system
 
@@ -75,13 +75,11 @@ Se você usar o SysIdentPy em sua publicação científica, agradeceríamos cita
 }
 ```
 
-## Versões em PDF, Epub e Mobi
+## Versões em PDF e EPUB
 
-Baixe a versão em pdf do livro: [versão pdf](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/Nonlinear_System_Identification_Theory_and_Practice_With_SysIdentPy_Wilson_R_L_Junior.pdf){:download="Nonlinear System Identification and Forecasting: Theory and Practice With SysIdentPy"}
+Baixe a versão em PDF do livro: [versão PDF](https://github.com/wilsonrljr/sysidentpy-data/releases/download/book-latest/Identificacao_de_Sistemas_Nao_Lineares_e_Previsao_Teoria_e_Pratica_Com_SysIdentPy_Wilson_R_L_Junior.pdf){:download="Identificação de Sistemas Não Lineares e Previsão: Teoria e Prática Com SysIdentPy"}
 
-Baixe a versão em epub do livro: [versão epub](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/Nonlinear_System_Identification_Theory_and_Practice_With_SysIdentPy_Wilson_R_L_Junior.epub){:download="Nonlinear System Identification and Forecasting: Theory and Practice With SysIdentPy"}
-
-Baixe a versão em mobi do livro: [versão mobi](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/Nonlinear_System_Identification_Theory_and_Practice_With_SysIdentPy_Wilson_R_L_Junior.mobi){:download="Nonlinear System Identification and Forecasting: Theory and Practice With SysIdentPy"}
+Baixe a versão em EPUB do livro: [versão EPUB](https://github.com/wilsonrljr/sysidentpy-data/releases/download/book-latest/Identificacao_de_Sistemas_Nao_Lineares_e_Previsao_Teoria_e_Pratica_Com_SysIdentPy_Wilson_R_L_Junior.epub){:download="Identificação de Sistemas Não Lineares e Previsão: Teoria e Prática Com SysIdentPy"}
 
 ## Agradecimentos
 
