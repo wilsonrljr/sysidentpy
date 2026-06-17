@@ -36,6 +36,12 @@ class Polynomial(BaseBasisFunction):
     ----------
     degree : int (max_degree), default=2
         The maximum degree of the polynomial features.
+    include_bias : bool, default=True
+        Whether the constant (pure-bias) regressor is part of the candidate set.
+        When True, behavior matches prior releases: the (0,0,...,0) combination
+        produces a column of ones at index 0 of the output. When False, that
+        column is dropped from the candidate set; ``RegressorDictionary.regressor_space``
+        drops the matching row so ``regressor_code`` and ``psi`` stay aligned.
 
     Notes
     -----
@@ -47,8 +53,10 @@ class Polynomial(BaseBasisFunction):
     def __init__(
         self,
         degree: int = 2,
+        include_bias: bool = True,
     ):
         self.degree = degree
+        self.include_bias = include_bias
         # Cache combination indices per (n_features, degree) to avoid rebuilding
         self._combination_cache: Dict[Tuple[int, int], np.ndarray] = {}
 
@@ -138,6 +146,7 @@ class Polynomial(BaseBasisFunction):
         ----------
         data : ndarray of floats
             The lagged matrix built with respect to each lag and column.
+            Column 0 is the bias column added by ``build_input_output_matrix``.
         max_lag : int
             Target data used on training phase.
         ylag : ndarray of int
@@ -148,7 +157,8 @@ class Polynomial(BaseBasisFunction):
             The type of the model (NARMAX, NAR or NFIR).
         predefined_regressors : ndarray of int
             The index of the selected regressors by the Model Structure
-            Selection algorithm.
+            Selection algorithm. Indices address the candidate set after
+            ``include_bias`` has been applied.
 
         Returns
         -------
@@ -156,8 +166,20 @@ class Polynomial(BaseBasisFunction):
             The lagged matrix built in respect with each lag and column.
 
         """
-        # Create combinations of all columns based on its index
-        psi = self._evaluate_terms(data, predefined_regressors)
+        if self.include_bias:
+            psi = self._evaluate_terms(data, predefined_regressors)
+            return psi[max_lag:, :]
+
+        # include_bias=False: drop the pure-bias combination (0,0,...,0), which
+        # combinations_with_replacement always emits at index 0. predefined_regressors
+        # addresses the bias-dropped index space, so shift by +1 before slicing combos.
+        if predefined_regressors is not None:
+            shifted = self._normalize_predefined_regressors(predefined_regressors) + 1
+            psi = self._evaluate_terms(data, predefined_regressors=shifted)
+        else:
+            psi = self._evaluate_terms(data, predefined_regressors=None)
+            psi = psi[:, 1:]
+
         return psi[max_lag:, :]
 
     def transform(
