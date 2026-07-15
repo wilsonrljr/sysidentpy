@@ -9,7 +9,7 @@ import pytest
 import numpy as np
 
 from sysidentpy import config_context
-from sysidentpy._lib._array_api import _to_numpy, get_namespace
+from sysidentpy._lib._array_api import get_namespace
 from sysidentpy.model_structure_selection.ofr_base import (
     OFRBase,
     _compute_err_slice,
@@ -23,6 +23,10 @@ from sysidentpy.parameter_estimation import (
     RidgeRegression,
 )
 from sysidentpy.basis_function import Polynomial
+from sysidentpy.tests._array_api_asserts import (
+    assert_allclose as xp_assert_allclose,
+    assert_array_equal as xp_assert_array_equal,
+)
 from sysidentpy.narmax_base import BaseMSS
 
 
@@ -484,10 +488,7 @@ def test_predict_polynomial_preserves_array_api_namespace():
         result = model.predict(X=None, y=y_data)
 
     assert result.__array_namespace__().__name__ == xp.__name__
-    np.testing.assert_array_equal(
-        _to_numpy(result),
-        np.array([[0.0], [2.0], [2.0], [2.0]]),
-    )
+    xp_assert_array_equal(result, np.array([[0.0], [2.0], [2.0], [2.0]]))
 
 
 def test_predict_rejects_mixed_array_api_namespaces():
@@ -541,6 +542,6 @@ def test_error_reduction_ratio_matches_numpy_for_torch_tensors():
             psi_t, y_t, process_term_number=4
         )
 
-    np.testing.assert_array_equal(_to_numpy(piv_t), piv_np)
-    np.testing.assert_allclose(_to_numpy(err_t), err_np, rtol=1e-7, atol=1e-9)
-    np.testing.assert_allclose(_to_numpy(psi_orth_t), psi_orth_np, rtol=1e-7, atol=1e-9)
+    xp_assert_array_equal(piv_t, piv_np)
+    xp_assert_allclose(err_t, err_np, rtol=1e-7, atol=1e-9)
+    xp_assert_allclose(psi_orth_t, psi_orth_np, rtol=1e-7, atol=1e-9)

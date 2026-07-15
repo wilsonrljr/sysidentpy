@@ -3,7 +3,6 @@ import pytest
 from numpy.testing import assert_allclose, assert_almost_equal, assert_array_equal
 
 from sysidentpy import config_context
-from sysidentpy._lib._array_api import _to_numpy
 from sysidentpy.metrics import (
     forecast_error,
     mean_forecast_error,
@@ -18,6 +17,7 @@ from sysidentpy.metrics import (
     r2_score,
     symmetric_mean_absolute_percentage_error,
 )
+from sysidentpy.tests._array_api_asserts import assert_allclose as xp_assert_allclose
 
 
 def test_mean_forecast_error():
@@ -150,7 +150,7 @@ def test_forecast_error_accepts_array_api_strict():
     with config_context(array_api_dispatch=True):
         result = forecast_error(xp.asarray(y), xp.asarray(yhat))
 
-    assert_allclose(_to_numpy(result), forecast_error(y, yhat))
+    xp_assert_allclose(result, forecast_error(y, yhat))
 
 
 @pytest.mark.parametrize("metric", [explained_variance_score, r2_score])

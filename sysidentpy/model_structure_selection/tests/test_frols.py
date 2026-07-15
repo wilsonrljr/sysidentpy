@@ -13,6 +13,10 @@ from sysidentpy.parameter_estimation.estimators import (
     LeastSquares,
     RecursiveLeastSquares,
 )
+from sysidentpy.tests._array_api_asserts import (
+    assert_allclose as xp_assert_allclose,
+    assert_array_equal as xp_assert_array_equal,
+)
 from sysidentpy.tests.test_narmax_base import create_test_data
 from sysidentpy.utils.generate_data import get_siso_data
 
@@ -76,13 +80,12 @@ def _assert_order_selection_matches_numpy(
     rrse_numpy = root_relative_squared_error(expected_y, baseline_yhat)
 
     assert model.n_terms == baseline_model.n_terms
-    assert_array_equal(
-        np.asarray(_to_numpy(model.pivv), dtype=np.intp),
-        np.asarray(baseline_model.pivv, dtype=np.intp),
-    )
+    xp_assert_array_equal(model.pivv, baseline_model.pivv)
     assert_array_equal(model.final_model, baseline_model.final_model)
-    assert_array_equal(yhat_backend[: model.max_lag], expected_y[: model.max_lag])
-    assert_allclose(yhat_backend, baseline_yhat, rtol=1e-10, atol=1e-12)
+    xp_assert_array_equal(
+        yhat[: model.max_lag, :], expected_y[: model.max_lag, :]
+    )
+    xp_assert_allclose(yhat, baseline_yhat, rtol=1e-10, atol=1e-12)
     assert_allclose(rrse_backend, rrse_numpy, rtol=1e-10, atol=1e-12)
     assert_allclose(
         np.max(np.abs(yhat_backend - baseline_yhat)),
@@ -377,7 +380,7 @@ def test_fit_predict_accepts_torch_cuda_tensors_when_available():
     assert isinstance(yhat, torch.Tensor)
     assert yhat.device.type == "cuda"
     assert yhat.shape == y_test_t.shape
-    assert_almost_equal(_to_numpy(yhat[: model.max_lag]), y_test[: model.max_lag])
+    xp_assert_allclose(yhat[: model.max_lag, :], y_test[: model.max_lag, :])
 
 
 def test_polynomial_narmax_fast_path_matches_reference_for_frols_model():
@@ -424,12 +427,7 @@ def test_predict_repeated_calls_are_stable_under_array_api_dispatch_for_frols():
         final_model_first = model.final_model.copy()
         yhat_second = model.predict(X=x_test_t, y=y_test_t)
 
-    assert_allclose(
-        _to_numpy(yhat_first),
-        _to_numpy(yhat_second),
-        rtol=1e-10,
-        atol=1e-12,
-    )
+    xp_assert_allclose(yhat_first, yhat_second, rtol=1e-10, atol=1e-12)
     assert_array_equal(model.final_model, final_model_first)
 
 

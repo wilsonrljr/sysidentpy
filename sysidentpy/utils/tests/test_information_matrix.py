@@ -6,8 +6,10 @@ from numpy.testing import (
 )
 
 from sysidentpy import config_context
-from sysidentpy._lib._array_api import _to_numpy
 from sysidentpy.basis_function import Polynomial
+from sysidentpy.tests._array_api_asserts import (
+    assert_allclose as xp_assert_allclose,
+)
 from sysidentpy.utils.information_matrix import (
     shift_column,
     _build_sliding_windows,
@@ -270,7 +272,7 @@ def test_build_sliding_windows_preserves_array_api_namespace():
 
     assert windows.shape == (6, 3, 1)
     assert windows.__array_namespace__().__name__ == xp.__name__
-    assert_almost_equal(_to_numpy(windows)[2, :, 0], np.array([0.0, 1.0, 2.0]))
+    xp_assert_allclose(windows[2, :, 0], np.array([0.0, 1.0, 2.0]))
 
 
 def test_build_input_output_matrix_preserves_array_api_namespace():
@@ -290,7 +292,7 @@ def test_build_input_output_matrix_preserves_array_api_namespace():
         ]
     )
     assert result.__array_namespace__().__name__ == xp.__name__
-    assert_almost_equal(_to_numpy(result), expected)
+    xp_assert_allclose(result, expected)
 
 
 def test_build_input_output_matrix_rejects_mixed_array_api_namespaces():

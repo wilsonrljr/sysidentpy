@@ -5,12 +5,15 @@ from unittest.mock import MagicMock
 from numpy.testing import assert_almost_equal, assert_raises
 
 from sysidentpy._config import config_context
-from sysidentpy._lib._array_api import _to_numpy
 from sysidentpy.basis_function import Fourier, Polynomial
 from sysidentpy.simulation import SimulateNARMAX
 from sysidentpy.parameter_estimation.estimators import (
     LeastSquares,
     RecursiveLeastSquares,
+)
+from sysidentpy.tests._array_api_asserts import (
+    assert_allclose as xp_assert_allclose,
+    assert_array_equal as xp_assert_array_equal,
 )
 from sysidentpy.utils.generate_data import get_miso_data, get_siso_data
 
@@ -595,7 +598,7 @@ def test_predict_preserves_array_api_namespace_with_numpy_metadata():
         result = simulator.predict(X=x_valid, y=y_valid)
 
     assert result.__array_namespace__() is array_api_strict
-    np.testing.assert_allclose(_to_numpy(result), expected)
+    xp_assert_allclose(result, expected)
 
 
 def test_predict_n_step_preserves_array_api_namespace_via_cpu_fallback():
@@ -626,7 +629,7 @@ def test_predict_n_step_preserves_array_api_namespace_via_cpu_fallback():
         result = simulator.predict(X=x_valid, y=y_valid, steps_ahead=3)
 
     assert result.__array_namespace__() is array_api_strict
-    np.testing.assert_allclose(_to_numpy(result), expected)
+    xp_assert_allclose(result, expected)
 
 
 def test_predict_rejects_mixed_array_api_namespaces():
@@ -687,9 +690,9 @@ def test_error_reduction_ratio_preserves_array_api_namespace():
     assert err.__array_namespace__() is array_api_strict
     assert piv.__array_namespace__() is array_api_strict
     assert psi_orth.__array_namespace__() is array_api_strict
-    np.testing.assert_array_equal(_to_numpy(model_code), regressor_code[:1])
-    np.testing.assert_allclose(_to_numpy(err)[0], 0.8)
-    np.testing.assert_array_equal(_to_numpy(psi_orth), psi_np[:, :1])
+    xp_assert_array_equal(model_code, regressor_code[:1])
+    xp_assert_allclose(err[0], 0.8)
+    xp_assert_array_equal(psi_orth, psi_np[:, :1])
 
 
 def test_error_reduction_ratio_matches_numpy_for_torch_tensors():
@@ -714,12 +717,10 @@ def test_error_reduction_ratio_matches_numpy_for_torch_tensors():
             psi_t, y_t, 1, regressor_code
         )
 
-    np.testing.assert_array_equal(_to_numpy(model_code_t), model_code_np)
-    np.testing.assert_array_equal(_to_numpy(piv_t), piv_np)
-    np.testing.assert_allclose(_to_numpy(err_t), err_np, rtol=1e-10, atol=1e-12)
-    np.testing.assert_allclose(
-        _to_numpy(psi_orth_t), psi_orth_np, rtol=1e-10, atol=1e-12
-    )
+    xp_assert_array_equal(model_code_t, model_code_np)
+    xp_assert_array_equal(piv_t, piv_np)
+    xp_assert_allclose(err_t, err_np, rtol=1e-10, atol=1e-12)
+    xp_assert_allclose(psi_orth_t, psi_orth_np, rtol=1e-10, atol=1e-12)
 
 
 class _FourierPredictStub(SimulateNARMAX):

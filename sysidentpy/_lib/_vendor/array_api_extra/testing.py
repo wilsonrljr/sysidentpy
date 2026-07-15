@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import contextlib
 import enum
+import math
 import warnings
 from collections.abc import Callable, Generator, Iterator, Sequence
 from functools import update_wrapper, wraps
@@ -15,13 +16,33 @@ from inspect import getattr_static
 from types import FunctionType, ModuleType
 from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar, cast
 
-from ._lib._utils._compat import is_dask_namespace, is_jax_namespace
+from ._lib._utils._compat import (
+    array_namespace,
+    is_array_api_strict_namespace,
+    is_cupy_namespace,
+    is_dask_namespace,
+    is_jax_namespace,
+    is_numpy_namespace,
+    is_pydata_sparse_namespace,
+    is_torch_array,
+    is_torch_namespace,
+    to_device,
+)
 from ._lib._utils._helpers import jax_autojit, pickle_flatten, pickle_unflatten
+from ._lib._utils._typing import Array, Device
 
-__all__ = ["lazy_xp_function", "patch_lazy_xp_functions"]
+__all__ = [
+    "assert_close",
+    "assert_close_nulp",
+    "assert_equal",
+    "assert_less",
+    "lazy_xp_function",
+    "patch_lazy_xp_functions",
+]
 
 if TYPE_CHECKING:  # pragma: no cover
     # TODO import override from typing (requires Python >=3.12)
+    import numpy as np
     import pytest
     from dask.typing import Graph, Key, SchedulerGetCallable
     from typing_extensions import override
@@ -518,3 +539,235 @@ def _dask_wrap(
         )  # pyright: ignore[reportUnknownArgumentType]
 
     return wrapper
+
+
+def _require_numpy() -> ModuleType:  # numpydoc ignore=RT01
+    """Import and return numpy for public testing assertions."""
+    try:
+        import numpy as np
+    except ImportError as e:
+        msg = (
+            "The assertion functions of `xpx.testing` require the numpy module "
+            "to be importable in the Python environment."
+        )
+        raise ImportError(msg) from e
+
+    return np
+
+
+def _check_ns_shape_dtype(
+    actual: Array,
+    desired: Array,
+    check_dtype: bool,
+    check_shape: bool,
+    check_scalar: bool,
+    xp: ModuleType | None = None,
+) -> tuple[Array, Array, ModuleType, ModuleType]:  # numpydoc ignore=RT03
+    """Assert namespace, shape, and dtype compatibility for test arrays."""
+    np = _require_numpy()
+
+    actual_xp = array_namespace(actual)
+
+    if xp is not None:
+        msg = (
+            "Namespace of actual array does not match the `xp` argument.\n"
+            f"Actual array's namespace: {actual_xp.__name__}\n"
+            f"Expected namespace: {xp.__name__}."
+        )
+        assert actual_xp == xp, msg
+        desired_xp = xp
+    else:
+        desired_xp = array_namespace(desired)
+        msg = (
+            "Namespaces of actual and desired arrays do not match.\n"
+            f"Actual: {actual_xp.__name__}\n"
+            f"Desired: {desired_xp.__name__}."
+        )
+        assert actual_xp == desired_xp, msg
+
+    if is_numpy_namespace(actual_xp) and check_scalar:
+        msg = (
+            "array-ness does not match:\n Actual: "
+            f"{type(actual)}\n Desired: {type(desired)}"
+        )
+        assert np.isscalar(actual) == np.isscalar(desired), msg
+
+    actual_shape = cast(tuple[float, ...], actual.shape)
+    desired_shape = cast(tuple[float, ...], desired.shape)
+    assert None not in actual_shape
+    assert None not in desired_shape
+
+    if is_dask_namespace(desired_xp):
+        if any(math.isnan(i) for i in actual_shape):
+            actual.compute_chunk_sizes()  # type: ignore[attr-defined]
+            actual_shape = cast(tuple[float, ...], actual.shape)
+        if any(math.isnan(i) for i in desired_shape):
+            desired.compute_chunk_sizes()  # type: ignore[attr-defined]
+            desired_shape = cast(tuple[float, ...], desired.shape)
+
+    if check_shape:
+        msg = f"shapes do not match: {actual_shape} != {desired_shape}"
+        assert actual_shape == desired_shape, msg
+    elif desired.ndim > 0:
+        actual_size = math.prod(actual_shape)
+        desired_size = math.prod(desired_shape)
+        msg = f"sizes do not match: {actual_size} != {desired_size}"
+        assert actual_size == desired_size, msg
+
+    desired = desired_xp.asarray(desired)
+    if check_dtype:
+        msg = f"dtypes do not match: {actual.dtype} != {desired.dtype}"
+        assert actual.dtype == desired.dtype, msg
+    desired = desired_xp.broadcast_to(desired, actual_shape)
+    return actual, desired, desired_xp, np
+
+
+def _is_materializable(x: Array) -> bool:  # numpydoc ignore=PR01,RT01
+    """Return whether an array can be materialized as a NumPy array."""
+    return not is_torch_array(x) or x.device.type != "meta"  # type: ignore[attr-defined]
+
+
+def _as_numpy_array(
+    array: Array, *, xp: ModuleType
+) -> np.typing.NDArray[Any]:  # numpydoc ignore=PR01,RT01
+    """Convert an Array API object to a NumPy array for comparison."""
+    np = _require_numpy()
+    if is_cupy_namespace(xp):
+        return xp.asnumpy(array)
+    if is_pydata_sparse_namespace(xp):
+        return array.todense()  # type: ignore[attr-defined]
+
+    if is_torch_namespace(xp):
+        array = cast(Array, array.resolve_conj())  # type: ignore[attr-defined]
+        array = to_device(array, "cpu")
+    if is_array_api_strict_namespace(xp):
+        cpu: Device = xp.Device("CPU_DEVICE")
+        array = to_device(array, cpu)
+    if is_jax_namespace(xp):
+        import jax
+
+        cpu = cast(Device, jax.devices("cpu")[0])
+        array = to_device(array, cpu)
+
+    if hasattr(array, "__dlpack__"):
+        try:
+            return np.from_dlpack(array)
+        except (TypeError, BufferError):
+            pass
+
+    return np.asarray(array)
+
+
+def assert_close(
+    actual: Array,
+    desired: Array,
+    *,
+    rtol: float | Array | None = None,
+    atol: float | Array = 0,
+    equal_nan: bool = True,
+    err_msg: str = "",
+    verbose: bool = True,
+    check_dtype: bool = True,
+    check_shape: bool = True,
+    check_scalar: bool = False,
+    xp: ModuleType | None = None,
+) -> None:
+    """Check that two standard-compatible arrays are close."""
+    __tracebackhide__ = True
+    actual, desired, xp, np = _check_ns_shape_dtype(
+        actual, desired, check_dtype, check_shape, check_scalar, xp
+    )
+    if not _is_materializable(actual):
+        return
+
+    if rtol is None:
+        if xp.isdtype(actual.dtype, ("real floating", "complex floating")):
+            rtol = xp.finfo(actual.dtype).eps**0.5 * 4
+        else:
+            rtol = 1e-7
+    else:
+        rtol = float(rtol)
+
+    atol = float(atol)
+
+    actual_np = _as_numpy_array(actual, xp=xp)
+    desired_np = _as_numpy_array(desired, xp=xp)
+    np.testing.assert_allclose(
+        actual_np,
+        desired_np,
+        rtol=rtol,
+        atol=atol,
+        equal_nan=equal_nan,
+        err_msg=err_msg,
+        verbose=verbose,
+    )
+
+
+def assert_equal(
+    actual: Array,
+    desired: Array,
+    *,
+    err_msg: str = "",
+    verbose: bool = True,
+    check_dtype: bool = True,
+    check_shape: bool = True,
+    check_scalar: bool = False,
+    xp: ModuleType | None = None,
+) -> None:
+    """Check that two standard-compatible arrays are equal."""
+    __tracebackhide__ = True
+    actual, desired, xp, np = _check_ns_shape_dtype(
+        actual, desired, check_dtype, check_shape, check_scalar, xp
+    )
+    if not _is_materializable(actual):
+        return
+    actual_np = _as_numpy_array(actual, xp=xp)
+    desired_np = _as_numpy_array(desired, xp=xp)
+    np.testing.assert_array_equal(
+        actual_np, desired_np, err_msg=err_msg, verbose=verbose
+    )
+
+
+def assert_less(
+    x: Array,
+    y: Array,
+    *,
+    err_msg: str = "",
+    verbose: bool = True,
+    check_dtype: bool = True,
+    check_shape: bool = True,
+    check_scalar: bool = False,
+    xp: ModuleType | None = None,
+) -> None:
+    """Check that one standard-compatible array is elementwise less than another."""
+    __tracebackhide__ = True
+    x, y, xp, np = _check_ns_shape_dtype(
+        x, y, check_dtype, check_shape, check_scalar, xp
+    )
+    if not _is_materializable(x):
+        return
+    x_np = _as_numpy_array(x, xp=xp)
+    y_np = _as_numpy_array(y, xp=xp)
+    np.testing.assert_array_less(x_np, y_np, err_msg=err_msg, verbose=verbose)
+
+
+def assert_close_nulp(
+    actual: Array,
+    desired: Array,
+    *,
+    nulp: int = 1,
+    check_dtype: bool = True,
+    check_shape: bool = True,
+    check_scalar: bool = False,
+    xp: ModuleType | None = None,
+) -> None:
+    """Compare two arrays by units in the last place."""
+    __tracebackhide__ = True
+    actual, desired, xp, np = _check_ns_shape_dtype(
+        actual, desired, check_dtype, check_shape, check_scalar, xp
+    )
+    if not _is_materializable(actual):
+        return
+    actual_np = _as_numpy_array(actual, xp=xp)
+    desired_np = _as_numpy_array(desired, xp=xp)
+    np.testing.assert_array_almost_equal_nulp(actual_np, desired_np, nulp=nulp)

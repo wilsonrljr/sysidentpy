@@ -5,11 +5,15 @@ import pytest
 from numpy.testing import assert_almost_equal, assert_equal, assert_raises
 
 from sysidentpy import config_context
-from sysidentpy._lib._array_api import _to_numpy, get_namespace
+from sysidentpy._lib._array_api import get_namespace
 from sysidentpy.basis_function import Fourier, Polynomial
 from sysidentpy.parameter_estimation.estimators import LeastSquares
 from sysidentpy.model_structure_selection.accelerated_orthogonal_least_squares import (
     AOLS,
+)
+from sysidentpy.tests._array_api_asserts import (
+    assert_allclose as xp_assert_allclose,
+    assert_array_equal as xp_assert_array_equal,
 )
 from sysidentpy.tests.test_narmax_base import create_test_data
 
@@ -225,10 +229,7 @@ def test_predict_polynomial_preserves_array_api_namespace():
         yhat = model.predict(X=None, y=y_data)
 
     assert yhat.__array_namespace__().__name__ == xp.__name__
-    assert_equal(
-        _to_numpy(yhat),
-        np.array([[0.0], [1.5], [1.5], [1.5]]),
-    )
+    xp_assert_array_equal(yhat, np.array([[0.0], [1.5], [1.5], [1.5]]))
 
 
 def test_fit_predict_accepts_torch_tensors_under_array_api_dispatch():
@@ -245,7 +246,7 @@ def test_fit_predict_accepts_torch_tensors_under_array_api_dispatch():
 
     assert isinstance(yhat, torch.Tensor)
     assert_equal(tuple(yhat.shape), y_test.shape)
-    assert_equal(_to_numpy(yhat[: model.max_lag]), y_test[: model.max_lag])
+    xp_assert_array_equal(yhat[: model.max_lag, :], y_test[: model.max_lag, :])
 
 
 def test_predict_rejects_mixed_array_api_namespaces_for_aols():
@@ -279,7 +280,7 @@ def test_fit_predict_accepts_torch_cuda_tensors_under_array_api_dispatch():
     assert isinstance(yhat, torch.Tensor)
     assert yhat.device.type == "cuda"
     assert_equal(tuple(yhat.shape), y_test.shape)
-    assert_equal(_to_numpy(yhat[: model.max_lag]), y_test[: model.max_lag])
+    xp_assert_array_equal(yhat[: model.max_lag, :], y_test[: model.max_lag, :])
 
 
 def test_polynomial_narmax_fast_path_matches_reference_for_aols_model():
@@ -314,12 +315,7 @@ def test_predict_repeated_calls_are_stable_under_array_api_dispatch_for_aols():
         final_model_first = model.final_model.copy()
         yhat_second = model.predict(X=x_test_t, y=y_test_t)
 
-    np.testing.assert_allclose(
-        _to_numpy(yhat_first),
-        _to_numpy(yhat_second),
-        rtol=1e-10,
-        atol=1e-12,
-    )
+    xp_assert_allclose(yhat_first, yhat_second, rtol=1e-10, atol=1e-12)
     np.testing.assert_array_equal(model.final_model, final_model_first)
 
 
