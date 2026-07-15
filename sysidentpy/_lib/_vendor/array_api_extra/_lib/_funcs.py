@@ -23,6 +23,7 @@ from ._utils._helpers import (
 from ._utils._typing import Array, Device, DType
 
 __all__ = [
+    "angle",
     "apply_where",
     "atleast_nd",
     "broadcast_shapes",
@@ -172,6 +173,7 @@ def _apply_where(  # numpydoc ignore=PR01,RT01
     xp: ModuleType,
 ) -> Array:
     """Helper of `apply_where`. On Dask, this runs on a single chunk."""
+
     nargs = len(args) - len(kwkeys)
     kwargs = dict(zip(kwkeys, args[nargs:], strict=True))
     args = args[:nargs]
@@ -210,6 +212,7 @@ def _apply_where(  # numpydoc ignore=PR01,RT01
 def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType) -> Array:
     # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
+
     if x.ndim < ndim:
         x = xp.expand_dims(x, axis=0)
         x = atleast_nd(x, ndim=ndim, xp=xp)
@@ -218,46 +221,10 @@ def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType) -> Array:
 
 # `float` in signature to accept `math.nan` for Dask.
 # `int`s are still accepted as `float` is a superclass of `int` in typing
-def broadcast_shapes(*shapes: tuple[float | None, ...]) -> tuple[int | None, ...]:
-    """
-    Compute the shape of the broadcasted arrays.
-
-    Duplicates :func:`numpy.broadcast_shapes`, with additional support for
-    None and NaN sizes.
-
-    This is equivalent to ``xp.broadcast_arrays(arr1, arr2, ...)[0].shape``
-    without needing to worry about the backend potentially deep copying
-    the arrays.
-
-    Parameters
-    ----------
-    *shapes : tuple[int | None, ...]
-        Shapes of the arrays to broadcast.
-
-    Returns
-    -------
-    tuple[int | None, ...]
-        The shape of the broadcasted arrays.
-
-    See Also
-    --------
-    numpy.broadcast_shapes : Equivalent NumPy function.
-    array_api.broadcast_arrays : Function to broadcast actual arrays.
-
-    Notes
-    -----
-    This function accepts the Array API's ``None`` for unknown sizes,
-    as well as Dask's non-standard ``math.nan``.
-    Regardless of input, the output always contains ``None`` for unknown sizes.
-
-    Examples
-    --------
-    >>> import array_api_extra as xpx
-    >>> xpx.broadcast_shapes((2, 3), (2, 1))
-    (2, 3)
-    >>> xpx.broadcast_shapes((4, 2, 3), (2, 1), (1, 3))
-    (4, 2, 3)
-    """
+def broadcast_shapes(  # numpydoc ignore=PR01,RT01
+    *shapes: tuple[float | None, ...],
+) -> tuple[int | None, ...]:
+    """See docstring in array_api_extra._delegation."""
     if not shapes:
         return ()  # Match NumPy output
 
@@ -266,7 +233,7 @@ def broadcast_shapes(*shapes: tuple[float | None, ...]) -> tuple[int | None, ...
     for axis in range(-ndim, 0):
         sizes = {shape[axis] for shape in shapes if axis >= -len(shape)}
         # Dask uses NaN for unknown shape, which predates the Array API spec for None
-        none_size = None in sizes or math.nan in sizes
+        none_size = None in sizes or math.nan in sizes  # noqa: PLW0177
         sizes -= {1, None, math.nan}
         if len(sizes) > 1:
             msg = (
@@ -289,7 +256,7 @@ def cov(m: Array, /, *, xp: ModuleType) -> Array:  # numpydoc ignore=PR01,RT01
     m = atleast_nd(m, ndim=2, xp=xp)
     m = xp.astype(m, dtype)
 
-    avg = _helpers.mean(m, axis=-1, keepdims=True, xp=xp)
+    avg = xp.mean(m, axis=-1, keepdims=True)
 
     m_shape = eager_shape(m)
     fact = m_shape[-1] - 1
@@ -410,14 +377,9 @@ def isclose(
         out = apply_where(
             xp.isinf(a) | xp.isinf(b),
             (a, b),
-            lambda a, b: mxp.isinf(a)
-            & mxp.isinf(b)
-            & (
-                mxp.sign(a) == mxp.sign(b)
-            ),  # pyright: ignore[reportUnknownArgumentType]
+            lambda a, b: mxp.isinf(a) & mxp.isinf(b) & (mxp.sign(a) == mxp.sign(b)),  # pyright: ignore[reportUnknownArgumentType]
             # Note: inf <= inf is True!
-            lambda a, b: mxp.abs(a - b)
-            <= (atol + rtol * mxp.abs(b)),  # pyright: ignore[reportUnknownArgumentType]
+            lambda a, b: mxp.abs(a - b) <= (atol + rtol * mxp.abs(b)),  # pyright: ignore[reportUnknownArgumentType]
             xp=xp,
         )
         if equal_nan:
@@ -443,87 +405,13 @@ def isclose(
 
 
 def kron(
-    a: Array | complex,
-    b: Array | complex,
+    a: Array,
+    b: Array,
     /,
     *,
-    xp: ModuleType | None = None,
-) -> Array:
-    """
-    Kronecker product of two arrays.
-
-    Computes the Kronecker product, a composite array made of blocks of the
-    second array scaled by the first.
-
-    Equivalent to ``numpy.kron`` for NumPy arrays.
-
-    Parameters
-    ----------
-    a, b : Array | int | float | complex
-        Input arrays or scalars. At least one must be an array.
-    xp : array_namespace, optional
-        The standard-compatible namespace for `a` and `b`. Default: infer.
-
-    Returns
-    -------
-    array
-        The Kronecker product of `a` and `b`.
-
-    Notes
-    -----
-    The function assumes that the number of dimensions of `a` and `b`
-    are the same, if necessary prepending the smallest with ones.
-    If ``a.shape = (r0,r1,..,rN)`` and ``b.shape = (s0,s1,...,sN)``,
-    the Kronecker product has shape ``(r0*s0, r1*s1, ..., rN*SN)``.
-    The elements are products of elements from `a` and `b`, organized
-    explicitly by::
-
-        kron(a,b)[k0,k1,...,kN] = a[i0,i1,...,iN] * b[j0,j1,...,jN]
-
-    where::
-
-        kt = it * st + jt,  t = 0,...,N
-
-    In the common 2-D case (N=1), the block structure can be visualized::
-
-        [[ a[0,0]*b,   a[0,1]*b,  ... , a[0,-1]*b  ],
-         [  ...                              ...   ],
-         [ a[-1,0]*b,  a[-1,1]*b, ... , a[-1,-1]*b ]]
-
-    Examples
-    --------
-    >>> import array_api_strict as xp
-    >>> import array_api_extra as xpx
-    >>> xpx.kron(xp.asarray([1, 10, 100]), xp.asarray([5, 6, 7]), xp=xp)
-    Array([  5,   6,   7,  50,  60,  70, 500,
-           600, 700], dtype=array_api_strict.int64)
-
-    >>> xpx.kron(xp.asarray([5, 6, 7]), xp.asarray([1, 10, 100]), xp=xp)
-    Array([  5,  50, 500,   6,  60, 600,   7,
-            70, 700], dtype=array_api_strict.int64)
-
-    >>> xpx.kron(xp.eye(2), xp.ones((2, 2)), xp=xp)
-    Array([[1., 1., 0., 0.],
-           [1., 1., 0., 0.],
-           [0., 0., 1., 1.],
-           [0., 0., 1., 1.]], dtype=array_api_strict.float64)
-
-    >>> a = xp.reshape(xp.arange(100), (2, 5, 2, 5))
-    >>> b = xp.reshape(xp.arange(24), (2, 3, 4))
-    >>> c = xpx.kron(a, b, xp=xp)
-    >>> c.shape
-    (2, 10, 6, 20)
-    >>> I = (1, 3, 0, 2)
-    >>> J = (0, 2, 1)
-    >>> J1 = (0,) + J             # extend to ndim=4
-    >>> S1 = (1,) + b.shape
-    >>> K = tuple(xp.asarray(I) * xp.asarray(S1) + xp.asarray(J1))
-    >>> c[K] == a[I]*b[J]
-    Array(True, dtype=array_api_strict.bool)
-    """
-    if xp is None:
-        xp = array_namespace(a, b)
-    a, b = asarrays(a, b, xp=xp)
+    xp: ModuleType,
+) -> Array:  # numpydoc ignore=PR01,RT01
+    """See docstring in array_api_extra._delegation."""
 
     singletons = (1,) * (b.ndim - a.ndim)
     a = cast(Array, xp.broadcast_to(a, singletons + a.shape))
@@ -744,6 +632,7 @@ def setdiff1d(
     xp: ModuleType,
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._delegation.py`."""
+
     # https://github.com/microsoft/pyright/issues/10103
     x1_, x2_ = asarrays(x1, x2, xp=xp)
 
@@ -760,6 +649,7 @@ def setdiff1d(
 def sinc(x: Array, /, *, xp: ModuleType) -> Array:
     # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._delegation.py`."""
+
     # no scalars in `where` - array-api#807
     y = xp.pi * xp.where(
         xp.astype(x, xp.bool),
@@ -771,7 +661,7 @@ def sinc(x: Array, /, *, xp: ModuleType) -> Array:
 
 def partition(  # numpydoc ignore=PR01,RT01
     x: Array,
-    kth: int,
+    kth: int,  # noqa: ARG001
     /,
     axis: int = -1,
     *,
@@ -783,7 +673,7 @@ def partition(  # numpydoc ignore=PR01,RT01
 
 def argpartition(  # numpydoc ignore=PR01,RT01
     x: Array,
-    kth: int,
+    kth: int,  # noqa: ARG001
     /,
     axis: int = -1,
     *,
@@ -819,3 +709,51 @@ def union1d(a: Array, b: Array, /, *, xp: ModuleType) -> Array:
     b = xp.reshape(b, (-1,))
     # XXX: `sparse` returns NumPy arrays from `unique_values`
     return xp.asarray(xp.unique_values(xp.concat([a, b])))
+
+
+def angle(z: Array, /, *, deg: bool = False, xp: ModuleType | None = None) -> Array:
+    """
+    Return the angle of the complex argument.
+
+    Parameters
+    ----------
+    z : Array
+        Input array.
+    deg : bool, optional
+        Return angle in degrees if True, radians if False (default).
+    xp : array_namespace, optional
+        The standard-compatible namespace for `z`. Default: infer.
+
+    Returns
+    -------
+    array
+        The counterclockwise angle from the positive real axis on the complex
+        plane in the range ``(-pi, pi]``.
+
+    Notes
+    -----
+    Real input ``x`` is interpreted as ``x + 0j``.
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> xpx.angle(xp.asarray([1.0, 1.0j, 1 + 1j]), xp=xp)
+    Array([0.        , 1.57079633, 0.78539816], dtype=array_api_strict.float64)
+    >>> xpx.angle(xp.asarray([1.0, 1.0j, 1 + 1j]), deg=True, xp=xp)
+    Array([ 0., 90., 45.], dtype=array_api_strict.float64)
+    """
+    if xp is None:
+        xp = array_namespace(z)
+    if xp.isdtype(z.dtype, "complex floating"):
+        zimag = xp.imag(z)
+        zreal = xp.real(z)
+    else:
+        if not xp.isdtype(z.dtype, "real floating"):
+            z = xp.astype(z, default_dtype(xp, device=_compat.device(z)))
+        zimag = xp.zeros_like(z)
+        zreal = z
+    a = xp.atan2(zimag, zreal)
+    if deg:
+        a = a * 180 / xp.pi
+    return a

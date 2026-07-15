@@ -4,9 +4,9 @@ import numpy as np
 from numpy.testing import assert_almost_equal, assert_raises
 
 from sysidentpy import config_context
-from sysidentpy._lib._array_api import _to_numpy
 from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.basis_function import Polynomial
+from sysidentpy.tests._array_api_asserts import assert_allclose as xp_assert_allclose
 from sysidentpy.utils.information_matrix import build_input_output_matrix
 
 
@@ -92,7 +92,7 @@ def test_least_squares_preserves_array_api_namespace():
         theta_est = LeastSquares().optimize(psi, y_data)
 
     assert theta_est.__array_namespace__().__name__ == xp.__name__
-    assert_almost_equal(_to_numpy(theta_est), theta_true, decimal=10)
+    xp_assert_allclose(theta_est, theta_true, rtol=0, atol=1.5e-10)
 
 
 @pytest.mark.parametrize(

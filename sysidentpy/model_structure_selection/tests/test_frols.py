@@ -5,8 +5,6 @@ import pytest
 from numpy.testing import assert_almost_equal, assert_allclose, assert_array_equal
 from numpy.testing import assert_raises
 from sysidentpy import config_context
-from sysidentpy._lib._array_api import _to_numpy
-from sysidentpy.metrics import root_relative_squared_error
 from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation.estimators import (
@@ -75,24 +73,11 @@ def _fit_numpy_order_selection_baseline(info_criteria="aic"):
 def _assert_order_selection_matches_numpy(
     model, yhat, baseline_model, baseline_yhat, expected_y
 ):
-    yhat_backend = _to_numpy(yhat)
-    rrse_backend = root_relative_squared_error(expected_y, yhat_backend)
-    rrse_numpy = root_relative_squared_error(expected_y, baseline_yhat)
-
     assert model.n_terms == baseline_model.n_terms
     xp_assert_array_equal(model.pivv, baseline_model.pivv)
     assert_array_equal(model.final_model, baseline_model.final_model)
-    xp_assert_array_equal(
-        yhat[: model.max_lag, :], expected_y[: model.max_lag, :]
-    )
+    xp_assert_array_equal(yhat[: model.max_lag, :], expected_y[: model.max_lag, :])
     xp_assert_allclose(yhat, baseline_yhat, rtol=1e-10, atol=1e-12)
-    assert_allclose(rrse_backend, rrse_numpy, rtol=1e-10, atol=1e-12)
-    assert_allclose(
-        np.max(np.abs(yhat_backend - baseline_yhat)),
-        0.0,
-        rtol=0.0,
-        atol=1e-10,
-    )
 
 
 def test_error_reduction_ratio():

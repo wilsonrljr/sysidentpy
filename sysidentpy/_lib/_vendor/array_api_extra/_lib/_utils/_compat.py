@@ -1,5 +1,4 @@
 """Acquire helpers from array-api-compat."""
-
 # Allow packages that vendor both `array-api-extra` and
 # `array-api-compat` to override the import location
 

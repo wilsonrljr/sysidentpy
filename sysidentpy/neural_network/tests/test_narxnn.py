@@ -626,6 +626,7 @@ def test_model_predict_fourier():
         ylag=2,
         xlag=2,
         epochs=2000,
+        learning_rate=0.001,
         basis_function=basis_function,
         random_state=0,
         optim_params={

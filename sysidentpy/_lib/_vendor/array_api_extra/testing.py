@@ -70,8 +70,10 @@ class Deprecated(enum.Enum):
 DEPRECATED = Deprecated.DEPRECATED
 
 
-def _clone_function(f: Callable[..., Any]) -> Callable[..., Any]:
-    """Returns a clone of an existing function."""
+def _clone_function(  # numpydoc ignore=PR01,RT01
+    f: Callable[..., Any],
+) -> Callable[..., Any]:
+    """Return a clone of an existing function."""
     f_new = FunctionType(
         f.__code__,
         f.__globals__,
@@ -151,10 +153,10 @@ def lazy_xp_function(
             ...     return user_consumes(z)
 
         Default: True.
-    static_argnums :
-        Deprecated; ignored
-    static_argnames :
-        Deprecated; ignored
+    static_argnums : Deprecated
+        Deprecated; ignored.
+    static_argnames : Deprecated
+        Deprecated; ignored.
 
     See Also
     --------
@@ -280,7 +282,7 @@ def lazy_xp_function(
         f = func
 
     try:
-        f._lazy_xp_function = tags  # pylint: disable=protected-access  # pyright: ignore[reportFunctionMemberAccess]
+        f._lazy_xp_function = tags  # pylint: disable=protected-access # pyright: ignore[reportFunctionMemberAccess] # pyrefly: ignore[missing-attribute]
     except AttributeError:  # @cython.vectorize
         _ufuncs_tags[f] = tags
 
@@ -324,9 +326,14 @@ def patch_lazy_xp_functions(
     request : pytest.FixtureRequest
         Pytest fixture, as acquired by the test itself or by one of its fixtures.
     monkeypatch : pytest.MonkeyPatch
-        Deprecated
+        Deprecated.
     xp : array_namespace
         Array namespace to be tested.
+
+    Returns
+    -------
+    contextlib.AbstractContextManager
+        Testing context manager.
 
     See Also
     --------
@@ -359,8 +366,12 @@ def patch_lazy_xp_functions(
 
     to_revert: list[tuple[ModuleType | type, str, object]] = []
 
-    def temp_setattr(target: ModuleType | type, name: str, func: object) -> None:
+    def temp_setattr(  # numpydoc ignore=PR01
+        target: ModuleType | type, name: str, func: object
+    ) -> None:
         """
+        Temporary setattr.
+
         Variant of monkeypatch.setattr, which allows monkey-patching only selected
         parameters of a test so that pytest-run-parallel can run on the remainder.
         """
@@ -384,9 +395,9 @@ def patch_lazy_xp_functions(
         # Enable using patch_lazy_xp_function not as a context manager
         temp_setattr = monkeypatch.setattr  # type: ignore[assignment]  # pyright: ignore[reportAssignmentType]
 
-    def iter_tagged() -> (
-        Iterator[tuple[ModuleType | type, str, Any, Callable[..., Any], dict[str, Any]]]
-    ):
+    def iter_tagged() -> Iterator[
+        tuple[ModuleType | type, str, Any, Callable[..., Any], dict[str, Any]]
+    ]:  # numpydoc ignore=GL08
         for target in search_targets:
             for name, attr in target.__dict__.items():
                 # attr might be a staticmethod or classmethod. If so we need
@@ -453,7 +464,7 @@ def patch_lazy_xp_functions(
     # @contextlib.contextmanager because it would not work with the
     # deprecated monkeypatch when not used as a context manager.
     @contextlib.contextmanager
-    def revert_on_exit() -> Generator[None]:
+    def revert_on_exit() -> Generator[None]:  # numpydoc ignore=GL08
         try:
             yield
         finally:
@@ -463,7 +474,7 @@ def patch_lazy_xp_functions(
     return revert_on_exit()
 
 
-class CountingDaskScheduler(SchedulerGetCallable):
+class _CountingDaskScheduler(SchedulerGetCallable):
     """
     Dask scheduler that counts how many times `dask.compute` is called.
 
@@ -482,7 +493,7 @@ class CountingDaskScheduler(SchedulerGetCallable):
     max_count: int
     msg: str
 
-    def __init__(self, max_count: int, msg: str):  # numpydoc ignore=GL08
+    def __init__(self, max_count: int, msg: str) -> None:  # numpydoc ignore=GL08
         self.count = 0
         self.max_count = max_count
         self.msg = msg
@@ -523,10 +534,8 @@ def _dask_wrap(
 
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:  # numpydoc ignore=GL08
-        scheduler = CountingDaskScheduler(n, msg)
-        with dask.config.set(
-            {"scheduler": scheduler}
-        ):  # pyright: ignore[reportPrivateImportUsage]
+        scheduler = _CountingDaskScheduler(n, msg)
+        with dask.config.set({"scheduler": scheduler}):  # pyright: ignore[reportPrivateImportUsage]
             out = func(*args, **kwargs)
 
         # Block until the graph materializes and reraise exceptions. This allows
@@ -534,15 +543,15 @@ def _dask_wrap(
         # not work on scheduler='distributed', as it would not block.
         arrays, rest = pickle_flatten(out, da.Array)
         arrays = dask.persist(arrays, scheduler="threads")[0]  # type: ignore[attr-defined,no-untyped-call]  # pyright: ignore[reportPrivateImportUsage]
-        return pickle_unflatten(
-            arrays, rest
-        )  # pyright: ignore[reportUnknownArgumentType]
+        return pickle_unflatten(arrays, rest)  # pyright: ignore[reportUnknownArgumentType]
 
     return wrapper
 
 
 def _require_numpy() -> ModuleType:  # numpydoc ignore=RT01
-    """Import and return numpy for public testing assertions."""
+    """
+    Import and return `numpy` if it is available, otherwise raise informative error.
+    """
     try:
         import numpy as np
     except ImportError as e:
@@ -563,52 +572,80 @@ def _check_ns_shape_dtype(
     check_scalar: bool,
     xp: ModuleType | None = None,
 ) -> tuple[Array, Array, ModuleType, ModuleType]:  # numpydoc ignore=RT03
-    """Assert namespace, shape, and dtype compatibility for test arrays."""
+    """
+    Assert that namespace, shape and dtype of the two arrays match.
+
+    Parameters
+    ----------
+    actual : Array
+        The array produced by the tested function.
+    desired : Array
+        The expected array (typically hardcoded).
+    check_dtype : bool, default: True
+        Whether to check agreement between actual and desired dtypes.
+    check_shape : bool, default: True
+        Whether to check agreement between actual and desired shapes.
+    check_scalar : bool, default: False
+        NumPy only: whether to check agreement between actual and desired types -
+        0d array vs scalar.
+    xp : array_namespace, optional
+        A standard-compatible namespace which `actual` and `desired` must match.
+
+    Returns
+    -------
+    Actual array, desired array, their array namespace, the numpy module.
+    """
     np = _require_numpy()
 
-    actual_xp = array_namespace(actual)
+    actual_xp = array_namespace(actual)  # Raises on Python scalars and lists
 
     if xp is not None:
-        msg = (
+        _msg = (
             "Namespace of actual array does not match the `xp` argument.\n"
             f"Actual array's namespace: {actual_xp.__name__}\n"
             f"Expected namespace: {xp.__name__}."
         )
-        assert actual_xp == xp, msg
+        assert actual_xp == xp, _msg
         desired_xp = xp
     else:
         desired_xp = array_namespace(desired)
-        msg = (
+        _msg = (
             "Namespaces of actual and desired arrays do not match.\n"
             f"Actual: {actual_xp.__name__}\n"
             f"Desired: {desired_xp.__name__}."
         )
-        assert actual_xp == desired_xp, msg
+        assert actual_xp == desired_xp, _msg
 
     if is_numpy_namespace(actual_xp) and check_scalar:
-        msg = (
+        # only NumPy distinguishes between scalars and arrays; we do if check_scalar.
+        _msg = (
             "array-ness does not match:\n Actual: "
             f"{type(actual)}\n Desired: {type(desired)}"
         )
-        assert np.isscalar(actual) == np.isscalar(desired), msg
+        assert np.isscalar(actual) == np.isscalar(desired), _msg
 
+    # Dask uses nan instead of None for unknown shapes
     actual_shape = cast(tuple[float, ...], actual.shape)
     desired_shape = cast(tuple[float, ...], desired.shape)
-    assert None not in actual_shape
+    assert None not in actual_shape  # Requires explicit support
     assert None not in desired_shape
 
     if is_dask_namespace(desired_xp):
         if any(math.isnan(i) for i in actual_shape):
-            actual.compute_chunk_sizes()  # type: ignore[attr-defined]
+            actual.compute_chunk_sizes()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
             actual_shape = cast(tuple[float, ...], actual.shape)
         if any(math.isnan(i) for i in desired_shape):
-            desired.compute_chunk_sizes()  # type: ignore[attr-defined]
+            desired.compute_chunk_sizes()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
             desired_shape = cast(tuple[float, ...], desired.shape)
 
     if check_shape:
         msg = f"shapes do not match: {actual_shape} != {desired_shape}"
         assert actual_shape == desired_shape, msg
     elif desired.ndim > 0:
+        # Ignore shape, but check flattened size. This is normally done by
+        # np.testing.assert_array_equal etc even when strict=False, but not for
+        # non-materializable arrays.
+        # This check excludes 0d arrays as they are special-cased in NumPy.
         actual_size = math.prod(actual_shape)
         desired_size = math.prod(desired_shape)
         msg = f"sizes do not match: {actual_size} != {desired_size}"
@@ -623,22 +660,28 @@ def _check_ns_shape_dtype(
 
 
 def _is_materializable(x: Array) -> bool:  # numpydoc ignore=PR01,RT01
-    """Return whether an array can be materialized as a NumPy array."""
-    return not is_torch_array(x) or x.device.type != "meta"  # type: ignore[attr-defined]
+    """
+    Return True if you can call `as_numpy_array(x)`; False otherwise.
+    """
+    # Important: here we assume that we're not tracing -
+    # e.g. we're not inside `jax.jit`` nor `cupy.cuda.Stream.begin_capture`.
+    return not is_torch_array(x) or x.device.type != "meta"  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
 
-def _as_numpy_array(
+def _as_numpy_array(  # numpydoc ignore=PR01,RT01
     array: Array, *, xp: ModuleType
-) -> np.typing.NDArray[Any]:  # numpydoc ignore=PR01,RT01
-    """Convert an Array API object to a NumPy array for comparison."""
+) -> np.typing.NDArray[Any]:
+    """
+    Convert array to NumPy, bypassing GPU-CPU transfer guards and densification guards.
+    """
     np = _require_numpy()
     if is_cupy_namespace(xp):
         return xp.asnumpy(array)
     if is_pydata_sparse_namespace(xp):
-        return array.todense()  # type: ignore[attr-defined]
+        return array.todense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
     if is_torch_namespace(xp):
-        array = cast(Array, array.resolve_conj())  # type: ignore[attr-defined]
+        array = cast(Array, array.resolve_conj())  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
         array = to_device(array, "cpu")
     if is_array_api_strict_namespace(xp):
         cpu: Device = xp.Device("CPU_DEVICE")
@@ -646,6 +689,7 @@ def _as_numpy_array(
     if is_jax_namespace(xp):
         import jax
 
+        # Note: only needed if the transfer guard is enabled
         cpu = cast(Device, jax.devices("cpu")[0])
         array = to_device(array, cpu)
 
@@ -672,7 +716,66 @@ def assert_close(
     check_scalar: bool = False,
     xp: ModuleType | None = None,
 ) -> None:
-    """Check that two standard-compatible arrays are close."""
+    """
+    Check that two arrays are close, up to tolerance ``atol + rtol * abs(desired)``.
+
+    This is an interface to :func:`numpy.testing.assert_allclose` which accepts
+    any standard-compatible array and performs additional array namespace,
+    shape, and dtype checks.
+
+    Parameters
+    ----------
+    actual : Array
+        The array produced by the tested function.
+    desired : Array
+        The expected array (typically hardcoded).
+    rtol : float or Array, optional
+        Relative tolerance. Default: dtype-dependent.
+    atol : float or Array, optional
+        Absolute tolerance. Default: 0.
+    equal_nan : bool, default: True
+        Whether to consider NaNs in corresponding locations as equal.
+    err_msg : str, optional
+        Error message to display on failure.
+    verbose : bool, default: True
+        Whether to include the conflicting arrays in the error message on failure.
+    check_dtype : bool, default: True
+        Whether to check agreement between actual and desired dtypes.
+    check_shape : bool, default: True
+        Whether to check agreement between actual and desired shapes.
+    check_scalar : bool, default: False
+        NumPy only: whether to check agreement between actual and desired types —
+        0-D :class:`numpy.ndarray` vs scalar (e.g. :class:`numpy.double`).
+    xp : array_namespace, optional
+        A standard-compatible namespace which `actual` and `desired` must match.
+
+    Raises
+    ------
+    AssertionError
+        If `actual` and `desired` are not equal up to the defined tolerance.
+
+    ImportError
+        If :mod:`numpy` is not importable in the Python environment.
+
+    See Also
+    --------
+    assert_equal : Similar function for exact equality checks.
+    array_api_extra.isclose : Similar function checking closeness, returning a bool.
+    numpy.testing.assert_allclose : Similar function for NumPy arrays.
+
+    Notes
+    -----
+    The default `atol` and `rtol` differ from ``xp.all(xpx.isclose(a, b))``.
+    For inexact dtypes, the default `rtol` is
+    ``xp.finfo(actual.dtype).eps ** 0.5 * 4``, which for ``float64`` is roughly halfway
+    between :math:`\\sqrt{\\epsilon}` and the default for
+    :func:`numpy.testing.assert_allclose`, ``1e-7``.
+    This gives a more reasonable default for lower precision dtypes,
+    for example approximately ``1e-3`` for ``float32``.
+    For exact dtypes, the default ``1e-7`` is used.
+
+    Array arguments to `atol` and `rtol` must be valid input to :class:`float`.
+    """
     __tracebackhide__ = True
     actual, desired, xp, np = _check_ns_shape_dtype(
         actual, desired, check_dtype, check_shape, check_scalar, xp
@@ -682,7 +785,10 @@ def assert_close(
 
     if rtol is None:
         if xp.isdtype(actual.dtype, ("real floating", "complex floating")):
-            rtol = xp.finfo(actual.dtype).eps**0.5 * 4
+            # multiplier of 4 is used as for `np.float64` this puts the default `rtol`
+            # roughly half way between sqrt(eps) and the default for
+            # `numpy.testing.assert_allclose`, 1e-7
+            rtol = xp.finfo(actual.dtype).eps ** 0.5 * 4
         else:
             rtol = 1e-7
     else:
@@ -714,7 +820,46 @@ def assert_equal(
     check_scalar: bool = False,
     xp: ModuleType | None = None,
 ) -> None:
-    """Check that two standard-compatible arrays are equal."""
+    """
+    Check that two arrays are equal.
+
+    This is an interface to :func:`numpy.testing.assert_array_equal` which accepts
+    any standard-compatible array and performs additional array namespace,
+    shape, and dtype checks.
+
+    Parameters
+    ----------
+    actual : Array
+        The array produced by the tested function.
+    desired : Array
+        The expected array (typically hardcoded).
+    err_msg : str, optional
+        Error message to display on failure.
+    verbose : bool, default: True
+        Whether to include the conflicting arrays in the error message on failure.
+    check_dtype : bool, default: True
+        Whether to check agreement between actual and desired dtypes.
+    check_shape : bool, default: True
+        Whether to check agreement between actual and desired shapes.
+    check_scalar : bool, default: False
+        NumPy only: whether to check agreement between actual and desired types —
+        0-D :class:`numpy.ndarray` vs scalar (e.g. :class:`numpy.double`).
+    xp : array_namespace, optional
+        A standard-compatible namespace which `actual` and `desired` must match.
+
+    Raises
+    ------
+    AssertionError
+        If `actual` and `desired` are not equal.
+
+    ImportError
+        If :mod:`numpy` is not importable in the Python environment.
+
+    See Also
+    --------
+    assert_close : Similar function for inexact equality checks.
+    numpy.testing.assert_array_equal : Similar function for NumPy arrays.
+    """
     __tracebackhide__ = True
     actual, desired, xp, np = _check_ns_shape_dtype(
         actual, desired, check_dtype, check_shape, check_scalar, xp
@@ -739,7 +884,44 @@ def assert_less(
     check_scalar: bool = False,
     xp: ModuleType | None = None,
 ) -> None:
-    """Check that one standard-compatible array is elementwise less than another."""
+    """
+    Check that two arrays are ordered by less than.
+
+    This is an interface to :func:`numpy.testing.assert_array_less` which accepts
+    any standard-compatible array and performs additional array namespace,
+    shape, and dtype checks.
+
+    Parameters
+    ----------
+    x, y : Array
+        Array to compare according to ``x < y`` (elementwise).
+    err_msg : str, optional
+        Error message to display on failure.
+    verbose : bool, default: True
+        Whether to include the conflicting arrays in the error message on failure.
+    check_dtype : bool, default: True
+        Whether to check agreement between the dtypes of `x` and `y`.
+    check_shape : bool, default: True
+        Whether to check agreement between the shapes of `x` and `y`.
+    check_scalar : bool, default: False
+        NumPy only: whether to check agreement between actual and desired types —
+        0-D :class:`numpy.ndarray` vs scalar (e.g. :class:`numpy.double`).
+    xp : array_namespace, optional
+        A standard-compatible namespace which `x` and `y` must match.
+
+    Raises
+    ------
+    AssertionError
+        If `x` is not strictly smaller than `y`, elementwise.
+
+    ImportError
+        If :mod:`numpy` is not importable in the Python environment.
+
+    See Also
+    --------
+    assert_close : Similar function for inexact equality checks.
+    numpy.testing.assert_array_less : Similar function for NumPy arrays.
+    """
     __tracebackhide__ = True
     x, y, xp, np = _check_ns_shape_dtype(
         x, y, check_dtype, check_shape, check_scalar, xp
@@ -761,8 +943,59 @@ def assert_close_nulp(
     check_scalar: bool = False,
     xp: ModuleType | None = None,
 ) -> None:
-    """Compare two arrays by units in the last place."""
-    __tracebackhide__ = True
+    """
+    Compare two arrays relatively to their spacing.
+
+    This is an interface to :func:`numpy.testing.assert_array_almost_equal_nulp`
+    which accepts any standard-compatible array and performs
+    additional array namespace, shape, and dtype checks.
+
+    Parameters
+    ----------
+    actual : Array
+        The array produced by the tested function.
+    desired : Array
+        The expected array (typically hardcoded).
+    nulp : int, optional
+        The maximum number of units in the last place
+        for the tolerance check. Default: ``1``.
+    check_dtype : bool, default: True
+        Whether to check agreement between actual and desired dtypes.
+    check_shape : bool, default: True
+        Whether to check agreement between actual and desired shapes.
+    check_scalar : bool, default: False
+        NumPy only: whether to check agreement between actual and desired types —
+        0-D :class:`numpy.ndarray` vs scalar (e.g. :class:`numpy.double`).
+    xp : array_namespace, optional
+        A standard-compatible namespace which `actual` and `desired` must match.
+
+    Raises
+    ------
+    AssertionError
+        If the spacing between `actual` and `desired` for one or more elements is \
+        larger than `nulp`.
+
+    ImportError
+        If :mod:`numpy` is not importable in the Python environment.
+
+    See Also
+    --------
+    assert_close : Similar function for inexact equality checks.
+    numpy.spacing : Spacing calculation for NumPy arrays.
+    numpy.testing.assert_array_almost_equal_nulp : Similar function for NumPy arrays.
+
+    Notes
+    -----
+    This is a relatively robust method to compare two arrays whose amplitude is
+    variable.
+
+    An assertion is raised if the following condition is not met::
+
+        abs(actual - desired) <= nulp * spacing(maximum(abs(actual), abs(desired)))
+
+    where ``spacing(x)`` is the distance between ``x`` and the nearest adjacent number
+    representable by in the data type of ``x``.
+    """
     actual, desired, xp, np = _check_ns_shape_dtype(
         actual, desired, check_dtype, check_shape, check_scalar, xp
     )

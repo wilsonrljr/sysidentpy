@@ -1,13 +1,16 @@
 """Extra array functions built on top of the array API standard."""
 
+from . import testing
 from ._delegation import (
     argpartition,
     atleast_nd,
+    broadcast_shapes,
     cov,
     create_diagonal,
     expand_dims,
     isclose,
     isin,
+    kron,
     nan_to_num,
     one_hot,
     pad,
@@ -19,19 +22,19 @@ from ._delegation import (
 )
 from ._lib._at import at
 from ._lib._funcs import (
+    angle,
     apply_where,
-    broadcast_shapes,
     default_dtype,
-    kron,
     nunique,
 )
 from ._lib._lazy import lazy_apply
 
-__version__ = "0.10.1"
+__version__ = "0.11.0"
 
 # pylint: disable=duplicate-code
 __all__ = [
     "__version__",
+    "angle",
     "apply_where",
     "argpartition",
     "at",
@@ -53,5 +56,6 @@ __all__ = [
     "searchsorted",
     "setdiff1d",
     "sinc",
+    "testing",
     "union1d",
 ]

@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from numpy.testing import assert_allclose, assert_array_equal
+from numpy.testing import assert_array_equal
 
 from sysidentpy import config_context
 from sysidentpy._lib import _array_api as array_api_utils
@@ -269,8 +269,11 @@ def test_concat_moves_inputs_to_reference_device():
     second = xp.asarray([3.0, 4.0], device=xp.Device("CPU_DEVICE"))
 
     result = _concat(xp, [first, second], axis=0)
+    expected = xp.asarray([1.0, 2.0, 3.0, 4.0], device=result.device)
 
-    assert_array_equal(_to_numpy(result), np.array([1.0, 2.0, 3.0, 4.0]))
+    assert result.shape == expected.shape
+    assert result.dtype == expected.dtype
+    assert bool(xp.all(result == expected))
     assert str(result.device) == str(xp.Device("device1"))
 
 
