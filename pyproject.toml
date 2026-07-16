@@ -108,6 +108,7 @@ profile = "black"
 
 [tool.pytest.ini_options]
 addopts = ["--strict-config", "--strict-markers", "--cov=sysidentpy"]
+filterwarnings = ["error::DeprecationWarning:sysidentpy\\..*"]
 xfail_strict = true
 junit_family = "xunit2"
 
