@@ -488,7 +488,7 @@ class AILS:
                 residuals = get_cost_function(
                     system_data[j], affine_information_data[j], tmp_theta
                 )
-                J[j, i] = residuals[0]
+                J[j, i] = residuals.item()
 
             euclidean_norm[i] = np.linalg.norm(J[:, i])
 

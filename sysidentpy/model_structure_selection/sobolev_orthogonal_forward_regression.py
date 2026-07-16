@@ -815,7 +815,7 @@ class UOFR(OFRBase):
         )
         y_augmented = y_augmented.reshape(-1, 1)
         squared_y = np.dot(y_augmented.T, y_augmented)
-        squared_y = float(np.maximum(squared_y, np.finfo(np.float64).eps))
+        squared_y = max(squared_y.item(), np.finfo(np.float64).eps)
         psi_working = psi_augmented.copy()
         y_working = y_augmented.copy()
         num_terms = psi_working.shape[1]
