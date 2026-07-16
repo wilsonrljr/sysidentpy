@@ -70,6 +70,9 @@ save_model(model=model, file_name="model_name.syspy")
 ---
 ### Loading model and checking if everything went smoothly
 
+!!! warning
+    SysIdentPy model files use Python's `pickle` format. Loading a pickle file
+    can execute arbitrary code, so only load model files from trusted sources.
 
 ```python
 # load_model(file_name.syspy, path (optional))
@@ -122,4 +125,3 @@ plot_results(y=y_valid, yhat=yhat_loaded, n=1000)
     
 ![png](save-and-load-models_files/save-and-load-models_6_1.png)
     
-
