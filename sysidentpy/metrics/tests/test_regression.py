@@ -115,6 +115,59 @@ def test_symmetric_mean_absolute_percentage_error():
 
 @pytest.mark.parametrize(
     "metric",
+    [normalized_root_mean_squared_error, root_relative_squared_error],
+)
+def test_normalized_metrics_handle_constant_targets(metric):
+    y = np.ones((4, 1))
+
+    assert metric(y, y.copy()) == 0.0
+    assert np.isinf(metric(y, np.zeros_like(y)))
+
+
+@pytest.mark.parametrize(
+    "metric",
+    [normalized_root_mean_squared_error, root_relative_squared_error],
+)
+def test_normalized_metrics_do_not_mask_nan_predictions(metric):
+    y = np.ones((4, 1))
+    yhat = y.copy()
+    yhat[0] = np.nan
+
+    assert np.isnan(metric(y, yhat))
+
+
+def test_symmetric_mean_absolute_percentage_error_handles_zero_pairs():
+    y = np.array([0.0, 1.0])
+    yhat = np.array([0.0, 2.0])
+
+    result = symmetric_mean_absolute_percentage_error(y, yhat)
+
+    assert_allclose(result, 100 / 3)
+
+
+@pytest.mark.parametrize(
+    ("y", "yhat"),
+    [
+        (np.array([-1.0, 1.0]), np.array([0.0, 1.0])),
+        (np.array([0.0, 1.0]), np.array([-2.0, 1.0])),
+    ],
+)
+def test_mean_squared_log_error_rejects_invalid_domain(y, yhat):
+    with pytest.raises(ValueError, match="less than or equal to -1"):
+        mean_squared_log_error(y, yhat)
+
+
+def test_mean_squared_log_error_accepts_values_above_negative_one():
+    y = np.array([-0.5, 1.0])
+    yhat = np.array([-0.25, 1.5])
+
+    result = mean_squared_log_error(y, yhat)
+
+    assert np.isfinite(result)
+
+
+@pytest.mark.parametrize(
+    "metric",
     [
         mean_forecast_error,
         mean_squared_error,
@@ -177,3 +230,47 @@ def test_variance_metrics_handle_constant_targets_with_array_api_strict(metric):
     with config_context(array_api_dispatch=True):
         assert_allclose(metric(xp.asarray(y), xp.asarray(perfect)), 1.0)
         assert_allclose(metric(xp.asarray(y), xp.asarray(imperfect)), 0.0)
+
+
+@pytest.mark.parametrize(
+    "metric",
+    [normalized_root_mean_squared_error, root_relative_squared_error],
+)
+def test_normalized_metrics_handle_constant_array_api_targets(metric):
+    xp = pytest.importorskip("array_api_strict")
+    y = np.ones((4, 1))
+
+    with config_context(array_api_dispatch=True):
+        assert metric(xp.asarray(y), xp.asarray(y)) == 0.0
+        assert np.isinf(metric(xp.asarray(y), xp.asarray(np.zeros_like(y))))
+
+
+def test_smape_handles_zero_pairs_with_array_api_strict():
+    xp = pytest.importorskip("array_api_strict")
+    y = np.array([0.0, 1.0])
+    yhat = np.array([0.0, 2.0])
+
+    with config_context(array_api_dispatch=True):
+        result = symmetric_mean_absolute_percentage_error(
+            xp.asarray(y), xp.asarray(yhat)
+        )
+
+    assert_allclose(result, 100 / 3)
+
+
+def test_msle_domain_contract_with_array_api_strict():
+    xp = pytest.importorskip("array_api_strict")
+
+    with config_context(array_api_dispatch=True):
+        with pytest.raises(ValueError, match="less than or equal to -1"):
+            mean_squared_log_error(
+                xp.asarray(np.array([-1.0, 1.0])),
+                xp.asarray(np.array([0.0, 1.0])),
+            )
+
+        result = mean_squared_log_error(
+            xp.asarray(np.array([-0.5, 1.0])),
+            xp.asarray(np.array([-0.25, 1.5])),
+        )
+
+    assert np.isfinite(result)

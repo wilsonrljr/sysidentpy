@@ -200,6 +200,10 @@ def normalized_root_mean_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
         nRMSE output is non-negative values. Becoming 0.0 means your
         model outputs are exactly matched by true target values.
 
+        For a constant target, the normalization range is zero. In that case,
+        this function returns 0.0 for a perfect prediction and ``inf`` for an
+        imperfect prediction.
+
     References
     ----------
     - Wikipedia entry on the normalized Root Mean Squared Error
@@ -214,7 +218,14 @@ def normalized_root_mean_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
 
     """
     xp = get_namespace(y, yhat)
-    return float(root_mean_squared_error(y, yhat) / (xp.max(y) - xp.min(y)))
+    rmse = root_mean_squared_error(y, yhat)
+    normalization_range = float(xp.max(y) - xp.min(y))
+    if normalization_range == 0:
+        if np.isnan(rmse):
+            return float("nan")
+        return 0.0 if rmse == 0 else float("inf")
+
+    return float(rmse / normalization_range)
 
 
 def root_relative_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
@@ -233,6 +244,10 @@ def root_relative_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
         RRSE output is non-negative values. Becoming 0.0 means your
         model outputs are exactly matched by true target values.
 
+        For a constant target, the denominator is zero. In that case, this
+        function returns 0.0 for a perfect prediction and ``inf`` for an
+        imperfect prediction.
+
     Examples
     --------
     >>> y = [3, -0.5, 2, 7]
@@ -244,6 +259,13 @@ def root_relative_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
     xp = get_namespace(y, yhat)
     numerator = xp.sum((yhat - y) ** 2)
     denominator = xp.sum((y - xp.mean(y, axis=0)) ** 2)
+    denominator_value = float(denominator)
+    if denominator_value == 0:
+        numerator_value = float(numerator)
+        if np.isnan(numerator_value):
+            return float("nan")
+        return 0.0 if numerator_value == 0 else float("inf")
+
     return float(xp.sqrt(numerator / denominator))
 
 
@@ -296,6 +318,12 @@ def mean_squared_log_error(y: NDArray, yhat: NDArray) -> NDArray:
         MSLE output is non-negative values. Becoming 0.0 means your
         model outputs are exactly matched by true target values.
 
+    Raises
+    ------
+    ValueError
+        If ``y`` or ``yhat`` contains a value less than or equal to -1, where
+        ``log1p`` is not defined for real-valued metrics.
+
     Examples
     --------
     >>> y = [3, 5, 2.5, 7]
@@ -305,6 +333,12 @@ def mean_squared_log_error(y: NDArray, yhat: NDArray) -> NDArray:
 
     """
     xp = get_namespace(y, yhat)
+    if bool(xp.any(y <= -1)) or bool(xp.any(yhat <= -1)):
+        raise ValueError(
+            "Mean Squared Logarithmic Error cannot be used when targets "
+            "contain values less than or equal to -1."
+        )
+
     return mean_squared_error(xp.log(y + 1), xp.log(yhat + 1))
 
 
@@ -444,6 +478,8 @@ def symmetric_mean_absolute_percentage_error(y: NDArray, yhat: NDArray) -> NDArr
     -----
     One supposed problem with SMAPE is that it is not symmetric since
     over-forecasts and under-forecasts are not treated equally.
+    When both the target and prediction are zero, their contribution is
+    defined as zero.
 
     References
     ----------
@@ -460,4 +496,13 @@ def symmetric_mean_absolute_percentage_error(y: NDArray, yhat: NDArray) -> NDArr
     """
     xp = get_namespace(y, yhat)
     n = y.shape[0]
-    return float(100 / n * xp.sum(2 * xp.abs(yhat - y) / (xp.abs(y) + xp.abs(yhat))))
+    denominator = xp.abs(y) + xp.abs(yhat)
+    nonzero_denominator = denominator != 0
+    safe_denominator = xp.where(
+        nonzero_denominator, denominator, xp.ones_like(denominator)
+    )
+    percentage_error = 2 * xp.abs(yhat - y) / safe_denominator
+    percentage_error = xp.where(
+        nonzero_denominator, percentage_error, xp.zeros_like(percentage_error)
+    )
+    return float(100 / n * xp.sum(percentage_error))
