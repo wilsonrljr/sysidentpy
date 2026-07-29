@@ -1,47 +1,67 @@
 ## O Método `predict` no SysIdentPy
 
-Antes de entrar no processo de validação em Identificação de Sistemas, é essencial entender como o método `predict` funciona no SysIdentPy.
+Antes de entrar no processo de validação, é importante entender o que o método `predict` calcula. Em sistemas dinâmicos, a saída predita pode depender de valores passados da própria saída. Portanto, duas predições feitas pelo mesmo modelo podem ser muito diferentes dependendo de quais valores são realimentados no loop de predição.
 
-### Usando o Método `predict`
-
-Um uso típico do método `predict` no SysIdentPy é assim:
+Um uso típico do método `predict` no SysIdentPy é
 
 ```python
 yhat = model.predict(X=x_test, y=y_test)
 ```
 
-Usuários do SysIdentPy frequentemente têm duas dúvidas comuns sobre este método:
+As explicações a seguir usam o FROLS com base polinomial, a mesma configuração adotada no restante do capítulo. Esse caminho oferece simulação livre e predições de um e de $n$ passos para modelos NAR e NARMAX. Em modelos NFIR não existe realimentação da saída; por isso, a distinção entre esses modos não tem o mesmo significado, e a predição de $n$ passos não está disponível nesse caminho.
 
-1. Por que precisamos passar os dados de teste, `y_test`, como argumento no método `predict`?
-2. Por que os valores iniciais preditos são idênticos aos valores nos dados de teste?
+Duas dúvidas aparecem com frequência:
 
-Para responder a essas perguntas, vamos primeiro explicar os conceitos de predição infinitos passos à frente, predição n passos à frente e predição um passo à frente em sistemas dinâmicos.
+1. Por que precisamos passar `y_test` para predizer a saída?
+2. Por que os primeiros valores de `yhat` são iguais aos primeiros valores de `y_test`?
 
-### Predição Infinitos Passos à Frente
+A resposta está nas condições iniciais. Considere o modelo
 
-A predição infinitos passos à frente, também conhecida como *free run simulation*, refere-se a fazer predições usando valores previamente **preditos**, $\hat{y}_{k-n_y}$, no loop de predição.
+$$
+y_k = y_{k-1} + 2x_{k-1}.
+\tag{9.1}
+$$
 
-Por exemplo, considere os seguintes dados de entrada e saída de teste:
+Para calcular $\hat{y}_1$, o modelo precisa conhecer $y_0$. Se o maior lag do modelo for $n_{\text{lag}}$, serão necessárias pelo menos $n_{\text{lag}}$ amostras da saída para iniciar a recursão. No SysIdentPy, esse número fica disponível em `model.max_lag` assim que o modelo é configurado.
+
+```python
+from sysidentpy.basis_function import Polynomial
+from sysidentpy.model_structure_selection import FROLS
+from sysidentpy.parameter_estimation import LeastSquares
+
+basis_function = Polynomial(degree=2)
+model = FROLS(
+    order_selection=False,
+    n_terms=15,
+    ylag=2,
+    xlag=2,
+    estimator=LeastSquares(unbiased=False),
+    basis_function=basis_function,
+)
+model.max_lag
+```
+
+Para o modelo NARMAX desse exemplo, `max_lag` é obtido a partir dos lags configurados em `xlag` e `ylag`, e não apenas dos termos que permaneceram no modelo final. Se `xlag=ylag=10`, por exemplo, ainda será necessário fornecer dez condições iniciais mesmo que o maior lag entre os regressores selecionados seja menor.
+
+### Predição de Infinitos Passos à Frente
+
+A predição de infinitos passos à frente, também chamada de *free run simulation* ou simulação livre, usa as saídas anteriormente **preditas** para continuar a recursão. No método `predict`, esse é o comportamento obtido quando `steps_ahead=None`, que é o valor padrão.
+
+Considere
 
 $$
 x_{test} = [1, 2, 3, 4, 5, 6, 7]
 $$
 
-$$
-y_{test} = [8, 9, 10, 11, 12, 13, 14]
-$$
-
-Suponha que queremos validar um modelo $m$ definido por:
+e
 
 $$
-m \rightarrow y_k = 1*y_{k-1} + 2*x_{k-1}
+y_{test} = [8, 9, 10, 11, 12, 13, 14].
 $$
 
-Para predizer o primeiro valor, precisamos de acesso tanto a $y_{k-1}$ quanto a $x_{k-1}$. Esse requisito explica por que você precisa passar `y_test` como argumento no método `predict`. Isso também responde à segunda pergunta: o SysIdentPy requer que o usuário forneça as condições iniciais explicitamente. Os dados `y_test` passados no método `predict` não são usados inteiramente; apenas os valores iniciais necessários para a estrutura de lags do modelo são usados.
+Para o modelo da Equação 9.1, com lag máximo igual a 1, a simulação começa com $y_0=8$:
 
-Neste exemplo, o lag máximo do modelo é 1, então precisamos apenas de 1 condição inicial. Os valores preditos, `yhat`, são então calculados da seguinte forma:
-
-```python
+```text
 y_initial = yhat(0) = 8
 yhat(1) = 1*8 + 2*1 = 10
 yhat(2) = 1*10 + 2*2 = 14
@@ -49,185 +69,392 @@ yhat(3) = 1*14 + 2*3 = 20
 yhat(4) = 1*20 + 2*4 = 28
 ```
 
-Como mostrado, o primeiro valor de `yhat` corresponde ao primeiro valor de `y_test` porque ele serve como condição inicial. Outro ponto importante é que o loop de predição usa os valores previamente **preditos**, não os valores reais de `y_test`, e é por isso que é chamado de infinitos passos à frente ou free run simulation.
+Depois da condição inicial, nenhum outro valor real de `y_test` é usado. O erro cometido em uma amostra passa a influenciar as amostras seguintes. É justamente essa propagação que torna a simulação livre um teste importante para modelos dinâmicos.
 
-Em identificação de sistemas, frequentemente buscamos modelos que tenham bom desempenho em predições infinitos passos à frente. Como o erro de predição se propaga ao longo do tempo, um modelo que mostra bom desempenho em free run simulation é considerado um modelo robusto.
-
-No SysIdentPy, os usuários só precisam passar as condições iniciais ao realizar uma predição infinitos passos à frente. Se você passar apenas as condições iniciais, os resultados serão os mesmos! Portanto
+Quando `X` é fornecido, seu número de amostras define o horizonte da simulação. Por isso, passar toda a saída ou apenas as condições iniciais produz o mesmo resultado:
 
 ```python
 yhat = model.predict(X=x_test, y=y_test)
-```
-
-é na verdade o mesmo que
-
-```python
-yhat = model.predict(X=x_test, y=y_test[:model.max_lag].reshape(-1, 1))
-```
-
-> `model.max_lag` pode ser acessado após ajustarmos o modelo usando o código abaixo.
-
-```python
-model = FROLS(
-	order_selection=False,
-    ylag=2,
-    xlag=2,
-    estimator=LeastSquares(unbiased=False),
-    basis_function=basis_function,
-    e_tol=0.9999
-    n_terms=15
+yhat_from_initial_conditions = model.predict(
+    X=x_test,
+    y=y_test[: model.max_lag],
 )
-model.fit(X=x, y=y)
-model.max_lag
 ```
 
-> É importante mencionar que, na versão atual do SysIdentPy, o lag máximo considerado é na verdade o lag máximo entre as definições de `xlag` e `ylag`. Isso é importante porque você pode passar `ylag = xlag = 10` e o modelo final, após a seleção de estrutura de modelo, selecionar termos onde o lag máximo é 3. Você tem que passar 10 condições iniciais, mas internamente os cálculos são feitos usando os regressores corretos. Isso é necessário devido à forma como os regressores são criados após o modelo ser ajustado. Portanto, é recomendado usar `model.max_lag` para ter certeza.
+Nesse caso, um valor fornecido em `forecast_horizon` não substitui o comprimento de `X`: é `X.shape[0]` que determina quantas amostras serão retornadas, incluindo o prefixo das condições iniciais.
 
-### Predição 1 Passo à Frente
-
-A diferença entre predição 1 passo à frente e predição infinitos passos à frente é que o modelo usa os valores reais anteriores de `y_test` no loop ao invés dos valores preditos `yhat`. E essa é uma diferença enorme e importante. Vamos fazer a predição usando o método 1 passo à frente:
+Para modelos NAR, que não possuem entrada `X`, o horizonte deve ser informado por meio de `forecast_horizon`:
 
 ```python
+yhat = model.predict(
+    X=None,
+    y=y_initial,
+    forecast_horizon=100,
+)
+```
+
+Nesse exemplo, o resultado contém as condições iniciais seguidas de 100 valores preditos. Portanto, `forecast_horizon` controla o comprimento da previsão quando não existe `X`; ele não altera quais saídas são realimentadas. Essa última escolha é feita por `steps_ahead`.
+
+### Predição de Um Passo à Frente
+
+Na predição um passo à frente, o modelo usa a saída **medida** anterior em cada nova predição. Para o mesmo exemplo,
+
+```text
 y_initial = yhat(0) = 8
 yhat(1) = 1*8 + 2*1 = 10
 yhat(2) = 1*9 + 2*2 = 13
 yhat(3) = 1*10 + 2*3 = 16
 yhat(4) = 1*11 + 2*4 = 19
-e assim por diante
 ```
 
-O modelo usa valores reais no loop e apenas prediz o próximo valor. O erro de predição, neste caso, é sempre corrigido porque não estamos propagando o erro usando os valores preditos no loop.
-
-O método `predict` do SysIdentPy permite que o usuário realize uma predição 1 passo à frente configurando `steps_ahead=1`
+O erro não é propagado indefinidamente porque a recursão é corrigida pela saída medida a cada amostra. No SysIdentPy, essa opção é definida por `steps_ahead=1`:
 
 ```python
 yhat = model.predict(X=x_test, y=y_test, steps_ahead=1)
 ```
 
-Neste caso, como você pode imaginar, precisamos passar todos os dados de `y_test` porque o método precisa acessar os valores reais em cada iteração. Se você passar apenas as condições iniciais, `yhat` terá apenas as condições iniciais mais 1 amostra adicional, que é a predição 1 passo à frente. Para predizer outro ponto, você precisaria passar as novas condições iniciais novamente e assim por diante. O SysIdentPy já faz tudo isso para você, então apenas passe todos os dados que você quer validar usando o método 1 passo à frente.
+Neste caso, `y_test` precisa conter todo o intervalo que será avaliado. Resultados de um passo à frente costumam ser melhores do que resultados de simulação livre, mas respondem a uma pergunta menos exigente: quão bem o modelo prediz a próxima amostra quando conhece o histórico real da saída?
 
-### Predição n Passos à Frente
+### Predição de n Passos à Frente
 
-A predição n passos à frente é quase a mesma que a de 1 passo à frente, mas aqui você pode definir o número de passos à frente que quer testar seu modelo. Se você configurar `steps_ahead=5`, por exemplo, significa que os primeiros 5 valores serão preditos usando `yhat` no loop, mas então o processo é *reiniciado* alimentando os valores reais em `y_test` na próxima iteração, então realizando outras 5 predições usando o `yhat` e assim por diante. Vamos verificar o exemplo considerando `steps_ahead=2`:
+A predição de $n$ passos fica entre os dois casos anteriores. Dentro de cada bloco, o modelo usa as próprias predições. Ao completar `steps_ahead` amostras, a recursão é reiniciada com valores medidos e um novo bloco é calculado.
 
-```python
+Com `steps_ahead=2`, temos
+
+```text
 y_initial = yhat(0) = 8
 yhat(1) = 1*8 + 2*1 = 10
 yhat(2) = 1*10 + 2*2 = 14
 yhat(3) = 1*10 + 2*3 = 16
 yhat(4) = 1*16 + 2*4 = 24
-e assim por diante
 ```
 
-## Desempenho do Modelo
-
-A validação de modelos é uma das partes mais cruciais em identificação de sistemas. Como mencionamos antes, em identificação de sistemas estamos tentando modelar a dinâmica do processo para tarefas como projeto de controle. Em tais casos, não podemos apenas confiar em métricas de regressão, mas também garantir que os resíduos sejam imprevisíveis em várias combinações de entradas e saídas passadas ([Billings, S. A. and Voon, W. S. F., "Structure detection and model validity tests in the identification of nonlinear systems"](https://digital-library.theiet.org/content/journals/10.1049/ip-d.1983.0034)). Um teste estatístico frequentemente usado é o RMSE normalizado, chamado RRSE, que pode ser expresso por
-
-$$
-\begin{equation}
-        \textrm{RRSE}= \frac{\sqrt{\sum\limits_{k=1}^{n}(y_k-\hat{y}_k)^2}}{\sqrt{\sum\limits_{k=1}^{n}(y_k-\bar{y})^2}},
-\end{equation}
-\tag{1}
-$$
-
-onde $\hat{y}_k \in \mathbb{R}$ é a saída predita pelo modelo e $\bar{y} \in \mathbb{R}$ é a média da saída medida $y_k$. O RRSE fornece alguma indicação sobre a qualidade do modelo, mas concluir sobre o melhor modelo avaliando apenas essa quantidade pode levar a uma interpretação incorreta, como mostrado no exemplo a seguir.
-
-Considere os modelos
-
-$$
-y_{{_a}k} = 0.7077y_{{_a}k-1} + 0.1642u_{k-1} + 0.1280u_{k-2}
-$$
-
-e
-
-$$y_{{_b}k}=0.7103y_{{_b}k-1} + 0.1458u_{k-1} + 0.1631u_{k-2} -1467y^3_{{_b}k-1} + 0.0710y^3_{{_b}k-2} +0.0554y^2_{{_b}k-3}u_{k-3}$$
-
-definidos em [Meta Model Structure Selection: An Algorithm For Building Polynomial NARX Models For Regression And Classification](https://ufsj.edu.br/portal2-repositorio/File/ppgel/225-2020-02-17-DissertacaoWilsonLacerda.pdf). O primeiro resulta em $RRSE = 0.1202$ enquanto o último resulta em $RRSE~=0.0857$. Embora o modelo $y_{{_b}k}$ ajuste melhor os dados, ele é apenas uma representação enviesada para um conjunto de dados e não uma boa descrição de todo o sistema.
-
-O RRSE (ou qualquer outra métrica) mostra que testes de validação podem precisar ser realizados cuidadosamente. Outra prática tradicional é dividir o conjunto de dados em duas partes. Nesse sentido, pode-se testar os modelos obtidos da parte de estimação dos dados usando dados específicos para validação. No entanto, o desempenho de um passo à frente de modelos NARX geralmente resulta em interpretações equivocadas porque mesmo modelos fortemente enviesados podem ajustar bem os dados. Portanto, uma abordagem de free run simulation geralmente permite uma melhor interpretação se o modelo é adequado ou não ([Billings, S. A.](https://www.wiley.com/en-us/Nonlinear+System+Identification%3A+NARMAX+Methods+in+the+Time%2C+Frequency%2C+and+Spatio-Temporal+Domains-p-9781119943594)).
-
-Testes estatísticos para modelos SISO baseados nas funções de correlação foram propostos em ([Billings, S. A. and Voon, W. S. F., "A prediction-error and stepwise-regression estimation algorithm for non-linear systems"](https://www.tandfonline.com/doi/abs/10.1080/00207178608933633)), ([Model validity tests for non-linear signal processing applications](https://www.tandfonline.com/doi/abs/10.1080/00207179108934155)). Os testes são:
-
-$$
-\begin{aligned}
-    \phi_{_{\xi \xi}\tau} &= E\{\xi_k \xi_{k-\tau}\} = \delta_{\tau}, \\
-    \phi_{_{\xi x}\tau} &= E\{\xi_k x_{k-\tau}\} = 0 \forall \tau, \\
-    \phi_{_{\xi \xi x}\tau} &= E\{\xi_k \xi_{k-\tau} x_{k-\tau}\} = 0 \forall \tau, \\
-    \phi_{_{x^2 \xi}\tau} &= E\{(u^2_k - E\{x^2_k\})\xi_{k-\tau}\} = 0 \forall \tau, \\
-    \phi_{_{x^2 \xi^2}\tau} &= E\{(u^2_k - E\{x^2_k\})\xi^2_{k-\tau}\} = 0 \forall \tau, \\
-    \phi_{_{(y\xi) x^2}\tau} &= E\{(y_k\xi_k - E\{y_k\xi_k\})(x^2_{k-\tau} - E\{x^2_k\})\} = 0 \forall \tau,
-\end{aligned}
-\tag{2}
-$$
-
-
-onde $\delta$ é a função delta de Dirac e a função de correlação cruzada $\phi$ é denotada por ([Billings, S. A. and Voon, W. S. F.](https://digital-library.theiet.org/content/journals/10.1049/ip-d.1983.0034)):
-
-$$
-\begin{equation}
-\phi_{{_{ab}}\tau} = \frac{\frac{1}{n}\sum\limits_{k=1}^{n-\tau}(a_k - \hat{a})(b_{k+\tau}-\hat{b})}{\sqrt{\frac{1}{n}\sum\limits_{k=1}^{n}(a_k-\hat{a})^2} \sqrt{\frac{1}{n}\sum\limits_{k=1}^{n}(b_k-\hat{b})^2}} = \frac{\sum\limits_{k=1}^{n-\tau}(a_k - \hat{a})(b_{k+\tau}-\hat{b})}{\sqrt{\sum\limits_{k=1}^{n}(a_k-\hat{a})^2} \sqrt{\sum\limits_{k=1}^{n}(b_k-\hat{b})^2}},
-\end{equation}
-\tag{3}
-$$
-
-onde $a$ e $b$ são duas sequências de sinais. Se os testes são verdadeiros, então os resíduos do modelo podem ser considerados como ruído branco.
-
-### Métricas Disponíveis no SysIdentPy
-
-O SysIdentPy fornece as seguintes métricas de regressão prontas para uso:
-
-- forecast_error
-- mean_forecast_error
-- mean_squared_error
-- root_mean_squared_error
-- normalized_root_mean_squared_error
-- root_relative_squared_error
-- mean_absolute_error
-- mean_squared_log_error
-- median_absolute_error
-- explained_variance_score
-- r2_score
-- symmetric_mean_absolute_percentage_error
-
-Para usá-las, o usuário só precisa importar a métrica desejada usando, por exemplo
+No SysIdentPy:
 
 ```python
-from sysidentpy.metrics import root_relative_squared_error
+yhat = model.predict(X=x_test, y=y_test, steps_ahead=2)
 ```
 
-O SysIdentPy também fornece métodos para calcular e analisar a correlação dos resíduos
+`steps_ahead` deve ser um `int` positivo nativo do Python; escalares inteiros do NumPy não são aceitos pelo validador atual. Quanto maior o valor, mais o teste se aproxima da simulação livre e maior é a oportunidade para que erros sejam propagados.
+
+### Alinhando a Saída Antes da Avaliação
+
+O SysIdentPy copia as primeiras `model.max_lag` amostras de `y` para o início de `yhat`, pois elas são condições iniciais, não predições. Incluí-las no cálculo de uma métrica reduz o erro artificialmente. A comparação deve começar depois desse prefixo:
 
 ```python
+start = model.max_lag
+y_eval = y_test[start:]
+yhat_eval = yhat[start:]
+```
 
-from sysidentpy.utils.plotting import plot_residues_correlation
+O mesmo alinhamento deve ser usado nas métricas e nas correlações dos resíduos. Essa regra é especialmente importante ao comparar modelos com valores diferentes de `max_lag`.
+
+## Desempenho e Validação do Modelo
+
+Uma métrica resume a distância entre a saída medida e a saída predita. Isso é necessário, mas não suficiente para validar um modelo dinâmico. Dois modelos podem apresentar erros numéricos semelhantes e, ainda assim, representar dinâmicas muito diferentes.
+
+Sempre que possível, o desempenho deve ser medido em dados que não participaram da estimação dos parâmetros nem da seleção da estrutura. O erro no conjunto de estimação mostra quão bem o modelo se ajustou aos dados usados para construí-lo; o erro em um conjunto de validação separado fornece evidência sobre sua capacidade de generalização. Essa separação, porém, não substitui a análise dos resíduos nem a identificação do modo de predição usado.
+
+Defina o resíduo como
+
+$$
+e_k = y_k - \hat{y}_k.
+\tag{9.2}
+$$
+
+Se o modelo explicou toda a informação determinística disponível nos dados, não deve ser possível predizer $e_k$ usando resíduos anteriores ou entradas passadas. Em termos práticos, procuramos resíduos pequenos e sem padrões sistemáticos. Um RRSE baixo com resíduos fortemente correlacionados indica que ainda existe estrutura não explicada. Essa combinação entre desempenho numérico e análise residual é central nos testes de validade de modelos NARMAX ([Billings e Voon, 1983](https://doi.org/10.1049/ip-d.1983.0034)).
+
+Essa distinção também ajuda a entender por que o modo de predição precisa ser informado junto com qualquer métrica. Um erro calculado em predição de um passo não é diretamente comparável ao mesmo erro calculado em simulação livre.
+
+### Correlação dos Resíduos no SysIdentPy
+
+O SysIdentPy disponibiliza duas funções públicas para essa análise:
+
+```python
 from sysidentpy.residues.residues_correlation import (
-    compute_residues_autocorrelation,
     compute_cross_correlation,
+    compute_residues_autocorrelation,
+)
+from sysidentpy.utils.plotting import plot_residues_correlation
+```
+
+Os argumentos já devem estar alinhados e representar um sinal por chamada. Se
+`X` tiver várias colunas de entrada, chame `compute_cross_correlation`
+separadamente para cada entrada, em vez de passar a matriz completa como `arr`.
+
+`compute_residues_autocorrelation(y, yhat)` calcula a autocorrelação normalizada dos resíduos e retorna os $N$ lags não negativos. A implementação correlaciona diretamente $e$ com ele mesmo, sem subtrair a média dos resíduos, e normaliza o resultado pelo valor no lag zero. Quando a energia dos resíduos é diferente de zero, esse primeiro valor é 1; são os demais lags que devem ser inspecionados. Valores relevantes fora de zero sugerem que resíduos passados ainda carregam informação sobre o resíduo atual.
+
+`compute_cross_correlation(y, yhat, arr)` calcula a correlação cruzada entre os resíduos e outro sinal alinhado, normalmente a entrada usada para excitar o sistema, e retorna os primeiros $\lfloor N/2\rfloor$ lags não negativos. Correlações relevantes sugerem que parte do efeito dessa entrada não foi capturada pelo modelo. Esses dois testes procuram dependências lineares específicas; não esgotam todos os padrões que podem existir nos resíduos.
+
+As duas funções retornam uma tupla na ordem `correlation, upper_bound, lower_bound`. Para uma série residual com $N$ amostras, a implementação usa os limites aproximados
+
+$$
+\pm\frac{1.96}{\sqrt{2N-1}}.
+\tag{9.3}
+$$
+
+Esses limites são a referência visual nominal e aproximada de 95% retornada pela implementação. Alguns pontos fora da faixa podem aparecer por acaso, principalmente quando muitos lags são avaliados. Portanto, os gráficos são ferramentas de diagnóstico: eles não provam sozinhos que um modelo é válido ou inválido.
+
+`plot_residues_correlation(data=...)` recebe diretamente a tupla retornada por uma dessas funções, desenha a correlação e sombreia os limites. Por padrão, o gráfico mostra os primeiros 100 lags; o argumento `n` altera essa quantidade. Se todos os resíduos forem zero, a normalização da autocorrelação envolve uma divisão $0/0$ e a implementação retorna um vetor com `NaN`. A correlação cruzada também fica indefinida quando algum dos sinais normalizados tem energia zero, mas, nesse caso, a implementação atual lança `ZeroDivisionError`. Esses resultados representam uma correlação normalizada que não pode ser calculada, e não a detecção de correlação.
+
+## Métricas Disponíveis no SysIdentPy
+
+O módulo `sysidentpy.metrics` fornece 13 funções públicas para erros de regressão e previsão. Todas comparam valores observados, `y`, com valores preditos, `yhat`. `forecast_error` retorna o erro de cada amostra; as demais retornam um escalar. O MASE é a única métrica desse módulo que também exige os dados de treinamento e, opcionalmente, um período sazonal.
+
+| Grupo | Funções | Unidade ou escala | Melhor valor | Principal característica |
+|---|---|---|---:|---|
+| Erro com sinal | `forecast_error`, `mean_forecast_error` | Mesma unidade de $y$ | 0 | Mostram a direção do erro e o viés médio |
+| Erro quadrático | `mean_squared_error`, `root_mean_squared_error` | $y^2$ no MSE; unidade de $y$ no RMSE | 0 | Penalizam mais os erros grandes |
+| Erro quadrático normalizado | `normalized_root_mean_squared_error`, `root_relative_squared_error` | Adimensional | 0 | Facilitam comparações de escala, mas usam referências diferentes |
+| Erro absoluto | `mean_absolute_error`, `median_absolute_error` | Mesma unidade de $y$ | 0 | Têm interpretação direta e menor influência de erros extremos |
+| Erro absoluto escalado | `mean_absolute_scaled_error` | Adimensional | 0 | Compara o MAE com uma previsão ingênua calculada no treino |
+| Erro logarítmico e percentual | `mean_squared_log_error`, `symmetric_mean_absolute_percentage_error` | Diferença logarítmica ao quadrado; porcentagem | 0 | Avaliam diferenças relativas, sob restrições próprias |
+| Qualidade do ajuste | `explained_variance_score`, `r2_score` | Adimensional | 1 | Comparam o erro com a variabilidade da saída |
+
+### Erro de Previsão e Erro Médio de Previsão
+
+`forecast_error` implementa diretamente a Equação 9.2. Para uma única saída, retorna o vetor $[e_1,\ldots,e_N]$; de forma mais geral, a operação `y - yhat` preserva a forma resultante dos arrays. Como o SysIdentPy usa $e_k=y_k-\hat{y}_k$, um erro positivo indica subestimação e um erro negativo indica superestimação.
+
+`mean_forecast_error` calcula
+
+$$
+\mathrm{MFE}=\frac{1}{N}\sum_{k=1}^{N}e_k.
+\tag{9.4}
+$$
+
+O MFE, expresso na mesma unidade de $y$, é útil para detectar viés médio, mas erros positivos e negativos podem se cancelar. Um MFE próximo de zero não implica, por si só, predições precisas.
+
+### MSE e RMSE
+
+O erro quadrático médio é
+
+$$
+\mathrm{MSE}=\frac{1}{N}\sum_{k=1}^{N}(y_k-\hat{y}_k)^2,
+\tag{9.5}
+$$
+
+e sua raiz é
+
+$$
+\mathrm{RMSE}=\sqrt{\mathrm{MSE}}.
+\tag{9.6}
+$$
+
+O MSE está na unidade de $y$ ao quadrado. O RMSE volta à unidade original da saída e costuma ser mais fácil de interpretar. Como ambos elevam o erro ao quadrado, erros grandes recebem peso elevado.
+
+### NRMSE e RRSE
+
+No SysIdentPy, `normalized_root_mean_squared_error` normaliza o RMSE pelo intervalo observado da saída:
+
+$$
+\mathrm{NRMSE}=\frac{\mathrm{RMSE}}{\max(y)-\min(y)}.
+\tag{9.7}
+$$
+
+Essa definição torna o resultado adimensional, mas também o deixa sensível a valores extremos que ampliem o intervalo. Se `y` for constante, o denominador será zero. A implementação retorna 0 para uma predição perfeita e `inf` para uma predição imperfeita; um erro contendo `NaN` continua sendo `NaN`.
+
+O `root_relative_squared_error` usa a média da saída como referência:
+
+$$
+\mathrm{RRSE}=
+\sqrt{
+\frac{\sum_{k=1}^{N}(y_k-\hat{y}_k)^2}
+{\sum_{k=1}^{N}(y_k-\bar{y})^2}
+}.
+\tag{9.8}
+$$
+
+Para uma saída não constante, RRSE menor que 1 significa que o modelo supera a predição constante $\hat{y}_k=\bar{y}$ no mesmo conjunto de avaliação. RRSE igual a 1 indica desempenho equivalente e RRSE maior que 1 indica desempenho pior. Para uma saída constante, o comportamento é o mesmo do NRMSE: 0 para uma predição perfeita, `inf` para uma imperfeita e `NaN` quando o erro não é finito.
+
+Embora ambas sejam chamadas de métricas normalizadas, NRMSE e RRSE não são intercambiáveis. A primeira divide pelo intervalo da saída; a segunda compara a soma dos erros quadráticos com a variabilidade em torno da média.
+
+### MAE, Erro Absoluto Mediano e MASE
+
+O erro absoluto médio é
+
+$$
+\mathrm{MAE}=\frac{1}{N}\sum_{k=1}^{N}|y_k-\hat{y}_k|.
+\tag{9.9}
+$$
+
+O `median_absolute_error` substitui a média pela mediana dos erros absolutos. MAE e erro absoluto mediano mantêm a unidade de `y`, mas a mediana é menos influenciada por uma pequena quantidade de erros extremos. Essa robustez se refere à agregação: um valor extremo ainda produz um erro absoluto grande, mas tem menor influência sobre a mediana do conjunto.
+
+O `mean_absolute_scaled_error` normaliza o MAE usando o erro de uma previsão ingênua calculada nos dados de treinamento. A implementação generaliza para um período sazonal configurável a escala proposta por [Hyndman e Koehler (2006)](https://doi.org/10.1016/j.ijforecast.2006.03.001):
+
+$$
+\mathrm{MASE}=
+\frac{\frac{1}{N}\sum_{k=1}^{N}|y_k-\hat{y}_k|}
+{\frac{1}{T-m}\sum_{t=m+1}^{T}|y^{\mathrm{train}}_t-y^{\mathrm{train}}_{t-m}|},
+\tag{9.10}
+$$
+
+onde $m$ é `seasonal_period`. O valor padrão é $m=1$, correspondente à previsão ingênua de um passo. Um MASE menor que 1 indica que o MAE do modelo é menor que o erro ingênuo médio dentro do conjunto de treinamento; MASE igual a 1 indica desempenho equivalente.
+
+Sua assinatura é diferente das demais métricas:
+
+```python
+mean_absolute_scaled_error(
+    y,
+    yhat,
+    y_train,
+    seasonal_period=1,
 )
 ```
 
-Vamos verificar as métricas do sistema eletromecânico modelado no Capítulo 4.
+O MASE aceita apenas uma saída, em vetores unidimensionais ou matrizes com uma coluna. `y` e `yhat` devem ter a mesma forma, `seasonal_period` deve ser um inteiro positivo e `y_train` precisa conter mais amostras do que esse período. Se o erro ingênuo for zero, a implementação retorna 0 para uma predição perfeita, `inf` para uma imperfeita e preserva `NaN`.
+
+### MSLE e SMAPE
+
+O erro logarítmico quadrático médio é
+
+$$
+\mathrm{MSLE}=\frac{1}{N}\sum_{k=1}^{N}
+\left[\log(1+y_k)-\log(1+\hat{y}_k)\right]^2.
+\tag{9.11}
+$$
+
+O MSLE reduz a influência de diferenças absolutas em valores grandes e enfatiza diferenças relativas. Na implementação do SysIdentPy, todos os valores de `y` e `yhat` devem ser estritamente maiores que -1. Caso contrário, a função lança `ValueError` porque `log1p` não está definido no domínio real.
+
+O erro percentual absoluto médio simétrico é calculado por
+
+$$
+\mathrm{SMAPE}=\frac{100}{N}\sum_{k=1}^{N}
+\frac{2|y_k-\hat{y}_k|}{|y_k|+|\hat{y}_k|}.
+\tag{9.12}
+$$
+
+Para uma única saída e valores finitos, o resultado varia de 0% a 200%. Quando $y_k=\hat{y}_k=0$, a contribuição daquela amostra é definida como zero. Apesar do nome, superestimações e subestimações de mesma magnitude não são necessariamente penalizadas da mesma forma.
+
+### Variância Explicada e R²
+
+O `explained_variance_score` calcula
+
+$$
+\mathrm{EVS}=1-\frac{\mathrm{Var}(y-\hat{y})}{\mathrm{Var}(y)},
+\tag{9.13}
+$$
+
+enquanto o coeficiente de determinação é
+
+$$
+R^2=1-
+\frac{\sum_{k=1}^{N}(y_k-\hat{y}_k)^2}
+{\sum_{k=1}^{N}(y_k-\bar{y})^2}.
+\tag{9.14}
+$$
+
+O melhor valor de ambos é 1, e resultados negativos são possíveis. A diferença principal aparece quando existe um deslocamento constante. Se $\hat{y}=y+c$, o resíduo tem variância zero e o EVS pode ser 1 mesmo com $c\neq0$. O $R^2$ inclui esse viés na soma dos erros quadráticos e será menor que 1.
+
+Para uma saída constante, o $R^2$ retorna 1 quando a predição é perfeita e 0 quando há erro. No EVS, uma predição com deslocamento constante ainda retorna 1 porque a variância dos resíduos é zero; se os resíduos variarem, o resultado será 0. Esse comportamento é coerente com a diferença entre as duas definições, mas reforça por que o EVS não deve ser usado sozinho para detectar viés.
+
+### Formas, Agregação e Valores Ausentes
+
+Com exceção do MASE, as métricas não fazem uma validação comum de forma. Na prática, `y` e `yhat` devem ter a mesma forma e o mesmo alinhamento temporal; caso contrário, as regras de *broadcasting* do backend podem produzir um resultado diferente do pretendido ou lançar um erro. As métricas escalares geralmente agregam todos os elementos fornecidos. Duas exceções merecem atenção: `r2_score` calcula o $R^2$ de cada coluna de saída e retorna a média; o SMAPE soma todas as colunas, mas divide apenas pelo número de amostras, `y.shape[0]`. Portanto, para $q$ saídas, sua faixa teórica passa a ser de 0% a $200q$%. O MASE rejeita explicitamente múltiplas saídas.
+
+As funções também não removem nem imputam valores ausentes. Para um alvo finito e não constante, um `NaN` em `yhat` aparece na posição correspondente de `forecast_error` e se propaga como `NaN` nas métricas escalares. NRMSE, RRSE e MASE também preservam `NaN` quando seus respectivos divisores são zero. EVS e $R^2$ têm uma exceção definida pela função interna usada para alvos constantes: se a variância do alvo é zero e o numerador é diferente de zero ou `NaN`, o resultado retornado é 0. Isso não representa tratamento do dado ausente; é apenas o resultado da regra de segurança implementada para o divisor nulo.
+
+### Exemplo de Uso
+
+```python
+import numpy as np
+
+from sysidentpy.metrics import (
+    explained_variance_score,
+    forecast_error,
+    mean_absolute_error,
+    mean_absolute_scaled_error,
+    mean_forecast_error,
+    mean_squared_error,
+    mean_squared_log_error,
+    median_absolute_error,
+    normalized_root_mean_squared_error,
+    r2_score,
+    root_mean_squared_error,
+    root_relative_squared_error,
+    symmetric_mean_absolute_percentage_error,
+)
+
+y = np.array([3.0, -0.5, 2.0, 7.0])
+yhat = np.array([2.5, 0.0, 2.0, 8.0])
+y_train = np.array([1.0, 2.0, 3.0, 4.0])
+
+errors = forecast_error(y, yhat)
+bias = mean_forecast_error(y, yhat)
+mse = mean_squared_error(y, yhat)
+rmse = root_mean_squared_error(y, yhat)
+nrmse = normalized_root_mean_squared_error(y, yhat)
+rrse = root_relative_squared_error(y, yhat)
+mae = mean_absolute_error(y, yhat)
+median_ae = median_absolute_error(y, yhat)
+mase = mean_absolute_scaled_error(y, yhat, y_train)
+msle = mean_squared_log_error(y, yhat)
+smape = symmetric_mean_absolute_percentage_error(y, yhat)
+evs = explained_variance_score(y, yhat)
+r2 = r2_score(y, yhat)
+```
+
+Essas métricas também participam do suporte à Array API do SysIdentPy quando o despacho é habilitado. Independentemente do backend, a escolha da métrica deve ser guiada pela pergunta de avaliação, e não apenas pela conveniência de obter um único número.
+
+## Estudo de Caso: Sistema Eletromecânico
+
+Vamos retomar o sistema eletromecânico apresentado no Capítulo 4. O objetivo aqui não é encontrar uma configuração ótima, mas mostrar como uma conclusão muda quando observamos a simulação livre, a predição de um passo e as correlações dos resíduos.
+
+Os dados são carregados a partir de um commit específico do repositório `sysidentpy-data`, garantindo que o exemplo use sempre a mesma versão dos sinais.
 
 ```python
 import numpy as np
 import pandas as pd
-from sysidentpy.model_structure_selection import FROLS
-from sysidentpy.basis_function import Polynomial
-from sysidentpy.parameter_estimation import LeastSquares
-from sysidentpy.utils.display_results import results
-from sysidentpy.utils.plotting import plot_residues_correlation, plot_results
-from sysidentpy.residues.residues_correlation import (
-    compute_residues_autocorrelation,
-    compute_cross_correlation,
-)
-from sysidentpy.metrics import root_relative_squared_error
 
-df1 = pd.read_csv("examples/datasets/x_cc.csv")
-df2 = pd.read_csv("examples/datasets/y_cc.csv")
+from sysidentpy.basis_function import Polynomial
+from sysidentpy.metrics import root_relative_squared_error
+from sysidentpy.model_structure_selection import FROLS
+from sysidentpy.parameter_estimation import (
+    LeastSquares,
+    RecursiveLeastSquares,
+)
+from sysidentpy.residues.residues_correlation import (
+    compute_cross_correlation,
+    compute_residues_autocorrelation,
+)
+from sysidentpy.utils.plotting import (
+    plot_residues_correlation,
+    plot_results,
+)
+
+data_url = (
+    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/"
+    "4085901293ba5ed5674bb2911ef4d1fa20f3438d/datasets/generator/"
+)
+df1 = pd.read_csv(f"{data_url}x_cc.csv")
+df2 = pd.read_csv(f"{data_url}y_cc.csv")
 
 x_train, x_valid = np.split(df1.iloc[::500].values, 2)
 y_train, y_valid = np.split(df2.iloc[::500].values, 2)
+```
 
+Para evitar repetir o alinhamento, vamos criar uma pequena função de avaliação:
+
+```python
+def evaluate(model, *, steps_ahead=None):
+    yhat = model.predict(
+        X=x_valid,
+        y=y_valid,
+        steps_ahead=steps_ahead,
+    )
+    start = model.max_lag
+    y_eval = y_valid[start:]
+    yhat_eval = yhat[start:]
+    x_eval = x_valid[start:]
+
+    rrse = root_relative_squared_error(y_eval, yhat_eval)
+    ee = compute_residues_autocorrelation(y_eval, yhat_eval)
+    x1e = compute_cross_correlation(y_eval, yhat_eval, x_eval)
+    return y_eval, yhat_eval, rrse, ee, x1e
+```
+
+Primeiro, usamos Least Squares, dois lags e seleção de ordem pelo BIC:
+
+```python
 basis_function = Polynomial(degree=2)
 model = FROLS(
     order_selection=True,
@@ -236,33 +463,35 @@ model = FROLS(
     xlag=2,
     info_criteria="bic",
     estimator=LeastSquares(unbiased=False),
-    basis_function=basis_function
+    basis_function=basis_function,
 )
 model.fit(X=x_train, y=y_train)
-yhat = model.predict(X=x_valid, y=y_valid)
-rrse = root_relative_squared_error(y_valid, yhat)
-print(rrse)
-# plot only the first 100 samples (n=100)
-plot_results(y=y_valid, yhat=yhat, n=100)
 
-ee = compute_residues_autocorrelation(y_valid, yhat)
-plot_residues_correlation(data=ee, title="Residues", ylabel="$e^2$")
-x1e = compute_cross_correlation(y_valid, yhat, x_valid)
-plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
+y_eval, yhat_eval, rrse, ee, x1e = evaluate(model)
+print(rrse)
+
+plot_results(y=y_eval, yhat=yhat_eval, n=100)
+plot_residues_correlation(
+    data=ee,
+    title="Residual autocorrelation",
+    ylabel="$r_{ee}$",
+)
+plot_residues_correlation(
+    data=x1e,
+    title="Input-residual cross-correlation",
+    ylabel="$r_{xe}$",
+)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c9_dc_1.png?raw=true)
+```text
+671.3206640454391
+```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c09_ee_1.png?raw=true)
+O RRSE muito maior que 1 mostra que essa configuração é inadequada em simulação livre. A saída simulada se afasta rapidamente da saída medida, e a autocorrelação dos resíduos permanece elevada por muitos lags. Um gráfico limitado às primeiras amostras pode esconder a dimensão dessa divergência; por isso, a métrica e o gráfico devem ser analisados juntos.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c09_ex_1.png?raw=true)
-
-O RRSE é 0.0800, que é uma métrica muito boa. No entanto, podemos ver que os resíduos têm algumas autocorrelações altas e com a entrada. Isso significa que nosso modelo talvez não seja bom o suficiente como poderia ser.
-
-Vamos verificar o que acontece se aumentarmos `xlag`, `ylag` e mudarmos o algoritmo de estimação de parâmetros de Least Squares para Recursive Least Squares
+Agora aumentamos os lags e usamos Recursive Least Squares:
 
 ```python
-basis_function = Polynomial(degree=2)
 model = FROLS(
     order_selection=True,
     n_info_values=50,
@@ -270,49 +499,58 @@ model = FROLS(
     xlag=5,
     info_criteria="bic",
     estimator=RecursiveLeastSquares(unbiased=False),
-    basis_function=basis_function
+    basis_function=basis_function,
 )
-
 model.fit(X=x_train, y=y_train)
-yhat = model.predict(X=x_valid, y=y_valid)
-rrse = root_relative_squared_error(y_valid, yhat)
+
+y_eval, yhat_eval, rrse, ee, x1e = evaluate(model)
 print(rrse)
-# plot only the first 100 samples (n=100)
-plot_results(y=y_valid, yhat=yhat, n=100)
-ee = compute_residues_autocorrelation(y_valid, yhat)
-plot_residues_correlation(data=ee, title="Residues", ylabel="$e^2$")
-x1e = compute_cross_correlation(y_valid, yhat, x_valid)
-plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
+
+plot_results(y=y_eval, yhat=yhat_eval, n=100)
+plot_residues_correlation(
+    data=ee,
+    title="Residual autocorrelation",
+    ylabel="$r_{ee}$",
+)
+plot_residues_correlation(
+    data=x1e,
+    title="Input-residual cross-correlation",
+    ylabel="$r_{xe}$",
+)
 ```
 
-Agora o RRSE é 0.0568 e temos uma melhor correlação residual!
+```text
+255.83144074914404
+```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c09_dc_2.png?raw=true)
+O valor diminui em relação ao primeiro modelo, mas continua muito acima de 1. Portanto, seria incorreto chamar esse resultado de bom apenas porque houve uma melhora relativa. A simulação livre ainda é instável e os resíduos continuam apresentando dependência temporal.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c09_ee_2.png?raw=true)
-
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c09_ex_2.png?raw=true)
-
-No final das contas, o melhor modelo será aquele que satisfaz as necessidades do usuário. No entanto, é importante entender como analisar os modelos para que você possa ter uma ideia se pode obter algumas melhorias sem muito trabalho.
-
-Por curiosidade, vamos verificar como o modelo se comporta se executarmos uma predição 1 passo à frente. Não precisamos ajustar o modelo novamente, apenas fazer outra predição usando a opção 1 passo.
+Por fim, avaliamos exatamente o mesmo modelo em predição de um passo:
 
 ```python
-yhat = model.predict(X=x_valid, y=y_valid, steps_ahead=1)
-rrse = root_relative_squared_error(y_valid, yhat)
+y_eval, yhat_eval, rrse, ee, x1e = evaluate(
+    model,
+    steps_ahead=1,
+)
 print(rrse)
-# plot only the first 100 samples (n=100)
-plot_results(y=y_valid, yhat=yhat, n=100)
-ee = compute_residues_autocorrelation(y_valid, yhat)
-plot_residues_correlation(data=ee, title="Residues", ylabel="$e^2$")
-x1e = compute_cross_correlation(y_valid, yhat, x_valid)
-plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
+
+plot_results(y=y_eval, yhat=yhat_eval, n=100)
+plot_residues_correlation(
+    data=ee,
+    title="Residual autocorrelation",
+    ylabel="$r_{ee}$",
+)
+plot_residues_correlation(
+    data=x1e,
+    title="Input-residual cross-correlation",
+    ylabel="$r_{xe}$",
+)
 ```
 
-O mesmo modelo, mas avaliando a predição 1 passo à frente, agora retorna um RRSE$= 0.02044$ e os resíduos estão ainda melhores. Mas lembre-se, isso é esperado, como explicado na seção anterior.
+```text
+0.02061510242049919
+```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c09_dc_3.png?raw=true)
+O RRSE agora parece excelente, embora o modelo seja o mesmo que apresentou RRSE maior que 255 em simulação livre. A diferença vem da realimentação da saída medida a cada passo, que impede a propagação do erro. A autocorrelação dos resíduos diminui de forma acentuada, mas a correlação com a entrada ainda apresenta lags fora dos limites aproximados. Esses resultados devem ser inspecionados, e não resumidos pelo RRSE.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c09_ee_3.png?raw=true)
-
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c09_ex_03.png?raw=true)
+Este exemplo mostra por que a frase “o modelo tem RRSE igual a 0,02” é incompleta. É preciso informar o conjunto de dados, o alinhamento adotado e, principalmente, o modo de predição. Para aplicações em que o modelo precisa evoluir sem acesso contínuo à saída real, o resultado da simulação livre é o diagnóstico decisivo neste caso.
