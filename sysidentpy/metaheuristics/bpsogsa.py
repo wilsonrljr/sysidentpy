@@ -33,10 +33,14 @@ class BPSOGSA:
     dimension : int, default=15
         The dimension of the search space.
         criteria method.
-    p_zeros : float, default=0.5
+    p_ones : float, default=0.5
         The probability of getting ones in the construction of the population.
     p_zeros : float, default=0.5
         The probability of getting zeros in the construction of the population.
+    random_state : int, numpy.random.Generator, numpy.random.RandomState, optional
+        Controls all random draws made by the optimizer. An integer produces the
+        same trajectory on each call to :meth:`optimize`; a generator instance
+        advances its state between calls.
 
     Examples
     --------
@@ -77,6 +81,7 @@ class BPSOGSA:
         dimension=15,
         p_zeros=0.5,
         p_ones=0.5,
+        random_state=None,
     ):
         self.dimension = dimension
         self.n_agents = n_agents
@@ -88,6 +93,8 @@ class BPSOGSA:
         self.power = power
         self.p_zeros = p_zeros
         self.p_ones = p_ones
+        self.random_state = random_state
+        self._rng = check_random_state(random_state)
         self.best_by_iter = None
         self.mean_by_iter = None
         self.optimal_fitness_value = None
@@ -119,6 +126,8 @@ class BPSOGSA:
         - Manuscript: A taxonomy of hybrid metaheuristics.
 
         """
+        self.random_state = getattr(self, "random_state", None)
+        self._rng = check_random_state(self.random_state)
         velocity = np.zeros([self.dimension, self.n_agents])
         population = self.generate_random_population()
         self.best_by_iter = []
@@ -127,17 +136,28 @@ class BPSOGSA:
         self.optimal_model = None
 
         for i in range(self.maxiter):
-            fitness = self.evaluate_objective_function(population)
+            fitness = np.asarray(
+                self.evaluate_objective_function(population), dtype=float
+            )
+            finite_fitness = np.isfinite(fitness)
+            if not np.any(finite_fitness):
+                raise ValueError(
+                    "The objective function returned no finite fitness values."
+                )
+            fitness = np.where(finite_fitness, fitness, np.inf)
 
             column_of_best_solution = np.argmin(fitness)
             current_best_fitness = fitness[column_of_best_solution]
 
-            if current_best_fitness < self.optimal_fitness_value:
+            if (
+                current_best_fitness < self.optimal_fitness_value
+                or self.optimal_model is None
+            ):
                 self.optimal_fitness_value = current_best_fitness
                 self.optimal_model = population[:, column_of_best_solution].copy()
 
             self.best_by_iter.append(self.optimal_fitness_value)
-            self.mean_by_iter.append(np.mean(fitness))
+            self.mean_by_iter.append(np.mean(fitness[finite_fitness]))
             agent_mass = self.mass_calculation(fitness)
             gravitational_constant = self.calculate_gravitational_constant(i)
             acceleration = self.calculate_acceleration(
@@ -155,13 +175,24 @@ class BPSOGSA:
     def generate_random_population(self, random_state=None):
         """Generate the initial population of agents randomly.
 
+        Parameters
+        ----------
+        random_state : int, numpy.random.Generator, numpy.random.RandomState, optional
+            Random source used only for this population. If omitted, the optimizer's
+            shared random generator is used.
+
         Returns
         -------
         population : ndarray of zeros and ones
             The initial population of agents.
 
         """
-        rng = check_random_state(random_state)
+        if random_state is None:
+            if not hasattr(self, "_rng"):
+                self._rng = check_random_state(getattr(self, "random_state", None))
+            rng = self._rng
+        else:
+            rng = check_random_state(random_state)
         population = rng.choice(
             [0, 1], size=(self.dimension, self.n_agents), p=[self.p_zeros, self.p_ones]
         )
@@ -181,16 +212,28 @@ class BPSOGSA:
             The mass of each agent.
 
         """
-        highest_fitness_value = np.nanmax(fitness_value)
-        lowest_fitness_value = np.nanmin(fitness_value)
+        fitness_value = np.asarray(fitness_value, dtype=float)
+        finite_fitness = np.isfinite(fitness_value)
+        if np.any(finite_fitness):
+            scale = np.max(np.abs(fitness_value[finite_fitness]))
+            if scale > 0:
+                fitness_value = fitness_value / scale
+            highest_finite_fitness = np.max(fitness_value[finite_fitness])
+            replacement = highest_finite_fitness + max(abs(highest_finite_fitness), 1.0)
+            fitness_value = np.where(finite_fitness, fitness_value, replacement)
+        else:
+            fitness_value = np.ones_like(fitness_value)
+
+        highest_fitness_value = np.max(fitness_value)
+        lowest_fitness_value = np.min(fitness_value)
 
         column_fitness = len(fitness_value)
         if highest_fitness_value == lowest_fitness_value:
-            agent_mass = np.ones([column_fitness, 1])
+            agent_mass = np.ones(column_fitness)
         else:
             best_fitness_value = lowest_fitness_value
             worst_fitness_value = highest_fitness_value
-            agent_mass = (fitness_value - 0.99 * worst_fitness_value) / (
+            agent_mass = (fitness_value - worst_fitness_value) / (
                 best_fitness_value - worst_fitness_value
             )
 
@@ -244,22 +287,21 @@ class BPSOGSA:
         )
         k_best_agents = round(self.n_agents * k_best_agents / 100)
 
-        maximum_value_index = np.argsort(agent_mass)[::-1].ravel()
+        maximum_value_index = np.argsort(np.ravel(agent_mass))[::-1]
         gravitational_force = np.zeros([self.dimension, self.n_agents])
         for i in range(self.n_agents):
             for j in range(k_best_agents):
                 if maximum_value_index[j] != i:
-                    euclidean_distance = np.linalg.norm(
-                        population[:, i] - population[:, maximum_value_index[j]],
-                        self.norm,
-                    )
+                    with np.errstate(divide="ignore"):
+                        euclidean_distance = np.linalg.norm(
+                            population[:, i] - population[:, maximum_value_index[j]],
+                            self.norm,
+                        )
                     gravitational_force[:, i] = gravitational_force[
                         :, i
-                    ] + np.random.rand(self.dimension) * agent_mass[
+                    ] + self._rng.random(self.dimension) * agent_mass[
                         maximum_value_index[j]
-                    ] * (
-                        population[:, maximum_value_index[j]] - population[:, i]
-                    ) / (
+                    ] * (population[:, maximum_value_index[j]] - population[:, i]) / (
                         euclidean_distance**self.power + np.finfo(np.float64).eps
                     )
 
@@ -296,16 +338,19 @@ class BPSOGSA:
         """
         c_factor_local_best = -2 * ((iteration**3) / (self.maxiter**3)) + 2
         c_factor_global_best = 2 * ((iteration**3) / (self.maxiter**3)) + 2
+        if self.optimal_model is None:
+            raise RuntimeError("The optimizer has no candidate model to update from.")
+
         global_best = np.repeat(self.optimal_model, self.n_agents, axis=0).reshape(
             self.dimension, self.n_agents
         )
 
         velocity = (
-            np.random.rand(self.dimension, self.n_agents) * velocity
+            self._rng.random((self.dimension, self.n_agents)) * velocity
             + c_factor_local_best * acceleration
             + c_factor_global_best * (global_best - population)
         )
-        r = np.random.rand(self.dimension, self.n_agents)
+        r = self._rng.random((self.dimension, self.n_agents))
         transform_to_binary = np.absolute(np.tanh(velocity))
         ind = np.where(r < transform_to_binary)
         population[ind] = 1 - population[ind]
