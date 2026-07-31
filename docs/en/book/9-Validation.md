@@ -404,6 +404,7 @@ The data are loaded from a specific commit in the `sysidentpy-data` repository, 
 ```python
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import StandardScaler
 
 from sysidentpy.basis_function import Polynomial
 from sysidentpy.metrics import root_relative_squared_error
@@ -425,11 +426,18 @@ data_url = (
     "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/"
     "4085901293ba5ed5674bb2911ef4d1fa20f3438d/datasets/generator/"
 )
-df1 = pd.read_csv(f"{data_url}x_cc.csv")
-df2 = pd.read_csv(f"{data_url}y_cc.csv")
+df1 = pd.read_csv(f"{data_url}x_cc.csv", header=None)
+df2 = pd.read_csv(f"{data_url}y_cc.csv", header=None)
 
 x_train, x_valid = np.split(df1.iloc[::500].values, 2)
 y_train, y_valid = np.split(df2.iloc[::500].values, 2)
+
+x_scaler = StandardScaler()
+y_scaler = StandardScaler()
+x_train_scaled = x_scaler.fit_transform(x_train)
+x_valid_scaled = x_scaler.transform(x_valid)
+y_train_scaled = y_scaler.fit_transform(y_train)
+y_valid_scaled = y_scaler.transform(y_valid)
 ```
 
 To avoid repeating the alignment, we define a small evaluation function:
@@ -484,8 +492,14 @@ plot_residues_correlation(
 ```
 
 ```text
-671.3206640454391
+668.9962328881088
 ```
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/electromechanical-ls-free-run.png?raw=true)
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/electromechanical-ls-residual-autocorrelation.png?raw=true)
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/electromechanical-ls-input-residual-correlation.png?raw=true)
 
 The RRSE far above 1 shows that this configuration is inadequate in free run simulation. The simulated output quickly moves away from the observed output, and residual autocorrelation remains high across many lags. A plot restricted to the first samples may hide the extent of this divergence; the metric and plot should therefore be examined together.
 
@@ -520,8 +534,14 @@ plot_residues_correlation(
 ```
 
 ```text
-255.83144074914404
+256.51064230974333
 ```
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/electromechanical-rls-free-run.png?raw=true)
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/electromechanical-rls-residual-autocorrelation.png?raw=true)
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/electromechanical-rls-input-residual-correlation.png?raw=true)
 
 The value decreases relative to the first model, but remains far above 1. It would therefore be incorrect to call this a good result simply because it represents a relative improvement. The free run simulation is still unstable and the residuals remain temporally dependent.
 
@@ -534,7 +554,12 @@ y_eval, yhat_eval, rrse, ee, x1e = evaluate(
 )
 print(rrse)
 
-plot_results(y=y_eval, yhat=yhat_eval, n=100)
+plot_results(
+    y=y_eval,
+    yhat=yhat_eval,
+    n=100,
+    title="One-step-ahead prediction",
+)
 plot_residues_correlation(
     data=ee,
     title="Residual autocorrelation",
@@ -548,9 +573,127 @@ plot_residues_correlation(
 ```
 
 ```text
-0.02061510242049919
+0.020984834884319806
 ```
 
-The RRSE now appears excellent, even though this is the same model that produced an RRSE above 255 in free run simulation. The difference comes from feeding the observed output back at every step, which prevents error propagation. Residual autocorrelation decreases sharply, but the input-residual correlation still has lags outside the approximate bounds. These results should be inspected rather than summarized by RRSE.
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/electromechanical-rls-one-step-ahead.png?raw=true)
 
-This example shows why the statement “the model has an RRSE of 0.02” is incomplete. We must report the dataset, the alignment, and, most importantly, the prediction mode. For applications in which the model must evolve without continuous access to the true output, the free run result is the decisive diagnosis in this case.
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/electromechanical-rls-one-step-residual-autocorrelation.png?raw=true)
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/electromechanical-rls-one-step-input-residual-correlation.png?raw=true)
+
+The RRSE now appears excellent, even though this is the same model that produced an RRSE of approximately 257 in free run simulation. The difference comes from feeding the observed output back at every step, which prevents error propagation. Residual autocorrelation decreases sharply, but the input-residual correlation still has lags outside the approximate bounds. These results should be inspected rather than summarized by RRSE.
+
+### Conditioning with Train-Only Standardization
+
+A second evaluation keeps the model class, lags, polynomial basis, estimator, and
+search configuration fixed. Input and output are standardized using
+transformations fitted exclusively on the training set. Validation uses only the
+means and standard deviations learned from that set, preventing information
+leakage.
+
+```python
+scaled_model = FROLS(
+    order_selection=True,
+    n_info_values=50,
+    ylag=5,
+    xlag=5,
+    info_criteria="bic",
+    estimator=RecursiveLeastSquares(unbiased=False),
+    basis_function=basis_function,
+)
+scaled_model.fit(X=x_train_scaled, y=y_train_scaled)
+
+scaled_free_run_prediction = scaled_model.predict(
+    X=x_valid_scaled,
+    y=y_valid_scaled,
+)
+scaled_one_step_prediction = scaled_model.predict(
+    X=x_valid_scaled,
+    y=y_valid_scaled,
+    steps_ahead=1,
+)
+
+if not (
+    np.isfinite(scaled_free_run_prediction).all()
+    and np.isfinite(scaled_one_step_prediction).all()
+):
+    raise RuntimeError("The scaled model produced a non-finite prediction.")
+
+free_run_prediction = y_scaler.inverse_transform(scaled_free_run_prediction)
+one_step_prediction = y_scaler.inverse_transform(scaled_one_step_prediction)
+
+start = scaled_model.max_lag
+scaled_y_eval = y_valid[start:]
+scaled_x_eval = x_valid[start:]
+scaled_free_run_eval = free_run_prediction[start:]
+scaled_one_step_eval = one_step_prediction[start:]
+
+scaled_free_run_rrse = root_relative_squared_error(
+    scaled_y_eval,
+    scaled_free_run_eval,
+)
+scaled_one_step_rrse = root_relative_squared_error(
+    scaled_y_eval,
+    scaled_one_step_eval,
+)
+scaled_ee = compute_residues_autocorrelation(
+    scaled_y_eval,
+    scaled_free_run_eval,
+)
+scaled_x1e = compute_cross_correlation(
+    scaled_y_eval,
+    scaled_free_run_eval,
+    scaled_x_eval,
+)
+
+print(f"Free-run RRSE: {scaled_free_run_rrse}")
+print(f"One-step-ahead RRSE: {scaled_one_step_rrse}")
+
+plot_results(
+    y=scaled_y_eval,
+    yhat=scaled_free_run_eval,
+    n=100,
+    title="Free run simulation — standardized data",
+)
+plot_residues_correlation(
+    data=scaled_ee,
+    title="Residual autocorrelation",
+    ylabel="$r_{ee}$",
+)
+plot_residues_correlation(
+    data=scaled_x1e,
+    title="Input-residual cross-correlation",
+    ylabel="$r_{xe}$",
+)
+```
+
+```text
+Free-run RRSE: 0.08025565522199729
+One-step-ahead RRSE: 0.04219066805522397
+```
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/electromechanical-rls-scaled-free-run.png?raw=true)
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/electromechanical-rls-scaled-residual-autocorrelation.png?raw=true)
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/electromechanical-rls-scaled-input-residual-correlation.png?raw=true)
+
+The standardized free run remains finite and closely follows the output, with an
+RRSE of approximately 0.0803. This is not merely a consequence of expressing the
+metric in another unit: predictions are returned to the physical unit before
+evaluation. With a polynomial basis, scale changes the numerical conditioning of
+the regressors and can affect the selected structure and estimated parameters.
+
+The residual diagnosis nevertheless prevents an excessive conclusion. Residual
+autocorrelation remains outside the approximate bounds for many lags, and the
+input-residual correlation has some peaks outside those bounds. Standardization
+resolves the instability observed in simulation, but the model is still not a
+complete dynamic description of the system.
+
+This example shows why an isolated statement such as “the model has an RRSE of
+0.02” is incomplete. We must report the dataset, alignment, prediction mode, and
+preprocessing, including the set used to fit its transformations. For
+applications in which the model evolves without continuous access to the true
+output, free run simulation remains the decisive diagnosis, always interpreted
+together with residual analysis.
