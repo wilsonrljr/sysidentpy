@@ -1,5 +1,11 @@
 # Sistema Silver Box
 
+## Reprodutibilidade
+
+Este tutorial foi verificado com SysIdentPy 0.9.0 no Python 3.12.12 e requer
+também `nonlinear-benchmarks==1.0.1`. Os resultados devem ser recalculados quando
+o ambiente ou a configuração mudar.
+
 Nota: O exemplo mostrado neste notebook é retirado do livro complementar [Nonlinear System Identification and Forecasting: Theory and Practice with SysIdentPy](https://sysidentpy.org/book/0-Preface/).
 
 O conteúdo da descrição deriva principalmente (copiar e colar) do [artigo associado - Three free data sets for development and benchmarking in nonlinear system identification](https://ieeexplore.ieee.org/document/6669201). Para uma descrição detalhada, os leitores são encaminhados à referência vinculada.
@@ -44,26 +50,18 @@ $$
 
 ### Pacotes Necessários e Versões
 
-Para garantir que você possa replicar este estudo de caso, é essencial usar versões específicas dos pacotes necessários. Abaixo está uma lista dos pacotes junto com suas respectivas versões necessárias para executar os estudos de caso efetivamente.
+Este estudo de caso foi verificado com o SysIdentPy 0.9.0 no Python 3.12.12 e
+`nonlinear-benchmarks==1.0.1`. Instale explicitamente o checkout do repositório
+e o carregador oficial do benchmark:
 
-Para instalar todos os pacotes necessários, você pode criar um arquivo `requirements.txt` com o seguinte conteúdo:
-
-```
-sysidentpy==0.4.0
-pandas==2.2.2
-numpy==1.26.0
-matplotlib==3.8.4
-nonlinear_benchmarks==0.1.2
+```bash
+python -m pip install -e .
+python -m pip install nonlinear-benchmarks==1.0.1
 ```
 
-Então, instale os pacotes usando:
-
-```
-pip install -r requirements.txt
-```
-
-- Certifique-se de usar um ambiente virtual para evitar conflitos entre versões de pacotes.
-- As versões especificadas são baseadas na compatibilidade com os exemplos de código fornecidos. Se você estiver usando versões diferentes, alguns ajustes no código podem ser necessários.
+Use um ambiente virtual para isolar o carregador opcional. Os resultados
+numéricos devem ser recalculados se o ambiente ou a configuração do modelo forem
+alterados.
 
 ### Configuração do SysIdentPy
 
@@ -99,47 +97,36 @@ O gráfico a seguir detalha os dados de treinamento e teste do experimento.
 ```python
 plt.plot(x_train)
 plt.plot(y_train, alpha=0.3)
-plt.title("Experimento 1: dados de treinamento")
+plt.title("Experiment 1: training data")
 plt.show()
 
 plt.plot(x_test)
 plt.plot(y_test, alpha=0.3)
-plt.title("Experimento 1: dados de teste")
+plt.title("Experiment 1: testing data")
 plt.show()
 
 plt.plot(test_arrow_full.u)
 plt.plot(test_arrow_full.y, alpha=0.3)
-plt.title("Experimento 2: dados de treinamento")
+plt.title("Experiment 2: training data")
 plt.show()
 
 plt.plot(test_arrow_no_extrapolation.u)
 plt.plot(test_arrow_no_extrapolation.y, alpha=0.2)
-plt.title("Experimento 2: dados de teste")
+plt.title("Experiment 2: testing data")
 plt.show()
 ```
 
 
-    
-![png](../../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_5_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-01.png?raw=true)
 
 
-
-    
-![png](../../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_5_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-02.png?raw=true)
 
 
-
-    
-![png](../../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_5_2.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-03.png?raw=true)
 
 
-
-    
-![png](../../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_5_3.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-04.png?raw=true)
 
 
 > Nota Importante
@@ -164,7 +151,7 @@ O objetivo deste benchmark é desenvolver um modelo que supere o modelo estado-d
 
 Parece que os valores mostrados no artigo realmente representam o tempo de treinamento, não as métricas de erro. Entrarei em contato com os autores para confirmar esta informação. De acordo com o site Nonlinear Benchmark, a informação é a seguinte:
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_sota.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-05.png?raw=true)
 
 onde os valores na coluna "Training time" correspondem aos apresentados como métricas de erro no artigo.
 
@@ -188,44 +175,37 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
-nrmse = rmse / y_test.std()
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
 rmse_mv = 1000 * rmse
-print(nrmse, rmse_mv)
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=30000,
     figsize=(15, 4),
-    title=f"Multisine. Modelo -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
+    title=f"Multisine. Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
 )
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=300,
     figsize=(15, 4),
-    title=f"Multisine. Modelo -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
+    title=f"Multisine. Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
 )
 ```
 
-    0.1423804033714937 7.727682109791501
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-06.png?raw=true)
 
 
-
-    
-![png](../../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_7_1.png)
-    
-
-
-
-    
-![png](../../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_7_2.png)
-    
-
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-07.png?raw=true)
 
 
 ```python
@@ -247,48 +227,39 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-# não concatenaremos os últimos valores dos dados de treino para usar como condição inicial aqui porque
-# estes dados de teste têm um comportamento muito diferente.
-# No entanto, se você quiser, pode fazer isso e verá que o modelo ainda terá
-# um ótimo desempenho após algumas iterações
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
-nrmse = rmse / y_test.std()
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
 rmse_mv = 1000 * rmse
 
-print(nrmse, rmse_mv)
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=30000,
     figsize=(15, 4),
-    title=f"Arrow (full). Modelo -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
+    title=f"Arrow (full). Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
 )
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=300,
     figsize=(15, 4),
-    title=f"Arrow (full). Modelo -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
+    title=f"Arrow (full). Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
 )
 ```
 
-    0.07762658947015803 4.14903534238172
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-08.png?raw=true)
 
 
-
-    
-![png](../../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_8_1.png)
-    
-
-
-
-    
-![png](../../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_8_2.png)
-    
-
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-09.png?raw=true)
 
 
 ```python
@@ -310,39 +281,51 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
-nrmse = rmse / y_test.std()
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
 rmse_mv = 1000 * rmse
-print(nrmse, rmse_mv)
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=30000,
     figsize=(15, 4),
-    title=f"Arrow (no extrapolation). Modelo -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
+    title=f"Arrow (no extrapolation). Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
 )
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=300,
     figsize=(15, 4),
-    title=f"Simulação Free Run. Modelo -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
+    title=f"Free Run simulation. Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
 )
 ```
 
-    0.05187400789723806 2.2293393254015776
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-10.png?raw=true)
 
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver_sota.png?raw=true)
 
-    
-![png](../../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_9_1.png)
-    
+Os resultados atuais em simulação livre, avaliados após a janela de
+inicialização de 50 amostras fornecida pelo carregador, são:
 
+| Conjunto de teste | RMSE | NRMSE |
+| --- | ---: | ---: |
+| Multisine | 0.007727 | 0.142302 |
+| Arrow, completo | 0.004148 | 0.077565 |
+| Arrow, sem extrapolação | 0.002229 | 0.051822 |
 
-
-    
-![png](../../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_9_2.png)
-    
+O teste arrow completo é mais difícil que a versão sem extrapolação. A métrica
+exclui a janela de inicialização uma única vez; ela não remove
+`model.max_lag` pela segunda vez. Os resultados externos de modelos de estado
+profundos continuam sendo uma referência útil, mas não são comparados
+diretamente com esta tabela sem antes igualar divisão dos dados, inicialização e
+normalização.
