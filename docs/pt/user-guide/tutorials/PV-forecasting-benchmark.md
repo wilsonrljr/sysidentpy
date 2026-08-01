@@ -8,6 +8,13 @@ Exemplo criado por Wilson Rocha Lacerda Junior
 >
 > Este livro fornece orientações detalhadas para apoiar seu trabalho com o SysIdentPy.
 
+## Reprodutibilidade
+
+Este tutorial foi verificado com SysIdentPy 0.9.0 no Python 3.12.12,
+`neuralprophet==0.9.0`, `torch==2.5.1`, pandas 2.3.3 e scikit-learn 1.7.2. Os dados
+hospedados em `sysidentpy-data` usam uma URL de commit imutável, e os modelos
+aleatórios definem semente explícita.
+
 ## Nota
 
 O exemplo a seguir **não** tem a intenção de afirmar que uma biblioteca é melhor que outra. O foco principal destes exemplos é mostrar que o SysIdentPy pode ser uma boa alternativa para pessoas que desejam modelar séries temporais.
@@ -40,11 +47,12 @@ from neuralprophet import NeuralProphet
 from neuralprophet import set_random_seed
 
 simplefilter("ignore", FutureWarning)
-np.seterr(all="ignore")
-
-%matplotlib inline
-
 loss = mean_squared_error
+
+
+def require_finite(name, values):
+    if not np.isfinite(np.asarray(values)).all():
+        raise FloatingPointError(f"{name} contains non-finite values.")
 ```
 
 ## FROLS
@@ -52,7 +60,7 @@ loss = mean_squared_error
 
 ```python
 raw = pd.read_csv(
-    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
+    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/4085901293ba5ed5674bb2911ef4d1fa20f3438d/datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
 )
 df = pd.DataFrame()
 df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=8760)
@@ -83,22 +91,17 @@ x_test = np.concatenate([x_train[-sysidentpy.max_lag :], x_test])
 y_test = np.concatenate([y_train[-sysidentpy.max_lag :], y_test])
 
 yhat = sysidentpy.predict(X=x_test, y=y_test, steps_ahead=1)
+require_finite("FROLS predictions", yhat[sysidentpy.max_lag :])
 sysidentpy_loss = loss(
-    pd.Series(y_test.flatten()[sysidentpy.max_lag :]),
-    pd.Series(yhat.flatten()[sysidentpy.max_lag :]),
+    y_test[sysidentpy.max_lag :],
+    yhat[sysidentpy.max_lag :],
 )
 print(sysidentpy_loss)
 
 plot_results(y=y_test[-104:], yhat=yhat[-104:])
 ```
 
-    2204.333646698544
-
-
-
-    
-![png](../../../en/user-guide/tutorials/PV-forecasting-benchmark_files/PV-forecasting-benchmark_5_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/PV-forecasting-benchmark-01.png?raw=true)
 
 
 ## MetaMSS
@@ -107,7 +110,7 @@ plot_results(y=y_test[-104:], yhat=yhat[-104:])
 ```python
 set_random_seed(42)
 raw = pd.read_csv(
-    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
+    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/4085901293ba5ed5674bb2911ef4d1fa20f3438d/datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
 )
 df = pd.DataFrame()
 df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=8760)
@@ -141,22 +144,17 @@ x_test = np.concatenate([x_train[-sysidentpy_metamss.max_lag :], x_test])
 y_test = np.concatenate([y_train[-sysidentpy_metamss.max_lag :], y_test])
 
 yhat = sysidentpy_metamss.predict(X=x_test, y=y_test, steps_ahead=1)
+require_finite("MetaMSS predictions", yhat[sysidentpy_metamss.max_lag :])
 metamss_loss = loss(
-    pd.Series(y_test.flatten()[sysidentpy_metamss.max_lag :]),
-    pd.Series(yhat.flatten()[sysidentpy_metamss.max_lag :]),
+    y_test[sysidentpy_metamss.max_lag :],
+    yhat[sysidentpy_metamss.max_lag :],
 )
 print(metamss_loss)
 
 plot_results(y=y_test[-104:], yhat=yhat[-104:])
 ```
 
-    2157.7700127350877
-
-
-
-    
-![png](../../../en/user-guide/tutorials/PV-forecasting-benchmark_files/PV-forecasting-benchmark_7_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/PV-forecasting-benchmark-02.png?raw=true)
 
 
 ## AOLS
@@ -165,7 +163,7 @@ plot_results(y=y_test[-104:], yhat=yhat[-104:])
 ```python
 set_random_seed(42)
 raw = pd.read_csv(
-    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
+    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/4085901293ba5ed5674bb2911ef4d1fa20f3438d/datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
 )
 df = pd.DataFrame()
 df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=8760)
@@ -188,9 +186,10 @@ x_test = np.concatenate([x_train[-sysidentpy_AOLS.max_lag :], x_test])
 y_test = np.concatenate([y_train[-sysidentpy_AOLS.max_lag :], y_test])
 
 yhat = sysidentpy_AOLS.predict(X=x_test, y=y_test, steps_ahead=1)
+require_finite("AOLS predictions", yhat[sysidentpy_AOLS.max_lag :])
 aols_loss = loss(
-    pd.Series(y_test.flatten()[sysidentpy_AOLS.max_lag :]),
-    pd.Series(yhat.flatten()[sysidentpy_AOLS.max_lag :]),
+    y_test[sysidentpy_AOLS.max_lag :],
+    yhat[sysidentpy_AOLS.max_lag :],
 )
 print(aols_loss)
 
@@ -198,13 +197,7 @@ print(aols_loss)
 plot_results(y=y_test[-104:], yhat=yhat[-104:])
 ```
 
-    2361.561682547365
-
-
-
-    
-![png](../../../en/user-guide/tutorials/PV-forecasting-benchmark_files/PV-forecasting-benchmark_9_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/PV-forecasting-benchmark-03.png?raw=true)
 
 
 ## Neural Prophet
@@ -214,42 +207,37 @@ plot_results(y=y_test[-104:], yhat=yhat[-104:])
 set_random_seed(42)
 
 raw = pd.read_csv(
-    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
+    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/"
+    "4085901293ba5ed5674bb2911ef4d1fa20f3438d/"
+    "datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
 )
-df = pd.DataFrame()
-df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=8760)
-df["y"] = raw.iloc[:, 0].values
+df = pd.DataFrame(
+    {
+        "ds": pd.date_range("2015-01-01 01:00:00", freq="h", periods=8760),
+        "y": raw.iloc[:, 0].to_numpy(),
+    }
+)
 
 m = NeuralProphet(
-    n_lags=24,
-    ar_sparsity=0.5,
-    # num_hidden_layers = 2,
-    # d_hidden=20,
+    n_lags=24, ar_reg=0.5, epochs=100, learning_rate=0.01
 )
-metrics = m.fit(df, freq="H", valid_p=0.2)
-
-df_train, df_val = m.split_df(df, valid_p=0.2)
-m.test(df_val)
-
-future = m.make_future_dataframe(df_val, n_historic_predictions=True)
-forecast = m.predict(future)
-# fig = m.plot(forecast)
-print(loss(forecast["y"][24:-1], forecast["yhat1"][24:-1]))
+split = 7008
+df_train, df_val = df.iloc[:split], df.iloc[split:]
+m.fit(df_train, freq="h", progress=None)
+prediction_df = pd.concat([df_train.tail(m.config_ar.n_lags), df_val])
+forecast = m.predict(prediction_df)
+valid = (forecast["ds"] >= df_val["ds"].min()) & np.isfinite(
+    forecast["yhat1"].to_numpy()
+)
+if valid.sum() != len(df_val):
+    raise RuntimeError("NeuralProphet did not predict every validation sample.")
+require_finite("NeuralProphet predictions", forecast.loc[valid, "yhat1"])
+neuralprophet_loss = loss(
+    forecast.loc[valid, "y"].to_numpy(),
+    forecast.loc[valid, "yhat1"].to_numpy(),
+)
+print(neuralprophet_loss)
 ```
-
-    WARNING: nprophet - fit: Parts of code may break if using other than daily data.
-    INFO: nprophet.utils - set_auto_seasonalities: Disabling yearly seasonality. Run NeuralProphet with yearly_seasonality=True to override this.
-    INFO: nprophet.config - set_auto_batch_epoch: Auto-set batch_size to 32
-    INFO: nprophet.config - set_auto_batch_epoch: Auto-set epochs to 7
-     87%|████████▋ | 87/100 [00:00<00:00, 644.82it/s]
-    INFO: nprophet - _lr_range_test: learning rate range test found optimal lr: 1.23E-01
-    Epoch[7/7]: 100%|██████████| 7/7 [00:02<00:00,  2.58it/s, SmoothL1Loss=0.00415, MAE=58.8, RegLoss=0.0112]
-    INFO: nprophet - _evaluate: Validation metrics:    SmoothL1Loss    MAE
-    1         0.003 48.746
-
-
-    4642.234763049609
-
 
 
 ```python
@@ -257,14 +245,25 @@ plt.plot(forecast["y"][-104:], "ro-")
 plt.plot(forecast["yhat1"][-104:], "k*-")
 ```
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/PV-forecasting-benchmark-04.png?raw=true)
 
+## Resultados reproduzidos
 
+Os 20% finais da série horária formam o conjunto de validação. Os quatro métodos
+usam um contexto autorregressivo de 24 amostras e são comparados pelo MSE de um
+passo à frente.
 
-    [<matplotlib.lines.Line2D at 0x2618e76ebe0>]
+O MetaMSS ainda reserva os 25% finais do bloco de treino, com 7.008 amostras,
+para sua perda cronológica interna de seleção. O modelo escolhido é ajustado no
+segmento interno de identificação anterior; `fit` não o reajusta no bloco
+completo.
 
+| Método | MSE |
+| --- | ---: |
+| MetaMSS | 2154,2684 |
+| FROLS | 2204,3336 |
+| AOLS | 2361,5617 |
+| NeuralProphet | 2473,5397 |
 
-
-
-    
-![png](../../../en/user-guide/tutorials/PV-forecasting-benchmark_files/PV-forecasting-benchmark_12_1.png)
-    
+A comparação vale para os modelos, a semente e a divisão de dados informados; ela
+não representa uma classificação geral das bibliotecas.
