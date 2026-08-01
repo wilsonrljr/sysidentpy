@@ -1,4 +1,4 @@
-# Dispositivo Elétrico Acoplado
+# Acionamentos Elétricos Acoplados
 
 Nota: O exemplo mostrado neste notebook é retirado do livro [Nonlinear System Identification and Forecasting: Theory and Practice with SysIdentPy](https://sysidentpy.org/book/0-Preface/).
 
@@ -13,7 +13,7 @@ O sistema CE8, ilustrado na Figura 1, apresenta:
 - **Mecanismo de Polia**: A polia é suportada por uma mola, introduzindo um modo dinâmico levemente amortecido que adiciona complexidade ao sistema.
 - **Foco no Controle de Velocidade**: O foco principal é o sistema de controle de velocidade. A velocidade angular da polia é medida usando um contador de pulsos, que é insensível à direção da velocidade.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_design.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/ce8_design.png?raw=true)
 > Figura 1. Design do sistema CE8.
 
 ### Sensor e Filtragem
@@ -26,31 +26,24 @@ O processo de medição envolve:
 
 O SysIdentPy pode ser usado para construir modelos robustos para identificar e modelar as dinâmicas complexas do sistema CE8. O desempenho será comparado com um benchmark fornecido por [Max D. Champneys, Gerben I. Beintema, Roland Tóth, Maarten Schoukens, and Timothy J. Rogers - Baselines for Nonlinear Benchmarks, Workshop on Nonlinear System Identification Benchmarks, 2024.](https://arxiv.org/pdf/2405.10779)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_sota.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-01.png?raw=true)
 
 O benchmark avalia a métrica média entre os dois experimentos. Por isso o método SOTA não tem a melhor métrica para o `teste 1`, mas ainda é o melhor no geral. O objetivo deste estudo de caso não é apenas demonstrar a robustez do SysIdentPy, mas também fornecer insights valiosos sobre suas aplicações práticas em sistemas dinâmicos do mundo real.
 
 ### Pacotes e Versões Necessários
 
-Para garantir que você possa replicar este estudo de caso, é essencial usar versões específicas dos pacotes necessários. Abaixo está uma lista dos pacotes junto com suas respectivas versões necessárias para executar os estudos de caso de forma eficaz.
+Este estudo de caso foi verificado com o SysIdentPy 0.9.0 no Python 3.12.12 e
+`nonlinear-benchmarks==1.0.1`. Instale explicitamente o checkout do repositório
+e o carregador oficial do benchmark:
 
-Para instalar todos os pacotes necessários, você pode criar um arquivo `requirements.txt` com o seguinte conteúdo:
-
-```
-sysidentpy==0.4.0
-pandas==2.2.2
-numpy==1.26.0
-matplotlib==3.8.4
-nonlinear_benchmarks==0.1.2
+```bash
+python -m pip install -e .
+python -m pip install nonlinear-benchmarks==1.0.1
 ```
 
-Então, instale os pacotes usando:
-```
-pip install -r requirements.txt
-```
-
-- Certifique-se de usar um ambiente virtual para evitar conflitos entre versões de pacotes.
-- As versões especificadas são baseadas na compatibilidade com os exemplos de código fornecidos. Se você estiver usando versões diferentes, alguns ajustes no código podem ser necessários.
+Use um ambiente virtual para isolar o carregador opcional. Os resultados
+numéricos devem ser recalculados se o ambiente ou a configuração do modelo forem
+alterados.
 
 ### Configuração do SysIdentPy
 
@@ -60,6 +53,7 @@ Este exemplo prático ajudará os usuários a entender como utilizar efetivament
 
 
 ```python
+from warnings import catch_warnings, simplefilter
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -73,7 +67,11 @@ from sysidentpy.utils.plotting import plot_results
 
 import nonlinear_benchmarks
 
-train_val, test = nonlinear_benchmarks.CED(atleast_2d=True)
+ced_url = (
+    "https://web.archive.org/web/20210117142533id_/"
+    "http://www.it.uu.se/research/publications/reports/2010-020/NonlinearData.zip"
+)
+train_val, test = nonlinear_benchmarks.CED(url=ced_url, atleast_2d=True)
 data_train_1, data_train_2 = train_val
 data_test_1, data_test_2 = test
 ```
@@ -86,47 +84,36 @@ O gráfico a seguir detalha os dados de treinamento e teste de ambos os experime
 ```python
 plt.plot(data_train_1.u)
 plt.plot(data_train_1.y)
-plt.title("Experimento 1: dados de treinamento")
+plt.title("Experiment 1: training data")
 plt.show()
 
 plt.plot(data_test_1.u)
 plt.plot(data_test_1.y)
-plt.title("Experimento 1: dados de teste")
+plt.title("Experiment 1: testing data")
 plt.show()
 
 plt.plot(data_train_2.u)
 plt.plot(data_train_2.y)
-plt.title("Experimento 2: dados de treinamento")
+plt.title("Experiment 2: training data")
 plt.show()
 
 plt.plot(data_test_2.u)
 plt.plot(data_test_2.y)
-plt.title("Experimento 2: dados de teste")
+plt.title("Experiment 2: testing data")
 plt.show()
 ```
 
 
-    
-![png](../../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_4_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-02.png?raw=true)
 
 
-
-    
-![png](../../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_4_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-03.png?raw=true)
 
 
-
-    
-![png](../../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_4_2.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-04.png?raw=true)
 
 
-
-    
-![png](../../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_4_3.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-05.png?raw=true)
 
 
 ### Resultados
@@ -156,23 +143,26 @@ model = FROLS(
     n_info_values=120,
 )
 
-model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
+with catch_warnings():
+    simplefilter("ignore", UserWarning)
+    model.fit(X=x_train, y=y_train)
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+print(f"RMSE: {rmse:.6f}")
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=10000,
-    title=f"Simulação Free Run. Modelo 1 -> RMSE: {round(rmse, 4)}",
+    title=f"Free Run simulation. Model 1 -> RMSE: {round(rmse, 4)}",
 )
 ```
 
 
-    
-![png](../../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_6_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-06.png?raw=true)
 
 
 Modelo para o experimento 2:
@@ -196,55 +186,57 @@ model = FROLS(
     n_info_values=120,
 )
 
-model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
+with catch_warnings():
+    simplefilter("ignore", UserWarning)
+    model.fit(X=x_train, y=y_train)
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+print(f"RMSE: {rmse:.6f}")
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=10000,
-    title=f"Simulação Free Run. Modelo 2 -> RMSE: {round(rmse, 4)}",
+    title=f"Free Run simulation. Model 2 -> RMSE: {round(rmse, 4)}",
 )
 ```
 
 
-    
-![png](../../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_8_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/ce8_sota.png?raw=true)
 
 
-A primeira configuração para o experimento 1 já é melhor que os modelos **LTI ARX**, **LTI SS**, **GRU**, **LSTM**, **MLP NARX**, **MLP FIR**, **OLSTM** e **SOTA** mostrados na tabela do benchmark. Melhor que 8 de 11 modelos mostrados no benchmark. Para o experimento 2, é melhor que **LTI ARX**, **LTI SS**, **GRU**, **RNN**, **LSTM**, **OLSTM** e **pNARX** (7 de 11). É um bom começo, mas vamos verificar se o desempenho melhora se definirmos um lag maior para `xlag` e `ylag`.
+Com o carregador atual e a janela de inicialização definida pelo benchmark, esta
+primeira configuração produz RMSE $0.102862$ no experimento 1 e $0.106816$ no
+experimento 2. A média é $0.104839$. As amostras reservadas à inicialização do
+estado são excluídas uma única vez, e a recursão começa nas últimas
+`model.max_lag` saídas contidas nessa janela.
 
-A métrica média é $(0.1131 + 0.1059)/2 = 0.1095$, o que é muito bom, mas pior que o SOTA ($0.0945$). Agora vamos aumentar os lags para `x` e `y` para verificar se obtemos um modelo melhor. Antes de aumentar os lags, o critério de informação é mostrado:
+A tabela externa continua sendo uma referência útil, mas seus valores só devem
+ser comparados depois de igualar divisão dos dados, janela de inicialização,
+normalização e regra de agregação. Portanto, usaremos os valores de RMSE desta
+execução para comparar entre si as configurações do SysIdentPy. Antes de
+aumentar os lags, mostramos o critério de informação:
 
 
 ```python
 xaxis = np.arange(1, model.n_info_values + 1)
 plt.plot(xaxis, model.info_values)
 plt.xlabel("n_terms")
-plt.ylabel("Critério de Informação")
+plt.ylabel("Information Criteria")
 ```
 
 
-
-
-    Text(0, 0.5, 'Critério de Informação')
-
-
-
-
-    
-![png](../../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_10_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-07.png?raw=true)
 
 
 Pode-se observar que após 22 regressores, adicionar novos regressores não melhora o desempenho do modelo (considerando a configuração definida para aquele modelo). Como queremos experimentar modelos com lags maiores e grau de não linearidade maior, o critério de parada será alterado para `err_tol` em vez de critério de informação. Isso fará o algoritmo rodar consideravelmente mais rápido.
 
 
 ```python
-# experimento 1
+# experiment 1
 y_train = data_train_1.y
 y_test = data_test_1.y
 x_train = data_train_1.u
@@ -254,8 +246,8 @@ n = data_test_1.state_initialization_window_length
 
 basis_function = Polynomial(degree=2)
 model = FROLS(
-    xlag=14,
-    ylag=14,
+    xlag=10,
+    ylag=10,
     basis_function=basis_function,
     estimator=LeastSquares(),
     err_tol=0.9996,
@@ -265,32 +257,29 @@ model = FROLS(
 
 model.fit(X=x_train, y=y_train)
 print(model.final_model.shape, model.err.sum())
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
 
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
+rmse = root_mean_squared_error(y_test[n:], yhat)
+print(f"RMSE: {rmse:.6f}")
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=10000,
-    title=f"Simulação Free Run. Modelo 1 -> RMSE: {round(rmse, 4)}",
+    title=f"Free Run simulation. Model 1 -> RMSE: {round(rmse, 4)}",
 )
 ```
 
-    (22, 2) 0.9970964868326048
 
-
-
-    
-![png](../../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_12_1.png)
-    
-
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-08.png?raw=true)
 
 
 ```python
-# experimento 2
+# experiment 2
 y_train = data_train_2.y
 y_test = data_test_2.y
 x_train = data_train_2.u
@@ -300,8 +289,8 @@ n = data_test_2.state_initialization_window_length
 
 basis_function = Polynomial(degree=2)
 model = FROLS(
-    xlag=14,
-    ylag=14,
+    xlag=10,
+    ylag=10,
     basis_function=basis_function,
     estimator=LeastSquares(),
     info_criteria="aicc",
@@ -311,31 +300,40 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
 
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
+rmse = root_mean_squared_error(y_test[n:], yhat)
+print(f"RMSE: {rmse:.6f}")
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=10000,
-    title=f"Simulação Free Run. Modelo 2 -> RMSE: {round(rmse, 4)}",
+    title=f"Free Run simulation. Model 2 -> RMSE: {round(rmse, 4)}",
 )
 ```
 
 
-    
-![png](../../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_13_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-09.png?raw=true)
 
 
-No primeiro experimento, o modelo mostrou uma leve melhoria, enquanto o desempenho do segundo experimento experimentou uma pequena queda. Aumentar as configurações de lag com estas configurações não resultou em mudanças significativas. Portanto, vamos definir o grau polinomial para $3$ e aumentar o número de termos para construir o modelo para `n_terms=40` se o `err_tol` não for atingido. É importante notar que estes valores são escolhidos empiricamente. Também poderíamos ajustar a técnica de estimação de parâmetros, o `err_tol`, o algoritmo de seleção de estrutura do modelo e a função base, entre outros fatores. Os usuários são encorajados a empregar técnicas de ajuste de hiperparâmetros para encontrar as combinações ótimas de hiperparâmetros.
+Os modelos com 10 lags e 22 termos produzem RMSE $0.110933$ e $0.107076$ nos
+experimentos 1 e 2, respectivamente. A janela oficial de inicialização do estado
+contém 10 amostras; por isso, as configurações anteriores com 14 lags não são
+válidas sob este protocolo. Aumentar o lag até o maior valor válido não melhora
+esta configuração de grau 2. Portanto, vamos definir o grau polinomial como $3$
+e aumentar o número de termos para `n_terms=40` quando o `err_tol` não for
+atingido. Esses valores são empíricos; o estimador, a tolerância de erro, o
+algoritmo de seleção de estrutura e a função de base são outras dimensões que
+podem ser ajustadas.
 
 
 ```python
-# experimento 1
+# experiment 1
 y_train = data_train_1.y
 y_test = data_test_1.y
 x_train = data_train_1.u
@@ -345,8 +343,8 @@ n = data_test_1.state_initialization_window_length
 
 basis_function = Polynomial(degree=3)
 model = FROLS(
-    xlag=14,
-    ylag=14,
+    xlag=10,
+    ylag=10,
     basis_function=basis_function,
     estimator=LeastSquares(),
     err_tol=0.9996,
@@ -356,32 +354,29 @@ model = FROLS(
 
 model.fit(X=x_train, y=y_train)
 print(model.final_model.shape, model.err.sum())
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
 
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
+rmse = root_mean_squared_error(y_test[n:], yhat)
+print(f"RMSE: {rmse:.6f}")
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=10000,
-    title=f"Simulação Free Run. Modelo 1 -> RMSE: {round(rmse, 4)}",
+    title=f"Free Run simulation. Model 1 -> RMSE: {round(rmse, 4)}",
 )
 ```
 
-    (40, 3) 0.9982136069197526
 
-
-
-    
-![png](../../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_15_1.png)
-    
-
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-10.png?raw=true)
 
 
 ```python
-# experimento 2
+# experiment 2
 y_train = data_train_2.y
 y_test = data_test_2.y
 x_train = data_train_2.u
@@ -391,8 +386,8 @@ n = data_test_2.state_initialization_window_length
 
 basis_function = Polynomial(degree=3)
 model = FROLS(
-    xlag=14,
-    ylag=14,
+    xlag=10,
+    ylag=10,
     basis_function=basis_function,
     estimator=LeastSquares(),
     info_criteria="aicc",
@@ -402,24 +397,29 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
 
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
+rmse = root_mean_squared_error(y_test[n:], yhat)
+print(f"RMSE: {rmse:.6f}")
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=10000,
-    title=f"Simulação Free Run. Modelo 2 -> RMSE: {round(rmse, 4)}",
+    title=f"Free Run simulation. Model 2 -> RMSE: {round(rmse, 4)}",
 )
 ```
 
 
-    
-![png](../../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_16_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-11.png?raw=true)
 
 
-Como mostrado no gráfico, superamos os resultados do estado da arte (SOTA) com uma métrica média de $(0.0969 + 0.0731)/2 = 0.0849$. Além disso, a métrica para o primeiro experimento iguala o melhor modelo no benchmark, e a métrica para o segundo experimento supera levemente o melhor modelo do benchmark. Usando a mesma configuração para ambos os modelos, alcançamos os melhores resultados gerais!
+Os modelos de grau 3 produzem RMSE $0.112503$ e $0.096002$, com média
+$0.104253$. O segundo experimento melhora, enquanto o primeiro não. Por esse
+motivo, os dois experimentos devem ser apresentados separadamente, e a tabela
+externa de estado da arte não é usada para estabelecer uma classificação sem um
+protocolo de avaliação idêntico.
