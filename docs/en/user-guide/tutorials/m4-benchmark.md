@@ -16,31 +16,24 @@ By the end of this case study, you will have a solid understanding of how to use
 
 ### Required Packages and Versions
 
-To ensure that you can replicate this case study, it is essential to use specific versions of the required packages. Below is a list of the packages along with their respective versions needed for running the case studies effectively.
+This case study was verified with SysIdentPy 0.9.0 on Python 3.12.12 and
+`datasetsforecast==1.0.1`. Install the repository checkout and the M4 loader
+explicitly:
 
-To install all the required packages, you can create a `requirements.txt` file with the following content:
-
-```
-sysidentpy==0.4.0
-datasetsforecast==0.0.8
-pandas==2.2.2
-numpy==1.26.0
-matplotlib==3.8.4
-s3fs==2024.6.1
+```bash
+python -m pip install -e .
+python -m pip install datasetsforecast==1.0.1
 ```
 
-Then, install the packages using:
-```
-pip install -r requirements.txt
-```
-
-- Ensure that you use a virtual environment to avoid conflicts between package versions.
-- Versions specified are based on compatibility with the code examples provided. If you are using different versions, some adjustments in the code might be necessary.
+Use a virtual environment to isolate these optional dependencies. Randomized
+examples use seed 42; numerical results should be recomputed if the environment
+or model configuration changes.
 
 ### SysIdentPy configuration
 
-In this section, we will demonstrate the application of SysIdentPy to the Silver box dataset.  The following code will guide you through the process of loading the dataset, configuring the SysIdentPy parameters, and building a model for mentioned system.
-
+In this section, we will demonstrate the application of SysIdentPy to the M4
+hourly dataset. The following code guides you through loading the data,
+configuring SysIdentPy and building the forecasting models used in this study.
 
 ```python
 import warnings
@@ -64,10 +57,13 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 warnings.simplefilter(action="ignore", category=UserWarning)
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 
-train = pd.read_csv("https://auto-arima-results.s3.amazonaws.com/M4-Hourly.csv")
-test = pd.read_csv(
-    "https://auto-arima-results.s3.amazonaws.com/M4-Hourly-test.csv"
-).rename(columns={"y": "y_test"})
+m4_data, _, _ = M4.load(directory="data", group="Hourly")
+test = (
+    m4_data.groupby("unique_id", group_keys=False)
+    .tail(48)
+    .rename(columns={"y": "y_test"})
+)
+train = m4_data.drop(test.index)
 ```
 
 The following plots provide a visualization of the training data for a small subset of the time series. The plot shows the raw data, giving you an insight into the patterns and behaviors inherent in each series.
@@ -79,7 +75,6 @@ However, when dealing with a large number of different time series, it is common
 This approach provides a practical starting point, demonstrating how SysIdentPy can manage different types of time series data without too much work. As you become more familiar with the tool, you can refine your models with more detailed insights. For now, let's focus on using SysIdentPy to create the forecasts based on these initial assumptions.
 
 Our first assumption is that there is a 24-hour seasonal pattern in the series. By examining the plots below, this seems reasonable. Therefore, we'll begin building our models with `ylag=24`.
-
 
 ```python
 ax = (
@@ -93,14 +88,12 @@ for xc in xcoords:
     plt.axvline(x=xc, color="red", linestyle="--", alpha=0.5)
 ```
 
-
-    
-![png](m4-benchmark_files/m4-benchmark_4_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/m4-benchmark-01.png?raw=true)
 
 
-Lets check build a model for the `H20` group before we extrapolate the settings for every group. Because there are no input features, we will be using a `NAR` model type in SysIdentPy. To keep things simple and fast, we will start with Polynomial basis function with degree $1$.
 
+
+Let's check build a model for the `H20` group before we extrapolate the settings for every group. Because there are no input features, we will be using a `NAR` model type in SysIdentPy. To keep things simple and fast, we will start with Polynomial basis function with degree $1$.
 
 ```python
 unique_id = "H20"
@@ -132,18 +125,13 @@ plot_results(
 )
 ```
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/m4-benchmark-02.png?raw=true)
 
-    
-![png](m4-benchmark_files/m4-benchmark_6_0.png)
-    
-
-
-Probably, the result are not optimal and will not work for every group. However, let's check how this setting performs against the winner model  [M4 time series competition](https://www.researchgate.net/publication/325901666_The_M4_Competition_Results_findings_conclusion_and_way_forward): the Exponential Smoothing with Recurrent Neural Networks ([ESRNN](https://www.sciencedirect.com/science/article/abs/pii/S0169207019301153)).
-
+Probably, the result are not optimal and will not work for every group. However, let's check how this setting performs against the winner model [M4 time series competition](https://www.researchgate.net/publication/325901666_The_M4_Competition_Results_findings_conclusion_and_way_forward): the Exponential Smoothing with Recurrent Neural Networks ([ESRNN](https://www.sciencedirect.com/science/article/abs/pii/S0169207019301153)).
 
 ```python
 esrnn_url = (
-    "https://github.com/Nixtla/m4-forecasts/raw/master/forecasts/submission-118.zip"
+    "https://github.com/Nixtla/m4-forecasts/raw/e3dce409604c55f1f588f02db439b4cbe9a482a3/forecasts/submission-118.zip"
 )
 esrnn_forecasts = M4Evaluation.load_benchmark("data", "Hourly", esrnn_url)
 esrnn_evaluation = M4Evaluation.evaluate("data", "Hourly", esrnn_forecasts)
@@ -151,52 +139,17 @@ esrnn_evaluation = M4Evaluation.evaluate("data", "Hourly", esrnn_forecasts)
 esrnn_evaluation
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>SMAPE</th>
-      <th>MASE</th>
-      <th>OWA</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Hourly</th>
-      <td>9.328443</td>
-      <td>0.893046</td>
-      <td>0.440163</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
+|        | SMAPE | MASE  | OWA   |
+| ------ | ----- | ----- | ----- |
+| Hourly | 9.328 | 0.893 | 0.440 |
+> Table 1. ESRNN SOTA results
 
 The following code took only 49 seconds to run on my machine (AMD Ryzen 5 5600x processor, 32GB RAM at 3600MHz). Because of its efficiency, I didn't create a parallel version. By the end of this use case, you will see how SysIdentPy can be both fast and effective, delivering good results without too much optimization.
-
 
 ```python
 r = []
 ds_test = list(range(701, 749))
-for u_id, data in train.groupby(by=["unique_id"], observed=True):
+for u_id, data in train.groupby("unique_id", observed=True):
     y_id = data["y"].values.reshape(-1, 1)
     basis_function = Polynomial(degree=1)
     model = FROLS(
@@ -210,79 +163,65 @@ for u_id, data in train.groupby(by=["unique_id"], observed=True):
         model.fit(y=y_id)
         y_val = y_id[-model.max_lag :].reshape(-1, 1)
         y_hat = model.predict(y=y_val, forecast_horizon=48)
+        forecast = y_hat[model.max_lag :].ravel()
+        if forecast.shape != (48,) or not np.isfinite(forecast).all():
+            raise RuntimeError(f"Invalid 48-step forecast for {u_id}.")
         r.append(
             [
-                u_id * len(y_hat[model.max_lag : :]),
+                [u_id] * 48,
                 ds_test,
-                y_hat[model.max_lag : :].ravel(),
+                forecast,
             ]
         )
-    except Exception:
-        print(f"Problem with {u_id}")
+    except Exception as exc:
+        raise RuntimeError(f"Forecasting failed for {u_id}.") from exc
 
 results_1 = pd.DataFrame(r, columns=["unique_id", "ds", "NARMAX_1"]).explode(
     ["unique_id", "ds", "NARMAX_1"]
 )
 results_1["NARMAX_1"] = results_1["NARMAX_1"].astype(float)  # .clip(lower=10)
-pivot_df = results_1.pivot(index="unique_id", columns="ds", values="NARMAX_1")
+expected_ids = train["unique_id"].drop_duplicates().tolist()
+pivot_df = results_1.pivot(
+    index="unique_id", columns="ds", values="NARMAX_1"
+).reindex(expected_ids)
 results = pivot_df.to_numpy()
+if len(expected_ids) != 414 or results.shape != (414, 48):
+    raise RuntimeError("The M4 hourly evaluation requires 414 complete forecasts.")
+if not np.isfinite(results).all():
+    raise RuntimeError("The M4 forecast matrix contains non-finite values.")
 
-M4Evaluation.evaluate("data", "Hourly", results)
+daily_evaluation = M4Evaluation.evaluate("data", "Hourly", results)
+h147_index = expected_ids.index("H147")
+h147_observed = test.loc[test["unique_id"] == "H147", "y_test"].to_numpy()
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(h147_observed, "o-", label="Observed")
+ax.plot(results[h147_index], "*-", label="FROLS, 24 lags")
+ax.set_title("H147: 48-step forecast with daily lags")
+ax.set_xlabel("Forecast horizon")
+ax.set_ylabel("y")
+ax.legend()
+plt.show()
+daily_evaluation
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>SMAPE</th>
-      <th>MASE</th>
-      <th>OWA</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Hourly</th>
-      <td>16.034196</td>
-      <td>0.958083</td>
-      <td>0.636132</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
+|        |    SMAPE   |    MASE    |    OWA     |
+|--------|------------|------------|------------|
+| Hourly | 16.034196  | 0.958083   | 0.636132   |
+Table 2. First test with SysIdentPy
 
 The initial results are reasonable, but they don't quite match the performance of `ESRNN`. These results are based solely on our first assumption. To better understand the performance, let’s examine the groups with the worst results.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h147_r1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/m4-benchmark-03.png?raw=true)
 
 The following plot illustrates two such groups, `H147` and `H136`. Both exhibit a 24-hour seasonal pattern.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_seasonal_h147_1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/c10_m4_seasonal_h147_1.png?raw=true)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h136_seasonal_1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/c10_m4_h136_seasonal_1.png?raw=true)
 
 However, a closer look reveals an additional insight: in addition to the daily pattern, these series also show a weekly pattern. Observe how the data looks like when we split the series into weekly segments.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h147_seasonal_1.png?raw=true)
-
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/c10_m4_h147_seasonal_1.png?raw=true)
 
 ```python
 xcoords = list(range(0, 168 * 5, 168))
@@ -299,22 +238,16 @@ plt.tight_layout()
 plt.show()
 ```
 
-
-    
-![png](m4-benchmark_files/m4-benchmark_12_0.png)
-    
-
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/m4-benchmark-04.png?raw=true)
 
 Therefore, we will build models setting `ylag=168`.
 
-> Note that this is a very high number for lags, so be careful if you want to try it with higher polynomial degrees because the time to run the models can increase significantly. I tried some configurations with polynomial degree equal to 2 and only took $6$ minutes to run (even less, using `AOLS`), without making the code run in parallel. As you can see, SysIdentPy can be very fast and you can make it faster by applying parallelization.
-
+> Note that this is a very high number for lags, so be careful if you want to try it with higher polynomial degrees because the time to run the models can increase significantly. I tried some configurations with polynomial degree equal to 2 and only took $6$ minutes to run (even less, using `AOLS`), without making the code run in parallel. As you can see, SysIdentPy can be very fast, and you can make it faster by applying parallelization.
 
 ```python
-# this took 2min to run on my computer.
 r = []
 ds_test = list(range(701, 749))
-for u_id, data in train.groupby(by=["unique_id"], observed=True):
+for u_id, data in train.groupby("unique_id", observed=True):
     y_id = data["y"].values.reshape(-1, 1)
     basis_function = Polynomial(degree=1)
     model = FROLS(
@@ -327,71 +260,57 @@ for u_id, data in train.groupby(by=["unique_id"], observed=True):
         model.fit(y=y_id)
         y_val = y_id[-model.max_lag :].reshape(-1, 1)
         y_hat = model.predict(y=y_val, forecast_horizon=48)
+        forecast = y_hat[model.max_lag :].ravel()
+        if forecast.shape != (48,) or not np.isfinite(forecast).all():
+            raise RuntimeError(f"Invalid 48-step forecast for {u_id}.")
         r.append(
             [
-                u_id * len(y_hat[model.max_lag : :]),
+                [u_id] * 48,
                 ds_test,
-                y_hat[model.max_lag : :].ravel(),
+                forecast,
             ]
         )
-    except Exception:
-        print(f"Problem with {u_id}")
+    except Exception as exc:
+        raise RuntimeError(f"Forecasting failed for {u_id}.") from exc
 
 results_1 = pd.DataFrame(r, columns=["unique_id", "ds", "NARMAX_1"]).explode(
     ["unique_id", "ds", "NARMAX_1"]
 )
 results_1["NARMAX_1"] = results_1["NARMAX_1"].astype(float)  # .clip(lower=10)
-pivot_df = results_1.pivot(index="unique_id", columns="ds", values="NARMAX_1")
+expected_ids = train["unique_id"].drop_duplicates().tolist()
+pivot_df = results_1.pivot(
+    index="unique_id", columns="ds", values="NARMAX_1"
+).reindex(expected_ids)
 results = pivot_df.to_numpy()
-M4Evaluation.evaluate("data", "Hourly", results)
+if len(expected_ids) != 414 or results.shape != (414, 48):
+    raise RuntimeError("The M4 hourly evaluation requires 414 complete forecasts.")
+if not np.isfinite(results).all():
+    raise RuntimeError("The M4 forecast matrix contains non-finite values.")
+weekly_evaluation = M4Evaluation.evaluate("data", "Hourly", results)
+h147_index = expected_ids.index("H147")
+h147_observed = test.loc[test["unique_id"] == "H147", "y_test"].to_numpy()
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(h147_observed, "o-", label="Observed")
+ax.plot(results[h147_index], "*-", label="FROLS, 168 lags")
+ax.set_title("H147: 48-step forecast with weekly lags")
+ax.set_xlabel("Forecast horizon")
+ax.set_ylabel("y")
+ax.legend()
+plt.show()
+weekly_evaluation
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>SMAPE</th>
-      <th>MASE</th>
-      <th>OWA</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Hourly</th>
-      <td>10.475998</td>
-      <td>0.773749</td>
-      <td>0.446471</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
+|        |    SMAPE   |    MASE    |    OWA     |
+|--------|------------|------------|------------|
+| Hourly | 10.475998  | 0.773749   | 0.446471   |
+> Table 3. Improved results using SysIdentPy
 
 Now, the results are much closer to those of the `ESRNN` model! While the Symmetric Mean Absolute Percentage Error (`SMAPE`) is slightly worse, the Mean Absolute Scaled Error (`MASE`) is better when comparing against `ESRNN`, leading to a very similar Overall Weighted Average (`OWA`) metric. Remarkably, these results are achieved using only simple `AR` models. Next, let's see if the `AOLS` method can provide even better results.
-
 
 ```python
 r = []
 ds_test = list(range(701, 749))
-for u_id, data in train.groupby(by=["unique_id"], observed=True):
+for u_id, data in train.groupby("unique_id", observed=True):
     y_id = data["y"].values.reshape(-1, 1)
     basis_function = Polynomial(degree=1)
     model = AOLS(
@@ -405,69 +324,48 @@ for u_id, data in train.groupby(by=["unique_id"], observed=True):
         model.fit(y=y_id)
         y_val = y_id[-model.max_lag :].reshape(-1, 1)
         y_hat = model.predict(y=y_val, forecast_horizon=48)
+        forecast = y_hat[model.max_lag :].ravel()
+        if forecast.shape != (48,) or not np.isfinite(forecast).all():
+            raise RuntimeError(f"Invalid 48-step forecast for {u_id}.")
         r.append(
             [
-                u_id * len(y_hat[model.max_lag : :]),
+                [u_id] * 48,
                 ds_test,
-                y_hat[model.max_lag : :].ravel(),
+                forecast,
             ]
         )
-    except Exception:
-        print(f"Problem with {u_id}")
+    except Exception as exc:
+        raise RuntimeError(f"Forecasting failed for {u_id}.") from exc
 
 results_1 = pd.DataFrame(r, columns=["unique_id", "ds", "NARMAX_1"]).explode(
     ["unique_id", "ds", "NARMAX_1"]
 )
 results_1["NARMAX_1"] = results_1["NARMAX_1"].astype(float)  # .clip(lower=10)
-pivot_df = results_1.pivot(index="unique_id", columns="ds", values="NARMAX_1")
+expected_ids = train["unique_id"].drop_duplicates().tolist()
+pivot_df = results_1.pivot(
+    index="unique_id", columns="ds", values="NARMAX_1"
+).reindex(expected_ids)
 results = pivot_df.to_numpy()
+if len(expected_ids) != 414 or results.shape != (414, 48):
+    raise RuntimeError("The M4 hourly evaluation requires 414 complete forecasts.")
+if not np.isfinite(results).all():
+    raise RuntimeError("The M4 forecast matrix contains non-finite values.")
 M4Evaluation.evaluate("data", "Hourly", results)
 ```
 
+|        |    SMAPE   |    MASE    |    OWA     |
+|--------|------------|------------|------------|
+| Hourly | 9.9497     | 0.8074     | 0.4392     |
+> Table 4. SysIdentPy results using AOLS algorithm
 
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>SMAPE</th>
-      <th>MASE</th>
-      <th>OWA</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Hourly</th>
-      <td>9.951141</td>
-      <td>0.809965</td>
-      <td>0.439755</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-The Overall Weighted Average (`OWA`) is even better than that of the `ESRNN` model! Additionally, the `AOLS` method was incredibly efficient, taking only **6 seconds to run**. This combination of high performance and rapid execution makes `AOLS` a compelling alternative for time series forecasting in cases with multiple series.
+For this configuration, the Overall Weighted Average (`OWA`) is slightly lower
+than that of the `ESRNN` reference. This conclusion applies to the complete set
+of 414 hourly series and the 48-step competition horizon; it is not a general
+ranking of the algorithms.
 
 Before we finish, let's verify how the performance of the `H147` model has improved with the `ylag=168` setting.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h147_r2.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/m4-benchmark-05.png?raw=true)
 
 > Based on the M4 benchmark paper, we could also clip the predictions lower than 10 to 10 and the results would be slightly better. But this is left to the user.
 

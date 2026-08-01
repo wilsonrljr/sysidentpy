@@ -47,11 +47,12 @@ class Backend(Enum):  # numpydoc ignore=PR02
 
     def pytest_param(self) -> Any:
         """
-        Backend as a pytest parameter
+        Backend as a pytest parameter.
 
         Returns
         -------
         pytest.mark.ParameterSet
+            The backend as a pytest parameter.
         """
         id_ = (
             self.name.lower().replace("_gpu", ":gpu").replace("_readonly", ":readonly")
@@ -69,6 +70,4 @@ class Backend(Enum):  # numpydoc ignore=PR02
             # Monkey-patched by lazy_xp_function
             marks.append(pytest.mark.thread_unsafe)
 
-        return pytest.param(
-            self, id=id_, marks=marks
-        )  # pyright: ignore[reportUnknownArgumentType]
+        return pytest.param(self, id=id_, marks=marks)  # pyright: ignore[reportUnknownArgumentType]

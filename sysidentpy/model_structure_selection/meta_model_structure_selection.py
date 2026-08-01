@@ -3,6 +3,8 @@
 # Authors:
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
+from copy import deepcopy
+from numbers import Real
 from typing import Tuple, Union, Optional
 
 import numpy as np
@@ -20,6 +22,7 @@ from ..utils.check_arrays import (
     check_random_state,
     check_x_y,
 )
+from ..utils.lags import get_max_lag_from_model_code, get_max_xlag, get_max_ylag
 from ..utils.narmax_tools import train_test_split
 
 from ..parameter_estimation.estimators import (
@@ -113,10 +116,15 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         values.
     n_agents : int, default=10
         The number of agents to search the optimal solution.
-    p_zeros : float, default=0.5
+    p_ones : float, default=0.5
         The probability of getting ones in the construction of the population.
+        It must be greater than zero because MetaMSS cannot evaluate an empty model.
     p_zeros : float, default=0.5
         The probability of getting zeros in the construction of the population.
+    random_state : int, numpy.random.Generator, numpy.random.RandomState, optional
+        Controls all random draws made by the optimizer. An integer produces the
+        same trajectory on each call to :meth:`fit`; a generator instance advances
+        its state between calls.
 
     Examples
     --------
@@ -198,7 +206,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         model_type: str = "NARMAX",
         basis_function: Polynomial = Polynomial(),
         steps_ahead: Optional[int] = None,
-        random_state: Optional[int] = None,
+        random_state: int | np.random.Generator | np.random.RandomState | None = None,
         test_size: float = 0.25,
     ):
         super().__init__(
@@ -220,10 +228,13 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             power=power,
             p_zeros=p_zeros,
             p_ones=p_ones,
+            random_state=random_state,
         )
 
         self.xlag = xlag
         self.ylag = ylag
+        self._search_xlag = deepcopy(xlag)
+        self._search_ylag = deepcopy(ylag)
         self.elag = elag
         self.p_value = p_value
         self.estimator = estimator
@@ -237,6 +248,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self.best_model_history = None
         self.tested_models = None
         self.final_model = None
+        self._search_space_max_lag = None
         self._validate_metamss_params()
 
     def _validate_metamss_params(self):
@@ -251,6 +263,44 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
         if not isinstance(self.ylag, (int, list)):
             raise ValueError(f"ylag must be integer and > zero. Got {self.ylag}")
+
+        if (
+            isinstance(self.p_value, bool)
+            or not isinstance(self.p_value, Real)
+            or not np.isfinite(self.p_value)
+            or not 0 <= self.p_value <= 1
+        ):
+            raise ValueError(
+                "p_value must be a finite real number in the interval [0, 1]. "
+                f"Got {self.p_value}"
+            )
+
+        if not np.isclose(self.p_zeros + self.p_ones, 1):
+            raise ValueError("p_zeros and p_ones must sum to 1")
+
+        if not 0 < self.p_ones <= 1 or not 0 <= self.p_zeros < 1:
+            raise ValueError(
+                "MetaMSS requires p_ones > 0 so that nonempty models can be sampled"
+            )
+
+    def _generate_nonempty_agent(self) -> np.ndarray:
+        """Sample one nonempty candidate using the configured probabilities."""
+        dimension = (
+            self.regressor_code.shape[0]
+            if self.regressor_code is not None
+            else self.dimension
+        )
+        for _ in range(100):
+            agent = self._rng.choice(
+                [0, 1], size=dimension, p=[self.p_zeros, self.p_ones]
+            )
+            if np.any(agent):
+                return agent
+
+        raise RuntimeError(
+            "Unable to sample a nonempty MetaMSS candidate after 100 attempts. "
+            "Increase p_ones."
+        )
 
     def fit(
         self,
@@ -281,19 +331,46 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
 
         xp = get_namespace(y) if X is None else get_namespace(X, y)
         _require_numpy_namespace(xp, feature="MetaMSS", dependency="SciPy")
+        if y.ndim != 2 or y.shape[1] != 1:
+            raise ValueError(
+                "MetaMSS requires y to be a 2D array with exactly one output "
+                f"column. Got shape {y.shape}."
+            )
 
         if X is not None:
             check_x_y(X, y)
-            self.n_inputs = num_features(X)
+            n_inputs = num_features(X)
         else:
-            self.n_inputs = 1  # just to create the regressor space base
+            n_inputs = 1  # just to create the regressor space base
 
-        self.max_lag = self._get_max_lag()
+        search_xlag = deepcopy(getattr(self, "_search_xlag", self.xlag))
+        search_ylag = deepcopy(getattr(self, "_search_ylag", self.ylag))
+        search_space_max_lag = max(get_max_xlag(search_xlag), get_max_ylag(search_ylag))
+        x_train, x_test, y_train, y_test = train_test_split(
+            X, y, test_size=self.test_size
+        )
+        if y_train.shape[0] <= search_space_max_lag:
+            raise ValueError(
+                "The identification set must contain more samples than the "
+                f"maximum search-space lag ({search_space_max_lag}). Got "
+                f"{y_train.shape[0]} identification samples."
+            )
+
+        self.n_inputs = n_inputs
+        self._search_xlag = deepcopy(search_xlag)
+        self._search_ylag = deepcopy(search_ylag)
+        self.xlag = deepcopy(search_xlag)
+        self.ylag = deepcopy(search_ylag)
+        self.max_lag = search_space_max_lag
+        self._search_space_max_lag = search_space_max_lag
         self.regressor_code = self.regressor_space(self.n_inputs)
         self.dimension = self.regressor_code.shape[0]
         velocity = np.zeros([self.dimension, self.n_agents])
-        self.random_state = check_random_state(self.random_state)
-        population = self.generate_random_population(self.random_state)
+        self._rng = check_random_state(self.random_state)
+        population = self.generate_random_population()
+        empty_agents = np.flatnonzero(~np.any(population, axis=0))
+        for column in empty_agents:
+            population[:, column] = self._generate_nonempty_agent()
         self.best_by_iter = []
         self.mean_by_iter = []
         self.optimal_fitness_value = np.inf
@@ -301,20 +378,32 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         self.best_model_history = []
         self.tested_models = []
 
-        x, x_test, y, y_test = train_test_split(X, y, test_size=self.test_size)
-
         for i in range(self.maxiter):
-            fitness = self.evaluate_objective_function(x, y, x_test, y_test, population)
-            column_of_best_solution = np.nanargmin(fitness)
+            fitness = np.asarray(
+                self.evaluate_objective_function(
+                    x_train, y_train, x_test, y_test, population
+                ),
+                dtype=float,
+            )
+            finite_fitness = np.isfinite(fitness)
+            if not np.any(finite_fitness):
+                raise RuntimeError(
+                    "MetaMSS could not evaluate any candidate to a finite fitness."
+                )
+            fitness = np.where(finite_fitness, fitness, np.inf)
+            column_of_best_solution = np.argmin(fitness)
             current_best_fitness = fitness[column_of_best_solution]
 
-            if current_best_fitness < self.optimal_fitness_value:
+            if (
+                current_best_fitness < self.optimal_fitness_value
+                or self.optimal_model is None
+            ):
                 self.optimal_fitness_value = current_best_fitness
                 self.optimal_model = population[:, column_of_best_solution].copy()
                 self.best_model_history.append(self.optimal_model)
 
             self.best_by_iter.append(self.optimal_fitness_value)
-            self.mean_by_iter.append(np.mean(fitness))
+            self.mean_by_iter.append(np.mean(fitness[finite_fitness]))
             agent_mass = self.mass_calculation(fitness)
             gravitational_constant = self.calculate_gravitational_constant(i)
             acceleration = self.calculate_acceleration(
@@ -328,16 +417,37 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             )
 
         self.final_model = self.regressor_code[self.optimal_model == 1].copy()
+        final_lag = get_max_lag_from_model_code(self.final_model)
+        x_validation, y_validation = self._validation_data_with_training_tail(
+            x_train, y_train, x_test, y_test, final_lag
+        )
         _ = self.simulate(
-            X_train=x,
-            y_train=y,
-            X_test=x_test,
-            y_test=y_test,
+            X_train=x_train,
+            y_train=y_train,
+            X_test=x_validation,
+            y_test=y_validation,
             model_code=self.final_model,
             steps_ahead=self.steps_ahead,
         )
         self.max_lag = self._get_max_lag()
         return self
+
+    @staticmethod
+    def _validation_data_with_training_tail(
+        x_train: Optional[np.ndarray],
+        y_train: np.ndarray,
+        x_test: Optional[np.ndarray],
+        y_test: np.ndarray,
+        candidate_lag: int,
+    ) -> tuple[Optional[np.ndarray], np.ndarray]:
+        """Prepend identification data as validation initial conditions."""
+        y_validation = np.concatenate((y_train[-candidate_lag:], y_test), axis=0)
+        if x_test is None:
+            return None, y_validation
+        if x_train is None:
+            raise ValueError("x_train cannot be None when x_test is provided")
+        x_validation = np.concatenate((x_train[-candidate_lag:], x_test), axis=0)
+        return x_validation, y_validation
 
     def evaluate_objective_function(
         self,
@@ -367,66 +477,108 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         fitness_value : ndarray
             The fitness value of each agent.
         """
+        if y_train is None or y_test is None:
+            raise ValueError("y_train and y_test cannot be None")
+        if self.regressor_code is None:
+            raise RuntimeError("The regressor space must be built before evaluation.")
+        if self.tested_models is None:
+            self.tested_models = []
+
         fitness = []
         for agent in population.T:
-            if np.all(agent == 0):
-                fitness.append(30)  # penalty for cases where there is no terms
-                continue
+            for _ in range(100):
+                if np.all(agent == 0):
+                    agent[:] = self._generate_nonempty_agent()
 
-            m = self.regressor_code[agent == 1].copy()
-            yhat = self.simulate(
-                X_train=x_train,
-                y_train=y_train,
-                X_test=x_test,
-                y_test=y_test,
-                model_code=m,
-                steps_ahead=self.steps_ahead,
-            )
+                m = self.regressor_code[agent == 1].copy()
+                candidate_lag = get_max_lag_from_model_code(m)
+                x_validation, y_validation = self._validation_data_with_training_tail(
+                    x_train, y_train, x_test, y_test, candidate_lag
+                )
+                yhat = self.simulate(
+                    X_train=x_train,
+                    y_train=y_train,
+                    X_test=x_validation,
+                    y_test=y_validation,
+                    model_code=m,
+                    steps_ahead=self.steps_ahead,
+                )
 
-            residues = y_test - yhat
-            self.max_lag = self._get_max_lag()
-            lagged_data = build_lagged_matrix(
-                x_train, y_train, self.xlag, self.ylag, self.model_type
-            )
+                candidate_theta = self.theta
+                if candidate_theta is None:
+                    raise RuntimeError(
+                        "The candidate simulation did not estimate theta."
+                    )
 
-            psi = self.basis_function.fit(
-                lagged_data,
-                self.max_lag,
-                self.xlag,
-                self.ylag,
-                self.model_type,
-                predefined_regressors=self.pivv,
-            )
+                lagged_data = build_lagged_matrix(
+                    x_train, y_train, self.xlag, self.ylag, self.model_type
+                )
 
-            pos_insignificant_terms, _, _ = self.perform_t_test(
-                psi, self.theta, residues
-            )
+                psi = self.basis_function.fit(
+                    lagged_data,
+                    candidate_lag,
+                    self.ylag,
+                    self.xlag,
+                    self.model_type,
+                    predefined_regressors=self.pivv,
+                )
 
-            pos_aux = np.where(agent == 1)[0]
-            pos_aux = pos_aux[pos_insignificant_terms]
-            agent[pos_aux] = 0
+                identification_target = y_train[candidate_lag:, 0].reshape(-1, 1)
+                identification_residues = identification_target - psi @ candidate_theta
+                supports_ols_t_test = (
+                    isinstance(self.estimator, LeastSquares)
+                    and not self.estimator.unbiased
+                )
+                has_valid_design = (
+                    supports_ols_t_test
+                    and psi.shape[0] > psi.shape[1]
+                    and np.linalg.matrix_rank(psi) == psi.shape[1]
+                )
+                if has_valid_design:
+                    pos_insignificant_terms, _, _ = self.perform_t_test(
+                        psi, candidate_theta, identification_residues
+                    )
+                else:
+                    pos_insignificant_terms = np.array([], dtype=np.intp)
 
-            m = self.regressor_code[agent == 1].copy()
+                n_removed_terms = pos_insignificant_terms.size
+                selected_positions = np.flatnonzero(agent)
+                agent[selected_positions[pos_insignificant_terms]] = 0
 
-            if np.all(agent == 0):
-                fitness.append(1000)  # just a big number as penalty
-                continue
+                if np.all(agent == 0):
+                    agent[:] = self._generate_nonempty_agent()
+                    continue
 
-            yhat = self.simulate(
-                X_train=x_train,
-                y_train=y_train,
-                X_test=x_test,
-                y_test=y_test,
-                model_code=m,
-                steps_ahead=self.steps_ahead,
-            )
+                m = self.regressor_code[agent == 1].copy()
+                candidate_lag = get_max_lag_from_model_code(m)
+                x_validation, y_validation = self._validation_data_with_training_tail(
+                    x_train, y_train, x_test, y_test, candidate_lag
+                )
+                yhat = self.simulate(
+                    X_train=x_train,
+                    y_train=y_train,
+                    X_test=x_validation,
+                    y_test=y_validation,
+                    model_code=m,
+                    steps_ahead=self.steps_ahead,
+                )
 
-            self.final_model = m.copy()
-            self.tested_models.append(m)
-            if len(self.theta) == 0:
-                print(m)
-            d = getattr(self, self.loss_func)(y_test, yhat, len(self.theta))
-            fitness.append(d)
+                self.final_model = m.copy()
+                self.tested_models.append(m)
+                if self.theta is None:
+                    raise RuntimeError("The pruned simulation did not estimate theta.")
+
+                n_terms = len(self.theta)
+                if self.loss_func == "metamss_loss":
+                    n_terms += n_removed_terms
+
+                y_score = y_test
+                yhat_score = yhat[candidate_lag:]
+                d = getattr(self, self.loss_func)(y_score, yhat_score, n_terms)
+                fitness.append(d)
+                break
+            else:
+                fitness.append(np.inf)
 
         return fitness
 
@@ -454,26 +606,130 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         tail2p: array
             The calculated two-tailed p-value.
 
+        Raises
+        ------
+        ValueError
+            If the arrays do not represent a single-output OLS problem, if the
+            residuals or parameters are not aligned with ``psi``, if there are no
+            residual degrees of freedom, or if ``psi`` is rank deficient.
+
+        Notes
+        -----
+        ``residues`` must be the one-step-ahead identification residuals
+        ``y - psi @ theta`` from the same design matrix and OLS estimate passed to
+        this method. The finite-sample Student's t interpretation assumes a
+        correctly specified linear-in-the-parameters model, full-column-rank
+        regressors, exogeneity, and independent homoscedastic Gaussian errors.
+        Regressors containing lagged outputs are generally predetermined rather
+        than strictly exogenous, so the exact finite-sample interpretation need
+        not hold for dynamic NARX models even with white innovations. MetaMSS uses
+        the resulting p-values as a model-selection heuristic; after data-driven
+        structure selection they should not be interpreted as confirmatory
+        post-selection inference.
+
+        The residual variance is evaluated in a scaled logarithmic form. This
+        preserves the t-statistic when the output unit is changed and avoids
+        overflow or underflow in the sum of squared residuals. For an exactly
+        zero residual vector, the smallest positive ``float64`` variance is used
+        to define the otherwise degenerate standard error.
+
         """
-        sum_of_squared_residues = np.sum(residues**2)
-        variance_of_residues = sum_of_squared_residues / (len(residues) - psi.shape[1])
-        if np.isnan(variance_of_residues):
-            variance_of_residues = 4.3645e05
+        psi = np.asarray(psi)
+        theta = np.asarray(theta)
+        residues = np.asarray(residues)
+        if psi.ndim != 2:
+            raise ValueError(f"psi must be a 2D matrix. Got shape {psi.shape}.")
+        if theta.ndim == 1:
+            theta = theta.reshape(-1, 1)
+        elif theta.ndim != 2 or theta.shape[1] != 1:
+            raise ValueError(
+                "theta must contain one column for a single-output OLS model. "
+                f"Got shape {theta.shape}."
+            )
+        if residues.ndim == 1:
+            residues = residues.reshape(-1, 1)
+        elif residues.ndim != 2 or residues.shape[1] != 1:
+            raise ValueError(
+                "residues must contain one column for a single-output OLS model. "
+                f"Got shape {residues.shape}."
+            )
+        arrays = (psi, theta, residues)
+        if any(
+            not np.issubdtype(array.dtype, np.number) or np.iscomplexobj(array)
+            for array in arrays
+        ):
+            raise ValueError("psi, theta, and residues must be real numeric arrays.")
 
-        skk = np.linalg.pinv(psi.T.dot(psi))
-        skk_diag = np.diag(skk)
-        var_e = variance_of_residues * skk_diag
-        se_theta = np.sqrt(var_e)
-        se_theta = se_theta.reshape(-1, 1)
-        t_test = theta / se_theta
-        degree_of_freedom = psi.shape[0] - psi.shape[1]
+        n_samples, n_parameters = psi.shape
+        if n_parameters == 0:
+            raise ValueError("The t-test requires at least one regressor in psi.")
+        if theta.shape[0] != n_parameters:
+            raise ValueError(
+                "theta must have one row per regressor in psi. "
+                f"Got {theta.shape[0]} rows and {n_parameters} regressors."
+            )
+        if residues.shape[0] != n_samples:
+            raise ValueError(
+                "residues and psi must contain the same number of samples. "
+                f"Got {residues.shape[0]} and {n_samples}."
+            )
+        if n_samples <= n_parameters:
+            raise ValueError(
+                "The t-test requires more samples than regressors. "
+                f"Got {n_samples} samples and {n_parameters} regressors."
+            )
+        if not (
+            np.all(np.isfinite(psi))
+            and np.all(np.isfinite(theta))
+            and np.all(np.isfinite(residues))
+        ):
+            raise ValueError(
+                "psi, theta, and residues must contain only finite values."
+            )
+        if np.linalg.matrix_rank(psi) < n_parameters:
+            raise ValueError("The t-test requires a full-column-rank regressor matrix.")
 
-        tail2p = 2 * t.cdf(-np.abs(t_test), degree_of_freedom)
+        degree_of_freedom = n_samples - n_parameters
+        upper_triangular = np.linalg.qr(psi, mode="r")
+        inverse_triangular = np.linalg.solve(upper_triangular, np.eye(n_parameters))
 
-        pos_insignificant_terms = np.where(tail2p > self.p_value)[0]
-        pos_insignificant_terms = pos_insignificant_terms.reshape(-1, 1).T
-        if pos_insignificant_terms.shape == 0:
-            return np.array([]), t_test, tail2p
+        # diag((psi.T @ psi)^-1) is the squared row norm of R^-1. Computing
+        # its logarithm from normalized rows avoids overflow/underflow without
+        # changing the covariance represented by the QR factorization.
+        inverse_scale = np.max(np.abs(inverse_triangular), axis=1)
+        normalized_inverse = inverse_triangular / inverse_scale[:, np.newaxis]
+        log_skk_diag = 2 * np.log(inverse_scale) + np.log(
+            np.sum(normalized_inverse**2, axis=1)
+        )
+
+        residual_scale = float(np.max(np.abs(residues)))
+        if residual_scale == 0:
+            log_residual_variance = np.log(np.finfo(np.float64).tiny)
+        else:
+            normalized_residues = residues / residual_scale
+            scaled_sum_of_squares = float(np.sum(normalized_residues**2))
+            log_residual_variance = (
+                2 * np.log(residual_scale)
+                + np.log(scaled_sum_of_squares)
+                - np.log(degree_of_freedom)
+            )
+
+        log_standard_error = 0.5 * (log_residual_variance + log_skk_diag)
+        theta_values = theta.ravel()
+        t_values = np.zeros(n_parameters, dtype=float)
+        nonzero_theta = theta_values != 0
+        with np.errstate(over="ignore", under="ignore"):
+            t_values[nonzero_theta] = np.sign(theta_values[nonzero_theta]) * np.exp(
+                np.log(np.abs(theta_values[nonzero_theta]))
+                - log_standard_error[nonzero_theta]
+            )
+        t_test = t_values.reshape(-1, 1)
+
+        tail2p = 2 * t.sf(np.abs(t_test), degree_of_freedom)
+
+        pos_insignificant_terms = np.flatnonzero(tail2p.ravel() > self.p_value).reshape(
+            1, -1
+        )
 
         return pos_insignificant_terms, t_test, tail2p
 
@@ -495,7 +751,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             The Akaike Information Criterion
 
         """
-        mse = mean_squared_error(y_test, yhat)
+        mse = max(mean_squared_error(y_test, yhat), np.finfo(np.float64).eps)
         n = y_test.shape[0]
         return n * np.log(mse) + 2 * n_theta
 
@@ -517,9 +773,9 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             The Bayesian Information Criterion
 
         """
-        mse = mean_squared_error(y_test, yhat)
+        mse = max(mean_squared_error(y_test, yhat), np.finfo(np.float64).eps)
         n = y_test.shape[0]
-        return n * np.log(mse) + n_theta + np.log(n)
+        return n * np.log(mse) + n_theta * np.log(n)
 
     def metamss_loss(self, y_test: np.ndarray, yhat: np.ndarray, n_terms: int) -> float:
         """Calculate the MetaMSS loss function.
@@ -539,7 +795,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
             The MetaMSS loss function
 
         """
-        penalty_count = np.arange(0, self.dimension)
+        penalty_count = np.arange(0, self.dimension + 1)
         penalty_distribution = (np.log(n_terms + 1) ** (-1)) / self.dimension
         penalty = self.sigmoid_linear_unit_derivative(
             penalty_count, self.dimension / 2, penalty_distribution
@@ -548,7 +804,7 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         penalty = penalty - np.min(penalty)
         rmse = root_relative_squared_error(y_test, yhat)
         fitness = rmse * penalty[n_terms]
-        if np.isnan(fitness):
+        if not np.isfinite(fitness):
             fitness = 30
 
         return fitness

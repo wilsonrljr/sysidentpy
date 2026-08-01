@@ -1,6 +1,6 @@
-# Sistema Wiener Hammerstein
+# Sistema Wiener–Hammerstein
 
-Nota: O exemplo mostrado neste notebook é retirado do livro complementar [Nonlinear System Identification and Forecasting: Theory and Practice with SysIdentPy](https://sysidentpy.org/book/0-Preface/).
+Nota: O exemplo mostrado neste notebook é retirado do livro [Nonlinear System Identification and Forecasting: Theory and Practice with SysIdentPy](https://sysidentpy.org/book/0-Preface/).
 
 O conteúdo da descrição deriva principalmente do [site do benchmark - Nonlinear Benchmark](https://www.nonlinearbenchmark.org/benchmarks) e do [artigo associado - Wiener-Hammerstein benchmark with process noise](https://data.4tu.nl/articles/_/12952124). Para uma descrição detalhada, os leitores são encaminhados às referências vinculadas.
 
@@ -11,7 +11,7 @@ Este benchmark foca em um circuito eletrônico Wiener-Hammerstein onde o ruído 
 A estrutura Wiener-Hammerstein é um sistema orientado a blocos bem conhecido que contém uma não linearidade estática intercalada entre dois blocos Lineares Invariantes no Tempo (LTI) (Figura 2). Este arranjo apresenta um problema de identificação desafiador devido à presença desses blocos LTI.
 
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_system.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wh_system.png?raw=true)
 > Figura 2: o sistema Wiener-Hammerstein
 
 Na Figura 2, o sistema Wiener-Hammerstein é ilustrado com ruído de processo $e_x(t)$ entrando antes da não linearidade estática $f(x)$, intercalado entre blocos LTI representados por $R(s)$ e $S(s)$ na entrada e saída, respectivamente. Além disso, pequenas fontes de ruído desprezíveis $e_u(t)$ e $e_y(t)$ afetam os canais de medição. Os sinais de entrada e saída medidos são denotados como $u_m(t)$ e $y_m(t)$.
@@ -34,25 +34,18 @@ O objetivo deste benchmark é desenvolver e validar modelos robustos usando dado
 
 ### Pacotes Necessários e Versões
 
-Para garantir que você possa replicar este estudo de caso, é essencial usar versões específicas dos pacotes necessários. Abaixo está uma lista dos pacotes junto com suas respectivas versões necessárias para executar os estudos de caso efetivamente.
+Este estudo de caso foi verificado com o SysIdentPy 0.9.0 no Python 3.12.12 e
+`nonlinear-benchmarks==1.0.1`. Instale explicitamente o checkout do repositório
+e o carregador oficial do benchmark:
 
-Para instalar todos os pacotes necessários, você pode criar um arquivo `requirements.txt` com o seguinte conteúdo:
-
-```
-sysidentpy==0.4.0
-pandas==2.2.2
-numpy==1.26.0
-matplotlib==3.8.4
-nonlinear_benchmarks==0.1.2
+```bash
+python -m pip install -e .
+python -m pip install nonlinear-benchmarks==1.0.1
 ```
 
-Então, instale os pacotes usando:
-```
-pip install -r requirements.txt
-```
-
-- Certifique-se de usar um ambiente virtual para evitar conflitos entre versões de pacotes.
-- As versões especificadas são baseadas na compatibilidade com os exemplos de código fornecidos. Se você estiver usando versões diferentes, alguns ajustes no código podem ser necessários.
+Use um ambiente virtual para isolar o carregador opcional. Os resultados
+numéricos devem ser recalculados se o ambiente ou a configuração do modelo forem
+alterados.
 
 ### Configuração do SysIdentPy
 
@@ -95,33 +88,31 @@ plot_n = 800
 plt.figure(figsize=(15, 4))
 plt.plot(x_train[:plot_n])
 plt.plot(y_train[:plot_n])
-plt.title("Experimento: dados de treinamento")
+plt.title("Experiment: training data")
 plt.legend(["x_train", "y_train"])
 plt.show()
 
 plt.figure(figsize=(15, 4))
 plt.plot(x_test[:plot_n])
 plt.plot(y_test[:plot_n])
-plt.title("Experimento: dados de teste")
+plt.title("Experiment: testing data")
 plt.legend(["x_test", "y_test"])
 plt.show()
 ```
 
 
-    
-![png](../../../en/user-guide/tutorials/wiener-hammerstein-system_files/wiener-hammerstein-system_4_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wiener-hammerstein-system-01.png?raw=true)
 
 
-
-    
-![png](../../../en/user-guide/tutorials/wiener-hammerstein-system_files/wiener-hammerstein-system_4_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wiener-hammerstein-system-02.png?raw=true)
 
 
-O objetivo deste benchmark é obter um modelo que tenha um desempenho melhor que o modelo SOTA fornecido no artigo de benchmarking.
+O benchmark externo fornece um contexto útil para o experimento. Uma comparação
+direta, porém, exige a mesma divisão dos dados, janela de inicialização e
+normalização; essas condições são explicitadas abaixo antes de qualquer
+comparação.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_sota_results.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wiener-hammerstein-system-03.png?raw=true)
 > Resultados estado-da-arte apresentados no [artigo de benchmarking](https://arxiv.org/pdf/2405.10779). Nesta seção estamos trabalhando apenas com os resultados Wiener-Hammerstein, que são apresentados na coluna $W-H$.
 
 ### Resultados
@@ -130,8 +121,6 @@ Começaremos com uma configuração básica do FROLS usando uma função de base
 
 
 ```python
-# 3min para rodar na minha máquina (amd 5600x, 32gb ram)
-
 n = test.state_initialization_window_length
 
 basis_function = Polynomial(degree=2)
@@ -144,31 +133,33 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
-rmse_sota = rmse / y_test.std()
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=1000,
-    title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(rmse_sota, 4)}",
+    title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(nrmse, 4)}",
 )
 ```
 
 
-    
-![png](../../../en/user-guide/tutorials/wiener-hammerstein-system_files/wiener-hammerstein-system_6_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wiener-hammerstein-system-04.png?raw=true)
 
 
-A primeira configuração já é melhor que os modelos **SOTA** mostrados na tabela de benchmark! Começamos usando `xlag=ylag=7` para ter uma ideia de quão bem o SysIdentPy lidaria com este dataset, mas os resultados já são muito bons! No entanto, o artigo de benchmarking indica que eles usaram lags maiores para seus modelos. Vamos verificar o que acontece se definirmos `xlag=ylag=10`.
+A primeira configuração produz RMSE $0.020007$ e NRMSE $0.082029$. Começamos
+com `xlag=ylag=7` para estabelecer uma referência compacta. O artigo de
+benchmarking usa memórias mais longas em alguns modelos; por isso, a próxima
+configuração define `xlag=ylag=10`.
 
 
 ```python
-# 7min para rodar na minha máquina (amd 5600x, 32gb ram)
-
 x_train, y_train = train_val
 x_test, y_test = test
 
@@ -184,26 +175,30 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
-rmse_sota = rmse / y_test.std()
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=1000,
-    title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(rmse_sota, 4)}",
+    title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(nrmse, 4)}",
 )
 ```
 
 
-    
-![png](../../../en/user-guide/tutorials/wiener-hammerstein-system_files/wiener-hammerstein-system_8_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wiener-hammerstein-system-05.png?raw=true)
 
 
-O desempenho é ainda melhor agora! Por enquanto, não estamos preocupados com a complexidade do modelo (mesmo neste caso onde estamos comparando com uma rede neural de estado profundo...). No entanto, se verificarmos a ordem do modelo e o gráfico `AIC`, vemos que o modelo tem 50 regressores, mas os valores de `AIC` não mudam muito após cada regressão adicionada.
+A configuração com 10 lags melhora o resultado para RMSE $0.015202$ e NRMSE
+$0.062328$. Por enquanto, não estamos otimizando a complexidade do modelo. Ainda
+assim, o traçado do critério de informação mostra que o modelo com 50
+regressores muda pouco após várias das últimas inclusões.
 
 
 ```python
@@ -211,24 +206,13 @@ plt.plot(model.info_values)
 ```
 
 
-
-
-    [<matplotlib.lines.Line2D at 0x28c0058a450>]
-
-
-
-
-    
-![png](../../../en/user-guide/tutorials/wiener-hammerstein-system_files/wiener-hammerstein-system_10_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wiener-hammerstein-system-06.png?raw=true)
 
 
 Então, o que acontece se definirmos um modelo com metade dos regressores?
 
 
 ```python
-# 14 segundos para rodar
-
 x_train, y_train = train_val
 x_test, y_test = test
 
@@ -246,25 +230,40 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
-rmse_sota = rmse / y_test.std()
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=1000,
-    title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(rmse_sota, 4)}",
+    title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(nrmse, 4)}",
 )
 ```
 
 
-    
-![png](../../../en/user-guide/tutorials/wiener-hammerstein-system_files/wiener-hammerstein-system_12_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wh_sota_results.png?raw=true)
 
 
-Como mostrado na figura acima, os resultados ainda superam os modelos SOTA apresentados no artigo de benchmarking. Os resultados SOTA do artigo provavelmente também poderiam ser melhorados. Os usuários são encorajados a explorar o [pacote deepsysid](https://github.com/AlexandraBaier/deepsysid), que pode ser usado para construir redes neurais de estado profundo.
+O modelo fixado em 25 termos produz RMSE $0.018809$ e NRMSE $0.077117$. Ele é
+mais compacto que o modelo de 50 termos selecionado automaticamente, ao custo de
+um erro maior. Os três resultados atuais são resumidos a seguir.
+
+| Configuração | RMSE | NRMSE |
+| --- | ---: | ---: |
+| 7 lags, ordem automática | 0.020007 | 0.082029 |
+| 10 lags, ordem automática | 0.015202 | 0.062328 |
+| 10 lags, 25 termos fixos | 0.018809 | 0.077117 |
+
+As figuras históricas armazenavam quatro casas decimais, e os valores
+reproduzidos permanecem iguais nessa precisão. Tabelas publicadas podem usar
+outra normalização ou divisão dos dados, portanto não são tratadas como uma
+comparação direta. Quem quiser investigar alternativas baseadas em modelos de
+estado profundos pode explorar o [pacote deepsysid](https://github.com/AlexandraBaier/deepsysid).
 
 Esta configuração básica pode servir como ponto de partida para os usuários desenvolverem modelos ainda melhores usando o SysIdentPy. Experimente!

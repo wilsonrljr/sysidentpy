@@ -24,7 +24,7 @@ def get_index_from_regressor_code(regressor_code: np.ndarray, model_code: List[i
     """
     dims = regressor_code.max(0) + 1
     model_index = np.where(
-        np.in1d(
+        np.isin(
             np.ravel_multi_index(regressor_code.T, dims),
             np.ravel_multi_index(model_code.T, dims),
         )

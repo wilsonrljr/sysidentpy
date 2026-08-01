@@ -129,7 +129,7 @@ def test_rmss_multi_dataset_unbiased_warns():
     assert model.pivv.shape[0] == 2
 
 
-@pytest.mark.parametrize("error_measure", ["mae", "mse", "smape", "rmse_ratio"])
+@pytest.mark.parametrize("error_measure", ["mae", "mse", "phi3", "rmse_ratio"])
 def test_rmss_error_measure_variants(error_measure):
     model = RMSS(
         n_terms=2,

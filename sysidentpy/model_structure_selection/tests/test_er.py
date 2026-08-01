@@ -1,7 +1,8 @@
 # pylint: disable=protected-access,redefined-outer-name
 import numpy as np
 import pytest
-from numpy.testing import assert_almost_equal, assert_equal
+from numpy.testing import assert_allclose, assert_almost_equal, assert_array_equal
+from numpy.testing import assert_equal
 from numpy.testing import assert_raises
 
 from sysidentpy import config_context
@@ -262,6 +263,104 @@ def test_entropic_forward_flags_unsuccessful_when_too_many_terms():
 
     assert success is False
     assert len(selected_terms) == 9
+
+
+def test_entropic_backward_keeps_all_terms_above_tolerance(monkeypatch):
+    model = ER(basis_function=Polynomial(degree=1))
+    model.tol = 0.5
+    monkeypatch.setattr(
+        model, "conditional_mutual_information", lambda *_args, **_kwargs: 1.0
+    )
+    reg_matrix = np.eye(3)
+    y = np.ones((3, 1))
+
+    selected = model.entropic_regression_backward(reg_matrix, y, [0, 1, 2])
+
+    assert_equal(selected, np.array([0, 1, 2]))
+
+
+def test_entropic_backward_removes_terms_equal_to_tolerance(monkeypatch):
+    model = ER(basis_function=Polynomial(degree=1))
+    model.tol = 0.5
+    monkeypatch.setattr(
+        model, "conditional_mutual_information", lambda *_args, **_kwargs: 0.5
+    )
+    reg_matrix = np.eye(3)
+    y = np.ones((3, 1))
+
+    selected = model.entropic_regression_backward(reg_matrix, y, [0, 1, 2])
+
+    assert len(selected) == 1
+
+
+def test_entropic_backward_removes_then_stops_above_tolerance(monkeypatch):
+    model = ER(basis_function=Polynomial(degree=1))
+    model.tol = 0.5
+    mutual_information = iter([0.1, 0.4, 0.6, 0.7, 0.8])
+    monkeypatch.setattr(
+        model,
+        "conditional_mutual_information",
+        lambda *_args, **_kwargs: next(mutual_information),
+    )
+    reg_matrix = np.eye(3)
+    y = np.ones((3, 1))
+
+    selected = model.entropic_regression_backward(reg_matrix, y, [0, 1, 2])
+
+    assert_equal(selected, np.array([1, 2]))
+
+
+def test_fit_estimates_and_uses_one_tolerance(monkeypatch):
+    model = ER(
+        ylag=1,
+        xlag=1,
+        n_perm=1,
+        random_state=0,
+        basis_function=Polynomial(degree=1),
+    )
+    calls = 0
+
+    def fake_tolerance(_y):
+        nonlocal calls
+        calls += 1
+        return 100.0
+
+    monkeypatch.setattr(model, "tolerance_estimator", fake_tolerance)
+    monkeypatch.setattr(model, "mutual_information_knn", lambda *_args, **_kwargs: 0.0)
+    monkeypatch.setattr(
+        model, "conditional_mutual_information", lambda *_args, **_kwargs: 0.0
+    )
+
+    model.fit(X=X_train[:10], y=y_train[:10])
+
+    assert calls == 1
+    assert model.tol == model.estimated_tolerance == 100.0
+
+
+def test_er_recovers_known_polynomial_structure_end_to_end():
+    x_data, y_data, _ = create_test_data()
+    model = ER(
+        ylag=2,
+        xlag=2,
+        n_perm=20,
+        random_state=0,
+        basis_function=Polynomial(degree=2),
+    )
+
+    model.fit(X=x_data, y=y_data)
+
+    expected_codes = np.array(
+        [
+            [2002, 0],
+            [1002, 0],
+            [2001, 1001],
+            [2002, 1002],
+            [1001, 1001],
+        ]
+    )
+    expected_theta = np.array([0.6, -0.5, 0.7, -0.7, 0.2])
+    assert_array_equal(model.final_model, expected_codes)
+    assert_allclose(model.theta.ravel(), expected_theta, atol=1e-8)
 
 
 def test_predict_polynomial_variants_cover_all_branches():

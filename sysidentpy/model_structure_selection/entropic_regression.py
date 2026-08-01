@@ -305,10 +305,8 @@ class ER(BaseMSS):
             Backward Greedy Feature Elimination.
 
         """
-        min_value = -np.inf
         piv = np.asarray(piv, dtype=np.intp)
-        ix = []
-        while (min_value <= self.tol) and (len(piv) > 1):
+        while len(piv) > 1:
             initial_array = np.full((1, len(piv)), np.inf)
             for i in range(initial_array.shape[1]):
                 rem = np.setdiff1d(piv, piv[i])
@@ -318,6 +316,9 @@ class ER(BaseMSS):
 
             ix = np.argmin(initial_array)
             min_value = initial_array[0, ix]
+            if min_value > self.tol:
+                break
+
             piv = np.delete(piv, ix)
 
         return piv
@@ -351,7 +352,9 @@ class ER(BaseMSS):
         ix = []
         selected_terms = []
         reg_matrix_columns = np.array(list(range(reg_matrix.shape[1])))
-        self.tol = self.tolerance_estimator(y)
+        if self.tol is None:
+            self.tol = self.tolerance_estimator(y)
+        self.estimated_tolerance = self.tol
         ksg_max = getattr(self, self.mutual_information_estimator)(
             y, reg_matrix @ pinv(reg_matrix) @ y
         )
@@ -591,23 +594,13 @@ class ER(BaseMSS):
 
         y_full = y.copy()
         y = y[self.max_lag :].reshape(-1, 1)
-        self.tol = 0
-        ksg_estimation = []
-        for _ in range(self.n_perm):
-            mutual_information_output = getattr(
-                self, self.mutual_information_estimator
-            )(y, self.rng.permutation(y))
-            ksg_estimation.append(mutual_information_output)
-
-        ksg_estimation = np.array(ksg_estimation).reshape(-1, 1)
-        self.tol = np.quantile(ksg_estimation, self.q)
+        self.tol = self.tolerance_estimator(y)
         self.estimated_tolerance = self.tol
-        success = False
+        selected_terms = np.arange(reg_matrix.shape[1])
         if not self.skip_forward:
-            selected_terms, success = self.entropic_regression_forward(reg_matrix, y)
-
-        if not success or self.skip_forward:
-            selected_terms = np.array(list(range(reg_matrix.shape[1])))
+            forward_terms, success = self.entropic_regression_forward(reg_matrix, y)
+            if success:
+                selected_terms = forward_terms
 
         selected_terms_backward = self.entropic_regression_backward(
             reg_matrix[:, selected_terms], y, list(range(len(selected_terms)))

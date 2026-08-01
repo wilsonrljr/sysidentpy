@@ -12,7 +12,9 @@ from numpy.testing import (
 
 from sysidentpy import config_context
 from sysidentpy.basis_function import Polynomial, Fourier
-from sysidentpy._lib._array_api import _to_numpy
+from sysidentpy.tests._array_api_asserts import (
+    assert_array_equal as xp_assert_array_equal,
+)
 from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.narmax_base import RegressorDictionary, BaseMSS
 from sysidentpy.parameter_estimation.estimators import (
@@ -897,7 +899,7 @@ def test_one_step_ahead_prediction_preserves_array_api_namespace():
         result = model._one_step_ahead_prediction(x_base)
 
     assert result.__array_namespace__().__name__ == xp.__name__
-    assert_array_equal(_to_numpy(result), np.array([[2.0], [4.0], [6.0]]))
+    xp_assert_array_equal(result, [[2.0], [4.0], [6.0]])
 
 
 def test_narmax_predict_preserves_array_api_namespace_with_numpy_theta():
@@ -912,7 +914,7 @@ def test_narmax_predict_preserves_array_api_namespace_with_numpy_theta():
         result = model._narmax_predict(x_data, y_initial, forecast_horizon=6)
 
     assert result.__array_namespace__().__name__ == xp.__name__
-    assert_array_equal(_to_numpy(result), np.full((4, 1), 2.0))
+    xp_assert_array_equal(result, np.full((4, 1), 2.0))
 
 
 def test_polynomial_narmax_predict_fast_matches_reference_with_interactions():
@@ -1005,7 +1007,7 @@ def test_nfir_predict_preserves_array_api_namespace_with_numpy_theta():
         result = model._nfir_predict(x_data, y_initial)
 
     assert result.__array_namespace__().__name__ == xp.__name__
-    assert_array_equal(_to_numpy(result), np.full((4, 1), 2.0))
+    xp_assert_array_equal(result, np.full((4, 1), 2.0))
 
 
 def test_n_step_ahead_prediction_invalid_model():

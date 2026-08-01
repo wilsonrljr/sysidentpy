@@ -30,7 +30,7 @@ else:
 P = ParamSpec("P")
 
 
-@overload
+@overload  # pyrefly: ignore[invalid-param-spec]
 def lazy_apply(  # type: ignore[valid-type]
     func: Callable[P, Array | ArrayLike],
     *args: Array | complex | None,
@@ -42,7 +42,7 @@ def lazy_apply(  # type: ignore[valid-type]
 ) -> Array: ...  # numpydoc ignore=GL08
 
 
-@overload
+@overload  # pyrefly: ignore[invalid-param-spec]
 def lazy_apply(  # type: ignore[valid-type]
     func: Callable[P, Sequence[Array | ArrayLike]],
     *args: Array | complex | None,
@@ -54,7 +54,7 @@ def lazy_apply(  # type: ignore[valid-type]
 ) -> tuple[Array, ...]: ...  # numpydoc ignore=GL08
 
 
-def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
+def lazy_apply(  # type: ignore[valid-type]  # pyrefly: ignore[invalid-param-spec]  # numpydoc ignore=GL07,SA04
     func: Callable[P, Array | ArrayLike | Sequence[Array | ArrayLike]],
     *args: Array | complex | None,
     shape: tuple[int | None, ...] | Sequence[tuple[int | None, ...]] | None = None,
@@ -240,9 +240,7 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
     if is_dask_namespace(xp):
         import dask
 
-        metas: list[Array] = [
-            arg._meta for arg in array_args
-        ]  # pylint: disable=protected-access    # pyright: ignore[reportAttributeAccessIssue]
+        metas: list[Array] = [arg._meta for arg in array_args]  # pylint: disable=protected-access # pyright: ignore[reportAttributeAccessIssue] # pyrefly: ignore[missing-attribute]
         meta_xp = array_namespace(*metas)
 
         wrapped = dask.delayed(  # type: ignore[attr-defined]  # pyright: ignore[reportPrivateImportUsage]
@@ -289,9 +287,7 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
             jax.pure_callback(
                 wrapped,
                 tuple(
-                    jax.ShapeDtypeStruct(
-                        shape, dtype
-                    )  # pyright: ignore[reportUnknownArgumentType]
+                    jax.ShapeDtypeStruct(shape, dtype)  # pyright: ignore[reportUnknownArgumentType]
                     for shape, dtype in zip(shapes, dtypes, strict=True)
                 ),
                 *args,
@@ -347,9 +343,7 @@ def _lazy_apply_wrapper(  # numpydoc ignore=PR01,RT01
                 if as_numpy:
                     import numpy as np
 
-                    arg = cast(
-                        Array, np.asarray(arg)
-                    )  # pyright: ignore[reportInvalidCast] # noqa: PLW2901
+                    arg = cast(Array, np.asarray(arg))  # pyright: ignore[reportInvalidCast] # noqa: PLW2901
             args_list.append(arg)
         assert device is not None
 

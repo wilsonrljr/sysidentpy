@@ -1,5 +1,11 @@
 # Modelagem de um Dispositivo Amortecedor Magneto-Reológico
 
+## Reprodutibilidade
+
+Este tutorial foi verificado com SysIdentPy 0.9.0 no Python 3.12.12, pandas 2.3.3
+e scikit-learn 1.7.2. Os dados hospedados em `sysidentpy-data` usam uma URL de
+commit imutável, e os exemplos aleatórios definem semente explícita.
+
 Nota: O exemplo mostrado neste notebook é retirado do livro complementar [Nonlinear System Identification and Forecasting: Theory and Practice with SysIdentPy](https://sysidentpy.org/book/0-Preface/).
 
 Os efeitos de memória entre entrada e saída quase-estáticas tornam a modelagem de sistemas histeréticos muito difícil. Modelos baseados em física são frequentemente usados para descrever os loops de histerese, mas esses modelos geralmente carecem da simplicidade e eficiência requeridas em aplicações práticas envolvendo caracterização, identificação e controle de sistemas. Como detalhado em [Martins, S. A. M. and Aguirre, L. A. - Sufficient conditions for rate-independent hysteresis in autoregressive identified models](https://www.sciencedirect.com/science/article/abs/pii/S0888327015005968), modelos NARX provaram ser uma escolha viável para descrever os loops de histerese. Veja o Capítulo 8 para um background detalhado. No entanto, mesmo considerando as condições suficientes para representação de histerese independente de taxa, algoritmos clássicos de seleção de estrutura falham em retornar um modelo com desempenho decente e o usuário precisa definir uma função multi-valorada para garantir a ocorrência da estrutura limitante $\mathcal{H}$ ([Martins, S. A. M. and Aguirre, L. A. - Sufficient conditions for rate-independent hysteresis in autoregressive identified models](https://www.sciencedirect.com/science/article/abs/pii/S0888327015005968)).
@@ -11,7 +17,7 @@ Embora algum progresso tenha sido feito, trabalhos anteriores foram limitados a 
 Os dados usados neste estudo de caso são do modelo Bouc-Wen ([Bouc, R - Forced Vibrations of a Mechanical System with Hysteresis](https://www.scirp.org/reference/referencespapers?referenceid=726819)), ([Wen, Y. X. - Method for Random Vibration of Hysteretic Systems](https://ascelibrary.org/doi/10.1061/JMCEA3.0002106)) de um MRD cujo diagrama esquemático é mostrado na figura abaixo.
 
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bouc_wen.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/bouc_wen.png?raw=true)
 > O modelo para um amortecedor magneto-reológico proposto por [Spencer, B. F. and Sain, M. K. - Controlling buildings: a new frontier in feedback](https://ieeexplore.ieee.org/document/642972).
 
 A forma geral do modelo Bouc-Wen pode ser descrita como ([Spencer, B. F. and Sain, M. K. - Controlling buildings: a new frontier in feedback](https://ieeexplore.ieee.org/document/642972)):
@@ -61,31 +67,23 @@ Os desafios são:
 
 ### Pacotes Necessários e Versões
 
-Para garantir que você possa replicar este estudo de caso, é essencial usar versões específicas dos pacotes necessários. Abaixo está uma lista dos pacotes junto com suas respectivas versões necessárias para executar os estudos de caso efetivamente.
+Este estudo de caso foi verificado com o SysIdentPy 0.9.0 no Python 3.12.12,
+`pandas==2.3.3` e `scikit-learn==1.7.2`. Instale explicitamente o checkout do
+repositório e os dois pacotes de preparação dos dados:
 
-Para instalar todos os pacotes necessários, você pode criar um arquivo `requirements.txt` com o seguinte conteúdo:
-
-```
-sysidentpy==0.4.0
-pandas==2.2.2
-numpy==1.26.0
-matplotlib==3.8.4
-scikit-learn==1.4.2
+```bash
+python -m pip install -e .
+python -m pip install pandas==2.3.3 scikit-learn==1.7.2
 ```
 
-Então, instale os pacotes usando:
-```
-pip install -r requirements.txt
-```
-
-- Certifique-se de usar um ambiente virtual para evitar conflitos entre versões de pacotes.
-- As versões especificadas são baseadas na compatibilidade com os exemplos de código fornecidos. Se você estiver usando versões diferentes, alguns ajustes no código podem ser necessários.
+O conjunto de dados é carregado por uma URL imutável do `sysidentpy-data`. Os
+exemplos aleatórios usam a semente 42.
 
 ### Configuração do SysIdentPy
 
 
-
 ```python
+from warnings import catch_warnings, simplefilter
 import numpy as np
 from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler
 import pandas as pd
@@ -99,7 +97,7 @@ from sysidentpy.metrics import root_relative_squared_error
 from sysidentpy.utils.plotting import plot_results
 
 df = pd.read_csv(
-    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/bouc_wen/boucwen_histeretic_system.csv"
+    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/4085901293ba5ed5674bb2911ef4d1fa20f3438d/datasets/bouc_wen/boucwen_histeretic_system.csv"
 )
 scaler_x = MaxAbsScaler()
 scaler_y = MaxAbsScaler()
@@ -121,38 +119,38 @@ y_test = (
 )
 y_test = scaler_y.transform(y_test)
 
-# Plotando os dados
+# Plotting the data
 plt.figure(figsize=(10, 8))
-plt.suptitle("Dados de identificação (treinamento)", fontsize=16)
+plt.suptitle("Identification (training) data", fontsize=16)
 
 plt.subplot(221)
 plt.plot(y_train, "k")
-plt.ylabel("Força - Saída")
-plt.xlabel("Amostras")
+plt.ylabel("Force - Output")
+plt.xlabel("Samples")
 plt.title("y")
 plt.grid()
 plt.axis([0, 1500, -1.5, 1.5])
 
 plt.subplot(222)
 plt.plot(x_train[:, 0], "k")
-plt.ylabel("Tensão de Controle")
-plt.xlabel("Amostras")
+plt.ylabel("Control Voltage")
+plt.xlabel("Samples")
 plt.title("x_1")
 plt.grid()
 plt.axis([0, 1500, 0, 1])
 
 plt.subplot(223)
 plt.plot(x_train[:, 1], "k")
-plt.ylabel("Velocidade")
-plt.xlabel("Amostras")
+plt.ylabel("Velocity")
+plt.xlabel("Samples")
 plt.title("x_2")
 plt.grid()
 plt.axis([0, 1500, -1.5, 1.5])
 
 plt.subplot(224)
 plt.plot(x_train[:, 2], "k")
-plt.ylabel("sign(Velocidade)")
-plt.xlabel("Amostras")
+plt.ylabel("sign(Velocity)")
+plt.xlabel("Samples")
 plt.title("x_3")
 plt.grid()
 plt.axis([0, 1500, -1.5, 1.5])
@@ -162,57 +160,39 @@ plt.show()
 ```
 
 
-    
-![png](../../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_3_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-01.png?raw=true)
 
 
-Vamos verificar como é o comportamento histerético considerando cada entrada:
+Os gráficos aos pares ajudam a revelar a relação multivalorada entre a força e
+cada entrada candidata.
 
 
 ```python
 plt.figure()
 plt.plot(x_train[:, 0], y_train)
-plt.xlabel("x1 - Tensão")
-plt.ylabel("y - Força")
+plt.xlabel("x1 - Voltage")
+plt.ylabel("y - Force")
 
 plt.figure()
 plt.plot(x_train[:, 1], y_train)
-plt.xlabel("x2 - Velocidade")
-plt.ylabel("y - Força")
+plt.xlabel("x2 - Velocity")
+plt.ylabel("y - Force")
 
 plt.figure()
 plt.plot(x_train[:, 2], y_train)
-plt.xlabel("u3 - sign(Velocidade)")
-plt.ylabel("y - Força")
+plt.xlabel("u3 - sign(Velocity)")
+plt.ylabel("y - Force")
 ```
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-02.png?raw=true)
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-03.png?raw=true)
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-04.png?raw=true)
 
 
-
-    Text(0, 0.5, 'y - Força')
-
-
-
-
-    
-![png](../../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_5_1.png)
-    
-
-
-
-    
-![png](../../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_5_2.png)
-    
-
-
-
-    
-![png](../../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_5_3.png)
-    
-
-
-Agora, podemos simplesmente construir um modelo NARX:
+Agora podemos construir um modelo NARX. Com as três entradas e o
+`MaxAbsScaler`, o RRSE em simulação livre é $0.045104$:
 
 
 ```python
@@ -233,20 +213,16 @@ plot_results(
     y=y_test[model.max_lag :],
     yhat=yhat[model.max_lag :],
     n=10000,
-    title="FROLS: sign(v) e MaxAbsScaler",
+    title="FROLS: sign(v) and MaxAbsScaler",
 )
 ```
 
-    0.04510435472905795
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-05.png?raw=true)
 
 
-
-    
-![png](../../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_7_1.png)
-    
-
-
-Se removermos a entrada `sign(v)` e tentarmos construir um modelo NARX usando a mesma configuração, o modelo diverge, como pode ser visto na figura a seguir:
+Se removermos a entrada `sign(v)` e usarmos a mesma configuração, a simulação
+livre diverge na amostra 203, como mostra a figura a seguir:
 
 
 ```python
@@ -260,33 +236,40 @@ model = FROLS(
 )
 
 model.fit(X=x_train[:, :2], y=y_train)
-yhat = model.predict(X=x_test[:, :2], y=y_test[: model.max_lag :, :])
-rrse = root_relative_squared_error(y_test[model.max_lag :], yhat[model.max_lag :])
-print(rrse)
-plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
-    n=10000,
-    title="FROLS: MaxAbsScaler, descartando sign(v)",
-)
+with catch_warnings(), np.errstate(over="ignore", invalid="ignore"):
+    simplefilter("ignore", RuntimeWarning)
+    yhat = model.predict(
+        X=x_test[:, :2], y=y_test[: model.max_lag]
+    )
+if np.isfinite(yhat).all():
+    rrse = root_relative_squared_error(
+        y_test[model.max_lag :], yhat[model.max_lag :]
+    )
+    print(rrse)
+    plot_results(
+        y=y_test[model.max_lag :],
+        yhat=yhat[model.max_lag :],
+        n=10000,
+        title="FROLS without sign(v)",
+    )
+else:
+    finite_mask = np.isfinite(yhat[:, 0])
+    finite_stop = int(np.flatnonzero(~finite_mask)[0])
+    print(f"Free-run simulation diverged at sample {finite_stop}.")
+    plot_results(
+        y=y_test[model.max_lag : finite_stop],
+        yhat=yhat[model.max_lag : finite_stop],
+        n=max(1, finite_stop - model.max_lag),
+        title="FROLS without sign(v): trajectory before divergence",
+    )
 ```
 
-    nan
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-06.png?raw=true)
 
 
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\sysidentpy\narmax_base.py:724: RuntimeWarning: overflow encountered in power
-      regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\sysidentpy\metrics\_regression.py:216: RuntimeWarning: overflow encountered in square
-      numerator = np.sum(np.square((yhat - y)))
-
-
-
-    
-![png](../../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_9_2.png)
-    
-
-
-Se usarmos o algoritmo `MetaMSS` em vez disso, os resultados são melhores.
+Usar o MetaMSS sem `sign(v)` adia a perda de estabilidade numérica, mas não a
+elimina: esta trajetória em simulação livre diverge na amostra 1153.
 
 
 ```python
@@ -301,55 +284,63 @@ model = MetaMSS(
     random_state=42,
 )
 
-model.fit(X=x_train[:, :2], y=y_train)
-yhat = model.predict(X=x_test[:, :2], y=y_test[: model.max_lag :, :])
-rrse = root_relative_squared_error(y_test[model.max_lag :], yhat[model.max_lag :])
-print(rrse)
-plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
-    n=10000,
-    title="MetaMSS: MaxAbsScaler, descartando sign(v)",
-)
+with catch_warnings(), np.errstate(over="ignore", invalid="ignore"):
+    simplefilter("ignore", RuntimeWarning)
+    simplefilter("ignore", UserWarning)
+    model.fit(X=x_train[:, :2], y=y_train)
+    yhat = model.predict(
+        X=x_test[:, :2], y=y_test[: model.max_lag]
+    )
+if np.isfinite(yhat).all():
+    rrse = root_relative_squared_error(
+        y_test[model.max_lag :], yhat[model.max_lag :]
+    )
+    print(rrse)
+    finite_stop = len(yhat)
+    plot_results(
+        y=y_test[model.max_lag :],
+        yhat=yhat[model.max_lag :],
+        n=10000,
+        title="MetaMSS without sign(v)",
+    )
+else:
+    finite_mask = np.isfinite(yhat[:, 0])
+    finite_stop = int(np.flatnonzero(~finite_mask)[0])
+    print(f"Free-run simulation diverged at sample {finite_stop}.")
+    plot_results(
+        y=y_test[model.max_lag : finite_stop],
+        yhat=yhat[model.max_lag : finite_stop],
+        n=max(1, finite_stop - model.max_lag),
+        title="MetaMSS without sign(v): trajectory before divergence",
+    )
 ```
 
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\sysidentpy\narmax_base.py:724: RuntimeWarning: overflow encountered in power
-      regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\sysidentpy\model_structure_selection\meta_model_structure_selection.py:453: RuntimeWarning: overflow encountered in square
-      sum_of_squared_residues = np.sum(residues**2)
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\sysidentpy\metrics\_regression.py:216: RuntimeWarning: overflow encountered in square
-      numerator = np.sum(np.square((yhat - y)))
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\numpy\linalg\linalg.py:2590: RuntimeWarning: divide by zero encountered in power
-      absx **= ord
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\numpy\core\fromnumeric.py:88: RuntimeWarning: invalid value encountered in reduce
-      return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-07.png?raw=true)
 
 
-    0.24685651932553157
-
-
-
-    
-![png](../../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_11_2.png)
-    
-
-
-No entanto, quando a saída do sistema atinge seu valor mínimo, o modelo oscila
+Antes da divergência, o comportamento oscilatório se torna visível quando a
+saída se aproxima de seu valor mínimo.
 
 
 ```python
+window_stop = finite_stop
+window_start = max(model.max_lag, window_stop - 100)
 plot_results(
-    y=y_test[1100:1200], yhat=yhat[1100:1200], n=10000, title="Região instável"
+    y=y_test[window_start:window_stop],
+    yhat=yhat[window_start:window_stop],
+    n=100,
+    title="MetaMSS without sign(v): last finite window",
 )
 ```
 
 
-    
-![png](../../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_13_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-08.png?raw=true)
 
 
-Se adicionarmos a entrada `sign(v)` novamente e usarmos `MetaMSS`, os resultados são muito próximos do algoritmo `FROLS` com todas as entradas
+Ao adicionar novamente a entrada `sign(v)` e usar o MetaMSS, a simulação livre
+permanece finita e produz RRSE $0.055707$, próximo ao resultado do FROLS com
+todas as entradas.
 
 
 ```python
@@ -362,35 +353,23 @@ model = MetaMSS(
     random_state=42,
 )
 
-model.fit(X=x_train, y=y_train)
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag :, :])
+with catch_warnings(), np.errstate(over="ignore", invalid="ignore"):
+    simplefilter("ignore", RuntimeWarning)
+    simplefilter("ignore", UserWarning)
+    model.fit(X=x_train, y=y_train)
+    yhat = model.predict(X=x_test, y=y_test[: model.max_lag :, :])
 rrse = root_relative_squared_error(y_test[model.max_lag :], yhat[model.max_lag :])
 print(rrse)
 plot_results(
     y=y_test[model.max_lag :],
     yhat=yhat[model.max_lag :],
     n=10000,
-    title="MetaMSS: sign(v) e MaxAbsScaler",
+    title="MetaMSS: sign(v) and MaxAbsScaler",
 )
 ```
 
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\sysidentpy\parameter_estimation\estimators.py:75: UserWarning: Psi matrix might have linearly dependent rows.Be careful and check your data
-      self._check_linear_dependence_rows(psi)
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\sysidentpy\narmax_base.py:724: RuntimeWarning: overflow encountered in power
-      regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\sysidentpy\model_structure_selection\meta_model_structure_selection.py:453: RuntimeWarning: overflow encountered in square
-      sum_of_squared_residues = np.sum(residues**2)
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\numpy\linalg\linalg.py:2590: RuntimeWarning: divide by zero encountered in power
-      absx **= ord
 
-
-    0.055422497807759194
-
-
-
-    
-![png](../../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_15_2.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-09.png?raw=true)
 
 
 Este caso também destacará a importância do escalonamento de dados. Anteriormente, usamos o método `MaxAbsScaler`, que resultou em ótimos modelos ao usar as entradas `sign(v)`, mas também resultou em modelos instáveis ao remover essa feature de entrada. Quando o escalonamento é aplicado usando `MinMaxScaler`, no entanto, a estabilidade geral dos resultados melhora, e o modelo não diverge, mesmo quando a entrada `sign(v)` é removida, usando o algoritmo `FROLS`.
@@ -399,41 +378,139 @@ O usuário pode obter os resultados abaixo apenas alterando o método de escalon
 
 
 ```python
-scaler_x = MinMaxScaler()
-scaler_y = MinMaxScaler()
+minmax_scaler_x = MinMaxScaler()
+minmax_scaler_y = MinMaxScaler()
+midpoint = df.shape[0] // 2
+
+x_train_minmax_frame = df[["E", "v"]].iloc[init:midpoint].copy()
+x_train_minmax_frame["sign_v"] = np.sign(x_train_minmax_frame["v"])
+x_test_minmax_frame = df[["E", "v"]].iloc[midpoint + 1 : df.shape[0] - init].copy()
+x_test_minmax_frame["sign_v"] = np.sign(x_test_minmax_frame["v"])
+x_train_minmax = minmax_scaler_x.fit_transform(x_train_minmax_frame)
+x_test_minmax = minmax_scaler_x.transform(x_test_minmax_frame)
+
+y_train_minmax = minmax_scaler_y.fit_transform(
+    df[["f"]].iloc[init:midpoint].to_numpy()
+)
+y_test_minmax = minmax_scaler_y.transform(
+    df[["f"]].iloc[midpoint + 1 : df.shape[0] - init].to_numpy()
+)
+
+def run_minmax_experiment(name, selector, use_sign):
+    n_inputs = 3 if use_sign else 2
+    x_train_variant = x_train_minmax[:, :n_inputs]
+    x_test_variant = x_test_minmax[:, :n_inputs]
+    if selector == "FROLS":
+        candidate = FROLS(
+            xlag=[[1]] * n_inputs,
+            ylag=1,
+            basis_function=Polynomial(degree=3),
+            estimator=LeastSquares(),
+            info_criteria="aic",
+        )
+    else:
+        candidate = MetaMSS(
+            xlag=[[1]] * n_inputs,
+            ylag=1,
+            basis_function=Polynomial(degree=3),
+            estimator=LeastSquares(),
+            random_state=42,
+        )
+
+    with catch_warnings(), np.errstate(over="ignore", invalid="ignore"):
+        simplefilter("ignore", RuntimeWarning)
+        simplefilter("ignore", UserWarning)
+        candidate.fit(X=x_train_variant, y=y_train_minmax)
+        prediction = candidate.predict(
+            X=x_test_variant,
+            y=y_test_minmax[: candidate.max_lag],
+        )
+
+    finite_mask = np.isfinite(prediction[:, 0])
+    if finite_mask.all():
+        score = root_relative_squared_error(
+            y_test_minmax[candidate.max_lag :],
+            prediction[candidate.max_lag :],
+        )
+        print(f"{name}: RRSE={score:.6f}")
+        stop = len(prediction)
+    else:
+        score = np.nan
+        stop = int(np.flatnonzero(~finite_mask)[0])
+        print(f"{name}: free-run simulation diverged at sample {stop}")
+
+    plot_results(
+        y=y_test_minmax[candidate.max_lag : stop],
+        yhat=prediction[candidate.max_lag : stop],
+        n=max(1, stop - candidate.max_lag),
+        title=f"{name} with MinMaxScaler",
+    )
+    return prediction, score
+
+minmax_results = {
+    "FROLS with sign(v)": run_minmax_experiment(
+        "FROLS with sign(v)", "FROLS", True
+    ),
+    "FROLS without sign(v)": run_minmax_experiment(
+        "FROLS without sign(v)", "FROLS", False
+    ),
+    "MetaMSS without sign(v)": run_minmax_experiment(
+        "MetaMSS without sign(v)", "MetaMSS", False
+    ),
+    "MetaMSS with sign(v)": run_minmax_experiment(
+        "MetaMSS with sign(v)", "MetaMSS", True
+    ),
+}
+yhat = minmax_results["MetaMSS with sign(v)"][0]
+x_test = x_test_minmax
+y_test = y_test_minmax
 ```
 
-e executando cada modelo novamente. Essa é a única mudança para melhorar os resultados.
+e executando cada modelo novamente. Essa mudança torna finitas todas as
+trajetórias em simulação livre, mas não melhora as configurações que usam todas
+as entradas.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r4.png?raw=true)
-> FROLS: com `sign(v)` e `MinMaxScaler`. RMSE: 0.1159
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-10.png?raw=true)
+> FROLS com `sign(v)` e `MinMaxScaler`: RRSE 0.115986.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r5.png?raw=true)
-FROLS: descartando `sign(v)` e usando `MinMaxScaler`. RMSE: 0.1639
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-11.png?raw=true)
+> FROLS sem `sign(v)` e com `MinMaxScaler`: RRSE 0.163944.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r6.png?raw=true)
-> MetaMSS: descartando `sign(v)` e usando `MinMaxScaler`. RMSE: 0.1762
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-12.png?raw=true)
+> MetaMSS sem `sign(v)` e com `MinMaxScaler`: RRSE 0.185607.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r7.png?raw=true)
-> MetaMSS: incluindo `sign(v)` e usando `MinMaxScaler`. RMSE: 0.0694
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-13.png?raw=true)
+> MetaMSS com `sign(v)` e `MinMaxScaler`: RRSE 0.104511.
 
-Em contraste, o método MetaMSS retornou o melhor modelo geral, mas não melhor que o melhor método `FROLS` usando `MaxAbsScaler`.
+A comparação completa é:
+
+| Escalonamento | Seletor | Entradas | Resultado em simulação livre |
+| --- | --- | --- | ---: |
+| MaxAbs | FROLS | com `sign(v)` | RRSE 0.045104 |
+| MaxAbs | FROLS | sem `sign(v)` | divergiu na amostra 203 |
+| MaxAbs | MetaMSS | sem `sign(v)` | divergiu na amostra 1153 |
+| MaxAbs | MetaMSS | com `sign(v)` | RRSE 0.055707 |
+| MinMax | FROLS | com `sign(v)` | RRSE 0.115986 |
+| MinMax | FROLS | sem `sign(v)` | RRSE 0.163944 |
+| MinMax | MetaMSS | sem `sign(v)` | RRSE 0.185607 |
+| MinMax | MetaMSS | com `sign(v)` | RRSE 0.104511 |
+
+O MetaMSS com `sign(v)` é o melhor entre as configurações com MinMax. O melhor
+resultado geral continua sendo o FROLS com `sign(v)` e `MaxAbsScaler`. Uma saída
+não finita em simulação livre é registrada como divergência, em vez de ser
+convertida em uma métrica escalar.
 
 Aqui está o loop histerético predito:
 
 
 ```python
+plt.figure(figsize=(8, 6))
 plt.plot(x_test[:, 1], yhat)
+plt.xlabel("Scaled velocity")
+plt.ylabel("Predicted scaled force")
+plt.title("MetaMSS with sign(v) and MinMaxScaler")
+plt.show()
 ```
 
 
-
-
-    [<matplotlib.lines.Line2D at 0x225ff4f8b00>]
-
-
-
-
-    
-![png](../../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_19_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-14.png?raw=true)

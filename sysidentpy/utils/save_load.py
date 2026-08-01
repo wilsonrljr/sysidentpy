@@ -56,6 +56,11 @@ def load_model(
     -------
     model_loaded: model loaded, as a variable, containing model and its attributes
 
+    Warnings
+    --------
+    This function uses :mod:`pickle`, which can execute arbitrary code while
+    loading a file. Only load models from trusted sources.
+
     """
     # Checking if path is provided
     if path is not None:

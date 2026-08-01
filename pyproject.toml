@@ -64,7 +64,7 @@ dev = [
     "black >= 23.3.0",
     "pre-commit",
     "ruff >=0.15.0,<1.0.0",
-    "array-api-strict >=2.0",
+    "array-api-strict >=2.1.3",
 ]
 
 examples = ["scikit-learn", "catboost"]
@@ -108,6 +108,7 @@ profile = "black"
 
 [tool.pytest.ini_options]
 addopts = ["--strict-config", "--strict-markers", "--cov=sysidentpy"]
+filterwarnings = ["error::DeprecationWarning:sysidentpy\\..*"]
 xfail_strict = true
 junit_family = "xunit2"
 
@@ -157,6 +158,7 @@ exclude = '''
   | \.git          # root of the project
   | \.mypy_cache
   | \.vscode
+  | sysidentpy/_lib/_vendor
   | paper
   | examples
   | images

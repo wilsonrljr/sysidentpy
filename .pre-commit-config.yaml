@@ -21,6 +21,7 @@ repos:
     hooks:
       - id: black # use black-jupyter to run in notebooks too
         args: [--config=./pyproject.toml]
+        exclude: ^sysidentpy/_lib/_vendor/
         # It is recommended to specify the latest version of Python
         # supported by your project here, or alternatively use
         # pre-commit's default_language_version, see
@@ -30,6 +31,7 @@ repos:
     hooks:
       - id: black-jupyter
         args: [--config=./pyproject.toml]
+        exclude: ^sysidentpy/_lib/_vendor/
         # It is recommended to specify the latest version of Python
         # supported by your project here, or alternatively use
         # pre-commit's default_language_version, see
@@ -40,3 +42,4 @@ repos:
     hooks:
       - id: ruff-check
         types_or: [python] # you can add notebook and other files using pyi, jupyter
+        exclude: ^sysidentpy/_lib/_vendor/

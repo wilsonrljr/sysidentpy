@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from numpy.testing import assert_allclose, assert_array_equal
+from numpy.testing import assert_array_equal
 
 from sysidentpy import config_context
 from sysidentpy._lib import _array_api as array_api_utils
@@ -23,6 +23,10 @@ from sysidentpy._lib._array_api import (
     _vstack,
     device as array_device,
     get_namespace,
+)
+from sysidentpy.tests._array_api_asserts import (
+    assert_allclose as xp_assert_allclose,
+    assert_array_equal as xp_assert_array_equal,
 )
 
 
@@ -256,7 +260,7 @@ def test_lstsq_array_api_fallback_matches_numpy_for_rank_deficient_system():
     result = _lstsq(xp, a, b)
     expected = np.linalg.lstsq(a_np, b_np, rcond=None)[0]
 
-    assert_allclose(np.asarray(result), expected, rtol=1e-10, atol=1e-10)
+    xp_assert_allclose(result, xp.asarray(expected), rtol=1e-10, atol=1e-10)
 
 
 def test_concat_moves_inputs_to_reference_device():
@@ -265,8 +269,11 @@ def test_concat_moves_inputs_to_reference_device():
     second = xp.asarray([3.0, 4.0], device=xp.Device("CPU_DEVICE"))
 
     result = _concat(xp, [first, second], axis=0)
+    expected = xp.asarray([1.0, 2.0, 3.0, 4.0], device=result.device)
 
-    assert_array_equal(_to_numpy(result), np.array([1.0, 2.0, 3.0, 4.0]))
+    assert result.shape == expected.shape
+    assert result.dtype == expected.dtype
+    assert bool(xp.all(result == expected))
     assert str(result.device) == str(xp.Device("device1"))
 
 
@@ -304,7 +311,7 @@ def test_stack_helpers_match_numpy_semantics(helper, arrays_np, expected):
 
     result = helper(xp, arrays)
 
-    assert_array_equal(np.asarray(result), expected)
+    xp_assert_array_equal(result, xp.asarray(expected, dtype=xp.float64))
 
 
 def test_nanargmin_ignores_nan_values_for_array_api_inputs():
@@ -314,7 +321,8 @@ def test_nanargmin_ignores_nan_values_for_array_api_inputs():
 
     result = _nanargmin(xp, values, axis=0)
 
-    assert_array_equal(np.asarray(result), np.nanargmin(values_np, axis=0))
+    expected = xp.asarray(np.nanargmin(values_np, axis=0))
+    xp_assert_array_equal(result, expected)
 
 
 @pytest.mark.parametrize(
@@ -331,7 +339,8 @@ def test_median_matches_numpy_for_array_api_inputs(values_np, axis):
 
     result = _median(xp, values, axis=axis)
 
-    assert_allclose(np.asarray(result), np.median(values_np, axis=axis))
+    expected = xp.asarray(np.median(values_np, axis=axis), dtype=xp.float64)
+    xp_assert_allclose(result, expected)
 
 
 def test_einsum_helper_matches_numpy_columnwise_inner_product():
@@ -343,7 +352,8 @@ def test_einsum_helper_matches_numpy_columnwise_inner_product():
 
     result = _einsum_ij_ij_j(xp, a, b)
 
-    assert_array_equal(np.asarray(result), np.einsum("ij,ij->j", a_np, b_np))
+    expected = xp.asarray(np.einsum("ij,ij->j", a_np, b_np), dtype=xp.float64)
+    xp_assert_array_equal(result, expected)
 
 
 def test_diag_creates_diagonal_matrix_for_array_api_inputs():
@@ -352,7 +362,7 @@ def test_diag_creates_diagonal_matrix_for_array_api_inputs():
 
     result = _diag(xp, values)
 
-    assert_array_equal(np.asarray(result), np.diag([1.0, 2.0, 3.0]))
+    xp_assert_array_equal(result, xp.asarray(np.diag([1.0, 2.0, 3.0])))
 
 
 def test_diag_extracts_diagonal_for_array_api_inputs():
@@ -362,7 +372,7 @@ def test_diag_extracts_diagonal_for_array_api_inputs():
 
     result = _diag(xp, values)
 
-    assert_array_equal(np.asarray(result), np.diag(values_np))
+    xp_assert_array_equal(result, xp.asarray(np.diag(values_np), dtype=xp.float64))
 
 
 def test_diag_rejects_three_dimensional_inputs():

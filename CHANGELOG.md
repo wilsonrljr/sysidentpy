@@ -1,5 +1,28 @@
 # Changes in SysIdentPy
 
+## v0.9.1 (Unreleased)
+
+### CONTRIBUTORS
+
+- Wilson Rocha Lacerda Junior (wilsonrljr)
+
+### CHANGES
+
+- **Array API Testing:**
+    - Updated the vendored `array-api-extra` tree from v0.10.1 to v0.11.0, replacing the experimental testing overlay with the complete upstream implementation while retaining the existing hook for vendored `array-api-compat` v1.14.0.
+    - Added a narrow test-only assertion facade for SysIdentPy policies around NumPy baselines, Python literals, scalar values, dtype, shape, and namespace validation.
+    - Replaced test-only NumPy materialization with backend-aware assertions where the tests are intended to validate Array API behavior.
+    - Raised the development-only `array-api-strict` minimum from v2.0 to v2.1.3. This does not add or change any runtime dependency.
+    - Stabilized the Fourier NARX neural-network test under current PyTorch releases with an explicit learning rate already used by the related Fourier tests.
+
+### IMPACT
+
+The standard `pip install sysidentpy` installation remains unchanged. Array API testing dependencies continue to be development-only, and the update does not change SysIdentPy's public runtime API.
+
+### TESTING
+
+The assertion facade is covered with NumPy, `array-api-strict`, and PyTorch CPU arrays, including namespace, dtype, shape, scalar, zero-dimensional tolerance, and non-default-device cases.
+
 ## v0.9.0
 
 ### CONTRIBUTORS

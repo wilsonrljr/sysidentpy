@@ -1,5 +1,11 @@
 # Silver Box System
 
+## Reproducibility
+
+This tutorial was verified with SysIdentPy 0.9.0 on Python 3.12.12 and additionally
+requires `nonlinear-benchmarks==1.0.1`. Numerical results must be recomputed when
+the environment or model configuration changes.
+
 Note: The example shown in this notebook is taken from the companion book [Nonlinear System Identification and Forecasting: Theory and Practice with SysIdentPy](https://sysidentpy.org/book/0-Preface/).
 
 The description content mainly derives (copy and paste) from the [associated paper - Three free data sets for development and benchmarking in nonlinear system identification](https://ieeexplore.ieee.org/document/6669201). For a detailed description, readers are referred to the linked reference.
@@ -44,31 +50,21 @@ $$
 
 ### Required Packages and Versions
 
-To ensure that you can replicate this case study, it is essential to use specific versions of the required packages. Below is a list of the packages along with their respective versions needed for running the case studies effectively.
+This case study was verified with SysIdentPy 0.9.0 on Python 3.12.12 and
+`nonlinear-benchmarks==1.0.1`. Install the repository checkout and the official
+benchmark loader explicitly:
 
-To install all the required packages, you can create a `requirements.txt` file with the following content:
-
-```
-sysidentpy==0.4.0
-pandas==2.2.2
-numpy==1.26.0
-matplotlib==3.8.4
-nonlinear_benchmarks==0.1.2
+```bash
+python -m pip install -e .
+python -m pip install nonlinear-benchmarks==1.0.1
 ```
 
-Then, install the packages using:
-
-```
-pip install -r requirements.txt
-```
-
-- Ensure that you use a virtual environment to avoid conflicts between package versions.
-- Versions specified are based on compatibility with the code examples provided. If you are using different versions, some adjustments in the code might be necessary.
+Use a virtual environment to isolate the optional loader. Numerical results
+should be recomputed if the environment or model configuration changes.
 
 ### SysIdentPy configuration
 
 In this section, we will demonstrate the application of SysIdentPy to the Silver box dataset.  The following code will guide you through the process of loading the dataset, configuring the SysIdentPy parameters, and building a model for mentioned system.
-
 
 ```python
 import numpy as np
@@ -91,10 +87,9 @@ x_test, y_test = test_multisine.u, test_multisine.y
 n = test_multisine.state_initialization_window_length
 ```
 
-We used the `nonlinear_benchmarks` package to load the data. The user is referred to the [package documentation - GerbenBeintema/nonlinear_benchmarks: The official dataload for http://www.nonlinearbenchmark.org/ (github.com)](https://github.com/GerbenBeintema/nonlinear_benchmarks/tree/master) to check the details of how to use it.
+We used the `nonlinear_benchmarks` package to load the data. The user is referred to the [package documentation - GerbenBeintema/nonlinear_benchmarks: The official data load for http://www.nonlinearbenchmark.org/ (github.com)](https://github.com/GerbenBeintema/nonlinear_benchmarks/tree/master) to check the details of how to use it.
 
 The following plot detail the training and testing data of the experiment.
-
 
 ```python
 plt.plot(x_train)
@@ -118,29 +113,13 @@ plt.title("Experiment 2: testing data")
 plt.show()
 ```
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-01.png?raw=true)
 
-    
-![png](silver-box-system_files/silver-box-system_5_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-02.png?raw=true)
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-03.png?raw=true)
 
-
-    
-![png](silver-box-system_files/silver-box-system_5_1.png)
-    
-
-
-
-    
-![png](silver-box-system_files/silver-box-system_5_2.png)
-    
-
-
-
-    
-![png](silver-box-system_files/silver-box-system_5_3.png)
-    
-
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-04.png?raw=true)
 
 > Important Note
 
@@ -164,7 +143,7 @@ The goal of this benchmark is to develop a model that outperforms the state-of-t
 
 It appears that the values shown in the paper actually represent the training time, not the error metrics. I will contact the authors to confirm this information. According to the Nonlinear Benchmark website, the information is as follows:
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_sota.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-05.png?raw=true)
 
 where the values in the "Training time" column matches the ones presented as error metrics in the paper.
 
@@ -172,8 +151,13 @@ where the values in the "Training time" column matches the ones presented as err
 
 ### Results
 
-We will start (as we did in every other case study) with a basic configuration of FROLS using a polynomial basis function with degree equal 2. The `xlag` and `ylag` are set to $7$ in this first example. Because the dataset is considerably large, we will start with `n_info_values=40`. Because we dealing with a large training dataset, we will use the `err_tol` instead of information criteria to have a faster performance. We will also set `n_terms=40`, which means that the search will stop if the `err_tol` is reached or 40 regressors is tested in the `ERR` algorithm. While this approach might result in a sub-optimal model, it is a reasonable starting point for our first attempt. There are three different experiments: multisine, arrow (full), and arrow (no extrapolation).
-
+We will start (as we did in every other case study) with a basic configuration
+of FROLS using a polynomial basis function with degree equal to 2. The `xlag`
+and `ylag` are set to $7$ in this first example. Because the dataset is large,
+we use `err_tol` and set `n_terms=40`; the search stops when the error-reduction
+tolerance is reached or 40 regressors have been tested. While this approach may
+result in a suboptimal model, it is a reasonable starting point. There are three
+tests: multisine, arrow (full), and arrow (without extrapolation).
 
 ```python
 basis_function = Polynomial(degree=2)
@@ -188,44 +172,35 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
-nrmse = rmse / y_test.std()
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
 rmse_mv = 1000 * rmse
-print(nrmse, rmse_mv)
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=30000,
     figsize=(15, 4),
     title=f"Multisine. Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
 )
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=300,
     figsize=(15, 4),
     title=f"Multisine. Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
 )
 ```
 
-    0.1423804033714937 7.727682109791501
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-06.png?raw=true)
 
-
-
-    
-![png](silver-box-system_files/silver-box-system_7_1.png)
-    
-
-
-
-    
-![png](silver-box-system_files/silver-box-system_7_2.png)
-    
-
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-07.png?raw=true)
 
 
 ```python
@@ -247,49 +222,38 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-# we will not concatente the last values from train data to use as initial condition here because
-# this test data have a very different behavior.
-# However, if you want you can do that and you will see that the model will still perform
-# great after a few iterations
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
-nrmse = rmse / y_test.std()
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
 rmse_mv = 1000 * rmse
 
-print(nrmse, rmse_mv)
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=30000,
     figsize=(15, 4),
     title=f"Arrow (full). Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
 )
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=300,
     figsize=(15, 4),
     title=f"Arrow (full). Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
 )
 ```
 
-    0.07762658947015803 4.14903534238172
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-08.png?raw=true)
 
-
-    
-![png](silver-box-system_files/silver-box-system_8_1.png)
-    
-
-
-
-    
-![png](silver-box-system_files/silver-box-system_8_2.png)
-    
-
-
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-09.png?raw=true)
 
 ```python
 x_train, y_train = train_val.u, train_val.y
@@ -310,40 +274,48 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
-nrmse = rmse / y_test.std()
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
 rmse_mv = 1000 * rmse
-print(nrmse, rmse_mv)
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=30000,
     figsize=(15, 4),
     title=f"Arrow (no extrapolation). Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
 )
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=300,
     figsize=(15, 4),
     title=f"Free Run simulation. Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
 )
 ```
 
-    0.05187400789723806 2.2293393254015776
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-10.png?raw=true)
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver_sota.png?raw=true)
 
+The current free-run results, evaluated after the 50-sample initialization
+window supplied by the loader, are:
 
-    
-![png](silver-box-system_files/silver-box-system_9_1.png)
-    
+| Test set | RMSE | NRMSE |
+| --- | ---: | ---: |
+| Multisine | 0.007727 | 0.142302 |
+| Arrow, complete | 0.004148 | 0.077565 |
+| Arrow, without extrapolation | 0.002229 | 0.051822 |
 
-
-
-    
-![png](silver-box-system_files/silver-box-system_9_2.png)
-    
-
+The complete arrow test is harder than the version without extrapolation. The
+metric excludes the initialization window once; it does not remove
+`model.max_lag` a second time. The external deep state-space results remain
+valuable context, but are not ranked directly against this table without first
+matching the split, initialization and normalization.

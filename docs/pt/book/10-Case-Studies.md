@@ -14,30 +14,24 @@ Ao final deste estudo de caso, você terá uma compreensão sólida de como usar
 
 ### Pacotes Necessários e Versões
 
-Para garantir que você possa replicar este estudo de caso, é essencial usar versões específicas dos pacotes necessários. Abaixo está uma lista dos pacotes junto com suas respectivas versões necessárias para executar os estudos de caso efetivamente.
+Este estudo de caso foi verificado com o SysIdentPy 0.9.0 no Python 3.12.12 e
+`datasetsforecast==1.0.1`. Instale explicitamente o checkout do repositório e o
+carregador do M4:
 
-Para instalar todos os pacotes necessários, você pode criar um arquivo `requirements.txt` com o seguinte conteúdo:
-
-```
-sysidentpy==0.4.0
-datasetsforecast==0.0.8
-pandas==2.2.2
-numpy==1.26.0
-matplotlib==3.8.4
-s3fs==2024.6.1
+```bash
+python -m pip install -e .
+python -m pip install datasetsforecast==1.0.1
 ```
 
-Então, instale os pacotes usando:
-```
-pip install -r requirements.txt
-```
-
-- Certifique-se de usar um ambiente virtual para evitar conflitos entre versões de pacotes.
-- As versões especificadas são baseadas na compatibilidade com os exemplos de código fornecidos. Se você estiver usando versões diferentes, alguns ajustes no código podem ser necessários.
+Use um ambiente virtual para isolar essas dependências opcionais. Os exemplos
+aleatórios usam a semente 42; os resultados numéricos devem ser recalculados se
+o ambiente ou a configuração do modelo forem alterados.
 
 ### Configuração do SysIdentPy
 
-Nesta seção, demonstraremos a aplicação do SysIdentPy ao dataset Silver box. O código a seguir guiará você através do processo de carregamento do dataset, configuração dos parâmetros do SysIdentPy e construção de um modelo para o sistema mencionado.
+Nesta seção, demonstraremos a aplicação do SysIdentPy ao subconjunto horário do
+M4. O código a seguir mostra o carregamento dos dados, a configuração do
+SysIdentPy e a construção dos modelos de previsão usados neste estudo.
 
 
 ```python
@@ -62,10 +56,13 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 warnings.simplefilter(action="ignore", category=UserWarning)
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 
-train = pd.read_csv("https://auto-arima-results.s3.amazonaws.com/M4-Hourly.csv")
-test = pd.read_csv(
-    "https://auto-arima-results.s3.amazonaws.com/M4-Hourly-test.csv"
-).rename(columns={"y": "y_test"})
+m4_data, _, _ = M4.load(directory="data", group="Hourly")
+test = (
+    m4_data.groupby("unique_id", group_keys=False)
+    .tail(48)
+    .rename(columns={"y": "y_test"})
+)
+train = m4_data.drop(test.index)
 ```
 
 Os gráficos a seguir fornecem uma visualização dos dados de treinamento para um pequeno subconjunto das séries temporais. O gráfico mostra os dados brutos, dando uma visão dos padrões e comportamentos inerentes a cada série.
@@ -80,21 +77,25 @@ Nossa primeira suposição é que há um padrão sazonal de 24 horas nas séries
 
 
 ```python
-ax = (
-    train[train["unique_id"] == "H10"]
-    .reset_index(drop=True)["y"]
-    .plot(figsize=(15, 2), title="H10")
-)
-xcoords = [a for a in range(24, 24 * 30, 24)]
-
-for xc in xcoords:
-    plt.axvline(x=xc, color="red", linestyle="--", alpha=0.5)
+for unique_id in ("H10", "H100", "H20", "H150"):
+    ax = (
+        train[train["unique_id"] == unique_id]
+        .reset_index(drop=True)["y"]
+        .plot(figsize=(15, 2), title=unique_id)
+    )
+    for xc in range(24, 24 * 30, 24):
+        ax.axvline(x=xc, color="red", linestyle="--", alpha=0.5)
+    plt.show()
 ```
 
 
-    
-![png](../../en/user-guide/tutorials/m4-benchmark_files/m4-benchmark_4_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/m4-benchmark-01.png?raw=true)
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/c10_m4_h100_1.png?raw=true)
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/c10_m4_h20_1.png?raw=true)
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/c10_m4_h150_1.png?raw=true)
 
 
 Vamos verificar e construir um modelo para o grupo `H20` antes de extrapolar as configurações para todos os grupos. Como não há features de entrada, usaremos um modelo tipo `NAR` no SysIdentPy. Para manter as coisas simples e rápidas, começaremos com função de base Polinomial com grau $1$.
@@ -126,14 +127,12 @@ plot_results(
     yhat=y_hat[model.max_lag :],
     n=30000,
     figsize=(15, 4),
-    title=f"Grupo: {unique_id} - SMAPE {round(smape, 4)}",
+    title=f"Group: {unique_id} - SMAPE {round(smape, 4)}",
 )
 ```
 
 
-    
-![png](../../en/user-guide/tutorials/m4-benchmark_files/m4-benchmark_6_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/m4-benchmark-02.png?raw=true)
 
 
 Provavelmente, os resultados não são ótimos e não funcionarão para todos os grupos. No entanto, vamos verificar como esta configuração se compara ao modelo vencedor da [competição de séries temporais M4](https://www.researchgate.net/publication/325901666_The_M4_Competition_Results_findings_conclusion_and_way_forward): o Exponential Smoothing with Recurrent Neural Networks ([ESRNN](https://www.sciencedirect.com/science/article/abs/pii/S0169207019301153)).
@@ -141,7 +140,7 @@ Provavelmente, os resultados não são ótimos e não funcionarão para todos os
 
 ```python
 esrnn_url = (
-    "https://github.com/Nixtla/m4-forecasts/raw/master/forecasts/submission-118.zip"
+    "https://github.com/Nixtla/m4-forecasts/raw/e3dce409604c55f1f588f02db439b4cbe9a482a3/forecasts/submission-118.zip"
 )
 esrnn_forecasts = M4Evaluation.load_benchmark("data", "Hourly", esrnn_url)
 esrnn_evaluation = M4Evaluation.evaluate("data", "Hourly", esrnn_forecasts)
@@ -149,44 +148,10 @@ esrnn_evaluation = M4Evaluation.evaluate("data", "Hourly", esrnn_forecasts)
 esrnn_evaluation
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>SMAPE</th>
-      <th>MASE</th>
-      <th>OWA</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Hourly</th>
-      <td>9.328443</td>
-      <td>0.893046</td>
-      <td>0.440163</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
+|        | SMAPE | MASE  | OWA   |
+| ------ | ----- | ----- | ----- |
+| Hourly | 9.328 | 0.893 | 0.440 |
+> Tabela 1. Resultados de referência do ESRNN
 
 O código a seguir levou apenas 49 segundos para rodar na minha máquina (processador AMD Ryzen 5 5600x, 32GB RAM a 3600MHz). Devido à sua eficiência, não criei uma versão paralela. Ao final deste caso de uso, você verá como o SysIdentPy pode ser rápido e eficaz, entregando bons resultados sem muita otimização.
 
@@ -194,7 +159,7 @@ O código a seguir levou apenas 49 segundos para rodar na minha máquina (proces
 ```python
 r = []
 ds_test = list(range(701, 749))
-for u_id, data in train.groupby(by=["unique_id"], observed=True):
+for u_id, data in train.groupby("unique_id", observed=True):
     y_id = data["y"].values.reshape(-1, 1)
     basis_function = Polynomial(degree=1)
     model = FROLS(
@@ -208,78 +173,65 @@ for u_id, data in train.groupby(by=["unique_id"], observed=True):
         model.fit(y=y_id)
         y_val = y_id[-model.max_lag :].reshape(-1, 1)
         y_hat = model.predict(y=y_val, forecast_horizon=48)
+        forecast = y_hat[model.max_lag :].ravel()
+        if forecast.shape != (48,) or not np.isfinite(forecast).all():
+            raise RuntimeError(f"Invalid 48-step forecast for {u_id}.")
         r.append(
             [
-                u_id * len(y_hat[model.max_lag : :]),
+                [u_id] * 48,
                 ds_test,
-                y_hat[model.max_lag : :].ravel(),
+                forecast,
             ]
         )
-    except Exception:
-        print(f"Problema com {u_id}")
+    except Exception as exc:
+        raise RuntimeError(f"Forecasting failed for {u_id}.") from exc
 
 results_1 = pd.DataFrame(r, columns=["unique_id", "ds", "NARMAX_1"]).explode(
     ["unique_id", "ds", "NARMAX_1"]
 )
 results_1["NARMAX_1"] = results_1["NARMAX_1"].astype(float)  # .clip(lower=10)
-pivot_df = results_1.pivot(index="unique_id", columns="ds", values="NARMAX_1")
+expected_ids = train["unique_id"].drop_duplicates().tolist()
+pivot_df = results_1.pivot(
+    index="unique_id", columns="ds", values="NARMAX_1"
+).reindex(expected_ids)
 results = pivot_df.to_numpy()
+if len(expected_ids) != 414 or results.shape != (414, 48):
+    raise RuntimeError("The M4 hourly evaluation requires 414 complete forecasts.")
+if not np.isfinite(results).all():
+    raise RuntimeError("The M4 forecast matrix contains non-finite values.")
 
-M4Evaluation.evaluate("data", "Hourly", results)
+daily_evaluation = M4Evaluation.evaluate("data", "Hourly", results)
+h147_index = expected_ids.index("H147")
+h147_observed = test.loc[test["unique_id"] == "H147", "y_test"].to_numpy()
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(h147_observed, "o-", label="Observed")
+ax.plot(results[h147_index], "*-", label="FROLS, 24 lags")
+ax.set_title("H147: 48-step forecast with daily lags")
+ax.set_xlabel("Forecast horizon")
+ax.set_ylabel("y")
+ax.legend()
+plt.show()
+daily_evaluation
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>SMAPE</th>
-      <th>MASE</th>
-      <th>OWA</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Hourly</th>
-      <td>16.034196</td>
-      <td>0.958083</td>
-      <td>0.636132</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
+|        | SMAPE      | MASE     | OWA      |
+| ------ | ---------- | -------- | -------- |
+| Hourly | 16.034196  | 0.958083 | 0.636132 |
+> Tabela 2. Primeiro teste com o SysIdentPy
 
 Os resultados iniciais são razoáveis, mas não correspondem exatamente ao desempenho do `ESRNN`. Esses resultados são baseados apenas em nossa primeira suposição. Para entender melhor o desempenho, vamos examinar os grupos com os piores resultados.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h147_r1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/m4-benchmark-03.png?raw=true)
 
 O gráfico a seguir ilustra dois desses grupos, `H147` e `H136`. Ambos exibem um padrão sazonal de 24 horas.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_seasonal_h147_1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/c10_m4_seasonal_h147_1.png?raw=true)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h136_seasonal_1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/c10_m4_h136_seasonal_1.png?raw=true)
 
 No entanto, uma observação mais atenta revela um insight adicional: além do padrão diário, essas séries também mostram um padrão semanal. Observe como os dados parecem quando dividimos a série em segmentos semanais.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h147_seasonal_1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/c10_m4_h147_seasonal_1.png?raw=true)
 
 
 ```python
@@ -291,16 +243,14 @@ for i, start in enumerate(xcoords[:-1]):
     end = xcoords[i + 1]
     ax = fig.add_subplot(len(xcoords[1:]), 1, i + 1)
     filtered_train["y"].iloc[start:end].plot(ax=ax)
-    ax.set_title(f"H147 -> Fatia {i+1}: Hora {start} a {end-1}")
+    ax.set_title(f"H147 -> Slice {i+1}: Hour {start} to {end-1}")
 
 plt.tight_layout()
 plt.show()
 ```
 
 
-    
-![png](../../en/user-guide/tutorials/m4-benchmark_files/m4-benchmark_12_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/m4-benchmark-04.png?raw=true)
 
 
 Portanto, construiremos modelos definindo `ylag=168`.
@@ -309,10 +259,9 @@ Portanto, construiremos modelos definindo `ylag=168`.
 
 
 ```python
-# isso levou 2min para rodar no meu computador.
 r = []
 ds_test = list(range(701, 749))
-for u_id, data in train.groupby(by=["unique_id"], observed=True):
+for u_id, data in train.groupby("unique_id", observed=True):
     y_id = data["y"].values.reshape(-1, 1)
     basis_function = Polynomial(degree=1)
     model = FROLS(
@@ -325,63 +274,50 @@ for u_id, data in train.groupby(by=["unique_id"], observed=True):
         model.fit(y=y_id)
         y_val = y_id[-model.max_lag :].reshape(-1, 1)
         y_hat = model.predict(y=y_val, forecast_horizon=48)
+        forecast = y_hat[model.max_lag :].ravel()
+        if forecast.shape != (48,) or not np.isfinite(forecast).all():
+            raise RuntimeError(f"Invalid 48-step forecast for {u_id}.")
         r.append(
             [
-                u_id * len(y_hat[model.max_lag : :]),
+                [u_id] * 48,
                 ds_test,
-                y_hat[model.max_lag : :].ravel(),
+                forecast,
             ]
         )
-    except Exception:
-        print(f"Problema com {u_id}")
+    except Exception as exc:
+        raise RuntimeError(f"Forecasting failed for {u_id}.") from exc
 
 results_1 = pd.DataFrame(r, columns=["unique_id", "ds", "NARMAX_1"]).explode(
     ["unique_id", "ds", "NARMAX_1"]
 )
 results_1["NARMAX_1"] = results_1["NARMAX_1"].astype(float)  # .clip(lower=10)
-pivot_df = results_1.pivot(index="unique_id", columns="ds", values="NARMAX_1")
+expected_ids = train["unique_id"].drop_duplicates().tolist()
+pivot_df = results_1.pivot(
+    index="unique_id", columns="ds", values="NARMAX_1"
+).reindex(expected_ids)
 results = pivot_df.to_numpy()
-M4Evaluation.evaluate("data", "Hourly", results)
+if len(expected_ids) != 414 or results.shape != (414, 48):
+    raise RuntimeError("The M4 hourly evaluation requires 414 complete forecasts.")
+if not np.isfinite(results).all():
+    raise RuntimeError("The M4 forecast matrix contains non-finite values.")
+weekly_evaluation = M4Evaluation.evaluate("data", "Hourly", results)
+h147_index = expected_ids.index("H147")
+h147_observed = test.loc[test["unique_id"] == "H147", "y_test"].to_numpy()
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(h147_observed, "o-", label="Observed")
+ax.plot(results[h147_index], "*-", label="FROLS, 168 lags")
+ax.set_title("H147: 48-step forecast with weekly lags")
+ax.set_xlabel("Forecast horizon")
+ax.set_ylabel("y")
+ax.legend()
+plt.show()
+weekly_evaluation
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>SMAPE</th>
-      <th>MASE</th>
-      <th>OWA</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Hourly</th>
-      <td>10.475998</td>
-      <td>0.773749</td>
-      <td>0.446471</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
+|        | SMAPE      | MASE     | OWA      |
+| ------ | ---------- | -------- | -------- |
+| Hourly | 10.475998  | 0.773749 | 0.446471 |
+> Tabela 3. Resultados aprimorados com o SysIdentPy
 
 Agora, os resultados estão muito mais próximos dos do modelo `ESRNN`! Enquanto o Erro Percentual Absoluto Médio Simétrico (`SMAPE`) é ligeiramente pior, o Erro Escalado Absoluto Médio (`MASE`) é melhor quando comparado ao `ESRNN`, levando a uma métrica de Média Ponderada Geral (`OWA`) muito semelhante. Notavelmente, esses resultados são alcançados usando apenas modelos `AR` simples. A seguir, vamos ver se o método `AOLS` pode fornecer resultados ainda melhores.
 
@@ -389,83 +325,62 @@ Agora, os resultados estão muito mais próximos dos do modelo `ESRNN`! Enquanto
 ```python
 r = []
 ds_test = list(range(701, 749))
-for u_id, data in train.groupby(by=["unique_id"], observed=True):
+for u_id, data in train.groupby("unique_id", observed=True):
     y_id = data["y"].values.reshape(-1, 1)
     basis_function = Polynomial(degree=1)
     model = AOLS(
         ylag=168,
         basis_function=basis_function,
         model_type="NAR",
-        # devido às configurações de lag alto, k foi aumentado para 6 como um palpite inicial
+        # due to high lag settings, k was increased to 6 as an initial guess
         k=6,
     )
     try:
         model.fit(y=y_id)
         y_val = y_id[-model.max_lag :].reshape(-1, 1)
         y_hat = model.predict(y=y_val, forecast_horizon=48)
+        forecast = y_hat[model.max_lag :].ravel()
+        if forecast.shape != (48,) or not np.isfinite(forecast).all():
+            raise RuntimeError(f"Invalid 48-step forecast for {u_id}.")
         r.append(
             [
-                u_id * len(y_hat[model.max_lag : :]),
+                [u_id] * 48,
                 ds_test,
-                y_hat[model.max_lag : :].ravel(),
+                forecast,
             ]
         )
-    except Exception:
-        print(f"Problema com {u_id}")
+    except Exception as exc:
+        raise RuntimeError(f"Forecasting failed for {u_id}.") from exc
 
 results_1 = pd.DataFrame(r, columns=["unique_id", "ds", "NARMAX_1"]).explode(
     ["unique_id", "ds", "NARMAX_1"]
 )
 results_1["NARMAX_1"] = results_1["NARMAX_1"].astype(float)  # .clip(lower=10)
-pivot_df = results_1.pivot(index="unique_id", columns="ds", values="NARMAX_1")
+expected_ids = train["unique_id"].drop_duplicates().tolist()
+pivot_df = results_1.pivot(
+    index="unique_id", columns="ds", values="NARMAX_1"
+).reindex(expected_ids)
 results = pivot_df.to_numpy()
+if len(expected_ids) != 414 or results.shape != (414, 48):
+    raise RuntimeError("The M4 hourly evaluation requires 414 complete forecasts.")
+if not np.isfinite(results).all():
+    raise RuntimeError("The M4 forecast matrix contains non-finite values.")
 M4Evaluation.evaluate("data", "Hourly", results)
 ```
 
+|        | SMAPE | MASE   | OWA    |
+| ------ | ----- | ------ | ------ |
+| Hourly | 9.9497 | 0.8074 | 0.4392 |
+> Tabela 4. Resultados do SysIdentPy com o algoritmo AOLS
 
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>SMAPE</th>
-      <th>MASE</th>
-      <th>OWA</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Hourly</th>
-      <td>9.951141</td>
-      <td>0.809965</td>
-      <td>0.439755</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-A Média Ponderada Geral (`OWA`) é ainda melhor que a do modelo `ESRNN`! Além disso, o método `AOLS` foi incrivelmente eficiente, levando apenas **6 segundos para rodar**. Esta combinação de alto desempenho e execução rápida torna o `AOLS` uma alternativa atraente para previsão de séries temporais em casos com múltiplas séries.
+Para esta configuração, a Média Ponderada Geral (`OWA`) é ligeiramente menor
+que a da referência `ESRNN`. Essa conclusão se aplica ao conjunto completo das
+414 séries horárias e ao horizonte de 48 passos da competição; ela não
+estabelece uma classificação geral entre os algoritmos.
 
 Antes de terminar, vamos verificar como o desempenho do modelo `H147` melhorou com a configuração `ylag=168`.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h147_r2.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/m4-benchmark-05.png?raw=true)
 
 > Com base no artigo de benchmark M4, também poderíamos limitar as previsões menores que 10 para 10 e os resultados seriam ligeiramente melhores. Mas isso fica a critério do usuário.
 
@@ -484,7 +399,7 @@ O sistema CE8, ilustrado na Figura 1, apresenta:
 - **Mecanismo de Polia**: A polia é suportada por uma mola, introduzindo um modo dinâmico levemente amortecido que adiciona complexidade ao sistema.
 - **Foco no Controle de Velocidade**: O foco principal é o sistema de controle de velocidade. A velocidade angular da polia é medida usando um contador de pulsos, que é insensível à direção da velocidade.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_design.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/ce8_design.png?raw=true)
 > Figura 1. Design do sistema CE8.
 
 ### Sensor e Filtragem
@@ -497,31 +412,24 @@ O processo de medição envolve:
 
 O SysIdentPy pode ser usado para construir modelos robustos para identificar e modelar as dinâmicas complexas do sistema CE8. O desempenho será comparado com um benchmark fornecido por [Max D. Champneys, Gerben I. Beintema, Roland Tóth, Maarten Schoukens, and Timothy J. Rogers - Baselines for Nonlinear Benchmarks, Workshop on Nonlinear System Identification Benchmarks, 2024.](https://arxiv.org/pdf/2405.10779)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_sota.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/ce8_sota.png?raw=true)
 
 O benchmark avalia a métrica média entre os dois experimentos. Por isso o método SOTA não tem a melhor métrica para o `teste 1`, mas ainda é o melhor no geral. O objetivo deste estudo de caso não é apenas demonstrar a robustez do SysIdentPy, mas também fornecer insights valiosos sobre suas aplicações práticas em sistemas dinâmicos do mundo real.
 
 ### Pacotes e Versões Necessários
 
-Para garantir que você possa replicar este estudo de caso, é essencial usar versões específicas dos pacotes necessários. Abaixo está uma lista dos pacotes junto com suas respectivas versões necessárias para executar os estudos de caso de forma eficaz.
+Este estudo de caso foi verificado com o SysIdentPy 0.9.0 no Python 3.12.12 e
+`nonlinear-benchmarks==1.0.1`. Instale explicitamente o checkout do repositório
+e o carregador oficial do benchmark:
 
-Para instalar todos os pacotes necessários, você pode criar um arquivo `requirements.txt` com o seguinte conteúdo:
-
-```
-sysidentpy==0.4.0
-pandas==2.2.2
-numpy==1.26.0
-matplotlib==3.8.4
-nonlinear_benchmarks==0.1.2
+```bash
+python -m pip install -e .
+python -m pip install nonlinear-benchmarks==1.0.1
 ```
 
-Então, instale os pacotes usando:
-```
-pip install -r requirements.txt
-```
-
-- Certifique-se de usar um ambiente virtual para evitar conflitos entre versões de pacotes.
-- As versões especificadas são baseadas na compatibilidade com os exemplos de código fornecidos. Se você estiver usando versões diferentes, alguns ajustes no código podem ser necessários.
+Use um ambiente virtual para isolar o carregador opcional. Os resultados
+numéricos devem ser recalculados se o ambiente ou a configuração do modelo forem
+alterados.
 
 ### Configuração do SysIdentPy
 
@@ -531,6 +439,7 @@ Este exemplo prático ajudará os usuários a entender como utilizar efetivament
 
 
 ```python
+from warnings import catch_warnings, simplefilter
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -544,7 +453,11 @@ from sysidentpy.utils.plotting import plot_results
 
 import nonlinear_benchmarks
 
-train_val, test = nonlinear_benchmarks.CED(atleast_2d=True)
+ced_url = (
+    "https://web.archive.org/web/20210117142533id_/"
+    "http://www.it.uu.se/research/publications/reports/2010-020/NonlinearData.zip"
+)
+train_val, test = nonlinear_benchmarks.CED(url=ced_url, atleast_2d=True)
 data_train_1, data_train_2 = train_val
 data_test_1, data_test_2 = test
 ```
@@ -557,47 +470,36 @@ O gráfico a seguir detalha os dados de treinamento e teste de ambos os experime
 ```python
 plt.plot(data_train_1.u)
 plt.plot(data_train_1.y)
-plt.title("Experimento 1: dados de treinamento")
+plt.title("Experiment 1: training data")
 plt.show()
 
 plt.plot(data_test_1.u)
 plt.plot(data_test_1.y)
-plt.title("Experimento 1: dados de teste")
+plt.title("Experiment 1: testing data")
 plt.show()
 
 plt.plot(data_train_2.u)
 plt.plot(data_train_2.y)
-plt.title("Experimento 2: dados de treinamento")
+plt.title("Experiment 2: training data")
 plt.show()
 
 plt.plot(data_test_2.u)
 plt.plot(data_test_2.y)
-plt.title("Experimento 2: dados de teste")
+plt.title("Experiment 2: testing data")
 plt.show()
 ```
 
 
-    
-![png](../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_4_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-01.png?raw=true)
 
 
-
-    
-![png](../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_4_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-02.png?raw=true)
 
 
-
-    
-![png](../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_4_2.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-03.png?raw=true)
 
 
-
-    
-![png](../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_4_3.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-04.png?raw=true)
 
 
 ### Resultados
@@ -627,23 +529,26 @@ model = FROLS(
     n_info_values=120,
 )
 
-model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
+with catch_warnings():
+    simplefilter("ignore", UserWarning)
+    model.fit(X=x_train, y=y_train)
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+print(f"RMSE: {rmse:.6f}")
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=10000,
-    title=f"Simulação Free Run. Modelo 1 -> RMSE: {round(rmse, 4)}",
+    title=f"Free Run simulation. Model 1 -> RMSE: {round(rmse, 4)}",
 )
 ```
 
 
-    
-![png](../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_6_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-05.png?raw=true)
 
 
 Modelo para o experimento 2:
@@ -667,55 +572,57 @@ model = FROLS(
     n_info_values=120,
 )
 
-model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
+with catch_warnings():
+    simplefilter("ignore", UserWarning)
+    model.fit(X=x_train, y=y_train)
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+print(f"RMSE: {rmse:.6f}")
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=10000,
-    title=f"Simulação Free Run. Modelo 2 -> RMSE: {round(rmse, 4)}",
+    title=f"Free Run simulation. Model 2 -> RMSE: {round(rmse, 4)}",
 )
 ```
 
 
-    
-![png](../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_8_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-06.png?raw=true)
 
 
-A primeira configuração para o experimento 1 já é melhor que os modelos **LTI ARX**, **LTI SS**, **GRU**, **LSTM**, **MLP NARX**, **MLP FIR**, **OLSTM** e **SOTA** mostrados na tabela do benchmark. Melhor que 8 de 11 modelos mostrados no benchmark. Para o experimento 2, é melhor que **LTI ARX**, **LTI SS**, **GRU**, **RNN**, **LSTM**, **OLSTM** e **pNARX** (7 de 11). É um bom começo, mas vamos verificar se o desempenho melhora se definirmos um lag maior para `xlag` e `ylag`.
+Com o carregador atual e a janela de inicialização definida pelo benchmark, esta
+primeira configuração produz RMSE $0.102862$ no experimento 1 e $0.106816$ no
+experimento 2. A média é $0.104839$. As amostras reservadas à inicialização do
+estado são excluídas uma única vez, e a recursão começa nas últimas
+`model.max_lag` saídas contidas nessa janela.
 
-A métrica média é $(0.1131 + 0.1059)/2 = 0.1095$, o que é muito bom, mas pior que o SOTA ($0.0945$). Agora vamos aumentar os lags para `x` e `y` para verificar se obtemos um modelo melhor. Antes de aumentar os lags, o critério de informação é mostrado:
+A tabela externa continua sendo uma referência útil, mas seus valores só devem
+ser comparados depois de igualar divisão dos dados, janela de inicialização,
+normalização e regra de agregação. Portanto, usaremos os valores de RMSE desta
+execução para comparar entre si as configurações do SysIdentPy. Antes de
+aumentar os lags, mostramos o critério de informação:
 
 
 ```python
 xaxis = np.arange(1, model.n_info_values + 1)
 plt.plot(xaxis, model.info_values)
 plt.xlabel("n_terms")
-plt.ylabel("Critério de Informação")
+plt.ylabel("Information Criteria")
 ```
 
 
-
-
-    Text(0, 0.5, 'Critério de Informação')
-
-
-
-
-    
-![png](../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_10_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-07.png?raw=true)
 
 
 Pode-se observar que após 22 regressores, adicionar novos regressores não melhora o desempenho do modelo (considerando a configuração definida para aquele modelo). Como queremos experimentar modelos com lags maiores e grau de não linearidade maior, o critério de parada será alterado para `err_tol` em vez de critério de informação. Isso fará o algoritmo rodar consideravelmente mais rápido.
 
 
 ```python
-# experimento 1
+# experiment 1
 y_train = data_train_1.y
 y_test = data_test_1.y
 x_train = data_train_1.u
@@ -725,8 +632,8 @@ n = data_test_1.state_initialization_window_length
 
 basis_function = Polynomial(degree=2)
 model = FROLS(
-    xlag=14,
-    ylag=14,
+    xlag=10,
+    ylag=10,
     basis_function=basis_function,
     estimator=LeastSquares(),
     err_tol=0.9996,
@@ -736,32 +643,29 @@ model = FROLS(
 
 model.fit(X=x_train, y=y_train)
 print(model.final_model.shape, model.err.sum())
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
 
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
+rmse = root_mean_squared_error(y_test[n:], yhat)
+print(f"RMSE: {rmse:.6f}")
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=10000,
-    title=f"Simulação Free Run. Modelo 1 -> RMSE: {round(rmse, 4)}",
+    title=f"Free Run simulation. Model 1 -> RMSE: {round(rmse, 4)}",
 )
 ```
 
-    (22, 2) 0.9970964868326048
 
-
-
-    
-![png](../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_12_1.png)
-    
-
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-08.png?raw=true)
 
 
 ```python
-# experimento 2
+# experiment 2
 y_train = data_train_2.y
 y_test = data_test_2.y
 x_train = data_train_2.u
@@ -771,8 +675,8 @@ n = data_test_2.state_initialization_window_length
 
 basis_function = Polynomial(degree=2)
 model = FROLS(
-    xlag=14,
-    ylag=14,
+    xlag=10,
+    ylag=10,
     basis_function=basis_function,
     estimator=LeastSquares(),
     info_criteria="aicc",
@@ -782,31 +686,40 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
 
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
+rmse = root_mean_squared_error(y_test[n:], yhat)
+print(f"RMSE: {rmse:.6f}")
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=10000,
-    title=f"Simulação Free Run. Modelo 2 -> RMSE: {round(rmse, 4)}",
+    title=f"Free Run simulation. Model 2 -> RMSE: {round(rmse, 4)}",
 )
 ```
 
 
-    
-![png](../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_13_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-09.png?raw=true)
 
 
-No primeiro experimento, o modelo mostrou uma leve melhoria, enquanto o desempenho do segundo experimento experimentou uma pequena queda. Aumentar as configurações de lag com estas configurações não resultou em mudanças significativas. Portanto, vamos definir o grau polinomial para $3$ e aumentar o número de termos para construir o modelo para `n_terms=40` se o `err_tol` não for atingido. É importante notar que estes valores são escolhidos empiricamente. Também poderíamos ajustar a técnica de estimação de parâmetros, o `err_tol`, o algoritmo de seleção de estrutura do modelo e a função base, entre outros fatores. Os usuários são encorajados a empregar técnicas de ajuste de hiperparâmetros para encontrar as combinações ótimas de hiperparâmetros.
+Os modelos com 10 lags e 22 termos produzem RMSE $0.110933$ e $0.107076$ nos
+experimentos 1 e 2, respectivamente. A janela oficial de inicialização do estado
+contém 10 amostras; por isso, as configurações anteriores com 14 lags não são
+válidas sob este protocolo. Aumentar o lag até o maior valor válido não melhora
+esta configuração de grau 2. Portanto, vamos definir o grau polinomial como $3$
+e aumentar o número de termos para `n_terms=40` quando o `err_tol` não for
+atingido. Esses valores são empíricos; o estimador, a tolerância de erro, o
+algoritmo de seleção de estrutura e a função de base são outras dimensões que
+podem ser ajustadas.
 
 
 ```python
-# experimento 1
+# experiment 1
 y_train = data_train_1.y
 y_test = data_test_1.y
 x_train = data_train_1.u
@@ -816,8 +729,8 @@ n = data_test_1.state_initialization_window_length
 
 basis_function = Polynomial(degree=3)
 model = FROLS(
-    xlag=14,
-    ylag=14,
+    xlag=10,
+    ylag=10,
     basis_function=basis_function,
     estimator=LeastSquares(),
     err_tol=0.9996,
@@ -827,32 +740,29 @@ model = FROLS(
 
 model.fit(X=x_train, y=y_train)
 print(model.final_model.shape, model.err.sum())
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
 
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
+rmse = root_mean_squared_error(y_test[n:], yhat)
+print(f"RMSE: {rmse:.6f}")
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=10000,
-    title=f"Simulação Free Run. Modelo 1 -> RMSE: {round(rmse, 4)}",
+    title=f"Free Run simulation. Model 1 -> RMSE: {round(rmse, 4)}",
 )
 ```
 
-    (40, 3) 0.9982136069197526
 
-
-
-    
-![png](../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_15_1.png)
-    
-
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-10.png?raw=true)
 
 
 ```python
-# experimento 2
+# experiment 2
 y_train = data_train_2.y
 y_test = data_test_2.y
 x_train = data_train_2.u
@@ -862,8 +772,8 @@ n = data_test_2.state_initialization_window_length
 
 basis_function = Polynomial(degree=3)
 model = FROLS(
-    xlag=14,
-    ylag=14,
+    xlag=10,
+    ylag=10,
     basis_function=basis_function,
     estimator=LeastSquares(),
     info_criteria="aicc",
@@ -873,27 +783,32 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
 
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
+rmse = root_mean_squared_error(y_test[n:], yhat)
+print(f"RMSE: {rmse:.6f}")
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=10000,
-    title=f"Simulação Free Run. Modelo 2 -> RMSE: {round(rmse, 4)}",
+    title=f"Free Run simulation. Model 2 -> RMSE: {round(rmse, 4)}",
 )
 ```
 
 
-    
-![png](../../en/user-guide/tutorials/coupled-eletric-device_files/coupled-eletric-device_16_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-11.png?raw=true)
 
 
-Como mostrado no gráfico, superamos os resultados do estado da arte (SOTA) com uma métrica média de $(0.0969 + 0.0731)/2 = 0.0849$. Além disso, a métrica para o primeiro experimento iguala o melhor modelo no benchmark, e a métrica para o segundo experimento supera levemente o melhor modelo do benchmark. Usando a mesma configuração para ambos os modelos, alcançamos os melhores resultados gerais!
+Os modelos de grau 3 produzem RMSE $0.112503$ e $0.096002$, com média
+$0.104253$. O segundo experimento melhora, enquanto o primeiro não. Por esse
+motivo, os dois experimentos devem ser apresentados separadamente, e a tabela
+externa de estado da arte não é usada para estabelecer uma classificação sem um
+protocolo de avaliação idêntico.
 
 ## Wiener-Hammerstein
 
@@ -906,7 +821,7 @@ Este benchmark foca em um circuito eletrônico Wiener-Hammerstein onde o ruído 
 A estrutura Wiener-Hammerstein é um sistema orientado a blocos bem conhecido que contém uma não linearidade estática intercalada entre dois blocos Lineares Invariantes no Tempo (LTI) (Figura 2). Este arranjo apresenta um problema de identificação desafiador devido à presença desses blocos LTI.
 
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_system.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wh_system.png?raw=true)
 > Figura 2: o sistema Wiener-Hammerstein
 
 Na Figura 2, o sistema Wiener-Hammerstein é ilustrado com ruído de processo $e_x(t)$ entrando antes da não linearidade estática $f(x)$, intercalado entre blocos LTI representados por $R(s)$ e $S(s)$ na entrada e saída, respectivamente. Além disso, pequenas fontes de ruído desprezíveis $e_u(t)$ e $e_y(t)$ afetam os canais de medição. Os sinais de entrada e saída medidos são denotados como $u_m(t)$ e $y_m(t)$.
@@ -929,25 +844,18 @@ O objetivo deste benchmark é desenvolver e validar modelos robustos usando dado
 
 ### Pacotes Necessários e Versões
 
-Para garantir que você possa replicar este estudo de caso, é essencial usar versões específicas dos pacotes necessários. Abaixo está uma lista dos pacotes junto com suas respectivas versões necessárias para executar os estudos de caso efetivamente.
+Este estudo de caso foi verificado com o SysIdentPy 0.9.0 no Python 3.12.12 e
+`nonlinear-benchmarks==1.0.1`. Instale explicitamente o checkout do repositório
+e o carregador oficial do benchmark:
 
-Para instalar todos os pacotes necessários, você pode criar um arquivo `requirements.txt` com o seguinte conteúdo:
-
-```
-sysidentpy==0.4.0
-pandas==2.2.2
-numpy==1.26.0
-matplotlib==3.8.4
-nonlinear_benchmarks==0.1.2
+```bash
+python -m pip install -e .
+python -m pip install nonlinear-benchmarks==1.0.1
 ```
 
-Então, instale os pacotes usando:
-```
-pip install -r requirements.txt
-```
-
-- Certifique-se de usar um ambiente virtual para evitar conflitos entre versões de pacotes.
-- As versões especificadas são baseadas na compatibilidade com os exemplos de código fornecidos. Se você estiver usando versões diferentes, alguns ajustes no código podem ser necessários.
+Use um ambiente virtual para isolar o carregador opcional. Os resultados
+numéricos devem ser recalculados se o ambiente ou a configuração do modelo forem
+alterados.
 
 ### Configuração do SysIdentPy
 
@@ -990,33 +898,31 @@ plot_n = 800
 plt.figure(figsize=(15, 4))
 plt.plot(x_train[:plot_n])
 plt.plot(y_train[:plot_n])
-plt.title("Experimento: dados de treinamento")
+plt.title("Experiment: training data")
 plt.legend(["x_train", "y_train"])
 plt.show()
 
 plt.figure(figsize=(15, 4))
 plt.plot(x_test[:plot_n])
 plt.plot(y_test[:plot_n])
-plt.title("Experimento: dados de teste")
+plt.title("Experiment: testing data")
 plt.legend(["x_test", "y_test"])
 plt.show()
 ```
 
 
-    
-![png](../../en/user-guide/tutorials/wiener-hammerstein-system_files/wiener-hammerstein-system_4_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wiener-hammerstein-system-01.png?raw=true)
 
 
-
-    
-![png](../../en/user-guide/tutorials/wiener-hammerstein-system_files/wiener-hammerstein-system_4_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wiener-hammerstein-system-02.png?raw=true)
 
 
-O objetivo deste benchmark é obter um modelo que tenha um desempenho melhor que o modelo SOTA fornecido no artigo de benchmarking.
+O benchmark externo fornece um contexto útil para o experimento. Uma comparação
+direta, porém, exige a mesma divisão dos dados, janela de inicialização e
+normalização; essas condições são explicitadas abaixo antes de qualquer
+comparação.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_sota_results.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wh_sota_results.png?raw=true)
 > Resultados estado-da-arte apresentados no [artigo de benchmarking](https://arxiv.org/pdf/2405.10779). Nesta seção estamos trabalhando apenas com os resultados Wiener-Hammerstein, que são apresentados na coluna $W-H$.
 
 ### Resultados
@@ -1025,8 +931,6 @@ Começaremos com uma configuração básica do FROLS usando uma função de base
 
 
 ```python
-# 3min para rodar na minha máquina (amd 5600x, 32gb ram)
-
 n = test.state_initialization_window_length
 
 basis_function = Polynomial(degree=2)
@@ -1039,31 +943,33 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
-rmse_sota = rmse / y_test.std()
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=1000,
-    title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(rmse_sota, 4)}",
+    title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(nrmse, 4)}",
 )
 ```
 
 
-    
-![png](../../en/user-guide/tutorials/wiener-hammerstein-system_files/wiener-hammerstein-system_6_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wiener-hammerstein-system-03.png?raw=true)
 
 
-A primeira configuração já é melhor que os modelos **SOTA** mostrados na tabela de benchmark! Começamos usando `xlag=ylag=7` para ter uma ideia de quão bem o SysIdentPy lidaria com este dataset, mas os resultados já são muito bons! No entanto, o artigo de benchmarking indica que eles usaram lags maiores para seus modelos. Vamos verificar o que acontece se definirmos `xlag=ylag=10`.
+A primeira configuração produz RMSE $0.020007$ e NRMSE $0.082029$. Começamos
+com `xlag=ylag=7` para estabelecer uma referência compacta. O artigo de
+benchmarking usa memórias mais longas em alguns modelos; por isso, a próxima
+configuração define `xlag=ylag=10`.
 
 
 ```python
-# 7min para rodar na minha máquina (amd 5600x, 32gb ram)
-
 x_train, y_train = train_val
 x_test, y_test = test
 
@@ -1079,26 +985,30 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
-rmse_sota = rmse / y_test.std()
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=1000,
-    title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(rmse_sota, 4)}",
+    title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(nrmse, 4)}",
 )
 ```
 
 
-    
-![png](../../en/user-guide/tutorials/wiener-hammerstein-system_files/wiener-hammerstein-system_8_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wiener-hammerstein-system-04.png?raw=true)
 
 
-O desempenho é ainda melhor agora! Por enquanto, não estamos preocupados com a complexidade do modelo (mesmo neste caso onde estamos comparando com uma rede neural de estado profundo...). No entanto, se verificarmos a ordem do modelo e o gráfico `AIC`, vemos que o modelo tem 50 regressores, mas os valores de `AIC` não mudam muito após cada regressão adicionada.
+A configuração com 10 lags melhora o resultado para RMSE $0.015202$ e NRMSE
+$0.062328$. Por enquanto, não estamos otimizando a complexidade do modelo. Ainda
+assim, o traçado do critério de informação mostra que o modelo com 50
+regressores muda pouco após várias das últimas inclusões.
 
 
 ```python
@@ -1106,24 +1016,13 @@ plt.plot(model.info_values)
 ```
 
 
-
-
-    [<matplotlib.lines.Line2D at 0x28c0058a450>]
-
-
-
-
-    
-![png](../../en/user-guide/tutorials/wiener-hammerstein-system_files/wiener-hammerstein-system_10_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wiener-hammerstein-system-05.png?raw=true)
 
 
 Então, o que acontece se definirmos um modelo com metade dos regressores?
 
 
 ```python
-# 14 segundos para rodar
-
 x_train, y_train = train_val
 x_test, y_test = test
 
@@ -1141,145 +1040,212 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
-rmse_sota = rmse / y_test.std()
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=1000,
-    title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(rmse_sota, 4)}",
+    title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(nrmse, 4)}",
 )
 ```
 
 
-    
-![png](../../en/user-guide/tutorials/wiener-hammerstein-system_files/wiener-hammerstein-system_12_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wiener-hammerstein-system-06.png?raw=true)
 
 
-Como mostrado na figura acima, os resultados ainda superam os modelos SOTA apresentados no artigo de benchmarking. Os resultados SOTA do artigo provavelmente também poderiam ser melhorados. Os usuários são encorajados a explorar o [pacote deepsysid](https://github.com/AlexandraBaier/deepsysid), que pode ser usado para construir redes neurais de estado profundo.
+O modelo fixado em 25 termos produz RMSE $0.018809$ e NRMSE $0.077117$. Ele é
+mais compacto que o modelo de 50 termos selecionado automaticamente, ao custo de
+um erro maior. Os três resultados atuais são resumidos a seguir.
+
+| Configuração | RMSE | NRMSE |
+| --- | ---: | ---: |
+| 7 lags, ordem automática | 0.020007 | 0.082029 |
+| 10 lags, ordem automática | 0.015202 | 0.062328 |
+| 10 lags, 25 termos fixos | 0.018809 | 0.077117 |
+
+As figuras históricas armazenavam quatro casas decimais, e os valores
+reproduzidos permanecem iguais nessa precisão. Tabelas publicadas podem usar
+outra normalização ou divisão dos dados, portanto não são tratadas como uma
+comparação direta. Quem quiser investigar alternativas baseadas em modelos de
+estado profundos pode explorar o [pacote deepsysid](https://github.com/AlexandraBaier/deepsysid).
 
 Esta configuração básica pode servir como ponto de partida para os usuários desenvolverem modelos ainda melhores usando o SysIdentPy. Experimente!
 
-## Previsão de Demanda de Passageiros Aéreos
+## Previsão de Demanda de Passageiros Aéreos — um benchmark
 
-## Nota
+Neste estudo de caso, exploramos as capacidades do SysIdentPy aplicando-o ao
+conjunto Air Passenger, uma série temporal clássica muito usada na avaliação de
+métodos de previsão. O principal objetivo é demonstrar que o SysIdentPy pode ser
+uma alternativa consistente para modelagem de séries temporais, e não afirmar
+que uma biblioteca é superior às demais.
 
-O exemplo a seguir **não** tem a intenção de afirmar que uma biblioteca é melhor que outra. O foco principal destes exemplos é mostrar que o SysIdentPy pode ser uma boa alternativa para pessoas que desejam modelar séries temporais.
+### Visão geral do conjunto de dados
 
-Compararemos os resultados obtidos usando as bibliotecas **sktime** e **neural prophet**.
+O conjunto Air Passenger contém os totais mensais de passageiros de voos
+internacionais entre 1949 e 1960. Ele apresenta sazonalidade acentuada,
+tendência e variabilidade, o que o torna uma referência adequada para avaliar
+diferentes métodos de previsão. Mais especificamente, o conjunto inclui:
 
-Do sktime, os seguintes modelos serão utilizados:
+- **Total mensal de passageiros:** o número de passageiros, em milhares, a cada
+  mês.
+- **Período:** de janeiro de 1949 a dezembro de 1960, totalizando 144
+  observações.
 
-- AutoARIMA
+As flutuações sazonais e a tendência são evidentes e impõem um desafio
+significativo aos métodos de previsão. Por sua complexidade inerente e seu
+comportamento bem documentado, esta série se tornou um benchmark conhecido para
+comparar modelos de séries temporais.
 
-- BATS
+### Comparação com outras bibliotecas
 
-- TBATS
+Compararemos o SysIdentPy com outras bibliotecas populares de modelagem de
+séries temporais, considerando as seguintes ferramentas:
 
-- Exponential Smoothing
+- **sktime:** uma biblioteca abrangente para análise de séries temporais em
+  Python. Neste estudo, usaremos:
+  - `AutoARIMA`: seleciona automaticamente o modelo ARIMA a partir dos dados.
+  - `BATS` (Bayesian Structural Time Series): representa tendências e padrões
+    sazonais complexos.
+  - `TBATS` (Trigonometric, Box-Cox, ARMA, Trend, and Seasonal): foi projetado
+    para lidar com múltiplos padrões sazonais.
+  - `Exponential Smoothing`: aplica médias ponderadas para prever valores
+    futuros.
+  - `Prophet`: desenvolvido pelo Facebook, é especialmente adequado para
+    representar sazonalidade e efeitos de feriados.
+  - `AutoETS` (Automatic Exponential Smoothing): seleciona automaticamente o
+    modelo de suavização exponencial.
+- **SysIdentPy:** uma biblioteca voltada à identificação de sistemas e à
+  modelagem de séries temporais. Usaremos:
+  - `MetaMSS` (Meta-heuristic Model Structure Selection): usa algoritmos
+    meta-heurísticos para selecionar a estrutura do modelo.
+  - `AOLS` (Accelerated Orthogonal Least Squares): seleciona regressores
+    relevantes para o modelo.
+  - `FROLS` (Forward Regression with Orthogonal Least Squares, com função de
+    base polinomial): realiza a seleção de estrutura por regressão ortogonal.
+  - `NARXNN` (Nonlinear Auto-Regressive model with Exogenous Inputs using Neural
+    Networks): oferece uma forma flexível de representar séries não lineares
+    com entradas externas.
 
-- Prophet
+### Objetivo
 
-- AutoETS
+O objetivo é avaliar e comparar o desempenho desses métodos no conjunto Air
+Passenger. Queremos observar como cada biblioteca trata a sazonalidade e a
+tendência da série e apresentar o SysIdentPy como uma opção viável para previsão
+de séries temporais.
 
-Por questão de brevidade, do **SysIdentPy** apenas os métodos **MetaMSS**, **AOLS**, **FROLS** (com função base polinomial) e **NARXNN** serão utilizados. Consulte a documentação do SysIdentPy para conhecer outras formas de modelagem com a biblioteca.
+### Pacotes necessários e versões
 
+Esta comparação foi verificada com o SysIdentPy 0.9.0 no Python 3.12.12. As
+bibliotecas de previsão são opcionais e foram testadas com as seguintes versões:
+
+```bash
+python -m pip install -e .
+python -m pip install sktime==1.0.1 neuralprophet==0.9.0 prophet==1.3.0
+python -m pip install pmdarima==2.1.1 tbats==1.1.3 statsmodels==0.14.6
+python -m pip install scipy==1.15.3 torch==2.5.1
+```
+
+A versão do SciPy satisfaz a restrição `scipy<1.16` imposta pelos adaptadores
+BATS/TBATS nesta versão do sktime. Use um ambiente virtual, pois esses pacotes
+possuem uma árvore de dependências relativamente grande e sensível a
+compatibilidade. Os modelos aleatórios usam a semente 42.
+
+Vamos começar importando os pacotes necessários e preparando o ambiente desta
+análise.
 
 ```python
+import logging
 from warnings import simplefilter
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
-import scipy.signal.signaltools
-
-
-def _centered(arr, newsize):
-    # Return the center newsize portion of the array.
-    newsize = np.asarray(newsize)
-    currsize = np.array(arr.shape)
-    startind = (currsize - newsize) // 2
-    endind = startind + newsize
-    myslice = [slice(startind[k], endind[k]) for k in range(len(endind))]
-    return arr[tuple(myslice)]
-
-
-scipy.signal.signaltools._centered = _centered
-
-from sysidentpy.model_structure_selection import FROLS
-from sysidentpy.model_structure_selection import AOLS
-from sysidentpy.model_structure_selection import MetaMSS
-from sysidentpy.basis_function import Polynomial
-from sysidentpy.utils.plotting import plot_results
-from torch import nn
-
-# from sysidentpy.metrics import mean_squared_error
-from sysidentpy.neural_network import NARXNN
-
+import torch
+from neuralprophet import NeuralProphet, set_random_seed
 from sktime.datasets import load_airline
-from sktime.forecasting.ets import AutoETS
 from sktime.forecasting.arima import ARIMA, AutoARIMA
 from sktime.forecasting.base import ForecastingHorizon
-from sktime.forecasting.exp_smoothing import ExponentialSmoothing
-from sktime.forecasting.fbprophet import Prophet
-from sktime.forecasting.tbats import TBATS
 from sktime.forecasting.bats import BATS
+from sktime.forecasting.ets import AutoETS
+from sktime.forecasting.exp_smoothing import ExponentialSmoothing
+from prophet import Prophet
+from sktime.forecasting.tbats import TBATS
+from sktime.split import temporal_train_test_split
+from torch import nn
 
-# from sktime.forecasting.model_evaluation import evaluate
-from sktime.forecasting.model_selection import temporal_train_test_split
-from sktime.performance_metrics.forecasting import mean_squared_error
-from sktime.utils.plotting import plot_series
-from neuralprophet import NeuralProphet
-from neuralprophet import set_random_seed
+from sysidentpy.basis_function import Polynomial
+from sysidentpy.metrics import mean_squared_error
+from sysidentpy.model_structure_selection import AOLS, FROLS, MetaMSS
+from sysidentpy.neural_network import NARXNN
+from sysidentpy.parameter_estimation import LeastSquares
+from sysidentpy.utils.plotting import plot_results
 
 simplefilter("ignore", FutureWarning)
-np.seterr(all="ignore")
-
-%matplotlib inline
-
 loss = mean_squared_error
+
+
+def plot_series(*series, labels):
+    for values, label in zip(series, labels):
+        index = (
+            values.index.to_timestamp()
+            if isinstance(values.index, pd.PeriodIndex)
+            else values.index
+        )
+        plt.plot(index, values.to_numpy(), label=label)
+    plt.legend()
+
+logging.getLogger("NP").setLevel(logging.ERROR)
 ```
 
-## Dados de passageiros aéreos
-
+Usamos o carregador do `sktime` e reservamos as 24 observações mensais finais
+para teste. Todos os métodos são avaliados nesse mesmo horizonte.
 
 ```python
 y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=23)  # 23 amostras para teste
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 plot_series(y_train, y_test, labels=["y_train", "y_test"])
 fh = ForecastingHorizon(y_test.index, is_relative=False)
 print(y_train.shape[0], y_test.shape[0])
 ```
 
-    121 23
+A imagem a seguir mostra os dados do sistema que será modelado.
 
-
-
-    
-![png](../../en/user-guide/tutorials/air-passenger-benchmark_files/air-passenger-benchmark_4_1.png)
-    
-
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-01.png?raw=true)
 
 ## Resultados
 
-| No. | Pacote | Erro Quadrático Médio |
-| --- | ------- | ------------- |
-| 1 | SysIdentPy (Modelo Neural) | 316.54 |
-| 2 | SysIdentPy (MetaMSS) | 450.99 |
-| 3 | SysIdentPy (AOLS) | 476.64 |
-| 4 | NeuralProphet | 501.24 |
-| 5 | SysIdentPy (FROLS) | 805.95 |
-| 6 | Exponential Smoothing | 910.52 |
-| 7 | Prophet | 1186.00 |
-| 8 | AutoArima | 1714.47 |
-| 9 | Arima Manual | 2085.42 |
-| 10 | ETS | 2590.05 |
-| 11 | BATS | 7286.64 |
-| 12 | TBATS | 7448.43 |
+Como temos vários modelos para testar, os resultados atuais são resumidos na
+tabela a seguir. A divisão dos dados e a definição do MSE são as mesmas em todas
+as linhas.
+
+| Nº | Pacote | Erro quadrático médio |
+| ---: | --- | ---: |
+| 1 | SysIdentPy (AOLS) | 440.9993 |
+| 2 | SysIdentPy (MetaMSS) | 510.3495 |
+| 3 | NeuralProphet | 514.0477 |
+| 4 | Prophet | 910.7187 |
+| 5 | Exponential Smoothing | 1055.5128 |
+| 6 | SysIdentPy (Neural NARX) | 1621.5225 |
+| 7 | SysIdentPy (FROLS) | 1811.9000 |
+| 8 | AutoARIMA | 2230.3321 |
+| 9 | ARIMA manual | 2592.7244 |
+| 10 | AutoETS | 3128.9366 |
+| 11 | TBATS | 8825.0097 |
+| 12 | BATS | 9043.4934 |
+
+As 13 saídas finais do treinamento inicializam a previsão livre de cada modelo
+do SysIdentPy e não entram na métrica. O MetaMSS usa uma divisão cronológica
+interna para selecionar a estrutura e não reajusta automaticamente os parâmetros
+selecionados com todas as 120 observações de treinamento. A tabela compara as
+configurações compactas declaradas aqui; ela não estabelece uma classificação
+geral entre as bibliotecas.
 
 
 ## SysIdentPy FROLS
@@ -1287,37 +1253,34 @@ print(y_train.shape[0], y_test.shape[0])
 
 ```python
 y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=23)
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 y_train = y_train.values.reshape(-1, 1)
 y_test = y_test.values.reshape(-1, 1)
 
 basis_function = Polynomial(degree=1)
 sysidentpy = FROLS(
     order_selection=True,
-    ylag=13,  # os lags para todos os modelos serão 13
+    ylag=13,  # the lags for all models will be 13
+    n_info_values=14,
     basis_function=basis_function,
     model_type="NAR",
+    estimator=LeastSquares(),
 )
 sysidentpy.fit(y=y_train)
 y_test = np.concatenate([y_train[-sysidentpy.max_lag :], y_test])
 
-yhat = sysidentpy.predict(y=y_test, forecast_horizon=23)
+yhat = sysidentpy.predict(y=y_test, forecast_horizon=24)
 frols_loss = loss(
-    pd.Series(y_test.flatten()[sysidentpy.max_lag :]),
-    pd.Series(yhat.flatten()[sysidentpy.max_lag :]),
+    y_test[sysidentpy.max_lag :],
+    yhat[sysidentpy.max_lag :],
 )
 print(frols_loss)
 
 plot_results(y=y_test[sysidentpy.max_lag :], yhat=yhat[sysidentpy.max_lag :])
 ```
 
-    805.9521186338106
 
-
-
-    
-![png](../../en/user-guide/tutorials/air-passenger-benchmark_files/air-passenger-benchmark_7_2.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-02.png?raw=true)
 
 
 ## SysIdentPy AOLS
@@ -1325,11 +1288,11 @@ plot_results(y=y_test[sysidentpy.max_lag :], yhat=yhat[sysidentpy.max_lag :])
 
 ```python
 y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=23)
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 y_train = y_train.values.reshape(-1, 1)
 y_test = y_test.values.reshape(-1, 1)
 
-df_train, df_test = temporal_train_test_split(y, test_size=23)
+df_train, df_test = temporal_train_test_split(y, test_size=24)
 df_train = df_train.reset_index()
 df_train.columns = ["ds", "y"]
 df_train["ds"] = pd.to_datetime(df_train["ds"].astype(str))
@@ -1343,23 +1306,18 @@ sysidentpy_AOLS = AOLS(
 sysidentpy_AOLS.fit(y=y_train)
 y_test = np.concatenate([y_train[-sysidentpy_AOLS.max_lag :], y_test])
 
-yhat = sysidentpy_AOLS.predict(y=y_test, steps_ahead=None, forecast_horizon=23)
+yhat = sysidentpy_AOLS.predict(y=y_test, steps_ahead=None, forecast_horizon=24)
 aols_loss = loss(
-    pd.Series(y_test.flatten()[sysidentpy_AOLS.max_lag :]),
-    pd.Series(yhat.flatten()[sysidentpy_AOLS.max_lag :]),
+    y_test[sysidentpy_AOLS.max_lag :],
+    yhat[sysidentpy_AOLS.max_lag :],
 )
 print(aols_loss)
 
 plot_results(y=y_test[sysidentpy_AOLS.max_lag :], yhat=yhat[sysidentpy_AOLS.max_lag :])
 ```
 
-    476.64996316992523
 
-
-
-    
-![png](../../en/user-guide/tutorials/air-passenger-benchmark_files/air-passenger-benchmark_9_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-03.png?raw=true)
 
 
 ## SysIdentPy MetaMSS
@@ -1369,21 +1327,21 @@ plot_results(y=y_test[sysidentpy_AOLS.max_lag :], yhat=yhat[sysidentpy_AOLS.max_
 set_random_seed(42)
 
 y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=23)
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 y_train = y_train.values.reshape(-1, 1)
 y_test = y_test.values.reshape(-1, 1)
 
 sysidentpy_metamss = MetaMSS(
-    basis_function=basis_function, ylag=13, model_type="NAR", test_size=0.17
+    basis_function=basis_function, ylag=13, model_type="NAR", test_size=0.17, random_state=42
 )
 sysidentpy_metamss.fit(y=y_train)
 
 y_test = np.concatenate([y_train[-sysidentpy_metamss.max_lag :], y_test])
 
-yhat = sysidentpy_metamss.predict(y=y_test, steps_ahead=None, forecast_horizon=23)
+yhat = sysidentpy_metamss.predict(y=y_test, steps_ahead=None, forecast_horizon=24)
 metamss_loss = loss(
-    pd.Series(y_test.flatten()[sysidentpy_metamss.max_lag :]),
-    pd.Series(yhat.flatten()[sysidentpy_metamss.max_lag :]),
+    y_test[sysidentpy_metamss.max_lag :],
+    yhat[sysidentpy_metamss.max_lag :],
 )
 print(metamss_loss)
 
@@ -1392,17 +1350,14 @@ plot_results(
 )
 ```
 
-    450.992127624293
 
-
-
-    
-![png](../../en/user-guide/tutorials/air-passenger-benchmark_files/air-passenger-benchmark_11_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-04.png?raw=true)
 
 
 ## SysIdentPy Neural NARX
 
+A arquitetura da rede é a mesma usada na documentação do SysIdentPy para
+demonstrar a construção de um modelo Neural NARX.
 
 ```python
 import torch
@@ -1410,7 +1365,7 @@ import torch
 torch.manual_seed(42)
 
 y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=36)
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 y_train = y_train.values.reshape(-1, 1)
 y_test = y_test.values.reshape(-1, 1)
 x_train = np.zeros_like(y_train)
@@ -1442,56 +1397,55 @@ narx_net = NARXNN(
     ylag=13,
     model_type="NAR",
     basis_function=Polynomial(degree=1),
-    epochs=900,
+    batch_size=128,
+    epochs=1500,
     verbose=False,
-    learning_rate=2.5e-02,
-    optim_params={},  # parâmetros opcionais do otimizador
+    learning_rate=1e-02,
+    optim_params={},  # optional parameters of the optimizer
+    random_state=42,
 )
 
 narx_net.fit(y=y_train)
-yhat = narx_net.predict(y=y_test, forecast_horizon=23)
-narxnet_loss = loss(
-    pd.Series(y_test.flatten()[narx_net.max_lag :]),
-    pd.Series(yhat.flatten()[narx_net.max_lag :]),
-)
+y_initial = y_train[-narx_net.max_lag :]
+yhat = narx_net.predict(y=y_initial, forecast_horizon=24)
+narxnet_loss = loss(y_test, yhat[narx_net.max_lag :])
 print(narxnet_loss)
-plot_results(y=y_test[narx_net.max_lag :], yhat=yhat[narx_net.max_lag :])
+plot_results(y=y_test, yhat=yhat[narx_net.max_lag :])
+
+one_step_context = np.concatenate([y_initial, y_test])
+one_step_yhat = narx_net.predict(y=one_step_context, steps_ahead=1)
+narxnet_one_step_loss = loss(
+    y_test, one_step_yhat[narx_net.max_lag :]
+)
+print(narxnet_one_step_loss)
 ```
 
-    316.54086775668776
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-05.png?raw=true)
 
+## Modelos do sktime
 
-    
-![png](../../en/user-guide/tutorials/air-passenger-benchmark_files/air-passenger-benchmark_13_1.png)
-    
-
-
+Os modelos a seguir estão disponíveis no pacote **sktime**.
 
 ```python
 y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=23)  # 23 amostras para teste
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 plot_series(y_train, y_test, labels=["y_train", "y_test"])
 fh = ForecastingHorizon(y_test.index, is_relative=False)
 print(y_train.shape[0], y_test.shape[0])
 ```
 
-    121 23
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-06.png?raw=true)
 
 
-
-    
-![png](../../en/user-guide/tutorials/air-passenger-benchmark_files/air-passenger-benchmark_14_1.png)
-    
-
-
-## Exponential Smoothing
+## sktime: Exponential Smoothing
 
 
 ```python
 es = ExponentialSmoothing(trend="add", seasonal="multiplicative", sp=12)
 y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=23)
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 es.fit(y_train)
 y_pred_es = es.predict(fh)
 
@@ -1501,25 +1455,16 @@ es_loss
 ```
 
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-07.png?raw=true)
 
 
-    910.462659260655
-
-
-
-
-    
-![png](../../en/user-guide/tutorials/air-passenger-benchmark_files/air-passenger-benchmark_16_1.png)
-    
-
-
-## AutoETS
+## sktime: AutoETS
 
 
 ```python
 y = load_airline()
 
-y_train, y_test = temporal_train_test_split(y, test_size=23)
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 ets = AutoETS(auto=True, sp=12, n_jobs=-1)
 ets.fit(y_train)
 y_pred_ets = ets.predict(fh)
@@ -1530,26 +1475,17 @@ ets_loss
 ```
 
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-08.png?raw=true)
 
 
-    1739.117296439066
-
-
-
-
-    
-![png](../../en/user-guide/tutorials/air-passenger-benchmark_files/air-passenger-benchmark_18_1.png)
-    
-
-
-## AutoArima
+## sktime: AutoArima
 
 
 ```python
 auto_arima = AutoARIMA(sp=12, suppress_warnings=True)
 y = load_airline()
 
-y_train, y_test = temporal_train_test_split(y, test_size=23)
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 auto_arima.fit(y_train)
 y_pred_auto_arima = auto_arima.predict(fh)
 
@@ -1559,25 +1495,16 @@ autoarima_loss
 ```
 
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-09.png?raw=true)
 
 
-    1714.4753226965322
-
-
-
-
-    
-![png](../../en/user-guide/tutorials/air-passenger-benchmark_files/air-passenger-benchmark_20_1.png)
-    
-
-
-## Arima 
+## sktime: Arima
 
 
 ```python
 y = load_airline()
 
-y_train, y_test = temporal_train_test_split(y, test_size=23)
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 manual_arima = ARIMA(
     order=(13, 1, 0), suppress_warnings=True
 )  # seasonal_order=(0, 1, 0, 12)
@@ -1589,25 +1516,16 @@ manualarima_loss
 ```
 
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-10.png?raw=true)
 
 
-    2085.425167938668
-
-
-
-
-    
-![png](../../en/user-guide/tutorials/air-passenger-benchmark_files/air-passenger-benchmark_22_1.png)
-    
-
-
-## BATS
+## sktime: BATS
 
 
 ```python
 y = load_airline()
 
-y_train, y_test = temporal_train_test_split(y, test_size=23)
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 bats = BATS(sp=12, use_trend=True, use_box_cox=False)
 bats.fit(y_train)
 y_pred_bats = bats.predict(fh)
@@ -1618,25 +1536,16 @@ bats_loss
 ```
 
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-11.png?raw=true)
 
 
-    7286.6484525676415
-
-
-
-
-    
-![png](../../en/user-guide/tutorials/air-passenger-benchmark_files/air-passenger-benchmark_24_1.png)
-    
-
-
-## TBATS
+## sktime: TBATS
 
 
 ```python
 y = load_airline()
 
-y_train, y_test = temporal_train_test_split(y, test_size=23)
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 tbats = TBATS(sp=12, use_trend=True, use_box_cox=False)
 tbats.fit(y_train)
 y_pred_tbats = tbats.predict(fh)
@@ -1646,60 +1555,43 @@ tbats_loss
 ```
 
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-12.png?raw=true)
 
 
-    7448.434672875093
-
-
-
-
-    
-![png](../../en/user-guide/tutorials/air-passenger-benchmark_files/air-passenger-benchmark_26_1.png)
-    
-
-
-## Prophet
+## sktime: Prophet
 
 
 ```python
 set_random_seed(42)
 
-y = load_airline()
-
-y_train, y_test = temporal_train_test_split(y, test_size=23)
-z = y.copy()
-z = z.to_timestamp(freq="M")
-z_train, z_test = temporal_train_test_split(z, test_size=23)
-
+y = load_airline().to_timestamp(how="start")
+df = y.rename_axis("ds").rename("y").reset_index()
+df_train = df.iloc[:-24].copy()
+df_test = df.iloc[-24:].copy()
 
 prophet = Prophet(
     seasonality_mode="multiplicative",
-    n_changepoints=int(len(y_train) / 12),
-    add_country_holidays={"country_name": "Germany"},
+    n_changepoints=int(len(df_train) / 12),
     yearly_seasonality=True,
     weekly_seasonality=False,
     daily_seasonality=False,
 )
-prophet.fit(z_train)
-y_pred_prophet = prophet.predict(fh.to_relative(cutoff=y_train.index[-1]))
+prophet.add_country_holidays(country_name="Germany")
+prophet.fit(df_train)
+forecast_prophet = prophet.predict(df_test[["ds"]])
+y_pred_prophet = forecast_prophet["yhat"].to_numpy()
 
-y_pred_prophet.index = y_test.index
-plot_series(y_test, y_pred_prophet, labels=["y_test", "y_pred"])
-prophet_loss = loss(y_test, y_pred_prophet)
+plot_series(
+    df_test.set_index("ds")["y"],
+    pd.Series(y_pred_prophet, index=df_test["ds"]),
+    labels=["y_test", "y_pred"],
+)
+prophet_loss = loss(df_test["y"].to_numpy(), y_pred_prophet)
 prophet_loss
 ```
 
 
-
-
-    1186.0045566050442
-
-
-
-
-    
-![png](../../en/user-guide/tutorials/air-passenger-benchmark_files/air-passenger-benchmark_28_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-13.png?raw=true)
 
 
 ## Neural Prophet
@@ -1708,35 +1600,45 @@ prophet_loss
 ```python
 set_random_seed(42)
 
-df = pd.read_csv(r".\datasets\air_passengers.csv")
-m = NeuralProphet(seasonality_mode="multiplicative")
-df_train = df.iloc[:-23, :].copy()
-df_test = df.iloc[-23:, :].copy()
+y = load_airline().to_timestamp(how="start")
+df = y.rename_axis("ds").rename("y").reset_index()
+df_train = df.iloc[:-24].copy()
+df_test = df.iloc[-24:].copy()
 
-m = NeuralProphet(seasonality_mode="multiplicative")
-
-metrics = m.fit(df_train, freq="MS")
-
-future = m.make_future_dataframe(
-    df_train, periods=23, n_historic_predictions=len(df_train)
+m = NeuralProphet(
+    seasonality_mode="multiplicative", epochs=100, learning_rate=0.01
 )
-
+m.fit(df_train, freq="MS", progress=None)
+future = m.make_future_dataframe(
+    df_train, periods=24, n_historic_predictions=False
+)
 forecast = m.predict(future)
-plt.plot(forecast["yhat1"].values[-23:])
-plt.plot(df_test["y"].values)
-neuralprophet_loss = loss(forecast["yhat1"].values[-23:], df_test["y"].values)
-neuralprophet_loss
+
+neuralprophet_loss = loss(
+    df_test["y"].to_numpy(), forecast["yhat1"].to_numpy()
+)
+print(neuralprophet_loss)
+plt.plot(df_test["ds"], df_test["y"], label="observed")
+plt.plot(forecast["ds"], forecast["yhat1"], label="predicted")
+plt.legend()
 ```
 
-    501.24794023767436
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-14.png?raw=true)
 
+O valor histórico de 316.5409 para o Neural NARX usava outro protocolo: a rede
+era treinada nas primeiras 108 observações, as 13 saídas medidas seguintes
+inicializavam a recursão e somente os 23 meses finais eram avaliados. Repetir
+esse protocolo com o ambiente atual produz 316.8340. Na divisão comum de
+120/24, a antiga configuração em minibatches produz MSE 2967.6219. Selecionar o
+tamanho do lote, a taxa de aprendizado e o número de épocas em uma divisão
+interna de 96/24 e, depois, reajustar a rede com todas as 120 observações de
+treinamento reduz o MSE em simulação livre para 1621.5225. O MSE da predição de
+um passo à frente é 307.1843, indicando que a acumulação recursiva de erros
+explica boa parte do erro restante em simulação livre.
 
-
-    
-![png](../../en/user-guide/tutorials/air-passenger-benchmark_files/air-passenger-benchmark_30_14.png)
-    
-
+Os resultados finais podem ser resumidos como na tabela apresentada no início
+deste estudo de caso:
 
 
 ```python
@@ -1744,12 +1646,12 @@ results = {
     "Exponential Smoothing": es_loss,
     "ETS": ets_loss,
     "AutoArima": autoarima_loss,
-    "Arima Manual": manualarima_loss,
+    "Manual Arima": manualarima_loss,
     "BATS": bats_loss,
     "TBATS": tbats_loss,
     "Prophet": prophet_loss,
-    "SysIdentPy (Modelo Polinomial)": frols_loss,
-    "SysIdentPy (Modelo Neural)": narxnet_loss,
+    "SysIdentPy (Polynomial Model)": frols_loss,
+    "SysIdentPy (Neural Model)": narxnet_loss,
     "SysIdentPy (AOLS)": aols_loss,
     "SysIdentPy (MetaMSS)": metamss_loss,
     "NeuralProphet": neuralprophet_loss,
@@ -1758,21 +1660,6 @@ results = {
 sorted(results.items(), key=lambda result: result[1])
 ```
 
-
-
-
-    [('SysIdentPy (Modelo Neural)', 316.54086775668776),
-     ('SysIdentPy (MetaMSS)', 450.992127624293),
-     ('SysIdentPy (AOLS)', 476.64996316992523),
-     ('NeuralProphet', 501.24794023767436),
-     ('SysIdentPy (Modelo Polinomial)', 805.9521186338106),
-     ('Exponential Smoothing', 910.462659260655),
-     ('Prophet', 1186.0045566050442),
-     ('AutoArima', 1714.4753226965322),
-     ('ETS', 1739.117296439066),
-     ('Arima Manual', 2085.425167938668),
-     ('BATS', 7286.6484525676415),
-     ('TBATS', 7448.434672875093)]
 
 ## Sistema com Histerese - Modelagem de um Dispositivo Amortecedor Magneto-reológico
 
@@ -1785,7 +1672,7 @@ Embora algum progresso tenha sido feito, trabalhos anteriores foram limitados a 
 Os dados usados neste estudo de caso são do modelo Bouc-Wen ([Bouc, R - Forced Vibrations of a Mechanical System with Hysteresis](https://www.scirp.org/reference/referencespapers?referenceid=726819)), ([Wen, Y. X. - Method for Random Vibration of Hysteretic Systems](https://ascelibrary.org/doi/10.1061/JMCEA3.0002106)) de um MRD cujo diagrama esquemático é mostrado na figura abaixo.
 
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bouc_wen.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/bouc_wen.png?raw=true)
 > O modelo para um amortecedor magneto-reológico proposto por [Spencer, B. F. and Sain, M. K. - Controlling buildings: a new frontier in feedback](https://ieeexplore.ieee.org/document/642972).
 
 A forma geral do modelo Bouc-Wen pode ser descrita como ([Spencer, B. F. and Sain, M. K. - Controlling buildings: a new frontier in feedback](https://ieeexplore.ieee.org/document/642972)):
@@ -1835,31 +1722,23 @@ Os desafios são:
 
 ### Pacotes Necessários e Versões
 
-Para garantir que você possa replicar este estudo de caso, é essencial usar versões específicas dos pacotes necessários. Abaixo está uma lista dos pacotes junto com suas respectivas versões necessárias para executar os estudos de caso efetivamente.
+Este estudo de caso foi verificado com o SysIdentPy 0.9.0 no Python 3.12.12,
+`pandas==2.3.3` e `scikit-learn==1.7.2`. Instale explicitamente o checkout do
+repositório e os dois pacotes de preparação dos dados:
 
-Para instalar todos os pacotes necessários, você pode criar um arquivo `requirements.txt` com o seguinte conteúdo:
-
-```
-sysidentpy==0.4.0
-pandas==2.2.2
-numpy==1.26.0
-matplotlib==3.8.4
-scikit-learn==1.4.2
+```bash
+python -m pip install -e .
+python -m pip install pandas==2.3.3 scikit-learn==1.7.2
 ```
 
-Então, instale os pacotes usando:
-```
-pip install -r requirements.txt
-```
-
-- Certifique-se de usar um ambiente virtual para evitar conflitos entre versões de pacotes.
-- As versões especificadas são baseadas na compatibilidade com os exemplos de código fornecidos. Se você estiver usando versões diferentes, alguns ajustes no código podem ser necessários.
+O conjunto de dados é carregado por uma URL imutável do `sysidentpy-data`. Os
+exemplos aleatórios usam a semente 42.
 
 ### Configuração do SysIdentPy
 
 
-
 ```python
+from warnings import catch_warnings, simplefilter
 import numpy as np
 from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler
 import pandas as pd
@@ -1873,7 +1752,7 @@ from sysidentpy.metrics import root_relative_squared_error
 from sysidentpy.utils.plotting import plot_results
 
 df = pd.read_csv(
-    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/bouc_wen/boucwen_histeretic_system.csv"
+    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/4085901293ba5ed5674bb2911ef4d1fa20f3438d/datasets/bouc_wen/boucwen_histeretic_system.csv"
 )
 scaler_x = MaxAbsScaler()
 scaler_y = MaxAbsScaler()
@@ -1895,38 +1774,38 @@ y_test = (
 )
 y_test = scaler_y.transform(y_test)
 
-# Plotando os dados
+# Plotting the data
 plt.figure(figsize=(10, 8))
-plt.suptitle("Dados de identificação (treinamento)", fontsize=16)
+plt.suptitle("Identification (training) data", fontsize=16)
 
 plt.subplot(221)
 plt.plot(y_train, "k")
-plt.ylabel("Força - Saída")
-plt.xlabel("Amostras")
+plt.ylabel("Force - Output")
+plt.xlabel("Samples")
 plt.title("y")
 plt.grid()
 plt.axis([0, 1500, -1.5, 1.5])
 
 plt.subplot(222)
 plt.plot(x_train[:, 0], "k")
-plt.ylabel("Tensão de Controle")
-plt.xlabel("Amostras")
+plt.ylabel("Control Voltage")
+plt.xlabel("Samples")
 plt.title("x_1")
 plt.grid()
 plt.axis([0, 1500, 0, 1])
 
 plt.subplot(223)
 plt.plot(x_train[:, 1], "k")
-plt.ylabel("Velocidade")
-plt.xlabel("Amostras")
+plt.ylabel("Velocity")
+plt.xlabel("Samples")
 plt.title("x_2")
 plt.grid()
 plt.axis([0, 1500, -1.5, 1.5])
 
 plt.subplot(224)
 plt.plot(x_train[:, 2], "k")
-plt.ylabel("sign(Velocidade)")
-plt.xlabel("Amostras")
+plt.ylabel("sign(Velocity)")
+plt.xlabel("Samples")
 plt.title("x_3")
 plt.grid()
 plt.axis([0, 1500, -1.5, 1.5])
@@ -1936,9 +1815,7 @@ plt.show()
 ```
 
 
-    
-![png](../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_3_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-01.png?raw=true)
 
 
 Vamos verificar como é o comportamento histerético considerando cada entrada:
@@ -1947,46 +1824,34 @@ Vamos verificar como é o comportamento histerético considerando cada entrada:
 ```python
 plt.figure()
 plt.plot(x_train[:, 0], y_train)
-plt.xlabel("x1 - Tensão")
-plt.ylabel("y - Força")
+plt.xlabel("x1 - Voltage")
+plt.ylabel("y - Force")
+```
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-02.png?raw=true)
+
+```python
 plt.figure()
 plt.plot(x_train[:, 1], y_train)
-plt.xlabel("x2 - Velocidade")
-plt.ylabel("y - Força")
+plt.xlabel("x2 - Velocity")
+plt.ylabel("y - Force")
+```
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-03.png?raw=true)
+
+```python
 plt.figure()
 plt.plot(x_train[:, 2], y_train)
-plt.xlabel("u3 - sign(Velocidade)")
-plt.ylabel("y - Força")
+plt.xlabel("u3 - sign(Velocity)")
+plt.ylabel("y - Force")
 ```
 
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-04.png?raw=true)
 
 
-    Text(0, 0.5, 'y - Força')
-
-
-
-
-    
-![png](../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_5_1.png)
-    
-
-
-
-    
-![png](../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_5_2.png)
-    
-
-
-
-    
-![png](../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_5_3.png)
-    
-
-
-Agora, podemos simplesmente construir um modelo NARX:
+Agora podemos construir um modelo NARX. Com as três entradas e o
+`MaxAbsScaler`, o RRSE em simulação livre é $0.045104$:
 
 
 ```python
@@ -2007,20 +1872,16 @@ plot_results(
     y=y_test[model.max_lag :],
     yhat=yhat[model.max_lag :],
     n=10000,
-    title="FROLS: sign(v) e MaxAbsScaler",
+    title="FROLS: sign(v) and MaxAbsScaler",
 )
 ```
 
-    0.04510435472905795
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-05.png?raw=true)
 
 
-
-    
-![png](../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_7_1.png)
-    
-
-
-Se removermos a entrada `sign(v)` e tentarmos construir um modelo NARX usando a mesma configuração, o modelo diverge, como pode ser visto na figura a seguir:
+Se removermos a entrada `sign(v)` e usarmos a mesma configuração, a simulação
+livre diverge na amostra 203, como mostra a figura a seguir:
 
 
 ```python
@@ -2034,33 +1895,40 @@ model = FROLS(
 )
 
 model.fit(X=x_train[:, :2], y=y_train)
-yhat = model.predict(X=x_test[:, :2], y=y_test[: model.max_lag :, :])
-rrse = root_relative_squared_error(y_test[model.max_lag :], yhat[model.max_lag :])
-print(rrse)
-plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
-    n=10000,
-    title="FROLS: MaxAbsScaler, descartando sign(v)",
-)
+with catch_warnings(), np.errstate(over="ignore", invalid="ignore"):
+    simplefilter("ignore", RuntimeWarning)
+    yhat = model.predict(
+        X=x_test[:, :2], y=y_test[: model.max_lag]
+    )
+if np.isfinite(yhat).all():
+    rrse = root_relative_squared_error(
+        y_test[model.max_lag :], yhat[model.max_lag :]
+    )
+    print(rrse)
+    plot_results(
+        y=y_test[model.max_lag :],
+        yhat=yhat[model.max_lag :],
+        n=10000,
+        title="FROLS without sign(v)",
+    )
+else:
+    finite_mask = np.isfinite(yhat[:, 0])
+    finite_stop = int(np.flatnonzero(~finite_mask)[0])
+    print(f"Free-run simulation diverged at sample {finite_stop}.")
+    plot_results(
+        y=y_test[model.max_lag : finite_stop],
+        yhat=yhat[model.max_lag : finite_stop],
+        n=max(1, finite_stop - model.max_lag),
+        title="FROLS without sign(v): trajectory before divergence",
+    )
 ```
 
-    nan
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-06.png?raw=true)
 
 
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\sysidentpy\narmax_base.py:724: RuntimeWarning: overflow encountered in power
-      regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\sysidentpy\metrics\_regression.py:216: RuntimeWarning: overflow encountered in square
-      numerator = np.sum(np.square((yhat - y)))
-
-
-
-    
-![png](../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_9_2.png)
-    
-
-
-Se usarmos o algoritmo `MetaMSS` em vez disso, os resultados são melhores.
+Usar o MetaMSS sem `sign(v)` adia a perda de estabilidade numérica, mas não a
+elimina: esta trajetória em simulação livre diverge na amostra 1153.
 
 
 ```python
@@ -2075,55 +1943,63 @@ model = MetaMSS(
     random_state=42,
 )
 
-model.fit(X=x_train[:, :2], y=y_train)
-yhat = model.predict(X=x_test[:, :2], y=y_test[: model.max_lag :, :])
-rrse = root_relative_squared_error(y_test[model.max_lag :], yhat[model.max_lag :])
-print(rrse)
-plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
-    n=10000,
-    title="MetaMSS: MaxAbsScaler, descartando sign(v)",
-)
+with catch_warnings(), np.errstate(over="ignore", invalid="ignore"):
+    simplefilter("ignore", RuntimeWarning)
+    simplefilter("ignore", UserWarning)
+    model.fit(X=x_train[:, :2], y=y_train)
+    yhat = model.predict(
+        X=x_test[:, :2], y=y_test[: model.max_lag]
+    )
+if np.isfinite(yhat).all():
+    rrse = root_relative_squared_error(
+        y_test[model.max_lag :], yhat[model.max_lag :]
+    )
+    print(rrse)
+    finite_stop = len(yhat)
+    plot_results(
+        y=y_test[model.max_lag :],
+        yhat=yhat[model.max_lag :],
+        n=10000,
+        title="MetaMSS without sign(v)",
+    )
+else:
+    finite_mask = np.isfinite(yhat[:, 0])
+    finite_stop = int(np.flatnonzero(~finite_mask)[0])
+    print(f"Free-run simulation diverged at sample {finite_stop}.")
+    plot_results(
+        y=y_test[model.max_lag : finite_stop],
+        yhat=yhat[model.max_lag : finite_stop],
+        n=max(1, finite_stop - model.max_lag),
+        title="MetaMSS without sign(v): trajectory before divergence",
+    )
 ```
 
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\sysidentpy\narmax_base.py:724: RuntimeWarning: overflow encountered in power
-      regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\sysidentpy\model_structure_selection\meta_model_structure_selection.py:453: RuntimeWarning: overflow encountered in square
-      sum_of_squared_residues = np.sum(residues**2)
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\sysidentpy\metrics\_regression.py:216: RuntimeWarning: overflow encountered in square
-      numerator = np.sum(np.square((yhat - y)))
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\numpy\linalg\linalg.py:2590: RuntimeWarning: divide by zero encountered in power
-      absx **= ord
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\numpy\core\fromnumeric.py:88: RuntimeWarning: invalid value encountered in reduce
-      return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-07.png?raw=true)
 
 
-    0.24685651932553157
-
-
-
-    
-![png](../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_11_2.png)
-    
-
-
-No entanto, quando a saída do sistema atinge seu valor mínimo, o modelo oscila
+Antes da divergência, o comportamento oscilatório se torna visível quando a
+saída se aproxima de seu valor mínimo.
 
 
 ```python
+window_stop = finite_stop
+window_start = max(model.max_lag, window_stop - 100)
 plot_results(
-    y=y_test[1100:1200], yhat=yhat[1100:1200], n=10000, title="Região instável"
+    y=y_test[window_start:window_stop],
+    yhat=yhat[window_start:window_stop],
+    n=100,
+    title="MetaMSS without sign(v): last finite window",
 )
 ```
 
 
-    
-![png](../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_13_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-08.png?raw=true)
 
 
-Se adicionarmos a entrada `sign(v)` novamente e usarmos `MetaMSS`, os resultados são muito próximos do algoritmo `FROLS` com todas as entradas
+Ao adicionar novamente a entrada `sign(v)` e usar o MetaMSS, a simulação livre
+permanece finita e produz RRSE $0.055707$, próximo ao resultado do FROLS com
+todas as entradas.
 
 
 ```python
@@ -2136,35 +2012,23 @@ model = MetaMSS(
     random_state=42,
 )
 
-model.fit(X=x_train, y=y_train)
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag :, :])
+with catch_warnings(), np.errstate(over="ignore", invalid="ignore"):
+    simplefilter("ignore", RuntimeWarning)
+    simplefilter("ignore", UserWarning)
+    model.fit(X=x_train, y=y_train)
+    yhat = model.predict(X=x_test, y=y_test[: model.max_lag :, :])
 rrse = root_relative_squared_error(y_test[model.max_lag :], yhat[model.max_lag :])
 print(rrse)
 plot_results(
     y=y_test[model.max_lag :],
     yhat=yhat[model.max_lag :],
     n=10000,
-    title="MetaMSS: sign(v) e MaxAbsScaler",
+    title="MetaMSS: sign(v) and MaxAbsScaler",
 )
 ```
 
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\sysidentpy\parameter_estimation\estimators.py:75: UserWarning: Psi matrix might have linearly dependent rows.Be careful and check your data
-      self._check_linear_dependence_rows(psi)
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\sysidentpy\narmax_base.py:724: RuntimeWarning: overflow encountered in power
-      regressor_value[j] = np.prod(np.power(raw_regressor, model_exponent))
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\sysidentpy\model_structure_selection\meta_model_structure_selection.py:453: RuntimeWarning: overflow encountered in square
-      sum_of_squared_residues = np.sum(residues**2)
-    c:\Users\wilso\miniconda3\envs\sysidentpyv04\Lib\site-packages\numpy\linalg\linalg.py:2590: RuntimeWarning: divide by zero encountered in power
-      absx **= ord
 
-
-    0.055422497807759194
-
-
-
-    
-![png](../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_15_2.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-09.png?raw=true)
 
 
 Este caso também destacará a importância do escalonamento de dados. Anteriormente, usamos o método `MaxAbsScaler`, que resultou em ótimos modelos ao usar as entradas `sign(v)`, mas também resultou em modelos instáveis ao remover essa feature de entrada. Quando o escalonamento é aplicado usando `MinMaxScaler`, no entanto, a estabilidade geral dos resultados melhora, e o modelo não diverge, mesmo quando a entrada `sign(v)` é removida, usando o algoritmo `FROLS`.
@@ -2173,43 +2037,142 @@ O usuário pode obter os resultados abaixo apenas alterando o método de escalon
 
 
 ```python
-scaler_x = MinMaxScaler()
-scaler_y = MinMaxScaler()
+minmax_scaler_x = MinMaxScaler()
+minmax_scaler_y = MinMaxScaler()
+midpoint = df.shape[0] // 2
+
+x_train_minmax_frame = df[["E", "v"]].iloc[init:midpoint].copy()
+x_train_minmax_frame["sign_v"] = np.sign(x_train_minmax_frame["v"])
+x_test_minmax_frame = df[["E", "v"]].iloc[midpoint + 1 : df.shape[0] - init].copy()
+x_test_minmax_frame["sign_v"] = np.sign(x_test_minmax_frame["v"])
+x_train_minmax = minmax_scaler_x.fit_transform(x_train_minmax_frame)
+x_test_minmax = minmax_scaler_x.transform(x_test_minmax_frame)
+
+y_train_minmax = minmax_scaler_y.fit_transform(
+    df[["f"]].iloc[init:midpoint].to_numpy()
+)
+y_test_minmax = minmax_scaler_y.transform(
+    df[["f"]].iloc[midpoint + 1 : df.shape[0] - init].to_numpy()
+)
+
+def run_minmax_experiment(name, selector, use_sign):
+    n_inputs = 3 if use_sign else 2
+    x_train_variant = x_train_minmax[:, :n_inputs]
+    x_test_variant = x_test_minmax[:, :n_inputs]
+    if selector == "FROLS":
+        candidate = FROLS(
+            xlag=[[1]] * n_inputs,
+            ylag=1,
+            basis_function=Polynomial(degree=3),
+            estimator=LeastSquares(),
+            info_criteria="aic",
+        )
+    else:
+        candidate = MetaMSS(
+            xlag=[[1]] * n_inputs,
+            ylag=1,
+            basis_function=Polynomial(degree=3),
+            estimator=LeastSquares(),
+            random_state=42,
+        )
+
+    with catch_warnings(), np.errstate(over="ignore", invalid="ignore"):
+        simplefilter("ignore", RuntimeWarning)
+        simplefilter("ignore", UserWarning)
+        candidate.fit(X=x_train_variant, y=y_train_minmax)
+        prediction = candidate.predict(
+            X=x_test_variant,
+            y=y_test_minmax[: candidate.max_lag],
+        )
+
+    finite_mask = np.isfinite(prediction[:, 0])
+    if finite_mask.all():
+        score = root_relative_squared_error(
+            y_test_minmax[candidate.max_lag :],
+            prediction[candidate.max_lag :],
+        )
+        print(f"{name}: RRSE={score:.6f}")
+        stop = len(prediction)
+    else:
+        score = np.nan
+        stop = int(np.flatnonzero(~finite_mask)[0])
+        print(f"{name}: free-run simulation diverged at sample {stop}")
+
+    plot_results(
+        y=y_test_minmax[candidate.max_lag : stop],
+        yhat=prediction[candidate.max_lag : stop],
+        n=max(1, stop - candidate.max_lag),
+        title=f"{name} with MinMaxScaler",
+    )
+    return prediction, score
+
+minmax_results = {
+    "FROLS with sign(v)": run_minmax_experiment(
+        "FROLS with sign(v)", "FROLS", True
+    ),
+    "FROLS without sign(v)": run_minmax_experiment(
+        "FROLS without sign(v)", "FROLS", False
+    ),
+    "MetaMSS without sign(v)": run_minmax_experiment(
+        "MetaMSS without sign(v)", "MetaMSS", False
+    ),
+    "MetaMSS with sign(v)": run_minmax_experiment(
+        "MetaMSS with sign(v)", "MetaMSS", True
+    ),
+}
+yhat = minmax_results["MetaMSS with sign(v)"][0]
+x_test = x_test_minmax
+y_test = y_test_minmax
 ```
 
-e executando cada modelo novamente. Essa é a única mudança para melhorar os resultados.
+e executando cada modelo novamente. Essa mudança torna finitas todas as
+trajetórias em simulação livre, mas não melhora as configurações que usam todas
+as entradas.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r4.png?raw=true)
-> FROLS: com `sign(v)` e `MinMaxScaler`. RMSE: 0.1159
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-10.png?raw=true)
+> FROLS com `sign(v)` e `MinMaxScaler`: RRSE 0.115986.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r5.png?raw=true)
-FROLS: descartando `sign(v)` e usando `MinMaxScaler`. RMSE: 0.1639
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-11.png?raw=true)
+> FROLS sem `sign(v)` e com `MinMaxScaler`: RRSE 0.163944.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r6.png?raw=true)
-> MetaMSS: descartando `sign(v)` e usando `MinMaxScaler`. RMSE: 0.1762
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-12.png?raw=true)
+> MetaMSS sem `sign(v)` e com `MinMaxScaler`: RRSE 0.185607.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r7.png?raw=true)
-> MetaMSS: incluindo `sign(v)` e usando `MinMaxScaler`. RMSE: 0.0694
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-13.png?raw=true)
+> MetaMSS com `sign(v)` e `MinMaxScaler`: RRSE 0.104511.
 
-Em contraste, o método MetaMSS retornou o melhor modelo geral, mas não melhor que o melhor método `FROLS` usando `MaxAbsScaler`.
+A comparação completa é:
+
+| Escalonamento | Seletor | Entradas | Resultado em simulação livre |
+| --- | --- | --- | ---: |
+| MaxAbs | FROLS | com `sign(v)` | RRSE 0.045104 |
+| MaxAbs | FROLS | sem `sign(v)` | divergiu na amostra 203 |
+| MaxAbs | MetaMSS | sem `sign(v)` | divergiu na amostra 1153 |
+| MaxAbs | MetaMSS | com `sign(v)` | RRSE 0.055707 |
+| MinMax | FROLS | com `sign(v)` | RRSE 0.115986 |
+| MinMax | FROLS | sem `sign(v)` | RRSE 0.163944 |
+| MinMax | MetaMSS | sem `sign(v)` | RRSE 0.185607 |
+| MinMax | MetaMSS | com `sign(v)` | RRSE 0.104511 |
+
+O MetaMSS com `sign(v)` é o melhor entre as configurações com MinMax. O melhor
+resultado geral continua sendo o FROLS com `sign(v)` e `MaxAbsScaler`. Uma saída
+não finita em simulação livre é registrada como divergência, em vez de ser
+convertida em uma métrica escalar.
 
 Aqui está o loop histerético predito:
 
 
 ```python
+plt.figure(figsize=(8, 6))
 plt.plot(x_test[:, 1], yhat)
+plt.xlabel("Scaled velocity")
+plt.ylabel("Predicted scaled force")
+plt.title("MetaMSS with sign(v) and MinMaxScaler")
+plt.show()
 ```
 
 
-
-
-    [<matplotlib.lines.Line2D at 0x225ff4f8b00>]
-
-
-
-
-    
-![png](../../en/user-guide/tutorials/modeling-a-magneto-rheological-damper-device_files/modeling-a-magneto-rheological-damper-device_19_1.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-14.png?raw=true)
 
 ## Silver box
 
@@ -2255,26 +2218,18 @@ $$
 
 ### Pacotes Necessários e Versões
 
-Para garantir que você possa replicar este estudo de caso, é essencial usar versões específicas dos pacotes necessários. Abaixo está uma lista dos pacotes junto com suas respectivas versões necessárias para executar os estudos de caso efetivamente.
+Este estudo de caso foi verificado com o SysIdentPy 0.9.0 no Python 3.12.12 e
+`nonlinear-benchmarks==1.0.1`. Instale explicitamente o checkout do repositório
+e o carregador oficial do benchmark:
 
-Para instalar todos os pacotes necessários, você pode criar um arquivo `requirements.txt` com o seguinte conteúdo:
-
-```
-sysidentpy==0.4.0
-pandas==2.2.2
-numpy==1.26.0
-matplotlib==3.8.4
-nonlinear_benchmarks==0.1.2
+```bash
+python -m pip install -e .
+python -m pip install nonlinear-benchmarks==1.0.1
 ```
 
-Então, instale os pacotes usando:
-
-```
-pip install -r requirements.txt
-```
-
-- Certifique-se de usar um ambiente virtual para evitar conflitos entre versões de pacotes.
-- As versões especificadas são baseadas na compatibilidade com os exemplos de código fornecidos. Se você estiver usando versões diferentes, alguns ajustes no código podem ser necessários.
+Use um ambiente virtual para isolar o carregador opcional. Os resultados
+numéricos devem ser recalculados se o ambiente ou a configuração do modelo forem
+alterados.
 
 ### Configuração do SysIdentPy
 
@@ -2310,47 +2265,36 @@ O gráfico a seguir detalha os dados de treinamento e teste do experimento.
 ```python
 plt.plot(x_train)
 plt.plot(y_train, alpha=0.3)
-plt.title("Experimento 1: dados de treinamento")
+plt.title("Experiment 1: training data")
 plt.show()
 
 plt.plot(x_test)
 plt.plot(y_test, alpha=0.3)
-plt.title("Experimento 1: dados de teste")
+plt.title("Experiment 1: testing data")
 plt.show()
 
 plt.plot(test_arrow_full.u)
 plt.plot(test_arrow_full.y, alpha=0.3)
-plt.title("Experimento 2: dados de treinamento")
+plt.title("Experiment 2: training data")
 plt.show()
 
 plt.plot(test_arrow_no_extrapolation.u)
 plt.plot(test_arrow_no_extrapolation.y, alpha=0.2)
-plt.title("Experimento 2: dados de teste")
+plt.title("Experiment 2: testing data")
 plt.show()
 ```
 
 
-    
-![png](../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_5_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-01.png?raw=true)
 
 
-
-    
-![png](../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_5_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-02.png?raw=true)
 
 
-
-    
-![png](../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_5_2.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-03.png?raw=true)
 
 
-
-    
-![png](../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_5_3.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-04.png?raw=true)
 
 
 > Nota Importante
@@ -2375,7 +2319,7 @@ O objetivo deste benchmark é desenvolver um modelo que supere o modelo estado-d
 
 Parece que os valores mostrados no artigo realmente representam o tempo de treinamento, não as métricas de erro. Entrarei em contato com os autores para confirmar esta informação. De acordo com o site Nonlinear Benchmark, a informação é a seguinte:
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_sota.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver_sota.png?raw=true)
 
 onde os valores na coluna "Training time" correspondem aos apresentados como métricas de erro no artigo.
 
@@ -2399,44 +2343,37 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag :], y_test])
-x_test = np.concatenate([x_train[-model.max_lag :], x_test])
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
-nrmse = rmse / y_test.std()
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
 rmse_mv = 1000 * rmse
-print(nrmse, rmse_mv)
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=30000,
     figsize=(15, 4),
-    title=f"Multisine. Modelo -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
+    title=f"Multisine. Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
 )
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=300,
     figsize=(15, 4),
-    title=f"Multisine. Modelo -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
+    title=f"Multisine. Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
 )
 ```
 
-    0.1423804033714937 7.727682109791501
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-05.png?raw=true)
 
 
-
-    
-![png](../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_7_1.png)
-    
-
-
-
-    
-![png](../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_7_2.png)
-    
-
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-06.png?raw=true)
 
 
 ```python
@@ -2458,48 +2395,39 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-# não concatenaremos os últimos valores dos dados de treino para usar como condição inicial aqui porque
-# estes dados de teste têm um comportamento muito diferente.
-# No entanto, se você quiser, pode fazer isso e verá que o modelo ainda terá
-# um ótimo desempenho após algumas iterações
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
-nrmse = rmse / y_test.std()
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
 rmse_mv = 1000 * rmse
 
-print(nrmse, rmse_mv)
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=30000,
     figsize=(15, 4),
-    title=f"Arrow (full). Modelo -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
+    title=f"Arrow (full). Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
 )
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=300,
     figsize=(15, 4),
-    title=f"Arrow (full). Modelo -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
+    title=f"Arrow (full). Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
 )
 ```
 
-    0.07762658947015803 4.14903534238172
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-07.png?raw=true)
 
 
-
-    
-![png](../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_8_1.png)
-    
-
-
-
-    
-![png](../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_8_2.png)
-    
-
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-08.png?raw=true)
 
 
 ```python
@@ -2521,68 +2449,122 @@ model = FROLS(
 )
 
 model.fit(X=x_train, y=y_train)
-yhat = model.predict(X=x_test, y=y_test[: model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n :])
-nrmse = rmse / y_test.std()
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
 rmse_mv = 1000 * rmse
-print(nrmse, rmse_mv)
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=30000,
     figsize=(15, 4),
-    title=f"Arrow (no extrapolation). Modelo -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
+    title=f"Arrow (no extrapolation). Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
 )
 
 plot_results(
-    y=y_test[model.max_lag :],
-    yhat=yhat[model.max_lag :],
+    y=y_test[n:],
+    yhat=yhat,
     n=300,
     figsize=(15, 4),
-    title=f"Simulação Free Run. Modelo -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
+    title=f"Free Run simulation. Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
 )
 ```
 
-    0.05187400789723806 2.2293393254015776
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-09.png?raw=true)
 
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-10.png?raw=true)
 
-    
-![png](../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_9_1.png)
-    
+Os resultados atuais em simulação livre, avaliados após a janela de
+inicialização de 50 amostras fornecida pelo carregador, são:
 
+| Conjunto de teste | RMSE | NRMSE |
+| --- | ---: | ---: |
+| Multisine | 0.007727 | 0.142302 |
+| Arrow, completo | 0.004148 | 0.077565 |
+| Arrow, sem extrapolação | 0.002229 | 0.051822 |
 
-
-    
-![png](../../en/user-guide/tutorials/silver-box-system_files/silver-box-system_9_2.png)
+O teste arrow completo é mais difícil que a versão sem extrapolação. A métrica
+exclui a janela de inicialização uma única vez; ela não remove
+`model.max_lag` pela segunda vez. Os resultados externos de modelos de estado
+profundos continuam sendo uma referência útil, mas não são comparados
+diretamente com esta tabela sem antes igualar divisão dos dados, inicialização e
+normalização.
 
 ## F-16 Ground Vibration Test Benchmark
 
-**Nota**: Os exemplos a seguir não tentam replicar os resultados dos manuscritos citados. Mesmo os parâmetros do modelo como ylag e xlag e o tamanho dos dados de identificação e validação não são os mesmos dos artigos citados. Além disso, ajuste de taxa de amostragem e outras preparações de dados diferentes não são tratados aqui.
+Os exemplos a seguir demonstram a aplicação do SysIdentPy a um conjunto de
+dados real. Eles não procuram reproduzir os resultados dos manuscritos citados.
+Parâmetros como `ylag` e `xlag`, assim como o tamanho dos conjuntos de
+identificação e validação, diferem dos estudos originais. Ajustes relacionados à
+taxa de amostragem e outras etapas de preparação dos dados também não são
+tratados neste exemplo.
 
-## Referência
+**Para uma referência abrangente sobre o benchmark F-16 Ground Vibration Test,
+consulte o [site Nonlinear Benchmark](http://www.nonlinearbenchmark.org/#F16).**
 
-**O texto a seguir foi retirado do link http://www.nonlinearbenchmark.org/#F16**.
+> **Nota:** este exemplo é uma demonstração preliminar do desempenho do
+> SysIdentPy no conjunto F-16. Uma análise mais detalhada será apresentada em
+> uma publicação futura. O site do benchmark reúne recursos e referências úteis
+> sobre identificação de sistemas e aprendizado de máquina, e o leitor é
+> encorajado a consultá-los.
 
-**Nota**: O leitor é encaminhado ao site mencionado para uma referência completa sobre o experimento. Por enquanto, este notebook é apenas um exemplo simples do desempenho do SysIdentPy em um conjunto de dados do mundo real. Um estudo mais detalhado deste sistema será publicado no futuro.
+### Visão geral do benchmark
 
-> O benchmark do Ground Vibration Test da F-16 apresenta um sistema de alta ordem com não linearidades de folga e atrito na interface de montagem das cargas úteis.
+O F-16 Ground Vibration Test é um experimento relevante em identificação de
+sistemas e dinâmica não linear. Trata-se de um sistema de alta ordem com
+não linearidades de folga e atrito nas interfaces de montagem das cargas úteis
+de uma aeronave F-16 em escala real.
 
-> Os dados experimentais disponibilizados aos participantes do Workshop foram adquiridos em uma aeronave F-16 em escala real na ocasião do Siemens LMS Ground Vibration Testing Master Class, realizado em setembro de 2014 na base militar de Saffraanberg, Sint-Truiden, Bélgica.
+**Detalhes do experimento:**
 
-> Durante a campanha de testes, duas cargas úteis simuladas foram montadas nas pontas das asas para simular as propriedades de massa e inércia de dispositivos reais que tipicamente equipam uma F-16 em voo. A estrutura da aeronave foi instrumentada com acelerômetros. Um excitador foi fixado sob a asa direita para aplicar sinais de entrada. A fonte dominante de não linearidade nas dinâmicas estruturais era esperada originar das interfaces de montagem das duas cargas úteis. Essas interfaces consistem em elementos de conexão em forma de T no lado da carga útil, deslizados através de um trilho fixado ao lado da asa. Uma investigação preliminar mostrou que a conexão traseira da interface asa direita-carga útil era a fonte predominante de distorções não lineares nas dinâmicas da aeronave e, portanto, é o foco deste estudo de benchmark.
+- **Evento:** Siemens LMS Ground Vibration Testing Master Class
+- **Data:** setembro de 2014
+- **Local:** base militar de Saffraanberg, Sint-Truiden, Bélgica
 
-> Uma formulação detalhada do problema de identificação pode ser encontrada aqui. Todos os arquivos fornecidos e informações sobre o sistema de benchmark da aeronave F-16 estão disponíveis para download aqui. Este arquivo zip contém uma descrição detalhada do sistema, os conjuntos de dados de estimação e teste, e algumas fotos da configuração. Os dados estão disponíveis nos formatos de arquivo .csv e .mat.
+Durante o ensaio, duas cargas úteis simuladas foram montadas nas pontas das asas
+para representar a massa e a inércia de dispositivos reais normalmente
+instalados na aeronave durante o voo. A estrutura foi instrumentada com
+acelerômetros, e um excitador sob a asa direita aplicou os sinais de entrada. A
+principal fonte de não linearidade foi associada às interfaces de montagem das
+cargas úteis, em particular à interface entre a asa direita e a carga útil, que
+apresentou distorções não lineares significativas.
 
-> Por favor, cite o benchmark F16 como:
+**Dados e referências:**
 
-> J.P. Noël and M. Schoukens, F-16 aircraft benchmark based on ground vibration test data, 2017 Workshop on Nonlinear System Identification Benchmarks, pp. 19-23, Brussels, Belgium, April 24-26, 2017.
+- **Disponibilidade dos dados:** o conjunto inclui a descrição detalhada do
+  sistema, dados de estimação e teste e imagens da montagem, disponibilizados
+  nos formatos `.csv` e `.mat`.
+- **Referência:** J.P. Noël e M. Schoukens, “F-16 aircraft benchmark based on
+  ground vibration test data”, 2017 Workshop on Nonlinear System Identification
+  Benchmarks, pp. 19–23, Bruxelas, Bélgica, 24–26 de abril de 2017.
 
+O objetivo é ilustrar como o SysIdentPy pode ser aplicado a um conjunto de dados
+dessa complexidade. Para uma análise completa do benchmark e de sua metodologia,
+consulte os recursos e as referências indicados.
+
+### Pacotes necessários e versões
+
+Este estudo de caso foi verificado com o SysIdentPy 0.9.0 no Python 3.12.12 e
+`pandas==2.3.3`. Instale explicitamente o checkout do repositório e o pandas:
 
 ```bash
-pip install sysidentpy
+python -m pip install -e .
+python -m pip install pandas==2.3.3
 ```
+
+Os dados são carregados por uma URL imutável do `sysidentpy-data`. Os resultados
+numéricos devem ser recalculados se o ambiente ou a configuração do modelo forem
+alterados.
+
+### Configuração do SysIdentPy
 
 
 ```python
@@ -2601,10 +2583,11 @@ from sysidentpy.residues.residues_correlation import (
 )
 ```
 
+## Procedimento
 
 ```python
 f_16 = pd.read_csv(
-    r"https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/f_16_vibration_test/f-16.txt",
+    r"https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/4085901293ba5ed5674bb2911ef4d1fa20f3438d/datasets/f_16_vibration_test/f-16.txt",
     header=None,
     names=["x1", "x2", "y"],
 )
@@ -2616,31 +2599,12 @@ f_16.shape
 ```
 
 
-
-
-    (32768, 3)
-
-
-
-## Visualizando os Dados
-
-
 ```python
 f_16[["x1", "x2"]][0:500].plot(figsize=(12, 8))
 ```
 
 
-
-
-    <Axes: >
-
-
-
-
-    
-![png](../../en/user-guide/tutorials/f-16-aircraft_files/f-16-aircraft_7_1.png)
-    
-
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/f-16-aircraft-01.png?raw=true)
 
 
 ```python
@@ -2648,20 +2612,10 @@ f_16["y"][0:2000].plot(figsize=(12, 8))
 ```
 
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/f-16-aircraft-02.png?raw=true)
 
 
-    <Axes: >
-
-
-
-
-    
-![png](../../en/user-guide/tutorials/f-16-aircraft_files/f-16-aircraft_8_1.png)
-    
-
-
-## Dividindo os Dados
-
+O código a seguir divide o conjunto de dados em partes de treinamento e teste.
 
 ```python
 x1_id, x1_val = f_16["x1"][0:16384].values.reshape(-1, 1), f_16["x1"][
@@ -2678,8 +2632,7 @@ y_id, y_val = f_16["y"][0:16384].values.reshape(-1, 1), f_16["y"][
 ].values.reshape(-1, 1)
 ```
 
-## Configurando os Lags de Entrada
-
+Definiremos os lags das duas entradas como:
 
 ```python
 x1lag = list(range(1, 10))
@@ -2688,14 +2641,7 @@ x2lag
 ```
 
 
-
-
-    [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
-
-
-## Treinamento e Avaliação do Modelo
-
+e construiremos um modelo NARX da seguinte forma:
 
 ```python
 basis_function = Polynomial(degree=1)
@@ -2713,7 +2659,9 @@ model = FROLS(
 
 model.fit(X=x_id, y=y_id)
 y_hat = model.predict(X=x_val, y=y_val)
-rrse = root_relative_squared_error(y_val, y_hat)
+rrse = root_relative_squared_error(
+    y_val[model.max_lag :], y_hat[model.max_lag :]
+)
 print(rrse)
 r = pd.DataFrame(
     results(
@@ -2724,112 +2672,186 @@ r = pd.DataFrame(
         err_precision=8,
         dtype="sci",
     ),
-    columns=["Regressores", "Parâmetros", "ERR"],
+    columns=["Regressors", "Parameters", "ERR"],
 )
 print(r)
 ```
 
-    0.2910089654603829
-       Regressores   Parâmetros             ERR
-    0      y(k-1)   1.8387E+00  9.43378253E-01
-    1      y(k-2)  -1.8938E+00  1.95167599E-02
-    2      y(k-3)   1.3337E+00  1.02432261E-02
-    3      y(k-6)  -1.6038E+00  8.03485985E-03
-    4      y(k-9)   2.6776E-01  9.27874557E-04
-    5     x2(k-7)  -2.2385E+01  3.76837313E-04
-    6     x1(k-1)   8.2709E+00  6.81508210E-04
-    7     x2(k-3)   1.0587E+02  1.57459800E-03
-    8     x1(k-8)  -3.7975E+00  7.35086279E-04
-    9     x2(k-1)   8.5725E+01  4.85358786E-04
-    10     y(k-7)   1.3955E+00  2.77245281E-04
-    11     y(k-5)   1.3219E+00  8.64120037E-04
-    12    y(k-10)  -2.9306E-01  8.51717688E-04
-    13     y(k-4)  -9.5479E-01  7.23623116E-04
-    14     y(k-8)  -7.1309E-01  4.44988077E-04
-    15    y(k-12)  -3.0437E-01  1.49743148E-04
-    16    y(k-11)   4.8602E-01  3.34613282E-04
-    17    y(k-13)  -8.2442E-02  1.43738964E-04
-    18    y(k-15)  -1.6762E-01  1.25546584E-04
-    19    x1(k-2)  -8.9698E+00  9.76699739E-05
-    20    y(k-17)   2.2036E-02  4.55983807E-05
-    21    y(k-14)   2.4900E-01  1.10314107E-04
-    22    y(k-19)  -6.8239E-03  1.99734771E-05
-    23    x2(k-9)  -9.6265E+01  2.98523208E-05
-    24    x2(k-8)   2.2620E+02  2.34402543E-04
-    25    x2(k-2)  -2.3609E+02  1.04172323E-04
-    26    y(k-20)  -5.4663E-02  5.37895336E-05
-    27    x2(k-6)  -2.3651E+02  2.11392628E-05
-    28    x2(k-4)   1.7378E+02  2.18396315E-05
-    29    x1(k-7)   4.9862E+00  2.03811842E-05
+Depois de excluir as 20 amostras iniciais correspondentes aos lags do modelo, o
+RRSE em simulação livre é $0.291070$. O mesmo trecho alinhado é usado na
+autocorrelação dos resíduos e na correlação cruzada com a primeira entrada.
 
+| Regressores | Parâmetros | ERR |
+| --- | ---: | ---: |
+| y(k-1) | 1.8387E+00 | 9.43378253E-01 |
+| y(k-2) | -1.8938E+00 | 1.95167599E-02 |
+| y(k-3) | 1.3337E+00 | 1.02432261E-02 |
+| y(k-6) | -1.6038E+00 | 8.03485985E-03 |
+| y(k-9) | 2.6776E-01 | 9.27874557E-04 |
+| x2(k-7) | -2.2385E+01 | 3.76837313E-04 |
+| x1(k-1) | 8.2709E+00 | 6.81508210E-04 |
+| x2(k-3) | 1.0587E+02 | 1.57459800E-03 |
+| x1(k-8) | -3.7975E+00 | 7.35086279E-04 |
+| x2(k-1) | 8.5725E+01 | 4.85358786E-04 |
+| y(k-7) | 1.3955E+00 | 2.77245281E-04 |
+| y(k-5) | 1.3219E+00 | 8.64120037E-04 |
+| y(k-10) | -2.9306E-01 | 8.51717688E-04 |
+| y(k-4) | -9.5479E-01 | 7.23623116E-04 |
+| y(k-8) | -7.1309E-01 | 4.44988077E-04 |
+| y(k-12) | -3.0437E-01 | 1.49743148E-04 |
+| y(k-11) | 4.8602E-01 | 3.34613282E-04 |
+| y(k-13) | -8.2442E-02 | 1.43738964E-04 |
+| y(k-15) | -1.6762E-01 | 1.25546584E-04 |
+| x1(k-2) | -8.9698E+00 | 9.76699739E-05 |
+| y(k-17) | 2.2036E-02 | 4.55983807E-05 |
+| y(k-14) | 2.4900E-01 | 1.10314107E-04 |
+| y(k-19) | -6.8239E-03 | 1.99734771E-05 |
+| x2(k-9) | -9.6265E+01 | 2.98523208E-05 |
+| x2(k-8) | 2.2620E+02 | 2.34402543E-04 |
+| x2(k-2) | -2.3609E+02 | 1.04172323E-04 |
+| y(k-20) | -5.4663E-02 | 5.37895336E-05 |
+| x2(k-6) | -2.3651E+02 | 2.11392628E-05 |
+| x2(k-4) | 1.7378E+02 | 2.18396315E-05 |
+| x1(k-7) | 4.9862E+00 | 2.03811842E-05 |
 
 
 ```python
-plot_results(y=y_val, yhat=y_hat, n=1000)
-ee = compute_residues_autocorrelation(y_val, y_hat)
-plot_residues_correlation(data=ee, title="Resíduos", ylabel="$e^2$")
-x1e = compute_cross_correlation(y_val, y_hat, x_val[:, 0])
-plot_residues_correlation(data=x1e, title="Resíduos", ylabel="$x_1e$")
+plot_results(
+    y=y_val[model.max_lag :], yhat=y_hat[model.max_lag :], n=1000
+)
+ee = compute_residues_autocorrelation(
+    y_val[model.max_lag :], y_hat[model.max_lag :]
+)
+plot_residues_correlation(data=ee, title="Residues", ylabel="$e^2$")
+x1e = compute_cross_correlation(
+    y_val[model.max_lag :],
+    y_hat[model.max_lag :],
+    x_val[model.max_lag :, 0],
+)
+plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 ```
 
 
-    
-![png](../../en/user-guide/tutorials/f-16-aircraft_files/f-16-aircraft_15_0.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/f-16-aircraft-03.png?raw=true)
 
 
-
-    
-![png](../../en/user-guide/tutorials/f-16-aircraft_files/f-16-aircraft_15_1.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/f-16-aircraft-04.png?raw=true)
 
 
-
-    
-![png](../../en/user-guide/tutorials/f-16-aircraft_files/f-16-aircraft_15_2.png)
-    
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/f-16-aircraft-05.png?raw=true)
 
 
-## Gráfico de Critérios de Informação
+### Critério de informação
+
+O traçado do critério de informação usado durante a seleção de ordem é mostrado
+abaixo. Ele complementa a tabela de regressores selecionados sem alterar o
+protocolo de validação.
 
 
 ```python
 xaxis = np.arange(1, model.n_info_values + 1)
 plt.plot(xaxis, model.info_values)
 plt.xlabel("n_terms")
-plt.ylabel("Critério de Informação")
+plt.ylabel("Information Criteria")
 
-# Você pode usar o gráfico abaixo para escolher o "n_terms" e executar o modelo novamente com o valor mais adequado de termos.
+# You can use the plot below to choose the "n_terms" and run the model again with the most adequate value of terms.
 ```
 
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/f-16-aircraft-06.png?raw=true)
 
-
-    Text(0, 0.5, 'Critério de Informação')
-
-
-
-
-    
-![png](../../en/user-guide/tutorials/f-16-aircraft_files/f-16-aircraft_17_1.png)
+Este é um estudo ilustrativo com o SysIdentPy, não uma submissão oficial ao
+benchmark F-16. O registro curado de 32.768 amostras e sua divisão em duas
+metades não reproduzem todas as divisões distribuídas pelo carregador oficial;
+por isso, o RRSE não deve ser comparado diretamente às tabelas oficiais do
+benchmark.
 
 ## Previsão Fotovoltaica
 
-## Nota
+Neste estudo de caso, avaliamos a capacidade do SysIdentPy de prever dados de
+irradiância solar, que podem servir como aproximação para a produção solar
+fotovoltaica (PV). O objetivo é demonstrar que o SysIdentPy oferece uma
+alternativa competitiva para modelagem de séries temporais, sem afirmar que uma
+biblioteca é superior às demais.
 
-O exemplo a seguir **não** tem a intenção de afirmar que uma biblioteca é melhor que outra. O foco principal destes exemplos é mostrar que o SysIdentPy pode ser uma boa alternativa para pessoas que desejam modelar séries temporais.
+### Visão geral do conjunto de dados
 
-Compararemos os resultados obtidos com a biblioteca **neural prophet**.
+O conjunto usado nesta análise contém medições de irradiância solar, uma
+variável essencial para prever a produção fotovoltaica. A irradiância solar é a
+potência da radiação recebida por unidade de área na superfície terrestre,
+normalmente medida em watts por metro quadrado (W/m²). Previsões precisas dessa
+grandeza ajudam a otimizar a produção de energia e a administrar a estabilidade
+da rede elétrica.
 
-Por questão de brevidade, do **SysIdentPy** apenas os métodos **MetaMSS**, **AOLS** e **FROLS** (com função base polinomial) serão utilizados. Consulte a documentação do SysIdentPy para conhecer outras formas de modelagem com a biblioteca.
+**Detalhes do conjunto de dados:**
 
+- **Fonte:** o conjunto pode ser obtido no repositório do NeuralProphet no
+  GitHub.
+- **Período:** os dados cobrem um intervalo contínuo com medições frequentes.
+- **Variáveis:** valores de irradiância solar ao longo do tempo, usados para
+  modelar e prever níveis futuros de irradiância.
 
-Compararemos um previsor de 1 passo à frente em dados de irradiância solar (que pode ser um proxy para produção fotovoltaica). A configuração do modelo neuralprophet foi retirada da documentação do neuralprophet (https://neuralprophet.com/html/example_links/energy_data_example.html)
+### Comparação com outras bibliotecas
 
-O treinamento ocorrerá em 80% dos dados, reservando os últimos 20% para validação.
+Para avaliar o SysIdentPy, compararemos seu desempenho com o da biblioteca
+NeuralProphet. O NeuralProphet é capaz de representar padrões sazonais e
+tendências complexas, servindo como uma referência adequada para esta tarefa.
 
-Nota: os dados usados neste exemplo podem ser encontrados no github do neuralprophet.
+Usaremos os seguintes métodos:
 
+- **NeuralProphet:**
+  - A configuração será baseada nos exemplos da [documentação do
+    NeuralProphet](https://neuralprophet.com/html/example_links/energy_data_example.html),
+    que apresenta recursos para capturar padrões temporais e fazer previsões.
+- **SysIdentPy:**
+  - **MetaMSS (Meta-heuristic Model Structure Selection):** usa algoritmos
+    meta-heurísticos para determinar a estrutura do modelo.
+  - **AOLS (Accelerated Orthogonal Least Squares):** seleciona os regressores
+    relevantes do modelo.
+  - **FROLS (Forward Regression with Orthogonal Least Squares, com função de
+    base polinomial):** seleciona a estrutura por regressão ortogonal e pode
+    incorporar termos polinomiais.
+
+### Objetivo
+
+O objetivo é comparar os métodos de previsão do SysIdentPy com o
+NeuralProphet, com foco em:
+
+- **Predição de um passo à frente:** avaliar a capacidade dos modelos de prever
+  o próximo instante a partir dos dados históricos.
+
+Os modelos são treinados com 80% do conjunto, e os 20% finais são reservados à
+validação. Assim, o desempenho é medido em dados que não participaram do
+treinamento.
+
+### Pacotes necessários e versões
+
+Este estudo de caso foi verificado com o SysIdentPy 0.9.0 no Python 3.12.12,
+`neuralprophet==0.9.0`, `torch==2.5.1`, `pandas==2.3.3` e
+`scikit-learn==1.7.2`. Instale explicitamente as dependências opcionais da
+comparação:
+
+```bash
+python -m pip install -e .
+python -m pip install neuralprophet==0.9.0 torch==2.5.1
+python -m pip install pandas==2.3.3 scikit-learn==1.7.2
+```
+
+O conjunto de dados é carregado por uma URL imutável do `sysidentpy-data`. Os
+modelos aleatórios usam a semente 42.
+
+### Procedimento
+
+1. **Preparação dos dados:** carregar e preparar os dados de irradiância solar.
+2. **Treinamento dos modelos:** aplicar os métodos escolhidos do SysIdentPy e o
+   NeuralProphet aos dados de treinamento.
+3. **Avaliação:** medir a precisão das previsões no conjunto de validação.
+
+Ao comparar essas abordagens, procuramos mostrar o SysIdentPy como uma opção
+viável para previsão de séries temporais e destacar sua utilidade em aplicações
+práticas.
+
+Vamos começar importando as bibliotecas necessárias e preparando o ambiente.
 
 ```python
 from warnings import simplefilter
@@ -2847,19 +2869,68 @@ from neuralprophet import NeuralProphet
 from neuralprophet import set_random_seed
 
 simplefilter("ignore", FutureWarning)
-np.seterr(all="ignore")
-
-%matplotlib inline
-
 loss = mean_squared_error
+
+
+def require_finite(name, values):
+    if not np.isfinite(np.asarray(values)).all():
+        raise FloatingPointError(f"{name} contains non-finite values.")
 ```
 
-## FROLS
+### Neural Prophet
 
+```python
+set_random_seed(42)
+
+raw = pd.read_csv(
+    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/"
+    "4085901293ba5ed5674bb2911ef4d1fa20f3438d/"
+    "datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
+)
+df = pd.DataFrame(
+    {
+        "ds": pd.date_range("2015-01-01 01:00:00", freq="h", periods=8760),
+        "y": raw.iloc[:, 0].to_numpy(),
+    }
+)
+
+m = NeuralProphet(
+    n_lags=24, ar_reg=0.5, epochs=100, learning_rate=0.01
+)
+split = 7008
+df_train, df_val = df.iloc[:split], df.iloc[split:]
+m.fit(df_train, freq="h", progress=None)
+prediction_df = pd.concat([df_train.tail(m.config_ar.n_lags), df_val])
+forecast = m.predict(prediction_df)
+valid = (forecast["ds"] >= df_val["ds"].min()) & np.isfinite(
+    forecast["yhat1"].to_numpy()
+)
+if valid.sum() != len(df_val):
+    raise RuntimeError("NeuralProphet did not predict every validation sample.")
+require_finite("NeuralProphet predictions", forecast.loc[valid, "yhat1"])
+neuralprophet_loss = loss(
+    forecast.loc[valid, "y"].to_numpy(),
+    forecast.loc[valid, "yhat1"].to_numpy(),
+)
+print(neuralprophet_loss)
+```
+
+```python
+plt.plot(forecast["y"][-104:], "ro-")
+plt.plot(forecast["yhat1"][-104:], "k*-")
+```
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/PV-forecasting-benchmark-04.png?raw=true)
+
+A referência NeuralProphet produz $MSE=2473.5397$ nos 1.752 instantes de
+validação. Vamos verificar como os métodos do SysIdentPy se comportam no mesmo
+intervalo.
+
+### FROLS
 
 ```python
 raw = pd.read_csv(
-    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
+    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/4085901293ba5ed5674bb2911ef4d1fa20f3438d/datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
 )
 df = pd.DataFrame()
 df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=8760)
@@ -2890,31 +2961,26 @@ x_test = np.concatenate([x_train[-sysidentpy.max_lag :], x_test])
 y_test = np.concatenate([y_train[-sysidentpy.max_lag :], y_test])
 
 yhat = sysidentpy.predict(X=x_test, y=y_test, steps_ahead=1)
+require_finite("FROLS predictions", yhat[sysidentpy.max_lag :])
 sysidentpy_loss = loss(
-    pd.Series(y_test.flatten()[sysidentpy.max_lag :]),
-    pd.Series(yhat.flatten()[sysidentpy.max_lag :]),
+    y_test[sysidentpy.max_lag :],
+    yhat[sysidentpy.max_lag :],
 )
 print(sysidentpy_loss)
 
 plot_results(y=y_test[-104:], yhat=yhat[-104:])
 ```
 
-    2204.333646698544
+O resultado do FROLS é $MSE=2204.3336$.
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/PV-forecasting-benchmark-01.png?raw=true)
 
-
-    
-![png](../../en/user-guide/tutorials/PV-forecasting-benchmark_files/PV-forecasting-benchmark_5_1.png)
-    
-
-
-## MetaMSS
-
+### MetaMSS
 
 ```python
 set_random_seed(42)
 raw = pd.read_csv(
-    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
+    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/4085901293ba5ed5674bb2911ef4d1fa20f3438d/datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
 )
 df = pd.DataFrame()
 df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=8760)
@@ -2948,31 +3014,27 @@ x_test = np.concatenate([x_train[-sysidentpy_metamss.max_lag :], x_test])
 y_test = np.concatenate([y_train[-sysidentpy_metamss.max_lag :], y_test])
 
 yhat = sysidentpy_metamss.predict(X=x_test, y=y_test, steps_ahead=1)
+require_finite("MetaMSS predictions", yhat[sysidentpy_metamss.max_lag :])
 metamss_loss = loss(
-    pd.Series(y_test.flatten()[sysidentpy_metamss.max_lag :]),
-    pd.Series(yhat.flatten()[sysidentpy_metamss.max_lag :]),
+    y_test[sysidentpy_metamss.max_lag :],
+    yhat[sysidentpy_metamss.max_lag :],
 )
 print(metamss_loss)
 
 plot_results(y=y_test[-104:], yhat=yhat[-104:])
 ```
 
-    2157.7700127350877
+O MetaMSS seleciona o modelo com o menor erro desta comparação, com
+$MSE=2154.2684$.
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/PV-forecasting-benchmark-02.png?raw=true)
 
-
-    
-![png](../../en/user-guide/tutorials/PV-forecasting-benchmark_files/PV-forecasting-benchmark_7_1.png)
-    
-
-
-## AOLS
-
+### AOLS
 
 ```python
 set_random_seed(42)
 raw = pd.read_csv(
-    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
+    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/4085901293ba5ed5674bb2911ef4d1fa20f3438d/datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
 )
 df = pd.DataFrame()
 df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=8760)
@@ -2995,9 +3057,10 @@ x_test = np.concatenate([x_train[-sysidentpy_AOLS.max_lag :], x_test])
 y_test = np.concatenate([y_train[-sysidentpy_AOLS.max_lag :], y_test])
 
 yhat = sysidentpy_AOLS.predict(X=x_test, y=y_test, steps_ahead=1)
+require_finite("AOLS predictions", yhat[sysidentpy_AOLS.max_lag :])
 aols_loss = loss(
-    pd.Series(y_test.flatten()[sysidentpy_AOLS.max_lag :]),
-    pd.Series(yhat.flatten()[sysidentpy_AOLS.max_lag :]),
+    y_test[sysidentpy_AOLS.max_lag :],
+    yhat[sysidentpy_AOLS.max_lag :],
 )
 print(aols_loss)
 
@@ -3005,72 +3068,22 @@ print(aols_loss)
 plot_results(y=y_test[-104:], yhat=yhat[-104:])
 ```
 
-    2361.561682547365
+O resultado do AOLS é $MSE=2361.5617$.
 
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/PV-forecasting-benchmark-03.png?raw=true)
 
+A comparação reproduzida é, portanto:
 
-    
-![png](../../en/user-guide/tutorials/PV-forecasting-benchmark_files/PV-forecasting-benchmark_9_1.png)
-    
+| Método | MSE de um passo à frente |
+| --- | ---: |
+| MetaMSS | 2154.2684 |
+| FROLS | 2204.3336 |
+| AOLS | 2361.5617 |
+| NeuralProphet | 2473.5397 |
 
-
-## Neural Prophet
-
-
-```python
-set_random_seed(42)
-
-raw = pd.read_csv(
-    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/refs/heads/main/datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
-)
-df = pd.DataFrame()
-df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=8760)
-df["y"] = raw.iloc[:, 0].values
-
-m = NeuralProphet(
-    n_lags=24,
-    ar_sparsity=0.5,
-    # num_hidden_layers = 2,
-    # d_hidden=20,
-)
-metrics = m.fit(df, freq="H", valid_p=0.2)
-
-df_train, df_val = m.split_df(df, valid_p=0.2)
-m.test(df_val)
-
-future = m.make_future_dataframe(df_val, n_historic_predictions=True)
-forecast = m.predict(future)
-# fig = m.plot(forecast)
-print(loss(forecast["y"][24:-1], forecast["yhat1"][24:-1]))
-```
-
-    WARNING: nprophet - fit: Parts of code may break if using other than daily data.
-    INFO: nprophet.utils - set_auto_seasonalities: Disabling yearly seasonality. Run NeuralProphet with yearly_seasonality=True to override this.
-    INFO: nprophet.config - set_auto_batch_epoch: Auto-set batch_size to 32
-    INFO: nprophet.config - set_auto_batch_epoch: Auto-set epochs to 7
-     87%|████████▋ | 87/100 [00:00<00:00, 644.82it/s]
-    INFO: nprophet - _lr_range_test: learning rate range test found optimal lr: 1.23E-01
-    Epoch[7/7]: 100%|██████████| 7/7 [00:02<00:00,  2.58it/s, SmoothL1Loss=0.00415, MAE=58.8, RegLoss=0.0112]
-    INFO: nprophet - _evaluate: Validation metrics:    SmoothL1Loss    MAE
-    1         0.003 48.746
-
-
-    4642.234763049609
-
-
-
-```python
-plt.plot(forecast["y"][-104:], "ro-")
-plt.plot(forecast["yhat1"][-104:], "k*-")
-```
-
-
-
-
-    [<matplotlib.lines.Line2D at 0x2618e76ebe0>]
-
-
-
-
-    
-![png](../../en/user-guide/tutorials/PV-forecasting-benchmark_files/PV-forecasting-benchmark_12_1.png)
+Os vetores de validação do SysIdentPy recebem como prefixo as 24 observações
+finais do treinamento, e a métrica exclui esse prefixo. O NeuralProphet recebe
+as mesmas 24 observações como contexto, enquanto seu MSE é restrito aos
+instantes de validação. Portanto, todos os valores cobrem o mesmo intervalo. O
+protocolo de um passo à frente mede a predição local com acesso à saída medida
+mais recente a cada passo; ele não demonstra estabilidade em simulação livre.

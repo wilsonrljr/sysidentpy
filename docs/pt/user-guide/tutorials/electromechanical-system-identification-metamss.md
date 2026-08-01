@@ -13,6 +13,7 @@ Exemplo criado por Wilson Rocha Lacerda Junior
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
 from sysidentpy.model_structure_selection import MetaMSS, FROLS
 from sysidentpy.metrics import root_relative_squared_error
 from sysidentpy.basis_function import Polynomial
@@ -27,8 +28,12 @@ from sysidentpy.residues.residues_correlation import (
 
 
 ```python
-df1 = pd.read_csv("./datasets/x_cc.csv")
-df2 = pd.read_csv("./datasets/y_cc.csv")
+data_url = (
+    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/"
+    "4085901293ba5ed5674bb2911ef4d1fa20f3438d/datasets/generator/"
+)
+df1 = pd.read_csv(f"{data_url}x_cc.csv", header=None)
+df2 = pd.read_csv(f"{data_url}y_cc.csv", header=None)
 
 df2[5000:80000].plot(figsize=(10, 4))
 ```
@@ -58,20 +63,30 @@ df1.iloc[::500].values.shape
 
 
 
-Decimaremos os dados usando d=500 neste exemplo.
-Além disso, separamos os dados do MetaMSS para usar a mesma quantidade de amostras na validação de predição. Como o MetaMSS precisa de dados de treino e teste para otimizar os parâmetros do modelo, neste caso, usaremos 400 amostras para treinar em vez de 500 amostras usadas para os outros modelos.
+Decimamos os dados usando $d=500$ e dividimos as 1.000 amostras resultantes em
+conjuntos de identificação e validação de mesmo tamanho. A padronização da
+entrada e da saída é ajustada somente no conjunto de identificação; em seguida,
+as transformações ajustadas são aplicadas aos dados de validação, evitando
+vazamento de informação.
 
 
 ```python
-# decimaremos os dados usando d=500 neste exemplo
+# Decimamos os dados usando d=500 neste exemplo.
 x_train, x_test = np.split(df1.iloc[::500].values, 2)
 y_train, y_test = np.split(df2.iloc[::500].values, 2)
+
+x_scaler = StandardScaler()
+y_scaler = StandardScaler()
+x_train_scaled = x_scaler.fit_transform(x_train)
+x_test_scaled = x_scaler.transform(x_test)
+y_train_scaled = y_scaler.fit_transform(y_train)
+y_test_scaled = y_scaler.transform(y_test)
 ```
 
 
 ```python
 basis_function = Polynomial(degree=2)
-estimator = RecursiveLeastSquares()
+estimator = RecursiveLeastSquares(lam=0.95, delta=0.01)
 
 model = MetaMSS(
     xlag=5,
@@ -83,21 +98,40 @@ model = MetaMSS(
     random_state=42,
 )
 
-model.fit(X=x_train, y=y_train)
+with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+    model.fit(X=x_train_scaled, y=y_train_scaled)
 ```
 
 
-
-
-    <sysidentpy.model_structure_selection.meta_model_structure_selection.MetaMSS at 0x229e13e3150>
-
-
+A busca pode avaliar candidatos cujas recursões são numericamente inválidas. O
+`np.errstate` silencia apenas esses avisos numéricos esperados; as previsões do
+modelo selecionado são verificadas explicitamente antes da avaliação.
 
 
 ```python
-yhat = model.predict(X=x_test, y=y_test, steps_ahead=None)
-rrse = root_relative_squared_error(y_test[model.max_lag :, :], yhat[model.max_lag :, :])
-print(rrse)
+yhat_free_scaled = model.predict(
+    X=x_test_scaled, y=y_test_scaled, steps_ahead=None
+)
+yhat_one_step_scaled = model.predict(
+    X=x_test_scaled, y=y_test_scaled, steps_ahead=1
+)
+
+yhat_free = y_scaler.inverse_transform(yhat_free_scaled)
+yhat_one_step = y_scaler.inverse_transform(yhat_one_step_scaled)
+
+if not (np.isfinite(yhat_free).all() and np.isfinite(yhat_one_step).all()):
+    raise RuntimeError("The selected model produced a non-finite prediction.")
+
+start = model.max_lag
+y_eval = y_test[start:]
+yhat_free_eval = yhat_free[start:]
+yhat_one_step_eval = yhat_one_step[start:]
+x_eval = x_test[start:]
+
+rrse_free = root_relative_squared_error(y_eval, yhat_free_eval)
+rrse_one_step = root_relative_squared_error(y_eval, yhat_one_step_eval)
+print(f"RRSE em simulação livre: {rrse_free:.6f}")
+print(f"RRSE de um passo à frente: {rrse_one_step:.6f}")
 
 r = pd.DataFrame(
     results(
@@ -112,40 +146,55 @@ r = pd.DataFrame(
 )
 print(r)
 
-plot_results(y=y_test, yhat=yhat, n=1000)
-ee = compute_residues_autocorrelation(y_test, yhat)
-plot_residues_correlation(data=ee, title="Resíduos", ylabel="$e^2$")
-x1e = compute_cross_correlation(y_test, yhat, x_test)
-plot_residues_correlation(data=x1e, title="Resíduos", ylabel="$x_1e$")
+plot_results(
+    y=y_eval,
+    yhat=yhat_free_eval,
+    n=1000,
+    title=f"Free run simulation — RRSE {rrse_free:.6f}",
+)
+ee = compute_residues_autocorrelation(y_eval, yhat_free_eval)
+plot_residues_correlation(data=ee, title="Residues", ylabel="$e^2$")
+x1e = compute_cross_correlation(y_eval, yhat_free_eval, x_eval)
+plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 ```
 
-    0.035919583498004094
+    RRSE em simulação livre: 0.031354
+    RRSE de um passo à frente: 0.022595
             Regressores   Parâmetros             ERR
-    0                1  -6.1606E+02  0.00000000E+00
-    1           y(k-1)   1.3117E+00  0.00000000E+00
-    2           y(k-2)  -3.0579E-01  0.00000000E+00
-    3          x1(k-1)   5.7920E+02  0.00000000E+00
-    4          x1(k-3)  -1.8750E-01  0.00000000E+00
-    5    x1(k-1)y(k-1)  -1.7305E-01  0.00000000E+00
-    6    x1(k-2)y(k-1)  -1.1660E-01  0.00000000E+00
-    7    x1(k-1)y(k-2)   1.2182E-01  0.00000000E+00
-    8    x1(k-2)y(k-2)   3.4112E-02  0.00000000E+00
-    9    x1(k-1)y(k-3)  -4.8970E-02  0.00000000E+00
-    10   x1(k-1)y(k-4)   1.3846E-02  0.00000000E+00
-    11       x1(k-2)^2   1.0290E+02  0.00000000E+00
-    12  x1(k-3)x1(k-2)   8.6745E-01  0.00000000E+00
-    13  x1(k-4)x1(k-2)   3.4336E-01  0.00000000E+00
-    14  x1(k-5)x1(k-2)   2.7815E-01  0.00000000E+00
-    15       x1(k-3)^2  -9.3749E-01  0.00000000E+00
-    16  x1(k-4)x1(k-3)   6.1039E-01  0.00000000E+00
-    17  x1(k-5)x1(k-3)   3.9361E-02  0.00000000E+00
-    18       x1(k-4)^2  -4.6335E-01  0.00000000E+00
-    19  x1(k-5)x1(k-4)  -9.5668E-02  0.00000000E+00
-    20       x1(k-5)^2   3.6922E-01  0.00000000E+00
+    0           y(k-1)   7.0968E-01  0.00000000E+00
+    1           y(k-3)  -5.8259E-02  0.00000000E+00
+    2           y(k-4)  -1.0981E-04  0.00000000E+00
+    3          x1(k-1)   3.7458E-01  0.00000000E+00
+    4          x1(k-4)   2.2133E-01  0.00000000E+00
+    5         y(k-1)^2  -2.2259E-02  0.00000000E+00
+    6     y(k-2)y(k-1)   1.3530E-02  0.00000000E+00
+    7     y(k-3)y(k-1)   1.6170E-02  0.00000000E+00
+    8     y(k-4)y(k-1)  -2.0950E-02  0.00000000E+00
+    9     y(k-5)y(k-1)  -5.9322E-03  0.00000000E+00
+    10   x1(k-1)y(k-1)  -4.1207E-01  0.00000000E+00
+    11   x1(k-2)y(k-1)  -1.6460E-01  0.00000000E+00
+    12    y(k-4)y(k-2)   1.0074E-02  0.00000000E+00
+    13    y(k-5)y(k-2)   1.4187E-02  0.00000000E+00
+    14   x1(k-1)y(k-2)   2.8701E-01  0.00000000E+00
+    15   x1(k-3)y(k-2)   3.5765E-03  0.00000000E+00
+    16        y(k-3)^2  -1.2085E-02  0.00000000E+00
+    17    y(k-4)y(k-3)   8.3141E-03  0.00000000E+00
+    18   x1(k-1)y(k-3)  -1.2719E-01  0.00000000E+00
+    19   x1(k-2)y(k-3)   2.9013E-02  0.00000000E+00
+    20   x1(k-4)y(k-3)   9.3360E-03  0.00000000E+00
+    21   x1(k-1)y(k-4)   3.6354E-02  0.00000000E+00
+    22        y(k-5)^2  -3.4384E-03  0.00000000E+00
+    23   x1(k-1)y(k-5)  -1.3772E-03  0.00000000E+00
+    24   x1(k-5)y(k-5)  -1.0137E-03  0.00000000E+00
+    25  x1(k-2)x1(k-1)  -1.1732E-02  0.00000000E+00
+    26  x1(k-5)x1(k-1)   6.8615E-03  0.00000000E+00
+    27       x1(k-2)^2   1.8984E+00  0.00000000E+00
+    28  x1(k-3)x1(k-2)  -8.0513E-03  0.00000000E+00
+    29  x1(k-5)x1(k-2)  -2.0967E-03  0.00000000E+00
+    30       x1(k-4)^2  -1.8366E+00  0.00000000E+00
+    31       x1(k-5)^2  -8.7361E-03  0.00000000E+00
 
 
-
-    
 ![png](../../../en/user-guide/tutorials/electromechanical-system-identification-metamss_files/electromechanical-system-identification-metamss_7_1.png)
     
 
@@ -163,21 +212,32 @@ plot_residues_correlation(data=x1e, title="Resíduos", ylabel="$x_1e$")
 
 
 
+Mantendo a mesma divisão dos dados, os atrasos, a base polinomial, o orçamento da
+busca e a semente, o efeito da padronização e do fator de esquecimento do RLS pode
+ser resumido da seguinte forma:
+
+| Tratamento dos dados | `lam` | RRSE em simulação livre | RRSE de um passo |
+| --- | ---: | ---: | ---: |
+| Sem padronização | 0,98 | 2,184406 | 0,037653 |
+| Padronizado | 0,98 | 0,035944 | 0,021008 |
+| Padronizado | 0,95 | 0,031354 | 0,022595 |
+
+O código acima usa a última configuração. Os dois modos de predição são gerados
+em coordenadas padronizadas, transformados de volta para a escala original da
+saída e avaliados somente após `model.max_lag`. A comparação mostra que o
+pré-processamento e o modo de predição fazem parte do resultado relatado.
+
 ```python
 # Plotando a evolução dos agentes
-plt.plot(model.best_by_iter)
+plt.plot(model.best_by_iter, marker="o")
+plt.title("Optimization evolution")
+plt.xlabel("Iteration")
+plt.ylabel("Best MetaMSS loss")
 model.best_by_iter[-1]
 ```
 
+    0.0019710527
 
-
-
-    0.0017530517788608157
-
-
-
-
-    
 ![png](../../../en/user-guide/tutorials/electromechanical-system-identification-metamss_files/electromechanical-system-identification-metamss_8_1.png)
     
 
@@ -191,7 +251,6 @@ model.best_by_iter[-1]
 
 ```python
 from sklearn.neighbors import KNeighborsRegressor
-from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from catboost import CatBoostRegressor
@@ -213,7 +272,7 @@ estimators = [
     (
         "NARX_DecisionTreeRegressor",
         NARX(
-            base_estimator=DecisionTreeRegressor(),
+            base_estimator=DecisionTreeRegressor(random_state=42),
             xlag=xlag,
             ylag=ylag,
             basis_function=basis_function,
@@ -222,7 +281,9 @@ estimators = [
     (
         "NARX_RandomForestRegressor",
         NARX(
-            base_estimator=RandomForestRegressor(n_estimators=200),
+            base_estimator=RandomForestRegressor(
+                n_estimators=200, random_state=42
+            ),
             xlag=xlag,
             ylag=ylag,
             basis_function=basis_function,
@@ -232,7 +293,11 @@ estimators = [
         "NARX_Catboost",
         NARX(
             base_estimator=CatBoostRegressor(
-                iterations=800, learning_rate=0.1, depth=8
+                iterations=800,
+                learning_rate=0.1,
+                depth=8,
+                random_seed=42,
+                allow_writing_files=False,
             ),
             xlag=xlag,
             ylag=ylag,
@@ -281,27 +346,23 @@ estimators = [
 all_results = {}
 for model_name, modelo in estimators:
     all_results["%s" % model_name] = []
-    modelo.fit(X=x_train, y=y_train)
-    yhat = modelo.predict(X=x_test, y=y_test)
-    if model_name in ["FROLS-Polynomial_NARX", "MetaMSS"]:
-        result = root_relative_squared_error(
-            y_test[modelo.max_lag :], yhat[modelo.max_lag :]
-        )
-    else:
-        result = root_relative_squared_error(y_test, yhat)
+    with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+        modelo.fit(X=x_train_scaled, y=y_train_scaled)
+    yhat_scaled = modelo.predict(X=x_test_scaled, y=y_test_scaled)
+    yhat = y_scaler.inverse_transform(yhat_scaled)
+    start = modelo.max_lag
+    result = root_relative_squared_error(y_test[start:], yhat[start:])
     all_results["%s" % model_name].append(result)
     print(model_name, "%.3f" % np.mean(result))
 ```
 
-    NARX_KNeighborsRegressor 1.158
-    NARX_DecisionTreeRegressor 0.203
-    NARX_RandomForestRegressor 0.146
-    NARX_Catboost 0.120
-    NARX_ARD 0.083
-    FROLS-Polynomial_NARX 0.057
-    MetaMSS 0.036
-
-
+    NARX_KNeighborsRegressor 0.166
+    NARX_DecisionTreeRegressor 0.413
+    NARX_RandomForestRegressor 0.263
+    NARX_Catboost 0.104
+    NARX_ARD 0.074
+    FROLS-Polynomial_NARX 0.080
+    MetaMSS 0.031
 
 ```python
 for model_name, metric in sorted(
@@ -310,10 +371,10 @@ for model_name, metric in sorted(
     print(model_name, np.mean(metric))
 ```
 
-    MetaMSS 0.035919583498004094
-    FROLS-Polynomial_NARX 0.05729765719062527
-    NARX_ARD 0.08265856190495872
-    NARX_Catboost 0.12034851661643597
-    NARX_RandomForestRegressor 0.14557973585496042
-    NARX_DecisionTreeRegressor 0.203057724881072
-    NARX_KNeighborsRegressor 1.157787546845798
+    MetaMSS 0.0313536683
+    NARX_ARD 0.0739274875
+    FROLS-Polynomial_NARX 0.0802556552
+    NARX_Catboost 0.1040535249
+    NARX_KNeighborsRegressor 0.1658751918
+    NARX_RandomForestRegressor 0.2629589141
+    NARX_DecisionTreeRegressor 0.4132172020

@@ -15,15 +15,17 @@ from ._lib._utils._compat import (
     is_torch_namespace,
 )
 from ._lib._utils._compat import device as get_device
-from ._lib._utils._helpers import asarrays, eager_shape
+from ._lib._utils._helpers import asarrays, deprecated, eager_shape
 from ._lib._utils._typing import Array, DType
 
 __all__ = [
     "atleast_nd",
+    "broadcast_shapes",
     "cov",
     "create_diagonal",
     "expand_dims",
     "isclose",
+    "kron",
     "nan_to_num",
     "one_hot",
     "pad",
@@ -79,6 +81,70 @@ def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array
         return getattr(xp, f"atleast_{ndim}d")(x)
 
     return _funcs.atleast_nd(x, ndim=ndim, xp=xp)
+
+
+@deprecated(
+    "`xpx.broadcast_shapes` is deprecated and will be removed in v1.0.0. "
+    "`xp.broadcast_shapes` exists in the standard as of v2025.12."
+)
+def broadcast_shapes(
+    *shapes: tuple[float | None, ...], xp: ModuleType | None = None
+) -> tuple[int | None, ...]:
+    """
+    Compute the shape of the broadcasted arrays.
+
+    .. deprecated:: 0.11.0
+        :func:`broadcast_shapes` is deprecated and will be removed in v1.0.0.
+        :func:`array_api.broadcast_shapes` exists in the standard as of v2025.12.
+
+    Duplicates :func:`numpy.broadcast_shapes`, with additional support for
+    None and NaN sizes.
+
+    Parameters
+    ----------
+    *shapes : tuple[int | None, ...]
+        Shapes of the arrays to broadcast.
+    xp : array_namespace, optional
+        The standard-compatible namespace to use for native delegation.
+        Default: use the array-agnostic implementation.
+
+    Returns
+    -------
+    tuple[int | None, ...]
+        The shape of the broadcasted arrays.
+
+    See Also
+    --------
+    numpy.broadcast_shapes : Equivalent NumPy function.
+    array_api.broadcast_arrays : Function to broadcast actual arrays.
+
+    Notes
+    -----
+    This function accepts the Array API's ``None`` for unknown sizes,
+    as well as Dask's non-standard ``math.nan``.
+    Regardless of input, the output always contains ``None`` for unknown sizes.
+
+    Examples
+    --------
+    >>> import array_api_extra as xpx
+    >>> xpx.broadcast_shapes((2, 3), (2, 1))
+    (2, 3)
+    >>> xpx.broadcast_shapes((4, 2, 3), (2, 1), (1, 3))
+    (4, 2, 3)
+    """
+    if (
+        xp is not None
+        and all(isinstance(size, int) for shape in shapes for size in shape)
+        and (
+            is_numpy_namespace(xp)
+            or is_cupy_namespace(xp)
+            or is_jax_namespace(xp)
+            or is_torch_namespace(xp)
+        )
+    ):
+        return xp.broadcast_shapes(*shapes)
+
+    return _funcs.broadcast_shapes(*shapes)
 
 
 def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
@@ -160,6 +226,7 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
            [[ 46.84      , -17.144     ],
             [-17.144     ,   8.57653333]]], dtype=array_api_strict.float64)
     """
+
     if xp is None:
         xp = array_namespace(m)
 
@@ -237,17 +304,24 @@ def create_diagonal(
     return _funcs.create_diagonal(x, offset=offset, xp=xp)
 
 
+@deprecated(
+    "`xpx.expand_dims` is deprecated and will be removed in v1.0.0. "
+    "`xp.expand_dims` with support for a tuple of ints in `axis` "
+    "exists in the standard as of v2025.12."
+)
 def expand_dims(
     a: Array, /, *, axis: int | tuple[int, ...] = (0,), xp: ModuleType | None = None
 ) -> Array:
     """
     Expand the shape of an array.
 
+    .. deprecated:: 0.11.0
+        :func:`expand_dims` is deprecated and will be removed in v1.0.0.
+        :func:`array_api.expand_dims` with support for a tuple of ints in `axis`
+        exists in the standard as of v2025.12.
+
     Insert (a) new axis/axes that will appear at the position(s) specified by
     `axis` in the expanded array shape.
-
-    This is ``xp.expand_dims`` for `axis` an int *or a tuple of ints*.
-    Roughly equivalent to ``numpy.expand_dims`` for NumPy arrays.
 
     Parameters
     ----------
@@ -415,6 +489,101 @@ def isclose(
         return xp.isclose(a, b, rtol=rtol, atol=atol, equal_nan=equal_nan)
 
     return _funcs.isclose(a, b, rtol=rtol, atol=atol, equal_nan=equal_nan, xp=xp)
+
+
+def kron(
+    a: Array | complex,
+    b: Array | complex,
+    /,
+    *,
+    xp: ModuleType | None = None,
+) -> Array:
+    """
+    Kronecker product of two arrays.
+
+    Computes the Kronecker product, a composite array made of blocks of the
+    second array scaled by the first.
+
+    Equivalent to ``numpy.kron`` for NumPy arrays.
+
+    Parameters
+    ----------
+    a, b : Array | int | float | complex
+        Input arrays or scalars. At least one must be an array.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `a` and `b`. Default: infer.
+
+    Returns
+    -------
+    array
+        The Kronecker product of `a` and `b`.
+
+    Notes
+    -----
+    The function assumes that the number of dimensions of `a` and `b`
+    are the same, if necessary prepending the smallest with ones.
+    If ``a.shape = (r0,r1,..,rN)`` and ``b.shape = (s0,s1,...,sN)``,
+    the Kronecker product has shape ``(r0*s0, r1*s1, ..., rN*SN)``.
+    The elements are products of elements from `a` and `b`, organized
+    explicitly by::
+
+        kron(a,b)[k0,k1,...,kN] = a[i0,i1,...,iN] * b[j0,j1,...,jN]
+
+    where::
+
+        kt = it * st + jt,  t = 0,...,N
+
+    In the common 2-D case (N=1), the block structure can be visualized::
+
+        [[ a[0,0]*b,   a[0,1]*b,  ... , a[0,-1]*b  ],
+         [  ...                              ...   ],
+         [ a[-1,0]*b,  a[-1,1]*b, ... , a[-1,-1]*b ]]
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> xpx.kron(xp.asarray([1, 10, 100]), xp.asarray([5, 6, 7]), xp=xp)
+    Array([  5,   6,   7,  50,  60,  70, 500,
+           600, 700], dtype=array_api_strict.int64)
+
+    >>> xpx.kron(xp.asarray([5, 6, 7]), xp.asarray([1, 10, 100]), xp=xp)
+    Array([  5,  50, 500,   6,  60, 600,   7,
+            70, 700], dtype=array_api_strict.int64)
+
+    >>> xpx.kron(xp.eye(2), xp.ones((2, 2)), xp=xp)
+    Array([[1., 1., 0., 0.],
+           [1., 1., 0., 0.],
+           [0., 0., 1., 1.],
+           [0., 0., 1., 1.]], dtype=array_api_strict.float64)
+
+    >>> a = xp.reshape(xp.arange(100), (2, 5, 2, 5))
+    >>> b = xp.reshape(xp.arange(24), (2, 3, 4))
+    >>> c = xpx.kron(a, b, xp=xp)
+    >>> c.shape
+    (2, 10, 6, 20)
+    >>> I = (1, 3, 0, 2)
+    >>> J = (0, 2, 1)
+    >>> J1 = (0,) + J             # extend to ndim=4
+    >>> S1 = (1,) + b.shape
+    >>> K = tuple(xp.asarray(I) * xp.asarray(S1) + xp.asarray(J1))
+    >>> c[K] == a[I]*b[J]
+    Array(True, dtype=array_api_strict.bool)
+    """
+    if xp is None:
+        xp = array_namespace(a, b)
+
+    a, b = asarrays(a, b, xp=xp)
+
+    if (
+        is_cupy_namespace(xp)
+        or is_jax_namespace(xp)
+        or is_numpy_namespace(xp)
+        or is_torch_namespace(xp)
+    ):
+        return xp.kron(a, b)
+
+    return _funcs.kron(a, b, xp=xp)
 
 
 def nan_to_num(
@@ -646,7 +815,7 @@ def searchsorted(
     Find the indices into a sorted array ``x1`` such that if the elements in ``x2``
     were inserted before the indices, the resulting array would remain sorted.
 
-    The behavior of this function is similar to that of `array_api.searchsorted`,
+    The behavior of this function is similar to that of :func:`array_api.searchsorted`,
     but it relaxes the requirement that `x1` must be one-dimensional.
     This function is vectorized, treating slices along the last axis
     as elements and preceding axes as batch (or "loop") dimensions.
@@ -753,6 +922,7 @@ def setdiff1d(
     >>> xpx.setdiff1d(x1, x2, xp=xp)
     Array([1, 2], dtype=array_api_strict.int64)
     """
+
     if xp is None:
         xp = array_namespace(x1, x2)
 
@@ -837,6 +1007,7 @@ def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
            -8.40918587e-02, -4.92362781e-02,
            -3.89817183e-17], dtype=array_api_strict.float64)
     """
+
     if xp is None:
         xp = array_namespace(x)
 
@@ -1060,8 +1231,8 @@ def isin(
     """
     Determine whether each element in `a` is present in `b`.
 
-    Return a boolean array of the same shape as `a` that is True for elements
-    that are in `b` and False otherwise.
+    This is :func:`array_api.isin`, with additional `assume_unique`
+    and `kind` parameters.
 
     Parameters
     ----------

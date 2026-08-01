@@ -34,9 +34,14 @@ def test_metamss():
         [[1001, 0], [2002, 0], [2001, 1001]]  # y(k-1)  # x1(k-2)  # x1(k-1)y(k-1)
     )
     basis_function = Polynomial(degree=2)
-    x_train, _x_test, y_train, _y_test = get_siso_data(
-        n=1000, colored_noise=False, sigma=0.0001, train_percentage=90
-    )
+    global_rng_state = np.random.get_state()
+    try:
+        np.random.seed(42)
+        x_train, _x_test, y_train, _y_test = get_siso_data(
+            n=1000, colored_noise=False, sigma=0.0001, train_percentage=90
+        )
+    finally:
+        np.random.set_state(global_rng_state)
 
     model = MetaMSS(
         ylag=[1, 2],
@@ -155,3 +160,81 @@ def test_metamss_rejects_array_api_dispatch_with_clear_error():
     with config_context(array_api_dispatch=True):
         with pytest.raises(NotImplementedError, match=r"MetaMSS.*requires NumPy"):
             model.fit(X=xp.asarray(X_train[:10]), y=xp.asarray(y_train[:10]))
+
+
+def test_metamss_same_seed_reproduces_optimization_history():
+    x_train, _x_test, y_train, _y_test = get_siso_data(
+        n=120, colored_noise=False, sigma=0.001, train_percentage=90
+    )
+    configuration = {
+        "ylag": 2,
+        "xlag": 2,
+        "maxiter": 2,
+        "n_agents": 4,
+        "basis_function": Polynomial(degree=2),
+        "random_state": 42,
+        "test_size": 0.2,
+    }
+
+    first = MetaMSS(**configuration).fit(X=x_train, y=y_train)
+    second = MetaMSS(**configuration).fit(X=x_train, y=y_train)
+
+    assert_array_equal(first.final_model, second.final_model)
+    assert_almost_equal(first.best_by_iter, second.best_by_iter)
+    assert_almost_equal(first.mean_by_iter, second.mean_by_iter)
+
+
+def test_metamss_integer_seed_restarts_repeated_fit_on_same_instance():
+    x_train, _x_test, y_train, _y_test = get_siso_data(
+        n=120, colored_noise=False, sigma=0.001, train_percentage=90
+    )
+    model = MetaMSS(
+        ylag=2,
+        xlag=2,
+        maxiter=2,
+        n_agents=4,
+        basis_function=Polynomial(degree=2),
+        random_state=42,
+        test_size=0.2,
+    )
+
+    model.fit(X=x_train, y=y_train)
+    first_model = model.final_model.copy()
+    first_best = np.asarray(model.best_by_iter).copy()
+    first_mean = np.asarray(model.mean_by_iter).copy()
+    first_dimension = model.dimension
+    first_space = model.regressor_code.copy()
+    model.fit(X=x_train, y=y_train)
+
+    assert_array_equal(model.final_model, first_model)
+    assert_array_equal(model.regressor_code, first_space)
+    assert model.dimension == first_dimension
+    assert_almost_equal(model.best_by_iter, first_best)
+    assert_almost_equal(model.mean_by_iter, first_mean)
+
+
+def test_metamss_generator_advances_across_repeated_fit():
+    random_state = np.random.default_rng(42)
+    model = MetaMSS(
+        ylag=2,
+        xlag=2,
+        maxiter=1,
+        n_agents=3,
+        basis_function=Polynomial(degree=2),
+        random_state=random_state,
+        test_size=0.2,
+    )
+    state_before = repr(random_state.bit_generator.state)
+
+    model.fit(X=X_train, y=y_train)
+    state_after_first_fit = repr(random_state.bit_generator.state)
+    model.fit(X=X_train, y=y_train)
+    state_after_second_fit = repr(random_state.bit_generator.state)
+
+    assert state_before != state_after_first_fit
+    assert state_after_first_fit != state_after_second_fit
+
+
+def test_metamss_rejects_zero_probability_of_nonempty_model():
+    with pytest.raises(ValueError, match="requires p_ones > 0"):
+        MetaMSS(p_zeros=1, p_ones=0)

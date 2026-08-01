@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import functools
 import io
 import math
 import pickle
 import types
+import warnings
 from collections.abc import Callable, Generator, Iterable, Iterator
 from functools import wraps
 from types import ModuleType
@@ -28,7 +30,6 @@ from ._compat import (
     is_dask_namespace,
     is_jax_namespace,
     is_numpy_array,
-    is_pydata_sparse_namespace,
     is_torch_namespace,
 )
 from ._typing import Array, Device
@@ -49,15 +50,35 @@ T = TypeVar("T")
 __all__ = [
     "asarrays",
     "capabilities",
+    "deprecated",
     "eager_shape",
     "in1d",
     "is_python_scalar",
     "jax_autojit",
-    "mean",
     "meta_namespace",
     "pickle_flatten",
     "pickle_unflatten",
 ]
+
+
+def deprecated(
+    msg: str, stacklevel: int = 2
+) -> Callable[[Callable[P, T]], Callable[P, T]]:  # numpydoc ignore=PR01,RT01
+    """Deprecate a function by emitting a warning on use."""
+
+    def decorate(func: Callable[P, T]) -> Callable[P, T]:  # numpydoc ignore=GL08
+        @functools.wraps(func)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:  # numpydoc ignore=GL08
+            warnings.warn(
+                msg,
+                category=DeprecationWarning,
+                stacklevel=stacklevel,
+            )
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorate
 
 
 def in1d(
@@ -120,29 +141,6 @@ def in1d(
     if assume_unique:
         return ret[: x1.shape[0]]
     return xp.take(ret, rev_idx, axis=0)
-
-
-def mean(
-    x: Array,
-    /,
-    *,
-    axis: int | tuple[int, ...] | None = None,
-    keepdims: bool = False,
-    xp: ModuleType | None = None,
-) -> Array:  # numpydoc ignore=PR01,RT01
-    """
-    Complex mean, https://github.com/data-apis/array-api/issues/846.
-    """
-    if xp is None:
-        xp = array_namespace(x)
-
-    if xp.isdtype(x.dtype, "complex floating"):
-        x_real = xp.real(x)
-        x_imag = xp.imag(x)
-        mean_real = xp.mean(x_real, axis=axis, keepdims=keepdims)
-        mean_imag = xp.mean(x_imag, axis=axis, keepdims=keepdims)
-        return mean_real + (mean_imag * xp.asarray(1j))
-    return xp.mean(x, axis=axis, keepdims=keepdims)
 
 
 def is_python_scalar(x: object) -> TypeIs[complex]:  # numpydoc ignore=PR01,RT01
@@ -332,14 +330,7 @@ def capabilities(
         Capabilities of the namespace.
     """
     out = xp.__array_namespace_info__().capabilities()
-    if is_pydata_sparse_namespace(xp):
-        if out["boolean indexing"]:
-            # FIXME https://github.com/pydata/sparse/issues/876
-            # boolean indexing is supported, but not when the index is a sparse array.
-            # boolean indexing by list or numpy array is not part of the Array API.
-            out = out.copy()
-            out["boolean indexing"] = False
-    elif is_jax_namespace(xp):
+    if is_jax_namespace(xp):
         if out["boolean indexing"]:  # pragma: no cover
             # Backwards compatibility with jax <0.6.0
             # https://github.com/jax-ml/jax/issues/27418
@@ -439,7 +430,7 @@ def pickle_flatten(
             self, obj: object
         ) -> Literal[0, 1, None]:  # numpydoc ignore=GL08
             if isinstance(obj, cls):
-                instances.append(obj)  # type: ignore[arg-type]
+                instances.append(obj)
                 return 0
 
             typ_ = type(obj)
@@ -551,12 +542,8 @@ class _AutoJITWrapper(Generic[T]):  # numpydoc ignore=PR01
 
             jax.tree_util.register_pytree_node(
                 cls,
-                lambda instance: pickle_flatten(
-                    instance, jax.Array
-                ),  # pyright: ignore[reportUnknownArgumentType]
-                lambda aux_data, children: pickle_unflatten(
-                    children, aux_data
-                ),  # pyright: ignore[reportUnknownArgumentType]
+                lambda instance: pickle_flatten(instance, jax.Array),  # pyright: ignore[reportUnknownArgumentType]
+                lambda aux_data, children: pickle_unflatten(children, aux_data),  # pyright: ignore[reportUnknownArgumentType]
             )
             cls._registered = True
 

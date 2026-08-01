@@ -14,30 +14,24 @@ By the end of this case study, you will have a solid understanding of how to use
 
 ### Required Packages and Versions
 
-To ensure that you can replicate this case study, it is essential to use specific versions of the required packages. Below is a list of the packages along with their respective versions needed for running the case studies effectively.
+This case study was verified with SysIdentPy 0.9.0 on Python 3.12.12 and
+`datasetsforecast==1.0.1`. Install the repository checkout and the M4 loader
+explicitly:
 
-To install all the required packages, you can create a `requirements.txt` file with the following content:
-
-```
-sysidentpy==0.4.0
-datasetsforecast==0.0.8
-pandas==2.2.2
-numpy==1.26.0
-matplotlib==3.8.4
-s3fs==2024.6.1
+```bash
+python -m pip install -e .
+python -m pip install datasetsforecast==1.0.1
 ```
 
-Then, install the packages using:
-```
-pip install -r requirements.txt
-```
-
-- Ensure that you use a virtual environment to avoid conflicts between package versions.
-- Versions specified are based on compatibility with the code examples provided. If you are using different versions, some adjustments in the code might be necessary.
+Use a virtual environment to isolate these optional dependencies. Randomized
+examples use seed 42; numerical results should be recomputed if the environment
+or model configuration changes.
 
 ### SysIdentPy configuration
 
-In this section, we will demonstrate the application of SysIdentPy to the Silver box dataset.  The following code will guide you through the process of loading the dataset, configuring the SysIdentPy parameters, and building a model for mentioned system.
+In this section, we will demonstrate the application of SysIdentPy to the M4
+hourly dataset. The following code guides you through loading the data,
+configuring SysIdentPy and building the forecasting models used in this study.
 
 ```python
 import warnings
@@ -49,17 +43,25 @@ import matplotlib.pyplot as plt
 from sysidentpy.model_structure_selection import FROLS, AOLS
 from sysidentpy.basis_function import Polynomial
 from sysidentpy.parameter_estimation import LeastSquares
-from sysidentpy.metrics import root_relative_squared_error, symmetric_mean_absolute_percentage_error
+from sysidentpy.metrics import (
+    root_relative_squared_error,
+    symmetric_mean_absolute_percentage_error,
+)
 from sysidentpy.utils.plotting import plot_results
 
 from datasetsforecast.m4 import M4, M4Evaluation
 
-warnings.simplefilter(action='ignore', category=FutureWarning)
-warnings.simplefilter(action='ignore', category=UserWarning)
-warnings.simplefilter(action='ignore', category=SettingWithCopyWarning)
+warnings.simplefilter(action="ignore", category=FutureWarning)
+warnings.simplefilter(action="ignore", category=UserWarning)
+warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 
-train = pd.read_csv('https://auto-arima-results.s3.amazonaws.com/M4-Hourly.csv')
-test = pd.read_csv('https://auto-arima-results.s3.amazonaws.com/M4-Hourly-test.csv').rename(columns={'y': 'y_test'})
+m4_data, _, _ = M4.load(directory="data", group="Hourly")
+test = (
+    m4_data.groupby("unique_id", group_keys=False)
+    .tail(48)
+    .rename(columns={"y": "y_test"})
+)
+train = m4_data.drop(test.index)
 ```
 
 The following plots provide a visualization of the training data for a small subset of the time series. The plot shows the raw data, giving you an insight into the patterns and behaviors inherent in each series.
@@ -73,53 +75,67 @@ This approach provides a practical starting point, demonstrating how SysIdentPy 
 Our first assumption is that there is a 24-hour seasonal pattern in the series. By examining the plots below, this seems reasonable. Therefore, we'll begin building our models with `ylag=24`.
 
 ```python
-ax = train[train["unique_id"]=="H10"].reset_index(drop=True)["y"].plot(figsize=(15, 2), title="H10")
-xcoords = [a for a in range(24, 24*30, 24)]
-
-for xc in xcoords:
-    plt.axvline(x=xc, color='red', linestyle='--', alpha=0.5)
+for unique_id in ("H10", "H100", "H20", "H150"):
+    ax = (
+        train[train["unique_id"] == unique_id]
+        .reset_index(drop=True)["y"]
+        .plot(figsize=(15, 2), title=unique_id)
+    )
+    for xc in range(24, 24 * 30, 24):
+        ax.axvline(x=xc, color="red", linestyle="--", alpha=0.5)
+    plt.show()
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h10_1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/m4-benchmark-01.png?raw=true)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h100_1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/c10_m4_h100_1.png?raw=true)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h20_1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/c10_m4_h20_1.png?raw=true)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h150_1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/c10_m4_h150_1.png?raw=true)
 
 Let's check build a model for the `H20` group before we extrapolate the settings for every group. Because there are no input features, we will be using a `NAR` model type in SysIdentPy. To keep things simple and fast, we will start with Polynomial basis function with degree $1$.
 
 ```python
 unique_id = "H20"
-y_id = train[train["unique_id"]==unique_id]["y"].values.reshape(-1, 1)
-y_val = test[test["unique_id"]==unique_id]["y_test"].values.reshape(-1, 1)
+y_id = train[train["unique_id"] == unique_id]["y"].values.reshape(-1, 1)
+y_val = test[test["unique_id"] == unique_id]["y_test"].values.reshape(-1, 1)
 
 basis_function = Polynomial(degree=1)
 model = FROLS(
-	order_selection=True,
-	ylag=24,
-	estimator=LeastSquares(),
-	basis_function=basis_function,
-	model_type="NAR",
+    order_selection=True,
+    ylag=24,
+    estimator=LeastSquares(),
+    basis_function=basis_function,
+    model_type="NAR",
 )
 
 model.fit(y=y_id)
 y_val = np.concatenate([y_id[-model.max_lag :], y_val])
 y_hat = model.predict(y=y_val, forecast_horizon=48)
-smape = symmetric_mean_absolute_percentage_error(y_val[model.max_lag::], y_hat[model.max_lag::])
+smape = symmetric_mean_absolute_percentage_error(
+    y_val[model.max_lag : :], y_hat[model.max_lag : :]
+)
 
-plot_results(y=y_val[model.max_lag :], yhat=y_hat[model.max_lag :], n=30000, figsize=(15, 4), title=f"Group: {unique_id} - SMAPE {round(smape, 4)}")
+plot_results(
+    y=y_val[model.max_lag :],
+    yhat=y_hat[model.max_lag :],
+    n=30000,
+    figsize=(15, 4),
+    title=f"Group: {unique_id} - SMAPE {round(smape, 4)}",
+)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h20_r1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/m4-benchmark-02.png?raw=true)
 
 Probably, the result are not optimal and will not work for every group. However, let's check how this setting performs against the winner model [M4 time series competition](https://www.researchgate.net/publication/325901666_The_M4_Competition_Results_findings_conclusion_and_way_forward): the Exponential Smoothing with Recurrent Neural Networks ([ESRNN](https://www.sciencedirect.com/science/article/abs/pii/S0169207019301153)).
 
 ```python
-esrnn_url = 'https://github.com/Nixtla/m4-forecasts/raw/master/forecasts/submission-118.zip'
-esrnn_forecasts = M4Evaluation.load_benchmark('data', 'Hourly', esrnn_url)
-esrnn_evaluation = M4Evaluation.evaluate('data', 'Hourly', esrnn_forecasts)
+esrnn_url = (
+    "https://github.com/Nixtla/m4-forecasts/raw/e3dce409604c55f1f588f02db439b4cbe9a482a3/forecasts/submission-118.zip"
+)
+esrnn_forecasts = M4Evaluation.load_benchmark("data", "Hourly", esrnn_url)
+esrnn_evaluation = M4Evaluation.evaluate("data", "Hourly", esrnn_forecasts)
 
 esrnn_evaluation
 ```
@@ -134,36 +150,59 @@ The following code took only 49 seconds to run on my machine (AMD Ryzen 5 5600x 
 ```python
 r = []
 ds_test = list(range(701, 749))
-for u_id, data in train.groupby(by=["unique_id"], observed=True):
-    y_id = data["y"].values.reshape(-1, 1)
-    basis_function = Polynomial(degree=1)
-    model = FROLS(
-		ylag=24,
-		estimator=LeastSquares(),
-		basis_function=basis_function,
-		model_type="NAR",
-		n_info_values=25,
-	)
-    try:
-        model.fit(y=y_id)
-        y_val = y_id[-model.max_lag :].reshape(-1, 1)
-        y_hat = model.predict(y=y_val, forecast_horizon=48)
-        r.append(
-            [
-                u_id*len(y_hat[model.max_lag::]),
-                ds_test,
-                y_hat[model.max_lag::].ravel()
-            ]
-        )
-    except Exception:
-        print(f"Problem with {u_id}")
+for u_id, data in train.groupby("unique_id", observed=True):
+    y_id = data["y"].values.reshape(-1, 1)
+    basis_function = Polynomial(degree=1)
+    model = FROLS(
+        ylag=24,
+        estimator=LeastSquares(),
+        basis_function=basis_function,
+        model_type="NAR",
+        n_info_values=25,
+    )
+    try:
+        model.fit(y=y_id)
+        y_val = y_id[-model.max_lag :].reshape(-1, 1)
+        y_hat = model.predict(y=y_val, forecast_horizon=48)
+        forecast = y_hat[model.max_lag :].ravel()
+        if forecast.shape != (48,) or not np.isfinite(forecast).all():
+            raise RuntimeError(f"Invalid 48-step forecast for {u_id}.")
+        r.append(
+            [
+                [u_id] * 48,
+                ds_test,
+                forecast,
+            ]
+        )
+    except Exception as exc:
+        raise RuntimeError(f"Forecasting failed for {u_id}.") from exc
 
-results_1 = pd.DataFrame(r, columns=["unique_id", "ds", "NARMAX_1"]).explode(['unique_id', 'ds', 'NARMAX_1'])
-results_1["NARMAX_1"] = results_1["NARMAX_1"].astype(float)#.clip(lower=10)
-pivot_df = results_1.pivot(index='unique_id', columns='ds', values='NARMAX_1')
+results_1 = pd.DataFrame(r, columns=["unique_id", "ds", "NARMAX_1"]).explode(
+    ["unique_id", "ds", "NARMAX_1"]
+)
+results_1["NARMAX_1"] = results_1["NARMAX_1"].astype(float)  # .clip(lower=10)
+expected_ids = train["unique_id"].drop_duplicates().tolist()
+pivot_df = results_1.pivot(
+    index="unique_id", columns="ds", values="NARMAX_1"
+).reindex(expected_ids)
 results = pivot_df.to_numpy()
+if len(expected_ids) != 414 or results.shape != (414, 48):
+    raise RuntimeError("The M4 hourly evaluation requires 414 complete forecasts.")
+if not np.isfinite(results).all():
+    raise RuntimeError("The M4 forecast matrix contains non-finite values.")
 
-M4Evaluation.evaluate('data', 'Hourly', results)
+daily_evaluation = M4Evaluation.evaluate("data", "Hourly", results)
+h147_index = expected_ids.index("H147")
+h147_observed = test.loc[test["unique_id"] == "H147", "y_test"].to_numpy()
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(h147_observed, "o-", label="Observed")
+ax.plot(results[h147_index], "*-", label="FROLS, 24 lags")
+ax.set_title("H147: 48-step forecast with daily lags")
+ax.set_xlabel("Forecast horizon")
+ax.set_ylabel("y")
+ax.legend()
+plt.show()
+daily_evaluation
 ```
 
 |        |    SMAPE   |    MASE    |    OWA     |
@@ -173,71 +212,93 @@ Table 2. First test with SysIdentPy
 
 The initial results are reasonable, but they don't quite match the performance of `ESRNN`. These results are based solely on our first assumption. To better understand the performance, let’s examine the groups with the worst results.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h147_r1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/m4-benchmark-03.png?raw=true)
 
 The following plot illustrates two such groups, `H147` and `H136`. Both exhibit a 24-hour seasonal pattern.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_seasonal_h147_1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/c10_m4_seasonal_h147_1.png?raw=true)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h136_seasonal_1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/c10_m4_h136_seasonal_1.png?raw=true)
 
 However, a closer look reveals an additional insight: in addition to the daily pattern, these series also show a weekly pattern. Observe how the data looks like when we split the series into weekly segments.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h147_seasonal_1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/c10_m4_h147_seasonal_1.png?raw=true)
 
 ```python
-xcoords = list(range(0, 168*5, 168))
+xcoords = list(range(0, 168 * 5, 168))
 filtered_train = train[train["unique_id"] == "H147"].reset_index(drop=True)
 
 fig, ax = plt.subplots(figsize=(10, 1.5 * len(xcoords[1:])))
 for i, start in enumerate(xcoords[:-1]):
-    end = xcoords[i + 1]
-    ax = fig.add_subplot(len(xcoords[1:]), 1, i + 1)
-    filtered_train["y"].iloc[start:end].plot(ax=ax)
-    ax.set_title(f'H147 -> Slice {i+1}: Hour {start} to {end-1}')
+    end = xcoords[i + 1]
+    ax = fig.add_subplot(len(xcoords[1:]), 1, i + 1)
+    filtered_train["y"].iloc[start:end].plot(ax=ax)
+    ax.set_title(f"H147 -> Slice {i+1}: Hour {start} to {end-1}")
 
 plt.tight_layout()
 plt.show()
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h147_part_seasonal.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/m4-benchmark-04.png?raw=true)
 
 Therefore, we will build models setting `ylag=168`.
 
 > Note that this is a very high number for lags, so be careful if you want to try it with higher polynomial degrees because the time to run the models can increase significantly. I tried some configurations with polynomial degree equal to 2 and only took $6$ minutes to run (even less, using `AOLS`), without making the code run in parallel. As you can see, SysIdentPy can be very fast, and you can make it faster by applying parallelization.
 
 ```python
-# this took 2min to run on my computer.
 r = []
 ds_test = list(range(701, 749))
-for u_id, data in train.groupby(by=["unique_id"], observed=True):
-    y_id = data["y"].values.reshape(-1, 1)
-    basis_function = Polynomial(degree=1)
-    model = FROLS(
-            ylag=168,
-            estimator=LeastSquares(),
-            basis_function=basis_function,
-            model_type="NAR",
-        )
-    try:
-        model.fit(y=y_id)
-        y_val = y_id[-model.max_lag :].reshape(-1, 1)
-        y_hat = model.predict(y=y_val, forecast_horizon=48)
-        r.append(
-            [
-                u_id*len(y_hat[model.max_lag::]),
-                ds_test,
-                y_hat[model.max_lag::].ravel()
-            ]
-        )
-    except Exception:
-        print(f"Problem with {u_id}")
+for u_id, data in train.groupby("unique_id", observed=True):
+    y_id = data["y"].values.reshape(-1, 1)
+    basis_function = Polynomial(degree=1)
+    model = FROLS(
+        ylag=168,
+        estimator=LeastSquares(),
+        basis_function=basis_function,
+        model_type="NAR",
+    )
+    try:
+        model.fit(y=y_id)
+        y_val = y_id[-model.max_lag :].reshape(-1, 1)
+        y_hat = model.predict(y=y_val, forecast_horizon=48)
+        forecast = y_hat[model.max_lag :].ravel()
+        if forecast.shape != (48,) or not np.isfinite(forecast).all():
+            raise RuntimeError(f"Invalid 48-step forecast for {u_id}.")
+        r.append(
+            [
+                [u_id] * 48,
+                ds_test,
+                forecast,
+            ]
+        )
+    except Exception as exc:
+        raise RuntimeError(f"Forecasting failed for {u_id}.") from exc
 
-results_1 = pd.DataFrame(r, columns=["unique_id", "ds", "NARMAX_1"]).explode(['unique_id', 'ds', 'NARMAX_1'])
-results_1["NARMAX_1"] = results_1["NARMAX_1"].astype(float)#.clip(lower=10)
-pivot_df = results_1.pivot(index='unique_id', columns='ds', values='NARMAX_1')
+results_1 = pd.DataFrame(r, columns=["unique_id", "ds", "NARMAX_1"]).explode(
+    ["unique_id", "ds", "NARMAX_1"]
+)
+results_1["NARMAX_1"] = results_1["NARMAX_1"].astype(float)  # .clip(lower=10)
+expected_ids = train["unique_id"].drop_duplicates().tolist()
+pivot_df = results_1.pivot(
+    index="unique_id", columns="ds", values="NARMAX_1"
+).reindex(expected_ids)
 results = pivot_df.to_numpy()
-M4Evaluation.evaluate('data', 'Hourly', results)
+if len(expected_ids) != 414 or results.shape != (414, 48):
+    raise RuntimeError("The M4 hourly evaluation requires 414 complete forecasts.")
+if not np.isfinite(results).all():
+    raise RuntimeError("The M4 forecast matrix contains non-finite values.")
+weekly_evaluation = M4Evaluation.evaluate("data", "Hourly", results)
+h147_index = expected_ids.index("H147")
+h147_observed = test.loc[test["unique_id"] == "H147", "y_test"].to_numpy()
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(h147_observed, "o-", label="Observed")
+ax.plot(results[h147_index], "*-", label="FROLS, 168 lags")
+ax.set_title("H147: 48-step forecast with weekly lags")
+ax.set_xlabel("Forecast horizon")
+ax.set_ylabel("y")
+ax.legend()
+plt.show()
+weekly_evaluation
 ```
 
 |        |    SMAPE   |    MASE    |    OWA     |
@@ -250,47 +311,62 @@ Now, the results are much closer to those of the `ESRNN` model! While the Symmet
 ```python
 r = []
 ds_test = list(range(701, 749))
-for u_id, data in train.groupby(by=["unique_id"], observed=True):
-    y_id = data["y"].values.reshape(-1, 1)
-    basis_function = Polynomial(degree=1)
-    model = AOLS(
-		ylag=168,
-		basis_function=basis_function,
-		model_type="NAR",
-		# due to high lag settings, k was increased to 6 as an initial guess
-		k=6,
-	)
-    try:
-        model.fit(y=y_id)
-        y_val = y_id[-model.max_lag :].reshape(-1, 1)
-        y_hat = model.predict(y=y_val, forecast_horizon=48)
-        r.append(
-            [
-                u_id*len(y_hat[model.max_lag::]),
-                ds_test,
-                y_hat[model.max_lag::].ravel()
-            ]
-        )
-    except Exception:
-        print(f"Problem with {u_id}")
+for u_id, data in train.groupby("unique_id", observed=True):
+    y_id = data["y"].values.reshape(-1, 1)
+    basis_function = Polynomial(degree=1)
+    model = AOLS(
+        ylag=168,
+        basis_function=basis_function,
+        model_type="NAR",
+        # due to high lag settings, k was increased to 6 as an initial guess
+        k=6,
+    )
+    try:
+        model.fit(y=y_id)
+        y_val = y_id[-model.max_lag :].reshape(-1, 1)
+        y_hat = model.predict(y=y_val, forecast_horizon=48)
+        forecast = y_hat[model.max_lag :].ravel()
+        if forecast.shape != (48,) or not np.isfinite(forecast).all():
+            raise RuntimeError(f"Invalid 48-step forecast for {u_id}.")
+        r.append(
+            [
+                [u_id] * 48,
+                ds_test,
+                forecast,
+            ]
+        )
+    except Exception as exc:
+        raise RuntimeError(f"Forecasting failed for {u_id}.") from exc
 
-results_1 = pd.DataFrame(r, columns=["unique_id", "ds", "NARMAX_1"]).explode(['unique_id', 'ds', 'NARMAX_1'])
-results_1["NARMAX_1"] = results_1["NARMAX_1"].astype(float)#.clip(lower=10)
-pivot_df = results_1.pivot(index='unique_id', columns='ds', values='NARMAX_1')
+results_1 = pd.DataFrame(r, columns=["unique_id", "ds", "NARMAX_1"]).explode(
+    ["unique_id", "ds", "NARMAX_1"]
+)
+results_1["NARMAX_1"] = results_1["NARMAX_1"].astype(float)  # .clip(lower=10)
+expected_ids = train["unique_id"].drop_duplicates().tolist()
+pivot_df = results_1.pivot(
+    index="unique_id", columns="ds", values="NARMAX_1"
+).reindex(expected_ids)
 results = pivot_df.to_numpy()
-M4Evaluation.evaluate('data', 'Hourly', results)
+if len(expected_ids) != 414 or results.shape != (414, 48):
+    raise RuntimeError("The M4 hourly evaluation requires 414 complete forecasts.")
+if not np.isfinite(results).all():
+    raise RuntimeError("The M4 forecast matrix contains non-finite values.")
+M4Evaluation.evaluate("data", "Hourly", results)
 ```
 
 |        |    SMAPE   |    MASE    |    OWA     |
 |--------|------------|------------|------------|
-| Hourly | 9.951141   | 0.809965   | 0.439755   |
+| Hourly | 9.9497     | 0.8074     | 0.4392     |
 > Table 4. SysIdentPy results using AOLS algorithm
 
-The Overall Weighted Average (`OWA`) is even better than that of the `ESRNN` model! Additionally, the `AOLS` method was incredibly efficient, taking only **6 seconds to run**. This combination of high performance and rapid execution makes `AOLS` a compelling alternative for time series forecasting in cases with multiple series.
+For this configuration, the Overall Weighted Average (`OWA`) is slightly lower
+than that of the `ESRNN` reference. This conclusion applies to the complete set
+of 414 hourly series and the 48-step competition horizon; it is not a general
+ranking of the algorithms.
 
 Before we finish, let's verify how the performance of the `H147` model has improved with the `ylag=168` setting.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/c10_m4_h147_r2.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/m4-benchmark-05.png?raw=true)
 
 > Based on the M4 benchmark paper, we could also clip the predictions lower than 10 to 10 and the results would be slightly better. But this is left to the user.
 
@@ -309,7 +385,7 @@ The CE8 system, illustrated in Figure 1, features:
 - **Pulley Mechanism**: The pulley is supported by a spring, introducing a lightly damped dynamic mode that adds complexity to the system.
 - **Speed Control Focus**: The primary focus is on the speed control system. The pulley’s angular speed is measured using a pulse counter, which is insensitive to the direction of the velocity.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_design.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/ce8_design.png?raw=true)
 > Figure 1. CE8 system design.
 
 ### Sensor and Filtering
@@ -320,33 +396,25 @@ The measurement process involves:
 
 ### SOTA Results
 
-SysIdentPy can be used to build robust models for identifying and modeling the complex dynamics of the CE8 system. The performance will be compared against a benchmark provided by [Max D. Champneys, Gerben I. Beintema, Roland Tóth, Maarten Schoukens, and Timothy J. Rogers - Baselines for Nonlinear Benchmarks, Workshop on Nonlinear System Identification Benchmarks, 2024.](https://arxiv.org/pdf/2405.10779)
+SysIdentPy can be used to build robust models for identifying and modeling the complex dynamics of the CE8 system. The performance will be compared against a benchmark provided by [Max D. Champneys, Gerben I. Beintema, Roland Tóth, Maarten Schoukens, and Timothy J. Rogers - Baselines for Nonlinear Benchmarks, Workshop on Nonlinear System Identification Benchmarks, 2024.](https://arxiv.org/pdf/2405.10779)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_sota.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/ce8_sota.png?raw=true)
 
 The benchmark evaluate the average metric between the two experiments. That's why the SOTA method do not have the better metric for `test 1`, but it is still the best overall.  The goal of this case study is not only to showcase the robustness of SysIdentPy but also provides valuable insights into its practical applications in real-world dynamic systems.
 
 ### Required Packages and Versions
 
-To ensure that you can replicate this case study, it is essential to use specific versions of the required packages. Below is a list of the packages along with their respective versions needed for running the case studies effectively.
+This case study was verified with SysIdentPy 0.9.0 on Python 3.12.12 and
+`nonlinear-benchmarks==1.0.1`. Install the repository checkout and the official
+benchmark loader explicitly:
 
-To install all the required packages, you can create a `requirements.txt` file with the following content:
-
-```
-sysidentpy==0.4.0
-pandas==2.2.2
-numpy==1.26.0
-matplotlib==3.8.4
-nonlinear_benchmarks==0.1.2
+```bash
+python -m pip install -e .
+python -m pip install nonlinear-benchmarks==1.0.1
 ```
 
-Then, install the packages using:
-```
-pip install -r requirements.txt
-```
-
-- Ensure that you use a virtual environment to avoid conflicts between package versions.
-- Versions specified are based on compatibility with the code examples provided. If you are using different versions, some adjustments in the code might be necessary.
+Use a virtual environment to isolate the optional loader. Numerical results
+should be recomputed if the environment or model configuration changes.
 
 ### SysIdentPy configuration
 
@@ -355,6 +423,7 @@ In this section, we will demonstrate the application of SysIdentPy to the CE8 co
 This practical example will help users understand how to effectively utilize SysIdentPy for their own system identification tasks, leveraging its advanced features to handle the complexities of real-world dynamic systems. Let's dive into the code and explore the capabilities of SysIdentPy.
 
 ```python
+from warnings import catch_warnings, simplefilter
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -368,7 +437,11 @@ from sysidentpy.utils.plotting import plot_results
 
 import nonlinear_benchmarks
 
-train_val, test = nonlinear_benchmarks.CED(atleast_2d=True)
+ced_url = (
+    "https://web.archive.org/web/20210117142533id_/"
+    "http://www.it.uu.se/research/publications/reports/2010-020/NonlinearData.zip"
+)
+train_val, test = nonlinear_benchmarks.CED(url=ced_url, atleast_2d=True)
 data_train_1, data_train_2 = train_val
 data_test_1, data_test_2 = test
 ```
@@ -399,13 +472,13 @@ plt.title("Experiment 2: testing data")
 plt.show()
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_data_1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-01.png?raw=true)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_test_data.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-02.png?raw=true)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_training_data.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-03.png?raw=true)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_2_experiment_testing_data.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-04.png?raw=true)
 
 ### Results
 
@@ -425,23 +498,33 @@ n = data_test_1.state_initialization_window_length
 
 basis_function = Polynomial(degree=2)
 model = FROLS(
-    xlag=7,
-    ylag=7,
-    basis_function=basis_function,
-    estimator=LeastSquares(),
-    info_criteria="aic",
-    n_info_values=120
+    xlag=7,
+    ylag=7,
+    basis_function=basis_function,
+    estimator=LeastSquares(),
+    info_criteria="aic",
+    n_info_values=120,
 )
 
-model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag:], y_test])
-x_test = np.concatenate([x_train[-model.max_lag:], x_test])
-yhat = model.predict(X=x_test, y=y_test[:model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n:])
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, title=f"Free Run simulation. Model 1 -> RMSE: {round(rmse, 4)}")
+with catch_warnings():
+    simplefilter("ignore", UserWarning)
+    model.fit(X=x_train, y=y_train)
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+print(f"RMSE: {rmse:.6f}")
+plot_results(
+    y=y_test[n:],
+    yhat=yhat,
+    n=10000,
+    title=f"Free Run simulation. Model 1 -> RMSE: {round(rmse, 4)}",
+)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_e1_r1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-05.png?raw=true)
 
 Model for experiment 2:
 ```python
@@ -454,27 +537,45 @@ n = data_test_2.state_initialization_window_length
 
 basis_function = Polynomial(degree=2)
 model = FROLS(
-    xlag=7,
-    ylag=7,
-    basis_function=basis_function,
-    estimator=LeastSquares(),
-    info_criteria="aic",
-    n_info_values=120
+    xlag=7,
+    ylag=7,
+    basis_function=basis_function,
+    estimator=LeastSquares(),
+    info_criteria="aic",
+    n_info_values=120,
 )
 
-model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag:], y_test])
-x_test = np.concatenate([x_train[-model.max_lag:], x_test])
-yhat = model.predict(X=x_test, y=y_test[:model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n:])
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, title=f"Free Run simulation. Model 2 -> RMSE: {round(rmse, 4)}")
+with catch_warnings():
+    simplefilter("ignore", UserWarning)
+    model.fit(X=x_train, y=y_train)
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+print(f"RMSE: {rmse:.6f}")
+plot_results(
+    y=y_test[n:],
+    yhat=yhat,
+    n=10000,
+    title=f"Free Run simulation. Model 2 -> RMSE: {round(rmse, 4)}",
+)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_ex2_r1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-06.png?raw=true)
 
-The first configuration for experiment 1 is already better than the **LTI ARX**, **LTI SS**, **GRU**, **LSTM**, **MLP NARX**, **MLP FIR**, **OLSTM**, and the **SOTA** models shown in the benchmark table. Better than 8 out 11 models shown in the benchmark. For experiment 2, its better than **LTI ARX**, **LTI SS**, **GRU**, **RNN**, **LSTM**, **OLSTM**, and **pNARX** (7 out 11). It's a good start, but let's check if the performance improves if we set a higher lag for both `xlag` and `ylag`.
+With the current loader and the benchmark-defined initialization window, this
+first configuration gives RMSE $0.102862$ for experiment 1 and $0.106816$ for
+experiment 2. Their average is $0.104839$. The samples reserved for state
+initialization are excluded once, and the recursion starts from the last
+`model.max_lag` outputs inside that window.
 
-The average metric is $(0.1131 + 0.1059)/2 = 0.1095$, which is very good, but worse than the SOTA ($0.0945$). We will now increase the lags for `x` and `y` to check if we get a better model. Before increasing the lags, the information criteria is shown:
+The external table is still useful as context, but its values should only be
+compared after matching the split, initialization, normalization and aggregation
+rules. We will therefore use the present RMSE values to compare the SysIdentPy
+configurations with one another. Before increasing the lags, the information
+criterion is shown:
 
 ```python
 xaxis = np.arange(1, model.n_info_values + 1)
@@ -482,7 +583,7 @@ plt.plot(xaxis, model.info_values)
 plt.xlabel("n_terms")
 plt.ylabel("Information Criteria")
 ```
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_aic.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-07.png?raw=true)
 
 It can be observed that after 22 regressors, adding new regressors do not improve the model performance (considering the configuration defined for that model). Because we want to try models with higher lags and higher nonlinearity degree, the stopping criteria will be changed to `err_tol` instead of information criteria. This will made the algorithm runs considerably faster.
 
@@ -497,27 +598,35 @@ n = data_test_1.state_initialization_window_length
 
 basis_function = Polynomial(degree=2)
 model = FROLS(
-    xlag=14,
-    ylag=14,
-    basis_function=basis_function,
-    estimator=LeastSquares(),
-    err_tol=0.9996,
-    n_terms=22,
-    order_selection=False
+    xlag=10,
+    ylag=10,
+    basis_function=basis_function,
+    estimator=LeastSquares(),
+    err_tol=0.9996,
+    n_terms=22,
+    order_selection=False,
 )
 
 model.fit(X=x_train, y=y_train)
 print(model.final_model.shape, model.err.sum())
-y_test = np.concatenate([y_train[-model.max_lag:], y_test])
-x_test = np.concatenate([x_train[-model.max_lag:], x_test])
-yhat = model.predict(X=x_test, y=y_test[:model.max_lag, :])
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
 
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n:])
+rmse = root_mean_squared_error(y_test[n:], yhat)
+print(f"RMSE: {rmse:.6f}")
 
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, title=f"Free Run simulation. Model 1 -> RMSE: {round(rmse, 4)}")
+plot_results(
+    y=y_test[n:],
+    yhat=yhat,
+    n=10000,
+    title=f"Free Run simulation. Model 1 -> RMSE: {round(rmse, 4)}",
+)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_e1_r2.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-08.png?raw=true)
 
 ```python
 # experiment 2
@@ -530,29 +639,44 @@ n = data_test_2.state_initialization_window_length
 
 basis_function = Polynomial(degree=2)
 model = FROLS(
-    xlag=14,
-    ylag=14,
-    basis_function=basis_function,
-    estimator=LeastSquares(),
-    info_criteria="aicc",
-    err_tol=0.9996,
-    n_terms=22,
-    order_selection=False
+    xlag=10,
+    ylag=10,
+    basis_function=basis_function,
+    estimator=LeastSquares(),
+    info_criteria="aicc",
+    err_tol=0.9996,
+    n_terms=22,
+    order_selection=False,
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag:], y_test])
-x_test = np.concatenate([x_train[-model.max_lag:], x_test])
-yhat = model.predict(X=x_test, y=y_test[:model.max_lag, :])
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
 
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n:])
+rmse = root_mean_squared_error(y_test[n:], yhat)
+print(f"RMSE: {rmse:.6f}")
 
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, title=f"Free Run simulation. Model 2 -> RMSE: {round(rmse, 4)}")
+plot_results(
+    y=y_test[n:],
+    yhat=yhat,
+    n=10000,
+    title=f"Free Run simulation. Model 2 -> RMSE: {round(rmse, 4)}",
+)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_ex2_r2.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-09.png?raw=true)
 
-In the first experiment, the model showed a slight improvement, while the performance of the second experiment experienced a minor decline. Increasing the lag settings with these configurations did not result in significant changes. Therefore, let's set the polynomial degree to $3$ and increase the number of terms to build the model to `n_terms=40` if the `err_tol` is not reached. It's important to note that these values are chosen empirically. We could also adjust the parameter estimation technique, the `err_tol`, the model structure selection algorithm, and the basis function, among other factors. Users are encouraged to employ hyperparameter tuning techniques to find the optimal combinations of hyperparameters.
+The 10-lag, 22-term models give RMSE $0.110933$ and $0.107076$ for experiments
+1 and 2, respectively. The official state-initialization window contains 10
+samples, so the former 14-lag configurations are not valid under this protocol.
+Increasing the lag to the largest valid value does not improve this degree-2
+configuration. Therefore, let's set the polynomial degree to $3$ and increase
+the number of terms to `n_terms=40` if the `err_tol` is not reached. These values
+are empirical; the estimator, error tolerance, structure-selection algorithm and
+basis function are other possible tuning dimensions.
 
 ```python
 # experiment 1
@@ -565,27 +689,35 @@ n = data_test_1.state_initialization_window_length
 
 basis_function = Polynomial(degree=3)
 model = FROLS(
-    xlag=14,
-    ylag=14,
-    basis_function=basis_function,
-    estimator=LeastSquares(),
-    err_tol=0.9996,
-    n_terms=40,
-    order_selection=False
+    xlag=10,
+    ylag=10,
+    basis_function=basis_function,
+    estimator=LeastSquares(),
+    err_tol=0.9996,
+    n_terms=40,
+    order_selection=False,
 )
 
 model.fit(X=x_train, y=y_train)
 print(model.final_model.shape, model.err.sum())
-y_test = np.concatenate([y_train[-model.max_lag:], y_test])
-x_test = np.concatenate([x_train[-model.max_lag:], x_test])
-yhat = model.predict(X=x_test, y=y_test[:model.max_lag, :])
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
 
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n:])
+rmse = root_mean_squared_error(y_test[n:], yhat)
+print(f"RMSE: {rmse:.6f}")
 
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, title=f"Free Run simulation. Model 1 -> RMSE: {round(rmse, 4)}")
+plot_results(
+    y=y_test[n:],
+    yhat=yhat,
+    n=10000,
+    title=f"Free Run simulation. Model 1 -> RMSE: {round(rmse, 4)}",
+)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_ex1_r3.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-10.png?raw=true)
 
 ```python
 # experiment 2
@@ -598,29 +730,40 @@ n = data_test_2.state_initialization_window_length
 
 basis_function = Polynomial(degree=3)
 model = FROLS(
-    xlag=14,
-    ylag=14,
-    basis_function=basis_function,
-    estimator=LeastSquares(),
-    info_criteria="aicc",
-    err_tol=0.9996,
-    n_terms=40,
-    order_selection=False
+    xlag=10,
+    ylag=10,
+    basis_function=basis_function,
+    estimator=LeastSquares(),
+    info_criteria="aicc",
+    err_tol=0.9996,
+    n_terms=40,
+    order_selection=False,
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag:], y_test])
-x_test = np.concatenate([x_train[-model.max_lag:], x_test])
-yhat = model.predict(X=x_test, y=y_test[:model.max_lag, :])
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
 
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n:])
+rmse = root_mean_squared_error(y_test[n:], yhat)
+print(f"RMSE: {rmse:.6f}")
 
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, title=f"Free Run simulation. Model 2 -> RMSE: {round(rmse, 4)}")
+plot_results(
+    y=y_test[n:],
+    yhat=yhat,
+    n=10000,
+    title=f"Free Run simulation. Model 2 -> RMSE: {round(rmse, 4)}",
+)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ce8_ex2_r3.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/coupled-eletric-device-11.png?raw=true)
 
-As shown in the plot, we have surpassed the state-of-the-art (SOTA) results with an average metric of $(0.0969 + 0.0731)/2 = 0.0849$. Additionally, the metric for the first experiment matches the best model in the benchmark, and the metric for the second experiment slightly exceeds the benchmark's best model. Using the same configuration for both models, we achieved the best overall results!
+The degree-3 models give RMSE $0.112503$ and $0.096002$, with an average of
+$0.104253$. The second experiment improves, whereas the first does not. This is
+why the two experiments should be reported separately and why the external SOTA
+table is not used to claim a ranking without an identical evaluation protocol.
 
 ## Wiener-Hammerstein
 
@@ -633,7 +776,7 @@ This benchmark focuses on a Wiener-Hammerstein electronic circuit where process 
 The Wiener-Hammerstein structure is a well-known block-oriented system which contains a static nonlinearity sandwiched between two Linear Time-Invariant (LTI) blocks (Figure 2). This arrangement presents a challenging identification problem due to the presence of these LTI blocks.
 
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_system.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wh_system.png?raw=true)
 > Figure 2: the Wiener-Hammerstein system
 
 In Figure 2, the Wiener-Hammerstein system is illustrated with process noise $e_x(t)$ entering before the static nonlinearity $f(x)$, sandwiched between LTI blocks represented by $R(s)$ and $S(s)$ at the input and output, respectively. Additionally, small, negligible noise sources $e_u(t)$ and $e_y(t)$ affect the measurement channels. The measured input and output signals are denoted as $u_m(t)$ and $y_m(t)$.
@@ -656,25 +799,17 @@ The goal of this benchmark is to develop and validate robust models using separa
 
 ### Required Packages and Versions
 
-To ensure that you can replicate this case study, it is essential to use specific versions of the required packages. Below is a list of the packages along with their respective versions needed for running the case studies effectively.
+This case study was verified with SysIdentPy 0.9.0 on Python 3.12.12 and
+`nonlinear-benchmarks==1.0.1`. Install the repository checkout and the official
+benchmark loader explicitly:
 
-To install all the required packages, you can create a `requirements.txt` file with the following content:
-
-```
-sysidentpy==0.4.0
-pandas==2.2.2
-numpy==1.26.0
-matplotlib==3.8.4
-nonlinear_benchmarks==0.1.2
+```bash
+python -m pip install -e .
+python -m pip install nonlinear-benchmarks==1.0.1
 ```
 
-Then, install the packages using:
-```
-pip install -r requirements.txt
-```
-
-- Ensure that you use a virtual environment to avoid conflicts between package versions.
-- Versions specified are based on compatibility with the code examples provided. If you are using different versions, some adjustments in the code might be necessary.
+Use a virtual environment to isolate the optional loader. Numerical results
+should be recomputed if the environment or model configuration changes.
 
 ### SysIdentPy configuration
 
@@ -688,7 +823,12 @@ import matplotlib.pyplot as plt
 from sysidentpy.model_structure_selection import FROLS, AOLS, MetaMSS
 from sysidentpy.basis_function import Polynomial, Fourier
 from sysidentpy.utils.display_results import results
-from sysidentpy.parameter_estimation import LeastSquares, BoundedVariableLeastSquares, NonNegativeLeastSquares, LeastSquaresMinimalResidual
+from sysidentpy.parameter_estimation import (
+    LeastSquares,
+    BoundedVariableLeastSquares,
+    NonNegativeLeastSquares,
+    LeastSquaresMinimalResidual,
+)
 
 from sysidentpy.metrics import root_mean_squared_error
 from sysidentpy.utils.plotting import plot_results
@@ -722,13 +862,16 @@ plt.legend(["x_test", "y_test"])
 plt.show()
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_training_data.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wiener-hammerstein-system-01.png?raw=true)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_testing_data.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wiener-hammerstein-system-02.png?raw=true)
 
-The goal of this benchmark it to get a model that have a better performance than the SOTA model provided in the benchmarking paper.
+The external benchmark provides useful context for the experiment. A direct
+ranking, however, requires the same split, initialization window and
+normalization; those conditions are made explicit below before any comparison is
+drawn.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_sota_results.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wh_sota_results.png?raw=true)
 > State of the art results presented in the [benchmarking paper](https://arxiv.org/pdf/2405.10779). In this section we are only working with the Wiener-Hammerstein results, which are presented in the $W-H$  column.
 
 ### Results
@@ -740,25 +883,36 @@ n = test.state_initialization_window_length
 
 basis_function = Polynomial(degree=2)
 model = FROLS(
-    xlag=7,
-    ylag=7,
-    basis_function=basis_function,
-    estimator=LeastSquares(unbiased=False),
-    n_info_values=50,
+    xlag=7,
+    ylag=7,
+    basis_function=basis_function,
+    estimator=LeastSquares(unbiased=False),
+    n_info_values=50,
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag:], y_test])
-x_test = np.concatenate([x_train[-model.max_lag:], x_test])
-yhat = model.predict(X=x_test, y=y_test[:model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n:])
-rmse_sota = rmse/y_test.std()
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=1000, title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(rmse_sota, 4)}")
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
+plot_results(
+    y=y_test[n:],
+    yhat=yhat,
+    n=1000,
+    title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(nrmse, 4)}",
+)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_r1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wiener-hammerstein-system-03.png?raw=true)
 
-The first configuration is already better than the **SOTA** models shown in the benchmark table! We started using `xlag=ylag=7` to have an idea of how well SysIdentPy would handle this dataset, but the results are pretty good already! However, the benchmarking paper indicates  that they used higher lags for their models. Let's check what happens if we set `xlag=ylag=10`.
+The first configuration gives RMSE $0.020007$ and NRMSE $0.082029$. We started
+with `xlag=ylag=7` to establish a compact baseline. The benchmarking paper uses
+longer memories in some models, so the next configuration sets
+`xlag=ylag=10`.
 
 ```python
 x_train, y_train = train_val
@@ -768,31 +922,42 @@ n = test.state_initialization_window_length
 
 basis_function = Polynomial(degree=2)
 model = FROLS(
-    xlag=10,
-    ylag=10,
-    basis_function=basis_function,
-    estimator=LeastSquares(unbiased=False),
-    n_info_values=50,
+    xlag=10,
+    ylag=10,
+    basis_function=basis_function,
+    estimator=LeastSquares(unbiased=False),
+    n_info_values=50,
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag:], y_test])
-x_test = np.concatenate([x_train[-model.max_lag:], x_test])
-yhat = model.predict(X=x_test, y=y_test[:model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n:])
-rmse_sota = rmse/y_test.std()
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=1000, title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(rmse_sota, 4)}")
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
+plot_results(
+    y=y_test[n:],
+    yhat=yhat,
+    n=1000,
+    title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(nrmse, 4)}",
+)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_r2.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wiener-hammerstein-system-04.png?raw=true)
 
-The performance is even better now! For now, we are not worried about the model complexity (even in this case where we are comparing to a deep state neural network...). However, if we check the model order and the `AIC` plot, we see that the model have 50 regressors , but the `AIC` values do not change much after each added regression.
+The 10-lag configuration improves the result to RMSE $0.015202$ and NRMSE
+$0.062328$. For now, we are not optimizing model complexity. The information-
+criterion trace nevertheless shows that the 50-regressor model changes little
+after many of the later additions.
 
 ```python
 plt.plot(model.info_values)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_aic.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wiener-hammerstein-system-05.png?raw=true)
 
 So, what happens if we set a model with half of the regressors?
 
@@ -804,27 +969,49 @@ n = test.state_initialization_window_length
 
 basis_function = Polynomial(degree=2)
 model = FROLS(
-    xlag=10,
-    ylag=10,
-    basis_function=basis_function,
-    estimator=LeastSquares(unbiased=False),
-    n_info_values=50,
-    n_terms=25,
-    order_selection=False
+    xlag=10,
+    ylag=10,
+    basis_function=basis_function,
+    estimator=LeastSquares(unbiased=False),
+    n_info_values=50,
+    n_terms=25,
+    order_selection=False,
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag:], y_test])
-x_test = np.concatenate([x_train[-model.max_lag:], x_test])
-yhat = model.predict(X=x_test, y=y_test[:model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n:])
-rmse_sota = rmse/y_test.std()
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=1000, title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(rmse_sota, 4)}")
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
+plot_results(
+    y=y_test[n:],
+    yhat=yhat,
+    n=1000,
+    title=f"SysIdentPy -> RMSE: {round(rmse, 4)}, NRMSE: {round(nrmse, 4)}",
+)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/wh_r3.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/wiener-hammerstein-system-06.png?raw=true)
 
-As shown in the figure above, the results still outperform the SOTA models presented in the benchmarking paper. The SOTA results from the paper could likely be improved as well. Users are encouraged to explore the [deepsysid package](https://github.com/AlexandraBaier/deepsysid), which can be used to build deep state neural networks.
+The fixed 25-term model gives RMSE $0.018809$ and NRMSE $0.077117$. It is more
+compact than the automatically selected 50-term model, at the cost of a larger
+error. The three current results are summarized below.
+
+| Configuration | RMSE | NRMSE |
+| --- | ---: | ---: |
+| lags 7, automatic order | 0.020007 | 0.082029 |
+| lags 10, automatic order | 0.015202 | 0.062328 |
+| lags 10, fixed at 25 terms | 0.018809 | 0.077117 |
+
+The historical figures stored four decimal places, and the reproduced values
+remain the same at that precision. Published tables may use a different
+normalization or split, so they are not treated as a direct ranking. Users who
+want to investigate the deep state-space alternatives can explore the
+[deepsysid package](https://github.com/AlexandraBaier/deepsysid).
 
 This basic configuration can serve as a starting point for users to develop even better models using SysIdentPy. Give it a try!
 
@@ -865,92 +1052,73 @@ The objective of this case study is to evaluate and compare the performance of t
 
 ### Required Packages and Versions
 
-To ensure that you can replicate this case study, it is essential to use specific versions of the required packages. Below is a list of the packages along with their respective versions needed for running the case studies effectively.
+This comparison was verified with SysIdentPy 0.9.0 on Python 3.12.12. The
+forecasting libraries are optional and were tested with the following versions:
 
-To install all the required packages, you can create a `requirements.txt` file with the following content:
-
-```
-sysidentpy==0.4.0
-pystan==2.19.1.1
-holidays==0.11.2
-fbprophet==0.7.1
-neuralprophet==0.2.7
-pandas==1.3.2
-numpy==1.23.3
-matplotlib==3.8.4
-pmdarima==1.8.3
-scikit-learn==0.24.2
-scipy==1.9.1
-sktime==0.8.0
-statsmodels==0.12.2
-tbats==1.1.0
-torch==1.12.1
+```bash
+python -m pip install -e .
+python -m pip install sktime==1.0.1 neuralprophet==0.9.0 prophet==1.3.0
+python -m pip install pmdarima==2.1.1 tbats==1.1.3 statsmodels==0.14.6
+python -m pip install scipy==1.15.3 torch==2.5.1
 ```
 
-Then, install the packages using:
-```
-pip install -r requirements.txt
-```
-
-- Ensure that you use a virtual environment to avoid conflicts between package versions. This practice isolates your project’s dependencies and prevents version conflicts with other projects or system-wide packages. Additionally, be aware that some packages, such as `sktime` and `neuralprophet`, may install several dependencies automatically during their installation. Setting up a virtual environment helps manage these dependencies more effectively and keeps your project environment clean and reproducible.
-- Versions specified are based on compatibility with the code examples provided. If you are using different versions, some adjustments in the code might be necessary.
+The SciPy pin satisfies the `scipy<1.16` constraint enforced by the BATS/TBATS
+adapters in this sktime version. Use a virtual environment because these packages
+have a comparatively large and compatibility-sensitive dependency graph.
+Randomized models use seed 42.
 
 Let's begin by importing the necessary packages and setting up the environment for this analysis.
 
 ```python
+import logging
 from warnings import simplefilter
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import scipy.signal.signaltools
-
-def _centered(arr, newsize):
-    # Return the center newsize portion of the array.
-    # this is needed due a conflict error using the versions of the packages defined
-    # for this example
-    newsize = np.asarray(newsize)
-    currsize = np.array(arr.shape)
-    startind = (currsize - newsize) // 2
-    endind = startind + newsize
-    myslice = [slice(startind[k], endind[k]) for k in range(len(endind))]
-    return arr[tuple(myslice)]
-
-
-scipy.signal.signaltools._centered = _centered
-from sysidentpy.model_structure_selection import FROLS
-from sysidentpy.model_structure_selection import AOLS
-from sysidentpy.model_structure_selection import MetaMSS
-from sysidentpy.basis_function import Polynomial
-from sysidentpy.utils.plotting import plot_results
-from torch import nn
-from sysidentpy.neural_network import NARXNN
-
+import torch
+from neuralprophet import NeuralProphet, set_random_seed
 from sktime.datasets import load_airline
-from sktime.forecasting.ets import AutoETS
 from sktime.forecasting.arima import ARIMA, AutoARIMA
 from sktime.forecasting.base import ForecastingHorizon
-from sktime.forecasting.exp_smoothing import ExponentialSmoothing
-from sktime.forecasting.fbprophet import Prophet
-from sktime.forecasting.tbats import TBATS
 from sktime.forecasting.bats import BATS
-from sktime.forecasting.model_selection import temporal_train_test_split
-from sktime.performance_metrics.forecasting import mean_squared_error
-from sktime.utils.plotting import plot_series
+from sktime.forecasting.ets import AutoETS
+from sktime.forecasting.exp_smoothing import ExponentialSmoothing
+from prophet import Prophet
+from sktime.forecasting.tbats import TBATS
+from sktime.split import temporal_train_test_split
+from torch import nn
 
-from neuralprophet import NeuralProphet
-from neuralprophet import set_random_seed
+from sysidentpy.basis_function import Polynomial
+from sysidentpy.metrics import mean_squared_error
+from sysidentpy.model_structure_selection import AOLS, FROLS, MetaMSS
+from sysidentpy.neural_network import NARXNN
+from sysidentpy.parameter_estimation import LeastSquares
+from sysidentpy.utils.plotting import plot_results
 
 simplefilter("ignore", FutureWarning)
-np.seterr(all="ignore")
-%matplotlib inline
 loss = mean_squared_error
+
+
+def plot_series(*series, labels):
+    for values, label in zip(series, labels):
+        index = (
+            values.index.to_timestamp()
+            if isinstance(values.index, pd.PeriodIndex)
+            else values.index
+        )
+        plt.plot(index, values.to_numpy(), label=label)
+    plt.legend()
+
+logging.getLogger("NP").setLevel(logging.ERROR)
 ```
 
-We use the `sktime` method to load the data. Besides, 23 samples is used as test data, following the definitions in the `sktime` examples.
+We use the `sktime` loader and reserve the final 24 monthly observations for
+testing. Every method is evaluated on that same horizon.
 
 ```python
 y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=23)  # 23 samples for testing
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 plot_series(y_train, y_test, labels=["y_train", "y_test"])
 fh = ForecastingHorizon(y_test.index, is_relative=False)
 print(y_train.shape[0], y_test.shape[0])
@@ -958,64 +1126,75 @@ print(y_train.shape[0], y_test.shape[0])
 
 The following image shows the data of the system to be modeled.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_dataset.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-01.png?raw=true)
 
 ## Results
 
-Because we have several different models to test, the results are summarized in the following table. The user you will see that no hyperparameter tuning was made for SysIdentPy model. The idea here is to show how simple it can be to build good models in SysIdentPy.
+Because we have several models to test, the current results are summarized in
+the following table. The split and MSE definition are common to every row.
 
 | No. | Package                   | Mean Squared Error |
-| --- | ------------------------- | ------------------ |
-| 1   | SysIdentPy (Neural Model) | 316.54             |
-| 2   | SysIdentPy (MetaMSS)      | 450.99             |
-| 3   | SysIdentPy (AOLS)         | 476.64             |
-| 4   | NeuralProphet             | 501.24             |
-| 5   | SysIdentPy (FROLS)        | 805.95             |
-| 6   | Exponential Smoothing     | 910.52             |
-| 7   | Prophet                   | 1186.00            |
-| 8   | AutoArima                 | 1714.47            |
-| 9   | Manual Arima              | 2085.42            |
-| 10  | ETS                       | 2590.05            |
-| 11  | BATS                      | 7286.64            |
-| 12  | TBATS                     | 7448.43            |
+| ---: | ------------------------- | -----------------: |
+| 1    | SysIdentPy (AOLS)         | 440.9993           |
+| 2    | SysIdentPy (MetaMSS)      | 510.3495           |
+| 3    | NeuralProphet             | 514.0477           |
+| 4    | Prophet                   | 910.7187           |
+| 5    | Exponential Smoothing     | 1055.5128          |
+| 6    | SysIdentPy (Neural NARX)  | 1621.5225          |
+| 7    | SysIdentPy (FROLS)        | 1811.9000          |
+| 8    | AutoARIMA                 | 2230.3321          |
+| 9    | Manual ARIMA              | 2592.7244          |
+| 10   | AutoETS                   | 3128.9366          |
+| 11   | TBATS                     | 8825.0097          |
+| 12   | BATS                      | 9043.4934          |
+
+The final 13 training outputs initialize each SysIdentPy free-run forecast and
+are excluded from the metric. MetaMSS uses an internal chronological split for
+structure selection and does not automatically refit the selected parameters on
+all 120 training observations. The table is a comparison of the stated compact
+configurations, not a general ranking of the libraries.
 
 ## SysIdentPy: FROLS
 
 ```python
 y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=23)
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 y_train = y_train.values.reshape(-1, 1)
 y_test = y_test.values.reshape(-1, 1)
+
 basis_function = Polynomial(degree=1)
 sysidentpy = FROLS(
-    order_selection=True,
-    ylag=13,  # the lags for all models will be 13
-    basis_function=basis_function,
-    model_type="NAR",
+    order_selection=True,
+    ylag=13,  # the lags for all models will be 13
+    n_info_values=14,
+    basis_function=basis_function,
+    model_type="NAR",
+    estimator=LeastSquares(),
 )
-
 sysidentpy.fit(y=y_train)
 y_test = np.concatenate([y_train[-sysidentpy.max_lag :], y_test])
-yhat = sysidentpy.predict(y=y_test, forecast_horizon=23)
+
+yhat = sysidentpy.predict(y=y_test, forecast_horizon=24)
 frols_loss = loss(
-    pd.Series(y_test.flatten()[sysidentpy.max_lag :]),
-    pd.Series(yhat.flatten()[sysidentpy.max_lag :]),
+    y_test[sysidentpy.max_lag :],
+    yhat[sysidentpy.max_lag :],
 )
 print(frols_loss)
+
 plot_results(y=y_test[sysidentpy.max_lag :], yhat=yhat[sysidentpy.max_lag :])
->>> 805.95
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_frols.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-02.png?raw=true)
 
 ## SysIdentPy: AOLS
 
 ```python
 y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=23)
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 y_train = y_train.values.reshape(-1, 1)
 y_test = y_test.values.reshape(-1, 1)
-df_train, df_test = temporal_train_test_split(y, test_size=23)
+
+df_train, df_test = temporal_train_test_split(y, test_size=24)
 df_train = df_train.reset_index()
 df_train.columns = ["ds", "y"]
 df_train["ds"] = pd.to_datetime(df_train["ds"].astype(str))
@@ -1024,57 +1203,53 @@ df_test.columns = ["ds", "y"]
 df_test["ds"] = pd.to_datetime(df_test["ds"].astype(str))
 
 sysidentpy_AOLS = AOLS(
-    ylag=13, k=2, L=1, model_type="NAR", basis_function=basis_function
+    ylag=13, k=2, L=1, model_type="NAR", basis_function=basis_function
 )
-
 sysidentpy_AOLS.fit(y=y_train)
 y_test = np.concatenate([y_train[-sysidentpy_AOLS.max_lag :], y_test])
-yhat = sysidentpy_AOLS.predict(y=y_test, steps_ahead=None, forecast_horizon=23)
 
+yhat = sysidentpy_AOLS.predict(y=y_test, steps_ahead=None, forecast_horizon=24)
 aols_loss = loss(
-    pd.Series(y_test.flatten()[sysidentpy_AOLS.max_lag :]),
-    pd.Series(yhat.flatten()[sysidentpy_AOLS.max_lag :]),
+    y_test[sysidentpy_AOLS.max_lag :],
+    yhat[sysidentpy_AOLS.max_lag :],
 )
-
 print(aols_loss)
+
 plot_results(y=y_test[sysidentpy_AOLS.max_lag :], yhat=yhat[sysidentpy_AOLS.max_lag :])
->>> 476.64
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_aols.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-03.png?raw=true)
 
 ## SysIdentPy: MetaMSS
 
 ```python
 set_random_seed(42)
+
 y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=23)
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 y_train = y_train.values.reshape(-1, 1)
 y_test = y_test.values.reshape(-1, 1)
 
 sysidentpy_metamss = MetaMSS(
-    basis_function=basis_function, ylag=13, model_type="NAR", test_size=0.17
+    basis_function=basis_function, ylag=13, model_type="NAR", test_size=0.17, random_state=42
 )
-
 sysidentpy_metamss.fit(y=y_train)
 
 y_test = np.concatenate([y_train[-sysidentpy_metamss.max_lag :], y_test])
-yhat = sysidentpy_metamss.predict(y=y_test, steps_ahead=None, forecast_horizon=23)
 
+yhat = sysidentpy_metamss.predict(y=y_test, steps_ahead=None, forecast_horizon=24)
 metamss_loss = loss(
-    pd.Series(y_test.flatten()[sysidentpy_metamss.max_lag :]),
-    pd.Series(yhat.flatten()[sysidentpy_metamss.max_lag :]),
+    y_test[sysidentpy_metamss.max_lag :],
+    yhat[sysidentpy_metamss.max_lag :],
 )
-
 print(metamss_loss)
-plot_results(
-    y=y_test[sysidentpy_metamss.max_lag :], yhat=yhat[sysidentpy_metamss.max_lag :]
-)
 
->>> 450.99
+plot_results(
+    y=y_test[sysidentpy_metamss.max_lag :], yhat=yhat[sysidentpy_metamss.max_lag :]
+)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_metamss.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-04.png?raw=true)
 
 ## SysIdentPy: Neural NARX
 
@@ -1082,60 +1257,66 @@ The network architecture is just the same as the one used in to show how to buil
 
 ```python
 import torch
+
 torch.manual_seed(42)
 
 y = load_airline()
-# the split here will use 36 as test size just because the network will use the first values as initial conditions. It could be done like the others methods by concatenating the values
-y_train, y_test = temporal_train_test_split(y, test_size=36)
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 y_train = y_train.values.reshape(-1, 1)
 y_test = y_test.values.reshape(-1, 1)
 x_train = np.zeros_like(y_train)
 x_test = np.zeros_like(y_test)
 
+
 class NARX(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.lin = nn.Linear(13, 20)
-        self.lin2 = nn.Linear(20, 20)
-        self.lin3 = nn.Linear(20, 20)
-        self.lin4 = nn.Linear(20, 1)
-        self.relu = nn.ReLU()
+    def __init__(self):
+        super().__init__()
+        self.lin = nn.Linear(13, 20)
+        self.lin2 = nn.Linear(20, 20)
+        self.lin3 = nn.Linear(20, 20)
+        self.lin4 = nn.Linear(20, 1)
+        self.relu = nn.ReLU()
 
+    def forward(self, xb):
+        z = self.lin(xb)
+        z = self.relu(z)
+        z = self.lin2(z)
+        z = self.relu(z)
+        z = self.lin3(z)
+        z = self.relu(z)
+        z = self.lin4(z)
+        return z
 
-    def forward(self, xb):
-        z = self.lin(xb)
-        z = self.relu(z)
-        z = self.lin2(z)
-        z = self.relu(z)
-        z = self.lin3(z)
-        z = self.relu(z)
-        z = self.lin4(z)
-        return z
 
 narx_net = NARXNN(
-    net=NARX(),
-    ylag=13,
-    model_type="NAR",
-    basis_function=Polynomial(degree=1),
-    epochs=900,
-    verbose=False,
-    learning_rate=2.5e-02,
-    optim_params={},  # optional parameters of the optimizer
+    net=NARX(),
+    ylag=13,
+    model_type="NAR",
+    basis_function=Polynomial(degree=1),
+    batch_size=128,
+    epochs=1500,
+    verbose=False,
+    learning_rate=1e-02,
+    optim_params={},  # optional parameters of the optimizer
+    random_state=42,
 )
 
 narx_net.fit(y=y_train)
-yhat = narx_net.predict(y=y_test, forecast_horizon=23)
-
-narxnet_loss = loss(
-    pd.Series(y_test.flatten()[narx_net.max_lag :]),
-    pd.Series(yhat.flatten()[narx_net.max_lag :]),
-)
-
+y_initial = y_train[-narx_net.max_lag :]
+yhat = narx_net.predict(y=y_initial, forecast_horizon=24)
+narxnet_loss = loss(y_test, yhat[narx_net.max_lag :])
 print(narxnet_loss)
-plot_results(y=y_test[narx_net.max_lag :], yhat=yhat[narx_net.max_lag :])
+plot_results(y=y_test, yhat=yhat[narx_net.max_lag :])
+
+one_step_context = np.concatenate([y_initial, y_test])
+one_step_yhat = narx_net.predict(y=one_step_context, steps_ahead=1)
+narxnet_one_step_loss = loss(
+    y_test, one_step_yhat[narx_net.max_lag :]
+)
+print(narxnet_one_step_loss)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_neural_narx.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-05.png?raw=true)
 
 ## sktime models
 
@@ -1143,179 +1324,207 @@ The following models are the ones available in the **sktime** package.
 
 ```python
 y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=23)  # 23 samples for testing
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 plot_series(y_train, y_test, labels=["y_train", "y_test"])
 fh = ForecastingHorizon(y_test.index, is_relative=False)
+print(y_train.shape[0], y_test.shape[0])
 ```
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-06.png?raw=true)
+
 
 ## sktime: Exponential Smoothing
 
 ```python
 es = ExponentialSmoothing(trend="add", seasonal="multiplicative", sp=12)
 y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=23)
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 es.fit(y_train)
 y_pred_es = es.predict(fh)
+
 plot_series(y_test, y_pred_es, labels=["y_test", "y_pred"])
 es_loss = loss(y_test, y_pred_es)
 es_loss
->>> 910.46
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_es.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-07.png?raw=true)
 
 ## sktime: AutoETS
 
 ```python
 y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=23)
+
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 ets = AutoETS(auto=True, sp=12, n_jobs=-1)
 ets.fit(y_train)
 y_pred_ets = ets.predict(fh)
+
 plot_series(y_test, y_pred_ets, labels=["y_test", "y_pred"])
 ets_loss = loss(y_test, y_pred_ets)
 ets_loss
->>> 1739.11
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_ets.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-08.png?raw=true)
 
 ## sktime: AutoArima
 
 ```python
-y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=23)
-
 auto_arima = AutoARIMA(sp=12, suppress_warnings=True)
+y = load_airline()
+
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 auto_arima.fit(y_train)
 y_pred_auto_arima = auto_arima.predict(fh)
+
 plot_series(y_test, y_pred_auto_arima, labels=["y_test", "y_pred"])
 autoarima_loss = loss(y_test, y_pred_auto_arima)
 autoarima_loss
->>> 1714.47
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_autoarima.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-09.png?raw=true)
 
 ## sktime: Arima
 
 ```python
 y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=23)
+
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 manual_arima = ARIMA(
-    order=(13, 1, 0), suppress_warnings=True
-)  # seasonal_order=(0, 1, 0, 12)
+    order=(13, 1, 0), suppress_warnings=True
+)  # seasonal_order=(0, 1, 0, 12)
 manual_arima.fit(y_train)
 y_pred_manual_arima = manual_arima.predict(fh)
 plot_series(y_test, y_pred_manual_arima, labels=["y_test", "y_pred"])
 manualarima_loss = loss(y_test, y_pred_manual_arima)
 manualarima_loss
->>> 2085.42
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_manual_arima.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-10.png?raw=true)
 
 ## sktime: BATS
 
 ```python
 y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=23)
+
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 bats = BATS(sp=12, use_trend=True, use_box_cox=False)
 bats.fit(y_train)
 y_pred_bats = bats.predict(fh)
+
 plot_series(y_test, y_pred_bats, labels=["y_test", "y_pred"])
 bats_loss = loss(y_test, y_pred_bats)
 bats_loss
->>> 7286.64
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_bats.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-11.png?raw=true)
 
 ## sktime: TBATS
 
 ```python
 y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=23)
+
+y_train, y_test = temporal_train_test_split(y, test_size=24)
 tbats = TBATS(sp=12, use_trend=True, use_box_cox=False)
 tbats.fit(y_train)
 y_pred_tbats = tbats.predict(fh)
 plot_series(y_test, y_pred_tbats, labels=["y_test", "y_pred"])
 tbats_loss = loss(y_test, y_pred_tbats)
 tbats_loss
->>> 7448.43
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_tbats.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-12.png?raw=true)
 
 ## sktime: Prophet
 
 ```python
 set_random_seed(42)
-y = load_airline()
-y_train, y_test = temporal_train_test_split(y, test_size=23)
-z = y.copy()
-z = z.to_timestamp(freq="M")
-z_train, z_test = temporal_train_test_split(z, test_size=23)
+
+y = load_airline().to_timestamp(how="start")
+df = y.rename_axis("ds").rename("y").reset_index()
+df_train = df.iloc[:-24].copy()
+df_test = df.iloc[-24:].copy()
+
 prophet = Prophet(
-    seasonality_mode="multiplicative",
-    n_changepoints=int(len(y_train) / 12),
-    add_country_holidays={"country_name": "Germany"},
-    yearly_seasonality=True,
-    weekly_seasonality=False,
-    daily_seasonality=False,
+    seasonality_mode="multiplicative",
+    n_changepoints=int(len(df_train) / 12),
+    yearly_seasonality=True,
+    weekly_seasonality=False,
+    daily_seasonality=False,
 )
-prophet.fit(z_train)
-y_pred_prophet = prophet.predict(fh.to_relative(cutoff=y_train.index[-1]))
-y_pred_prophet.index = y_test.index
-plot_series(y_test, y_pred_prophet, labels=["y_test", "y_pred"])
-prophet_loss = loss(y_test, y_pred_prophet)
+prophet.add_country_holidays(country_name="Germany")
+prophet.fit(df_train)
+forecast_prophet = prophet.predict(df_test[["ds"]])
+y_pred_prophet = forecast_prophet["yhat"].to_numpy()
+
+plot_series(
+    df_test.set_index("ds")["y"],
+    pd.Series(y_pred_prophet, index=df_test["ds"]),
+    labels=["y_test", "y_pred"],
+)
+prophet_loss = loss(df_test["y"].to_numpy(), y_pred_prophet)
 prophet_loss
->>> 1186.00
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_prophet.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-13.png?raw=true)
 
 ## Neural Prophet
 
 ```python
 set_random_seed(42)
-df = pd.read_csv(r".\datasets\air_passengers.csv")
-m = NeuralProphet(seasonality_mode="multiplicative")
-df_train = df.iloc[:-23, :].copy()
-df_test = df.iloc[-23:, :].copy()
 
-m = NeuralProphet(seasonality_mode="multiplicative")
-metrics = m.fit(df_train, freq="MS")
+y = load_airline().to_timestamp(how="start")
+df = y.rename_axis("ds").rename("y").reset_index()
+df_train = df.iloc[:-24].copy()
+df_test = df.iloc[-24:].copy()
+
+m = NeuralProphet(
+    seasonality_mode="multiplicative", epochs=100, learning_rate=0.01
+)
+m.fit(df_train, freq="MS", progress=None)
 future = m.make_future_dataframe(
-    df_train, periods=23, n_historic_predictions=len(df_train)
+    df_train, periods=24, n_historic_predictions=False
 )
 forecast = m.predict(future)
-plt.plot(forecast["yhat1"].values[-23:])
-plt.plot(df_test["y"].values)
-neuralprophet_loss = loss(forecast["yhat1"].values[-23:], df_test["y"].values)
-neuralprophet_loss
->>> 501.24
+
+neuralprophet_loss = loss(
+    df_test["y"].to_numpy(), forecast["yhat1"].to_numpy()
+)
+print(neuralprophet_loss)
+plt.plot(df_test["ds"], df_test["y"], label="observed")
+plt.plot(forecast["ds"], forecast["yhat1"], label="predicted")
+plt.legend()
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/ap_neuralprophet.png)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/air-passenger-benchmark-14.png?raw=true)
+
+The historical Neural NARX value of 316.5409 used a different protocol: the
+network was trained on the first 108 observations, the next 13 measured outputs
+initialized the recursion, and only the final 23 months were scored. Repeating
+that protocol with the current stack gives 316.8340. Under the common 120/24
+split, the former mini-batch configuration gives MSE 2967.6219. Selecting the
+batch size, learning rate and epoch count on an internal 96/24 split, then
+refitting on all 120 training observations, reduces the free-run MSE to
+1621.5225. Its one-step-ahead MSE is 307.1843, indicating that recursive error
+accumulation accounts for much of the remaining free-run error.
 
 The final results can be summarized as follows, resulting in the table presented in the beginning of this case study:
 
 ```python
 results = {
-    "Exponential Smoothing": es_loss,
-    "ETS": ets_loss,
-    "AutoArima": autoarima_loss,
-    "Manual Arima": manualarima_loss,
-    "BATS": bats_loss,
-    "TBATS": tbats_loss,
-    "Prophet": prophet_loss,
-    "SysIdentPy (Polynomial Model)": frols_loss,
-    "SysIdentPy (Neural Model)": narxnet_loss,
-    "SysIdentPy (AOLS)": aols_loss,
-    "SysIdentPy (MetaMSS)": metamss_loss,
-    "NeuralProphet": neuralprophet_loss,
+    "Exponential Smoothing": es_loss,
+    "ETS": ets_loss,
+    "AutoArima": autoarima_loss,
+    "Manual Arima": manualarima_loss,
+    "BATS": bats_loss,
+    "TBATS": tbats_loss,
+    "Prophet": prophet_loss,
+    "SysIdentPy (Polynomial Model)": frols_loss,
+    "SysIdentPy (Neural Model)": narxnet_loss,
+    "SysIdentPy (AOLS)": aols_loss,
+    "SysIdentPy (MetaMSS)": metamss_loss,
+    "NeuralProphet": neuralprophet_loss,
 }
+
 sorted(results.items(), key=lambda result: result[1])
 ```
 
@@ -1330,7 +1539,7 @@ Even though some progress has been made, previous work has been limited to model
 The data used in this study-case is the Bouc-Wen model ([Bouc, R - Forced Vibrations of a Mechanical System with Hysteresis](https://www.scirp.org/reference/referencespapers?referenceid=726819)), ([Wen, Y. X. - Method for Random Vibration of Hysteretic Systems](https://ascelibrary.org/doi/10.1061/JMCEA3.0002106)) of an MRD whose schematic diagram is shown in the figure below.
 
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bouc_wen.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/bouc_wen.png?raw=true)
 > The model for a magneto-rheological damper proposed by [Spencer, B. F. and Sain, M. K. - Controlling buildings: a new frontier in feedback](https://ieeexplore.ieee.org/document/642972).
 
 The general form of the Bouc-Wen model can be described as ([Spencer, B. F. and Sain, M. K. - Controlling buildings: a new frontier in feedback](https://ieeexplore.ieee.org/document/642972)):
@@ -1380,29 +1589,22 @@ The challenges are:
 
 ### Required Packages and Versions
 
-To ensure that you can replicate this case study, it is essential to use specific versions of the required packages. Below is a list of the packages along with their respective versions needed for running the case studies effectively.
+This case study was verified with SysIdentPy 0.9.0 on Python 3.12.12,
+`pandas==2.3.3` and `scikit-learn==1.7.2`. Install the repository checkout and
+the two data-preparation packages explicitly:
 
-To install all the required packages, you can create a `requirements.txt` file with the following content:
-
-```
-sysidentpy==0.4.0
-pandas==2.2.2
-numpy==1.26.0
-matplotlib==3.8.4
-scikit-learn==1.4.2
+```bash
+python -m pip install -e .
+python -m pip install pandas==2.3.3 scikit-learn==1.7.2
 ```
 
-Then, install the packages using:
-```
-pip install -r requirements.txt
-```
-
-- Ensure that you use a virtual environment to avoid conflicts between package versions.
-- Versions specified are based on compatibility with the code examples provided. If you are using different versions, some adjustments in the code might be necessary.
+The dataset is loaded from an immutable `sysidentpy-data` URL. Randomized
+examples use seed 42.
 
 ### SysIdentPy Configuration
 
 ```python
+from warnings import catch_warnings, simplefilter
 import numpy as np
 from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler
 import pandas as pd
@@ -1415,58 +1617,62 @@ from sysidentpy.parameter_estimation import LeastSquares
 from sysidentpy.metrics import root_relative_squared_error
 from sysidentpy.utils.plotting import plot_results
 
-df = pd.read_csv("boucwen_histeretic_system.csv")
+df = pd.read_csv(
+    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/4085901293ba5ed5674bb2911ef4d1fa20f3438d/datasets/bouc_wen/boucwen_histeretic_system.csv"
+)
 scaler_x = MaxAbsScaler()
 scaler_y = MaxAbsScaler()
 
 init = 400
-x_train = df[["E", "v"]].iloc[init:df.shape[0]//2, :]
+x_train = df[["E", "v"]].iloc[init : df.shape[0] // 2, :]
 x_train["sign_v"] = np.sign(df["v"])
 x_train = scaler_x.fit_transform(x_train)
 
-x_test = df[["E", "v"]].iloc[df.shape[0]//2 + 1:df.shape[0] - init, :]
+x_test = df[["E", "v"]].iloc[df.shape[0] // 2 + 1 : df.shape[0] - init, :]
 x_test["sign_v"] = np.sign(df["v"])
 x_test = scaler_x.transform(x_test)
 
-y_train = df[["f"]].iloc[init:df.shape[0]//2, :].values.reshape(-1, 1)
+y_train = df[["f"]].iloc[init : df.shape[0] // 2, :].values.reshape(-1, 1)
 y_train = scaler_y.fit_transform(y_train)
 
-y_test = df[["f"]].iloc[df.shape[0]//2 + 1:df.shape[0] - init, :].values.reshape(-1, 1)
+y_test = (
+    df[["f"]].iloc[df.shape[0] // 2 + 1 : df.shape[0] - init, :].values.reshape(-1, 1)
+)
 y_test = scaler_y.transform(y_test)
 
 # Plotting the data
 plt.figure(figsize=(10, 8))
-plt.suptitle('Identification (training) data', fontsize=16)
+plt.suptitle("Identification (training) data", fontsize=16)
 
 plt.subplot(221)
-plt.plot(y_train, 'k')
-plt.ylabel('Force - Output')
-plt.xlabel('Samples')
-plt.title('y')
+plt.plot(y_train, "k")
+plt.ylabel("Force - Output")
+plt.xlabel("Samples")
+plt.title("y")
 plt.grid()
 plt.axis([0, 1500, -1.5, 1.5])
 
 plt.subplot(222)
-plt.plot(x_train[:, 0], 'k')
-plt.ylabel('Control Voltage')
-plt.xlabel('Samples')
-plt.title('x_1')
+plt.plot(x_train[:, 0], "k")
+plt.ylabel("Control Voltage")
+plt.xlabel("Samples")
+plt.title("x_1")
 plt.grid()
 plt.axis([0, 1500, 0, 1])
 
 plt.subplot(223)
-plt.plot(x_train[:, 1], 'k')
-plt.ylabel('Velocity')
-plt.xlabel('Samples')
-plt.title('x_2')
+plt.plot(x_train[:, 1], "k")
+plt.ylabel("Velocity")
+plt.xlabel("Samples")
+plt.title("x_2")
 plt.grid()
 plt.axis([0, 1500, -1.5, 1.5])
 
 plt.subplot(224)
-plt.plot(x_train[:, 2], 'k')
-plt.ylabel('sign(Velocity)')
-plt.xlabel('Samples')
-plt.title('x_3')
+plt.plot(x_train[:, 2], "k")
+plt.ylabel("sign(Velocity)")
+plt.xlabel("Samples")
+plt.title("x_3")
 plt.grid()
 plt.axis([0, 1500, -1.5, 1.5])
 
@@ -1474,164 +1680,339 @@ plt.tight_layout(rect=[0, 0, 1, 0.95])
 plt.show()
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bouc_wen_data.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-01.png?raw=true)
 
 Let's check how is the hysteretic behavior considering each input:
 ```python
+plt.figure()
 plt.plot(x_train[:, 0], y_train)
 plt.xlabel("x1 - Voltage")
 plt.ylabel("y - Force")
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_voltage.png?raw=true)
-
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-02.png?raw=true)
 
 ```python
+plt.figure()
 plt.plot(x_train[:, 1], y_train)
 plt.xlabel("x2 - Velocity")
 plt.ylabel("y - Force")
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_velocity.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-03.png?raw=true)
 
 ```python
+plt.figure()
 plt.plot(x_train[:, 2], y_train)
 plt.xlabel("u3 - sign(Velocity)")
 plt.ylabel("y - Force")
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_sign.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-04.png?raw=true)
 
-Now, we can just build a NARX model:
+Now, we can build a NARX model. With all three inputs and `MaxAbsScaler`, the
+free-run RRSE is $0.045104$:
 
 ```python
 basis_function = Polynomial(degree=3)
 model = FROLS(
-    xlag=[[1], [1], [1]],
-    ylag=1,
-    basis_function=basis_function,
-    estimator=LeastSquares(),
-    info_criteria="aic",
+    xlag=[[1], [1], [1]],
+    ylag=1,
+    basis_function=basis_function,
+    estimator=LeastSquares(),
+    info_criteria="aic",
 )
 
 model.fit(X=x_train, y=y_train)
-yhat = model.predict(X=x_test, y=y_test[:model.max_lag :, :])
+yhat = model.predict(X=x_test, y=y_test[: model.max_lag :, :])
 rrse = root_relative_squared_error(y_test[model.max_lag :], yhat[model.max_lag :])
 print(rrse)
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, title="FROLS: sign(v) and MaxAbsScaler")
->>> 0.0450
+plot_results(
+    y=y_test[model.max_lag :],
+    yhat=yhat[model.max_lag :],
+    n=10000,
+    title="FROLS: sign(v) and MaxAbsScaler",
+)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-05.png?raw=true)
 
 
-If we remove the `sign(v)` input and try to build a NARX model using the same configuration, the model diverge, as can be seen in the following figure:
+If we remove the `sign(v)` input and use the same configuration, free-run
+simulation diverges at sample 203, as shown in the following figure:
 
 ```python
 basis_function = Polynomial(degree=3)
 model = FROLS(
-    xlag=[[1], [1]],
-    ylag=1,
-    basis_function=basis_function,
-    estimator=LeastSquares(),
-    info_criteria="aic",
+    xlag=[[1], [1]],
+    ylag=1,
+    basis_function=basis_function,
+    estimator=LeastSquares(),
+    info_criteria="aic",
 )
 
 model.fit(X=x_train[:, :2], y=y_train)
-yhat = model.predict(X=x_test[:, :2], y=y_test[:model.max_lag :, :])
-rrse = root_relative_squared_error(y_test[model.max_lag :], yhat[model.max_lag :])
-print(rrse)
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, title="FROLS: MaxAbsScaler, discarding sign(v)")
->>> nan
+with catch_warnings(), np.errstate(over="ignore", invalid="ignore"):
+    simplefilter("ignore", RuntimeWarning)
+    yhat = model.predict(
+        X=x_test[:, :2], y=y_test[: model.max_lag]
+    )
+if np.isfinite(yhat).all():
+    rrse = root_relative_squared_error(
+        y_test[model.max_lag :], yhat[model.max_lag :]
+    )
+    print(rrse)
+    plot_results(
+        y=y_test[model.max_lag :],
+        yhat=yhat[model.max_lag :],
+        n=10000,
+        title="FROLS without sign(v)",
+    )
+else:
+    finite_mask = np.isfinite(yhat[:, 0])
+    finite_stop = int(np.flatnonzero(~finite_mask)[0])
+    print(f"Free-run simulation diverged at sample {finite_stop}.")
+    plot_results(
+        y=y_test[model.max_lag : finite_stop],
+        yhat=yhat[model.max_lag : finite_stop],
+        n=max(1, finite_stop - model.max_lag),
+        title="FROLS without sign(v): trajectory before divergence",
+    )
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_divergent.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-06.png?raw=true)
 
-If we use the `MetaMSS` algorithm instead, the results are better.
+Using MetaMSS without `sign(v)` delays the loss of numerical stability, but does
+not eliminate it: this free-run trajectory diverges at sample 1153.
 
 ```python
 from sysidentpy.model_structure_selection import MetaMSS
 
 basis_function = Polynomial(degree=3)
 model = MetaMSS(
-    xlag=[[1], [1]],
-    ylag=1,
-    basis_function=basis_function,
-    estimator=LeastSquares(),
-    random_state=42,
+    xlag=[[1], [1]],
+    ylag=1,
+    basis_function=basis_function,
+    estimator=LeastSquares(),
+    random_state=42,
 )
 
-model.fit(X=x_train[:, :2], y=y_train)
-yhat = model.predict(X=x_test[:, :2], y=y_test[:model.max_lag :, :])
-rrse = root_relative_squared_error(y_test[model.max_lag :], yhat[model.max_lag :])
-print(rrse)
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, title="MetaMSS: MaxAbsScaler, discarding sign(v)")
->>> 0.24
+with catch_warnings(), np.errstate(over="ignore", invalid="ignore"):
+    simplefilter("ignore", RuntimeWarning)
+    simplefilter("ignore", UserWarning)
+    model.fit(X=x_train[:, :2], y=y_train)
+    yhat = model.predict(
+        X=x_test[:, :2], y=y_test[: model.max_lag]
+    )
+if np.isfinite(yhat).all():
+    rrse = root_relative_squared_error(
+        y_test[model.max_lag :], yhat[model.max_lag :]
+    )
+    print(rrse)
+    finite_stop = len(yhat)
+    plot_results(
+        y=y_test[model.max_lag :],
+        yhat=yhat[model.max_lag :],
+        n=10000,
+        title="MetaMSS without sign(v)",
+    )
+else:
+    finite_mask = np.isfinite(yhat[:, 0])
+    finite_stop = int(np.flatnonzero(~finite_mask)[0])
+    print(f"Free-run simulation diverged at sample {finite_stop}.")
+    plot_results(
+        y=y_test[model.max_lag : finite_stop],
+        yhat=yhat[model.max_lag : finite_stop],
+        n=max(1, finite_stop - model.max_lag),
+        title="MetaMSS without sign(v): trajectory before divergence",
+    )
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r2.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-07.png?raw=true)
 
-However, when the output of the system reach its minimum value, the model oscillate
+Before divergence, the oscillatory behavior becomes visible when the output
+approaches its minimum value.
 
 ```python
-plot_results(y=y_test[1100 : 1200], yhat=yhat[1100 : 1200], n=10000, title="Unstable region")
+window_stop = finite_stop
+window_start = max(model.max_lag, window_stop - 100)
+plot_results(
+    y=y_test[window_start:window_stop],
+    yhat=yhat[window_start:window_stop],
+    n=100,
+    title="MetaMSS without sign(v): last finite window",
+)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_unstable.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-08.png?raw=true)
 
-If we add the `sign(v)` input again and use `MetaMSS`, the results are very close to the `FROLS` algorithm with all inputs
+If we add the `sign(v)` input again and use MetaMSS, the free-run simulation is
+finite and gives RRSE $0.055707$, close to the FROLS result with all inputs.
 
 ```python
 basis_function = Polynomial(degree=3)
 model = MetaMSS(
-    xlag=[[1], [1], [1]],
-    ylag=1,
-    basis_function=basis_function,
-    estimator=LeastSquares(),
-    random_state=42,
+    xlag=[[1], [1], [1]],
+    ylag=1,
+    basis_function=basis_function,
+    estimator=LeastSquares(),
+    random_state=42,
 )
 
-model.fit(X=x_train, y=y_train)
-yhat = model.predict(X=x_test, y=y_test[:model.max_lag :, :])
+with catch_warnings(), np.errstate(over="ignore", invalid="ignore"):
+    simplefilter("ignore", RuntimeWarning)
+    simplefilter("ignore", UserWarning)
+    model.fit(X=x_train, y=y_train)
+    yhat = model.predict(X=x_test, y=y_test[: model.max_lag :, :])
 rrse = root_relative_squared_error(y_test[model.max_lag :], yhat[model.max_lag :])
 print(rrse)
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=10000, title="MetaMSS: sign(v) and MaxAbsScaler")
->>> 0.0554
+plot_results(
+    y=y_test[model.max_lag :],
+    yhat=yhat[model.max_lag :],
+    n=10000,
+    title="MetaMSS: sign(v) and MaxAbsScaler",
+)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r3.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-09.png?raw=true)
 
 This case will also highlight the significance of data scaling. Previously, we used the `MaxAbsScaler` method, which resulted in great models when using the `sign(v)` inputs, but also resulted in unstable models when removing that input feature. When scaling is applied using `MinMaxScaler`, however, the overall stability of the results improves, and the model does not diverge, even when the `sign(v)` input is removed, using the `FROLS` algorithm.
 
 The user can get the results bellow by just changing the data scaling method using
 
 ```python
-scaler_x = MinMaxScaler()
-scaler_y = MinMaxScaler()
+minmax_scaler_x = MinMaxScaler()
+minmax_scaler_y = MinMaxScaler()
+midpoint = df.shape[0] // 2
+
+x_train_minmax_frame = df[["E", "v"]].iloc[init:midpoint].copy()
+x_train_minmax_frame["sign_v"] = np.sign(x_train_minmax_frame["v"])
+x_test_minmax_frame = df[["E", "v"]].iloc[midpoint + 1 : df.shape[0] - init].copy()
+x_test_minmax_frame["sign_v"] = np.sign(x_test_minmax_frame["v"])
+x_train_minmax = minmax_scaler_x.fit_transform(x_train_minmax_frame)
+x_test_minmax = minmax_scaler_x.transform(x_test_minmax_frame)
+
+y_train_minmax = minmax_scaler_y.fit_transform(
+    df[["f"]].iloc[init:midpoint].to_numpy()
+)
+y_test_minmax = minmax_scaler_y.transform(
+    df[["f"]].iloc[midpoint + 1 : df.shape[0] - init].to_numpy()
+)
+
+def run_minmax_experiment(name, selector, use_sign):
+    n_inputs = 3 if use_sign else 2
+    x_train_variant = x_train_minmax[:, :n_inputs]
+    x_test_variant = x_test_minmax[:, :n_inputs]
+    if selector == "FROLS":
+        candidate = FROLS(
+            xlag=[[1]] * n_inputs,
+            ylag=1,
+            basis_function=Polynomial(degree=3),
+            estimator=LeastSquares(),
+            info_criteria="aic",
+        )
+    else:
+        candidate = MetaMSS(
+            xlag=[[1]] * n_inputs,
+            ylag=1,
+            basis_function=Polynomial(degree=3),
+            estimator=LeastSquares(),
+            random_state=42,
+        )
+
+    with catch_warnings(), np.errstate(over="ignore", invalid="ignore"):
+        simplefilter("ignore", RuntimeWarning)
+        simplefilter("ignore", UserWarning)
+        candidate.fit(X=x_train_variant, y=y_train_minmax)
+        prediction = candidate.predict(
+            X=x_test_variant,
+            y=y_test_minmax[: candidate.max_lag],
+        )
+
+    finite_mask = np.isfinite(prediction[:, 0])
+    if finite_mask.all():
+        score = root_relative_squared_error(
+            y_test_minmax[candidate.max_lag :],
+            prediction[candidate.max_lag :],
+        )
+        print(f"{name}: RRSE={score:.6f}")
+        stop = len(prediction)
+    else:
+        score = np.nan
+        stop = int(np.flatnonzero(~finite_mask)[0])
+        print(f"{name}: free-run simulation diverged at sample {stop}")
+
+    plot_results(
+        y=y_test_minmax[candidate.max_lag : stop],
+        yhat=prediction[candidate.max_lag : stop],
+        n=max(1, stop - candidate.max_lag),
+        title=f"{name} with MinMaxScaler",
+    )
+    return prediction, score
+
+minmax_results = {
+    "FROLS with sign(v)": run_minmax_experiment(
+        "FROLS with sign(v)", "FROLS", True
+    ),
+    "FROLS without sign(v)": run_minmax_experiment(
+        "FROLS without sign(v)", "FROLS", False
+    ),
+    "MetaMSS without sign(v)": run_minmax_experiment(
+        "MetaMSS without sign(v)", "MetaMSS", False
+    ),
+    "MetaMSS with sign(v)": run_minmax_experiment(
+        "MetaMSS with sign(v)", "MetaMSS", True
+    ),
+}
+yhat = minmax_results["MetaMSS with sign(v)"][0]
+x_test = x_test_minmax
+y_test = y_test_minmax
 ```
 
-and running each model again. That is the only change to improve the results.
+and running each model again. This change makes every free-run trajectory finite,
+but it does not improve the complete-input configurations.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r4.png?raw=true)
-> FROLS: with `sign(v)` and `MinMaxScaler`. RMSE: 0.1159
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-10.png?raw=true)
+> FROLS with `sign(v)` and `MinMaxScaler`: RRSE 0.115986.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r5.png?raw=true)
-FROLS: discarding `sign(v)` and using `MinMaxScaler`. RMSE: 0.1639
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-11.png?raw=true)
+> FROLS without `sign(v)` and using `MinMaxScaler`: RRSE 0.163944.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r6.png?raw=true)
-> MetaMSS: discarding `sign(v)` and using `MinMaxScaler`. RMSE: 0.1762
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-12.png?raw=true)
+> MetaMSS without `sign(v)` and using `MinMaxScaler`: RRSE 0.185607.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_r7.png?raw=true)
-> MetaMSS: including `sign(v)` and using `MinMaxScaler`. RMSE: 0.0694
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-13.png?raw=true)
+> MetaMSS with `sign(v)` and using `MinMaxScaler`: RRSE 0.104511.
 
-In contrast, the MetaMSS method returned the best model overall, but not better than the best `FROLS` method using `MaxAbsScaler`.
+The complete comparison is:
+
+| Scaling | Selector | Inputs | Free-run result |
+| --- | --- | --- | ---: |
+| MaxAbs | FROLS | with `sign(v)` | RRSE 0.045104 |
+| MaxAbs | FROLS | without `sign(v)` | diverged at sample 203 |
+| MaxAbs | MetaMSS | without `sign(v)` | diverged at sample 1153 |
+| MaxAbs | MetaMSS | with `sign(v)` | RRSE 0.055707 |
+| MinMax | FROLS | with `sign(v)` | RRSE 0.115986 |
+| MinMax | FROLS | without `sign(v)` | RRSE 0.163944 |
+| MinMax | MetaMSS | without `sign(v)` | RRSE 0.185607 |
+| MinMax | MetaMSS | with `sign(v)` | RRSE 0.104511 |
+
+MetaMSS with `sign(v)` is the best of the MinMax-scaled configurations. The
+best result overall remains FROLS with `sign(v)` and `MaxAbsScaler`. A non-finite
+free-run output is reported as divergence rather than converted into a scalar
+metric.
 
 Here is the predicted hysteretic loop:
 ```python
+plt.figure(figsize=(8, 6))
 plt.plot(x_test[:, 1], yhat)
+plt.xlabel("Scaled velocity")
+plt.ylabel("Predicted scaled force")
+plt.title("MetaMSS with sign(v) and MinMaxScaler")
+plt.show()
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/bw_predicted_hystereis.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/modeling-a-magneto-rheological-damper-device-14.png?raw=true)
 
 ## Silver box
 
@@ -1677,26 +2058,17 @@ $$
 
 ### Required Packages and Versions
 
-To ensure that you can replicate this case study, it is essential to use specific versions of the required packages. Below is a list of the packages along with their respective versions needed for running the case studies effectively.
+This case study was verified with SysIdentPy 0.9.0 on Python 3.12.12 and
+`nonlinear-benchmarks==1.0.1`. Install the repository checkout and the official
+benchmark loader explicitly:
 
-To install all the required packages, you can create a `requirements.txt` file with the following content:
-
-```
-sysidentpy==0.4.0
-pandas==2.2.2
-numpy==1.26.0
-matplotlib==3.8.4
-nonlinear_benchmarks==0.1.2
+```bash
+python -m pip install -e .
+python -m pip install nonlinear-benchmarks==1.0.1
 ```
 
-Then, install the packages using:
-
-```
-pip install -r requirements.txt
-```
-
-- Ensure that you use a virtual environment to avoid conflicts between package versions.
-- Versions specified are based on compatibility with the code examples provided. If you are using different versions, some adjustments in the code might be necessary.
+Use a virtual environment to isolate the optional loader. Numerical results
+should be recomputed if the environment or model configuration changes.
 
 ### SysIdentPy configuration
 
@@ -1704,7 +2076,6 @@ In this section, we will demonstrate the application of SysIdentPy to the Silver
 
 ```python
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 
 from sysidentpy.model_structure_selection import FROLS
@@ -1750,13 +2121,13 @@ plt.title("Experiment 2: testing data")
 plt.show()
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_e1_training.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-01.png?raw=true)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_e1_testing.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-02.png?raw=true)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_e2_training.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-03.png?raw=true)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_e2_testing.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-04.png?raw=true)
 
 > Important Note
 
@@ -1780,7 +2151,7 @@ The goal of this benchmark is to develop a model that outperforms the state-of-t
 
 It appears that the values shown in the paper actually represent the training time, not the error metrics. I will contact the authors to confirm this information. According to the Nonlinear Benchmark website, the information is as follows:
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_sota.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver_sota.png?raw=true)
 
 where the values in the "Training time" column matches the ones presented as error metrics in the paper.
 
@@ -1788,45 +2159,56 @@ where the values in the "Training time" column matches the ones presented as err
 
 ### Results
 
-We will start (as we did in every other case study) with a basic configuration of FROLS using a polynomial basis function with degree equal 2. The `xlag` and `ylag` are set to $7$ in this first example. Because the dataset is considerably large, we will start with `n_info_values=40`. Because we're dealing with a large training dataset, we will use the `err_tol` instead of information criteria to have a faster performance. We will also set `n_terms=40`, which means that the search will stop if the `err_tol` is reached or 40 regressors is tested in the `ERR` algorithm. While this approach might result in a suboptimal model, it is a reasonable starting point for our first attempt. There are three different experiments: multi sine, arrow (full), and arrow (no extrapolation).
+We will start (as we did in every other case study) with a basic configuration
+of FROLS using a polynomial basis function with degree equal to 2. The `xlag`
+and `ylag` are set to $7$ in this first example. Because the dataset is large,
+we use `err_tol` and set `n_terms=40`; the search stops when the error-reduction
+tolerance is reached or 40 regressors have been tested. While this approach may
+result in a suboptimal model, it is a reasonable starting point. There are three
+tests: multisine, arrow (full), and arrow (without extrapolation).
 
 ```python
-x_train, y_train = train_val.u, train_val.y
-test_multisine, test_arrow_full, test_arrow_no_extrapolation = test
-x_test, y_test = test_multisine.u, test_multisine.y
-
-n = test_multisine.state_initialization_window_length
-
 basis_function = Polynomial(degree=2)
 model = FROLS(
-    xlag=7,
-    ylag=7,
-    basis_function=basis_function,
-    estimator=LeastSquares(),
-    err_tol=0.999,
-    n_terms=40,
-    order_selection=False
+    xlag=7,
+    ylag=7,
+    basis_function=basis_function,
+    estimator=LeastSquares(),
+    err_tol=0.999,
+    n_terms=40,
+    order_selection=False,
 )
 
 model.fit(X=x_train, y=y_train)
-y_test = np.concatenate([y_train[-model.max_lag:], y_test])
-x_test = np.concatenate([x_train[-model.max_lag:], x_test])
-yhat = model.predict(X=x_test, y=y_test[:model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n:])
-nrmse = rmse/y_test.std()
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
 rmse_mv = 1000 * rmse
-print(nrmse, rmse_mv)
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=30000, figsize=(15, 4), title=f"Multisine. Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}")
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
+plot_results(
+    y=y_test[n:],
+    yhat=yhat,
+    n=30000,
+    figsize=(15, 4),
+    title=f"Multisine. Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
+)
 
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=300, figsize=(15, 4), title=f"Multisine. Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}")
-
-> 0.1423804033714937
-> 7.727682109791501
+plot_results(
+    y=y_test[n:],
+    yhat=yhat,
+    n=300,
+    figsize=(15, 4),
+    title=f"Multisine. Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
+)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_r1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-05.png?raw=true)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_r1_zoom.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-06.png?raw=true)
 
 
 ```python
@@ -1838,36 +2220,48 @@ n = test_arrow_full.state_initialization_window_length
 
 basis_function = Polynomial(degree=3)
 model = FROLS(
-    xlag=14,
-    ylag=14,
-    basis_function=basis_function,
-    estimator=LeastSquares(),
-    err_tol=0.9999,
-    n_terms=80,
-    order_selection=False
+    xlag=14,
+    ylag=14,
+    basis_function=basis_function,
+    estimator=LeastSquares(),
+    err_tol=0.9999,
+    n_terms=80,
+    order_selection=False,
 )
 
 model.fit(X=x_train, y=y_train)
-# we will not concatente the last values from train data to use as initial condition here because
-# this test data have a very different behavior.
-# However, if you want you can do that and you will see that the model will still perform
-# great after a few iterations
-yhat = model.predict(X=x_test, y=y_test[:model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n:])
-nrmse = rmse/y_test.std()
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
 rmse_mv = 1000 * rmse
 
-print(nrmse, rmse_mv)
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
 
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=30000, figsize=(15, 4), title=f"Arrow (full). Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}")
+plot_results(
+    y=y_test[n:],
+    yhat=yhat,
+    n=30000,
+    figsize=(15, 4),
+    title=f"Arrow (full). Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
+)
 
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=300, figsize=(15, 4), title=f"Arrow (full). Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}")
+plot_results(
+    y=y_test[n:],
+    yhat=yhat,
+    n=300,
+    figsize=(15, 4),
+    title=f"Arrow (full). Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
+)
 ```
 
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_r2.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-07.png?raw=true)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_r2_zoom.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-08.png?raw=true)
 
 ```python
 x_train, y_train = train_val.u, train_val.y
@@ -1878,30 +2272,61 @@ n = test_arrow_no_extrapolation.state_initialization_window_length
 
 basis_function = Polynomial(degree=3)
 model = FROLS(
-    xlag=14,
-    ylag=14,
-    basis_function=basis_function,
-    estimator=LeastSquares(),
-    err_tol=0.9999,
-    n_terms=40,
-    order_selection=False
+    xlag=14,
+    ylag=14,
+    basis_function=basis_function,
+    estimator=LeastSquares(),
+    err_tol=0.9999,
+    n_terms=40,
+    order_selection=False,
 )
 
 model.fit(X=x_train, y=y_train)
-yhat = model.predict(X=x_test, y=y_test[:model.max_lag, :])
-rmse = root_mean_squared_error(y_test[model.max_lag + n :], yhat[model.max_lag + n:])
-nrmse = rmse/y_test.std()
+if model.max_lag > n:
+    raise ValueError("The model lag exceeds the benchmark initialization window.")
+start = n - model.max_lag
+yhat = model.predict(X=x_test[start:], y=y_test[start:n])
+yhat = yhat[model.max_lag :]
+rmse = root_mean_squared_error(y_test[n:], yhat)
+nrmse = rmse / np.std(y_test[n:])
 rmse_mv = 1000 * rmse
-print(nrmse, rmse_mv)
+print(f"RMSE: {rmse:.6f}; NRMSE: {nrmse:.6f}")
 
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=30000, figsize=(15, 4), title=f"Arrow (no extrapolation). Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}")
+plot_results(
+    y=y_test[n:],
+    yhat=yhat,
+    n=30000,
+    figsize=(15, 4),
+    title=f"Arrow (no extrapolation). Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
+)
 
-plot_results(y=y_test[model.max_lag :], yhat=yhat[model.max_lag :], n=300, figsize=(15, 4), title=f"Free Run simulation. Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}")
+plot_results(
+    y=y_test[n:],
+    yhat=yhat,
+    n=300,
+    figsize=(15, 4),
+    title=f"Free Run simulation. Model -> RMSE (x1000) mv: {round(rmse_mv, 4)}",
+)
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_r3.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-09.png?raw=true)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/silver_r3_zoom.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/silver-box-system-10.png?raw=true)
+
+The current free-run results, evaluated after the 50-sample initialization
+window supplied by the loader, are:
+
+| Test set | RMSE | NRMSE |
+| --- | ---: | ---: |
+| Multisine | 0.007727 | 0.142302 |
+| Arrow, complete | 0.004148 | 0.077565 |
+| Arrow, without extrapolation | 0.002229 | 0.051822 |
+
+The complete arrow test is harder than the version without extrapolation. The
+metric excludes the initialization window once; it does not remove
+`model.max_lag` a second time. The external deep state-space results remain
+valuable context, but are not ranked directly against this table without first
+matching the split, initialization and normalization.
 
 ## F-16 Ground Vibration Test Benchmark
 
@@ -1930,24 +2355,16 @@ The goal of this notebook is to illustrate how SysIdentPy can be applied to such
 
 ### Required Packages and Versions
 
-To ensure that you can replicate this case study, it is essential to use specific versions of the required packages. Below is a list of the packages along with their respective versions needed for running the case studies effectively.
+This case study was verified with SysIdentPy 0.9.0 on Python 3.12.12 and
+`pandas==2.3.3`. Install the repository checkout and pandas explicitly:
 
-To install all the required packages, you can create a `requirements.txt` file with the following content:
-
-```
-sysidentpy==0.4.0
-pandas==2.2.2
-numpy==1.26.0
-matplotlib==3.8.4
+```bash
+python -m pip install -e .
+python -m pip install pandas==2.3.3
 ```
 
-Then, install the packages using:
-```
-pip install -r requirements.txt
-```
-
-- Ensure that you use a virtual environment to avoid conflicts between package versions.
-- Versions specified are based on compatibility with the code examples provided. If you are using different versions, some adjustments in the code might be necessary.
+The data are loaded from an immutable `sysidentpy-data` URL. Numerical results
+should be recomputed if the environment or model configuration changes.
 
 ### SysIdentPy Configuration
 
@@ -1962,41 +2379,50 @@ from sysidentpy.metrics import root_relative_squared_error
 from sysidentpy.utils.display_results import results
 from sysidentpy.utils.plotting import plot_residues_correlation, plot_results
 from sysidentpy.residues.residues_correlation import (
-    compute_residues_autocorrelation,
-    compute_cross_correlation,
+    compute_residues_autocorrelation,
+    compute_cross_correlation,
 )
 ```
 
 ## Procedure
 
 ```python
-f_16 = pd.read_csv(r"examples/datasets/f-16.txt", header=None, names=["x1", "x2", "y"])
-f_16.shape
-f_16[["x1", "x2"]][0:500].plot(figsize=(12, 8))
-
->>> (32768, 3)
+f_16 = pd.read_csv(
+    r"https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/4085901293ba5ed5674bb2911ef4d1fa20f3438d/datasets/f_16_vibration_test/f-16.txt",
+    header=None,
+    names=["x1", "x2", "y"],
+)
 ```
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/f16_input.png?raw=true)
+
+```python
+f_16.shape
+```
+
+```python
+f_16[["x1", "x2"]][0:500].plot(figsize=(12, 8))
+```
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/f-16-aircraft-01.png?raw=true)
 
 ```python
 f_16["y"][0:2000].plot(figsize=(12, 8))
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/f16_output.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/f-16-aircraft-02.png?raw=true)
 
 The following code is to split the dataset into training and test sets
 
 ```python
 x1_id, x1_val = f_16["x1"][0:16384].values.reshape(-1, 1), f_16["x1"][
-    16384::
+    16384::
 ].values.reshape(-1, 1)
 x2_id, x2_val = f_16["x2"][0:16384].values.reshape(-1, 1), f_16["x2"][
-    16384::
+    16384::
 ].values.reshape(-1, 1)
 x_id = np.concatenate([x1_id, x2_id], axis=1)
 x_val = np.concatenate([x1_val, x2_val], axis=1)
+
 y_id, y_val = f_16["y"][0:16384].values.reshape(-1, 1), f_16["y"][
-    16384::
+    16384::
 ].values.reshape(-1, 1)
 ```
 
@@ -2005,6 +2431,7 @@ We will set the lags for both inputs as
 ```python
 x1lag = list(range(1, 10))
 x2lag = list(range(1, 10))
+x2lag
 ```
 
 and build a NARX model as follows
@@ -2014,35 +2441,38 @@ basis_function = Polynomial(degree=1)
 estimator = LeastSquares()
 
 model = FROLS(
-    order_selection=True,
-    n_info_values=39,
-    ylag=20,
-    xlag=[x1lag, x2lag],
-    info_criteria="bic",
-    estimator=estimator,
-    basis_function=basis_function,
+    order_selection=True,
+    n_info_values=39,
+    ylag=20,
+    xlag=[x1lag, x2lag],
+    info_criteria="bic",
+    estimator=estimator,
+    basis_function=basis_function,
 )
 
 model.fit(X=x_id, y=y_id)
 y_hat = model.predict(X=x_val, y=y_val)
-rrse = root_relative_squared_error(y_val, y_hat)
+rrse = root_relative_squared_error(
+    y_val[model.max_lag :], y_hat[model.max_lag :]
+)
 print(rrse)
 r = pd.DataFrame(
-    results(
-        model.final_model,
-        model.theta,
-        model.err,
-        model.n_terms,
-        err_precision=8,
-        dtype="sci",
-    ),
-    columns=["Regressors", "Parameters", "ERR"],
+    results(
+        model.final_model,
+        model.theta,
+        model.err,
+        model.n_terms,
+        err_precision=8,
+        dtype="sci",
+    ),
+    columns=["Regressors", "Parameters", "ERR"],
 )
-
 print(r)
 ```
 
-The RRSE is $0.2910$
+After excluding the model's 20 initial lag samples, the free-run RRSE is
+$0.291070$. The same aligned segment is used for the residual autocorrelation
+and for the cross-correlation with the first input.
 
 | Regressors | Parameters | ERR            |
 |------------|------------|----------------|
@@ -2078,18 +2508,46 @@ The RRSE is $0.2910$
 | x1(k-7)    | 4.9862E+00 | 2.03811842E-05 |
 
 ```python
-plot_results(y=y_val, yhat=y_hat, n=1000)
-ee = compute_residues_autocorrelation(y_val, y_hat)
+plot_results(
+    y=y_val[model.max_lag :], yhat=y_hat[model.max_lag :], n=1000
+)
+ee = compute_residues_autocorrelation(
+    y_val[model.max_lag :], y_hat[model.max_lag :]
+)
 plot_residues_correlation(data=ee, title="Residues", ylabel="$e^2$")
-x1e = compute_cross_correlation(y_val, y_hat, x_val[:, 0])
+x1e = compute_cross_correlation(
+    y_val[model.max_lag :],
+    y_hat[model.max_lag :],
+    x_val[model.max_lag :, 0],
+)
 plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 ```
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/f16_r1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/f-16-aircraft-03.png?raw=true)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/f16_ee_1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/f-16-aircraft-04.png?raw=true)
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/f16_ex_1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/f-16-aircraft-05.png?raw=true)
+
+### Information criteria
+
+The information-criterion trace used during order selection is shown below. It complements the selected-regressor table without changing the validation protocol.
+
+```python
+xaxis = np.arange(1, model.n_info_values + 1)
+plt.plot(xaxis, model.info_values)
+plt.xlabel("n_terms")
+plt.ylabel("Information Criteria")
+
+# You can use the plot below to choose the "n_terms" and run the model again with the most adequate value of terms.
+```
+
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/f-16-aircraft-06.png?raw=true)
+
+This is an illustrative SysIdentPy study, not an official F-16 benchmark
+submission. The curated 32,768-sample record and its half-and-half split do not
+reproduce every split distributed by the official loader, so the RRSE should not
+be compared directly with official benchmark tables.
 
 ## PV Forecasting
 
@@ -2128,36 +2586,18 @@ We will train our models on 80% of the dataset and reserve the remaining 20% for
 
 ### Required Packages and Versions
 
-To ensure that you can replicate this case study, it is essential to use specific versions of the required packages. Below is a list of the packages along with their respective versions needed for running the case studies effectively.
+This case study was verified with SysIdentPy 0.9.0 on Python 3.12.12,
+`neuralprophet==0.9.0`, `torch==2.5.1`, `pandas==2.3.3` and
+`scikit-learn==1.7.2`. Install the optional comparison stack explicitly:
 
-To install all the required packages, you can create a `requirements.txt` file with the following content:
-
-```
-sysidentpy==0.4.0
-pystan==2.19.1.1
-holidays==0.11.2
-fbprophet==0.7.1
-neuralprophet==0.2.7
-pandas==1.3.2
-numpy==1.23.3
-matplotlib==3.8.4
-pmdarima==1.8.3
-scikit-learn==0.24.2
-scipy==1.9.1
-sktime==0.8.0
-statsmodels==0.12.2
-tbats==1.1.0
-torch==1.12.1
+```bash
+python -m pip install -e .
+python -m pip install neuralprophet==0.9.0 torch==2.5.1
+python -m pip install pandas==2.3.3 scikit-learn==1.7.2
 ```
 
-Then, install the packages using:
-
-```
-pip install -r requirements.txt
-```
-
-- Ensure that you use a virtual environment to avoid conflicts between package versions. This practice isolates your project’s dependencies and prevents version conflicts with other projects or system-wide packages. Additionally, be aware that some packages, such as `sktime` and `neuralprophet`, may install several dependencies automatically during their installation. Setting up a virtual environment helps manage these dependencies more effectively and keeps your project environment clean and reproducible.
-- Versions specified are based on compatibility with the code examples provided. If you are using different versions, some adjustments in the code might be necessary.
+The dataset is loaded from an immutable `sysidentpy-data` URL. Randomized
+models use seed 42.
 
 ### Procedure
 
@@ -2174,180 +2614,232 @@ from warnings import simplefilter
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from sysidentpy.model_structure_selection import FROLS
-from sysidentpy.model_structure_selection import AOLS
-from sysidentpy.model_structure_selection import MetaMSS
+
+from sysidentpy.model_structure_selection import FROLS, AOLS, MetaMSS
 from sysidentpy.basis_function import Polynomial
+from sysidentpy.parameter_estimation import LeastSquares
 from sysidentpy.utils.plotting import plot_results
-from sysidentpy.neural_network import NARXNN
 from sysidentpy.metrics import mean_squared_error
+
 from neuralprophet import NeuralProphet
 from neuralprophet import set_random_seed
 
 simplefilter("ignore", FutureWarning)
-np.seterr(all="ignore")
-%matplotlib inline
-
 loss = mean_squared_error
-data_location = r".\datasets"
+
+
+def require_finite(name, values):
+    if not np.isfinite(np.asarray(values)).all():
+        raise FloatingPointError(f"{name} contains non-finite values.")
 ```
 
 ### Neural Prophet
 
 ```python
 set_random_seed(42)
-files = ["\SanFrancisco_PV_GHI.csv", "\SanFrancisco_Hospital.csv"]
-raw = pd.read_csv(data_location + files[0])
-df = pd.DataFrame()
-df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=8760)
-df["y"] = raw.iloc[:, 0].values
 
-m = NeuralProphet(
-    n_lags=24,
-    ar_sparsity=0.5,
+raw = pd.read_csv(
+    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/"
+    "4085901293ba5ed5674bb2911ef4d1fa20f3438d/"
+    "datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
+)
+df = pd.DataFrame(
+    {
+        "ds": pd.date_range("2015-01-01 01:00:00", freq="h", periods=8760),
+        "y": raw.iloc[:, 0].to_numpy(),
+    }
 )
 
-metrics = m.fit(df, freq="H", valid_p=0.2)
-df_train, df_val = m.split_df(df, valid_p=0.2)
-m.test(df_val)
+m = NeuralProphet(
+    n_lags=24, ar_reg=0.5, epochs=100, learning_rate=0.01
+)
+split = 7008
+df_train, df_val = df.iloc[:split], df.iloc[split:]
+m.fit(df_train, freq="h", progress=None)
+prediction_df = pd.concat([df_train.tail(m.config_ar.n_lags), df_val])
+forecast = m.predict(prediction_df)
+valid = (forecast["ds"] >= df_val["ds"].min()) & np.isfinite(
+    forecast["yhat1"].to_numpy()
+)
+if valid.sum() != len(df_val):
+    raise RuntimeError("NeuralProphet did not predict every validation sample.")
+require_finite("NeuralProphet predictions", forecast.loc[valid, "yhat1"])
+neuralprophet_loss = loss(
+    forecast.loc[valid, "y"].to_numpy(),
+    forecast.loc[valid, "yhat1"].to_numpy(),
+)
+print(neuralprophet_loss)
+```
 
-future = m.make_future_dataframe(df_val, n_historic_predictions=True)
-forecast = m.predict(future)
-
-print(loss(forecast["y"][24:-1], forecast["yhat1"][24:-1]))
-
+```python
 plt.plot(forecast["y"][-104:], "ro-")
 plt.plot(forecast["yhat1"][-104:], "k*-")
 ```
 
-The error is $MSE=4642.23$ and will be used as baseline in this case. Let's check how SysIdentPy methods handle this data.
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/PV-forecasting-benchmark-04.png?raw=true)
+
+
+The NeuralProphet baseline gives $MSE=2473.5397$ on the 1,752 validation
+timestamps. Let's check how the SysIdentPy methods handle the same interval.
 
 ### FROLS
 
 ```python
-files = ["\SanFrancisco_PV_GHI.csv", "\SanFrancisco_Hospital.csv"]
-raw = pd.read_csv(data_location + files[0])
+raw = pd.read_csv(
+    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/4085901293ba5ed5674bb2911ef4d1fa20f3438d/datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
+)
 df = pd.DataFrame()
 df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=8760)
 df["y"] = raw.iloc[:, 0].values
+
 df_train, df_val = df.iloc[:7008, :], df.iloc[7008:, :]
+
 y = df["y"].values.reshape(-1, 1)
 y_train = df_train["y"].values.reshape(-1, 1)
 y_test = df_val["y"].values.reshape(-1, 1)
+
 x_train = df_train["ds"].dt.hour.values.reshape(-1, 1)
 x_test = df_val["ds"].dt.hour.values.reshape(-1, 1)
 
 basis_function = Polynomial(degree=1)
 sysidentpy = FROLS(
-    order_selection=True,
-    ylag=24,
-    xlag=24,
-    info_criteria="bic",
-    basis_function=basis_function,
-    model_type="NARMAX",
-    estimator=LeastSquares(),
+    order_selection=True,
+    ylag=24,
+    xlag=24,
+    info_criteria="bic",
+    basis_function=basis_function,
+    model_type="NARMAX",
+    estimator=LeastSquares(),
 )
 
 sysidentpy.fit(X=x_train, y=y_train)
 x_test = np.concatenate([x_train[-sysidentpy.max_lag :], x_test])
 y_test = np.concatenate([y_train[-sysidentpy.max_lag :], y_test])
-yhat = sysidentpy.predict(X=x_test, y=y_test, steps_ahead=1)
-sysidentpy_loss = loss(
-    pd.Series(y_test.flatten()[sysidentpy.max_lag :]),
-    pd.Series(yhat.flatten()[sysidentpy.max_lag :]),
-)
 
+yhat = sysidentpy.predict(X=x_test, y=y_test, steps_ahead=1)
+require_finite("FROLS predictions", yhat[sysidentpy.max_lag :])
+sysidentpy_loss = loss(
+    y_test[sysidentpy.max_lag :],
+    yhat[sysidentpy.max_lag :],
+)
 print(sysidentpy_loss)
+
 plot_results(y=y_test[-104:], yhat=yhat[-104:])
 ```
 
-The $MSE=3869.34$ for this case.
+The FROLS result is $MSE=2204.3336$.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/pv_r1.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/PV-forecasting-benchmark-01.png?raw=true)
 
 ### MetaMSS
 
 ```python
 set_random_seed(42)
-files = ["\SanFrancisco_PV_GHI.csv", "\SanFrancisco_Hospital.csv"]
-raw = pd.read_csv(data_location + files[0])
+raw = pd.read_csv(
+    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/4085901293ba5ed5674bb2911ef4d1fa20f3438d/datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
+)
 df = pd.DataFrame()
 df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=8760)
 df["y"] = raw.iloc[:, 0].values
+
 df_train, df_val = df.iloc[:7008, :], df.iloc[7008:, :]
+
 y = df["y"].values.reshape(-1, 1)
 y_train = df_train["y"].values.reshape(-1, 1)
 y_test = df_val["y"].values.reshape(-1, 1)
+
 x_train = df_train["ds"].dt.hour.values.reshape(-1, 1)
 x_test = df_val["ds"].dt.hour.values.reshape(-1, 1)
 
 basis_function = Polynomial(degree=1)
 estimator = LeastSquares()
-
 sysidentpy_metamss = MetaMSS(
-    basis_function=basis_function,
-    xlag=24,
-    ylag=24,
-    estimator=estimator,
-    maxiter=10,
-    steps_ahead=1,
-    n_agents=15,
-    loss_func="metamss_loss",
-    model_type="NARMAX",
-    random_state=42,
+    basis_function=basis_function,
+    xlag=24,
+    ylag=24,
+    estimator=estimator,
+    maxiter=10,
+    steps_ahead=1,
+    n_agents=15,
+    loss_func="metamss_loss",
+    model_type="NARMAX",
+    random_state=42,
 )
-
 sysidentpy_metamss.fit(X=x_train, y=y_train)
 x_test = np.concatenate([x_train[-sysidentpy_metamss.max_lag :], x_test])
 y_test = np.concatenate([y_train[-sysidentpy_metamss.max_lag :], y_test])
-yhat = sysidentpy_metamss.predict(X=x_test, y=y_test, steps_ahead=1)
-metamss_loss = loss(
-    pd.Series(y_test.flatten()[sysidentpy_metamss.max_lag :]),
-    pd.Series(yhat.flatten()[sysidentpy_metamss.max_lag :]),
-)
 
+yhat = sysidentpy_metamss.predict(X=x_test, y=y_test, steps_ahead=1)
+require_finite("MetaMSS predictions", yhat[sysidentpy_metamss.max_lag :])
+metamss_loss = loss(
+    y_test[sysidentpy_metamss.max_lag :],
+    yhat[sysidentpy_metamss.max_lag :],
+)
 print(metamss_loss)
+
 plot_results(y=y_test[-104:], yhat=yhat[-104:])
 ```
 
-The MetaMSS algorithm was able to select a better model in this case, as can be observed in the error metric, $MSE=2157.77$.
+MetaMSS selects the lowest-error model in this comparison, with
+$MSE=2154.2684$.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/pv_r2.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/PV-forecasting-benchmark-02.png?raw=true)
 
 ### AOLS
 
 ```python
 set_random_seed(42)
-files = ["\SanFrancisco_PV_GHI.csv", "\SanFrancisco_Hospital.csv"]
-raw = pd.read_csv(data_location + files[0])
+raw = pd.read_csv(
+    "https://raw.githubusercontent.com/wilsonrljr/sysidentpy-data/4085901293ba5ed5674bb2911ef4d1fa20f3438d/datasets/san_francisco_pv_ghi/SanFrancisco_PV_GHI.csv"
+)
 df = pd.DataFrame()
 df["ds"] = pd.date_range("1/1/2015 1:00:00", freq=str(60) + "Min", periods=8760)
 df["y"] = raw.iloc[:, 0].values
+
 df_train, df_val = df.iloc[:7008, :], df.iloc[7008:, :]
+
 y = df["y"].values.reshape(-1, 1)
 y_train = df_train["y"].values.reshape(-1, 1)
 y_test = df_val["y"].values.reshape(-1, 1)
+
 x_train = df_train["ds"].dt.hour.values.reshape(-1, 1)
 x_test = df_val["ds"].dt.hour.values.reshape(-1, 1)
-
 basis_function = Polynomial(degree=1)
 sysidentpy_AOLS = AOLS(
-    ylag=24, xlag=24, k=2, L=1, model_type="NARMAX", basis_function=basis_function
+    ylag=24, xlag=24, k=2, L=1, model_type="NARMAX", basis_function=basis_function
 )
-
 sysidentpy_AOLS.fit(X=x_train, y=y_train)
 x_test = np.concatenate([x_train[-sysidentpy_AOLS.max_lag :], x_test])
 y_test = np.concatenate([y_train[-sysidentpy_AOLS.max_lag :], y_test])
+
 yhat = sysidentpy_AOLS.predict(X=x_test, y=y_test, steps_ahead=1)
+require_finite("AOLS predictions", yhat[sysidentpy_AOLS.max_lag :])
 aols_loss = loss(
-    pd.Series(y_test.flatten()[sysidentpy_AOLS.max_lag :]),
-    pd.Series(yhat.flatten()[sysidentpy_AOLS.max_lag :]),
+    y_test[sysidentpy_AOLS.max_lag :],
+    yhat[sysidentpy_AOLS.max_lag :],
 )
 print(aols_loss)
+
+
 plot_results(y=y_test[-104:], yhat=yhat[-104:])
 ```
 
-The error now is $MSE=2361.56$.
+The AOLS result is $MSE=2361.5617$.
 
-![](https://github.com/wilsonrljr/sysidentpy-data/blob/4085901293ba5ed5674bb2911ef4d1fa20f3438d/book/assets/pv_r3.png?raw=true)
+![](https://github.com/wilsonrljr/sysidentpy-data/blob/f38f95efb02194bf2ab116d63982305e2ec09213/book/assets/PV-forecasting-benchmark-03.png?raw=true)
 
+The reproduced comparison is therefore:
+
+| Method | One-step-ahead MSE |
+| --- | ---: |
+| MetaMSS | 2154.2684 |
+| FROLS | 2204.3336 |
+| AOLS | 2361.5617 |
+| NeuralProphet | 2473.5397 |
+
+The SysIdentPy validation arrays are prefixed with the final 24 training
+observations, and the metric excludes that prefix. NeuralProphet receives the
+same 24 observations as context, while its MSE is restricted to validation
+timestamps. Thus every value covers the same validation interval. This
+one-step-ahead protocol measures local prediction with the latest measured
+output available at every step; it does not establish free-run stability.

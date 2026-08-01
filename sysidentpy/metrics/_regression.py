@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+from numbers import Integral
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -37,6 +38,20 @@ def _safe_variance_score(xp, numerator, denominator):
     return xp.where(nonzero_numerator & ~nonzero_denominator, zero, output_scores)
 
 
+def _as_float_array(xp, values):
+    """Promote boolean and integer values before computing regression errors."""
+    values = xp.asarray(values)
+    if _is_numpy_namespace(xp):
+        return (
+            values.astype(float, copy=False)
+            if values.dtype.kind in "biu"
+            else values
+        )
+    if xp.isdtype(values.dtype, ("bool", "integral")):
+        return xp.astype(values, xp.asarray(1.0).dtype, copy=False)
+    return values
+
+
 __ALL__ = [
     "forecast_error",
     "mean_forecast_error",
@@ -45,6 +60,7 @@ __ALL__ = [
     "normalized_root_mean_squared_error",
     "root_relative_squared_error",
     "mean_absolute_error",
+    "mean_absolute_scaled_error",
     "mean_squared_log_error",
     "median_absolute_error",
     "explained_variance_score",
@@ -200,6 +216,10 @@ def normalized_root_mean_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
         nRMSE output is non-negative values. Becoming 0.0 means your
         model outputs are exactly matched by true target values.
 
+        For a constant target, the normalization range is zero. In that case,
+        this function returns 0.0 for a perfect prediction and ``inf`` for an
+        imperfect prediction.
+
     References
     ----------
     - Wikipedia entry on the normalized Root Mean Squared Error
@@ -214,7 +234,14 @@ def normalized_root_mean_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
 
     """
     xp = get_namespace(y, yhat)
-    return float(root_mean_squared_error(y, yhat) / (xp.max(y) - xp.min(y)))
+    rmse = root_mean_squared_error(y, yhat)
+    normalization_range = float(xp.max(y) - xp.min(y))
+    if normalization_range == 0:
+        if np.isnan(rmse):
+            return float("nan")
+        return 0.0 if rmse == 0 else float("inf")
+
+    return float(rmse / normalization_range)
 
 
 def root_relative_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
@@ -233,6 +260,10 @@ def root_relative_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
         RRSE output is non-negative values. Becoming 0.0 means your
         model outputs are exactly matched by true target values.
 
+        For a constant target, the denominator is zero. In that case, this
+        function returns 0.0 for a perfect prediction and ``inf`` for an
+        imperfect prediction.
+
     Examples
     --------
     >>> y = [3, -0.5, 2, 7]
@@ -244,6 +275,13 @@ def root_relative_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
     xp = get_namespace(y, yhat)
     numerator = xp.sum((yhat - y) ** 2)
     denominator = xp.sum((y - xp.mean(y, axis=0)) ** 2)
+    denominator_value = float(denominator)
+    if denominator_value == 0:
+        numerator_value = float(numerator)
+        if np.isnan(numerator_value):
+            return float("nan")
+        return 0.0 if numerator_value == 0 else float("inf")
+
     return float(xp.sqrt(numerator / denominator))
 
 
@@ -280,6 +318,114 @@ def mean_absolute_error(y: NDArray, yhat: NDArray) -> NDArray:
     return float(xp.mean(xp.abs(y - yhat)))
 
 
+def mean_absolute_scaled_error(
+    y: NDArray,
+    yhat: NDArray,
+    y_train: NDArray,
+    seasonal_period: int = 1,
+) -> float:
+    r"""Calculate the Mean Absolute Scaled Error.
+
+    MASE scales the mean absolute forecast error by the in-sample mean
+    absolute error of a seasonal naive forecast.
+
+    Parameters
+    ----------
+    y : array-like of shape (n_samples,) or (n_samples, 1)
+        True target values for the forecast horizon.
+    yhat : array-like of shape (n_samples,) or (n_samples, 1)
+        Target values predicted by the model. ``yhat`` must have the same
+        shape and temporal alignment as ``y``.
+    y_train : array-like of shape (n_training_samples,) or (n_training_samples, 1)
+        In-sample target values used to scale the forecast error.
+    seasonal_period : int, default=1
+        Number of samples in one seasonal period. The default uses a
+        one-step naive forecast as the scaling baseline.
+
+    Returns
+    -------
+    loss : float
+        Non-negative scaled error. Values below one indicate that the model's
+        mean absolute error is lower than the in-sample seasonal-naive error.
+        If the in-sample scale is zero, returns 0.0 for a perfect forecast and
+        ``inf`` for an imperfect forecast.
+
+    Raises
+    ------
+    TypeError
+        If ``seasonal_period`` is not an integer.
+    ValueError
+        If ``seasonal_period`` is not positive, the forecast arrays are empty
+        or have incompatible shapes, the arrays are not single-output, or
+        ``y_train`` does not contain more samples than ``seasonal_period``.
+
+    Notes
+    -----
+    The caller is responsible for aligning ``y`` and ``yhat`` after excluding
+    model-specific initial conditions such as ``max_lag``. This metric does not
+    inspect the fitted model or alter the supplied arrays.
+
+    References
+    ----------
+    - Hyndman, R. J., and Koehler, A. B. (2006). Another look at measures of
+      forecast accuracy. International Journal of Forecasting, 22(4), 679-688.
+      https://doi.org/10.1016/j.ijforecast.2006.03.001
+
+    Examples
+    --------
+    >>> y_train = np.array([1.0, 2.0, 3.0, 4.0])
+    >>> y = np.array([5.0, 6.0])
+    >>> yhat = np.array([4.5, 5.5])
+    >>> mean_absolute_scaled_error(y, yhat, y_train)
+    0.5
+
+    """
+    if isinstance(seasonal_period, bool) or not isinstance(seasonal_period, Integral):
+        raise TypeError(
+            "seasonal_period must be an integer. "
+            f"Got {type(seasonal_period).__name__}."
+        )
+    if seasonal_period <= 0:
+        raise ValueError(
+            "seasonal_period must be a positive integer. "
+            f"Got {seasonal_period}."
+        )
+
+    xp = get_namespace(y, yhat, y_train)
+    y = _as_float_array(xp, y)
+    yhat = _as_float_array(xp, yhat)
+    y_train = _as_float_array(xp, y_train)
+
+    if y.shape != yhat.shape:
+        raise ValueError(
+            "y and yhat must have the same shape. "
+            f"Got {y.shape} and {yhat.shape}."
+        )
+    if y.ndim == 0 or y.shape[0] == 0:
+        raise ValueError("y and yhat must contain at least one sample.")
+    if y.ndim > 2 or (y.ndim == 2 and y.shape[1] != 1):
+        raise ValueError("y and yhat must contain a single output.")
+    if y_train.ndim == 0 or y_train.shape[0] <= seasonal_period:
+        raise ValueError(
+            "y_train must contain more samples than seasonal_period. "
+            f"Got {y_train.shape} and seasonal_period={seasonal_period}."
+        )
+    if y_train.ndim > 2 or (y_train.ndim == 2 and y_train.shape[1] != 1):
+        raise ValueError("y_train must contain a single output.")
+
+    forecast_error = xp.mean(xp.abs(y - yhat))
+    naive_error = xp.mean(
+        xp.abs(y_train[seasonal_period:] - y_train[:-seasonal_period])
+    )
+    if float(naive_error) == 0:
+        forecast_error_value = float(forecast_error)
+        if np.isnan(forecast_error_value):
+            return float("nan")
+        return 0.0 if forecast_error_value == 0 else float("inf")
+
+    return float(forecast_error / naive_error)
+
+
 def mean_squared_log_error(y: NDArray, yhat: NDArray) -> NDArray:
     """Calculate the Mean Squared Logarithmic Error.
 
@@ -296,6 +442,12 @@ def mean_squared_log_error(y: NDArray, yhat: NDArray) -> NDArray:
         MSLE output is non-negative values. Becoming 0.0 means your
         model outputs are exactly matched by true target values.
 
+    Raises
+    ------
+    ValueError
+        If ``y`` or ``yhat`` contains a value less than or equal to -1, where
+        ``log1p`` is not defined for real-valued metrics.
+
     Examples
     --------
     >>> y = [3, 5, 2.5, 7]
@@ -305,6 +457,12 @@ def mean_squared_log_error(y: NDArray, yhat: NDArray) -> NDArray:
 
     """
     xp = get_namespace(y, yhat)
+    if bool(xp.any(y <= -1)) or bool(xp.any(yhat <= -1)):
+        raise ValueError(
+            "Mean Squared Logarithmic Error cannot be used when targets "
+            "contain values less than or equal to -1."
+        )
+
     return mean_squared_error(xp.log(y + 1), xp.log(yhat + 1))
 
 
@@ -444,6 +602,8 @@ def symmetric_mean_absolute_percentage_error(y: NDArray, yhat: NDArray) -> NDArr
     -----
     One supposed problem with SMAPE is that it is not symmetric since
     over-forecasts and under-forecasts are not treated equally.
+    When both the target and prediction are zero, their contribution is
+    defined as zero.
 
     References
     ----------
@@ -460,4 +620,13 @@ def symmetric_mean_absolute_percentage_error(y: NDArray, yhat: NDArray) -> NDArr
     """
     xp = get_namespace(y, yhat)
     n = y.shape[0]
-    return float(100 / n * xp.sum(2 * xp.abs(yhat - y) / (xp.abs(y) + xp.abs(yhat))))
+    denominator = xp.abs(y) + xp.abs(yhat)
+    nonzero_denominator = denominator != 0
+    safe_denominator = xp.where(
+        nonzero_denominator, denominator, xp.ones_like(denominator)
+    )
+    percentage_error = 2 * xp.abs(yhat - y) / safe_denominator
+    percentage_error = xp.where(
+        nonzero_denominator, percentage_error, xp.zeros_like(percentage_error)
+    )
+    return float(100 / n * xp.sum(percentage_error))
