@@ -75,6 +75,9 @@ def test_default_values():
         "verbose": False,
         "optim_params": {},
         "random_state": None,
+        "early_stopping": False,
+        "patience": 10,
+        "min_delta": 0.0,
     }
     model = NARXNN(basis_function=Polynomial())
     model_values = [
@@ -91,6 +94,9 @@ def test_default_values():
         model.verbose,
         model.optim_params,
         model.random_state,
+        model.early_stopping,
+        model.patience,
+        model.min_delta,
     ]
     assert list(default.values()) == model_values
 

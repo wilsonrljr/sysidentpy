@@ -8,6 +8,9 @@
 
 ### CHANGES
 
+- **Neural NARX Early Stopping:**
+    - Added optional validation-loss early stopping to `NARXNN` with configurable `patience` and `min_delta`.
+    - Reused the existing `X_test` and `y_test` validation flow and automatically restored the network weights from the best validation epoch.
 - **Array API Testing:**
     - Updated the vendored `array-api-extra` tree from v0.10.1 to v0.11.0, replacing the experimental testing overlay with the complete upstream implementation while retaining the existing hook for vendored `array-api-compat` v1.14.0.
     - Added a narrow test-only assertion facade for SysIdentPy policies around NumPy baselines, Python literals, scalar values, dtype, shape, and namespace validation.
@@ -17,9 +20,11 @@
 
 ### IMPACT
 
-The standard `pip install sysidentpy` installation remains unchanged. Array API testing dependencies continue to be development-only, and the update does not change SysIdentPy's public runtime API.
+The standard `pip install sysidentpy` installation remains unchanged. Array API testing dependencies continue to be development-only. Neural NARX early stopping is opt-in, so existing training behaviour remains unchanged by default.
 
 ### TESTING
+
+Neural NARX tests cover disabled compatibility, validation requirements, patience, minimum improvement, stopping, and best-weight restoration.
 
 The assertion facade is covered with NumPy, `array-api-strict`, and PyTorch CPU arrays, including namespace, dtype, shape, scalar, zero-dimensional tolerance, and non-default-device cases.
 

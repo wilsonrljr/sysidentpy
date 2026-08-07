@@ -93,7 +93,9 @@ x_train, x_valid, y_train, y_valid = get_siso_data(
 
 One can create a NARXNN object and choose the maximum lag of both input and output for building the regressor matrix to serve as input of the network.
 
-In addition, you can choose the loss function, the optimizer, the optional parameters of the optimizer, the number of epochs.
+In addition, you can choose the loss function, the optimizer, the optional parameters of the optimizer, and the number of epochs.
+
+Early stopping can be enabled with `early_stopping=True`. It monitors the validation loss computed from the `X_test` and `y_test` data passed to `fit`, stops after `patience` consecutive epochs without an improvement greater than `min_delta`, and restores the network weights with the lowest observed validation loss.
 
 Because we built this feature on top of Pytorch, you can choose any of the loss function of the torch.nn.functional. [Click here](https://pytorch.org/docs/stable/nn.functional.html#loss-functions) for a list of the loss functions you can use. You just need to pass the name of the loss function you want.
 
@@ -113,6 +115,9 @@ narx_net = NARXNN(
     loss_func="mse_loss",
     optimizer="Adam",
     epochs=2000,
+    early_stopping=True,
+    patience=20,
+    min_delta=1e-4,
     verbose=False,
     device="cuda",
     optim_params={

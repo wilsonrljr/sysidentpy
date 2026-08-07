@@ -94,6 +94,8 @@ Você pode criar um objeto NARXNN e escolher o lag máximo tanto da entrada quan
 
 Além disso, você pode escolher a função de perda, o otimizador, os parâmetros opcionais do otimizador e o número de épocas.
 
+O early stopping pode ser ativado com `early_stopping=True`. Ele monitora a loss de validação calculada com os dados `X_test` e `y_test` passados para `fit`, interrompe o treinamento após `patience` épocas consecutivas sem uma melhoria maior que `min_delta` e restaura os pesos correspondentes à menor loss de validação observada.
+
 Como construímos esta funcionalidade sobre o Pytorch, você pode escolher qualquer função de perda do torch.nn.functional. [Clique aqui](https://pytorch.org/docs/stable/nn.functional.html#loss-functions) para uma lista das funções de perda disponíveis. Você só precisa passar o nome da função de perda desejada.
 
 Da mesma forma, você pode escolher qualquer otimizador do torch.optim. [Clique aqui](https://pytorch.org/docs/stable/optim.html) para uma lista de otimizadores disponíveis.
@@ -112,6 +114,9 @@ narx_net = NARXNN(
     loss_func="mse_loss",
     optimizer="Adam",
     epochs=2000,
+    early_stopping=True,
+    patience=20,
+    min_delta=1e-4,
     verbose=False,
     device="cuda",
     optim_params={
@@ -337,4 +342,3 @@ plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 # Nota
 
 Lembre-se que você pode usar predição n-steps-ahead e modelos NAR e NFIR. Verifique como usá-los em seus respectivos exemplos.
-
