@@ -9,6 +9,7 @@ import logging
 import sys
 import warnings
 from collections.abc import Mapping
+from copy import deepcopy
 from typing import Optional
 
 import numpy as np
@@ -47,14 +48,13 @@ def _check_cuda(device):
     if device == "cpu":
         return torch.device("cpu")
 
-    if device == "cuda":
-        if torch.cuda.is_available():
-            return torch.device("cuda")
+    if torch.cuda.is_available():
+        return torch.device("cuda")
 
-        warnings.warn(
-            "No CUDA available. We set the device as CPU",
-            stacklevel=2,
-        )
+    warnings.warn(
+        "No CUDA available. We set the device as CPU",
+        stacklevel=2,
+    )
 
     return torch.device("cpu")
 
@@ -140,6 +140,14 @@ class NARXNN(BaseMSS):
         Controls the seeding used to reset the neural network parameters before
         training. When provided, the model weights are reinitialized with the
         same seed at every call to ``fit`` to guarantee deterministic behaviour.
+    early_stopping : bool, default=False
+        Whether to stop training when the validation loss stops improving. Validation
+        data must be provided through ``X_test`` and ``y_test`` when calling ``fit``.
+    patience : int, default=10
+        Number of consecutive epochs without sufficient validation loss improvement
+        before training is stopped. Only used when ``early_stopping=True``.
+    min_delta : float, default=0.0
+        Minimum decrease in validation loss required to qualify as an improvement.
 
     Examples
     --------
@@ -219,6 +227,9 @@ class NARXNN(BaseMSS):
         device="cpu",
         shuffle_batches=False,
         random_state: Optional[int] = None,
+        early_stopping=False,
+        patience=10,
+        min_delta=0.0,
     ):
         if torch is None:
             raise ImportError(
@@ -245,6 +256,9 @@ class NARXNN(BaseMSS):
         self.verbose = verbose
         self.shuffle_batches = shuffle_batches
         self.random_state = random_state
+        self.early_stopping = early_stopping
+        self.patience = patience
+        self.min_delta = min_delta
         if optim_params is None:
             self.optim_params = {}
         elif isinstance(optim_params, Mapping):
@@ -288,6 +302,30 @@ class NARXNN(BaseMSS):
         if not isinstance(self.shuffle_batches, bool):
             raise TypeError(
                 f"shuffle_batches must be False or True. Got {self.shuffle_batches}"
+            )
+
+        if not isinstance(self.early_stopping, bool):
+            raise TypeError(
+                f"early_stopping must be False or True. Got {self.early_stopping}"
+            )
+
+        if (
+            isinstance(self.patience, bool)
+            or not isinstance(self.patience, (int, np.integer))
+            or self.patience < 1
+        ):
+            raise ValueError(
+                f"patience must be integer and > zero. Got {self.patience}"
+            )
+
+        if (
+            isinstance(self.min_delta, bool)
+            or not isinstance(self.min_delta, (int, float, np.integer, np.floating))
+            or not np.isfinite(self.min_delta)
+            or self.min_delta < 0
+        ):
+            raise ValueError(
+                f"min_delta must be a finite number and >= zero. Got {self.min_delta}"
             )
 
         self.ylag = self._sanitize_lag(self.ylag, "ylag")
@@ -525,6 +563,13 @@ class NARXNN(BaseMSS):
         if y is None:
             raise ValueError("y cannot be None")
 
+        self.max_lag = self._get_max_lag()
+        if len(y) <= self.max_lag:
+            raise ValueError(
+                "y must contain more samples than the maximum lag. "
+                f"Got {len(y)} samples and max_lag={self.max_lag}"
+            )
+
         x_train, y_train = self.split_data(x, y)
         train_ds = convert_to_tensor(x_train, y_train)
         train_dl = self.get_data(train_ds, shuffle=shuffle)
@@ -544,9 +589,11 @@ class NARXNN(BaseMSS):
         y : ndarray of floats
             The output data to be used in the training process.
         X_test : ndarray of floats
-            The input data to be used in the prediction process.
+            The input data to be used in the validation process. Required when
+            ``verbose=True`` or ``early_stopping=True``.
         y_test : ndarray of floats
-            The output data (initial conditions) to be used in the prediction process.
+            The output data to be used in the validation process. Required when
+            ``verbose=True`` or ``early_stopping=True``.
 
         Returns
         -------
@@ -558,6 +605,17 @@ class NARXNN(BaseMSS):
             The validation loss of each batch
 
         """
+        monitor_validation = self.verbose or self.early_stopping
+        if monitor_validation and (X_test is None or y_test is None):
+            if self.early_stopping:
+                raise ValueError(
+                    "X_test and y_test cannot be None if you set early_stopping=True"
+                )
+            raise ValueError("X_test and y_test cannot be None if you set verbose=True")
+
+        if self.net is None:
+            raise ValueError("The neural network must be defined before training")
+
         xp = get_namespace(y) if X is None else get_namespace(X, y)
         _require_numpy_namespace(xp, feature="NARXNN", dependency="PyTorch/NumPy")
 
@@ -566,16 +624,16 @@ class NARXNN(BaseMSS):
             self._reset_network_parameters()
 
         train_dl = self.data_transform(X, y, shuffle=self.shuffle_batches)
-        if self.verbose:
-            if X_test is None or y_test is None:
-                raise ValueError(
-                    "X_test and y_test cannot be None if you set verbose=True"
-                )
+        if monitor_validation:
             valid_dl = self.data_transform(X_test, y_test, shuffle=False)
 
         opt = self.define_opt()
         self.val_loss = []
         self.train_loss = []
+        best_val_loss = float("inf")
+        patience_reference_loss = float("inf")
+        best_state = None
+        epochs_without_improvement = 0
         for epoch in range(self.epochs):
             self.net.train()
             epoch_loss = 0.0
@@ -584,11 +642,11 @@ class NARXNN(BaseMSS):
                 X_batch = input_data.to(self.device, non_blocking=True)
                 y_batch = output_data.to(self.device, non_blocking=True)
                 batch_loss, batch_size = self.loss_batch(X_batch, y_batch, opt=opt)
-                if self.verbose:
+                if monitor_validation:
                     epoch_loss += batch_loss * batch_size
                     seen_samples += batch_size
 
-            if self.verbose:
+            if monitor_validation:
                 train_metric = epoch_loss / max(seen_samples, 1)
                 self.train_loss.append(train_metric)
 
@@ -603,12 +661,37 @@ class NARXNN(BaseMSS):
                         )
                         val_loss += loss_val * batch_size
                         val_count += batch_size
-                self.val_loss.append(val_loss / max(val_count, 1))
-                logging.info(
-                    "Train metrics: %s | Validation metrics: %s",
-                    self.train_loss[epoch],
-                    self.val_loss[epoch],
-                )
+                validation_metric = val_loss / max(val_count, 1)
+                self.val_loss.append(validation_metric)
+
+                if self.early_stopping:
+                    if not np.isfinite(validation_metric):
+                        raise ValueError(
+                            "Validation loss must be finite when early stopping is "
+                            f"enabled. Got {validation_metric}"
+                        )
+                    if validation_metric < best_val_loss:
+                        best_val_loss = validation_metric
+                        best_state = deepcopy(self.net.state_dict())
+
+                    if validation_metric < patience_reference_loss - self.min_delta:
+                        patience_reference_loss = validation_metric
+                        epochs_without_improvement = 0
+                    else:
+                        epochs_without_improvement += 1
+
+                if self.verbose:
+                    logging.info(
+                        "Train metrics: %s | Validation metrics: %s",
+                        self.train_loss[epoch],
+                        self.val_loss[epoch],
+                    )
+
+                if self.early_stopping and epochs_without_improvement >= self.patience:
+                    break
+
+        if self.early_stopping and best_state is not None:
+            self.net.load_state_dict(best_state)
         return self
 
     def predict(self, *, X=None, y=None, steps_ahead=None, forecast_horizon=None):
