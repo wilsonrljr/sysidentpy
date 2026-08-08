@@ -291,39 +291,6 @@ class NARX(BaseMSS):
         yhat = self.base_estimator.predict(x_base)
         return yhat.reshape(-1, 1)
 
-    def _nar_step_ahead(self, y, steps_ahead):
-        if len(y) < self.max_lag:
-            raise ValueError(
-                "Insufficient initial condition elements! Expected at least"
-                f" {self.max_lag} elements."
-            )
-
-        to_remove = int(np.ceil((len(y) - self.max_lag) / steps_ahead))
-        yhat = np.zeros(len(y) + steps_ahead, dtype=float)
-        yhat.fill(np.nan)
-        yhat[: self.max_lag] = y[: self.max_lag, 0]
-        i = self.max_lag
-
-        steps = [step for step in range(0, to_remove * steps_ahead, steps_ahead)]
-        if len(steps) > 1:
-            for step in steps[:-1]:
-                yhat[i : i + steps_ahead] = self._model_prediction(
-                    x=None, y_initial=y[step:i], forecast_horizon=steps_ahead
-                )[-steps_ahead:].ravel()
-                i += steps_ahead
-
-            steps_ahead = np.sum(np.isnan(yhat))
-            yhat[i : i + steps_ahead] = self._model_prediction(
-                x=None, y_initial=y[steps[-1] : i]
-            )[-steps_ahead:].ravel()
-        else:
-            yhat[i : i + steps_ahead] = self._model_prediction(
-                x=None, y_initial=y[0:i], forecast_horizon=steps_ahead
-            )[-steps_ahead:].ravel()
-
-        yhat = yhat.ravel()[self.max_lag : :]
-        return yhat.reshape(-1, 1)
-
     def narmax_n_step_ahead(self, x, y, steps_ahead):
         """N steps ahead prediction method for NARMAX model."""
         if len(y) < self.max_lag:

@@ -1,9 +1,11 @@
 # pylint: disable=protected-access
 # pyright: reportMissingTypeStubs=false
 import numpy as np
+import pytest
 from sklearn.linear_model import LinearRegression  # type: ignore[reportMissingTypeStubs]
 from unittest.mock import MagicMock
 from numpy.testing import (
+    assert_allclose,
     assert_almost_equal,
     assert_equal,
     assert_raises,
@@ -59,6 +61,27 @@ def fit_narx_model(
     )
     model.fit(X=x_data, y=y_data)
     return model
+
+
+def segmented_nar_prediction(model, y_data, steps_ahead):
+    """Build an n-step NAR reference from independent free-run segments."""
+    reference = np.empty_like(y_data)
+    reference[: model.max_lag] = y_data[: model.max_lag]
+
+    for block_start in range(model.max_lag, len(y_data), steps_ahead):
+        block_horizon = min(steps_ahead, len(y_data) - block_start)
+        y_initial = y_data[block_start - model.max_lag : block_start]
+        block_prediction = model.predict(
+            X=None,
+            y=y_initial,
+            steps_ahead=None,
+            forecast_horizon=block_horizon,
+        )
+        reference[block_start : block_start + block_horizon] = block_prediction[
+            -block_horizon:
+        ]
+
+    return reference
 
 
 def test_default_values():
@@ -402,17 +425,72 @@ def test_nar_step_ahead_multi_segment_prediction():
     )
     steps = 3
     yhat = model._nar_step_ahead(y_test, steps_ahead=steps)
-    expected = y_test.shape[0] + steps - model.max_lag
-    assert_equal(yhat.shape[0], expected)
-    assert_equal(model._model_prediction.called, True)
+    prediction_count = y_test.shape[0] - model.max_lag
+    expected_horizons = [
+        min(steps, prediction_count - start)
+        for start in range(0, prediction_count, steps)
+    ]
+    expected_values = np.concatenate(
+        [np.arange(100, dtype=float)[-horizon:] for horizon in expected_horizons]
+    )
+
+    assert_equal(yhat.shape, (prediction_count, 1))
+    assert_allclose(yhat[:, 0], expected_values)
+    assert [
+        call.kwargs["forecast_horizon"]
+        for call in model._model_prediction.call_args_list
+    ] == expected_horizons
+    for block, call in enumerate(model._model_prediction.call_args_list):
+        start = block * steps
+        assert_allclose(call.kwargs["y_initial"], y_test[start : start + model.max_lag])
 
 
 def test_nar_step_ahead_single_segment_prediction():
     model = fit_narx_model(model_type="NAR", x_data=None)
     y_small = y_test[: model.max_lag + 1]
     yhat = model._nar_step_ahead(y_small, steps_ahead=4)
-    expected = y_small.shape[0] + 4 - model.max_lag
-    assert_equal(yhat.shape[0], expected)
+    expected = model._model_prediction(
+        x=None,
+        y_initial=y_small[: model.max_lag],
+        forecast_horizon=1,
+    )
+    assert_equal(yhat.shape, (1, 1))
+    assert_allclose(yhat, expected)
+
+
+@pytest.mark.parametrize("include_bias", [True, False])
+@pytest.mark.parametrize("steps_ahead", [2, 3])
+def test_nar_n_step_prediction_matches_segmented_free_runs(include_bias, steps_ahead):
+    model = fit_narx_model(
+        model_type="NAR",
+        basis_function=Polynomial(degree=2, include_bias=include_bias),
+        x_data=None,
+    )
+    y_evaluation = y_test[:25]
+
+    expected = segmented_nar_prediction(model, y_evaluation, steps_ahead)
+    yhat = model.predict(X=None, y=y_evaluation, steps_ahead=steps_ahead)
+
+    assert_equal(yhat.shape, y_evaluation.shape)
+    assert_allclose(yhat[: model.max_lag], y_evaluation[: model.max_lag])
+    assert_allclose(yhat, expected)
+
+
+def test_nar_step_larger_than_remaining_horizon_matches_single_free_run():
+    model = fit_narx_model(model_type="NAR", x_data=None)
+    y_evaluation = y_test[: model.max_lag + 4]
+    steps_ahead = len(y_evaluation)
+
+    expected = model.predict(
+        X=None,
+        y=y_evaluation[: model.max_lag],
+        steps_ahead=None,
+        forecast_horizon=len(y_evaluation) - model.max_lag,
+    )
+    yhat = model.predict(X=None, y=y_evaluation, steps_ahead=steps_ahead)
+
+    assert_equal(yhat.shape, y_evaluation.shape)
+    assert_allclose(yhat, expected)
 
 
 def test_narmax_n_step_ahead_requires_initial_conditions():
@@ -436,7 +514,7 @@ def test_nar_n_step_prediction_path():
     )
     steps = 2
     yhat = model._n_step_ahead_prediction(None, y_test, steps_ahead=steps)
-    expected = y_test.shape[0] + steps - model.max_lag
+    expected = y_test.shape[0] - model.max_lag
     assert_equal(yhat.shape[0], expected)
 
 

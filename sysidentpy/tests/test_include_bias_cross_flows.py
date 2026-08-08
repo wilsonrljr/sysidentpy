@@ -85,6 +85,89 @@ def _fit_frols_model(basis_function, x_train, y_train):
     ).fit(X=x_train, y=y_train)
 
 
+def _generate_nar_data(n_samples=100):
+    rng = np.random.default_rng(193)
+    y = np.zeros((n_samples, 1))
+    y[:2, 0] = [0.2, -0.1]
+
+    for k in range(2, n_samples):
+        y[k, 0] = 0.55 * y[k - 1, 0] - 0.1 * y[k - 2, 0] + 0.05 + 0.03 * rng.normal()
+
+    return y[:-25], y[-25:]
+
+
+def _fit_frols_nar(y_train, include_bias):
+    return FROLS(
+        ylag=2,
+        xlag=2,
+        model_type="NAR",
+        n_terms=3,
+        order_selection=False,
+        estimator=LeastSquares(),
+        basis_function=Polynomial(degree=2, include_bias=include_bias),
+    ).fit(X=None, y=y_train)
+
+
+def _fit_aols_nar(y_train, include_bias):
+    return AOLS(
+        ylag=2,
+        xlag=2,
+        model_type="NAR",
+        k=3,
+        L=1,
+        estimator=LeastSquares(),
+        basis_function=Polynomial(degree=2, include_bias=include_bias),
+    ).fit(X=None, y=y_train)
+
+
+def _fit_rmss_nar(y_train, include_bias):
+    return RMSS(
+        ylag=2,
+        xlag=2,
+        model_type="NAR",
+        n_terms=3,
+        order_selection=False,
+        estimator=LeastSquares(),
+        basis_function=Polynomial(degree=2, include_bias=include_bias),
+    ).fit(X=None, y=y_train)
+
+
+def _fit_exact_ar1_nar(include_bias):
+    offset = 0.25 if include_bias else 0.0
+    y = np.empty((40, 1))
+    y[0, 0] = 3.0
+    for k in range(1, len(y)):
+        y[k, 0] = 0.5 * y[k - 1, 0] + offset
+
+    return FROLS(
+        ylag=1,
+        xlag=1,
+        model_type="NAR",
+        n_terms=1 + int(include_bias),
+        order_selection=False,
+        estimator=LeastSquares(),
+        basis_function=Polynomial(degree=1, include_bias=include_bias),
+    ).fit(X=None, y=y)
+
+
+def _segmented_nar_free_run_reference(model, y, steps_ahead):
+    reference = np.full_like(y, np.nan)
+    reference[: model.max_lag] = y[: model.max_lag]
+
+    for block_start in range(model.max_lag, len(y), steps_ahead):
+        block_horizon = min(steps_ahead, len(y) - block_start)
+        initial_condition = y[block_start - model.max_lag : block_start]
+        free_run = model.predict(
+            X=None,
+            y=initial_condition,
+            steps_ahead=None,
+            forecast_horizon=block_horizon,
+        )
+        reference[block_start : block_start + block_horizon] = free_run[-block_horizon:]
+
+    return reference
+
+
 def _simulate_metamss(model, **kwargs):
     model.theta = np.ones((len(kwargs["model_code"]), 1))
     model.pivv = np.arange(len(kwargs["model_code"]), dtype=np.intp)
@@ -437,6 +520,120 @@ def test_frols_without_bias_aligns_nar_and_nfir_models(model_type, uses_input):
     assert not np.any(np.all(model.regressor_code == 0, axis=1))
     assert prediction.shape == y_valid.shape
     assert np.all(np.isfinite(prediction))
+
+
+@pytest.mark.parametrize(
+    "steps_ahead",
+    [
+        pytest.param(2, id="two-steps"),
+        pytest.param(3, id="three-steps"),
+        pytest.param(24, id="longer-than-remaining-horizon"),
+    ],
+)
+@pytest.mark.parametrize("include_bias", [True, False])
+def test_frols_nar_n_step_matches_segmented_free_runs(
+    include_bias,
+    steps_ahead,
+):
+    y_train, y_valid = _generate_nar_data()
+    model = _fit_frols_nar(y_train, include_bias)
+    expected = _segmented_nar_free_run_reference(
+        model,
+        y_valid,
+        steps_ahead,
+    )
+
+    prediction = model.predict(
+        X=None,
+        y=y_valid,
+        steps_ahead=steps_ahead,
+    )
+
+    assert prediction.shape == y_valid.shape
+    assert np.all(np.isfinite(prediction))
+    assert_array_equal(prediction[: model.max_lag], y_valid[: model.max_lag])
+    assert_allclose(prediction, expected, rtol=1e-12, atol=1e-12)
+    assert_allclose(prediction[-1], expected[-1], rtol=1e-12, atol=1e-12)
+
+
+@pytest.mark.parametrize("include_bias", [True, False])
+def test_frols_nar_one_step_and_free_run_regressions(include_bias):
+    y_train, y_valid = _generate_nar_data()
+    model = _fit_frols_nar(y_train, include_bias)
+    remaining_horizon = int(len(y_valid) - model.max_lag)
+
+    one_step = model.predict(X=None, y=y_valid, steps_ahead=1)
+    one_step_reference = _segmented_nar_free_run_reference(model, y_valid, 1)
+    free_run = model.predict(
+        X=None,
+        y=y_valid[: model.max_lag],
+        forecast_horizon=remaining_horizon,
+    )
+    free_run_reference = _segmented_nar_free_run_reference(
+        model,
+        y_valid,
+        remaining_horizon + 1,
+    )
+
+    assert one_step.shape == y_valid.shape
+    assert free_run.shape == y_valid.shape
+    assert np.all(np.isfinite(one_step))
+    assert np.all(np.isfinite(free_run))
+    assert_array_equal(one_step[: model.max_lag], y_valid[: model.max_lag])
+    assert_array_equal(free_run[: model.max_lag], y_valid[: model.max_lag])
+    assert_allclose(one_step, one_step_reference, rtol=1e-12, atol=1e-12)
+    assert_allclose(free_run, free_run_reference, rtol=1e-12, atol=1e-12)
+
+
+@pytest.mark.parametrize("include_bias", [True, False])
+def test_frols_nar_recursive_predictions_promote_integer_output(include_bias):
+    model = _fit_exact_ar1_nar(include_bias)
+    y_integer = np.array([[3], [100], [100], [100], [100]])
+
+    if include_bias:
+        expected_one_step = np.array([[3], [1.75], [50.25], [50.25], [50.25]])
+        expected_n_step = np.array([[3], [1.75], [1.125], [50.25], [25.375]])
+        expected_free_run = np.array([[3], [1.75], [1.125], [0.8125], [0.65625]])
+    else:
+        expected_one_step = np.array([[3], [1.5], [50], [50], [50]])
+        expected_n_step = np.array([[3], [1.5], [0.75], [50], [25]])
+        expected_free_run = np.array([[3], [1.5], [0.75], [0.375], [0.1875]])
+
+    one_step = model.predict(X=None, y=y_integer, steps_ahead=1)
+    n_step = model.predict(X=None, y=y_integer, steps_ahead=2)
+    free_run = model.predict(X=None, y=y_integer[:1], forecast_horizon=4)
+
+    assert np.issubdtype(one_step.dtype, np.floating)
+    assert np.issubdtype(n_step.dtype, np.floating)
+    assert np.issubdtype(free_run.dtype, np.floating)
+    assert_allclose(one_step, expected_one_step, rtol=1e-12, atol=1e-12)
+    assert_allclose(n_step, expected_n_step, rtol=1e-12, atol=1e-12)
+    assert_allclose(free_run, expected_free_run, rtol=1e-12, atol=1e-12)
+
+
+@pytest.mark.parametrize(
+    "fit_model",
+    [
+        pytest.param(_fit_aols_nar, id="aols"),
+        pytest.param(_fit_rmss_nar, id="rmss"),
+    ],
+)
+@pytest.mark.parametrize("include_bias", [True, False])
+def test_base_mss_nar_consumers_match_segmented_free_runs(
+    fit_model,
+    include_bias,
+):
+    y_train, y_valid = _generate_nar_data()
+    model = fit_model(y_train, include_bias)
+    expected = _segmented_nar_free_run_reference(model, y_valid, 3)
+
+    prediction = model.predict(X=None, y=y_valid, steps_ahead=3)
+
+    assert prediction.shape == y_valid.shape
+    assert np.all(np.isfinite(prediction))
+    assert_array_equal(prediction[: model.max_lag], y_valid[: model.max_lag])
+    assert_allclose(prediction, expected, rtol=1e-12, atol=1e-12)
+    assert_allclose(prediction[-2:], expected[-2:], rtol=1e-12, atol=1e-12)
 
 
 def test_rmss_without_bias_keeps_selection_and_parameters_aligned():

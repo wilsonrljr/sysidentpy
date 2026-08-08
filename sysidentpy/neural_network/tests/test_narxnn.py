@@ -86,8 +86,47 @@ class _ExpandedPolynomial(Polynomial):
         return features[:, predefined_regressors]
 
 
+class _DeterministicNARNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.linear = nn.Linear(2, 1, bias=False)
+        with torch.no_grad():
+            self.linear.weight.copy_(torch.tensor([[0.4, -0.15]], dtype=torch.float32))
+
+    def forward(self, xb):
+        return self.linear(xb)
+
+
 def _first_regressor_value(values):
     return float(np.asarray(values).reshape(-1)[0])
+
+
+def _build_deterministic_nar_model(y, include_bias):
+    model = NARXNN(
+        net=_DeterministicNARNet(),
+        ylag=2,
+        xlag=2,
+        model_type="NAR",
+        basis_function=Polynomial(degree=1, include_bias=include_bias),
+    )
+    model.split_data(None, y)
+    return model
+
+
+def _segmented_nar_free_run_reference(model, y, steps_ahead):
+    reference = np.empty_like(y, dtype=np.float32)
+    reference[: model.max_lag] = y[: model.max_lag]
+    for start in range(model.max_lag, len(y), steps_ahead):
+        block_horizon = min(steps_ahead, len(y) - start)
+        initial_conditions = y[start - model.max_lag : start]
+        free_run = model.predict(
+            X=None,
+            y=initial_conditions,
+            forecast_horizon=block_horizon,
+        )
+        reference[start : start + block_horizon] = free_run[-block_horizon:]
+
+    return reference
 
 
 def test_default_values():
@@ -261,6 +300,22 @@ def test_polynomial_bias_modes_produce_same_neural_inputs_and_one_step_matrix():
     matrix_without_bias = without_bias_forward.call_args.args[0]
     np.testing.assert_allclose(matrix_with_bias, matrix_without_bias)
     assert matrix_with_bias.shape[1] == with_bias.regressor_code.shape[0]
+
+
+@pytest.mark.parametrize("include_bias", [True, False])
+@pytest.mark.parametrize("steps_ahead", [2, 3, 30])
+def test_polynomial_nar_n_step_matches_segmented_free_run(include_bias, steps_ahead):
+    sample = np.arange(25, dtype=np.float32)
+    y_data = (0.1 * sample + 0.5 * np.sin(sample / 2)).reshape(-1, 1)
+    model = _build_deterministic_nar_model(y_data, include_bias)
+
+    reference = _segmented_nar_free_run_reference(model, y_data, steps_ahead)
+    prediction = model.predict(X=None, y=y_data, steps_ahead=steps_ahead)
+
+    assert prediction.shape == y_data.shape
+    np.testing.assert_array_equal(prediction[: model.max_lag], y_data[: model.max_lag])
+    np.testing.assert_allclose(prediction, reference, rtol=1e-6, atol=1e-6)
+    assert np.all(np.isfinite(prediction))
 
 
 def test_custom_polynomial_layout_removes_only_one_bias_code():

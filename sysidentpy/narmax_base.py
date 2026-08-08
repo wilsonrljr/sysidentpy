@@ -25,6 +25,7 @@ from sysidentpy._lib._array_api import (
     device as _device,
     get_namespace,
 )
+from sysidentpy.utils.check_arrays import check_positive_int
 from sysidentpy.utils.information_matrix import (
     build_output_matrix,
     build_input_matrix,
@@ -40,6 +41,15 @@ def _find_method_owner(cls: type, method_name: str) -> Optional[type]:
         if method_name in parent.__dict__:
             return parent
     return None
+
+
+def _recursive_prediction_dtype(xp, dtype):
+    """Return a floating dtype when recursive prediction inputs are integral."""
+    if _is_numpy_namespace(xp):
+        return np.dtype(float) if np.dtype(dtype).kind in "biu" else dtype
+    if xp.isdtype(dtype, ("bool", "integral")):
+        return xp.asarray(1.0).dtype
+    return dtype
 
 
 class RegressorDictionary:
@@ -443,8 +453,15 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         finally:
             self.theta = original_theta
 
+        output_dtype = y.dtype
+        if self.model_type == "NAR":
+            output_dtype = _recursive_prediction_dtype(original_xp, output_dtype)
+
         return _asarray(
-            yhat_np, xp=original_xp, dtype=y.dtype, target_device=target_device
+            yhat_np,
+            xp=original_xp,
+            dtype=output_dtype,
+            target_device=target_device,
         )
 
     def _code2exponents(self, *, code: np.ndarray) -> np.ndarray:
@@ -653,6 +670,9 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         """Return the reference recursive NARMAX prediction."""
         xp = get_namespace(x, y_initial)
         _dtype = x.dtype if x is not None else y_initial.dtype
+        if self.model_type == "NAR":
+            _dtype = _recursive_prediction_dtype(xp, _dtype)
+
         target_device = _device(x, y_initial)
         y_output = _zeros(
             xp,
@@ -661,7 +681,12 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             target_device=target_device,
         )
         y_output = y_output * float("nan")
-        y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
+        y_output[: self.max_lag] = _asarray(
+            y_initial[: self.max_lag, 0],
+            xp=xp,
+            dtype=_dtype,
+            target_device=target_device,
+        )
 
         model_exponents = _vstack(
             xp,
@@ -818,6 +843,29 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         return xp.reshape(y_output[self.max_lag : :], (-1, 1))
 
     def _nar_step_ahead(self, y: np.ndarray, steps_ahead: int) -> np.ndarray:
+        """Return blockwise NAR predictions without initial conditions.
+
+        Parameters
+        ----------
+        y : ndarray of shape (n_samples, 1)
+            Observed output values. The first ``max_lag`` samples provide the
+            initial conditions for the first prediction block.
+        steps_ahead : int
+            Maximum number of recursive predictions in each block.
+
+        Returns
+        -------
+        ndarray of shape (n_samples - max_lag, 1)
+            Predicted values after the initial conditions. Each block restarts
+            from the immediately preceding observed outputs.
+
+        Raises
+        ------
+        ValueError
+            If ``steps_ahead`` is not a positive integer or if ``y`` does not
+            contain enough initial conditions.
+        """
+        check_positive_int(steps_ahead, "steps_ahead")
         xp = get_namespace(y)
         if len(y) < self.max_lag:
             raise ValueError(
@@ -825,38 +873,26 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
                 f" {self.max_lag} elements."
             )
 
-        to_remove = math.ceil((len(y) - self.max_lag) / steps_ahead)
-        yhat_length = len(y) + steps_ahead
-        yhat = _zeros(xp, yhat_length, dtype=y.dtype, target_device=_device(y))
+        yhat = _zeros(
+            xp,
+            len(y),
+            dtype=_recursive_prediction_dtype(xp, y.dtype),
+            target_device=_device(y),
+        )
         yhat = yhat * float("nan")
-        yhat[: self.max_lag] = y[: self.max_lag, 0]
         i = self.max_lag
 
-        steps = [step for step in range(0, to_remove * steps_ahead, steps_ahead)]
-        if len(steps) > 1:
-            for step in steps[:-1]:
-                yhat[i : i + steps_ahead] = xp.reshape(
-                    self._model_prediction(
-                        x=None, y_initial=y[step:i], forecast_horizon=steps_ahead
-                    )[-steps_ahead:],
-                    (-1,),
-                )
-                i += steps_ahead
-
-            steps_ahead = int(xp.sum(xp.asarray(xp.isnan(yhat), dtype=xp.int32)))
-            yhat[i : i + steps_ahead] = xp.reshape(
-                self._model_prediction(x=None, y_initial=y[steps[-1] : i])[
-                    -steps_ahead:
-                ],
-                (-1,),
-            )
-        else:
-            yhat[i : i + steps_ahead] = xp.reshape(
+        while i < len(y):
+            block_horizon = min(steps_ahead, len(y) - i)
+            yhat[i : i + block_horizon] = xp.reshape(
                 self._model_prediction(
-                    x=None, y_initial=y[0:i], forecast_horizon=steps_ahead
-                )[-steps_ahead:],
+                    x=None,
+                    y_initial=y[i - self.max_lag : i],
+                    forecast_horizon=block_horizon,
+                )[-block_horizon:],
                 (-1,),
             )
+            i += block_horizon
 
         yhat = xp.reshape(yhat, (-1,))[self.max_lag : :]
         return xp.reshape(yhat, (-1, 1))

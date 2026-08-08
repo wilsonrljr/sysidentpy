@@ -514,6 +514,45 @@ def _small_siso_dataset():
     return get_siso_data(n=200, colored_noise=False, sigma=0.0, train_percentage=80)
 
 
+def _nar_observed_series(n_samples=25):
+    rng = np.random.default_rng(193)
+    y = np.zeros((n_samples, 1))
+    y[:2, 0] = [0.2, -0.1]
+
+    for k in range(2, n_samples):
+        y[k, 0] = 0.55 * y[k - 1, 0] - 0.1 * y[k - 2, 0] + 0.05 + 0.03 * rng.normal()
+
+    return y
+
+
+def _nar_model_and_theta(include_bias):
+    model = np.array([[1001, 0], [1002, 0]])
+    theta = np.array([[0.55], [-0.1]])
+    if include_bias:
+        model = np.concatenate([np.array([[0, 0]]), model], axis=0)
+        theta = np.concatenate([np.array([[0.05]]), theta], axis=0)
+
+    return model, theta
+
+
+def _segmented_nar_free_run_reference(simulator, y, steps_ahead):
+    reference = np.full_like(y, np.nan)
+    reference[: simulator.max_lag] = y[: simulator.max_lag]
+
+    for block_start in range(simulator.max_lag, len(y), steps_ahead):
+        block_horizon = min(steps_ahead, len(y) - block_start)
+        initial_condition = y[block_start - simulator.max_lag : block_start]
+        free_run = simulator.predict(
+            X=None,
+            y=initial_condition,
+            steps_ahead=None,
+            forecast_horizon=block_horizon,
+        )
+        reference[block_start : block_start + block_horizon] = free_run[-block_horizon:]
+
+    return reference
+
+
 def test_simulate_polynomial_without_bias_rejects_bias_model_code():
     _, x_valid, _, y_valid = _small_siso_dataset()
     simulator = SimulateNARMAX(
@@ -741,6 +780,111 @@ def test_predict_paths_cover_all_branches():
     assert multi_step.shape == y_valid.shape
 
 
+@pytest.mark.parametrize("include_bias", [True, False])
+def test_simulate_nar_n_step_matches_segmented_free_runs(include_bias):
+    y = _nar_observed_series()
+    model_code, theta = _nar_model_and_theta(include_bias)
+    simulator = SimulateNARMAX(
+        model_type="NAR",
+        estimate_parameter=False,
+        basis_function=Polynomial(degree=2, include_bias=include_bias),
+    )
+
+    prediction = simulator.simulate(
+        X_test=None,
+        y_test=y,
+        model_code=model_code,
+        theta=theta,
+        steps_ahead=3,
+    )
+    expected = _segmented_nar_free_run_reference(simulator, y, 3)
+
+    assert prediction.shape == y.shape
+    assert np.all(np.isfinite(prediction))
+    np.testing.assert_array_equal(
+        prediction[: simulator.max_lag],
+        y[: simulator.max_lag],
+    )
+    np.testing.assert_allclose(prediction, expected, rtol=1e-12, atol=1e-12)
+    np.testing.assert_allclose(prediction[-2:], expected[-2:], rtol=1e-12, atol=1e-12)
+
+    one_step = simulator.predict(X=None, y=y, steps_ahead=1)
+    one_step_reference = _segmented_nar_free_run_reference(simulator, y, 1)
+    remaining_horizon = int(len(y) - simulator.max_lag)
+    free_run = simulator.predict(
+        X=None,
+        y=y[: simulator.max_lag],
+        forecast_horizon=remaining_horizon,
+    )
+
+    assert one_step.shape == y.shape
+    assert free_run.shape == y.shape
+    assert np.all(np.isfinite(one_step))
+    assert np.all(np.isfinite(free_run))
+    np.testing.assert_array_equal(
+        one_step[: simulator.max_lag],
+        y[: simulator.max_lag],
+    )
+    np.testing.assert_array_equal(
+        free_run[: simulator.max_lag],
+        y[: simulator.max_lag],
+    )
+    np.testing.assert_allclose(
+        one_step,
+        one_step_reference,
+        rtol=1e-12,
+        atol=1e-12,
+    )
+    np.testing.assert_allclose(
+        free_run,
+        _segmented_nar_free_run_reference(
+            simulator,
+            y,
+            remaining_horizon + 1,
+        ),
+        rtol=1e-12,
+        atol=1e-12,
+    )
+
+
+@pytest.mark.parametrize("include_bias", [True, False])
+def test_simulate_nar_recursive_predictions_promote_integer_output(include_bias):
+    y_integer = np.array([[3], [100], [100], [100], [100]])
+    model_code = np.array([[1001]])
+    theta = np.array([[0.5]])
+    if include_bias:
+        model_code = np.array([[0], [1001]])
+        theta = np.array([[0.25], [0.5]])
+        expected_n_step = np.array([[3], [1.75], [1.125], [50.25], [25.375]])
+        expected_free_run = np.array([[3], [1.75], [1.125], [0.8125], [0.65625]])
+    else:
+        expected_n_step = np.array([[3], [1.5], [0.75], [50], [25]])
+        expected_free_run = np.array([[3], [1.5], [0.75], [0.375], [0.1875]])
+
+    simulator = SimulateNARMAX(
+        model_type="NAR",
+        estimate_parameter=False,
+        basis_function=Polynomial(degree=1, include_bias=include_bias),
+    )
+    n_step = simulator.simulate(
+        X_test=None,
+        y_test=y_integer,
+        model_code=model_code,
+        theta=theta,
+        steps_ahead=2,
+    )
+    free_run = simulator.predict(
+        X=None,
+        y=y_integer[:1],
+        forecast_horizon=4,
+    )
+
+    assert np.issubdtype(n_step.dtype, np.floating)
+    assert np.issubdtype(free_run.dtype, np.floating)
+    np.testing.assert_allclose(n_step, expected_n_step, rtol=1e-12, atol=1e-12)
+    np.testing.assert_allclose(free_run, expected_free_run, rtol=1e-12, atol=1e-12)
+
+
 def test_predict_preserves_array_api_namespace_with_numpy_metadata():
     array_api_strict = pytest.importorskip("array_api_strict")
     _, x_valid_np, _, y_valid_np = _small_siso_dataset()
@@ -801,6 +945,35 @@ def test_predict_n_step_preserves_array_api_namespace_via_cpu_fallback():
 
     assert result.__array_namespace__() is array_api_strict
     xp_assert_allclose(result, expected)
+
+
+def test_nar_integer_n_step_promotes_array_api_output_via_cpu_fallback():
+    array_api_strict = pytest.importorskip("array_api_strict")
+    y_integer_np = np.array([[3], [100], [100], [100], [100]])
+    expected = np.array([[3], [1.5], [0.75], [50], [25]])
+    simulator = SimulateNARMAX(
+        model_type="NAR",
+        estimate_parameter=False,
+        basis_function=Polynomial(degree=1, include_bias=False),
+    )
+    simulator.simulate(
+        X_test=None,
+        y_test=y_integer_np,
+        model_code=np.array([[1001]]),
+        theta=np.array([[0.5]]),
+        steps_ahead=2,
+    )
+
+    with config_context(array_api_dispatch=True):
+        y_integer = array_api_strict.asarray(
+            y_integer_np,
+            dtype=array_api_strict.int64,
+        )
+        result = simulator.predict(X=None, y=y_integer, steps_ahead=2)
+
+    assert result.__array_namespace__() is array_api_strict
+    assert array_api_strict.isdtype(result.dtype, "real floating")
+    xp_assert_allclose(result, expected, rtol=1e-12, atol=1e-12)
 
 
 def test_predict_rejects_mixed_array_api_namespaces():

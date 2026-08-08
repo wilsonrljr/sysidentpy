@@ -822,6 +822,10 @@ class NARXNN(BaseMSS):
                 f" {self.max_lag} elements."
             )
 
+        if self.model_type == "NAR":
+            yhat = self._nar_step_ahead(y, steps_ahead)
+            return np.concatenate([y[: self.max_lag], yhat], axis=0)
+
         yhat = np.zeros(x.shape[0], dtype=float)
         yhat.fill(np.nan)
         yhat[: self.max_lag] = y[: self.max_lag, 0]
