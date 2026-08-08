@@ -34,7 +34,7 @@ def test_simulate():
         ]
     )
     # theta must be a numpy array of shape (n, 1) where n is the number of regressors
-    theta = np.array([[0.2, 0.9, 0.1]]).T
+    theta = np.array([[0.2, 0.1, 0.9]]).T
 
     yhat = s.simulate(X_test=x_valid, y_test=y_valid, model_code=model, theta=theta)
     assert yhat.shape == (100, 1)
@@ -62,7 +62,7 @@ def test_simulate_theta():
         y_test=y_valid,
         model_code=model,
     )
-    theta = np.array([[0.2, 0.9, 0.1]]).T
+    theta = np.array([[0.2, 0.1, 0.9]]).T
     assert_almost_equal(s.theta, theta, decimal=1)
 
 
@@ -506,12 +506,183 @@ def test_estimate_parameter_els():
     )
     print(s.theta)
     assert_almost_equal(
-        s.theta, np.array([[0.19999698], [0.90011667], [0.10080975]]), decimal=3
+        s.theta, np.array([[0.19999698], [0.10080975], [0.90011667]]), decimal=3
     )
 
 
 def _small_siso_dataset():
     return get_siso_data(n=200, colored_noise=False, sigma=0.0, train_percentage=80)
+
+
+def test_simulate_polynomial_without_bias_rejects_bias_model_code():
+    _, x_valid, _, y_valid = _small_siso_dataset()
+    simulator = SimulateNARMAX(
+        basis_function=Polynomial(degree=2, include_bias=False),
+        estimate_parameter=False,
+    )
+    model = np.array([[0, 0], [1001, 0]])
+    theta = np.array([[0.2], [0.9]])
+
+    with pytest.raises(ValueError, match="not available"):
+        simulator.simulate(
+            X_test=x_valid,
+            y_test=y_valid,
+            model_code=model,
+            theta=theta,
+        )
+
+
+def test_simulate_validates_theta_shape_against_model_code():
+    _, x_valid, _, y_valid = _small_siso_dataset()
+    simulator = SimulateNARMAX(
+        basis_function=Polynomial(degree=2, include_bias=False),
+        estimate_parameter=False,
+    )
+    model = np.array([[1001, 0], [2001, 0]])
+
+    with pytest.raises(ValueError, match=r"shape \(n_terms, 1\)"):
+        simulator.simulate(
+            X_test=x_valid,
+            y_test=y_valid,
+            model_code=model,
+            theta=np.array([[0.2, 0.9]]),
+        )
+
+
+def test_simulate_preserves_requested_model_code_and_theta_order():
+    x_data = np.array([[2.0], [4.0], [8.0]])
+    y_data = np.array([[3.0], [0.0], [0.0]])
+    simulator = SimulateNARMAX(
+        basis_function=Polynomial(degree=2, include_bias=False),
+        estimate_parameter=False,
+    )
+    model = np.array([[2001, 0], [1001, 0]])
+    theta = np.array([[10.0], [1.0]])
+
+    yhat = simulator.simulate(
+        X_test=x_data,
+        y_test=y_data,
+        model_code=model,
+        theta=theta,
+    )
+
+    np.testing.assert_array_equal(simulator.final_model, model)
+    np.testing.assert_array_equal(simulator.pivv, np.array([1, 0]))
+    assert yhat[1, 0] == pytest.approx(10 * x_data[0, 0] + y_data[0, 0])
+
+
+def test_simulate_rejects_model_code_width_before_matching_rows():
+    x_data = np.arange(1, 5, dtype=float).reshape(-1, 1)
+    y_data = np.zeros_like(x_data)
+    simulator = SimulateNARMAX(
+        basis_function=Polynomial(degree=2, include_bias=False),
+        estimate_parameter=False,
+    )
+
+    with pytest.raises(ValueError, match="same number of columns"):
+        simulator.simulate(
+            X_test=x_data,
+            y_test=y_data,
+            model_code=np.array([[1001, 0, 0]]),
+            theta=np.array([[0.2]]),
+        )
+
+
+@pytest.mark.parametrize(
+    ("regressor_code", "model_code", "error_message"),
+    [
+        (
+            np.array([[1001, 0], [1001, 0], [2001, 0]]),
+            np.array([[1001, 0]]),
+            "ambiguous regressor code space",
+        ),
+        (
+            np.array([[1001, 0], [2001, 0]]),
+            np.array([[1001, 0], [1001, 0]]),
+            "unique regressors",
+        ),
+    ],
+)
+def test_model_code_resolution_rejects_ambiguous_and_duplicate_terms(
+    regressor_code,
+    model_code,
+    error_message,
+):
+    simulator = SimulateNARMAX(
+        basis_function=Polynomial(degree=2),
+        estimate_parameter=False,
+    )
+
+    with pytest.raises(ValueError, match=error_message):
+        simulator._resolve_model_code_indices(regressor_code, model_code)
+
+
+def test_simulate_normalizes_historical_one_dimensional_theta():
+    x_data = np.arange(1, 5, dtype=float).reshape(-1, 1)
+    y_data = np.zeros_like(x_data)
+    simulator = SimulateNARMAX(
+        basis_function=Polynomial(degree=2, include_bias=False),
+        estimate_parameter=False,
+    )
+    model = np.array([[1001, 0], [2001, 0]])
+
+    yhat = simulator.simulate(
+        X_test=x_data,
+        y_test=y_data,
+        model_code=model,
+        theta=np.array([0.2, 0.9]),
+    )
+
+    assert simulator.theta.shape == (2, 1)
+    assert yhat.shape == y_data.shape
+
+
+def test_simulate_polynomial_without_bias_accepts_available_model():
+    _, x_valid, _, y_valid = _small_siso_dataset()
+    simulator = SimulateNARMAX(
+        basis_function=Polynomial(degree=2, include_bias=False),
+        estimate_parameter=False,
+    )
+    model = np.array([[1001, 0], [2001, 0]])
+    theta = np.array([[0.2], [0.9]])
+
+    yhat = simulator.simulate(
+        X_test=x_valid,
+        y_test=y_valid,
+        model_code=model,
+        theta=theta,
+    )
+
+    assert yhat.shape == y_valid.shape
+    assert not np.any(np.all(simulator.final_model == 0, axis=1))
+
+
+def test_simulate_estimates_parameters_without_bias_in_model_order():
+    x_train, x_valid, y_train, y_valid = _small_siso_dataset()
+    simulator = SimulateNARMAX(
+        basis_function=Polynomial(degree=2, include_bias=False),
+        estimate_parameter=True,
+        calculate_err=False,
+    )
+    model = np.array([[1001, 0], [2001, 1001], [2002, 0]])
+
+    yhat = simulator.simulate(
+        X_train=x_train,
+        y_train=y_train,
+        X_test=x_valid,
+        y_test=y_valid,
+        model_code=model,
+    )
+
+    np.testing.assert_array_equal(simulator.final_model, model)
+    np.testing.assert_allclose(
+        simulator.theta,
+        np.array([[0.2], [0.1], [0.9]]),
+        rtol=3e-4,
+        atol=3e-5,
+    )
+    assert not np.any(np.all(simulator.final_model == 0, axis=1))
+    assert yhat.shape == y_valid.shape
 
 
 def test_simulate_unbiased_estimator_called_without_err():

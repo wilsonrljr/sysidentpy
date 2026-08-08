@@ -183,7 +183,9 @@ class NARX(BaseMSS):
         else:
             self.n_inputs = 1  # just to create the regressor space base
 
-        self.regressor_code = self.regressor_space(self.n_inputs)
+        self.regressor_code = self._regressor_space_for_feature_matrix(
+            self.n_inputs, n_features=reg_matrix.shape[1]
+        )
         self.final_model = self.regressor_code
         y = y[self.max_lag :].ravel()
 

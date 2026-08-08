@@ -26,6 +26,30 @@ from sysidentpy.utils.information_matrix import (
 )
 
 
+class _RecordingBasis:
+    def __init__(self):
+        self.fit_args = None
+
+    def fit(
+        self,
+        data,
+        max_lag,
+        ylag,
+        xlag,
+        model_type,
+        predefined_regressors,
+    ):
+        self.fit_args = (
+            data.shape[0],
+            max_lag,
+            ylag,
+            xlag,
+            model_type,
+            predefined_regressors,
+        )
+        return np.ones((1, 4))
+
+
 def test_create_lagged_y():
     """Test lagged matrix creation for output variable."""
     y = np.array([[1], [2], [3], [4], [5]])
@@ -254,6 +278,47 @@ def test_count_model_regressors_neural_adjustment():
         basis_function=Polynomial(degree=2),
     )
     assert poly_features == total_features - 1
+
+
+def test_count_model_regressors_neural_polynomial_without_bias_is_not_decremented():
+    x = np.arange(12.0).reshape(-1, 1)
+    y = np.arange(12.0).reshape(-1, 1)
+    basis_function = Polynomial(degree=2, include_bias=False)
+
+    neural_features = count_model_regressors(
+        x=x,
+        y=y,
+        xlag=2,
+        ylag=2,
+        model_type="NARMAX",
+        basis_function=basis_function,
+        is_neural_narx=True,
+    )
+    total_features = count_model_regressors(
+        x=x,
+        y=y,
+        xlag=2,
+        ylag=2,
+        model_type="NARMAX",
+        basis_function=basis_function,
+    )
+
+    assert neural_features == total_features
+
+
+def test_count_model_regressors_passes_model_configuration_to_basis():
+    basis_function = _RecordingBasis()
+    n_features = count_model_regressors(
+        x=np.arange(20.0).reshape(-1, 1),
+        y=np.arange(20.0).reshape(-1, 1),
+        xlag=4,
+        ylag=2,
+        model_type="NARMAX",
+        basis_function=basis_function,
+    )
+
+    assert n_features == 4
+    assert basis_function.fit_args == (5, 4, 2, 4, "NARMAX", None)
 
 
 def test_create_lagged_x_handles_lag_larger_than_series():

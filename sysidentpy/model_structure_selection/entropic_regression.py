@@ -581,7 +581,9 @@ class ER(BaseMSS):
         else:
             self.n_inputs = 1  # just to create the regressor space base
 
-        self.regressor_code = self.regressor_space(self.n_inputs)
+        self.regressor_code = self._regressor_space_for_feature_matrix(
+            self.n_inputs, n_features=reg_matrix.shape[1]
+        )
 
         if self.regressor_code.shape[0] > 90:
             warnings.warn(
@@ -607,29 +609,29 @@ class ER(BaseMSS):
         )
 
         final_model = selected_terms[selected_terms_backward]
-        # re-check for the constant term (add it to the estimated indices)
-        if 0 not in final_model:
-            final_model = np.array([0, *final_model])
+        bias_indices = np.flatnonzero(np.all(self.regressor_code == 0, axis=1))
+        bias_index = int(bias_indices[0]) if bias_indices.size else None
+        if bias_index is not None and bias_index not in final_model:
+            final_model = np.array([bias_index, *final_model])
 
-        repetition = len(reg_matrix)
-        if isinstance(self.basis_function, Polynomial):
-            self.final_model = self.regressor_code[final_model, :].copy()
-        else:
-            self.regressor_code = np.sort(
-                np.tile(self.regressor_code[1:, :], (repetition, 1)),
-                axis=0,
-            )
-            self.final_model = self.regressor_code[final_model, :].copy()
+        self.final_model = self.regressor_code[final_model, :].copy()
 
         self.theta = self.estimator.optimize(
             reg_matrix[:, final_model], y_full[self.max_lag :, 0].reshape(-1, 1)
         )
-        if (np.abs(self.theta[0]) < self.h) and (
-            np.sum((self.theta != 0).astype(int)) > 1
-        ):
-            self.theta = self.theta[1:].reshape(-1, 1)
-            self.final_model = self.final_model[1:, :]
-            final_model = final_model[1:]
+        selected_bias_positions = (
+            np.flatnonzero(final_model == bias_index)
+            if bias_index is not None
+            else np.array([], dtype=np.intp)
+        )
+        if selected_bias_positions.size:
+            bias_position = int(selected_bias_positions[0])
+            if (np.abs(self.theta[bias_position, 0]) < self.h) and (
+                np.sum((self.theta != 0).astype(int)) > 1
+            ):
+                self.theta = np.delete(self.theta, bias_position, axis=0).reshape(-1, 1)
+                self.final_model = np.delete(self.final_model, bias_position, axis=0)
+                final_model = np.delete(final_model, bias_position)
 
         self.n_terms = len(
             self.theta

@@ -48,6 +48,8 @@ class Bilinear(BaseBasisFunction):
     ----------
     degree : int (max_degree), default=2
         The maximum degree of the polynomial features.
+    include_bias : bool, default=True
+        If True, include the bias (constant) term in the output feature matrix.
 
     Notes
     -----
@@ -59,8 +61,17 @@ class Bilinear(BaseBasisFunction):
     def __init__(
         self,
         degree: int = 2,
+        include_bias: bool = True,
     ):
+        self._validate_include_bias(include_bias)
+        if degree == 1 and not include_bias:
+            raise ValueError(
+                "Bilinear with degree=1 and include_bias=False generates no "
+                "regressors. Use Polynomial(degree=1, include_bias=False) for "
+                "a linear model without an intercept."
+            )
         self.degree = degree
+        self.include_bias = include_bias
 
     def _normalize_predefined_regressors(
         self,
@@ -75,6 +86,47 @@ class Bilinear(BaseBasisFunction):
 
         return np.asarray(predefined_regressors, dtype=np.intp).reshape(-1)
 
+    def _get_feature_combinations(
+        self,
+        n_features: int,
+        ylag,
+        xlag,
+    ) -> list[tuple[int, ...]]:
+        """Return bilinear column combinations in the historical set order."""
+        iterable_list = range(n_features)
+        combination_list = list(
+            combinations_with_replacement(iterable_list, self.degree)
+        )
+        ny = get_max_ylag(ylag)
+        combination_ylag = list(
+            combinations_with_replacement(list(range(1, ny + 1)), self.degree)
+        )
+        xlag_values = [xlag] if isinstance(xlag, int) else xlag
+        combination_xlag = []
+        ni = 0
+        for lag in xlag_values:
+            nx = get_max_xlag(lag)
+            combination_xlag.append(
+                list(
+                    combinations_with_replacement(
+                        list(range(ny + 1 + ni, nx + ny + 1 + ni)),
+                        self.degree,
+                    )
+                )
+            )
+            ni += nx
+
+        combination_xlag = list(chain.from_iterable(combination_xlag))
+        combinations_xy = combination_xlag + combination_ylag
+        combination_list = list(set(combination_list) - set(combinations_xy))
+        if not getattr(self, "include_bias", True):
+            combination_list = [
+                combination
+                for combination in combination_list
+                if any(index != 0 for index in combination)
+            ]
+        return combination_list
+
     def _get_combination_list(
         self,
         data: np.ndarray,
@@ -83,33 +135,11 @@ class Bilinear(BaseBasisFunction):
         predefined_regressors: Optional[np.ndarray] = None,
     ) -> list[tuple[int, ...]]:
         """Return bilinear term combinations filtered by lag configuration."""
-        iterable_list = range(data.shape[1])
-        combination_list = list(
-            combinations_with_replacement(iterable_list, self.degree)
+        combination_list = self._get_feature_combinations(
+            data.shape[1],
+            ylag,
+            xlag,
         )
-
-        ny = get_max_ylag(ylag)
-        combination_ylag = list(
-            combinations_with_replacement(list(range(1, ny + 1)), self.degree)
-        )
-        if isinstance(xlag, int):
-            xlag = [xlag]
-
-        combination_xlag = []
-        ni = 0
-        for lag in xlag:
-            nx = get_max_xlag(lag)
-            combination_lag = list(
-                combinations_with_replacement(
-                    list(range(ny + 1 + ni, nx + ny + 1 + ni)), self.degree
-                )
-            )
-            combination_xlag.append(combination_lag)
-            ni += nx
-
-        combination_xlag = list(chain.from_iterable(combination_xlag))
-        combinations_xy = combination_xlag + combination_ylag
-        combination_list = list(set(combination_list) - set(combinations_xy))
 
         predefined_regressors = self._normalize_predefined_regressors(
             predefined_regressors
@@ -118,6 +148,29 @@ class Bilinear(BaseBasisFunction):
             return combination_list
 
         return [combination_list[index] for index in predefined_regressors]
+
+    def _get_feature_codes(
+        self,
+        base_codes: np.ndarray,
+        *,
+        xlag=1,
+        ylag=1,
+        model_type: str = "NARMAX",
+    ) -> np.ndarray:
+        """Return bilinear codes in the same set-derived order as ``fit``."""
+        combination_list = self._get_feature_combinations(
+            base_codes.shape[0],
+            ylag,
+            xlag,
+        )
+        if not combination_list:
+            return np.empty((0, self.degree), dtype=base_codes.dtype)
+
+        feature_codes = np.asarray(
+            [base_codes[list(combination)] for combination in combination_list],
+            dtype=base_codes.dtype,
+        )
+        return feature_codes[:, ::-1]
 
     def _evaluate_terms(
         self,

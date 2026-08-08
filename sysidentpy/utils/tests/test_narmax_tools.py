@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+from sysidentpy.basis_function import Polynomial
 from sysidentpy.utils.narmax_tools import regressor_code, set_weights, train_test_split
 
 
@@ -32,6 +33,31 @@ def test_regressor_code_without_ensemble():
 
     encoding = regressor_code(basis_function=FakeBasisFunction())
     assert encoding.size > 0
+
+
+def test_polynomial_neural_regressor_code_drops_only_semantic_bias():
+    basis_function = Polynomial(degree=2)
+    full_encoding = regressor_code(basis_function=basis_function)
+    neural_encoding = regressor_code(
+        basis_function=basis_function,
+        model_representation="neural_network",
+    )
+
+    assert np.any(np.all(full_encoding == 0, axis=1))
+    assert not np.any(np.all(neural_encoding == 0, axis=1))
+    assert neural_encoding.shape[0] == full_encoding.shape[0] - 1
+
+
+def test_polynomial_without_bias_has_same_normal_and_neural_regressor_codes():
+    basis_function = Polynomial(degree=2, include_bias=False)
+    full_encoding = regressor_code(basis_function=basis_function)
+    neural_encoding = regressor_code(
+        basis_function=basis_function,
+        model_representation="neural_network",
+    )
+
+    assert not np.any(np.all(full_encoding == 0, axis=1))
+    np.testing.assert_array_equal(neural_encoding, full_encoding)
 
 
 def test_set_weights_default():

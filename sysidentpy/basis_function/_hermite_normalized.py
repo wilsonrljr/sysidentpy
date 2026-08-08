@@ -59,9 +59,25 @@ class HermiteNormalized(BaseBasisFunction):
         include_bias: bool = True,
         ensemble: bool = False,
     ):
+        self._validate_include_bias(include_bias)
         self.degree = degree
         self.include_bias = include_bias
         self.ensemble = ensemble
+
+    def _get_feature_codes(
+        self,
+        base_codes: np.ndarray,
+        *,
+        xlag=1,
+        ylag=1,
+        model_type: str = "NARMAX",
+    ) -> np.ndarray:
+        """Return normalized Hermite feature codes in transformation order."""
+        return self._get_univariate_feature_codes(
+            base_codes,
+            include_bias=self.include_bias,
+            ensemble=self.ensemble,
+        )
 
     def _hermitenorm_expansion(self, data: np.ndarray):
         num_samples = data.shape[0]

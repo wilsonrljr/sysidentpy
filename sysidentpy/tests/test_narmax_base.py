@@ -11,7 +11,16 @@ from numpy.testing import (
 )
 
 from sysidentpy import config_context
-from sysidentpy.basis_function import Polynomial, Fourier
+from sysidentpy.basis_function import (
+    Bernstein,
+    Bilinear,
+    Fourier,
+    Hermite,
+    HermiteNormalized,
+    Laguerre,
+    Legendre,
+    Polynomial,
+)
 from sysidentpy.tests._array_api_asserts import (
     assert_array_equal as xp_assert_array_equal,
 )
@@ -159,6 +168,232 @@ def test_regressor_space():
         xlag=[[1, 2], [1, 2]], ylag=2, basis_function=Polynomial(degree=2)
     ).regressor_space(n_inputs=2)
     assert_array_equal(output3, r3)
+
+
+def test_regressor_space_polynomial_include_bias_preserves_code_order():
+    default = RegressorDictionary(
+        xlag=1,
+        ylag=1,
+        basis_function=Polynomial(degree=2),
+    ).regressor_space(n_inputs=1)
+    explicit = RegressorDictionary(
+        xlag=1,
+        ylag=1,
+        basis_function=Polynomial(degree=2, include_bias=True),
+    ).regressor_space(n_inputs=1)
+    without_bias = RegressorDictionary(
+        xlag=1,
+        ylag=1,
+        basis_function=Polynomial(degree=2, include_bias=False),
+    ).regressor_space(n_inputs=1)
+
+    expected_without_bias = np.array(
+        [
+            [1001, 0],
+            [2001, 0],
+            [1001, 1001],
+            [2001, 1001],
+            [2001, 2001],
+        ]
+    )
+    assert_array_equal(default, explicit)
+    assert_array_equal(without_bias, expected_without_bias)
+    assert not np.any(np.all(without_bias == 0, axis=1))
+
+
+def test_bilinear_regressor_codes_follow_matrix_order_for_noncontiguous_lags():
+    basis_function = Bilinear(degree=2, include_bias=False)
+    dictionary = RegressorDictionary(
+        xlag=[[1, 3], [2]],
+        ylag=[1, 4],
+        basis_function=basis_function,
+    )
+    data = np.array(
+        [
+            [1.0, 2.0, 3.0, 5.0, 7.0, 11.0],
+            [1.0, 13.0, 17.0, 19.0, 23.0, 29.0],
+            [1.0, 31.0, 37.0, 41.0, 43.0, 47.0],
+        ]
+    )
+    feature_matrix = basis_function.fit(
+        data,
+        max_lag=1,
+        ylag=dictionary.ylag,
+        xlag=dictionary.xlag,
+    )
+    feature_codes = dictionary.regressor_space(
+        n_inputs=2,
+        n_features=feature_matrix.shape[1],
+    )
+    x_codes, y_codes = dictionary.create_narmax_code(n_inputs=2)
+    base_codes = np.concatenate(([0], y_codes, x_codes))
+    code_to_column = {int(code): column for column, code in enumerate(base_codes)}
+    column_indices = np.array(
+        [
+            [code_to_column[int(code)] for code in feature_code]
+            for feature_code in feature_codes
+        ]
+    )
+    matrix_from_codes = np.prod(data[1:, column_indices], axis=2)
+
+    assert_array_equal(feature_matrix, matrix_from_codes)
+    assert not np.any(np.all(feature_codes == 0, axis=1))
+
+
+@pytest.mark.parametrize(
+    "basis_cls",
+    [Bernstein, Hermite, HermiteNormalized, Laguerre, Legendre],
+)
+def test_univariate_basis_regressor_codes_match_feature_layout(basis_cls):
+    basis_function = basis_cls(
+        degree=2,
+        include_bias=True,
+        ensemble=True,
+    )
+    data = np.array(
+        [
+            [1.0, 0.1, 0.2],
+            [1.0, 0.3, 0.4],
+            [1.0, 0.5, 0.6],
+        ]
+    )
+    feature_matrix = basis_function.fit(data, max_lag=1)
+    feature_codes = RegressorDictionary(
+        xlag=1,
+        ylag=1,
+        basis_function=basis_function,
+    ).regressor_space(n_inputs=1, n_features=feature_matrix.shape[1])
+
+    expected = np.array(
+        [
+            [1001, 0],
+            [2001, 0],
+            [0, 0],
+            [1001, 0],
+            [1001, 1001],
+            [2001, 0],
+            [2001, 2001],
+        ]
+    )
+    assert_array_equal(feature_codes, expected)
+
+
+@pytest.mark.parametrize("degree", [1, 2, 3])
+def test_fourier_regressor_codes_match_internal_polynomial_layout(degree):
+    basis_function = Fourier(degree=degree, n=2, ensemble=True)
+    data = np.array(
+        [
+            [1.0, 0.1, 0.2],
+            [1.0, 0.3, 0.4],
+            [1.0, 0.5, 0.6],
+        ]
+    )
+    feature_matrix = basis_function.fit(data, max_lag=1)
+    feature_codes = RegressorDictionary(
+        xlag=1,
+        ylag=1,
+        basis_function=basis_function,
+    ).regressor_space(n_inputs=1, n_features=feature_matrix.shape[1])
+
+    if degree == 1:
+        data_codes = np.array([[1001], [2001]])
+    else:
+        data_codes = np.array(
+            [
+                [1001, 0],
+                [2001, 0],
+                [1001, 1001],
+                [2001, 1001],
+                [2001, 2001],
+            ]
+        )
+        if degree == 3:
+            data_codes = np.column_stack([data_codes, np.zeros(5, dtype=int)])
+
+    expected = np.vstack([data_codes, np.repeat(data_codes, 4, axis=0)])
+    assert_array_equal(feature_codes, expected)
+
+
+def test_regressor_space_validates_canonical_feature_width():
+    dictionary = RegressorDictionary(
+        xlag=1,
+        ylag=1,
+        basis_function=Polynomial(degree=2, include_bias=False),
+    )
+
+    with pytest.raises(ValueError, match="feature matrix with 6 columns"):
+        dictionary.regressor_space(n_inputs=1, n_features=6)
+
+
+class _DuckTypedBasisWithoutFeatureCodes:
+    degree = 2
+
+
+class _InvalidFeatureCodeWidthPolynomial(Polynomial):
+    def _get_feature_codes(
+        self,
+        base_codes,
+        *,
+        xlag=1,
+        ylag=1,
+        model_type="NARMAX",
+    ):
+        return np.zeros((5, 1), dtype=int)
+
+
+@pytest.mark.parametrize("invalid_n_features", [True, 1.5, "2"])
+def test_regressor_space_rejects_non_integer_feature_width(invalid_n_features):
+    dictionary = RegressorDictionary(
+        xlag=1,
+        ylag=1,
+        basis_function=_DuckTypedBasisWithoutFeatureCodes(),
+    )
+
+    with pytest.raises(TypeError, match="n_features must be a non-negative integer"):
+        dictionary.regressor_space(n_inputs=1, n_features=invalid_n_features)
+
+
+def test_regressor_space_rejects_negative_feature_width_for_custom_basis():
+    dictionary = RegressorDictionary(
+        xlag=1,
+        ylag=1,
+        basis_function=_DuckTypedBasisWithoutFeatureCodes(),
+    )
+
+    with pytest.raises(ValueError, match="n_features must be a non-negative integer"):
+        dictionary.regressor_space(n_inputs=1, n_features=-1)
+
+
+def test_regressor_space_accepts_zero_and_numpy_integer_feature_width():
+    dictionary = RegressorDictionary(
+        xlag=1,
+        ylag=1,
+        basis_function=_DuckTypedBasisWithoutFeatureCodes(),
+    )
+
+    regressor_code = dictionary.regressor_space(
+        n_inputs=1,
+        n_features=np.int64(0),
+    )
+
+    assert regressor_code.shape == (0, 2)
+
+
+def test_regressor_space_rejects_invalid_explicit_feature_code_width():
+    dictionary = RegressorDictionary(
+        xlag=1,
+        ylag=1,
+        basis_function=_InvalidFeatureCodeWidthPolynomial(
+            degree=2,
+            include_bias=False,
+        ),
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="Expected 2 columns, but got 1",
+    ):
+        dictionary.regressor_space(n_inputs=1, n_features=5)
 
 
 def test_house():

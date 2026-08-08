@@ -36,6 +36,8 @@ class Polynomial(BaseBasisFunction):
     ----------
     degree : int (max_degree), default=2
         The maximum degree of the polynomial features.
+    include_bias : bool, default=True
+        If True, include the bias (constant) term in the output feature matrix.
 
     Notes
     -----
@@ -47,8 +49,11 @@ class Polynomial(BaseBasisFunction):
     def __init__(
         self,
         degree: int = 2,
+        include_bias: bool = True,
     ):
+        self._validate_include_bias(include_bias)
         self.degree = degree
+        self.include_bias = include_bias
         # Cache combination indices per (n_features, degree) to avoid rebuilding
         self._combination_cache: Dict[Tuple[int, int], np.ndarray] = {}
 
@@ -62,7 +67,26 @@ class Polynomial(BaseBasisFunction):
                 dtype=np.int32,
             )
             self._combination_cache[key] = combos
-        return self._combination_cache[key]
+        combinations = self._combination_cache[key]
+        if not getattr(self, "include_bias", True):
+            combinations = combinations[~np.all(combinations == 0, axis=1)]
+        return combinations
+
+    def _get_feature_codes(
+        self,
+        base_codes: np.ndarray,
+        *,
+        xlag=1,
+        ylag=1,
+        model_type: str = "NARMAX",
+    ) -> np.ndarray:
+        """Return polynomial codes in the same order as the feature columns."""
+        feature_codes = super()._get_feature_codes(
+            base_codes, xlag=xlag, ylag=ylag, model_type=model_type
+        )
+        if not getattr(self, "include_bias", True):
+            feature_codes = feature_codes[~np.all(feature_codes == 0, axis=1)]
+        return feature_codes
 
     def _normalize_predefined_regressors(
         self,

@@ -6,7 +6,7 @@ from numpy.testing import assert_equal
 from numpy.testing import assert_raises
 
 from sysidentpy import config_context
-from sysidentpy.basis_function import Fourier, Polynomial
+from sysidentpy.basis_function import Fourier, Legendre, Polynomial
 from sysidentpy.model_structure_selection import ER
 from sysidentpy.parameter_estimation.estimators import LeastSquares
 from sysidentpy.tests.test_narmax_base import create_test_data
@@ -506,6 +506,55 @@ def test_fit_skip_forward_skips_forward_stage(monkeypatch):
     assert_equal(model.pivv[0], 0)
 
 
+def test_fit_without_bias_does_not_force_first_regressor(monkeypatch):
+    model = ER(
+        ylag=2,
+        xlag=2,
+        estimator=LeastSquares(),
+        basis_function=Polynomial(degree=1, include_bias=False),
+        skip_forward=True,
+        n_perm=1,
+        random_state=0,
+    )
+    monkeypatch.setattr(
+        model,
+        "entropic_regression_backward",
+        lambda *_args, **_kwargs: np.array([1]),
+    )
+
+    model.fit(X=X_train[:10], y=y_train[:10])
+
+    assert_array_equal(model.pivv, np.array([1]))
+    assert_array_equal(model.final_model, model.regressor_code[[1]])
+    assert not np.any(np.all(model.final_model == 0, axis=1))
+
+
+def test_fit_locates_nonpolynomial_bias_outside_first_column(monkeypatch):
+    model = ER(
+        ylag=2,
+        xlag=2,
+        estimator=LeastSquares(),
+        basis_function=Legendre(degree=2, include_bias=True, ensemble=True),
+        skip_forward=True,
+        n_perm=1,
+        h=0.0,
+        random_state=0,
+    )
+    monkeypatch.setattr(
+        model,
+        "entropic_regression_backward",
+        lambda *_args, **_kwargs: np.array([0]),
+    )
+
+    model.fit(X=X_train[:10], y=y_train[:10])
+
+    bias_index = np.flatnonzero(np.all(model.regressor_code == 0, axis=1))[0]
+    assert bias_index > 0
+    assert_array_equal(model.pivv, np.array([bias_index, 0]))
+    assert_array_equal(model.final_model, model.regressor_code[model.pivv])
+    assert model.theta.shape == (2, 1)
+
+
 def test_large_h_removes_constant_term():
     model = ER(
         ylag=2,
@@ -513,6 +562,7 @@ def test_large_h_removes_constant_term():
         estimator=LeastSquares(),
         basis_function=Polynomial(degree=2),
         h=100.0,
+        random_state=0,
     )
     model.fit(X=X_train[:50], y=y_train[:50])
     assert 0 not in model.pivv

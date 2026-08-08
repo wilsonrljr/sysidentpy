@@ -26,7 +26,6 @@ from ..narmax_base import BaseMSS
 from sysidentpy.utils.information_matrix import build_lagged_matrix
 
 from sysidentpy.utils.simulation import (
-    get_index_from_regressor_code,
     list_output_regressor_code,
     list_input_regressor_code,
 )
@@ -196,7 +195,7 @@ class SimulateNARMAX(BaseMSS):
     ...     [2001, 1001],    # x1(k-1)y(k-1)
     ...     [2002, 0]        # x1(k-2)
     ... ])
-    >>> theta = np.array([[0.2, 0.9, 0.1]]).T  # Model parameters
+    >>> theta = np.array([[0.2, 0.1, 0.9]]).T  # Parameters follow model row order
     >>> y_pred = simulator.simulate(
     ...     X_test=x_train, y_test=y_train,
     ...     model_code=model, theta=theta
@@ -262,7 +261,11 @@ class SimulateNARMAX(BaseMSS):
             raise ValueError("y_test cannot be None")
 
         if not isinstance(model_code, np.ndarray):
-            raise TypeError(f"model_code must be an np.np.ndarray. Got {model_code}")
+            raise TypeError(f"model_code must be a NumPy ndarray. Got {model_code}")
+        if model_code.ndim != 2:
+            raise ValueError(
+                "model_code must be a two-dimensional array with one row per term"
+            )
 
         if not isinstance(steps_ahead, (int, type(None))):
             raise ValueError(
@@ -281,6 +284,61 @@ class SimulateNARMAX(BaseMSS):
                     "If estimate_parameter is True, X_train and y_train must be an"
                     f" np.ndarray. Got {type(y_train)}"
                 )
+
+    def _resolve_model_code_indices(self, regressor_code, model_code):
+        """Validate requested regressors and return indices in model-code order."""
+        if model_code.shape[1] != regressor_code.shape[1]:
+            raise ValueError(
+                "model_code must have the same number of columns as the "
+                "configured basis-function regressor codes. "
+                f"Got {model_code.shape[1]} and {regressor_code.shape[1]}."
+            )
+
+        matches = [
+            np.flatnonzero(np.all(regressor_code == row, axis=1)) for row in model_code
+        ]
+        ambiguous_terms = [
+            row.tolist()
+            for row, indices in zip(model_code, matches, strict=True)
+            if indices.size > 1
+        ]
+        if ambiguous_terms:
+            raise ValueError(
+                "The configured basis function generates an ambiguous regressor "
+                "code space: multiple feature columns share the requested codes "
+                f"{ambiguous_terms}. Simulation from model_code cannot distinguish "
+                "these features."
+            )
+
+        missing_terms = [
+            row.tolist()
+            for row, indices in zip(model_code, matches, strict=True)
+            if indices.size == 0
+        ]
+        if missing_terms:
+            raise ValueError(
+                "model_code contains regressors that are not available in the "
+                f"configured regressor space: {missing_terms}"
+            )
+
+        if np.unique(model_code, axis=0).shape[0] != model_code.shape[0]:
+            raise ValueError("model_code must contain unique regressors")
+
+        return np.asarray([indices[0] for indices in matches], dtype=np.intp)
+
+    def _normalize_theta(self, theta):
+        """Return one parameter column aligned with the selected model terms."""
+        if theta.ndim == 1 and theta.shape[0] == self.n_terms:
+            return theta.reshape(-1, 1)
+
+        if theta.shape != (self.n_terms, 1):
+            raise ValueError(
+                "theta must have shape (n_terms, 1) or (n_terms,), with one "
+                "parameter for each model_code regressor. "
+                f"Got {theta.shape} for {self.n_terms} terms"
+            )
+
+        return theta
 
     def simulate(
         self,
@@ -319,8 +377,9 @@ class SimulateNARMAX(BaseMSS):
         steps_ahead : int, optional
             Number of steps ahead for multi-step prediction. If `None`, defaults to
             one-step-ahead prediction.
-        theta : array-like, shape (n_terms, 1), optional
+        theta : array-like, shape (n_terms, 1) or (n_terms,), optional
             Precomputed model parameters. Required if `estimate_parameter=False`.
+            Parameters must follow the row order of `model_code`.
         forecast_horizon : int, optional
             Number of time steps to predict in open-loop forecasting.
             Used mainly for NAR and NARMA-type models.
@@ -362,7 +421,7 @@ class SimulateNARMAX(BaseMSS):
         ...     [2001, 1001],    # x1(k-1)y(k-1)
         ...     [2002, 0]        # x1(k-2)
         ... ])
-        >>> theta = np.array([[0.2, 0.9, 0.1]]).T  # Precomputed model parameters
+        >>> theta = np.array([[0.2, 0.1, 0.9]]).T  # Parameters follow model row order
         >>> y_pred = simulator.simulate(
         ...     X_train=X_train, y_train=y_train,
         ...     X_test=X_test, y_test=y_test,
@@ -391,11 +450,16 @@ class SimulateNARMAX(BaseMSS):
 
         self.non_degree = model_code.shape[1]
         regressor_code = self.regressor_space(self.n_inputs)
-
-        self.pivv = get_index_from_regressor_code(regressor_code, model_code)
+        # Preserve the requested term order so a user-supplied theta remains paired
+        # with the corresponding model_code row. The public utility historically
+        # returns matches in regressor-space order, so keep this ordering local.
+        self.pivv = self._resolve_model_code_indices(regressor_code, model_code)
         self.final_model = regressor_code[self.pivv]
         # to use in the predict function
         self.n_terms = self.final_model.shape[0]
+
+        if not self.estimate_parameter:
+            theta = self._normalize_theta(theta)
 
         # Determine namespace from available training arrays
         _ns_arrays = [a for a in [X_train, y_train] if a is not None]

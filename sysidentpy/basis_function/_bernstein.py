@@ -51,6 +51,8 @@ class Bernstein(BaseBasisFunction):
     ----------
     degree : int (max_degree), default=1
         The maximum degree of the polynomial features.
+    include_bias : bool, default=True
+        Whether to include the bias (constant) term in the output feature matrix.
     bias : bool, default=True
         Whether to include the bias (constant) term in the output feature matrix.
         deprecated in v.0.5.0
@@ -92,12 +94,28 @@ class Bernstein(BaseBasisFunction):
         else:
             self.degree = degree
 
+        self._validate_include_bias(include_bias)
         if bias is not None:
-            self.include_bias = bias
-        else:
-            self.include_bias = include_bias
+            self._validate_include_bias(bias)
+        resolved_include_bias = bias if bias is not None else include_bias
+        self.include_bias = resolved_include_bias
 
         self.ensemble = ensemble
+
+    def _get_feature_codes(
+        self,
+        base_codes: np.ndarray,
+        *,
+        xlag=1,
+        ylag=1,
+        model_type: str = "NARMAX",
+    ) -> np.ndarray:
+        """Return Bernstein feature codes in transformation order."""
+        return self._get_univariate_feature_codes(
+            base_codes,
+            include_bias=self.include_bias,
+            ensemble=self.ensemble,
+        )
 
     def _bernstein_expansion(self, data: np.ndarray):
         k = np.arange(1 + self.degree)

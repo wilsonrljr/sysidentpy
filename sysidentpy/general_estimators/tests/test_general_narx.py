@@ -146,6 +146,22 @@ def test_fit_lag_narmax():
     assert_equal(model.max_lag, 2)
 
 
+def test_polynomial_without_bias_aligns_codes_estimator_and_predictions():
+    model = NARX(
+        basis_function=Polynomial(degree=2, include_bias=False),
+        base_estimator=LinearRegression(fit_intercept=False),
+        xlag=2,
+        ylag=2,
+    )
+
+    model.fit(X=X_train, y=y_train)
+    prediction = model.predict(X=X_test, y=y_test, steps_ahead=1)
+
+    assert not np.any(np.all(model.regressor_code == 0, axis=1))
+    assert model.regressor_code.shape[0] == model.base_estimator.coef_.size
+    assert_equal(prediction.shape, y_test.shape)
+
+
 def test_fit_lag_narmax_fourier():
     model = NARX(
         basis_function=Fourier(degree=2), base_estimator=base_estimator, xlag=2, ylag=2

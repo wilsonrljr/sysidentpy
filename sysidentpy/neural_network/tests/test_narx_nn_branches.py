@@ -267,7 +267,7 @@ def test_split_data_with_none_input_sets_default_inputs(monkeypatch):
         "build_lagged_matrix",
         lambda *args, **kwargs: np.ones((3, 2), dtype=np.float32),
     )
-    model.basis_function.fit = lambda *args, **kwargs: np.ones((3, 2), dtype=np.float32)
+    model.basis_function.fit = lambda *args, **kwargs: np.ones((3, 6), dtype=np.float32)
 
     model.split_data(None, np.ones((5, 1), dtype=np.float32))
     assert model.n_inputs == 1
