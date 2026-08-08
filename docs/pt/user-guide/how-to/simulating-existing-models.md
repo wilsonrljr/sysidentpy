@@ -88,7 +88,7 @@ model = np.array(
     ]
 )
 # theta must be a numpy array of shape (n, 1) where n is the number of regressors
-theta = np.array([[0.2, 0.9, 0.1]]).T
+theta = np.array([[0.2, 0.1, 0.9]]).T
 ```
 
 ## Simulando o modelo
@@ -238,4 +238,3 @@ plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
     
 ![png](../../../en/user-guide/how-to/simulating-existing-models_files/simulating-existing-models_13_3.png)
     
-

@@ -47,6 +47,30 @@ SysIdentPy provides several basis functions that can be used in system identific
 
 The following code snippet dynamically loads and instantiates each available basis function. You can explore the full list of basis functions available in SysIdentPy by visiting the [basis functions documentation](https://sysidentpy.org/code/basis-function/).
 
+### Controlling the bias term
+
+`Polynomial`, `Bilinear`, `Bernstein`, `Legendre`, `Hermite`,
+`HermiteNormalized`, and `Laguerre` accept `include_bias`. Its default value is
+`True`, preserving existing generated feature matrices. Pass
+`include_bias=False` when the candidate model structure must not contain a
+constant term:
+
+```python
+basis = basis_function.Polynomial(degree=2, include_bias=False)
+```
+
+`Fourier` is intentionally excluded because its feature expansion does not add
+a constant term; its public constructor and generated feature matrix remain
+unchanged. Canonical codes for existing non-`Polynomial` bases were corrected
+to follow their actual feature-column order. This can change exposed
+`regressor_code` and `final_model` metadata from earlier releases without
+changing the default feature matrices. Entropic Regression may also select a
+different structure where its former first-column bias assumption was
+incorrect. Also note that `include_bias` controls only the features built by
+SysIdentPy. An external estimator used with `NARX` may still fit its own
+intercept; disable that estimator option as well when an entirely
+intercept-free model is required.
+
 
 ```python
 basis_function.__all__
@@ -156,4 +180,3 @@ for basis_name, bf in inspect.getmembers(basis_function):
     
 ![png](basis-function-overview_files/basis-function-overview_7_8.png)
     
-

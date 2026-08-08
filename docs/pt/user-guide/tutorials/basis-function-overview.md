@@ -47,6 +47,30 @@ O SysIdentPy fornece várias funções base que podem ser usadas na identificaç
 
 O seguinte trecho de código carrega e instancia dinamicamente cada função base disponível. Você pode explorar a lista completa de funções base disponíveis no SysIdentPy visitando a [documentação de funções base](https://sysidentpy.org/code/basis-function/).
 
+### Controlando o termo de bias
+
+`Polynomial`, `Bilinear`, `Bernstein`, `Legendre`, `Hermite`,
+`HermiteNormalized` e `Laguerre` aceitam `include_bias`. O valor padrão é
+`True`, preservando as matrizes de features geradas. Use `include_bias=False`
+quando a estrutura candidata do modelo não deve conter um termo constante:
+
+```python
+basis = basis_function.Polynomial(degree=2, include_bias=False)
+```
+
+`Fourier` foi excluída intencionalmente porque sua expansão de features não
+adiciona um termo constante; seu construtor público e sua matriz de features
+permanecem inalterados. Os códigos canônicos das bases existentes diferentes de
+`Polynomial` foram corrigidos para acompanhar a ordem real de suas colunas. Por
+isso, os metadados expostos em `regressor_code` e `final_model` podem diferir de
+versões anteriores, embora as matrizes de features padrão permaneçam
+inalteradas. A Regressão Entrópica também pode selecionar outra estrutura nos
+casos em que sua antiga suposição de bias na primeira coluna era incorreta.
+Observe também que `include_bias` controla apenas as features construídas pelo
+SysIdentPy. Um estimador externo usado com `NARX` ainda pode ajustar seu próprio
+intercepto; desative também essa opção do estimador quando for necessário um
+modelo totalmente sem intercepto.
+
 
 ```python
 basis_function.__all__
