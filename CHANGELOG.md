@@ -13,6 +13,9 @@
     - Setting `include_bias=False` now removes the constant term from both the generated regressor matrix and the corresponding model-structure codes, keeping selected terms and estimated parameters aligned throughout fitting, prediction, and simulation.
     - Fourier's public constructor and generated feature matrix remain unchanged, and it deliberately has no `include_bias` option because its feature expansion does not generate a constant term.
     - Corrected canonical structure-code generation for Fourier and the other existing non-`Polynomial` basis functions. Their default feature matrices are preserved, but exposed `regressor_code` and `final_model` metadata can change where earlier releases reported polynomial-style codes that did not describe the generated columns. Entropic Regression can also select different terms for bases whose bias was absent or not in the first column, because it no longer treats column zero as an intercept unconditionally.
+- **Model Simulation Fixes:**
+    - `SimulateNARMAX` now preserves the row order supplied in `model_code`, so each user-provided `theta` value remains paired with the regressor at the same position.
+    - Corrected `NARXNN` free-run prediction for NFIR models to populate the input-lag blocks used by their regressor codes.
 - **Neural NARX Early Stopping:**
     - Added optional validation-loss early stopping to `NARXNN` with configurable `patience` and `min_delta`.
     - Reused the existing `X_test` and `y_test` validation flow and automatically restored the network weights from the best validation epoch.
@@ -25,7 +28,7 @@
 
 ### IMPACT
 
-The standard `pip install sysidentpy` installation remains unchanged. Array API testing dependencies continue to be development-only. Neural NARX early stopping is opt-in, so existing training behaviour remains unchanged by default. Basis functions continue to include the bias term by default wherever they did previously, preserving their default generated feature matrices; excluding it is an explicit opt-in. Corrected canonical codes can change `regressor_code` and `final_model` metadata for non-`Polynomial` bases whose earlier identifiers were misaligned with their feature columns. Entropic Regression results can also change when its former first-column bias assumption was incorrect.
+The standard `pip install sysidentpy` installation remains unchanged. Array API testing dependencies continue to be development-only. Neural NARX early stopping is opt-in, so existing training behaviour remains unchanged by default. Basis functions continue to include the bias term by default wherever they did previously, preserving their default generated feature matrices; excluding it is an explicit opt-in. Corrected canonical codes can change `regressor_code` and `final_model` metadata for non-`Polynomial` bases whose earlier identifiers were misaligned with their feature columns. Entropic Regression results can also change when its former first-column bias assumption was incorrect. `SimulateNARMAX` code that supplied `theta` in the internal regressor-space order instead of the row order of `model_code` must reorder those values. `NARXNN` NFIR free-run predictions can change because they now use the intended input histories.
 
 ### TESTING
 

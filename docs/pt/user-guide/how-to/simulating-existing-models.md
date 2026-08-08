@@ -45,6 +45,8 @@ No próximo exemplo, geraremos dados com 1000 amostras com ruído branco e selec
 
 
 ```python
+np.random.seed(42)
+
 x_train, x_test, y_train, y_test = get_siso_data(
     n=1000, colored_noise=False, sigma=0.001, train_percentage=90
 )
@@ -65,13 +67,15 @@ Já sabemos que os dados gerados são resultado do modelo $𝑦_𝑘=0.2𝑦_{�
 
 ### Nota Importante
 
-A ordem dos arrays importa.
+A ordem dos códigos dentro de cada linha do modelo importa.
 
 Se você usar [2001, 1001], funcionará, mas [1001, 2001] não (o regressor será ignorado). Sempre coloque o maior valor primeiro:
 - $[2003, 2001]$ **funciona**
 - $[2001, 2003]$ **não funciona**
 
-Trataremos esta limitação em uma atualização futura.
+Trataremos esta limitação em uma atualização futura. As linhas do modelo podem
+aparecer em qualquer ordem, mas cada valor de `theta` deve corresponder à linha
+de `model` na mesma posição.
 
 
 ```python
@@ -87,7 +91,7 @@ model = np.array(
         [2002, 0],  # x1(k-2)
     ]
 )
-# theta must be a numpy array of shape (n, 1) where n is the number of regressors
+# theta deve ter formato (n, 1) e seguir a ordem das linhas de model
 theta = np.array([[0.2, 0.1, 0.9]]).T
 ```
 
@@ -121,8 +125,8 @@ plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 
           Regressors  Parameters             ERR
     0         y(k-1)  2.0000E-01  0.00000000E+00
-    1        x1(k-2)  9.0000E-01  0.00000000E+00
-    2  x1(k-1)y(k-1)  1.0000E-01  0.00000000E+00
+    1  x1(k-1)y(k-1)  1.0000E-01  0.00000000E+00
+    2        x1(k-2)  9.0000E-01  0.00000000E+00
 
 
 
@@ -160,7 +164,7 @@ rrse = root_relative_squared_error(y_test, yhat)
 print(rrse)
 ```
 
-    0.001980394341423956
+    0.0018437406169225401
 
 
 
@@ -176,7 +180,7 @@ rrse = root_relative_squared_error(y_test, yhat)
 print(rrse)
 ```
 
-    0.0019394741034286557
+    0.0018771888780714843
 
 
 ### Estimando os parâmetros
@@ -217,9 +221,9 @@ plot_residues_correlation(data=x1e, title="Residues", ylabel="$x_1e$")
 ```
 
           Regressors  Parameters             ERR
-    0         y(k-1)  1.9999E-01  9.57682046E-01
-    1        x1(k-2)  9.0003E-01  3.87716434E-02
-    2  x1(k-1)y(k-1)  1.0009E-01  3.54306118E-03
+    0         y(k-1)  2.0002E-01  9.55432286E-01
+    1  x1(k-1)y(k-1)  1.0004E-01  4.12434401E-02
+    2        x1(k-2)  8.9998E-01  3.32077000E-03
 
 
 
