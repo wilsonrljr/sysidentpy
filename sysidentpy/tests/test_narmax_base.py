@@ -22,6 +22,7 @@ from sysidentpy.basis_function import (
     Polynomial,
 )
 from sysidentpy.tests._array_api_asserts import (
+    assert_allclose as xp_assert_allclose,
     assert_array_equal as xp_assert_array_equal,
 )
 from sysidentpy.model_structure_selection import FROLS
@@ -825,24 +826,83 @@ def test_nar_step_ahead_insufficient_initial_conditions():
         model._nar_step_ahead(y[0], steps_ahead=2)
 
 
+@pytest.mark.parametrize("steps_ahead", [0, -1])
+def test_nar_step_ahead_rejects_non_positive_steps(steps_ahead):
+    model = RecordingPredictableMSS(model_type="NAR")
+    y_segment = np.arange(model.max_lag + 1, dtype=float).reshape(-1, 1)
+
+    with pytest.raises(
+        ValueError,
+        match="steps_ahead must be integer and > zero",
+    ):
+        model._nar_step_ahead(y_segment, steps_ahead=steps_ahead)
+
+
 def test_nar_step_ahead_handles_multiple_segments():
-    model = PredictableMSS(model_type="NAR")
-    y_segment = np.arange(model.max_lag + 4, dtype=float).reshape(-1, 1)
+    model = RecordingPredictableMSS(model_type="NAR")
+    y_segment = np.arange(model.max_lag + 5, dtype=float).reshape(-1, 1)
 
     result = model._nar_step_ahead(y_segment, steps_ahead=2)
 
-    expected_rows = y_segment.shape[0] + 2 - model.max_lag
-    assert result.shape == (expected_rows, 1)
+    assert result.shape == (y_segment.shape[0] - model.max_lag, 1)
+    assert_array_equal(result[:, 0], np.array([0.0, 1.0, 0.0, 1.0, 0.0]))
+    assert [call[2] for call in model.prediction_calls] == [2, 2, 1]
+    assert [call[0] for call in model.prediction_calls] == [None, None, None]
+    for block, call in enumerate(model.prediction_calls):
+        start = block * 2
+        assert_array_equal(call[1], y_segment[start : start + model.max_lag])
 
 
 def test_nar_step_ahead_handles_single_segment():
+    model = RecordingPredictableMSS(model_type="NAR")
+    y_segment = np.arange(model.max_lag + 3, dtype=float).reshape(-1, 1)
+
+    result = model._nar_step_ahead(y_segment, steps_ahead=10)
+
+    assert result.shape == (3, 1)
+    assert_array_equal(result[:, 0], np.arange(3, dtype=float))
+    assert len(model.prediction_calls) == 1
+    assert model.prediction_calls[0][2] == 3
+    assert_array_equal(model.prediction_calls[0][1], y_segment[: model.max_lag])
+
+
+def test_nar_step_ahead_with_only_initial_conditions_returns_empty_prediction():
+    model = RecordingPredictableMSS(model_type="NAR")
+    y_initial = np.arange(model.max_lag, dtype=float).reshape(-1, 1)
+
+    result = model._nar_step_ahead(y_initial, steps_ahead=3)
+
+    assert result.shape == (0, 1)
+    assert model.prediction_calls == []
+
+
+def test_nar_step_ahead_preserves_fractional_predictions_for_integer_output():
+    model = RecordingPredictableMSS(model_type="NAR", prediction_offset=0.5)
+    y_segment = np.arange(model.max_lag + 3, dtype=int).reshape(-1, 1)
+
+    result = model._nar_step_ahead(y_segment, steps_ahead=2)
+
+    assert np.issubdtype(result.dtype, np.floating)
+    np.testing.assert_allclose(result[:, 0], np.array([0.5, 1.5, 0.5]))
+
+
+def test_narmax_predict_reference_promotes_integer_array_api_inputs():
+    xp = pytest.importorskip("array_api_strict")
     model = PredictableMSS(model_type="NAR")
-    y_segment = np.arange(model.max_lag + 1, dtype=float).reshape(-1, 1)
+    model.n_inputs = 0
+    model.theta = np.array([[0.6]])
+    y_initial = xp.asarray([[1], [2]], dtype=xp.int64)
 
-    result = model._nar_step_ahead(y_segment, steps_ahead=y_segment.shape[0])
+    with config_context(array_api_dispatch=True):
+        result = model._narmax_predict_reference(
+            x=None,
+            y_initial=y_initial,
+            forecast_horizon=5,
+        )
 
-    expected_rows = y_segment.shape[0] * 2 - model.max_lag
-    assert result.shape == (expected_rows, 1)
+    assert result.__array_namespace__() is xp
+    assert xp.isdtype(result.dtype, "real floating")
+    xp_assert_allclose(result, np.array([[1.2], [0.72], [0.432]]))
 
 
 def test_narmarx_step_ahead_insufficient_initial_conditions():
@@ -1060,6 +1120,25 @@ class PredictableMSS(BaseMSS):
     ) -> np.ndarray:
         _ = (X, y, steps_ahead, forecast_horizon)
         return np.zeros((1, 1))
+
+
+class RecordingPredictableMSS(PredictableMSS):
+    """Predictable BaseMSS variant that records recursive NAR blocks."""
+
+    def __init__(self, model_type="NAR", prediction_offset=0.0):
+        super().__init__(model_type=model_type)
+        self.prediction_calls = []
+        self.prediction_offset = prediction_offset
+
+    def _model_prediction(
+        self,
+        x: Optional[np.ndarray],
+        y_initial: np.ndarray,
+        forecast_horizon: int = 1,
+    ) -> np.ndarray:
+        self.prediction_calls.append((x, y_initial.copy(), forecast_horizon))
+        prediction = super()._model_prediction(x, y_initial, forecast_horizon)
+        return prediction + self.prediction_offset
 
 
 class ArrayAPIPredictableMSS(PredictableMSS):
