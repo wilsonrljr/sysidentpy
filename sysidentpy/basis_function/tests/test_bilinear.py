@@ -48,6 +48,44 @@ def test_bilinear_fit_predefined_regressors():
     )  # Ensure correct feature selection
 
 
+def test_bilinear_include_bias_removes_only_the_constant_combination():
+    data = np.array(
+        [
+            [1.0, 1.0, 2.0],
+            [1.0, 3.0, 4.0],
+            [1.0, 5.0, 6.0],
+        ]
+    )
+    default_basis = Bilinear(degree=2)
+    explicit_basis = Bilinear(degree=2, include_bias=True)
+    without_bias_basis = Bilinear(degree=2, include_bias=False)
+
+    default = default_basis.fit(data, max_lag=1)
+    explicit = explicit_basis.fit(data, max_lag=1)
+    without_bias = without_bias_basis.fit(data, max_lag=1)
+    bias_columns = np.flatnonzero(np.all(explicit == 1, axis=0))
+
+    np.testing.assert_array_equal(default, explicit)
+    assert bias_columns.size == 1
+    np.testing.assert_array_equal(
+        without_bias,
+        np.delete(explicit, bias_columns, axis=1),
+    )
+    assert without_bias.shape[1] == 3
+
+    selected = without_bias_basis.fit(
+        data,
+        max_lag=1,
+        predefined_regressors=np.array([0, 2]),
+    )
+    np.testing.assert_array_equal(selected, without_bias[:, [0, 2]])
+
+
+def test_bilinear_degree_one_without_bias_rejects_empty_feature_space():
+    with pytest.raises(ValueError, match="generates no regressors"):
+        Bilinear(degree=1, include_bias=False)
+
+
 def test_bilinear_degree_warning():
     """Test that a warning is raised when degree=1 is chosen."""
     b = Bilinear(degree=1)

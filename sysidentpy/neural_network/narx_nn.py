@@ -4,7 +4,6 @@
 #           Wilson Rocha Lacerda Junior <wilsonrljr@outlook.com>
 # License: BSD 3 clause
 
-
 import logging
 import sys
 import warnings
@@ -400,6 +399,25 @@ class NARXNN(BaseMSS):
     def _scalar_forward(self, array):
         return float(self._forward_numpy(array).reshape(-1)[0])
 
+    def _prepare_regressor_matrix(self, reg_matrix, n_inputs):
+        """Align neural input columns with their canonical regressor codes."""
+        regressor_code = self._regressor_space_for_feature_matrix(
+            n_inputs, n_features=reg_matrix.shape[1]
+        )
+        if not isinstance(self.basis_function, Polynomial):
+            return reg_matrix, regressor_code
+
+        bias_indices = np.flatnonzero(np.all(regressor_code == 0, axis=1))
+        if bias_indices.size == 0:
+            return reg_matrix, regressor_code
+
+        # Native Polynomial layouts contain one bias. Compatibility fallbacks for
+        # custom subclasses can repeat approximate codes when extending the layout;
+        # removing every zero code would silently discard those custom features.
+        keep_columns = np.ones(regressor_code.shape[0], dtype=bool)
+        keep_columns[bias_indices[0]] = False
+        return reg_matrix[:, keep_columns], regressor_code[keep_columns, :]
+
     def define_opt(self):
         """Define the optimizer using the user parameters."""
         return self.optimizer_cls(
@@ -474,43 +492,23 @@ class NARXNN(BaseMSS):
         self.max_lag = self._get_max_lag()
         lagged_data = build_lagged_matrix(x, y, self.xlag, self.ylag, self.model_type)
 
-        if isinstance(self.basis_function, Polynomial):
-            reg_matrix = self.basis_function.fit(
-                lagged_data,
-                self.max_lag,
-                self.ylag,
-                self.xlag,
-                self.model_type,
-                predefined_regressors=None,
-            )
-            reg_matrix = reg_matrix[:, 1:]
-        else:
-            reg_matrix = self.basis_function.fit(
-                lagged_data,
-                self.max_lag,
-                self.ylag,
-                self.xlag,
-                self.model_type,
-                predefined_regressors=None,
-            )
+        reg_matrix = self.basis_function.fit(
+            lagged_data,
+            self.max_lag,
+            self.ylag,
+            self.xlag,
+            self.model_type,
+            predefined_regressors=None,
+        )
 
         if x is not None:
             self.n_inputs = num_features(x)
         else:
             self.n_inputs = 1  # only used to create the regressor space base
 
-        self.regressor_code = self.regressor_space(self.n_inputs)
-        repetition = len(reg_matrix)
-        if not isinstance(self.basis_function, Polynomial):
-            tmp_code = np.sort(
-                np.tile(self.regressor_code[1:, :], (repetition, 1)),
-                axis=0,
-            )
-            self.regressor_code = tmp_code[list(range(len(reg_matrix))), :].copy()
-        else:
-            self.regressor_code = self.regressor_code[
-                1:
-            ]  # removes the column of the constant
+        reg_matrix, self.regressor_code = self._prepare_regressor_matrix(
+            reg_matrix, self.n_inputs
+        )
 
         self.final_model = self.regressor_code.copy()
         reg_matrix = np.atleast_1d(reg_matrix).astype(np.float32)
@@ -784,19 +782,16 @@ class NARXNN(BaseMSS):
         if y is None:
             raise ValueError("y cannot be None")
 
+        n_inputs = num_features(x_base) if x_base is not None else 1
+
         lagged_data = build_lagged_matrix(
             x_base, y, self.xlag, self.ylag, self.model_type
         )
 
-        if isinstance(self.basis_function, Polynomial):
-            x_base = self.basis_function.transform(
-                lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type
-            )
-            x_base = x_base[:, 1:]
-        else:
-            x_base = self.basis_function.transform(
-                lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type
-            )
+        x_base = self.basis_function.transform(
+            lagged_data, self.max_lag, self.ylag, self.xlag, self.model_type
+        )
+        x_base, _ = self._prepare_regressor_matrix(x_base, n_inputs)
 
         predictions = self._forward_numpy(x_base)
         yhat = np.concatenate(
@@ -929,8 +924,10 @@ class NARXNN(BaseMSS):
         regressor_powers = np.empty(model_exponents.shape, dtype=np.float32)
         regressor_value = np.empty(model_exponents.shape[0], dtype=np.float32)
         for i in range(self.max_lag, x.shape[0]):
-            init = 0
-            final = self.max_lag
+            # ``_code2exponents`` always reserves the first block for output
+            # lags. NFIR codes only use the following input blocks.
+            init = self.max_lag
+            final = 2 * self.max_lag
             k = int(i - self.max_lag)
             for j in range(self.n_inputs):
                 raw_regressor[init:final] = x[k:i, j]

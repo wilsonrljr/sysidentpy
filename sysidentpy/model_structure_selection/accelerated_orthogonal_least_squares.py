@@ -404,18 +404,12 @@ class AOLS(BaseMSS):
         else:
             self.n_inputs = 1  # just to create the regressor space base
 
-        self.regressor_code = self.regressor_space(self.n_inputs)
-        (self.theta, self.pivv, self.res) = self.aols(reg_matrix, y)
+        self.regressor_code = self._regressor_space_for_feature_matrix(
+            self.n_inputs, n_features=reg_matrix.shape[1]
+        )
+        self.theta, self.pivv, self.res = self.aols(reg_matrix, y)
         self.pivv = np.asarray(_to_numpy(self.pivv), dtype=np.intp).reshape(-1)
-        repetition = reg_matrix.shape[0]
-        if isinstance(self.basis_function, Polynomial):
-            self.final_model = self.regressor_code[self.pivv, :].copy()
-        else:
-            self.regressor_code = np.sort(
-                np.tile(self.regressor_code[1:, :], (repetition, 1)),
-                axis=0,
-            )
-            self.final_model = self.regressor_code[self.pivv, :].copy()
+        self.final_model = self.regressor_code[self.pivv, :].copy()
 
         self.n_terms = self.theta.shape[
             0

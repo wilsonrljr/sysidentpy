@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import numpy as np
 import torch
@@ -7,6 +7,7 @@ from torch import nn
 
 from sysidentpy.basis_function import Fourier, Polynomial
 from sysidentpy.neural_network import NARXNN
+from sysidentpy.utils.information_matrix import build_lagged_matrix
 from sysidentpy.utils.narmax_tools import regressor_code
 from sysidentpy.tests.test_narmax_base import create_test_data
 import pytest
@@ -58,6 +59,35 @@ class NARX(nn.Module):
         z = self.tanh(z)
         z = self.lin3(z)
         return z
+
+
+class _ExpandedPolynomial(Polynomial):
+    def fit(
+        self,
+        data,
+        max_lag=1,
+        ylag=1,
+        xlag=1,
+        model_type="NARMAX",
+        predefined_regressors=None,
+    ):
+        base_features = super().fit(
+            data,
+            max_lag,
+            ylag,
+            xlag,
+            model_type,
+            predefined_regressors=None,
+        )
+        custom_feature = data[max_lag:, 1:2] ** 3
+        features = np.column_stack([base_features, custom_feature])
+        if predefined_regressors is None:
+            return features
+        return features[:, predefined_regressors]
+
+
+def _first_regressor_value(values):
+    return float(np.asarray(values).reshape(-1)[0])
 
 
 def test_default_values():
@@ -197,6 +227,77 @@ def test_data_transform_allows_shuffle_override(monkeypatch):
     dataloader = model.data_transform(X_train[:10], y_train[:10], shuffle=False)
     assert captured["shuffle"] is False
     assert isinstance(dataloader, tuple)
+
+
+def test_polynomial_bias_modes_produce_same_neural_inputs_and_one_step_matrix():
+    with_bias = NARXNN(
+        basis_function=Polynomial(degree=2, include_bias=True),
+        xlag=2,
+        ylag=2,
+    )
+    without_bias = NARXNN(
+        basis_function=Polynomial(degree=2, include_bias=False),
+        xlag=2,
+        ylag=2,
+    )
+
+    matrix_with_bias, _ = with_bias.split_data(X_train[:20], y_train[:20])
+    matrix_without_bias, _ = without_bias.split_data(X_train[:20], y_train[:20])
+
+    np.testing.assert_allclose(matrix_with_bias, matrix_without_bias)
+    np.testing.assert_array_equal(with_bias.regressor_code, without_bias.regressor_code)
+    assert matrix_with_bias.shape[1] == with_bias.regressor_code.shape[0]
+    assert not np.any(np.all(with_bias.regressor_code == 0, axis=1))
+
+    n_predictions = X_test[:10].shape[0] - with_bias.max_lag
+    with_bias_forward = MagicMock(return_value=np.zeros((n_predictions, 1)))
+    without_bias_forward = MagicMock(return_value=np.zeros((n_predictions, 1)))
+    with_bias._forward_numpy = with_bias_forward
+    without_bias._forward_numpy = without_bias_forward
+    with_bias._one_step_ahead_prediction(X_test[:10], y_test[:10])
+    without_bias._one_step_ahead_prediction(X_test[:10], y_test[:10])
+
+    matrix_with_bias = with_bias_forward.call_args.args[0]
+    matrix_without_bias = without_bias_forward.call_args.args[0]
+    np.testing.assert_allclose(matrix_with_bias, matrix_without_bias)
+    assert matrix_with_bias.shape[1] == with_bias.regressor_code.shape[0]
+
+
+def test_custom_polynomial_layout_removes_only_one_bias_code():
+    x_data = X_train[:20]
+    y_data = y_train[:20]
+    basis_function = _ExpandedPolynomial(degree=1, include_bias=True)
+    model = NARXNN(basis_function=basis_function, xlag=1, ylag=1)
+    lagged_data = build_lagged_matrix(
+        x_data, y_data, model.xlag, model.ylag, model.model_type
+    )
+    full_matrix = basis_function.fit(lagged_data, max_lag=1, ylag=1, xlag=1)
+
+    regressor_matrix, _ = model.split_data(x_data, y_data)
+
+    np.testing.assert_allclose(regressor_matrix, full_matrix[:, 1:])
+    assert regressor_matrix.shape[1] == full_matrix.shape[1] - 1
+    assert model.regressor_code.shape[0] == regressor_matrix.shape[1]
+    assert np.count_nonzero(np.all(model.regressor_code == 0, axis=1)) == 1
+
+
+@pytest.mark.parametrize("include_bias", [True, False])
+def test_polynomial_nfir_recursive_prediction_uses_input_exponent_block(include_bias):
+    x_data = np.arange(1, 7, dtype=float).reshape(-1, 1)
+    y_data = np.zeros_like(x_data)
+    model = NARXNN(
+        xlag=1,
+        ylag=1,
+        model_type="NFIR",
+        basis_function=Polynomial(degree=1, include_bias=include_bias),
+    )
+    regressor_matrix, _ = model.split_data(x_data, y_data)
+    model._scalar_forward = _first_regressor_value
+
+    prediction = model._nfir_predict(x_data, y_data)
+
+    np.testing.assert_allclose(regressor_matrix[:, 0], x_data[:-1, 0])
+    np.testing.assert_allclose(prediction[1:, 0], regressor_matrix[:, 0])
 
 
 def test_fit_verbose_requires_validation_data():

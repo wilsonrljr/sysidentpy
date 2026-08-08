@@ -16,6 +16,7 @@ from sysidentpy.tests._array_api_asserts import (
     assert_array_equal as xp_assert_array_equal,
 )
 from sysidentpy.tests.test_narmax_base import create_test_data
+from sysidentpy.utils.information_matrix import build_lagged_matrix
 
 x, y, _ = create_test_data()
 train_percentage = 90
@@ -122,6 +123,33 @@ def test_model_predict_fourier_steps_none():
     model.fit(X=X_train, y=y_train)
     yhat = model._basis_function_predict(x=X_test, y_initial=y_test)
     assert_almost_equal(yhat.mean(), y_test.mean(), decimal=1)
+
+
+def test_fourier_regressor_codes_align_with_feature_columns_and_selection():
+    basis_function = Fourier(degree=2, n=1)
+    model = AOLS(
+        ylag=[1, 2],
+        xlag=2,
+        basis_function=basis_function,
+    ).fit(X=X_train, y=y_train)
+    lagged_data = build_lagged_matrix(
+        X_train, y_train, model.xlag, model.ylag, model.model_type
+    )
+    reg_matrix = basis_function.fit(
+        lagged_data,
+        model.max_lag,
+        model.ylag,
+        model.xlag,
+        model.model_type,
+        predefined_regressors=None,
+    )
+
+    assert model.regressor_code.shape[0] == reg_matrix.shape[1]
+    np.testing.assert_array_equal(
+        model.final_model,
+        model.regressor_code[model.pivv],
+    )
+    assert model.theta.shape[0] == model.final_model.shape[0]
 
 
 def test_model_predict_fourier_steps_1():

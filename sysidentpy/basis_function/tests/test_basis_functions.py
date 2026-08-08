@@ -64,6 +64,62 @@ def test_fit_polynomial_predefined_accepts_array_api_inputs():
     xp_assert_array_equal(result, output)
 
 
+def test_polynomial_include_bias_controls_constant_term_before_selection():
+    data = np.array(
+        [
+            [1.0, 1.0, 2.0],
+            [1.0, 3.0, 4.0],
+            [1.0, 5.0, 6.0],
+        ]
+    )
+    default = Polynomial(degree=2).fit(data, max_lag=1)
+    explicit = Polynomial(degree=2, include_bias=True).fit(data, max_lag=1)
+    without_bias = Polynomial(degree=2, include_bias=False).fit(data, max_lag=1)
+
+    assert_array_equal(default, explicit)
+    assert_array_equal(without_bias, explicit[:, 1:])
+    assert not np.any(np.all(without_bias == 1, axis=0))
+
+    selected = Polynomial(degree=2, include_bias=False).fit(
+        data,
+        max_lag=1,
+        predefined_regressors=np.array([0, 2]),
+    )
+    assert_array_equal(selected, without_bias[:, [0, 2]])
+
+
+def test_polynomial_include_bias_uses_cached_combinations_safely():
+    data = np.column_stack(
+        [np.ones(4), np.arange(4, dtype=float), np.arange(4, dtype=float) + 1]
+    )
+    basis_function = Polynomial(degree=2)
+    with_bias = basis_function.fit(data, max_lag=1)
+
+    basis_function.include_bias = False
+    without_bias = basis_function.fit(data, max_lag=1)
+
+    assert_array_equal(without_bias, with_bias[:, 1:])
+
+
+def test_polynomial_without_bias_accepts_array_api_inputs():
+    xp = pytest.importorskip("array_api_strict")
+    data_np = np.array(
+        [
+            [1.0, 1.0, 2.0],
+            [1.0, 3.0, 4.0],
+            [1.0, 5.0, 6.0],
+        ]
+    )
+    basis_function = Polynomial(degree=2, include_bias=False)
+    expected = basis_function.fit(data_np, max_lag=1)
+
+    with config_context(array_api_dispatch=True):
+        result = basis_function.fit(xp.asarray(data_np), max_lag=1)
+
+    assert result.__array_namespace__().__name__ == xp.__name__
+    xp_assert_array_equal(result, expected)
+
+
 def test_transform_polynomial():
     basis_function = Polynomial(degree=2)
     data = np.array(([1, 1, 1], [2, 3, 4], [3, 3, 3]))
@@ -289,6 +345,32 @@ def test_scipy_basis_functions_reject_array_api_dispatch(basis_cls, basis_name):
             match=rf"{basis_name}.*requires NumPy inputs",
         ):
             basis_function.fit(data=data, max_lag=1)
+
+
+@pytest.mark.parametrize(
+    "basis_cls",
+    [
+        Polynomial,
+        Bilinear,
+        Legendre,
+        Laguerre,
+        Hermite,
+        HermiteNormalized,
+        Bernstein,
+    ],
+)
+@pytest.mark.parametrize("invalid_value", [1, "False", np.bool_(True), None])
+def test_include_bias_requires_a_boolean(basis_cls, invalid_value):
+    with pytest.raises(TypeError, match="include_bias must be False or True"):
+        basis_cls(include_bias=invalid_value)
+
+
+def test_bernstein_validates_legacy_bias_before_applying_precedence():
+    with pytest.raises(TypeError, match="include_bias must be False or True"):
+        Bernstein(include_bias=True, bias="False")
+
+    with pytest.raises(TypeError, match="include_bias must be False or True"):
+        Bernstein(include_bias="False", bias=True)
 
 
 class _DummyBasis(BaseBasisFunction):

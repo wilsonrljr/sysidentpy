@@ -57,29 +57,11 @@ def regressor_code(
         xlag=xlag, ylag=ylag, model_type=model_type, basis_function=basis_function
     ).regressor_space(n_inputs)
 
-    if not isinstance(basis_function, Polynomial) and basis_function.ensemble:
-        repetition = basis_function.n * 2
-        basis_code = np.sort(
-            np.tile(encoding[1:, :], (repetition, 1)),
-            axis=0,
-        )
-        encoding = np.concatenate([encoding[1:], basis_code])
-    elif (
-        not isinstance(basis_function, Polynomial) and basis_function.ensemble is False
-    ):
-        repetition = basis_function.n * 2
-        encoding = np.sort(
-            np.tile(encoding[1:, :], (repetition, 1)),
-            axis=0,
-        )
-
     if (
         isinstance(basis_function, Polynomial)
         and model_representation == "neural_network"
     ):
-        return encoding[1:]
-    if isinstance(basis_function, Polynomial) and model_representation is None:
-        return encoding
+        return encoding[~np.all(encoding == 0, axis=1)]
 
     return encoding
 

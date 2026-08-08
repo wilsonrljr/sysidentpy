@@ -1017,7 +1017,9 @@ class RMSS(OFRBase):
         self._reg_matrices = reg_matrices
         self._targets = targets
 
-        self.regressor_code = self.regressor_space(self.n_inputs)
+        self.regressor_code = self._regressor_space_for_feature_matrix(
+            self.n_inputs, n_features=reg_matrices[0].shape[1]
+        )
 
         if self.order_selection is True:
             self.info_values = self.information_criterion(reg_matrices, targets)
@@ -1044,15 +1046,7 @@ class RMSS(OFRBase):
         self.n_terms = model_length
 
         tmp_piv = self.pivv[0:model_length]
-        repetition = len(reg_matrices[0])
-        if isinstance(self.basis_function, Polynomial):
-            self.final_model = self.regressor_code[tmp_piv, :].copy()
-        else:
-            self.regressor_code = np.sort(
-                np.tile(self.regressor_code[1:, :], (repetition, 1)),
-                axis=0,
-            )
-            self.final_model = self.regressor_code[tmp_piv, :].copy()
+        self.final_model = self.regressor_code[tmp_piv, :].copy()
 
         self.theta = self._estimate_theta(self._reg_matrices, self._targets)
         return self

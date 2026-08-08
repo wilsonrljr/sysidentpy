@@ -702,7 +702,9 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
         else:
             self.n_inputs = 1  # just to create the regressor space base
 
-        self.regressor_code = self.regressor_space(self.n_inputs)
+        self.regressor_code = self._regressor_space_for_feature_matrix(
+            self.n_inputs, n_features=reg_matrix.shape[1]
+        )
 
         if self.order_selection is True:
             self.info_values = self.information_criterion(reg_matrix, y)
@@ -729,15 +731,7 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
         self.pivv = np.asarray(_to_numpy(self.pivv), dtype=np.intp).reshape(-1)
 
         tmp_piv = self.pivv[0:model_length]
-        repetition = reg_matrix.shape[0]
-        if isinstance(self.basis_function, Polynomial):
-            self.final_model = self.regressor_code[tmp_piv, :].copy()
-        else:
-            self.regressor_code = np.sort(
-                np.tile(self.regressor_code[1:, :], (repetition, 1)),
-                axis=0,
-            )
-            self.final_model = self.regressor_code[tmp_piv, :].copy()
+        self.final_model = self.regressor_code[tmp_piv, :].copy()
 
         self.theta = self.estimator.optimize(psi, estimation_target)
         if self.estimator.unbiased is True:

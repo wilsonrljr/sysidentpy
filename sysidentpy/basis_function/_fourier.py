@@ -67,6 +67,36 @@ class Fourier(BaseBasisFunction):
         )
         return base
 
+    def _get_feature_codes(
+        self,
+        base_codes: np.ndarray,
+        *,
+        xlag=1,
+        ylag=1,
+        model_type: str = "NARMAX",
+    ) -> np.ndarray:
+        """Return Fourier feature codes in the same order as ``fit``."""
+        if self.degree > 1:
+            data_codes = Polynomial(include_bias=False)._get_feature_codes(base_codes)
+        else:
+            lag_codes = base_codes[base_codes != 0]
+            data_codes = np.zeros(
+                (lag_codes.shape[0], self.degree), dtype=base_codes.dtype
+            )
+            data_codes[:, 0] = lag_codes
+
+        if data_codes.shape[1] < self.degree:
+            padding = np.zeros(
+                (data_codes.shape[0], self.degree - data_codes.shape[1]),
+                dtype=base_codes.dtype,
+            )
+            data_codes = np.column_stack([data_codes, padding])
+
+        expansion_codes = np.repeat(data_codes, self.n * 2, axis=0)
+        if self.ensemble:
+            return np.vstack([data_codes, expansion_codes])
+        return expansion_codes
+
     def fit(
         self,
         data: np.ndarray,
@@ -108,10 +138,9 @@ class Fourier(BaseBasisFunction):
 
         # remove intercept (because the data always have the intercept)
         if self.degree > 1:
-            data = Polynomial().fit(
+            data = Polynomial(include_bias=False).fit(
                 data, max_lag, ylag, xlag, model_type, predefined_regressors=None
             )
-            data = data[:, 1:]
         else:
             data = data[max_lag:, 1:]
 

@@ -12,7 +12,13 @@ from sysidentpy._lib._array_api import (
     device as _device,
     get_namespace,
 )
-from sysidentpy.utils.lags import _process_xlag, _process_ylag
+from sysidentpy.basis_function import Polynomial
+from sysidentpy.utils.lags import (
+    _process_xlag,
+    _process_ylag,
+    get_max_xlag,
+    get_max_ylag,
+)
 
 
 def _ensure_2d_array(data, xp):
@@ -417,8 +423,26 @@ def count_model_regressors(
         The number of regressors/features after transformation.
     """
     data = build_lagged_matrix(x, y, xlag, ylag, model_type)
-    n_features = basis_function.fit(data[:3, :]).shape[1]
+    if model_type == "NARMAX":
+        max_lag = max(get_max_xlag(xlag), get_max_ylag(ylag))
+    elif model_type == "NFIR":
+        max_lag = get_max_xlag(xlag)
+    else:
+        max_lag = get_max_ylag(ylag)
+
+    probe = data[: max_lag + 1, :]
+    n_features = basis_function.fit(
+        probe,
+        max_lag,
+        ylag,
+        xlag,
+        model_type,
+        predefined_regressors=None,
+    ).shape[1]
     if is_neural_narx:
-        return n_features - 1
+        if isinstance(basis_function, Polynomial) and getattr(
+            basis_function, "include_bias", True
+        ):
+            return n_features - 1
 
     return n_features
