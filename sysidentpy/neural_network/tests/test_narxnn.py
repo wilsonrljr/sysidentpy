@@ -97,6 +97,19 @@ class _DeterministicNARNet(nn.Module):
         return self.linear(xb)
 
 
+class _DeterministicFourierNARNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.linear = nn.Linear(4, 1, bias=False)
+        with torch.no_grad():
+            self.linear.weight.copy_(
+                torch.tensor([[0.12, -0.08, 0.04, 0.2]], dtype=torch.float32)
+            )
+
+    def forward(self, xb):
+        return self.linear(xb)
+
+
 def _first_regressor_value(values):
     return float(np.asarray(values).reshape(-1)[0])
 
@@ -108,6 +121,18 @@ def _build_deterministic_nar_model(y, include_bias):
         xlag=2,
         model_type="NAR",
         basis_function=Polynomial(degree=1, include_bias=include_bias),
+    )
+    model.split_data(None, y)
+    return model
+
+
+def _build_deterministic_fourier_nar_model(y):
+    model = NARXNN(
+        net=_DeterministicFourierNARNet(),
+        ylag=2,
+        xlag=2,
+        model_type="NAR",
+        basis_function=Fourier(n=1, degree=1, ensemble=False),
     )
     model.split_data(None, y)
     return model
@@ -125,6 +150,47 @@ def _segmented_nar_free_run_reference(model, y, steps_ahead):
             forecast_horizon=block_horizon,
         )
         reference[start : start + block_horizon] = free_run[-block_horizon:]
+
+    return reference
+
+
+def _fourier_nar_one_step_reference(model, y):
+    lagged_data = build_lagged_matrix(
+        None,
+        y,
+        model.xlag,
+        model.ylag,
+        model.model_type,
+    )
+    regressor_matrix = model.basis_function.transform(
+        lagged_data,
+        model.max_lag,
+        model.ylag,
+        model.xlag,
+        model.model_type,
+    )
+    regressor_matrix, _ = model._prepare_regressor_matrix(regressor_matrix, 1)
+    prediction = model._forward_numpy(regressor_matrix)
+    return np.concatenate([y[: model.max_lag], prediction], axis=0).astype(np.float32)
+
+
+def _fourier_nar_free_run_reference(model, y_initial, forecast_horizon):
+    reference = np.full(
+        (model.max_lag + forecast_horizon, 1),
+        np.nan,
+        dtype=np.float32,
+    )
+    reference[: model.max_lag] = y_initial[: model.max_lag]
+
+    for index in range(model.max_lag, len(reference)):
+        context = np.concatenate(
+            [
+                reference[index - model.max_lag : index],
+                np.zeros((1, 1), dtype=np.float32),
+            ],
+            axis=0,
+        )
+        reference[index] = _fourier_nar_one_step_reference(model, context)[-1]
 
     return reference
 
@@ -316,6 +382,81 @@ def test_polynomial_nar_n_step_matches_segmented_free_run(include_bias, steps_ah
     np.testing.assert_array_equal(prediction[: model.max_lag], y_data[: model.max_lag])
     np.testing.assert_allclose(prediction, reference, rtol=1e-6, atol=1e-6)
     assert np.all(np.isfinite(prediction))
+
+
+@pytest.mark.parametrize("forecast_horizon", [None, 1, 100])
+@pytest.mark.parametrize("steps_ahead", [2, 3, 30])
+@pytest.mark.parametrize("training", [True, False])
+def test_fourier_nar_n_step_matches_segmented_free_run(
+    steps_ahead,
+    forecast_horizon,
+    training,
+):
+    sample = np.arange(25, dtype=np.float32)
+    y_data = (0.1 * sample + 0.5 * np.sin(sample / 2)).reshape(-1, 1)
+    model = _build_deterministic_fourier_nar_model(y_data)
+    model.net.train(training)
+
+    reference = _segmented_nar_free_run_reference(model, y_data, steps_ahead)
+    prediction = model.predict(
+        X=None,
+        y=y_data,
+        steps_ahead=steps_ahead,
+        forecast_horizon=forecast_horizon,
+    )
+
+    assert prediction.shape == y_data.shape
+    np.testing.assert_array_equal(prediction[: model.max_lag], y_data[: model.max_lag])
+    np.testing.assert_allclose(prediction, reference, rtol=1e-6, atol=1e-6)
+    assert np.all(np.isfinite(prediction))
+    assert model.net.training is training
+
+
+def test_fourier_nar_n_step_with_only_initial_conditions_returns_prefix():
+    y_data = np.array([[0.2], [-0.1], [0.3]], dtype=np.float32)
+    model = _build_deterministic_fourier_nar_model(y_data)
+    initial_conditions = y_data[: model.max_lag]
+
+    prediction = model.predict(X=None, y=initial_conditions, steps_ahead=3)
+
+    assert prediction.shape == initial_conditions.shape
+    np.testing.assert_array_equal(prediction, initial_conditions)
+
+
+def test_fourier_nar_n_step_requires_initial_conditions():
+    sample = np.arange(10, dtype=np.float32)
+    y_data = np.sin(sample / 2).reshape(-1, 1)
+    model = _build_deterministic_fourier_nar_model(y_data)
+
+    with pytest.raises(ValueError, match="Insufficient initial condition elements"):
+        model.predict(X=None, y=y_data[: model.max_lag - 1], steps_ahead=2)
+
+
+def test_fourier_nar_one_step_and_free_run_regressions():
+    sample = np.arange(25, dtype=np.float32)
+    y_data = (0.1 * sample + 0.5 * np.sin(sample / 2)).reshape(-1, 1)
+    model = _build_deterministic_fourier_nar_model(y_data)
+    forecast_horizon = 5
+
+    expected_one_step = _fourier_nar_one_step_reference(model, y_data)
+    expected_free_run = _fourier_nar_free_run_reference(
+        model,
+        y_data[: model.max_lag],
+        forecast_horizon,
+    )
+    one_step = model.predict(X=None, y=y_data, steps_ahead=1)
+    free_run = model.predict(
+        X=None,
+        y=y_data[: model.max_lag],
+        forecast_horizon=forecast_horizon,
+    )
+
+    assert one_step.shape == y_data.shape
+    assert free_run.shape == (model.max_lag + forecast_horizon, 1)
+    np.testing.assert_array_equal(one_step[: model.max_lag], y_data[: model.max_lag])
+    np.testing.assert_array_equal(free_run[: model.max_lag], y_data[: model.max_lag])
+    np.testing.assert_allclose(one_step, expected_one_step, rtol=1e-6, atol=1e-6)
+    np.testing.assert_allclose(free_run, expected_free_run, rtol=1e-6, atol=1e-6)
 
 
 def test_custom_polynomial_layout_removes_only_one_bias_code():

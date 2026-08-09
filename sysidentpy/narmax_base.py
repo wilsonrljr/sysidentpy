@@ -881,11 +881,14 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         )
         yhat = yhat * float("nan")
         i = self.max_lag
+        prediction_method = self._model_prediction
+        if not isinstance(self.basis_function, Polynomial):
+            prediction_method = self._basis_function_predict
 
         while i < len(y):
             block_horizon = min(steps_ahead, len(y) - i)
             yhat[i : i + block_horizon] = xp.reshape(
-                self._model_prediction(
+                prediction_method(
                     x=None,
                     y_initial=y[i - self.max_lag : i],
                     forecast_horizon=block_horizon,
@@ -1050,6 +1053,9 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         forecast_horizon: int,
     ) -> np.ndarray:
         """Basis function n step ahead."""
+        if self.model_type == "NAR":
+            return self._nar_step_ahead(y, steps_ahead)
+
         xp = get_namespace(y)
         yhat = _zeros(xp, forecast_horizon, dtype=y.dtype, target_device=_device(x, y))
         yhat = yhat * float("nan")
@@ -1070,15 +1076,6 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
                         y[k : i + steps_ahead],
                         forecast_horizon=forecast_horizon,
                     )[-steps_ahead:],
-                    (-1,),
-                )
-            elif self.model_type == "NAR":
-                yhat[i : i + steps_ahead] = xp.reshape(
-                    self._basis_function_predict(
-                        x=None,
-                        y_initial=y[k : i + steps_ahead],
-                        forecast_horizon=forecast_horizon,
-                    )[-forecast_horizon : -forecast_horizon + steps_ahead],
                     (-1,),
                 )
             elif self.model_type == "NFIR":
@@ -1107,6 +1104,9 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         forecast_horizon: int,
     ) -> np.ndarray:
         """Basis n steps horizon."""
+        if self.model_type == "NAR":
+            return self._nar_step_ahead(y, steps_ahead)
+
         xp = get_namespace(y)
         yhat = _zeros(xp, forecast_horizon, dtype=y.dtype, target_device=_device(x, y))
         yhat = yhat * float("nan")
@@ -1124,15 +1124,6 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
                 yhat[i : i + steps_ahead] = xp.reshape(
                     self._basis_function_predict(
                         x[k : i + steps_ahead], y[k : i + steps_ahead], forecast_horizon
-                    )[-forecast_horizon : -forecast_horizon + steps_ahead],
-                    (-1,),
-                )
-            elif self.model_type == "NAR":
-                yhat[i : i + steps_ahead] = xp.reshape(
-                    self._basis_function_predict(
-                        x=None,
-                        y_initial=y[k : i + steps_ahead],
-                        forecast_horizon=forecast_horizon,
                     )[-forecast_horizon : -forecast_horizon + steps_ahead],
                     (-1,),
                 )

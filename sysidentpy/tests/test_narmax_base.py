@@ -886,6 +886,32 @@ def test_nar_step_ahead_preserves_fractional_predictions_for_integer_output():
     np.testing.assert_allclose(result[:, 0], np.array([0.5, 1.5, 0.5]))
 
 
+def test_basis_function_n_step_prediction_uses_shared_nar_blocks():
+    model = RecordingPredictableMSS(model_type="NAR")
+    model.basis_function = Fourier(degree=1)
+    y_segment = np.arange(model.max_lag + 5, dtype=float).reshape(-1, 1)
+
+    result = model._basis_function_n_step_prediction(
+        x=None,
+        y=y_segment,
+        steps_ahead=3,
+        forecast_horizon=1,
+    )
+
+    assert result.shape == (y_segment.shape[0] - model.max_lag, 1)
+    assert_array_equal(result[:, 0], np.array([0.0, 1.0, 2.0, 0.0, 1.0]))
+    assert model.prediction_calls == []
+    assert [call[2] for call in model.basis_prediction_calls] == [3, 2]
+    assert_array_equal(
+        model.basis_prediction_calls[0][1],
+        y_segment[: model.max_lag],
+    )
+    assert_array_equal(
+        model.basis_prediction_calls[1][1],
+        y_segment[3 : 3 + model.max_lag],
+    )
+
+
 def test_narmax_predict_reference_promotes_integer_array_api_inputs():
     xp = pytest.importorskip("array_api_strict")
     model = PredictableMSS(model_type="NAR")
@@ -1128,7 +1154,17 @@ class RecordingPredictableMSS(PredictableMSS):
     def __init__(self, model_type="NAR", prediction_offset=0.0):
         super().__init__(model_type=model_type)
         self.prediction_calls = []
+        self.basis_prediction_calls = []
         self.prediction_offset = prediction_offset
+
+    def _basis_function_predict(
+        self,
+        x: Optional[np.ndarray],
+        y_initial: np.ndarray,
+        forecast_horizon: int = 1,
+    ) -> np.ndarray:
+        self.basis_prediction_calls.append((x, y_initial.copy(), forecast_horizon))
+        return super()._basis_function_predict(x, y_initial, forecast_horizon)
 
     def _model_prediction(
         self,

@@ -36,6 +36,23 @@ y_test = np.reshape(y_test, (len(y_test), 1))
 X_test = np.reshape(X_test, (len(X_test), 1))
 
 
+def _segmented_nar_reference(model, y, steps_ahead):
+    reference = np.empty_like(y, dtype=float)
+    reference[: model.max_lag] = y[: model.max_lag]
+
+    for block_start in range(model.max_lag, len(y), steps_ahead):
+        block_horizon = min(steps_ahead, len(y) - block_start)
+        initial_conditions = y[block_start - model.max_lag : block_start]
+        free_run = model.predict(
+            X=None,
+            y=initial_conditions,
+            forecast_horizon=block_horizon,
+        )
+        reference[block_start : block_start + block_horizon] = free_run[-block_horizon:]
+
+    return reference
+
+
 class _AOLSProbe(AOLS):
     def narmax_predict_reference(self, x_data, y_data, forecast_horizon):
         return self._narmax_predict_reference(x_data, y_data, forecast_horizon)
@@ -443,7 +460,8 @@ def test_basis_function_n_step_prediction_requires_initial_conditions():
     )
 
 
-def test_basis_function_n_step_prediction_without_input_uses_horizon():
+@pytest.mark.parametrize("steps_ahead", [2, 3, 10])
+def test_basis_function_n_step_prediction_without_input_uses_observed_y(steps_ahead):
     basis_function = Fourier(degree=2, n=1)
     model = AOLS(
         ylag=[1, 2],
@@ -451,15 +469,41 @@ def test_basis_function_n_step_prediction_without_input_uses_horizon():
         basis_function=basis_function,
         model_type="NAR",
     )
-    model.fit(X=X_train, y=y_train)
-    horizon = model.max_lag + 2
-    yhat = model._basis_function_n_step_prediction(
-        x=None,
-        y=y_test,
-        steps_ahead=1,
-        forecast_horizon=horizon,
+    model.fit(X=None, y=y_train)
+    y_window = y_test[: model.max_lag + 5]
+
+    yhat = model.predict(X=None, y=y_window, steps_ahead=steps_ahead)
+    with_ignored_horizon = model.predict(
+        X=None,
+        y=y_window,
+        steps_ahead=steps_ahead,
+        forecast_horizon=1,
     )
-    assert_equal(yhat.shape[0], horizon)
+    expected = _segmented_nar_reference(model, y_window, steps_ahead)
+
+    assert_equal(yhat.shape, y_window.shape)
+    np.testing.assert_array_equal(
+        yhat[: model.max_lag],
+        y_window[: model.max_lag],
+    )
+    np.testing.assert_allclose(yhat, expected, rtol=1e-10, atol=1e-12)
+    np.testing.assert_allclose(
+        with_ignored_horizon,
+        expected,
+        rtol=1e-10,
+        atol=1e-12,
+    )
+
+
+def test_non_polynomial_predict_rejects_non_positive_steps():
+    model = AOLS(
+        ylag=[1, 2],
+        basis_function=Fourier(degree=1),
+        model_type="NAR",
+    ).fit(X=None, y=y_train)
+
+    with pytest.raises(ValueError, match="steps_ahead must be integer and > zero"):
+        model.predict(X=None, y=y_test[:5], steps_ahead=0)
 
 
 def test_basis_function_n_steps_horizon_returns_column_vector():

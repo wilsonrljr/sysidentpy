@@ -691,6 +691,7 @@ class ER(BaseMSS):
             yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
             return yhat
 
+        check_positive_int(steps_ahead, "steps_ahead")
         yhat = self._basis_function_n_step_prediction(
             X, y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
         )
@@ -831,10 +832,11 @@ class ER(BaseMSS):
                 f" {self.max_lag} elements."
             )
 
-        if x is not None:
-            forecast_horizon = x.shape[0]
-        else:
-            forecast_horizon = forecast_horizon + self.max_lag
+        if self.model_type != "NAR":
+            if x is not None:
+                forecast_horizon = x.shape[0]
+            else:
+                forecast_horizon = forecast_horizon + self.max_lag
 
         yhat = super()._basis_function_n_step_prediction(
             x, y, steps_ahead, forecast_horizon

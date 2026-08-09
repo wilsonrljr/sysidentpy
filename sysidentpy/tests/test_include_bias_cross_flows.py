@@ -23,6 +23,7 @@ from sysidentpy.basis_function import (
 from sysidentpy.general_estimators import NARX
 from sysidentpy.model_structure_selection import (
     AOLS,
+    ER,
     FROLS,
     MetaMSS,
     OSF,
@@ -132,6 +133,54 @@ def _fit_rmss_nar(y_train, include_bias):
     ).fit(X=None, y=y_train)
 
 
+def _fit_frols_non_polynomial_nar(y_train, basis_function):
+    return FROLS(
+        ylag=2,
+        xlag=2,
+        model_type="NAR",
+        n_terms=3,
+        order_selection=False,
+        estimator=LeastSquares(),
+        basis_function=basis_function,
+    ).fit(X=None, y=y_train)
+
+
+def _fit_aols_non_polynomial_nar(y_train, basis_function):
+    return AOLS(
+        ylag=2,
+        xlag=2,
+        model_type="NAR",
+        k=3,
+        L=1,
+        estimator=LeastSquares(),
+        basis_function=basis_function,
+    ).fit(X=None, y=y_train)
+
+
+def _fit_rmss_non_polynomial_nar(y_train, basis_function):
+    return RMSS(
+        ylag=2,
+        xlag=2,
+        model_type="NAR",
+        n_terms=3,
+        order_selection=False,
+        estimator=LeastSquares(),
+        basis_function=basis_function,
+    ).fit(X=None, y=y_train)
+
+
+def _fit_er_non_polynomial_nar(y_train, basis_function):
+    return ER(
+        ylag=2,
+        xlag=2,
+        model_type="NAR",
+        n_perm=5,
+        random_state=193,
+        estimator=LeastSquares(),
+        basis_function=basis_function,
+    ).fit(X=None, y=y_train)
+
+
 def _fit_exact_ar1_nar(include_bias):
     offset = 0.25 if include_bias else 0.0
     y = np.empty((40, 1))
@@ -151,7 +200,7 @@ def _fit_exact_ar1_nar(include_bias):
 
 
 def _segmented_nar_free_run_reference(model, y, steps_ahead):
-    reference = np.full_like(y, np.nan)
+    reference = np.full(y.shape, np.nan, dtype=np.result_type(y.dtype, float))
     reference[: model.max_lag] = y[: model.max_lag]
 
     for block_start in range(model.max_lag, len(y), steps_ahead):
@@ -634,6 +683,155 @@ def test_base_mss_nar_consumers_match_segmented_free_runs(
     assert_array_equal(prediction[: model.max_lag], y_valid[: model.max_lag])
     assert_allclose(prediction, expected, rtol=1e-12, atol=1e-12)
     assert_allclose(prediction[-2:], expected[-2:], rtol=1e-12, atol=1e-12)
+
+
+@pytest.mark.parametrize(
+    ("steps_ahead", "forecast_horizon"),
+    [
+        pytest.param(2, None, id="two-steps-without-horizon"),
+        pytest.param(3, 1, id="three-steps-with-short-horizon"),
+        pytest.param(3, 100, id="three-steps-with-long-horizon"),
+        pytest.param(24, None, id="step-longer-than-remaining-horizon"),
+    ],
+)
+def test_frols_non_polynomial_nar_uses_observed_series_as_n_step_horizon(
+    steps_ahead,
+    forecast_horizon,
+):
+    y_train, y_valid = _generate_nar_data()
+    model = _fit_frols_non_polynomial_nar(y_train, Fourier(degree=2, n=1))
+    expected = _segmented_nar_free_run_reference(model, y_valid, steps_ahead)
+    original_y = y_valid.copy()
+
+    prediction = model.predict(
+        X=None,
+        y=y_valid,
+        steps_ahead=steps_ahead,
+        forecast_horizon=forecast_horizon,
+    )
+
+    assert prediction.shape == y_valid.shape
+    assert np.all(np.isfinite(prediction))
+    assert_array_equal(y_valid, original_y)
+    assert_array_equal(prediction[: model.max_lag], y_valid[: model.max_lag])
+    assert_allclose(prediction, expected, rtol=1e-12, atol=1e-12)
+    assert_allclose(prediction[-1], expected[-1], rtol=1e-12, atol=1e-12)
+
+
+@pytest.mark.parametrize(
+    "fit_model",
+    [
+        pytest.param(_fit_frols_non_polynomial_nar, id="frols"),
+        pytest.param(_fit_aols_non_polynomial_nar, id="aols"),
+        pytest.param(_fit_rmss_non_polynomial_nar, id="rmss"),
+        pytest.param(_fit_er_non_polynomial_nar, id="er"),
+    ],
+)
+def test_base_mss_non_polynomial_nar_consumers_match_segmented_free_runs(
+    fit_model,
+):
+    y_train, y_valid = _generate_nar_data()
+    model = fit_model(y_train, Fourier(degree=2, n=1))
+    expected = _segmented_nar_free_run_reference(model, y_valid, 3)
+
+    prediction = model.predict(X=None, y=y_valid, steps_ahead=3)
+
+    assert prediction.shape == y_valid.shape
+    assert np.all(np.isfinite(prediction))
+    assert_array_equal(prediction[: model.max_lag], y_valid[: model.max_lag])
+    assert_allclose(prediction, expected, rtol=1e-12, atol=1e-12)
+    assert_allclose(prediction[-2:], expected[-2:], rtol=1e-12, atol=1e-12)
+
+
+@pytest.mark.parametrize(
+    ("basis_cls", "basis_kwargs"),
+    [
+        pytest.param(Fourier, {"n": 1}, id="fourier"),
+        pytest.param(Bilinear, {"include_bias": False}, id="bilinear"),
+        pytest.param(Bernstein, {"include_bias": False}, id="bernstein"),
+        pytest.param(Legendre, {"include_bias": True}, id="legendre-with-bias"),
+        pytest.param(Legendre, {"include_bias": False}, id="legendre-without-bias"),
+        pytest.param(Laguerre, {"include_bias": False}, id="laguerre"),
+        pytest.param(Hermite, {"include_bias": False}, id="hermite"),
+        pytest.param(
+            HermiteNormalized,
+            {"include_bias": False},
+            id="hermite-normalized",
+        ),
+    ],
+)
+def test_frols_nar_n_step_supports_every_non_polynomial_basis(
+    basis_cls,
+    basis_kwargs,
+):
+    y_train, y_valid = _generate_nar_data()
+    basis_function = basis_cls(degree=2, **basis_kwargs)
+    model = _fit_frols_non_polynomial_nar(y_train, basis_function)
+    expected = _segmented_nar_free_run_reference(model, y_valid, 3)
+
+    prediction = model.predict(
+        X=None,
+        y=y_valid,
+        steps_ahead=3,
+        forecast_horizon=1,
+    )
+
+    assert prediction.shape == y_valid.shape
+    assert np.all(np.isfinite(prediction))
+    assert_array_equal(prediction[: model.max_lag], y_valid[: model.max_lag])
+    assert_allclose(prediction, expected, rtol=1e-12, atol=1e-12)
+
+
+def test_frols_non_polynomial_nar_n_step_validates_boundaries_and_integer_data():
+    y_train, y_valid = _generate_nar_data()
+    model = _fit_frols_non_polynomial_nar(y_train, Fourier(degree=2, n=1))
+
+    for invalid_steps in (0, -1, 1.5):
+        with pytest.raises(
+            ValueError,
+            match="steps_ahead must be integer and > zero",
+        ):
+            model.predict(X=None, y=y_valid, steps_ahead=invalid_steps)
+
+    prefix_only = model.predict(
+        X=None,
+        y=y_valid[: model.max_lag],
+        steps_ahead=3,
+        forecast_horizon=100,
+    )
+    assert_array_equal(prefix_only, y_valid[: model.max_lag])
+
+    with pytest.raises(ValueError, match="Insufficient initial condition"):
+        model.predict(
+            X=None,
+            y=y_valid[: model.max_lag - 1],
+            steps_ahead=3,
+        )
+
+    y_integer = np.rint(100 * y_valid).astype(np.int64)
+    expected = _segmented_nar_free_run_reference(model, y_integer, 2)
+    prediction = model.predict(X=None, y=y_integer, steps_ahead=2)
+
+    assert np.issubdtype(prediction.dtype, np.floating)
+    assert_allclose(prediction, expected, rtol=1e-12, atol=1e-12)
+
+
+def test_frols_non_polynomial_nar_n_step_preserves_array_api_namespace():
+    xp = pytest.importorskip("array_api_strict")
+    y_train, y_valid = _generate_nar_data()
+    model = _fit_frols_non_polynomial_nar(y_train, Fourier(degree=2, n=1))
+    expected = model.predict(X=None, y=y_valid, steps_ahead=3)
+
+    with config_context(array_api_dispatch=True):
+        prediction = model.predict(
+            X=None,
+            y=xp.asarray(y_valid),
+            steps_ahead=3,
+            forecast_horizon=100,
+        )
+
+    assert prediction.__array_namespace__().__name__ == xp.__name__
+    xp_assert_allclose(prediction, expected, rtol=1e-12, atol=1e-12)
 
 
 def test_rmss_without_bias_keeps_selection_and_parameters_aligned():

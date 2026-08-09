@@ -1008,6 +1008,10 @@ class NARXNN(BaseMSS):
                 f" {self.max_lag} elements."
             )
 
+        if self.model_type == "NAR":
+            yhat = self._nar_step_ahead(y, steps_ahead)
+            return np.concatenate([y[: self.max_lag], yhat], axis=0)
+
         if x is not None:
             forecast_horizon = x.shape[0]
         else:
@@ -1028,12 +1032,6 @@ class NARXNN(BaseMSS):
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
                     x[k : i + steps_ahead], y[k : i + steps_ahead]
                 )[-steps_ahead:].ravel()
-            elif self.model_type == "NAR":
-                yhat[i : i + steps_ahead] = self._basis_function_predict(
-                    x=None,
-                    y_initial=y[k : i + steps_ahead],
-                    forecast_horizon=forecast_horizon,
-                )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
             elif self.model_type == "NFIR":
                 yhat[i : i + steps_ahead] = self._basis_function_predict(
                     x=x[k : i + steps_ahead],

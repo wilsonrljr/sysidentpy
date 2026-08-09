@@ -29,6 +29,23 @@ y_test = np.reshape(y_test, (len(y_test), 1))
 X_test = np.reshape(X_test, (len(X_test), 1))
 
 
+def _segmented_nar_reference(model, y, steps_ahead):
+    reference = np.empty_like(y, dtype=float)
+    reference[: model.max_lag] = y[: model.max_lag]
+
+    for block_start in range(model.max_lag, len(y), steps_ahead):
+        block_horizon = min(steps_ahead, len(y) - block_start)
+        initial_conditions = y[block_start - model.max_lag : block_start]
+        free_run = model.predict(
+            X=None,
+            y=initial_conditions,
+            forecast_horizon=block_horizon,
+        )
+        reference[block_start : block_start + block_horizon] = free_run[-block_horizon:]
+
+    return reference
+
+
 def test_default_values():
     default = {
         "ylag": 1,
@@ -407,8 +424,21 @@ def test_predict_polynomial_without_inputs_uses_forecast_horizon():
     assert_equal(yhat.shape, (model.max_lag + horizon, 1))
 
 
-def test_predict_fourier_variants_cover_non_pol_branches():
-    basis_function = Fourier(degree=2, n=1)
+@pytest.mark.parametrize(
+    "basis_function",
+    [
+        pytest.param(Fourier(degree=2, n=1), id="fourier"),
+        pytest.param(
+            Legendre(degree=2, include_bias=True),
+            id="legendre-with-bias",
+        ),
+        pytest.param(
+            Legendre(degree=2, include_bias=False),
+            id="legendre-without-bias",
+        ),
+    ],
+)
+def test_predict_non_polynomial_variants_cover_nar_branches(basis_function):
     model = ER(
         ylag=[1, 2],
         xlag=2,
@@ -420,7 +450,7 @@ def test_predict_fourier_variants_cover_non_pol_branches():
         random_state=0,
     )
     model.fit(y=y_train[:40])
-    horizon = 4
+    horizon = 5
     window = model.max_lag + horizon
     y_window = y_test[:window]
 
@@ -432,12 +462,43 @@ def test_predict_fourier_variants_cover_non_pol_branches():
         model.predict(X=None, y=y_window, steps_ahead=1).shape,
         (window, 1),
     )
-    assert_equal(
-        model.predict(
-            X=None, y=y_window, steps_ahead=2, forecast_horizon=horizon
-        ).shape,
-        (window, 1),
+
+    n_step = model.predict(X=None, y=y_window, steps_ahead=3)
+    with_ignored_horizon = model.predict(
+        X=None,
+        y=y_window,
+        steps_ahead=3,
+        forecast_horizon=1,
     )
+    expected = _segmented_nar_reference(model, y_window, 3)
+
+    assert_equal(n_step.shape, y_window.shape)
+    np.testing.assert_array_equal(
+        n_step[: model.max_lag],
+        y_window[: model.max_lag],
+    )
+    np.testing.assert_allclose(n_step, expected, rtol=1e-10, atol=1e-12)
+    np.testing.assert_allclose(
+        with_ignored_horizon,
+        expected,
+        rtol=1e-10,
+        atol=1e-12,
+    )
+
+
+def test_non_polynomial_predict_rejects_non_positive_steps():
+    model = ER(
+        ylag=[1, 2],
+        basis_function=Fourier(degree=1),
+        model_type="NAR",
+        estimator=LeastSquares(),
+        skip_forward=True,
+        n_perm=1,
+        random_state=0,
+    ).fit(y=y_train[:40])
+
+    with pytest.raises(ValueError, match="steps_ahead must be integer and > zero"):
+        model.predict(X=None, y=y_test[:5], steps_ahead=0)
 
 
 def test_er_basis_function_n_steps_horizon_returns_column_vector():

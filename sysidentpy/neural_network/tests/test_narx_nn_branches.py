@@ -716,7 +716,8 @@ def test_basis_function_n_step_prediction_validations():
         steps_ahead=1,
         forecast_horizon=2,
     )
-    assert result.shape[0] == 3
+    assert result.shape == y.shape
+    np.testing.assert_array_equal(result[: model.max_lag], y[: model.max_lag])
 
 
 def test_basis_function_n_step_prediction_modes():
@@ -747,7 +748,8 @@ def test_basis_function_n_step_prediction_modes():
     result = model._basis_function_n_step_prediction(
         x=None, y=y, steps_ahead=1, forecast_horizon=2
     )
-    assert result.shape == (3, 1)
+    assert result.shape == y.shape
+    np.testing.assert_array_equal(result[: model.max_lag], y[: model.max_lag])
 
     model.model_type = "NFIR"
     result = model._basis_function_n_step_prediction(

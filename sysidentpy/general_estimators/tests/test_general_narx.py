@@ -14,6 +14,7 @@ from numpy.testing import (
 from sysidentpy.basis_function import Polynomial, Fourier
 from sysidentpy.general_estimators import NARX
 from sysidentpy.tests.test_narmax_base import create_test_data
+from sysidentpy.utils.information_matrix import build_lagged_matrix
 
 base_estimator = LinearRegression()
 
@@ -80,6 +81,41 @@ def segmented_nar_prediction(model, y_data, steps_ahead):
         reference[block_start : block_start + block_horizon] = block_prediction[
             -block_horizon:
         ]
+
+    return reference
+
+
+def one_step_nar_reference(model, y_data):
+    """Build a one-step NAR reference directly from the fitted estimator."""
+    lagged_data = build_lagged_matrix(
+        None,
+        y_data,
+        model.xlag,
+        model.ylag,
+        model.model_type,
+    )
+    regressor_matrix = model.basis_function.transform(
+        lagged_data,
+        model.max_lag,
+        model.ylag,
+        model.xlag,
+        model.model_type,
+    )
+    prediction = model.base_estimator.predict(regressor_matrix).reshape(-1, 1)
+    return np.concatenate([y_data[: model.max_lag], prediction], axis=0)
+
+
+def free_run_nar_reference(model, y_initial, forecast_horizon):
+    """Build a free-run NAR reference from repeated one-step predictions."""
+    reference = np.empty((model.max_lag + forecast_horizon, 1), dtype=float)
+    reference[: model.max_lag] = y_initial[: model.max_lag]
+
+    for index in range(model.max_lag, len(reference)):
+        one_step_context = np.concatenate(
+            [reference[index - model.max_lag : index], np.zeros((1, 1))],
+            axis=0,
+        )
+        reference[index] = one_step_nar_reference(model, one_step_context)[-1]
 
     return reference
 
@@ -257,6 +293,116 @@ def test_model_predict_fourier_nar_inputs():
     model.fit(X=X_train, y=y_train)
     model.predict(X=X_test, y=y_test)
     assert_equal(model.n_inputs, 0)
+
+
+def test_fourier_nar_one_step_without_input_matches_estimator():
+    model = fit_narx_model(
+        model_type="NAR",
+        basis_function=Fourier(degree=1, n=1),
+        x_data=None,
+    )
+    y_evaluation = y_test[:10]
+
+    expected = one_step_nar_reference(model, y_evaluation)
+    yhat = model.predict(X=None, y=y_evaluation, steps_ahead=1)
+
+    assert_equal(yhat.shape, y_evaluation.shape)
+    assert_allclose(yhat[: model.max_lag], y_evaluation[: model.max_lag])
+    assert_allclose(yhat, expected, rtol=1e-12, atol=1e-12)
+    assert np.isfinite(yhat).all()
+
+
+def test_fourier_nar_free_run_without_input_matches_iterated_one_step():
+    model = fit_narx_model(
+        model_type="NAR",
+        basis_function=Fourier(degree=1, n=1),
+        x_data=None,
+    )
+    forecast_horizon = 7
+    y_initial = y_test[: model.max_lag]
+
+    expected = free_run_nar_reference(model, y_initial, forecast_horizon)
+    yhat = model.predict(
+        X=None,
+        y=y_initial,
+        steps_ahead=None,
+        forecast_horizon=forecast_horizon,
+    )
+
+    assert_equal(yhat.shape, (model.max_lag + forecast_horizon, 1))
+    assert_allclose(yhat[: model.max_lag], y_initial)
+    assert_allclose(yhat, expected, rtol=1e-12, atol=1e-12)
+    assert np.isfinite(yhat).all()
+
+
+@pytest.mark.parametrize("steps_ahead", [2, 3, 20])
+def test_fourier_nar_n_step_without_input_matches_segmented_free_runs(steps_ahead):
+    model = fit_narx_model(
+        model_type="NAR",
+        basis_function=Fourier(degree=1, n=1),
+        x_data=None,
+    )
+    y_evaluation = y_test[:10]
+
+    expected = segmented_nar_prediction(model, y_evaluation, steps_ahead)
+    yhat = model.predict(X=None, y=y_evaluation, steps_ahead=steps_ahead)
+
+    assert_equal(yhat.shape, y_evaluation.shape)
+    assert_allclose(yhat[: model.max_lag], y_evaluation[: model.max_lag])
+    assert_allclose(yhat, expected, rtol=1e-12, atol=1e-12)
+    assert np.isfinite(yhat).all()
+
+
+@pytest.mark.parametrize("steps_ahead", [2, 3, 20])
+@pytest.mark.parametrize("forecast_horizon", [0, 1, 100])
+def test_fourier_nar_n_step_ignores_conflicting_forecast_horizon(
+    steps_ahead, forecast_horizon
+):
+    model = fit_narx_model(
+        model_type="NAR",
+        basis_function=Fourier(degree=1, n=1),
+        x_data=None,
+    )
+    y_evaluation = y_test[:10]
+
+    expected = segmented_nar_prediction(model, y_evaluation, steps_ahead)
+    yhat = model.predict(
+        X=None,
+        y=y_evaluation,
+        steps_ahead=steps_ahead,
+        forecast_horizon=forecast_horizon,
+    )
+
+    assert_equal(yhat.shape, y_evaluation.shape)
+    assert_allclose(yhat[: model.max_lag], y_evaluation[: model.max_lag])
+    assert_allclose(yhat, expected, rtol=1e-12, atol=1e-12)
+    assert np.isfinite(yhat).all()
+
+
+@pytest.mark.parametrize("steps_ahead", [0, -1, 1.5])
+def test_fourier_nar_n_step_rejects_invalid_steps(steps_ahead):
+    model = fit_narx_model(
+        model_type="NAR",
+        basis_function=Fourier(degree=1, n=1),
+        x_data=None,
+    )
+
+    with pytest.raises(ValueError, match="steps_ahead must be integer and > zero"):
+        model.predict(X=None, y=y_test[:10], steps_ahead=steps_ahead)
+
+
+def test_fourier_nar_n_step_with_only_initial_conditions_returns_prefix():
+    model = fit_narx_model(
+        model_type="NAR",
+        basis_function=Fourier(degree=1, n=1),
+        x_data=None,
+    )
+    y_initial = y_test[: model.max_lag]
+
+    yhat = model.predict(X=None, y=y_initial, steps_ahead=3)
+
+    assert_equal(yhat.shape, y_initial.shape)
+    assert_allclose(yhat, y_initial)
 
 
 def test_model_predict_fourier_raises():
@@ -592,17 +738,16 @@ def test_basis_function_n_step_prediction_nar_flow():
     basis_function = Fourier(degree=2, n=1)
     model = fit_narx_model(model_type="NAR", basis_function=basis_function, x_data=None)
     y_small = y_test[: model.max_lag + 3]
+    expected = np.arange(len(y_small) - model.max_lag, dtype=float).reshape(-1, 1)
+    model._nar_step_ahead = MagicMock(return_value=expected)
 
-    def _mock_predict(*_args, **kwargs):
-        horizon = kwargs.get("forecast_horizon")
-        if horizon is None and len(_args) >= 3:
-            horizon = _args[2]
-        size = horizon + model.max_lag
-        return np.arange(size, dtype=float).reshape(-1, 1)
+    yhat = model._basis_function_n_step_prediction(None, y_small, 4, None)
 
-    model._basis_function_predict = MagicMock(side_effect=_mock_predict)
-    yhat = model._basis_function_n_step_prediction(None, y_small, 4, y_small.shape[0])
-    assert_equal(yhat.shape[0], y_small.shape[0])
+    assert_allclose(yhat, expected)
+    assert_equal(model._nar_step_ahead.call_count, 1)
+    call = model._nar_step_ahead.call_args
+    assert_allclose(call.args[0], y_small)
+    assert_equal(call.args[1], 4)
 
 
 def test_basis_function_n_step_prediction_nfir_flow():
