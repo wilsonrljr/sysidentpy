@@ -16,7 +16,7 @@ from numpy.typing import NDArray
 from ..narmax_base import BaseMSS
 from sysidentpy.utils.information_matrix import build_lagged_matrix
 from ..basis_function import Polynomial, Fourier
-from ..utils.check_arrays import check_positive_int, num_features
+from ..utils.check_arrays import num_features
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -206,12 +206,6 @@ class NARX(BaseMSS):
         Given a trained model, predict values given
         a new set of data.
 
-        This method accept y values mainly for prediction n-steps ahead
-        (to be implemented in the future).
-
-        Currently, we only support infinity-steps-ahead prediction,
-        but run 1-step-ahead prediction manually is straightforward.
-
         Parameters
         ----------
         X : ndarray of floats
@@ -221,46 +215,22 @@ class NARX(BaseMSS):
         steps_ahead : int (default = None)
             The user can use free run simulation, one-step ahead prediction
             and n-step ahead prediction.
-        forecast_horizon : int, default=None
-            The number of predictions over the time.
+        forecast_horizon : int, default=1
+            Number of values predicted beyond the initial conditions for a NAR
+            free-run prediction when ``X`` is ``None``.
 
         Returns
         -------
-        yhat : ndarray of floats
-            The predicted values of the model.
+        yhat : ndarray of floats of shape (n_predictions, 1)
+            Predicted values including the initial conditions.
 
         """
-        if isinstance(self.basis_function, Polynomial):
-            if steps_ahead is None:
-                yhat = self._model_prediction(X, y, forecast_horizon=forecast_horizon)
-                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
-                return yhat
-
-            if steps_ahead == 1:
-                yhat = self._one_step_ahead_prediction(X, y)
-                yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
-                return yhat
-
-            check_positive_int(steps_ahead, "steps_ahead")
-            yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
-            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
-            return yhat
-
-        if steps_ahead is None:
-            yhat = self._basis_function_predict(X, y, forecast_horizon=forecast_horizon)
-            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
-            return yhat
-        if steps_ahead == 1:
-            yhat = self._one_step_ahead_prediction(X, y)
-            yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
-            return yhat
-
-        check_positive_int(steps_ahead, "steps_ahead")
-        yhat = self._basis_function_n_step_prediction(
-            X, y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
+        return super().predict(
+            X=X,
+            y=y,
+            steps_ahead=steps_ahead,
+            forecast_horizon=forecast_horizon,
         )
-        yhat = np.concatenate([y[: self.max_lag], yhat], axis=0)
-        return yhat
 
     def _one_step_ahead_prediction(self, x_base, y=None):
         """Perform the 1-step-ahead prediction of a model.
@@ -292,97 +262,6 @@ class NARX(BaseMSS):
         yhat = self.base_estimator.predict(x_base)
         return yhat.reshape(-1, 1)
 
-    def narmax_n_step_ahead(self, x, y, steps_ahead):
-        """N steps ahead prediction method for NARMAX model."""
-        if len(y) < self.max_lag:
-            raise ValueError(
-                "Insufficient initial condition elements! Expected at least"
-                f" {self.max_lag} elements."
-            )
-
-        to_remove = int(np.ceil((len(y) - self.max_lag) / steps_ahead))
-        x = x.reshape(-1, self.n_inputs)
-        yhat = np.zeros(x.shape[0], dtype=float)
-        yhat.fill(np.nan)
-        yhat[: self.max_lag] = y[: self.max_lag, 0]
-        i = self.max_lag
-        steps = [step for step in range(0, to_remove * steps_ahead, steps_ahead)]
-        if len(steps) > 1:
-            for step in steps[:-1]:
-                yhat[i : i + steps_ahead] = self._model_prediction(
-                    x=x[step : i + steps_ahead],
-                    y_initial=y[step:i],
-                )[-steps_ahead:].ravel()
-                i += steps_ahead
-
-            steps_ahead = np.sum(np.isnan(yhat))
-            yhat[i : i + steps_ahead] = self._model_prediction(
-                x=x[steps[-1] : i + steps_ahead],
-                y_initial=y[steps[-1] : i],
-            )[-steps_ahead:].ravel()
-        else:
-            yhat[i : i + steps_ahead] = self._model_prediction(
-                x=x[0 : i + steps_ahead],
-                y_initial=y[0:i],
-            )[-steps_ahead:].ravel()
-
-        yhat = yhat.ravel()[self.max_lag : :]
-        return yhat.reshape(-1, 1)
-
-    def _n_step_ahead_prediction(self, x, y, steps_ahead):
-        """Perform the n-steps-ahead prediction of a model.
-
-        Parameters
-        ----------
-        y : array-like of shape = max_lag
-            Initial conditions values of the model
-            to start recursive process.
-        x : ndarray of floats of shape = n_samples
-            Vector with input values to be used in model simulation.
-        steps_ahead : int (default = None)
-            The user can use free run simulation, one-step ahead prediction
-            and n-step ahead prediction.
-
-        Returns
-        -------
-        yhat : ndarray of floats
-               The n-steps-ahead predicted values of the model.
-
-        """
-        if self.model_type == "NARMAX":
-            return self.narmax_n_step_ahead(x, y, steps_ahead)
-
-        if self.model_type == "NAR":
-            return self._nar_step_ahead(y, steps_ahead)
-
-    def _model_prediction(self, x, y_initial, forecast_horizon=None):
-        """Perform the infinity steps-ahead simulation of a model.
-
-        Parameters
-        ----------
-        y_initial : array-like of shape = max_lag
-            Number of initial conditions values of output
-            to start recursive process.
-        x : ndarray of floats of shape = n_samples
-            Vector with input values to be used in model simulation.
-        forecast_horizon : int, default=None
-            The number of predictions over the time.
-
-        Returns
-        -------
-        yhat : ndarray of floats
-               The predicted values of the model.
-
-        """
-        if self.model_type in ["NARMAX", "NAR"]:
-            return self._narmax_predict(x, y_initial, forecast_horizon)
-        if self.model_type == "NFIR":
-            return self._nfir_predict(x, y_initial)
-
-        raise ValueError(
-            f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
-        )
-
     def _narmax_predict(self, x, y_initial, forecast_horizon=None):
         if len(y_initial) < self.max_lag:
             raise ValueError(
@@ -399,16 +278,12 @@ class NARX(BaseMSS):
                 )
             forecast_horizon = forecast_horizon + self.max_lag
 
-        if self.model_type == "NAR":
-            self.n_inputs = 0
-
         y_output = np.zeros(forecast_horizon, dtype=float)
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
 
-        model_exponents = np.vstack(
-            [self._code2exponents(code=model) for model in self.final_model]
-        )
+        n_inputs = self._prediction_n_inputs()
+        model_exponents = self._get_prediction_exponents()
         raw_regressor = np.zeros(model_exponents.shape[1], dtype=float)
         regressor_powers = np.empty_like(model_exponents)
         for i in range(self.max_lag, forecast_horizon):
@@ -416,7 +291,7 @@ class NARX(BaseMSS):
             final = self.max_lag
             k = int(i - self.max_lag)
             raw_regressor[:final] = y_output[k:i]
-            for j in range(self.n_inputs):
+            for j in range(n_inputs):
                 init += self.max_lag
                 final += self.max_lag
                 raw_regressor[init:final] = x[k:i, j]
@@ -429,10 +304,9 @@ class NARX(BaseMSS):
         y_output = np.zeros(x.shape[0], dtype=float)
         y_output.fill(np.nan)
         y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
-        x = x.reshape(-1, self.n_inputs)
-        model_exponents = np.vstack(
-            [self._code2exponents(code=model) for model in self.final_model]
-        )
+        n_inputs = self._prediction_n_inputs()
+        x = x.reshape(-1, n_inputs)
+        model_exponents = self._get_prediction_exponents()
         raw_regressor = np.zeros(model_exponents.shape[1], dtype=float)
         regressor_powers = np.empty_like(model_exponents)
         for i in range(self.max_lag, x.shape[0]):
@@ -440,7 +314,7 @@ class NARX(BaseMSS):
             final = self.max_lag
             k = int(i - self.max_lag)
             raw_regressor[:final] = y_output[k:i]
-            for j in range(self.n_inputs):
+            for j in range(n_inputs):
                 init += self.max_lag
                 final += self.max_lag
                 raw_regressor[init:final] = x[k:i, j]
@@ -454,9 +328,6 @@ class NARX(BaseMSS):
             forecast_horizon = x.shape[0]
         else:
             forecast_horizon = forecast_horizon + self.max_lag
-
-        if self.model_type == "NAR":
-            self.n_inputs = 0
 
         yhat = np.zeros(forecast_horizon, dtype=float)
         yhat.fill(np.nan)
@@ -485,108 +356,3 @@ class NARX(BaseMSS):
             yhat[i + self.max_lag] = a[0]
 
         return yhat[self.max_lag :].reshape(-1, 1)
-
-    def _basis_function_n_step_prediction(self, x, y, steps_ahead, forecast_horizon):
-        """Perform the n-steps-ahead prediction of a model.
-
-        Parameters
-        ----------
-        y : array-like of shape = max_lag
-            Initial conditions values of the model
-            to start recursive process.
-        x : ndarray of floats of shape = n_samples
-            Vector with input values to be used in model simulation.
-        steps_ahead : int (default = None)
-            The user can use free run simulation, one-step ahead prediction
-            and n-step ahead prediction.
-        forecast_horizon : int, default=None
-            The number of predictions over the time.
-
-        Returns
-        -------
-        yhat : ndarray of floats
-               The n-steps-ahead predicted values of the model.
-
-        """
-        if self.model_type == "NAR":
-            return self._nar_step_ahead(y, steps_ahead)
-
-        if len(y) < self.max_lag:
-            raise ValueError(
-                "Insufficient initial condition elements! Expected at least"
-                f" {self.max_lag} elements."
-            )
-
-        if x is not None:
-            forecast_horizon = x.shape[0]
-        else:
-            forecast_horizon = forecast_horizon + self.max_lag
-
-        yhat = np.zeros(forecast_horizon, dtype=float)
-        yhat.fill(np.nan)
-        yhat[: self.max_lag] = y[: self.max_lag, 0]
-
-        i = self.max_lag
-
-        while i < len(y):
-            k = int(i - self.max_lag)
-            if i + steps_ahead > len(y):
-                steps_ahead = len(y) - i  # predicts the remaining values
-
-            if self.model_type == "NARMAX":
-                yhat[i : i + steps_ahead] = self._basis_function_predict(
-                    x[k : i + steps_ahead],
-                    y[k : i + steps_ahead],
-                    forecast_horizon=forecast_horizon,
-                )[-steps_ahead:].ravel()
-            elif self.model_type == "NFIR":
-                yhat[i : i + steps_ahead] = self._basis_function_predict(
-                    x=x[k : i + steps_ahead],
-                    y_initial=y[k : i + steps_ahead],
-                    forecast_horizon=forecast_horizon,
-                )[-steps_ahead:].ravel()
-            else:
-                raise ValueError(
-                    f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
-                )
-
-            i += steps_ahead
-
-        return yhat[self.max_lag : :].reshape(-1, 1)
-
-    def _basis_function_n_steps_horizon(self, x, y, steps_ahead, forecast_horizon):
-        if self.model_type == "NAR":
-            return self._nar_step_ahead(y, steps_ahead)
-
-        yhat = np.zeros(forecast_horizon, dtype=float)
-        yhat.fill(np.nan)
-        yhat[: self.max_lag] = y[: self.max_lag, 0]
-
-        i = self.max_lag
-
-        while i < len(y):
-            k = int(i - self.max_lag)
-            if i + steps_ahead > len(y):
-                steps_ahead = len(y) - i  # predicts the remaining values
-
-            if self.model_type == "NARMAX":
-                yhat[i : i + steps_ahead] = self._basis_function_predict(
-                    x[k : i + steps_ahead],
-                    y[k : i + steps_ahead],
-                    forecast_horizon,
-                )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
-            elif self.model_type == "NFIR":
-                yhat[i : i + steps_ahead] = self._basis_function_predict(
-                    x=x[k : i + steps_ahead],
-                    y_initial=y[k : i + steps_ahead],
-                    forecast_horizon=forecast_horizon,
-                )[-forecast_horizon : -forecast_horizon + steps_ahead].ravel()
-            else:
-                raise ValueError(
-                    f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
-                )
-
-            i += steps_ahead
-
-        yhat = yhat.ravel()
-        return yhat[self.max_lag : :].reshape(-1, 1)
