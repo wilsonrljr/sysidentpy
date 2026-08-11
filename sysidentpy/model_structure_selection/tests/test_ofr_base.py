@@ -27,7 +27,6 @@ from sysidentpy.tests._array_api_asserts import (
     assert_allclose as xp_assert_allclose,
     assert_array_equal as xp_assert_array_equal,
 )
-from sysidentpy.narmax_base import BaseMSS
 
 
 # Create a subclass to instantiate the abstract class
@@ -378,7 +377,7 @@ def test_fit_requires_n_terms_when_order_selection_disabled(series_data):
 
 
 def test_predict_non_polynomial_uses_basis_function_paths():
-    model = SimpleOFR(basis_function=_FakeBasis())
+    model = SimpleOFR(basis_function=_FakeBasis(), model_type="NAR")
     model.max_lag = 1
     model.final_model = np.array([[0]])
     model.pivv = np.array([0])
@@ -422,12 +421,12 @@ def test_non_polynomial_nar_n_step_matches_segmented_free_runs(steps_ahead):
     )
 
 
-@pytest.mark.parametrize("steps_ahead", [0, -1, 1.5])
+@pytest.mark.parametrize("steps_ahead", [0, -1, 1.5, True])
 def test_non_polynomial_predict_rejects_invalid_steps(steps_ahead):
     model = _configured_non_polynomial_nar_model()
     y = np.ones((model.max_lag + 2, 1))
 
-    with pytest.raises(ValueError, match="steps_ahead must be integer and > zero"):
+    with pytest.raises(ValueError, match="steps_ahead must be"):
         model.predict(X=None, y=y, steps_ahead=steps_ahead)
 
 
@@ -438,76 +437,27 @@ def test_model_prediction_raises_for_invalid_type():
         model._model_prediction(np.ones((3, 1)), np.ones((3, 1)))
 
 
-def test_narmax_predict_sets_inputs_to_zero(monkeypatch):
+def test_narmax_predict_preserves_fitted_input_count():
     model = SimpleOFR(model_type="NAR")
     model.max_lag = 1
     model.n_inputs = 2
-
-    def fake_super(self, _x, _y, horizon):
-        _ = self
-        return np.ones((horizon, 1), dtype=np.float64)
-
-    monkeypatch.setattr(BaseMSS, "_narmax_predict", fake_super)
+    model.theta = np.array([[0.5]])
+    model.final_model = np.array([[1001]])
     result = model._narmax_predict(
         x=None, y_initial=np.ones((1, 1)), forecast_horizon=2
     )
-    assert result.shape == (3, 1)
-    assert model.n_inputs == 0
+    assert result.shape == (2, 1)
+    assert model.n_inputs == 2
 
 
-def test_basis_function_predict_extends_horizon(monkeypatch):
-    model = SimpleOFR(model_type="NAR")
-    model.max_lag = 2
+def test_basis_function_predict_preserves_fitted_input_count():
+    model = _configured_non_polynomial_nar_model()
     model.n_inputs = 3
-
-    def fake_super(self, _x, _y, horizon):
-        _ = self
-        return np.ones((horizon, 1), dtype=np.float64)
-
-    monkeypatch.setattr(BaseMSS, "_basis_function_predict", fake_super)
     result = model._basis_function_predict(
         x=None, y_initial=np.ones((2, 1)), forecast_horizon=1
     )
-    assert result.shape == (3, 1)
-    assert model.n_inputs == 0
-
-
-def test_basis_function_n_step_prediction_requires_initial_conditions():
-    model = SimpleOFR()
-    model.max_lag = 3
-    with pytest.raises(ValueError, match="Insufficient initial condition"):
-        model._basis_function_n_step_prediction(
-            None, np.ones((2, 1)), steps_ahead=1, forecast_horizon=1
-        )
-
-
-def test_basis_function_n_step_prediction_extends_horizon(monkeypatch):
-    model = SimpleOFR()
-    model.max_lag = 1
-
-    def fake_super(self, _x, _y, _steps, horizon):
-        _ = self
-        return np.ones((horizon, 1), dtype=np.float64)
-
-    monkeypatch.setattr(BaseMSS, "_basis_function_n_step_prediction", fake_super)
-    result = model._basis_function_n_step_prediction(
-        None, np.ones((4, 1)), steps_ahead=1, forecast_horizon=2
-    )
-    assert result.shape == (3, 1)
-
-
-def test_basis_function_n_steps_horizon_returns_column(monkeypatch):
-    model = SimpleOFR()
-
-    def fake_super(self, *_args, **_kwargs):
-        _ = self
-        return np.array([1.0, 2.0, 3.0])
-
-    monkeypatch.setattr(BaseMSS, "_basis_function_n_steps_horizon", fake_super)
-    result = model._basis_function_n_steps_horizon(
-        None, None, steps_ahead=1, forecast_horizon=1
-    )
-    assert result.shape == (3, 1)
+    assert result.shape == (1, 1)
+    assert model.n_inputs == 3
 
 
 def test_information_criterion_clamps_n_info_values(monkeypatch):
@@ -533,7 +483,7 @@ def test_information_criterion_clamps_n_info_values(monkeypatch):
 
 
 def test_basis_function_branch_in_predict_uses_n_step(monkeypatch):
-    model = SimpleOFR(basis_function=_FakeBasis())
+    model = SimpleOFR(basis_function=_FakeBasis(), model_type="NAR")
     model.max_lag = 1
     model.final_model = np.array([[0]])
     model.pivv = np.array([0])
@@ -558,7 +508,7 @@ def test_basis_function_branch_in_predict_uses_n_step(monkeypatch):
 
 def test_predict_polynomial_preserves_array_api_namespace():
     xp = pytest.importorskip("array_api_strict")
-    model = SimpleOFR()
+    model = SimpleOFR(model_type="NAR")
     model.max_lag = 1
     model._model_prediction = lambda _x, _y, forecast_horizon=None: get_namespace(
         _y
@@ -566,7 +516,7 @@ def test_predict_polynomial_preserves_array_api_namespace():
     y_data = xp.asarray(np.arange(4.0).reshape(-1, 1))
 
     with config_context(array_api_dispatch=True):
-        result = model.predict(X=None, y=y_data)
+        result = model.predict(X=None, y=y_data, forecast_horizon=3)
 
     assert result.__array_namespace__().__name__ == xp.__name__
     xp_assert_array_equal(result, np.array([[0.0], [2.0], [2.0], [2.0]]))
@@ -576,6 +526,7 @@ def test_predict_rejects_mixed_array_api_namespaces():
     xp = pytest.importorskip("array_api_strict")
     torch = pytest.importorskip("torch")
     model = SimpleOFR()
+    model.n_inputs = 1
 
     x_data = torch.tensor(np.arange(4.0).reshape(-1, 1), dtype=torch.float64)
     y_data = xp.asarray(np.arange(4.0).reshape(-1, 1), dtype=xp.float64)
@@ -583,6 +534,25 @@ def test_predict_rejects_mixed_array_api_namespaces():
     with config_context(array_api_dispatch=True):
         with pytest.raises(ValueError, match="same Array API namespace"):
             model.predict(X=x_data, y=y_data)
+
+
+def test_nfir_prediction_modes_are_equivalent():
+    model = SimpleOFR(model_type="NFIR")
+    model.max_lag = 1
+    model.n_inputs = 1
+    model.final_model = np.array([[2001]])
+    model.pivv = np.array([0])
+    model.theta = np.array([[0.5]])
+    x_data = np.arange(6.0).reshape(-1, 1)
+    y_data = np.arange(6.0).reshape(-1, 1)
+
+    free_run = model.predict(X=x_data, y=y_data)
+    one_step = model.predict(X=x_data, y=y_data, steps_ahead=1)
+    n_step = model.predict(X=x_data, y=y_data, steps_ahead=3)
+
+    np.testing.assert_allclose(one_step, free_run, rtol=1e-12, atol=1e-12)
+    np.testing.assert_allclose(n_step, free_run, rtol=1e-12, atol=1e-12)
+    np.testing.assert_array_equal(free_run[: model.max_lag], y_data[: model.max_lag])
 
 
 def test_error_reduction_ratio_accepts_torch_tensors():

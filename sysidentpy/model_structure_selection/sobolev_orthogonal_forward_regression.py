@@ -925,34 +925,3 @@ class UOFR(OFRBase):
 
         super().fit(X=X, y=y)
         return self
-
-    def predict(
-        self,
-        *,
-        X: Optional[np.ndarray] = None,
-        y: np.ndarray,
-        steps_ahead: Optional[int] = None,
-        forecast_horizon: Optional[int] = None,
-    ) -> np.ndarray:
-        """Predict output using the fitted UOFR model.
-
-        Parameters
-        ----------
-        X : ndarray of floats, optional
-            Input data for prediction.
-        y : ndarray of floats
-            Output data (initial conditions for simulation).
-        steps_ahead : int, optional
-            Number of steps ahead for prediction.
-        forecast_horizon : int, optional
-            Forecast horizon for multi-step prediction.
-
-        Returns
-        -------
-        yhat : np.ndarray
-            Predicted output values.
-        """
-        yhat = super().predict(
-            X=X, y=y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
-        )
-        return yhat

@@ -497,32 +497,31 @@ def test_non_polynomial_predict_rejects_non_positive_steps():
         random_state=0,
     ).fit(y=y_train[:40])
 
-    with pytest.raises(ValueError, match="steps_ahead must be integer and > zero"):
+    with pytest.raises(ValueError, match="steps_ahead must be"):
         model.predict(X=None, y=y_test[:5], steps_ahead=0)
 
 
-def test_er_basis_function_n_steps_horizon_returns_column_vector():
-    basis_function = Fourier(degree=2, n=1)
+def test_nfir_prediction_modes_are_equivalent():
     model = ER(
         ylag=[1, 2],
         xlag=2,
         estimator=LeastSquares(),
-        basis_function=basis_function,
+        basis_function=Polynomial(degree=2),
+        model_type="NFIR",
         skip_forward=True,
         n_perm=1,
         random_state=0,
     )
     model.fit(X=X_train[:40], y=y_train[:40])
-    window_len = model.max_lag + 3
-    steps_ahead = window_len - model.max_lag
-    forecast_horizon = window_len
-    yhat = model._basis_function_n_steps_horizon(
-        x=X_test[:window_len],
-        y=y_test[:window_len],
-        steps_ahead=steps_ahead,
-        forecast_horizon=forecast_horizon,
-    )
-    assert_equal(tuple(yhat.shape), (forecast_horizon - model.max_lag, 1))
+    x_window = X_test[:10]
+    y_window = y_test[:10]
+    free_run = model.predict(X=x_window, y=y_window)
+    one_step = model.predict(X=x_window, y=y_window, steps_ahead=1)
+    n_step = model.predict(X=x_window, y=y_window, steps_ahead=3)
+
+    np.testing.assert_allclose(one_step, free_run, rtol=1e-10, atol=1e-12)
+    np.testing.assert_allclose(n_step, free_run, rtol=1e-10, atol=1e-12)
+    np.testing.assert_array_equal(free_run[: model.max_lag], y_window[: model.max_lag])
 
 
 def test_predict_nfir_model_uses_specific_branch():
@@ -651,9 +650,10 @@ def test_basis_function_predict_handles_missing_input():
         model_type="NAR",
     )
     model.fit(X=X_train, y=y_train)
+    fitted_n_inputs = model.n_inputs
     horizon = 3
     yhat = model._basis_function_predict(
         x=None, y_initial=y_test, forecast_horizon=horizon
     )
     assert_equal(yhat.shape, (horizon, 1))
-    assert_equal(model.n_inputs, 0)
+    assert_equal(model.n_inputs, fitted_n_inputs)

@@ -32,18 +32,6 @@ y_test = np.reshape(y_test, (len(y_test), 1))
 X_test = np.reshape(X_test, (len(X_test), 1))
 
 
-class _FROLSProbe(FROLS):
-    def narmax_predict_reference(self, x_data, y_data, forecast_horizon):
-        return self._narmax_predict_reference(x_data, y_data, forecast_horizon)
-
-    def polynomial_narmax_predict_fast(self, x_data, y_data, forecast_horizon):
-        return self._polynomial_narmax_predict_fast(
-            x_data,
-            y_data,
-            forecast_horizon,
-        )
-
-
 def _build_order_selection_model(info_criteria="aic"):
     return FROLS(
         ylag=[1, 2],
@@ -366,30 +354,6 @@ def test_fit_predict_accepts_torch_cuda_tensors_when_available():
     assert yhat.device.type == "cuda"
     assert yhat.shape == y_test_t.shape
     xp_assert_allclose(yhat[: model.max_lag, :], y_test[: model.max_lag, :])
-
-
-def test_polynomial_narmax_fast_path_matches_reference_for_frols_model():
-    model = _FROLSProbe(
-        n_terms=5,
-        ylag=[1, 2],
-        xlag=2,
-        estimator=LeastSquares(),
-        basis_function=Polynomial(degree=2),
-    )
-    model.fit(X=X_train, y=y_train)
-
-    reference = model.narmax_predict_reference(
-        X_test,
-        y_test,
-        forecast_horizon=X_test.shape[0],
-    )
-    fast = model.polynomial_narmax_predict_fast(
-        X_test,
-        y_test,
-        forecast_horizon=X_test.shape[0],
-    )
-
-    assert_allclose(fast, reference, rtol=1e-10, atol=1e-12)
 
 
 def test_predict_repeated_calls_are_stable_under_array_api_dispatch_for_frols():

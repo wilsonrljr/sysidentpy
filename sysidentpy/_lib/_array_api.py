@@ -127,6 +127,11 @@ def _is_numpy_namespace(xp) -> bool:
     return _is_numpy_ns(xp)
 
 
+def _supports_numpy_metadata_indices(xp) -> bool:
+    """Return whether *xp* accepts NumPy arrays as indexing metadata."""
+    return _is_torch_ns(xp) or _is_cupy_ns(xp)
+
+
 def _require_numpy_namespace(xp, *, feature: str, dependency: str = "SciPy") -> None:
     """Raise when *feature* is used with a non-NumPy Array API namespace.
 

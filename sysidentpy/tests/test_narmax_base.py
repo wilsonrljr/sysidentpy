@@ -1,5 +1,6 @@
 # pylint: disable=protected-access,unused-argument,redefined-outer-name,useless-super-delegation,arguments-renamed,abstract-class-instantiated
 from typing import Optional
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -10,7 +11,7 @@ from numpy.testing import (
     assert_raises,
 )
 
-from sysidentpy import config_context
+from sysidentpy import config_context, get_config
 from sysidentpy.basis_function import (
     Bernstein,
     Bilinear,
@@ -644,7 +645,7 @@ def test_model_predict_fourier_steps_1():
     assert_almost_equal(yhat.mean(), y_test.mean(), decimal=6)
 
 
-def test_model_predict_fourier_nar_inputs():
+def test_model_predict_fourier_nar_preserves_inputs_and_model_state():
     model = FROLS(
         order_selection=True,
         ylag=[1, 2],
@@ -654,161 +655,21 @@ def test_model_predict_fourier_nar_inputs():
         model_type="NAR",
     )
     model.fit(X=X_train, y=y_train)
-    model.predict(X=X_test, y=y_test)
-    assert_equal(model.n_inputs, 0)
+    original_n_inputs = model.n_inputs
+    x_before = X_test.copy()
+    conflicting_x = np.arange(len(X_test) * 3, dtype=np.int64).reshape(-1, 3)
+    conflicting_x_before = conflicting_x.copy()
+    y_before = y_test.copy()
 
+    first = model.predict(X=X_test, y=y_test)
+    second = model.predict(X=conflicting_x, y=y_test)
 
-def test_model_predict_fourier_raises():
-    model = FROLS(
-        order_selection=True,
-        ylag=[1, 2],
-        xlag=2,
-        estimator=RecursiveLeastSquares(),
-        basis_function=Fourier(degree=2, n=1),
-        model_type="NARMAX",
-    )
-    model.fit(X=X_train, y=y_train)
-    assert_raises(
-        Exception, model._basis_function_n_step_prediction, X=X_test, y=y_test[:1]
-    )
-
-
-def test_model_predict_fourier_value_error():
-    model = FROLS(
-        order_selection=True,
-        ylag=[1, 2],
-        xlag=2,
-        estimator=RecursiveLeastSquares(),
-        basis_function=Fourier(degree=2, n=1),
-        model_type="NARMAX",
-    )
-    model.fit(X=X_train, y=y_train)
-    model.model_type = "NARRARMAX"
-    assert_raises(
-        ValueError,
-        model._basis_function_n_step_prediction,
-        x=X_test,
-        y=y_test,
-        steps_ahead=1,
-        forecast_horizon=None,
-    )
-
-
-def test_model_predict_fourier_horizon_error():
-    model = FROLS(
-        order_selection=True,
-        ylag=[1, 2],
-        xlag=2,
-        estimator=RecursiveLeastSquares(),
-        basis_function=Fourier(degree=2, n=1),
-        model_type="NARMAX",
-    )
-    model.fit(X=X_train, y=y_train)
-    model.model_type = "NARRARMAX"
-    assert_raises(
-        ValueError,
-        model._basis_function_n_steps_horizon,
-        x=X_test,
-        y=y_test,
-        steps_ahead=1,
-        forecast_horizon=10,
-    )
-
-
-def test_basis_function_predict_nfir_branch():
-    model = FROLS(
-        order_selection=True,
-        ylag=[1, 2],
-        xlag=2,
-        estimator=RecursiveLeastSquares(),
-        basis_function=Fourier(degree=2, n=1),
-        model_type="NFIR",
-    )
-    model.fit(X=X_train, y=y_train)
-
-    horizon = model.max_lag + 5
-    y_segment = y_test[:horizon]
-    x_segment = X_test[:horizon]
-    result = model._basis_function_predict(
-        x=x_segment, y_initial=y_segment, forecast_horizon=horizon
-    )
-
-    assert result.shape[0] == horizon - model.max_lag
-
-
-def test_basis_function_predict_invalid_type():
-    model = FROLS(
-        order_selection=True,
-        ylag=[1, 2],
-        xlag=2,
-        estimator=RecursiveLeastSquares(),
-        basis_function=Fourier(degree=2, n=1),
-        model_type="NFIR",
-    )
-    model.fit(X=X_train, y=y_train)
-    model.model_type = "UNKNOWN"
-
-    with pytest.raises(ValueError, match="model_type must be NARMAX, NAR or NFIR"):
-        model._basis_function_predict(
-            x=X_test[: model.max_lag + 5],
-            y_initial=y_test[: model.max_lag + 5],
-            forecast_horizon=model.max_lag + 5,
-        )
-
-
-def test_basis_function_n_step_prediction_nfir_branch():
-    model = FROLS(
-        order_selection=True,
-        ylag=[1, 2],
-        xlag=2,
-        estimator=RecursiveLeastSquares(),
-        basis_function=Fourier(degree=2, n=1),
-        model_type="NFIR",
-    )
-    model.fit(X=X_train, y=y_train)
-
-    horizon = model.max_lag + 6
-    y_segment = y_test[:horizon]
-    x_segment = X_test[:horizon]
-    result = model._basis_function_n_step_prediction(
-        x=x_segment,
-        y=y_segment,
-        steps_ahead=2,
-        forecast_horizon=horizon,
-    )
-
-    assert result.shape[0] == horizon - model.max_lag
-
-
-def test_basis_function_n_steps_horizon_adjusts_step_nar():
-    model = PredictableMSS(model_type="NAR")
-    horizon = model.max_lag + 4
-    y_segment = np.arange(horizon, dtype=float).reshape(-1, 1)
-
-    result = model._basis_function_n_steps_horizon(
-        x=None,
-        y=y_segment,
-        steps_ahead=horizon,
-        forecast_horizon=horizon,
-    )
-
-    assert result.shape == (horizon - model.max_lag, 1)
-
-
-def test_basis_function_n_steps_horizon_adjusts_step_nfir():
-    model = PredictableMSS(model_type="NFIR")
-    horizon = model.max_lag + 4
-    y_segment = np.arange(horizon, dtype=float).reshape(-1, 1)
-    x_segment = np.ones((horizon, 1))
-
-    result = model._basis_function_n_steps_horizon(
-        x=x_segment,
-        y=y_segment,
-        steps_ahead=horizon,
-        forecast_horizon=horizon,
-    )
-
-    assert result.shape == (horizon - model.max_lag, 1)
+    assert_equal(model.n_inputs, original_n_inputs)
+    assert_array_equal(X_test, x_before)
+    assert_array_equal(conflicting_x, conflicting_x_before)
+    assert_array_equal(y_test, y_before)
+    assert first.dtype == second.dtype
+    np.testing.assert_allclose(first, second, rtol=0, atol=0)
 
 
 def test_nar_step_ahead_insufficient_initial_conditions():
@@ -826,16 +687,23 @@ def test_nar_step_ahead_insufficient_initial_conditions():
         model._nar_step_ahead(y[0], steps_ahead=2)
 
 
-@pytest.mark.parametrize("steps_ahead", [0, -1])
-def test_nar_step_ahead_rejects_non_positive_steps(steps_ahead):
+@pytest.mark.parametrize("steps_ahead", [0, -1, 1.5, True, np.bool_(False)])
+def test_nar_step_ahead_rejects_invalid_steps(steps_ahead):
     model = RecordingPredictableMSS(model_type="NAR")
     y_segment = np.arange(model.max_lag + 1, dtype=float).reshape(-1, 1)
 
-    with pytest.raises(
-        ValueError,
-        match="steps_ahead must be integer and > zero",
-    ):
+    with pytest.raises(ValueError, match="steps_ahead"):
         model._nar_step_ahead(y_segment, steps_ahead=steps_ahead)
+
+
+def test_nar_step_ahead_accepts_numpy_integer_steps():
+    model = RecordingPredictableMSS(model_type="NAR")
+    y_segment = np.arange(model.max_lag + 3, dtype=float).reshape(-1, 1)
+
+    result = model._nar_step_ahead(y_segment, steps_ahead=np.int64(2))
+
+    assert result.shape == (3, 1)
+    assert [call[2] for call in model.prediction_calls] == [2, 1]
 
 
 def test_nar_step_ahead_handles_multiple_segments():
@@ -1107,10 +975,11 @@ class PredictableMSS(BaseMSS):
         y_initial: np.ndarray,
         forecast_horizon: int = 1,
     ) -> np.ndarray:
-        _ = x
-        horizon = int(forecast_horizon or len(y_initial))
-        data = np.arange(horizon, dtype=float).reshape(-1, 1)
-        return data
+        if x is not None:
+            prediction_length = x.shape[0] - self.max_lag
+        else:
+            prediction_length = forecast_horizon
+        return np.arange(prediction_length, dtype=float).reshape(-1, 1)
 
     def _model_prediction(
         self,
@@ -1118,9 +987,11 @@ class PredictableMSS(BaseMSS):
         y_initial: np.ndarray,
         forecast_horizon: int = 1,
     ) -> np.ndarray:
-        _ = x
-        horizon = int(forecast_horizon or len(y_initial))
-        return np.arange(horizon, dtype=float).reshape(-1, 1)
+        if x is not None:
+            prediction_length = x.shape[0] - self.max_lag
+        else:
+            prediction_length = forecast_horizon
+        return np.arange(prediction_length, dtype=float).reshape(-1, 1)
 
     def _nfir_predict(self, x: np.ndarray, y_initial: np.ndarray) -> np.ndarray:
         _ = y_initial
@@ -1129,6 +1000,12 @@ class PredictableMSS(BaseMSS):
 
     def _n_step_ahead_prediction(self, x, y, steps_ahead):
         return super()._n_step_ahead_prediction(x, y, steps_ahead)
+
+    def _one_step_ahead_prediction(self, x, y=None):
+        prediction_length = y.shape[0] - self.max_lag
+        if self.model_type == "NFIR":
+            prediction_length = x.shape[0] - self.max_lag
+        return np.arange(prediction_length, dtype=float).reshape(-1, 1)
 
     def narmax_n_step_ahead(self, x, y, steps_ahead):
         return super().narmax_n_step_ahead(x, y, steps_ahead)
@@ -1144,8 +1021,12 @@ class PredictableMSS(BaseMSS):
         steps_ahead: Optional[int] = None,
         forecast_horizon: int = 1,
     ) -> np.ndarray:
-        _ = (X, y, steps_ahead, forecast_horizon)
-        return np.zeros((1, 1))
+        return super().predict(
+            X=X,
+            y=y,
+            steps_ahead=steps_ahead,
+            forecast_horizon=forecast_horizon,
+        )
 
 
 class RecordingPredictableMSS(PredictableMSS):
@@ -1164,7 +1045,12 @@ class RecordingPredictableMSS(PredictableMSS):
         forecast_horizon: int = 1,
     ) -> np.ndarray:
         self.basis_prediction_calls.append((x, y_initial.copy(), forecast_horizon))
-        return super()._basis_function_predict(x, y_initial, forecast_horizon)
+        prediction = super()._basis_function_predict(
+            x,
+            y_initial,
+            forecast_horizon,
+        )
+        return prediction + self.prediction_offset
 
     def _model_prediction(
         self,
@@ -1180,8 +1066,513 @@ class RecordingPredictableMSS(PredictableMSS):
 class ArrayAPIPredictableMSS(PredictableMSS):
     """Predictable BaseMSS variant that delegates NFIR prediction to the base path."""
 
+    def _model_prediction(self, x, y_initial, forecast_horizon=1):
+        return BaseMSS._model_prediction(self, x, y_initial, forecast_horizon)
+
     def _nfir_predict(self, x: np.ndarray, y_initial: np.ndarray) -> np.ndarray:
         return BaseMSS._nfir_predict(self, x, y_initial)
+
+
+def _segmented_public_prediction_reference(model, x, y, steps_ahead):
+    """Build an n-step reference from independent public free runs."""
+    blocks = [y[: model.max_lag].astype(float, copy=True)]
+    block_end = model.max_lag
+    while block_end < len(y):
+        block_horizon = min(steps_ahead, len(y) - block_end)
+        block_start = block_end - model.max_lag
+        y_initial = y[block_start:block_end]
+        if model.model_type == "NAR":
+            block_prediction = model.predict(
+                X=None,
+                y=y_initial,
+                forecast_horizon=block_horizon,
+            )
+        else:
+            block_prediction = model.predict(
+                X=x[block_start : block_end + block_horizon],
+                y=y_initial,
+            )
+        blocks.append(block_prediction[-block_horizon:])
+        block_end += block_horizon
+
+    return np.concatenate(blocks, axis=0)
+
+
+@pytest.mark.parametrize(
+    ("invalid_y", "error_message"),
+    [
+        (None, "y cannot be None"),
+        (np.ones(4), "y must be a 2D array"),
+        (np.ones((4, 2)), "single column"),
+    ],
+)
+def test_predict_validates_output_shape_at_public_boundary(
+    invalid_y,
+    error_message,
+):
+    model = PredictableMSS(model_type="NAR")
+
+    with pytest.raises(ValueError, match=error_message):
+        model.predict(X=None, y=invalid_y, steps_ahead=1)
+
+
+def test_predict_validates_optional_input_shape_at_public_boundary():
+    model = PredictableMSS(model_type="NAR")
+    y_data = np.arange(model.max_lag + 2, dtype=float).reshape(-1, 1)
+
+    with pytest.raises(ValueError, match="X must be a 2D array"):
+        model.predict(X=np.ones(len(y_data)), y=y_data, steps_ahead=1)
+
+
+@pytest.mark.parametrize("model_type", ["NARMAX", "NFIR"])
+def test_predict_requires_input_for_input_models(model_type):
+    model = PredictableMSS(model_type=model_type)
+    y_data = np.arange(model.max_lag + 2, dtype=float).reshape(-1, 1)
+
+    with pytest.raises(ValueError, match=f"X cannot be None for {model_type}"):
+        model.predict(X=None, y=y_data)
+
+
+@pytest.mark.parametrize("model_type", ["NARMAX", "NFIR"])
+def test_predict_validates_number_of_input_columns(model_type):
+    model = PredictableMSS(model_type=model_type)
+    y_data = np.ones((model.max_lag + 2, 1))
+    x_data = np.ones((len(y_data), 2))
+
+    with pytest.raises(ValueError, match="X must have 1 input column"):
+        model.predict(X=x_data, y=y_data)
+
+
+@pytest.mark.parametrize("model_type", ["NARMAX", "NFIR"])
+@pytest.mark.parametrize("steps_ahead", [1, 2])
+@pytest.mark.parametrize("input_length_offset", [-1, 1])
+def test_predict_requires_equal_lengths_for_conditioned_input_models(
+    model_type,
+    steps_ahead,
+    input_length_offset,
+):
+    model = PredictableMSS(model_type=model_type)
+    y_data = np.ones((model.max_lag + 3, 1))
+
+    with pytest.raises(ValueError, match="same number of samples"):
+        model.predict(
+            X=np.ones((len(y_data) + input_length_offset, 1)),
+            y=y_data,
+            steps_ahead=steps_ahead,
+        )
+
+
+@pytest.mark.parametrize("model_type", ["NAR", "NARMAX", "NFIR"])
+def test_predict_rejects_free_run_input_shorter_than_max_lag(model_type):
+    model = PredictableMSS(model_type=model_type)
+    y_data = np.ones((model.max_lag, 1))
+    x_data = np.ones((model.max_lag - 1, 1))
+
+    with pytest.raises(ValueError, match="X must contain at least"):
+        model.predict(X=x_data, y=y_data)
+
+
+def test_predict_rejects_unknown_model_type_at_public_boundary():
+    model = PredictableMSS(model_type="UNKNOWN")
+    y_data = np.ones((model.max_lag + 1, 1))
+
+    with pytest.raises(ValueError, match="model_type must be NARMAX, NAR or NFIR"):
+        model.predict(X=None, y=y_data, steps_ahead=1)
+
+
+@pytest.mark.parametrize("invalid_steps", [0, -1, 1.0, True, np.bool_(True)])
+def test_predict_rejects_invalid_steps_ahead(invalid_steps):
+    model = PredictableMSS(model_type="NAR")
+    y_data = np.arange(model.max_lag + 3, dtype=float).reshape(-1, 1)
+
+    with pytest.raises(ValueError, match="steps_ahead"):
+        model.predict(X=None, y=y_data, steps_ahead=invalid_steps)
+
+
+def test_predict_accepts_numpy_integer_steps_ahead():
+    model = PredictableMSS(model_type="NAR")
+    y_data = np.arange(model.max_lag + 3, dtype=float).reshape(-1, 1)
+
+    result = model.predict(X=None, y=y_data, steps_ahead=np.int64(2))
+    expected = model.predict(X=None, y=y_data, steps_ahead=2)
+
+    assert_array_equal(result, expected)
+
+
+def test_predict_rejects_backend_boolean_prediction_parameters():
+    torch = pytest.importorskip("torch")
+    model = PredictableMSS(model_type="NAR")
+    y_data = np.arange(model.max_lag + 3, dtype=float).reshape(-1, 1)
+
+    with pytest.raises(ValueError, match="steps_ahead"):
+        model.predict(X=None, y=y_data, steps_ahead=torch.tensor(True))
+
+    with pytest.raises(ValueError, match="forecast_horizon"):
+        model.predict(
+            X=None,
+            y=y_data[: model.max_lag],
+            forecast_horizon=torch.tensor(True),
+        )
+
+
+def test_predict_accepts_backend_integer_prediction_parameters():
+    torch = pytest.importorskip("torch")
+    model = PredictableMSS(model_type="NAR")
+    y_data = np.arange(model.max_lag + 3, dtype=float).reshape(-1, 1)
+
+    n_step = model.predict(X=None, y=y_data, steps_ahead=torch.tensor(2))
+    expected_n_step = model.predict(X=None, y=y_data, steps_ahead=2)
+    free_run = model.predict(
+        X=None,
+        y=y_data[: model.max_lag],
+        forecast_horizon=torch.tensor(3),
+    )
+    expected_free_run = model.predict(
+        X=None,
+        y=y_data[: model.max_lag],
+        forecast_horizon=3,
+    )
+
+    assert_array_equal(n_step, expected_n_step)
+    assert_array_equal(free_run, expected_free_run)
+
+
+@pytest.mark.parametrize(
+    "invalid_horizon",
+    [None, -1, 1.0, True, np.bool_(False)],
+)
+def test_nar_free_run_rejects_invalid_active_forecast_horizon(invalid_horizon):
+    model = PredictableMSS(model_type="NAR")
+    y_initial = np.arange(model.max_lag, dtype=float).reshape(-1, 1)
+
+    with pytest.raises(ValueError, match="forecast_horizon"):
+        model.predict(X=None, y=y_initial, forecast_horizon=invalid_horizon)
+
+
+def test_nar_free_run_accepts_numpy_integer_and_zero_forecast_horizon():
+    model = RecordingPredictableMSS(model_type="NAR")
+    y_initial = np.arange(model.max_lag, dtype=float).reshape(-1, 1)
+
+    prefix_only = model.predict(
+        X=None,
+        y=y_initial,
+        forecast_horizon=np.int64(0),
+    )
+    prediction = model.predict(
+        X=None,
+        y=y_initial,
+        forecast_horizon=np.int64(3),
+    )
+
+    assert_array_equal(prefix_only, y_initial)
+    assert not np.shares_memory(prefix_only, y_initial)
+    assert prediction.shape == (model.max_lag + 3, 1)
+    assert len(model.prediction_calls) == 1
+
+
+def test_nar_free_run_without_input_uses_horizon_and_only_initial_conditions():
+    model = PredictableMSS(model_type="NAR")
+    y_data = np.arange(model.max_lag + 5, dtype=float).reshape(-1, 1)
+    modified = y_data.copy()
+    modified[model.max_lag :] = -999
+
+    full_y = model.predict(X=None, y=y_data, forecast_horizon=4)
+    initial_only = model.predict(
+        X=None,
+        y=y_data[: model.max_lag],
+        forecast_horizon=4,
+    )
+    modified_suffix = model.predict(X=None, y=modified, forecast_horizon=4)
+
+    assert full_y.shape == (model.max_lag + 4, 1)
+    assert_array_equal(full_y, initial_only)
+    assert_array_equal(full_y, modified_suffix)
+    assert_array_equal(full_y[: model.max_lag], y_data[: model.max_lag])
+
+
+def test_nar_free_run_with_input_uses_input_length_and_ignores_horizon():
+    model = PredictableMSS(model_type="NAR")
+    y_initial = np.arange(model.max_lag, dtype=float).reshape(-1, 1)
+    x_data = np.arange(model.max_lag + 5, dtype=float).reshape(-1, 1)
+
+    result = model.predict(
+        X=x_data,
+        y=y_initial,
+        forecast_horizon="ignored",
+    )
+    changed_x = model.predict(
+        X=-x_data,
+        y=y_initial,
+        forecast_horizon=999,
+    )
+
+    assert result.shape == x_data.shape
+    assert_array_equal(result[: model.max_lag], y_initial)
+    assert_array_equal(result, changed_x)
+
+
+@pytest.mark.parametrize("steps_ahead", [1, 2, 3])
+def test_conditioned_nar_prediction_uses_y_length_and_ignores_x_and_horizon(
+    steps_ahead,
+):
+    model = PredictableMSS(model_type="NAR")
+    y_data = np.arange(model.max_lag + 5, dtype=float).reshape(-1, 1)
+    irrelevant_x = np.arange(
+        3 * (model.max_lag + 1),
+        dtype=np.int64,
+    ).reshape(-1, 3)
+    x_before = irrelevant_x.copy()
+
+    expected = model.predict(X=None, y=y_data, steps_ahead=steps_ahead)
+    result = model.predict(
+        X=irrelevant_x,
+        y=y_data,
+        steps_ahead=steps_ahead,
+        forecast_horizon="ignored",
+    )
+
+    assert result.shape == y_data.shape
+    assert result.dtype == expected.dtype
+    assert_array_equal(result, expected)
+    assert_array_equal(irrelevant_x, x_before)
+
+
+@pytest.mark.parametrize("steps_ahead", [1, 3])
+def test_conditioned_nar_discards_x_before_namespace_dispatch(steps_ahead):
+    xp = pytest.importorskip("array_api_strict")
+    model = PredictableMSS(model_type="NAR")
+    y_data = np.arange(model.max_lag + 4, dtype=float).reshape(-1, 1)
+    irrelevant_x = xp.asarray(np.ones((model.max_lag + 1, 2)))
+    expected = model.predict(X=None, y=y_data, steps_ahead=steps_ahead)
+
+    with config_context(array_api_dispatch=True):
+        result = model.predict(
+            X=irrelevant_x,
+            y=y_data,
+            steps_ahead=steps_ahead,
+        )
+
+    assert isinstance(result, np.ndarray)
+    assert_array_equal(result, expected)
+
+
+def test_narmax_free_run_uses_x_length_and_only_initial_conditions():
+    model = PredictableMSS(model_type="NARMAX")
+    x_data = np.arange(model.max_lag + 5, dtype=float).reshape(-1, 1)
+    y_data = np.arange(model.max_lag + 3, dtype=float).reshape(-1, 1)
+
+    full_y = model.predict(
+        X=x_data,
+        y=y_data,
+        forecast_horizon="ignored",
+    )
+    initial_only = model.predict(
+        X=x_data,
+        y=y_data[: model.max_lag],
+        forecast_horizon="ignored",
+    )
+
+    assert full_y.shape == x_data.shape
+    assert_array_equal(full_y, initial_only)
+
+
+def test_narmax_one_step_uses_aligned_y_interval_and_ignores_horizon():
+    model = PredictableMSS(model_type="NARMAX")
+    x_data = np.arange(model.max_lag + 5, dtype=float).reshape(-1, 1)
+    y_data = np.arange(len(x_data), dtype=float).reshape(-1, 1)
+
+    result = model.predict(
+        X=x_data,
+        y=y_data,
+        steps_ahead=1,
+        forecast_horizon="ignored",
+    )
+
+    assert result.shape == y_data.shape
+    assert_array_equal(result[: model.max_lag], y_data[: model.max_lag])
+
+
+@pytest.mark.parametrize("basis_function", [Polynomial(degree=1), Fourier(degree=1)])
+def test_nfir_prediction_modes_are_feed_forward_aliases(basis_function):
+    model = PredictableMSS(model_type="NFIR")
+    model.basis_function = basis_function
+    x_data = np.arange(model.max_lag + 5, dtype=float).reshape(-1, 1)
+    y_data = np.arange(len(x_data), dtype=float).reshape(-1, 1)
+    changed_suffix = y_data.copy()
+    changed_suffix[model.max_lag :] = -999
+
+    free_run = model.predict(X=x_data, y=y_data, forecast_horizon="ignored")
+    initial_only = model.predict(
+        X=x_data,
+        y=y_data[: model.max_lag],
+        forecast_horizon="ignored",
+    )
+    one_step = model.predict(
+        X=x_data,
+        y=y_data,
+        steps_ahead=1,
+        forecast_horizon="ignored",
+    )
+    n_step = model.predict(
+        X=x_data,
+        y=y_data,
+        steps_ahead=3,
+        forecast_horizon="ignored",
+    )
+    changed = model.predict(X=x_data, y=changed_suffix, steps_ahead=2)
+
+    assert free_run.shape == x_data.shape
+    assert_array_equal(free_run, initial_only)
+    assert_array_equal(free_run, one_step)
+    assert_array_equal(free_run, n_step)
+    assert_array_equal(free_run, changed)
+    assert_array_equal(free_run[: model.max_lag], y_data[: model.max_lag])
+
+
+@pytest.mark.parametrize(
+    ("model_type", "steps_ahead", "use_x", "forecast_horizon"),
+    [
+        ("NAR", None, False, 0),
+        ("NAR", 1, False, 1),
+        ("NAR", 3, False, 1),
+        ("NARMAX", None, True, None),
+        ("NARMAX", 1, True, None),
+        ("NARMAX", 3, True, None),
+        ("NFIR", None, True, None),
+        ("NFIR", 1, True, None),
+        ("NFIR", 3, True, None),
+    ],
+)
+def test_predict_returns_prefix_without_evaluating_empty_suffix(
+    model_type,
+    steps_ahead,
+    use_x,
+    forecast_horizon,
+):
+    model = RecordingPredictableMSS(model_type=model_type)
+    y_initial = np.arange(model.max_lag, dtype=float).reshape(-1, 1)
+    x_data = np.ones((model.max_lag, 1)) if use_x else None
+
+    result = model.predict(
+        X=x_data,
+        y=y_initial,
+        steps_ahead=steps_ahead,
+        forecast_horizon=forecast_horizon,
+    )
+
+    assert_array_equal(result, y_initial)
+    assert not np.shares_memory(result, y_initial)
+    assert result.dtype == y_initial.dtype
+    assert model.prediction_calls == []
+    assert model.basis_prediction_calls == []
+
+
+@pytest.mark.parametrize("model_type", ["NAR", "NARMAX", "NFIR"])
+def test_predict_rejects_fewer_than_max_lag_initial_conditions(model_type):
+    model = PredictableMSS(model_type=model_type)
+    y_short = np.ones((model.max_lag - 1, 1))
+    x_data = None if model_type == "NAR" else np.ones((model.max_lag, 1))
+
+    with pytest.raises(ValueError, match="Insufficient initial condition"):
+        model.predict(
+            X=x_data,
+            y=y_short,
+            steps_ahead=1,
+            forecast_horizon=1,
+        )
+
+
+@pytest.mark.parametrize("basis_function", [Polynomial(degree=1), Fourier(degree=1)])
+@pytest.mark.parametrize("steps_ahead", [2, 3, 20])
+def test_public_narmax_n_step_matches_segmented_free_runs(
+    basis_function,
+    steps_ahead,
+):
+    model = PredictableMSS(model_type="NARMAX")
+    model.basis_function = basis_function
+    x_data = np.arange(18, dtype=float).reshape(9, 2)
+    y_data = np.arange(9, dtype=float).reshape(-1, 1)
+    model.n_inputs = x_data.shape[1]
+    expected = _segmented_public_prediction_reference(
+        model,
+        x_data,
+        y_data,
+        steps_ahead,
+    )
+
+    result = model.predict(
+        X=x_data,
+        y=y_data,
+        steps_ahead=steps_ahead,
+        forecast_horizon=1,
+    )
+
+    assert result.shape == y_data.shape
+    assert_array_equal(result, expected)
+
+
+@pytest.mark.parametrize("basis_function", [Polynomial(degree=1), Fourier(degree=1)])
+def test_narmax_scheduler_uses_exact_windows_and_partial_final_block(
+    basis_function,
+):
+    model = RecordingPredictableMSS(model_type="NARMAX", prediction_offset=0.5)
+    model.basis_function = basis_function
+    model.n_inputs = 2
+    x_data = np.arange(18, dtype=int).reshape(9, 2)
+    y_data = np.arange(9, dtype=int).reshape(-1, 1)
+    x_before = x_data.copy()
+    y_before = y_data.copy()
+
+    result = model.narmax_n_step_ahead(
+        x_data,
+        y_data,
+        steps_ahead=np.int64(3),
+    )
+    calls = (
+        model.prediction_calls
+        if isinstance(basis_function, Polynomial)
+        else model.basis_prediction_calls
+    )
+
+    assert result.shape == (len(y_data) - model.max_lag, 1)
+    assert np.issubdtype(result.dtype, np.floating)
+    np.testing.assert_allclose(
+        result[:, 0],
+        np.array([0.5, 1.5, 2.5, 0.5, 1.5, 2.5, 0.5]),
+    )
+    assert [call[2] for call in calls] == [3, 3, 1]
+    for call, block_start, block_horizon in zip(
+        calls,
+        [0, 3, 6],
+        [3, 3, 1],
+        strict=True,
+    ):
+        assert_array_equal(
+            call[0],
+            x_data[block_start : block_start + model.max_lag + block_horizon],
+        )
+        assert_array_equal(
+            call[1],
+            y_data[block_start : block_start + model.max_lag],
+        )
+    assert_array_equal(x_data, x_before)
+    assert_array_equal(y_data, y_before)
+    assert model.n_inputs == 2
+
+
+def test_narmax_scheduler_validates_required_and_aligned_input():
+    model = PredictableMSS(model_type="NARMAX")
+    y_data = np.ones((model.max_lag + 2, 1))
+
+    with pytest.raises(ValueError, match="X cannot be None"):
+        model.narmax_n_step_ahead(None, y_data, steps_ahead=2)
+
+    with pytest.raises(ValueError, match="same number of samples"):
+        model.narmax_n_step_ahead(
+            np.ones((len(y_data) - 1, 1)),
+            y_data,
+            steps_ahead=2,
+        )
 
 
 def test_base_mss_initialization():
@@ -1213,8 +1604,8 @@ def test_base_mss_abstract_methods():
 def test_n_step_ahead_prediction_narmax():
     """Test `_n_step_ahead_prediction` for NARMAX model."""
     model = ConcreteMSS(model_type="NARMAX")
-    X = np.array([[1, 2], [3, 4]])
-    y = np.array([1, 2, 3])
+    X = np.array([[1], [2], [3]])
+    y = np.array([[1], [2], [3]])
     steps_ahead = 3
 
     result = model._n_step_ahead_prediction(X, y, steps_ahead)
@@ -1228,7 +1619,7 @@ def test_n_step_ahead_prediction_narmax():
 def test_n_step_ahead_prediction_nar():
     """Test `_n_step_ahead_prediction` for NAR model."""
     model = ConcreteMSS(model_type="NAR")
-    y = np.array([1, 2, 3])
+    y = np.array([[1], [2], [3]])
     steps_ahead = 2
 
     result = model._n_step_ahead_prediction(None, y, steps_ahead)
@@ -1246,10 +1637,41 @@ def test_one_step_ahead_prediction_preserves_array_api_namespace():
     x_base = xp.asarray(np.array([[1.0], [2.0], [3.0]]))
 
     with config_context(array_api_dispatch=True):
-        result = model._one_step_ahead_prediction(x_base)
+        result = BaseMSS._one_step_ahead_prediction(model, x_base)
 
     assert result.__array_namespace__().__name__ == xp.__name__
     xp_assert_array_equal(result, [[2.0], [4.0], [6.0]])
+
+
+def test_one_step_ahead_prediction_promotes_integer_regressors():
+    model = PredictableMSS(model_type="NARMAX")
+    model.theta = np.array([[0.5]])
+    regressors = np.array([[1], [2], [3]], dtype=np.int64)
+
+    result = BaseMSS._one_step_ahead_prediction(model, regressors)
+
+    assert np.issubdtype(result.dtype, np.floating)
+    np.testing.assert_allclose(result, np.array([[0.5], [1.0], [1.5]]))
+
+
+def test_prediction_dtype_preserves_floats_and_promotes_integral_data():
+    model = PredictableMSS(model_type="NARMAX")
+
+    float32_result = model._prediction_dtype(np, np.dtype(np.float32))
+    mixed_float_result = model._prediction_dtype(
+        np,
+        np.dtype(np.float32),
+        np.dtype(np.float64),
+    )
+    integer_result = model._prediction_dtype(
+        np,
+        np.dtype(np.int64),
+        np.dtype(np.float32),
+    )
+
+    assert float32_result == np.dtype(np.float32)
+    assert mixed_float_result == np.dtype(np.float64)
+    assert np.issubdtype(integer_result, np.floating)
 
 
 def test_narmax_predict_preserves_array_api_namespace_with_numpy_theta():
@@ -1267,49 +1689,7 @@ def test_narmax_predict_preserves_array_api_namespace_with_numpy_theta():
     xp_assert_array_equal(result, np.full((4, 1), 2.0))
 
 
-def test_polynomial_narmax_predict_fast_matches_reference_with_interactions():
-    model = PredictableMSS(model_type="NARMAX")
-    model.max_lag = 2
-    model.n_inputs = 2
-    model.basis_function = Polynomial(degree=2)
-    model.final_model = np.array(
-        [
-            [0, 0],
-            [1001, 1001],
-            [2002, 1001],
-            [3001, 1002],
-            [3002, 2001],
-        ]
-    )
-    model.theta = np.array([[0.3], [-0.1], [0.4], [-0.2], [0.15]])
-    x_data = np.array(
-        [
-            [1.0, 0.5],
-            [2.0, 1.5],
-            [3.0, 2.5],
-            [4.0, 3.5],
-            [5.0, 4.5],
-            [6.0, 5.5],
-        ]
-    )
-    y_initial = np.array([[0.2], [0.4], [0.6], [0.8], [1.0], [1.2]])
-
-    reference = model._narmax_predict_reference(
-        x_data,
-        y_initial,
-        forecast_horizon=x_data.shape[0],
-    )
-    fast = model._polynomial_narmax_predict_fast(
-        x_data,
-        y_initial,
-        forecast_horizon=x_data.shape[0],
-    )
-
-    assert_array_equal(fast.shape, reference.shape)
-    assert_almost_equal(fast, reference, decimal=12)
-
-
-def test_polynomial_narmax_predict_cache_preserves_final_model_order():
+def test_prediction_exponents_cache_preserves_order_and_reuses_result():
     model = PredictableMSS(model_type="NARMAX")
     model.max_lag = 2
     model.n_inputs = 1
@@ -1322,27 +1702,52 @@ def test_polynomial_narmax_predict_cache_preserves_final_model_order():
         ]
     )
 
-    exponent_matrix = model._get_polynomial_narmax_predict_exponents()
+    exponent_matrix = model._get_prediction_exponents()
+    cached = model._get_prediction_exponents()
     expected = np.vstack([model._code2exponents(code=row) for row in model.final_model])
 
     assert_array_equal(exponent_matrix, expected)
+    assert cached is exponent_matrix
+    assert not exponent_matrix.flags.writeable
+    assert model._get_polynomial_narmax_predict_exponents() is exponent_matrix
 
 
-def test_polynomial_narmax_fast_path_is_disabled_for_short_initial_conditions():
+def test_prediction_exponents_cache_invalidates_after_in_place_model_change():
     model = PredictableMSS(model_type="NARMAX")
-    model.max_lag = 2
-    model.n_inputs = 1
-    model.basis_function = Polynomial(degree=2)
-    model.final_model = np.array([[1001]])
-    model.theta = np.array([[1.0]])
-    x_data = np.ones((4, 1))
-    y_initial = np.arange(model.max_lag, dtype=float).reshape(-1, 1)
+    model.final_model = np.array([[1001], [2001]])
+    original = model._get_prediction_exponents()
 
-    assert not model._should_use_polynomial_narmax_fast_path(
-        x_data,
-        y_initial,
-        forecast_horizon=x_data.shape[0],
+    model.final_model[0, 0] = 2002
+    updated = model._get_prediction_exponents()
+
+    assert updated is not original
+    assert_array_equal(
+        updated,
+        np.vstack([model._code2exponents(code=row) for row in model.final_model]),
     )
+
+
+def test_prediction_exponents_cache_uses_effective_nar_input_count():
+    model = PredictableMSS(model_type="NAR")
+    model.n_inputs = 7
+    original = model._get_prediction_exponents()
+
+    model.n_inputs = 3
+    cached = model._get_prediction_exponents()
+
+    assert cached is original
+    assert cached.shape == (len(model.final_model), model.max_lag)
+    assert model.n_inputs == 3
+
+
+def test_prediction_exponents_cache_handles_empty_model():
+    model = PredictableMSS(model_type="NARMAX")
+    model.final_model = np.empty((0, 1), dtype=int)
+
+    result = model._get_prediction_exponents()
+
+    assert result.shape == (0, model.max_lag * (1 + model.n_inputs))
+    assert not result.flags.writeable
 
 
 def test_nfir_predict_preserves_array_api_namespace_with_numpy_theta():
@@ -1360,13 +1765,73 @@ def test_nfir_predict_preserves_array_api_namespace_with_numpy_theta():
     xp_assert_array_equal(result, np.full((4, 1), 2.0))
 
 
-def test_n_step_ahead_prediction_invalid_model():
-    """Test `_n_step_ahead_prediction` with an invalid model type."""
-    model = ConcreteMSS(model_type="NFIR")
+def test_public_array_api_fallback_preserves_model_state_and_inputs():
+    xp = pytest.importorskip("array_api_strict")
+    model = ArrayAPIPredictableMSS(model_type="NAR")
+    model.final_model = np.array([[1001]])
+    model.theta = np.array([[0.5]], dtype=np.float32)
+    y_numpy = np.arange(model.max_lag, dtype=np.int64).reshape(-1, 1)
+    expected_model = ArrayAPIPredictableMSS(model_type="NAR")
+    expected_model.final_model = model.final_model.copy()
+    expected_model.theta = model.theta.copy()
+    expected = expected_model.predict(X=None, y=y_numpy, forecast_horizon=4)
+    y_data = xp.asarray(y_numpy)
+    original_theta = model.theta
 
-    with pytest.raises(
-        ValueError,
-        match=r"n_steps_ahead prediction will be implemented"
-        r" for NFIR models in v0\.4\..*",
-    ):
-        model._n_step_ahead_prediction(None, np.array([1, 2, 3]), 2)
+    with config_context(array_api_dispatch=True):
+        result = model.predict(X=None, y=y_data, forecast_horizon=4)
+
+    assert result.__array_namespace__() is xp
+    assert xp.isdtype(result.dtype, "real floating")
+    xp_assert_allclose(result, expected)
+    xp_assert_array_equal(y_data, y_numpy)
+    assert model.theta is original_theta
+    assert model._prediction_exponents_cache is not None
+    assert model._prediction_exponents_cache_key is not None
+    assert model.n_inputs == 1
+
+
+def test_empty_array_api_prediction_skips_cpu_fallback_and_cache_warmup():
+    xp = pytest.importorskip("array_api_strict")
+    model = ArrayAPIPredictableMSS(model_type="NAR")
+    y_initial = xp.asarray(np.arange(model.max_lag, dtype=np.float32).reshape(-1, 1))
+
+    with config_context(array_api_dispatch=True):
+        prediction = model.predict(
+            X=None,
+            y=y_initial,
+            forecast_horizon=0,
+        )
+
+    assert prediction.__array_namespace__() is xp
+    xp_assert_array_equal(prediction, y_initial)
+    assert model._prediction_exponents_cache is None
+    assert model._prediction_exponents_cache_key is None
+
+
+def test_public_array_api_fallback_restores_nested_config_after_error():
+    xp = pytest.importorskip("array_api_strict")
+    model = ArrayAPIPredictableMSS(model_type="NAR")
+    model.final_model = np.array([[1001]])
+    model.theta = np.array([[0.5]])
+    model._prediction_dispatch = MagicMock(side_effect=RuntimeError("failed"))
+    y_data = xp.asarray(np.arange(model.max_lag, dtype=float).reshape(-1, 1))
+    original_dispatch = get_config()["array_api_dispatch"]
+
+    with config_context(array_api_dispatch=True):
+        with pytest.raises(RuntimeError, match="failed"):
+            model.predict(X=None, y=y_data, forecast_horizon=3)
+        assert get_config()["array_api_dispatch"] is True
+
+    assert get_config()["array_api_dispatch"] is original_dispatch
+
+
+def test_n_step_ahead_prediction_nfir_delegates_to_feed_forward_kernel():
+    model = PredictableMSS(model_type="NFIR")
+    x_data = np.arange(model.max_lag + 3, dtype=float).reshape(-1, 1)
+    y_data = np.arange(len(x_data), dtype=float).reshape(-1, 1)
+
+    result = model._n_step_ahead_prediction(x_data, y_data, steps_ahead=2)
+    expected = model._model_prediction(x_data, y_data)
+
+    assert_array_equal(result, expected)

@@ -11,8 +11,6 @@ import numpy as np
 from sysidentpy._lib._array_api import (
     _asarray,
     _concat,
-    _get_namespace_and_device,
-    _is_numpy_namespace,
     get_namespace,
     _copy,
     device as _device,
@@ -34,7 +32,7 @@ from sysidentpy.utils.lags import (
     get_lag_from_regressor_code,
 )
 
-from ..utils.check_arrays import check_positive_int, num_features
+from ..utils.check_arrays import num_features
 from ..parameter_estimation.estimators import (
     LeastSquares,
     RidgeRegression,
@@ -251,7 +249,7 @@ class SimulateNARMAX(BaseMSS):
                 f"model_type must be NARMAX, NAR, or NFIR. Got {self.model_type}"
             )
 
-    def _check_simulate_params(self, y_train, y_test, model_code, steps_ahead, theta):
+    def _check_simulate_params(self, y_train, y_test, model_code, theta):
         if not isinstance(self.basis_function, Polynomial):
             raise NotImplementedError(
                 "Currently, SimulateNARMAX only works for polynomial models."
@@ -265,11 +263,6 @@ class SimulateNARMAX(BaseMSS):
         if model_code.ndim != 2:
             raise ValueError(
                 "model_code must be a two-dimensional array with one row per term"
-            )
-
-        if not isinstance(steps_ahead, (int, type(None))):
-            raise ValueError(
-                f"steps_ahead must be None or integer > zero. Got {steps_ahead}"
             )
 
         if not isinstance(theta, np.ndarray) and not self.estimate_parameter:
@@ -375,8 +368,8 @@ class SimulateNARMAX(BaseMSS):
             Encoded representation of the model's regressors, defining
             the input-output relationships in the system.
         steps_ahead : int, optional
-            Number of steps ahead for multi-step prediction. If `None`, defaults to
-            one-step-ahead prediction.
+            ``None`` selects free-run simulation, 1 selects one-step-ahead
+            prediction, and values greater than 1 select n-step-ahead prediction.
         theta : array-like, shape (n_terms, 1) or (n_terms,), optional
             Precomputed model parameters. Required if `estimate_parameter=False`.
             Parameters must follow the row order of `model_code`.
@@ -429,7 +422,23 @@ class SimulateNARMAX(BaseMSS):
         ... )
 
         """
-        self._check_simulate_params(y_train, y_test, model_code, steps_ahead, theta)
+        self._check_simulate_params(y_train, y_test, model_code, theta)
+
+        if getattr(y_test, "ndim", None) != 2 or y_test.shape[1] != 1:
+            raise ValueError(
+                "y must be a 2D array with a single column. "
+                f"Got shape {getattr(y_test, 'shape', None)}."
+            )
+        if steps_ahead is not None:
+            steps_ahead = self._normalize_prediction_integer(
+                steps_ahead,
+                "steps_ahead",
+                allow_zero=False,
+            )
+        if X_test is not None and getattr(X_test, "ndim", None) != 2:
+            raise ValueError(
+                f"X must be a 2D array. Got shape {getattr(X_test, 'shape', None)}."
+            )
 
         if X_test is not None:
             self.n_inputs = num_features(X_test)
@@ -640,9 +649,6 @@ class SimulateNARMAX(BaseMSS):
         Given a previously trained model, predict values given
         a new set of data.
 
-        This method accept y values mainly for prediction n-steps ahead
-        (to be implemented in the future)
-
         Parameters
         ----------
         X : array_like
@@ -650,10 +656,12 @@ class SimulateNARMAX(BaseMSS):
         y : array_like
             The output data to be used in the prediction process.
         steps_ahead : int
-            The user can use free run simulation, one-step ahead prediction
-            and n-step ahead prediction. The default is None
+            ``None`` selects free-run simulation, 1 selects one-step-ahead
+            prediction, and values greater than 1 select n-step-ahead
+            prediction. The default is None.
         forecast_horizon : int
-            The number of predictions over the time. The default is None
+            Number of values predicted beyond the initial conditions for a NAR
+            free-run prediction when ``X`` is ``None``. The default is None.
 
         Returns
         -------
@@ -661,46 +669,17 @@ class SimulateNARMAX(BaseMSS):
             The predicted values of the model.
 
         """
-        xp, target_device = _get_namespace_and_device(X, y)
-        if steps_ahead != 1 and not _is_numpy_namespace(xp):
-            return self._predict_on_cpu(
-                X=X,
-                y=y,
-                steps_ahead=steps_ahead,
-                forecast_horizon=forecast_horizon,
-                original_xp=xp,
-                target_device=target_device,
+        if not isinstance(self.basis_function, Polynomial):
+            raise NotImplementedError(
+                "You can only use Polynomial Basis Function in SimulateNARMAX for "
+                "now."
             )
-
-        if isinstance(self.basis_function, Polynomial):
-            if steps_ahead is None:
-                yhat = self._model_prediction(X, y, forecast_horizon=forecast_horizon)
-                yhat = _concat(xp, [y[: self.max_lag, ...], yhat], axis=0)
-                return yhat
-            if steps_ahead == 1:
-                yhat = self._one_step_ahead_prediction(X, y)
-                yhat = _concat(xp, [y[: self.max_lag, ...], yhat], axis=0)
-                return yhat
-
-            check_positive_int(steps_ahead, "steps_ahead")
-            yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
-            yhat = _concat(xp, [y[: self.max_lag, ...], yhat], axis=0)
-            return yhat
-
-        if steps_ahead is None:
-            yhat = self._basis_function_predict(X, y, forecast_horizon=forecast_horizon)
-            yhat = _concat(xp, [y[: self.max_lag, ...], yhat], axis=0)
-            return yhat
-        if steps_ahead == 1:
-            yhat = self._one_step_ahead_prediction(X, y)
-            yhat = _concat(xp, [y[: self.max_lag, ...], yhat], axis=0)
-            return yhat
-
-        yhat = self._basis_function_n_step_prediction(
-            X, y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
+        return super().predict(
+            X=X,
+            y=y,
+            steps_ahead=steps_ahead,
+            forecast_horizon=forecast_horizon,
         )
-        yhat = _concat(xp, [y[: self.max_lag, ...], yhat], axis=0)
-        return yhat
 
     def _one_step_ahead_prediction(self, x_base, y=None):
         """Perform the 1-step-ahead prediction of a model.
@@ -735,74 +714,6 @@ class SimulateNARMAX(BaseMSS):
         yhat = super()._one_step_ahead_prediction(x_tmp)
         return xp.reshape(yhat, (-1, 1))
 
-    def _n_step_ahead_prediction(self, x, y, steps_ahead):
-        """Perform the n-steps-ahead prediction of a model.
-
-        Parameters
-        ----------
-        y : array-like of shape = max_lag
-            Initial conditions values of the model
-            to start recursive process.
-        x : array_like of shape = n_samples
-            Vector with input values to be used in model simulation.
-
-        Returns
-        -------
-        yhat : array_like
-               The n-steps-ahead predicted values of the model.
-
-        """
-        yhat = super()._n_step_ahead_prediction(x, y, steps_ahead)
-        return yhat
-
-    def _model_prediction(self, x, y_initial, forecast_horizon=None):
-        """Perform the infinity steps-ahead simulation of a model.
-
-        Parameters
-        ----------
-        y_initial : array-like of shape = max_lag
-            Number of initial conditions values of output
-            to start recursive process.
-        x : array_like of shape = n_samples
-            Vector with input values to be used in model simulation.
-
-        Returns
-        -------
-        yhat : array_like
-               The predicted values of the model.
-
-        """
-        if self.model_type in ["NARMAX", "NAR"]:
-            return self._narmax_predict(x, y_initial, forecast_horizon)
-        if self.model_type == "NFIR":
-            return self._nfir_predict(x, y_initial)
-
-        raise ValueError(
-            f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
-        )
-
-    def _narmax_predict(self, x, y_initial, forecast_horizon=1):
-        if y_initial.shape[0] < self.max_lag:
-            raise ValueError(
-                "Insufficient initial condition elements! Expected at least"
-                f" {self.max_lag} elements."
-            )
-
-        if x is not None:
-            forecast_horizon = x.shape[0]
-        else:
-            forecast_horizon = forecast_horizon + self.max_lag
-
-        if self.model_type == "NAR":
-            self.n_inputs = 0
-
-        y_output = super()._narmax_predict(x, y_initial, forecast_horizon)
-        return y_output
-
-    def _nfir_predict(self, x, y_initial):
-        y_output = super()._nfir_predict(x, y_initial)
-        return y_output
-
     def _basis_function_predict(self, x, y_initial, forecast_horizon=None):
         """Not implemented."""
         raise NotImplementedError(
@@ -810,12 +721,6 @@ class SimulateNARMAX(BaseMSS):
         )
 
     def _basis_function_n_step_prediction(self, x, y, steps_ahead, forecast_horizon):
-        """Not implemented."""
-        raise NotImplementedError(
-            "You can only use Polynomial Basis Function in SimulateNARMAX for now."
-        )
-
-    def _basis_function_n_steps_horizon(self, x, y, steps_ahead, forecast_horizon):
         """Not implemented."""
         raise NotImplementedError(
             "You can only use Polynomial Basis Function in SimulateNARMAX for now."

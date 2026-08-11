@@ -3,13 +3,12 @@ import pytest
 from numpy.testing import assert_allclose
 from scipy.stats import t as student_t
 
-from sysidentpy.basis_function import Polynomial
+from sysidentpy.basis_function import Fourier, Polynomial
 from sysidentpy.model_structure_selection import (
     meta_model_structure_selection as meta_module,
 )
 from sysidentpy.model_structure_selection.meta_model_structure_selection import MetaMSS
 from sysidentpy.parameter_estimation.estimators import TotalLeastSquares
-from sysidentpy.simulation import SimulateNARMAX
 
 
 def test_meta_mss_fit_requires_y():
@@ -321,9 +320,7 @@ def test_perform_t_test_accepts_single_output_vectors():
         psi, theta.reshape(-1, 1), residues.reshape(-1, 1)
     )
 
-    for vector_value, column_value in zip(
-        vector_result, column_result, strict=True
-    ):
+    for vector_value, column_value in zip(vector_result, column_result, strict=True):
         assert_allclose(vector_value, column_value)
 
 
@@ -815,7 +812,7 @@ def test_predict_free_run_uses_model_prediction(monkeypatch):
 
     def fake_model_prediction(self, X, y, forecast_horizon=None):
         calls["args"] = (X, y, forecast_horizon)
-        return np.array([[10.0]])
+        return np.array([[10.0], [11.0], [12.0]])
 
     monkeypatch.setattr(MetaMSS, "_model_prediction", fake_model_prediction)
 
@@ -825,7 +822,10 @@ def test_predict_free_run_uses_model_prediction(monkeypatch):
 
     assert calls["args"][2] == 2
     assert np.array_equal(result[: model.max_lag], y[: model.max_lag])
-    assert np.array_equal(result[model.max_lag :], np.array([[10.0]]))
+    assert np.array_equal(
+        result[model.max_lag :],
+        np.array([[10.0], [11.0], [12.0]]),
+    )
 
 
 def test_predict_one_step_branch(monkeypatch):
@@ -833,7 +833,7 @@ def test_predict_one_step_branch(monkeypatch):
     model.max_lag = 1
 
     def fake_one_step(self, X, y):
-        return np.array([[5.0], [6.0]])
+        return np.array([[5.0], [6.0], [7.0]])
 
     monkeypatch.setattr(MetaMSS, "_one_step_ahead_prediction", fake_one_step)
 
@@ -842,7 +842,10 @@ def test_predict_one_step_branch(monkeypatch):
     result = model.predict(X=X, y=y, steps_ahead=1)
 
     assert np.array_equal(result[: model.max_lag], y[: model.max_lag])
-    assert np.array_equal(result[model.max_lag :], np.array([[5.0], [6.0]]))
+    assert np.array_equal(
+        result[model.max_lag :],
+        np.array([[5.0], [6.0], [7.0]]),
+    )
 
 
 def test_predict_n_step_branch(monkeypatch):
@@ -850,7 +853,7 @@ def test_predict_n_step_branch(monkeypatch):
     model.max_lag = 2
 
     def fake_n_step(self, X, y, steps_ahead=None):
-        return np.array([[7.0]])
+        return np.array([[7.0], [8.0], [9.0], [10.0]])
 
     monkeypatch.setattr(MetaMSS, "_n_step_ahead_prediction", fake_n_step)
 
@@ -859,78 +862,67 @@ def test_predict_n_step_branch(monkeypatch):
     result = model.predict(X=X, y=y, steps_ahead=2)
 
     assert np.array_equal(result[: model.max_lag], y[: model.max_lag])
-    assert np.array_equal(result[model.max_lag :], np.array([[7.0]]))
-
-
-def test_one_step_ahead_prediction_returns_column_vector(monkeypatch):
-    def fake_super(self, x, y):
-        return np.array([1.0, 2.0])
-
-    monkeypatch.setattr(SimulateNARMAX, "_one_step_ahead_prediction", fake_super)
-
-    model = MetaMSS()
-    result = model._one_step_ahead_prediction(np.zeros((2, 1)), np.zeros((2, 1)))
-
-    assert result.shape == (2, 1)
-    assert np.array_equal(result, np.array([[1.0], [2.0]]))
-
-
-def test_n_step_ahead_prediction_passthrough(monkeypatch):
-    def fake_super(self, x, y, steps):
-        return np.array([[8.0]])
-
-    monkeypatch.setattr(SimulateNARMAX, "_n_step_ahead_prediction", fake_super)
-
-    model = MetaMSS()
-    result = model._n_step_ahead_prediction(
-        np.zeros((2, 1)), np.zeros((2, 1)), steps_ahead=3
+    assert np.array_equal(
+        result[model.max_lag :],
+        np.array([[7.0], [8.0], [9.0], [10.0]]),
     )
 
-    assert np.array_equal(result, np.array([[8.0]]))
+
+@pytest.mark.parametrize("steps_ahead", [None, 1, 3])
+def test_predict_rejects_non_polynomial_basis(steps_ahead):
+    model = MetaMSS(basis_function=Fourier())
+
+    with pytest.raises(NotImplementedError, match="other than polynomial"):
+        model.predict(
+            X=np.ones((2, 1)),
+            y=np.ones((2, 1)),
+            steps_ahead=steps_ahead,
+        )
 
 
-def test_model_prediction_dispatches_and_validates(monkeypatch):
-    model = MetaMSS()
-    model.model_type = "NARMAX"
-    narmax_called = {}
-
-    def fake_narmax(self, x, y_initial, forecast_horizon):
-        narmax_called["called"] = True
-        return np.array([[2.0]])
-
-    monkeypatch.setattr(MetaMSS, "_narmax_predict", fake_narmax)
-
-    result = model._model_prediction(
-        np.zeros((1, 1)), np.zeros((1, 1)), forecast_horizon=3
+def test_predict_nar_promotes_integer_output_without_mutating_state():
+    model = MetaMSS(
+        model_type="NAR",
+        basis_function=Polynomial(degree=1, include_bias=False),
     )
-    assert narmax_called["called"]
-    assert np.array_equal(result, np.array([[2.0]]))
+    model.max_lag = 1
+    model.n_inputs = 1
+    model.final_model = np.array([[1001]])
+    model.theta = np.array([[0.5]])
+    y = np.array([[3], [100], [100], [100], [100]])
 
-    nfir_called = {}
+    prediction = model.predict(X=None, y=y, steps_ahead=2)
 
-    def fake_nfir(self, x, y_initial):
-        nfir_called["called"] = True
-        return np.array([[3.0]])
-
-    monkeypatch.setattr(MetaMSS, "_nfir_predict", fake_nfir)
-
-    model.model_type = "NFIR"
-    result = model._model_prediction(np.zeros((1, 1)), np.zeros((1, 1)))
-    assert nfir_called["called"]
-    assert np.array_equal(result, np.array([[3.0]]))
-
-    model.model_type = "UNKNOWN"
-    with pytest.raises(ValueError, match="model_type must be"):
-        model._model_prediction(np.zeros((1, 1)), np.zeros((1, 1)))
+    assert model.n_inputs == 1
+    assert np.issubdtype(prediction.dtype, np.floating)
+    np.testing.assert_allclose(
+        prediction,
+        np.array([[3.0], [1.5], [0.75], [50.0], [25.0]]),
+        rtol=1e-12,
+        atol=1e-12,
+    )
 
 
-def test_nfir_predict_delegates_to_super(monkeypatch):
-    def fake_super(self, x, y_initial):
-        return np.array([[4.0]])
+def test_predict_nfir_uses_shared_memoryless_contract():
+    model = MetaMSS(
+        model_type="NFIR",
+        basis_function=Polynomial(degree=1, include_bias=False),
+    )
+    model.max_lag = 1
+    model.n_inputs = 1
+    model.final_model = np.array([[2001]])
+    model.pivv = np.array([0])
+    model.theta = np.array([[0.5]])
+    x = np.arange(1, 7, dtype=np.int64).reshape(-1, 1)
+    y = np.full((6, 1), 9, dtype=np.int64)
 
-    monkeypatch.setattr(SimulateNARMAX, "_nfir_predict", fake_super)
+    prediction = model.predict(X=x, y=y, steps_ahead=3)
 
-    model = MetaMSS()
-    result = model._nfir_predict(np.zeros((1, 1)), np.zeros((1, 1)))
-
-    assert np.array_equal(result, np.array([[4.0]]))
+    assert prediction.shape == y.shape
+    assert np.issubdtype(prediction.dtype, np.floating)
+    np.testing.assert_allclose(
+        prediction,
+        np.array([[9.0], [0.5], [1.0], [1.5], [2.0], [2.5]]),
+        rtol=1e-12,
+        atol=1e-12,
+    )
