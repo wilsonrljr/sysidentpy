@@ -204,6 +204,70 @@ def test_raises():
     )
 
 
+def test_simulate_uses_shared_steps_ahead_validation():
+    simulator = SimulateNARMAX(
+        model_type="NAR",
+        basis_function=Polynomial(degree=1, include_bias=False),
+        estimate_parameter=False,
+    )
+    y_data = np.arange(6.0).reshape(-1, 1)
+    model_code = np.array([[1001]])
+    theta = np.array([[0.5]])
+
+    prediction = simulator.simulate(
+        X_test=None,
+        y_test=y_data,
+        model_code=model_code,
+        theta=theta,
+        steps_ahead=np.int64(2),
+    )
+
+    assert prediction.shape == y_data.shape
+    for invalid_steps in (True, np.bool_(True), 1.5, 0, -1):
+        with pytest.raises(ValueError, match="steps_ahead"):
+            simulator.simulate(
+                X_test=None,
+                y_test=y_data,
+                model_code=model_code,
+                theta=theta,
+                steps_ahead=invalid_steps,
+            )
+
+
+@pytest.mark.parametrize(
+    "invalid_y",
+    [
+        pytest.param(np.arange(6.0), id="one-dimensional"),
+        pytest.param(np.array(1.0), id="scalar"),
+        pytest.param([1.0, 2.0, 3.0], id="list"),
+    ],
+)
+def test_simulate_rejects_invalid_prediction_shapes(invalid_y):
+    simulator = SimulateNARMAX(
+        model_type="NAR",
+        basis_function=Polynomial(degree=1, include_bias=False),
+        estimate_parameter=False,
+    )
+    model_code = np.array([[1001]])
+    theta = np.array([[0.5]])
+
+    with pytest.raises(ValueError, match="y must be a 2D array"):
+        simulator.simulate(
+            X_test=None,
+            y_test=invalid_y,
+            model_code=model_code,
+            theta=theta,
+        )
+
+    with pytest.raises(ValueError, match="X must be a 2D array"):
+        simulator.simulate(
+            X_test=np.arange(6.0),
+            y_test=np.arange(6.0).reshape(-1, 1),
+            model_code=model_code,
+            theta=theta,
+        )
+
+
 def test_estimate_parameter_conditions():
     x_train, x_valid, y_train, y_valid = get_siso_data(
         n=1000, colored_noise=False, sigma=0.001, train_percentage=90
@@ -230,7 +294,7 @@ def test_estimate_parameter_conditions():
     )
 
 
-def test_input_dimension():
+def test_nar_prediction_does_not_mutate_input_dimension():
     _x_train, _x_valid, _y_train, y_valid = get_siso_data(
         n=1000, colored_noise=False, sigma=0.001, train_percentage=90
     )
@@ -252,7 +316,12 @@ def test_input_dimension():
     _ = s.simulate(
         X_test=None, y_test=y_valid, model_code=model, theta=theta, forecast_horizon=1
     )
-    assert s.n_inputs == 0
+    n_inputs = s.n_inputs
+
+    _ = s.predict(X=None, y=y_valid, forecast_horizon=1)
+
+    assert n_inputs == 1
+    assert s.n_inputs == n_inputs
 
 
 def test_miso_dimension():
@@ -553,6 +622,23 @@ def _segmented_nar_free_run_reference(simulator, y, steps_ahead):
     return reference
 
 
+def _segmented_narmax_free_run_reference(simulator, x, y, steps_ahead):
+    reference = np.full_like(y, np.nan)
+    reference[: simulator.max_lag] = y[: simulator.max_lag]
+
+    for block_start in range(simulator.max_lag, len(y), steps_ahead):
+        block_horizon = min(steps_ahead, len(y) - block_start)
+        window_start = block_start - simulator.max_lag
+        free_run = simulator.predict(
+            X=x[window_start : block_start + block_horizon],
+            y=y[window_start:block_start],
+            steps_ahead=None,
+        )
+        reference[block_start : block_start + block_horizon] = free_run[-block_horizon:]
+
+    return reference
+
+
 def test_simulate_polynomial_without_bias_rejects_bias_model_code():
     _, x_valid, _, y_valid = _small_siso_dataset()
     simulator = SimulateNARMAX(
@@ -780,6 +866,96 @@ def test_predict_paths_cover_all_branches():
     assert multi_step.shape == y_valid.shape
 
 
+def test_simulate_narmax_n_step_matches_segmented_free_runs():
+    _, x_valid, _, y_valid = _small_siso_dataset()
+    simulator = SimulateNARMAX(
+        basis_function=Polynomial(),
+        estimate_parameter=False,
+    )
+    model = np.array([[1001, 0], [2001, 1001], [2002, 0]])
+    theta = np.array([[0.2, 0.9, 0.1]]).T
+    simulator.simulate(
+        X_test=x_valid,
+        y_test=y_valid,
+        model_code=model,
+        theta=theta,
+    )
+
+    prediction = simulator.predict(X=x_valid, y=y_valid, steps_ahead=3)
+    expected = _segmented_narmax_free_run_reference(
+        simulator,
+        x_valid,
+        y_valid,
+        3,
+    )
+
+    assert prediction.shape == y_valid.shape
+    np.testing.assert_array_equal(
+        prediction[: simulator.max_lag],
+        y_valid[: simulator.max_lag],
+    )
+    np.testing.assert_allclose(prediction, expected, rtol=1e-12, atol=1e-12)
+
+
+def test_predict_empty_interval_returns_initial_conditions_without_state_change():
+    y = np.array([[3], [2]], dtype=np.int64)
+    simulator = SimulateNARMAX(
+        model_type="NAR",
+        basis_function=Polynomial(degree=1, include_bias=False),
+        estimate_parameter=False,
+    )
+    simulator.max_lag = len(y)
+    simulator.n_inputs = 1
+
+    prediction = simulator.predict(X=None, y=y, steps_ahead=3)
+
+    np.testing.assert_array_equal(prediction, y)
+    assert prediction is not y
+    assert prediction.dtype == y.dtype
+    assert simulator.n_inputs == 1
+
+
+@pytest.mark.parametrize("steps_ahead", [None, 1, 3])
+def test_simulate_nfir_prediction_is_independent_of_steps_ahead(steps_ahead):
+    x = np.arange(1, 7, dtype=np.int64).reshape(-1, 1)
+    y = np.full((6, 1), 9, dtype=np.int64)
+    simulator = SimulateNARMAX(
+        model_type="NFIR",
+        basis_function=Polynomial(degree=1, include_bias=False),
+        estimate_parameter=False,
+    )
+    expected = np.array([[9.0], [0.5], [1.0], [1.5], [2.0], [2.5]])
+    simulator.simulate(
+        X_test=x,
+        y_test=y,
+        model_code=np.array([[2001]]),
+        theta=np.array([[0.5]]),
+    )
+
+    prediction = simulator.predict(X=x, y=y, steps_ahead=steps_ahead)
+
+    assert prediction.shape == y.shape
+    assert np.issubdtype(prediction.dtype, np.floating)
+    np.testing.assert_allclose(prediction, expected, rtol=1e-12, atol=1e-12)
+
+
+@pytest.mark.parametrize("steps_ahead", [0, -1, 1.5, True])
+def test_predict_uses_shared_steps_ahead_validation(steps_ahead):
+    simulator = SimulateNARMAX(
+        model_type="NAR",
+        basis_function=Polynomial(),
+        estimate_parameter=False,
+    )
+    simulator.max_lag = 1
+
+    with pytest.raises(ValueError, match="steps_ahead must"):
+        simulator.predict(
+            X=None,
+            y=np.ones((2, 1)),
+            steps_ahead=steps_ahead,
+        )
+
+
 @pytest.mark.parametrize("include_bias", [True, False])
 def test_simulate_nar_n_step_matches_segmented_free_runs(include_bias):
     y = _nar_observed_series()
@@ -980,6 +1156,8 @@ def test_predict_rejects_mixed_array_api_namespaces():
     array_api_strict = pytest.importorskip("array_api_strict")
     torch = pytest.importorskip("torch")
     simulator = SimulateNARMAX(basis_function=Polynomial(), estimate_parameter=False)
+    simulator.max_lag = 1
+    simulator.n_inputs = 1
 
     x_data = torch.tensor(np.arange(4.0).reshape(-1, 1), dtype=torch.float64)
     y_data = array_api_strict.asarray(
@@ -1067,63 +1245,13 @@ def test_error_reduction_ratio_matches_numpy_for_torch_tensors():
     xp_assert_allclose(psi_orth_t, psi_orth_np, rtol=1e-10, atol=1e-12)
 
 
-class _FourierPredictStub(SimulateNARMAX):
-    """Stub that bypasses basis function NotImplemented branches."""
-
-    def __init__(self):
-        super().__init__(basis_function=Fourier(), estimate_parameter=False)
-        self.max_lag = 1
-        self.calls = []
-
-    def _basis_function_predict(self, *_args, **_kwargs):
-        self.calls.append("predict")
-        return np.array([[0.25]])
-
-    def _basis_function_n_step_prediction(self, *_args, **_kwargs):
-        self.calls.append("n_step")
-        return np.array([[0.75]])
-
-    def _one_step_ahead_prediction(self, *_args, **_kwargs):
-        self.calls.append("one_step")
-        return np.array([[0.5]])
-
-    def _basis_function_n_steps_horizon(self, *_args, **_kwargs):
-        self.calls.append("n_steps_horizon")
-        return np.array([[0.0]])
-
-    def fit(self, *, X=None, y=None):
-        raise NotImplementedError
-
-
-def test_predict_with_fourier_basis_raises_not_implemented():
+@pytest.mark.parametrize("steps_ahead", [None, 1, 3])
+def test_predict_with_fourier_basis_raises_not_implemented(steps_ahead):
     simulator = SimulateNARMAX(basis_function=Fourier(), estimate_parameter=False)
     simulator.max_lag = 1
+    simulator.n_inputs = 1
+    x = np.ones((2, 1))
     y = np.ones((2, 1))
-    assert_raises(NotImplementedError, simulator.predict, X=None, y=y)
 
-
-def test_non_polynomial_predict_free_run_uses_stub_result():
-    simulator = _FourierPredictStub()
-    y = np.array([[1.0], [0.0]])
-    result = simulator.predict(X=None, y=y)
-    expected = np.concatenate([y[: simulator.max_lag], np.array([[0.25]])], axis=0)
-    assert np.allclose(result, expected)
-    assert simulator.calls == ["predict"]
-
-
-def test_non_polynomial_predict_one_step_uses_stub_result():
-    simulator = _FourierPredictStub()
-    y = np.array([[2.0], [0.0]])
-    result = simulator.predict(X=None, y=y, steps_ahead=1)
-    expected = np.concatenate([y[: simulator.max_lag], np.array([[0.5]])], axis=0)
-    assert np.allclose(result, expected)
-    assert simulator.calls == ["one_step"]
-
-
-def test_non_polynomial_predict_n_step_uses_stub_result():
-    simulator = _FourierPredictStub()
-    y = np.array([[3.0], [0.0]])
-    result = simulator.predict(X=None, y=y, steps_ahead=3)
-    expected = np.concatenate([y[: simulator.max_lag], np.array([[0.75]])], axis=0)
-    assert np.allclose(result, expected)
-    assert simulator.calls == ["n_step"]
+    with pytest.raises(NotImplementedError, match="Polynomial Basis Function"):
+        simulator.predict(X=x, y=y, steps_ahead=steps_ahead)

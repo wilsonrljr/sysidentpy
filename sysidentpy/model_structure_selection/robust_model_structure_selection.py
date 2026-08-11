@@ -1050,34 +1050,3 @@ class RMSS(OFRBase):
 
         self.theta = self._estimate_theta(self._reg_matrices, self._targets)
         return self
-
-    def predict(
-        self,
-        *,
-        X: Optional[np.ndarray] = None,
-        y: np.ndarray,
-        steps_ahead: Optional[int] = None,
-        forecast_horizon: Optional[int] = None,
-    ) -> np.ndarray:
-        """Predict using the fitted RMSS model.
-
-        Parameters
-        ----------
-        X : np.ndarray, optional
-            Input data for prediction. Can be None for NAR models.
-        y : np.ndarray
-            Output data with initial conditions for prediction.
-        steps_ahead : int, optional
-            Number of steps ahead for multi-step prediction. If None,
-            performs free-run simulation.
-        forecast_horizon : int, optional
-            Number of samples to forecast beyond the input data.
-
-        Returns
-        -------
-        np.ndarray
-            Predicted output values.
-        """
-        return super().predict(
-            X=X, y=y, steps_ahead=steps_ahead, forecast_horizon=forecast_horizon
-        )

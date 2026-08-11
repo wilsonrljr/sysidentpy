@@ -7,25 +7,28 @@
 import math
 from abc import ABCMeta, abstractmethod
 from collections import Counter
+from copy import copy
 from itertools import chain, combinations_with_replacement
+from operator import index
 from typing import Any, List, Optional, Tuple, Union
 
 import numpy as np
 
+from sysidentpy._config import config_context
 from sysidentpy._lib._array_api import (
+    _get_namespace_and_device,
     _asarray,
     _copy,
     _concat,
     _is_numpy_namespace,
     _zeros,
     _pow,
+    _supports_numpy_metadata_indices,
     _to_numpy,
     _vector_norm,
-    _vstack,
     device as _device,
     get_namespace,
 )
-from sysidentpy.utils.check_arrays import check_positive_int
 from sysidentpy.utils.information_matrix import (
     build_output_matrix,
     build_input_matrix,
@@ -41,15 +44,6 @@ def _find_method_owner(cls: type, method_name: str) -> Optional[type]:
         if method_name in parent.__dict__:
             return parent
     return None
-
-
-def _recursive_prediction_dtype(xp, dtype):
-    """Return a floating dtype when recursive prediction inputs are integral."""
-    if _is_numpy_namespace(xp):
-        return np.dtype(float) if np.dtype(dtype).kind in "biu" else dtype
-    if xp.isdtype(dtype, ("bool", "integral")):
-        return xp.asarray(1.0).dtype
-    return dtype
 
 
 class RegressorDictionary:
@@ -400,14 +394,13 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         self.theta = None
         self.final_model = None
         self.pivv = None
-        self._polynomial_narmax_predict_cache = None
-        self._polynomial_narmax_predict_cache_key = None
+        self._prediction_exponents_cache = None
+        self._prediction_exponents_cache_key = None
 
     @abstractmethod
     def fit(self, *, X, y):
         """Abstract method."""
 
-    @abstractmethod
     def predict(
         self,
         *,
@@ -416,7 +409,284 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         steps_ahead: Optional[int] = None,
         forecast_horizon: int = 1,
     ) -> np.ndarray:
-        """Abstract method."""
+        """Return predictions for the configured model.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_inputs), optional
+            Input data. It is required for NARMAX and NFIR models. For NAR
+            free-run prediction, a provided array preserves the historical
+            behavior where its number of rows defines the prediction length.
+        y : ndarray of shape (n_samples, 1)
+            Output data. The first ``max_lag`` rows are the initial conditions.
+        steps_ahead : int, optional
+            ``None`` selects free-run prediction, 1 selects one-step-ahead
+            prediction, and larger values select blockwise n-step prediction.
+        forecast_horizon : int, default=1
+            Number of values predicted beyond the initial conditions for a NAR
+            free-run prediction when ``X`` is ``None``.
+
+        Returns
+        -------
+        ndarray of shape (n_predictions, 1)
+            Predictions including the initial conditions.
+        """
+        return self._predict(
+            X=X,
+            y=y,
+            steps_ahead=steps_ahead,
+            forecast_horizon=forecast_horizon,
+        )
+
+    def _normalize_prediction_integer(
+        self,
+        value,
+        name: str,
+        *,
+        allow_zero: bool,
+    ) -> int:
+        """Normalize an integer used by the prediction API."""
+        value_dtype = getattr(value, "dtype", None)
+        dtype_name = getattr(value_dtype, "name", None)
+        if dtype_name is None and value_dtype is not None:
+            dtype_name = str(value_dtype).rsplit(".", maxsplit=1)[-1]
+        if isinstance(value, (bool, np.bool_)) or dtype_name in ("bool", "bool_"):
+            raise ValueError(f"{name} must be an integer. Got {value!r}.")
+
+        try:
+            normalized_value = index(value)
+        except TypeError as exc:
+            raise ValueError(f"{name} must be an integer. Got {value!r}.") from exc
+
+        minimum = 0 if allow_zero else 1
+        if normalized_value < minimum:
+            comparison = "greater than or equal to zero" if allow_zero else "positive"
+            raise ValueError(f"{name} must be {comparison}. Got {normalized_value}.")
+        return normalized_value
+
+    def _validate_prediction_inputs(
+        self,
+        X,
+        y,
+        steps_ahead,
+        forecast_horizon,
+    ) -> tuple[Optional[int], Optional[int]]:
+        """Validate and normalize inputs at the public prediction boundary."""
+        self._validate_prediction_array_shapes(X, y)
+
+        normalized_steps = None
+        if steps_ahead is not None:
+            normalized_steps = self._normalize_prediction_integer(
+                steps_ahead,
+                "steps_ahead",
+                allow_zero=False,
+            )
+
+        if self.model_type in ("NARMAX", "NFIR"):
+            self._validate_input_model_prediction(X, y, normalized_steps)
+            return normalized_steps, forecast_horizon
+
+        if self.model_type != "NAR":
+            raise ValueError(
+                f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
+            )
+
+        normalized_horizon = self._validate_nar_prediction(
+            X,
+            normalized_steps,
+            forecast_horizon,
+        )
+        return normalized_steps, normalized_horizon
+
+    def _validate_prediction_array_shapes(self, X, y) -> None:
+        """Validate prediction arrays and the initial-condition length."""
+        if y is None:
+            raise ValueError("y cannot be None for prediction.")
+        if getattr(y, "ndim", None) != 2 or y.shape[1] != 1:
+            raise ValueError(
+                "y must be a 2D array with a single column. "
+                f"Got shape {getattr(y, 'shape', None)}."
+            )
+        if y.shape[0] < self.max_lag:
+            raise ValueError(
+                "Insufficient initial condition elements. Expected at least "
+                f"{self.max_lag} samples, got {y.shape[0]}."
+            )
+
+        if X is not None and getattr(X, "ndim", None) != 2:
+            raise ValueError(
+                f"X must be a 2D array. Got shape {getattr(X, 'shape', None)}."
+            )
+
+    def _validate_input_model_prediction(self, X, y, steps_ahead) -> None:
+        """Validate a NARMAX or NFIR prediction request."""
+        if X is None:
+            raise ValueError(f"X cannot be None for {self.model_type} prediction.")
+        if self.n_inputs is not None and X.shape[1] != self.n_inputs:
+            raise ValueError(
+                f"X must have {self.n_inputs} input column(s). Got {X.shape[1]}."
+            )
+        if steps_ahead is not None and X.shape[0] != y.shape[0]:
+            raise ValueError(
+                "X and y must contain the same number of samples for "
+                f"{self.model_type} one-step and n-step prediction. "
+                f"Got {X.shape[0]} and {y.shape[0]}."
+            )
+        if steps_ahead is None and X.shape[0] < self.max_lag:
+            raise ValueError(
+                f"X must contain at least {self.max_lag} samples for free-run "
+                f"prediction. Got {X.shape[0]}."
+            )
+
+    def _validate_nar_prediction(self, X, steps_ahead, forecast_horizon):
+        """Validate a NAR request and return its normalized free-run horizon."""
+        if steps_ahead is not None:
+            return forecast_horizon
+        if X is not None:
+            if X.shape[0] < self.max_lag:
+                raise ValueError(
+                    f"X must contain at least {self.max_lag} samples for "
+                    f"free-run prediction. Got {X.shape[0]}."
+                )
+            return forecast_horizon
+        if forecast_horizon is None:
+            raise ValueError(
+                "forecast_horizon cannot be None when X is None for NAR "
+                "free-run prediction."
+            )
+
+        return self._normalize_prediction_integer(
+            forecast_horizon,
+            "forecast_horizon",
+            allow_zero=True,
+        )
+
+    def _prediction_has_empty_suffix(
+        self,
+        X,
+        y,
+        steps_ahead: Optional[int],
+        forecast_horizon: Optional[int],
+    ) -> bool:
+        """Return whether a prediction request contains no target samples."""
+        if steps_ahead is not None:
+            return y.shape[0] == self.max_lag
+        if self.model_type == "NAR" and X is None:
+            return forecast_horizon == 0
+        return X.shape[0] == self.max_lag
+
+    def _prediction_dispatch(
+        self,
+        *,
+        X,
+        y,
+        steps_ahead: Optional[int],
+        forecast_horizon: Optional[int],
+    ):
+        """Dispatch validated prediction inputs and prepend initial conditions."""
+        xp = get_namespace(X, y)
+        prefix = y[: self.max_lag, ...]
+        if self._prediction_has_empty_suffix(X, y, steps_ahead, forecast_horizon):
+            return _copy(xp, prefix)
+
+        if self.model_type == "NFIR":
+            yhat = self._one_step_ahead_prediction(X, y)
+            return self._prepend_initial_conditions(xp, prefix, yhat)
+
+        if isinstance(self.basis_function, Polynomial):
+            if steps_ahead is None:
+                yhat = self._model_prediction(X, y, forecast_horizon=forecast_horizon)
+            elif steps_ahead == 1:
+                yhat = self._one_step_ahead_prediction(X, y)
+            else:
+                yhat = self._n_step_ahead_prediction(X, y, steps_ahead=steps_ahead)
+        elif steps_ahead is None:
+            yhat = self._basis_function_predict(
+                X,
+                y,
+                forecast_horizon=forecast_horizon,
+            )
+        elif steps_ahead == 1:
+            yhat = self._one_step_ahead_prediction(X, y)
+        else:
+            yhat = self._basis_function_n_step_prediction(
+                X,
+                y,
+                steps_ahead=steps_ahead,
+                forecast_horizon=forecast_horizon,
+            )
+        return self._prepend_initial_conditions(xp, prefix, yhat)
+
+    def _prepend_initial_conditions(self, xp, prefix, yhat):
+        """Return predictions in the public namespace with one prefix."""
+        target_device = _device(prefix)
+        yhat = _asarray(
+            yhat,
+            xp=xp,
+            target_device=target_device,
+        )
+        output_dtype = self._prediction_dtype(xp, prefix.dtype, yhat.dtype)
+        yhat = _asarray(
+            yhat,
+            xp=xp,
+            dtype=output_dtype,
+            target_device=target_device,
+        )
+        prefix = _asarray(
+            prefix,
+            xp=xp,
+            dtype=output_dtype,
+            target_device=target_device,
+        )
+        return _concat(xp, [prefix, yhat], axis=0)
+
+    def _predict(
+        self,
+        *,
+        X,
+        y,
+        steps_ahead,
+        forecast_horizon,
+        allow_cpu_fallback: bool = True,
+    ):
+        """Implement the shared public prediction workflow."""
+        steps_ahead, forecast_horizon = self._validate_prediction_inputs(
+            X,
+            y,
+            steps_ahead,
+            forecast_horizon,
+        )
+        if self.model_type == "NAR" and steps_ahead is not None:
+            X = None
+        xp, target_device = _get_namespace_and_device(X, y)
+        if self._prediction_has_empty_suffix(X, y, steps_ahead, forecast_horizon):
+            return self._prediction_dispatch(
+                X=X,
+                y=y,
+                steps_ahead=steps_ahead,
+                forecast_horizon=forecast_horizon,
+            )
+
+        requires_recursive_fallback = self.model_type != "NFIR" and steps_ahead != 1
+        requires_basis_fallback = not isinstance(
+            self.basis_function, Polynomial
+        ) and not _supports_numpy_metadata_indices(xp)
+        requires_cpu_fallback = requires_recursive_fallback or requires_basis_fallback
+        if allow_cpu_fallback and requires_cpu_fallback and not _is_numpy_namespace(xp):
+            return self._predict_on_cpu(
+                X=X,
+                y=y,
+                steps_ahead=steps_ahead,
+                forecast_horizon=forecast_horizon,
+                original_xp=xp,
+                target_device=target_device,
+            )
+        return self._prediction_dispatch(
+            X=X,
+            y=y,
+            steps_ahead=steps_ahead,
+            forecast_horizon=forecast_horizon,
+        )
 
     def _predict_on_cpu(
         self,
@@ -433,35 +703,91 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         Sequential NARX prediction (free-run and n-step-ahead) is inherently
         recursive: y[t] depends on y[t-1].  Each iteration operates on a tiny
         regressor vector, so GPU kernel-launch overhead dominates and makes the
-        loop ~20-30x slower than NumPy.  This helper transparently moves inputs
-        to CPU, runs the existing (fast) NumPy predict path, and returns the
-        result in the caller's original namespace/device.
+        loop slower than NumPy. This boundary also supports basis functions that
+        still use NumPy metadata for column selection. Inputs are transferred
+        once, prediction runs on a shallow model copy, and the result is returned
+        in the caller's original namespace and device.
         """
         X_np = _to_numpy(X) if X is not None else None
         y_np = _to_numpy(y)
 
-        original_theta = self.theta
-        try:
-            if self.theta is not None:
-                self.theta = _to_numpy(self.theta)
-            yhat_np = self.predict(
+        if isinstance(self.basis_function, Polynomial) and self.final_model is not None:
+            self._get_prediction_exponents()
+        cpu_model = copy(self)
+        theta = getattr(self, "theta", None)
+        if theta is not None:
+            cpu_model.theta = _to_numpy(theta)
+        with config_context(array_api_dispatch=False):
+            yhat_np = cpu_model._prediction_dispatch(
                 X=X_np,
                 y=y_np,
                 steps_ahead=steps_ahead,
                 forecast_horizon=forecast_horizon,
             )
-        finally:
-            self.theta = original_theta
 
-        output_dtype = y.dtype
-        if self.model_type == "NAR":
-            output_dtype = _recursive_prediction_dtype(original_xp, output_dtype)
+        output_dtype = self._prediction_output_dtype(
+            original_xp,
+            X,
+            y,
+            prediction_dtype=yhat_np.dtype,
+        )
 
         return _asarray(
             yhat_np,
             xp=original_xp,
             dtype=output_dtype,
             target_device=target_device,
+        )
+
+    def _prediction_n_inputs(self) -> int:
+        """Return the number of inputs used by prediction kernels."""
+        if self.model_type == "NAR":
+            return 0
+        return self.n_inputs
+
+    def _prediction_dtype(self, xp, *dtypes):
+        """Resolve a floating compute dtype for prediction operands."""
+        normalized_dtypes = []
+        default_float = xp.asarray(1.0).dtype
+        for dtype in dtypes:
+            if dtype is None:
+                continue
+            if _is_numpy_namespace(xp):
+                normalized = (
+                    default_float if np.dtype(dtype).kind in "biu" else np.dtype(dtype)
+                )
+            else:
+                dtype_name = getattr(dtype, "name", None)
+                if dtype_name is None:
+                    dtype_name = str(dtype).rsplit(".", maxsplit=1)[-1]
+                if dtype_name == "bool_":
+                    dtype_name = "bool"
+                namespace_dtype = getattr(xp, dtype_name, dtype)
+                normalized = (
+                    default_float
+                    if xp.isdtype(namespace_dtype, ("bool", "integral"))
+                    else namespace_dtype
+                )
+            normalized_dtypes.append(normalized)
+
+        if not normalized_dtypes:
+            return default_float
+        result_dtype = normalized_dtypes[0]
+        for dtype in normalized_dtypes[1:]:
+            result_dtype = xp.result_type(result_dtype, dtype)
+        return result_dtype
+
+    def _prediction_output_dtype(self, xp, X, y, prediction_dtype=None):
+        """Return the public output dtype for the active prediction namespace."""
+        data_dtype = y.dtype if self.model_type == "NAR" or X is None else X.dtype
+        theta = getattr(self, "theta", None)
+        theta_dtype = getattr(theta, "dtype", None)
+        return self._prediction_dtype(
+            xp,
+            data_dtype,
+            y.dtype,
+            theta_dtype,
+            prediction_dtype,
         )
 
     def _code2exponents(self, *, code: np.ndarray) -> np.ndarray:
@@ -479,15 +805,16 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         regressors = np.array(list(set(code)))
         regressors_count = Counter(code)
 
+        n_inputs = self._prediction_n_inputs()
         if np.all(regressors == 0):
-            return np.zeros(self.max_lag * (1 + self.n_inputs))
+            return np.zeros(self.max_lag * (1 + n_inputs))
 
         exponents = np.array([], dtype=float)
         elements = np.round(np.divide(regressors, 1000), 0)[(regressors > 0)].astype(
             int
         )
 
-        for j in range(1, self.n_inputs + 2):
+        for j in range(1, n_inputs + 2):
             base_exponents = np.zeros(self.max_lag, dtype=float)
             if j in elements:
                 for i in range(1, self.max_lag + 1):
@@ -500,166 +827,43 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
         return exponents
 
-    def _get_polynomial_narmax_predict_cache_key(self):
+    def _get_prediction_exponents_cache_key(self):
         final_model = np.asarray(self.final_model)
         degree = getattr(self.basis_function, "degree", None)
         return (
             self.model_type,
             self.max_lag,
-            self.n_inputs,
+            self._prediction_n_inputs(),
             degree,
             final_model.shape,
             final_model.dtype.str,
             final_model.tobytes(),
         )
 
-    def _get_polynomial_narmax_predict_exponents(self) -> np.ndarray:
-        cache_key = self._get_polynomial_narmax_predict_cache_key()
-        cached_key = getattr(self, "_polynomial_narmax_predict_cache_key", None)
-        if cached_key != cache_key or not hasattr(
-            self, "_polynomial_narmax_predict_cache"
-        ):
+    def _get_prediction_exponents(self) -> np.ndarray:
+        """Return a cached exponent matrix for the selected Polynomial model."""
+        cache_key = self._get_prediction_exponents_cache_key()
+        cached_key = getattr(self, "_prediction_exponents_cache_key", None)
+        if cached_key != cache_key or not hasattr(self, "_prediction_exponents_cache"):
             final_model = np.asarray(self.final_model)
             if final_model.shape[0] == 0:
                 exponent_matrix = np.zeros(
-                    (0, self.max_lag * (1 + self.n_inputs)),
+                    (0, self.max_lag * (1 + self._prediction_n_inputs())),
                     dtype=float,
                 )
             else:
                 exponent_matrix = np.vstack(
                     [self._code2exponents(code=model) for model in final_model]
                 )
-            self._polynomial_narmax_predict_cache = exponent_matrix
-            self._polynomial_narmax_predict_cache_key = cache_key
+            exponent_matrix.setflags(write=False)
+            self._prediction_exponents_cache = exponent_matrix
+            self._prediction_exponents_cache_key = cache_key
 
-        return self._polynomial_narmax_predict_cache
+        return self._prediction_exponents_cache
 
-    def _should_use_polynomial_narmax_fast_path(
-        self,
-        x: Optional[np.ndarray],
-        y_initial: np.ndarray,
-        forecast_horizon: int,
-    ) -> bool:
-        if x is None:
-            return False
-
-        has_supported_state = (
-            self.model_type == "NARMAX"
-            and isinstance(self.basis_function, Polynomial)
-            and self.max_lag is not None
-            and self.n_inputs is not None
-            and self.theta is not None
-            and self.final_model is not None
-            and self.n_inputs > 0
-            and y_initial.shape[0] > self.max_lag
-            and forecast_horizon >= self.max_lag
-        )
-        if not has_supported_state:
-            return False
-
-        xp = get_namespace(x, y_initial)
-        namespace_name = getattr(xp, "__name__", xp.__class__.__name__)
-        return (
-            _is_numpy_namespace(xp)
-            or "torch" in namespace_name
-            or "cupy" in namespace_name
-        )
-
-    def _shift_regressor_block(
-        self,
-        xp,
-        raw_regressor,
-        start: int,
-        stop: int,
-        value,
-    ):
-        if stop - start > 1:
-            raw_regressor[start : stop - 1] = _copy(
-                xp,
-                raw_regressor[start + 1 : stop],
-            )
-        raw_regressor[stop - 1] = value
-
-    def _polynomial_narmax_predict_fast(
-        self,
-        x: np.ndarray,
-        y_initial: np.ndarray,
-        forecast_horizon: int,
-    ) -> np.ndarray:
-        xp = get_namespace(x, y_initial)
-        _dtype = x.dtype
-        target_device = _device(x, y_initial)
-        x = xp.reshape(x, (-1, self.n_inputs))
-        n_predictions = forecast_horizon - self.max_lag
-        if n_predictions <= 0:
-            return xp.reshape(
-                _zeros(xp, 0, dtype=_dtype, target_device=target_device),
-                (-1, 1),
-            )
-
-        model_exponents = _asarray(
-            self._get_polynomial_narmax_predict_exponents(),
-            xp=xp,
-            dtype=_dtype,
-            target_device=target_device,
-        )
-        raw_regressor = _zeros(
-            xp,
-            model_exponents.shape[1],
-            dtype=_dtype,
-            target_device=target_device,
-        )
-        raw_regressor[: self.max_lag] = y_initial[: self.max_lag, 0]
-        for input_index in range(self.n_inputs):
-            start = self.max_lag * (1 + input_index)
-            stop = start + self.max_lag
-            raw_regressor[start:stop] = x[: self.max_lag, input_index]
-
-        theta = xp.reshape(
-            _asarray(
-                self.theta,
-                xp=xp,
-                dtype=_dtype,
-                target_device=target_device,
-            ),
-            (-1,),
-        )
-        predictions = _zeros(
-            xp,
-            n_predictions,
-            dtype=_dtype,
-            target_device=target_device,
-        )
-
-        for step in range(n_predictions):
-            regressor_powers = _pow(xp, raw_regressor, model_exponents)
-            regressor_value = xp.prod(regressor_powers, axis=1)
-            y_next = regressor_value @ theta
-            predictions[step] = y_next
-
-            if step == n_predictions - 1:
-                continue
-
-            self._shift_regressor_block(
-                xp,
-                raw_regressor,
-                0,
-                self.max_lag,
-                y_next,
-            )
-            new_input_index = self.max_lag + step
-            for input_index in range(self.n_inputs):
-                start = self.max_lag * (1 + input_index)
-                stop = start + self.max_lag
-                self._shift_regressor_block(
-                    xp,
-                    raw_regressor,
-                    start,
-                    stop,
-                    x[new_input_index, input_index],
-                )
-
-        return xp.reshape(predictions, (-1, 1))
+    def _get_polynomial_narmax_predict_exponents(self) -> np.ndarray:
+        """Return Polynomial prediction exponents for backward compatibility."""
+        return self._get_prediction_exponents()
 
     def _narmax_predict_reference(
         self,
@@ -669,9 +873,13 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
     ) -> np.ndarray:
         """Return the reference recursive NARMAX prediction."""
         xp = get_namespace(x, y_initial)
-        _dtype = x.dtype if x is not None else y_initial.dtype
-        if self.model_type == "NAR":
-            _dtype = _recursive_prediction_dtype(xp, _dtype)
+        data_dtype = y_initial.dtype if self.model_type == "NAR" else x.dtype
+        _dtype = self._prediction_dtype(
+            xp,
+            data_dtype,
+            y_initial.dtype,
+            getattr(self.theta, "dtype", None),
+        )
 
         target_device = _device(x, y_initial)
         y_output = _zeros(
@@ -688,16 +896,11 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             target_device=target_device,
         )
 
-        model_exponents = _vstack(
-            xp,
-            [
-                _asarray(
-                    self._code2exponents(code=model),
-                    xp=xp,
-                    target_device=target_device,
-                )
-                for model in self.final_model
-            ],
+        model_exponents = _asarray(
+            self._get_prediction_exponents(),
+            xp=xp,
+            dtype=_dtype,
+            target_device=target_device,
         )
         raw_regressor = _zeros(
             xp,
@@ -719,7 +922,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             final = self.max_lag
             k = int(i - self.max_lag)
             raw_regressor[:final] = y_output[k:i]
-            for j in range(self.n_inputs):
+            for j in range(self._prediction_n_inputs()):
                 init += self.max_lag
                 final += self.max_lag
                 raw_regressor[init:final] = x[k:i, j]
@@ -751,26 +954,50 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         """
         _ = y  # keeps signature aligned with subclasses
         xp = get_namespace(x_base)
+        target_device = _device(x_base)
+        prediction_dtype = self._prediction_dtype(
+            xp,
+            x_base.dtype,
+            getattr(self.theta, "dtype", None),
+        )
+        x_base = _asarray(
+            x_base,
+            xp=xp,
+            dtype=prediction_dtype,
+            target_device=target_device,
+        )
         theta = xp.reshape(
             _asarray(
                 self.theta,
                 xp=xp,
-                dtype=x_base.dtype,
-                target_device=_device(x_base),
+                dtype=prediction_dtype,
+                target_device=target_device,
             ),
             (-1,),
         )
         yhat = x_base @ theta
         return xp.reshape(yhat, (-1, 1))
 
-    @abstractmethod
     def _model_prediction(
         self,
         x: Optional[np.ndarray],
         y_initial: np.ndarray,
         forecast_horizon: int = 1,
     ) -> np.ndarray:
-        """Model prediction wrapper."""
+        """Dispatch free-run prediction to the configured model kernel."""
+        if self.model_type in ("NARMAX", "NAR"):
+            return self._narmax_predict(x, y_initial, forecast_horizon)
+        if self.model_type == "NFIR":
+            return self._nfir_predict(x, y_initial)
+        raise ValueError(
+            f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
+        )
+
+    def _resolve_recursive_prediction_length(self, x, forecast_horizon: int) -> int:
+        """Return the total recursive buffer length for a prediction request."""
+        if x is not None:
+            return x.shape[0]
+        return forecast_horizon + self.max_lag
 
     def _narmax_predict(
         self,
@@ -779,50 +1006,64 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         forecast_horizon: int = 1,
     ) -> np.ndarray:
         """narmax_predict method."""
-        if self._should_use_polynomial_narmax_fast_path(
-            x,
-            y_initial,
-            forecast_horizon,
-        ):
-            return self._polynomial_narmax_predict_fast(
-                x,
-                y_initial,
-                forecast_horizon,
+        if y_initial.shape[0] < self.max_lag:
+            raise ValueError(
+                "Insufficient initial condition elements! Expected at least"
+                f" {self.max_lag} elements."
             )
+        prediction_length = self._resolve_recursive_prediction_length(
+            x,
+            forecast_horizon,
+        )
+        return self._narmax_predict_reference(x, y_initial, prediction_length)
 
-        return self._narmax_predict_reference(x, y_initial, forecast_horizon)
-
-    @abstractmethod
     def _nfir_predict(self, x: np.ndarray, y_initial: np.ndarray) -> np.ndarray:
         """Nfir predict method."""
         xp = get_namespace(x, y_initial)
         target_device = _device(x, y_initial)
-        y_output = _zeros(xp, x.shape[0], dtype=x.dtype, target_device=target_device)
-        y_output = y_output * float("nan")
-        y_output[: self.max_lag] = y_initial[: self.max_lag, 0]
-        x = xp.reshape(x, (-1, self.n_inputs))
-        model_exponents = _vstack(
+        prediction_dtype = self._prediction_dtype(
             xp,
-            [
-                _asarray(
-                    self._code2exponents(code=model),
-                    xp=xp,
-                    target_device=target_device,
-                )
-                for model in self.final_model
-            ],
+            x.dtype,
+            y_initial.dtype,
+            getattr(self.theta, "dtype", None),
+        )
+        x = _asarray(
+            x,
+            xp=xp,
+            dtype=prediction_dtype,
+            target_device=target_device,
+        )
+        y_output = _zeros(
+            xp,
+            x.shape[0],
+            dtype=prediction_dtype,
+            target_device=target_device,
+        )
+        y_output = y_output * float("nan")
+        y_output[: self.max_lag] = _asarray(
+            y_initial[: self.max_lag, 0],
+            xp=xp,
+            dtype=prediction_dtype,
+            target_device=target_device,
+        )
+        x = xp.reshape(x, (-1, self.n_inputs))
+        model_exponents = _asarray(
+            self._get_prediction_exponents(),
+            xp=xp,
+            dtype=prediction_dtype,
+            target_device=target_device,
         )
         raw_regressor = _zeros(
             xp,
             model_exponents.shape[1],
-            dtype=x.dtype,
+            dtype=prediction_dtype,
             target_device=target_device,
         )
         theta = xp.reshape(
             _asarray(
                 self.theta,
                 xp=xp,
-                dtype=x.dtype,
+                dtype=prediction_dtype,
                 target_device=target_device,
             ),
             (-1,),
@@ -832,7 +1073,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             final = self.max_lag
             k = int(i - self.max_lag)
             raw_regressor[:final] = y_output[k:i]
-            for j in range(self.n_inputs):
+            for j in range(self._prediction_n_inputs()):
                 init += self.max_lag
                 final += self.max_lag
                 raw_regressor[init:final] = x[k:i, j]
@@ -841,6 +1082,119 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             regressor_value = xp.prod(regressor_powers, axis=1)
             y_output[i] = regressor_value @ theta
         return xp.reshape(y_output[self.max_lag : :], (-1, 1))
+
+    def _store_prediction_block(
+        self,
+        *,
+        xp,
+        prediction_buffer,
+        block_prediction,
+        block_horizon: int,
+        output_start: int,
+        n_predictions: int,
+        target_device,
+    ):
+        """Store one recursive block without narrowing the predictor dtype."""
+        block_values = xp.reshape(
+            _asarray(
+                block_prediction[-block_horizon:],
+                xp=xp,
+                target_device=target_device,
+            ),
+            (-1,),
+        )
+        prediction_dtype = self._prediction_dtype(
+            xp,
+            getattr(prediction_buffer, "dtype", None),
+            block_values.dtype,
+        )
+        if prediction_buffer is None:
+            prediction_buffer = _zeros(
+                xp,
+                n_predictions,
+                dtype=prediction_dtype,
+                target_device=target_device,
+            )
+        elif prediction_buffer.dtype != prediction_dtype:
+            prediction_buffer = _asarray(
+                prediction_buffer,
+                xp=xp,
+                dtype=prediction_dtype,
+                target_device=target_device,
+            )
+
+        block_values = _asarray(
+            block_values,
+            xp=xp,
+            dtype=prediction_dtype,
+            target_device=target_device,
+        )
+        prediction_buffer[output_start : output_start + block_horizon] = block_values
+        return prediction_buffer
+
+    def _blockwise_prediction(self, *, x, y, steps_ahead: int) -> np.ndarray:
+        """Return recursive predictions over observation-anchored blocks."""
+        xp = get_namespace(x, y)
+        target_device = _device(x, y)
+        prediction_dtype = self._prediction_dtype(
+            xp,
+            getattr(x, "dtype", None),
+            y.dtype,
+            getattr(getattr(self, "theta", None), "dtype", None),
+        )
+        if x is not None:
+            x = xp.reshape(
+                _asarray(
+                    x,
+                    xp=xp,
+                    dtype=prediction_dtype,
+                    target_device=target_device,
+                ),
+                (-1, self._prediction_n_inputs()),
+            )
+
+        n_samples = y.shape[0]
+        n_predictions = n_samples - self.max_lag
+        if n_predictions == 0:
+            return xp.reshape(
+                _zeros(
+                    xp,
+                    0,
+                    dtype=prediction_dtype,
+                    target_device=target_device,
+                ),
+                (-1, 1),
+            )
+
+        prediction_method = self._model_prediction
+        if not isinstance(self.basis_function, Polynomial):
+            prediction_method = self._basis_function_predict
+
+        prediction_buffer = None
+        block_end = self.max_lag
+        while block_end < n_samples:
+            block_horizon = min(steps_ahead, n_samples - block_end)
+            block_start = block_end - self.max_lag
+            x_window = None
+            if x is not None:
+                x_window = x[block_start : block_end + block_horizon]
+            block_prediction = prediction_method(
+                x=x_window,
+                y_initial=y[block_start:block_end],
+                forecast_horizon=block_horizon,
+            )
+            prediction_buffer = self._store_prediction_block(
+                xp=xp,
+                prediction_buffer=prediction_buffer,
+                block_prediction=block_prediction,
+                block_horizon=block_horizon,
+                output_start=block_start,
+                n_predictions=n_predictions,
+                target_device=target_device,
+            )
+            block_end += block_horizon
+
+        return xp.reshape(prediction_buffer, (-1, 1))
 
     def _nar_step_ahead(self, y: np.ndarray, steps_ahead: int) -> np.ndarray:
         """Return blockwise NAR predictions without initial conditions.
@@ -865,37 +1219,19 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             If ``steps_ahead`` is not a positive integer or if ``y`` does not
             contain enough initial conditions.
         """
-        check_positive_int(steps_ahead, "steps_ahead")
-        xp = get_namespace(y)
-        if len(y) < self.max_lag:
+        steps_ahead = self._normalize_prediction_integer(
+            steps_ahead,
+            "steps_ahead",
+            allow_zero=False,
+        )
+        n_samples = y.shape[0]
+        if n_samples < self.max_lag:
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
                 f" {self.max_lag} elements."
             )
 
-        yhat = _zeros(
-            xp,
-            len(y),
-            dtype=_recursive_prediction_dtype(xp, y.dtype),
-            target_device=_device(y),
-        )
-        yhat = yhat * float("nan")
-        i = self.max_lag
-
-        while i < len(y):
-            block_horizon = min(steps_ahead, len(y) - i)
-            yhat[i : i + block_horizon] = xp.reshape(
-                self._model_prediction(
-                    x=None,
-                    y_initial=y[i - self.max_lag : i],
-                    forecast_horizon=block_horizon,
-                )[-block_horizon:],
-                (-1,),
-            )
-            i += block_horizon
-
-        yhat = xp.reshape(yhat, (-1,))[self.max_lag : :]
-        return xp.reshape(yhat, (-1, 1))
+        return self._blockwise_prediction(x=None, y=y, steps_ahead=steps_ahead)
 
     def narmax_n_step_ahead(
         self,
@@ -903,53 +1239,29 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         y: np.ndarray,
         steps_ahead: Optional[int],
     ) -> np.ndarray:
-        """n_steps ahead prediction method for NARMAX model."""
-        xp = get_namespace(x, y)
-        if len(y) < self.max_lag:
+        """Return blockwise NARMAX predictions without initial conditions."""
+        steps_ahead = self._normalize_prediction_integer(
+            steps_ahead,
+            "steps_ahead",
+            allow_zero=False,
+        )
+        if x is None:
+            raise ValueError("X cannot be None for NARMAX n-step prediction.")
+        n_samples = y.shape[0]
+        if n_samples < self.max_lag:
             raise ValueError(
                 "Insufficient initial condition elements! Expected at least"
                 f" {self.max_lag} elements."
             )
 
-        to_remove = math.ceil((len(y) - self.max_lag) / steps_ahead)
-        x = xp.reshape(x, (-1, self.n_inputs))
-        yhat = _zeros(xp, x.shape[0], dtype=x.dtype, target_device=_device(x, y))
-        yhat = yhat * float("nan")
-        yhat[: self.max_lag] = y[: self.max_lag, 0]
-        i = self.max_lag
-        steps = [step for step in range(0, to_remove * steps_ahead, steps_ahead)]
-        if len(steps) > 1:
-            for step in steps[:-1]:
-                yhat[i : i + steps_ahead] = xp.reshape(
-                    self._model_prediction(
-                        x=x[step : i + steps_ahead],
-                        y_initial=y[step:i],
-                    )[-steps_ahead:],
-                    (-1,),
-                )
-                i += steps_ahead
-
-            steps_ahead = int(xp.sum(xp.asarray(xp.isnan(yhat), dtype=xp.int32)))
-            yhat[i : i + steps_ahead] = xp.reshape(
-                self._model_prediction(
-                    x=x[steps[-1] : i + steps_ahead],
-                    y_initial=y[steps[-1] : i],
-                )[-steps_ahead:],
-                (-1,),
-            )
-        else:
-            yhat[i : i + steps_ahead] = xp.reshape(
-                self._model_prediction(
-                    x=x[0 : i + steps_ahead],
-                    y_initial=y[0:i],
-                )[-steps_ahead:],
-                (-1,),
+        if x.shape[0] != n_samples:
+            raise ValueError(
+                "X and y must contain the same number of samples for NARMAX "
+                f"n-step prediction. Got {x.shape[0]} and {n_samples}."
             )
 
-        yhat = xp.reshape(yhat, (-1,))[self.max_lag : :]
-        return xp.reshape(yhat, (-1, 1))
+        return self._blockwise_prediction(x=x, y=y, steps_ahead=steps_ahead)
 
-    @abstractmethod
     def _n_step_ahead_prediction(
         self,
         x: Optional[np.ndarray],
@@ -960,19 +1272,19 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
 
         Parameters
         ----------
-        y : array-like of shape = max_lag
-            Initial conditions values of the model
-            to start recursive process.
-        x : ndarray of floats of shape = n_samples
-            Vector with input values to be used in model simulation.
-        steps_ahead : int (default = None)
-            The user can use free run simulation, one-step ahead prediction
-            and n-step ahead prediction.
+        x : ndarray of shape (n_samples, n_inputs), optional
+            Input values for NARMAX prediction. NAR prediction ignores this
+            argument, and NFIR prediction uses it in the feed-forward kernel.
+        y : ndarray of shape (n_samples, 1)
+            Observed output values. Its length defines the prediction interval,
+            and its first ``max_lag`` rows provide the initial conditions.
+        steps_ahead : int
+            Maximum number of recursive predictions in each block.
 
         Returns
         -------
         yhat : ndarray of floats
-            Predicted values for NARMAX and NAR models.
+            Predicted values for NARMAX, NAR and NFIR models.
         """
         if self.model_type == "NARMAX":
             return self.narmax_n_step_ahead(x, y, steps_ahead)
@@ -980,11 +1292,13 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         if self.model_type == "NAR":
             return self._nar_step_ahead(y, steps_ahead)
 
+        if self.model_type == "NFIR":
+            return self._model_prediction(x, y)
+
         raise ValueError(
-            "n_steps_ahead prediction will be implemented for NFIR models in v0.4.*"
+            f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
         )
 
-    @abstractmethod
     def _basis_function_predict(
         self,
         x: Optional[np.ndarray],
@@ -992,15 +1306,37 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         forecast_horizon: int = 1,
     ) -> np.ndarray:
         """Basis function prediction."""
-        xp = get_namespace(y_initial)
+        forecast_horizon = self._resolve_recursive_prediction_length(
+            x,
+            forecast_horizon,
+        )
+        xp = get_namespace(x, y_initial)
+        target_device = _device(x, y_initial)
+        prediction_dtype = self._prediction_dtype(
+            xp,
+            None if self.model_type == "NAR" else getattr(x, "dtype", None),
+            y_initial.dtype,
+            getattr(self.theta, "dtype", None),
+        )
         yhat = _zeros(
             xp,
             forecast_horizon,
-            dtype=y_initial.dtype,
-            target_device=_device(x, y_initial),
+            dtype=prediction_dtype,
+            target_device=target_device,
         )
         yhat = yhat * float("nan")
-        yhat[: self.max_lag] = y_initial[: self.max_lag, 0]
+        yhat[: self.max_lag] = _asarray(
+            y_initial[: self.max_lag, 0],
+            xp=xp,
+            dtype=prediction_dtype,
+            target_device=target_device,
+        )
+        theta = _asarray(
+            self.theta,
+            xp=xp,
+            dtype=prediction_dtype,
+            target_device=target_device,
+        )
 
         # Discard unnecessary initial values
         analyzed_elements_number = self.max_lag + 1
@@ -1035,13 +1371,17 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
                 self.model_type,
                 predefined_regressors=self.pivv[: len(self.final_model)],
             )
-
-            a = x_tmp @ self.theta
+            x_tmp = _asarray(
+                x_tmp,
+                xp=xp,
+                dtype=prediction_dtype,
+                target_device=target_device,
+            )
+            a = x_tmp @ theta
             yhat[i + self.max_lag] = a.item()
 
         return xp.reshape(yhat[self.max_lag :], (-1, 1))
 
-    @abstractmethod
     def _basis_function_n_step_prediction(
         self,
         x: Optional[np.ndarray],
@@ -1050,110 +1390,22 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
         forecast_horizon: int,
     ) -> np.ndarray:
         """Basis function n step ahead."""
-        xp = get_namespace(y)
-        yhat = _zeros(xp, forecast_horizon, dtype=y.dtype, target_device=_device(x, y))
-        yhat = yhat * float("nan")
-        yhat[: self.max_lag] = y[: self.max_lag, 0]
+        if self.model_type == "NAR":
+            return self._nar_step_ahead(y, steps_ahead)
 
-        # Discard unnecessary initial values
-        i = self.max_lag
+        if self.model_type == "NARMAX":
+            return self.narmax_n_step_ahead(x, y, steps_ahead)
 
-        while i < len(y):
-            k = int(i - self.max_lag)
-            if i + steps_ahead > len(y):
-                steps_ahead = len(y) - i  # predicts the remaining values
+        if self.model_type == "NFIR":
+            return self._basis_function_predict(
+                x=x,
+                y_initial=y,
+                forecast_horizon=x.shape[0],
+            )
 
-            if self.model_type == "NARMAX":
-                yhat[i : i + steps_ahead] = xp.reshape(
-                    self._basis_function_predict(
-                        x[k : i + steps_ahead],
-                        y[k : i + steps_ahead],
-                        forecast_horizon=forecast_horizon,
-                    )[-steps_ahead:],
-                    (-1,),
-                )
-            elif self.model_type == "NAR":
-                yhat[i : i + steps_ahead] = xp.reshape(
-                    self._basis_function_predict(
-                        x=None,
-                        y_initial=y[k : i + steps_ahead],
-                        forecast_horizon=forecast_horizon,
-                    )[-forecast_horizon : -forecast_horizon + steps_ahead],
-                    (-1,),
-                )
-            elif self.model_type == "NFIR":
-                yhat[i : i + steps_ahead] = xp.reshape(
-                    self._basis_function_predict(
-                        x=x[k : i + steps_ahead],
-                        y_initial=y[k : i + steps_ahead],
-                        forecast_horizon=forecast_horizon,
-                    )[-steps_ahead:],
-                    (-1,),
-                )
-            else:
-                raise ValueError(
-                    f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
-                )
-
-            i += steps_ahead
-
-        return xp.reshape(yhat[self.max_lag :], (-1, 1))
-
-    def _basis_function_n_steps_horizon(
-        self,
-        x: Optional[np.ndarray],
-        y: np.ndarray,
-        steps_ahead: int,
-        forecast_horizon: int,
-    ) -> np.ndarray:
-        """Basis n steps horizon."""
-        xp = get_namespace(y)
-        yhat = _zeros(xp, forecast_horizon, dtype=y.dtype, target_device=_device(x, y))
-        yhat = yhat * float("nan")
-        yhat[: self.max_lag] = y[: self.max_lag, 0]
-
-        # Discard unnecessary initial values
-        i = self.max_lag
-
-        while i < len(y):
-            k = int(i - self.max_lag)
-            if i + steps_ahead > len(y):
-                steps_ahead = len(y) - i  # predicts the remaining values
-
-            if self.model_type == "NARMAX":
-                yhat[i : i + steps_ahead] = xp.reshape(
-                    self._basis_function_predict(
-                        x[k : i + steps_ahead], y[k : i + steps_ahead], forecast_horizon
-                    )[-forecast_horizon : -forecast_horizon + steps_ahead],
-                    (-1,),
-                )
-            elif self.model_type == "NAR":
-                yhat[i : i + steps_ahead] = xp.reshape(
-                    self._basis_function_predict(
-                        x=None,
-                        y_initial=y[k : i + steps_ahead],
-                        forecast_horizon=forecast_horizon,
-                    )[-forecast_horizon : -forecast_horizon + steps_ahead],
-                    (-1,),
-                )
-            elif self.model_type == "NFIR":
-                yhat[i : i + steps_ahead] = xp.reshape(
-                    self._basis_function_predict(
-                        x=x[k : i + steps_ahead],
-                        y_initial=y[k : i + steps_ahead],
-                        forecast_horizon=forecast_horizon,
-                    )[-forecast_horizon : -forecast_horizon + steps_ahead],
-                    (-1,),
-                )
-            else:
-                raise ValueError(
-                    f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
-                )
-
-            i += steps_ahead
-
-        yhat = xp.reshape(yhat, (-1,))
-        return xp.reshape(yhat[self.max_lag :], (-1, 1))
+        raise ValueError(
+            f"model_type must be NARMAX, NAR or NFIR. Got {self.model_type}"
+        )
 
 
 def house(x: np.ndarray) -> np.ndarray:

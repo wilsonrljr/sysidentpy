@@ -484,7 +484,7 @@ model.fit(y=y_train)
 yhat = model.predict(y=y_valid, forecast_horizon=23)
 ```
 
-For the **NFIR** model, however, you still need to pass the output array because autoregressive models require initial conditions to operate.
+For an **NFIR** model, you still pass `y` so `predict` can preserve the first `max_lag` samples as the output prefix and keep the result aligned with the validation interval. NFIR predictions themselves depend only on `X`; values of `y` after the prefix are not fed into the model. For that reason, free-run, one-step, and $n$-step NFIR predictions use the same feed-forward calculation.
 
 ```python
 import pandas as pd
@@ -718,4 +718,3 @@ Note that you can still explore various combinations to better fit your use case
 
 This is just a quickstart guide to **SysIdentPy**. For more comprehensive tutorials, step-by-step guides, detailed explanations, and advanced use cases, be sure to check out our full [documentation](https://sysidentpy.org/) and [companion book](https://sysidentpy.org/book/0%20-%20Preface/).
 They provide in-depth content to help you get the most out of SysIdentPy for your system identification and forecasting tasks.
-

@@ -613,15 +613,16 @@ def test_model_prediction_dispatches_nfir(monkeypatch):
 def test_predict_preserves_eval_mode(monkeypatch):
     model = _make_model(net=_EarlyStoppingNet())
     model.net.eval()
-    expected = np.ones((2, 1), dtype=np.float32)
-    monkeypatch.setattr(model, "_model_prediction", lambda *_args, **_kwargs: expected)
+    model.n_inputs = 1
+    suffix = np.array([[2.0]], dtype=np.float32)
+    monkeypatch.setattr(model, "_model_prediction", lambda *_args, **_kwargs: suffix)
 
     result = model.predict(
         X=np.ones((2, 1), dtype=np.float32),
         y=np.ones((2, 1), dtype=np.float32),
     )
 
-    assert result is expected
+    np.testing.assert_array_equal(result, np.array([[1.0], [2.0]], dtype=np.float32))
     assert model.net.training is False
 
 
@@ -646,10 +647,10 @@ def test_narmax_predict_handles_missing_inputs():
     y_initial = np.ones((1, 1), dtype=np.float32)
     result = model._narmax_predict(x=None, y_initial=y_initial, forecast_horizon=2)
 
-    assert result.shape == (3, 1)
+    assert result.shape == (2, 1)
 
 
-def test_narmax_predict_sets_nar_inputs_to_zero():
+def test_narmax_predict_preserves_fitted_input_count_for_nar():
     model = _make_model(model_type="NAR")
     model.max_lag = 1
     model.n_inputs = 2
@@ -661,7 +662,7 @@ def test_narmax_predict_sets_nar_inputs_to_zero():
     y_initial = np.ones((1, 1), dtype=np.float32)
     model._narmax_predict(x=x, y_initial=y_initial)
 
-    assert model.n_inputs == 0
+    assert model.n_inputs == 2
 
 
 def test_basis_function_predict_modes():
@@ -676,16 +677,16 @@ def test_basis_function_predict_modes():
     y_initial = np.ones((1, 1), dtype=np.float32)
 
     model.model_type = "NARMAX"
-    assert model._basis_function_predict(x, y_initial).shape == (3, 1)
+    assert model._basis_function_predict(x, y_initial).shape == (2, 1)
 
     model.model_type = "NAR"
     model.n_inputs = 1
     output = model._basis_function_predict(None, y_initial, forecast_horizon=2)
-    assert output.shape[0] == 3
-    assert model.n_inputs == 0
+    assert output.shape[0] == 2
+    assert model.n_inputs == 1
 
     model.model_type = "NFIR"
-    assert model._basis_function_predict(x, y_initial).shape == (3, 1)
+    assert model._basis_function_predict(x, y_initial).shape == (2, 1)
 
     model.model_type = "UNKNOWN"
     with pytest.raises(ValueError, match="Unrecognized model type"):
@@ -716,15 +717,21 @@ def test_basis_function_n_step_prediction_validations():
         steps_ahead=1,
         forecast_horizon=2,
     )
-    assert result.shape[0] == 3
+    assert result.shape == (y.shape[0] - model.max_lag, 1)
 
 
 def test_basis_function_n_step_prediction_modes():
     model = _make_model(basis_function=_DummyBasis())
     model.max_lag = 1
     model.model_type = "NARMAX"
+    model.n_inputs = 1
 
     def fake_predict(_self, *args, **kwargs):
+        if _self.model_type == "NFIR":
+            return np.arange(
+                kwargs["x"].shape[0] - _self.max_lag,
+                dtype=np.float32,
+            ).reshape(-1, 1)
         y_slice = kwargs.get("y_initial")
         if y_slice is None and len(args) > 1:
             y_slice = args[1]
@@ -741,19 +748,19 @@ def test_basis_function_n_step_prediction_modes():
     result = model._basis_function_n_step_prediction(
         x, y, steps_ahead=1, forecast_horizon=1
     )
-    assert result.shape == (4, 1)
+    assert result.shape == (3, 1)
 
     model.model_type = "NAR"
     result = model._basis_function_n_step_prediction(
         x=None, y=y, steps_ahead=1, forecast_horizon=2
     )
-    assert result.shape == (3, 1)
+    assert result.shape == (y.shape[0] - model.max_lag, 1)
 
     model.model_type = "NFIR"
     result = model._basis_function_n_step_prediction(
         x=x, y=y, steps_ahead=1, forecast_horizon=1
     )
-    assert result.shape == (4, 1)
+    assert result.shape == (3, 1)
 
     model.model_type = "UNKNOWN"
     with pytest.raises(ValueError, match="model_type must be NARMAX, NAR or NFIR"):

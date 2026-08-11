@@ -36,16 +36,21 @@ y_test = np.reshape(y_test, (len(y_test), 1))
 X_test = np.reshape(X_test, (len(X_test), 1))
 
 
-class _AOLSProbe(AOLS):
-    def narmax_predict_reference(self, x_data, y_data, forecast_horizon):
-        return self._narmax_predict_reference(x_data, y_data, forecast_horizon)
+def _segmented_nar_reference(model, y, steps_ahead):
+    reference = np.empty_like(y, dtype=float)
+    reference[: model.max_lag] = y[: model.max_lag]
 
-    def polynomial_narmax_predict_fast(self, x_data, y_data, forecast_horizon):
-        return self._polynomial_narmax_predict_fast(
-            x_data,
-            y_data,
-            forecast_horizon,
+    for block_start in range(model.max_lag, len(y), steps_ahead):
+        block_horizon = min(steps_ahead, len(y) - block_start)
+        initial_conditions = y[block_start - model.max_lag : block_start]
+        free_run = model.predict(
+            X=None,
+            y=initial_conditions,
+            forecast_horizon=block_horizon,
         )
+        reference[block_start : block_start + block_horizon] = free_run[-block_horizon:]
+
+    return reference
 
 
 class _NullEstimator:
@@ -173,8 +178,9 @@ def test_model_predict_fourier_nar_inputs():
         model_type="NAR",
     )
     model.fit(X=X_train, y=y_train)
+    fitted_n_inputs = model.n_inputs
     model.predict(X=X_test, y=y_test)
-    assert_equal(model.n_inputs, 0)
+    assert_equal(model.n_inputs, fitted_n_inputs)
 
 
 def test_model_predict_fourier_raises():
@@ -246,7 +252,7 @@ def test_predict_polynomial_returns_concatenated_output():
 
 def test_predict_polynomial_preserves_array_api_namespace():
     xp = pytest.importorskip("array_api_strict")
-    model = AOLS(basis_function=Polynomial(degree=2))
+    model = AOLS(basis_function=Polynomial(degree=2), model_type="NAR")
     model.max_lag = 1
     model._model_prediction = lambda _x, _y, forecast_horizon=0: get_namespace(
         _y
@@ -254,7 +260,7 @@ def test_predict_polynomial_preserves_array_api_namespace():
     y_data = xp.asarray(np.arange(4.0).reshape(-1, 1))
 
     with config_context(array_api_dispatch=True):
-        yhat = model.predict(X=None, y=y_data)
+        yhat = model.predict(X=None, y=y_data, forecast_horizon=3)
 
     assert yhat.__array_namespace__().__name__ == xp.__name__
     xp_assert_array_equal(yhat, np.array([[0.0], [1.5], [1.5], [1.5]]))
@@ -281,6 +287,7 @@ def test_predict_rejects_mixed_array_api_namespaces_for_aols():
     xp = pytest.importorskip("array_api_strict")
     torch = pytest.importorskip("torch")
     model = AOLS(basis_function=Polynomial(degree=2))
+    model.n_inputs = 1
 
     x_data = torch.tensor(np.arange(4.0).reshape(-1, 1), dtype=torch.float64)
     y_data = xp.asarray(np.arange(4.0).reshape(-1, 1), dtype=xp.float64)
@@ -309,24 +316,6 @@ def test_fit_predict_accepts_torch_cuda_tensors_under_array_api_dispatch():
     assert yhat.device.type == "cuda"
     assert_equal(tuple(yhat.shape), y_test.shape)
     xp_assert_array_equal(yhat[: model.max_lag, :], y_test[: model.max_lag, :])
-
-
-def test_polynomial_narmax_fast_path_matches_reference_for_aols_model():
-    model = _AOLSProbe(ylag=[1, 2], xlag=2, basis_function=Polynomial(degree=2))
-    model.fit(X=X_train, y=y_train)
-
-    reference = model.narmax_predict_reference(
-        X_test,
-        y_test,
-        forecast_horizon=X_test.shape[0],
-    )
-    fast = model.polynomial_narmax_predict_fast(
-        X_test,
-        y_test,
-        forecast_horizon=X_test.shape[0],
-    )
-
-    np.testing.assert_allclose(fast, reference, rtol=1e-10, atol=1e-12)
 
 
 def test_predict_repeated_calls_are_stable_under_array_api_dispatch_for_aols():
@@ -383,12 +372,13 @@ def test_basis_function_predict_handles_missing_input():
         model_type="NAR",
     )
     model.fit(X=X_train, y=y_train)
+    fitted_n_inputs = model.n_inputs
     horizon = 4
     yhat = model._basis_function_predict(
         x=None, y_initial=y_test, forecast_horizon=horizon
     )
     assert_equal(yhat.shape, (horizon, 1))
-    assert_equal(model.n_inputs, 0)
+    assert_equal(model.n_inputs, fitted_n_inputs)
 
 
 def test_model_prediction_handles_nfir_type():
@@ -403,12 +393,13 @@ def test_model_prediction_handles_nfir_type():
     assert_equal(yhat.shape[0], X_test.shape[0] - model.max_lag)
 
 
-def test_narmax_predict_with_missing_input_sets_single_input():
+def test_narmax_predict_with_missing_input_preserves_fitted_input_count():
     model = AOLS(ylag=[1, 2], basis_function=Polynomial(degree=2), model_type="NAR")
     model.fit(y=y_train)
+    fitted_n_inputs = model.n_inputs
     horizon = 3
     yhat = model._narmax_predict(x=None, y_initial=y_test, forecast_horizon=horizon)
-    assert_equal(model.n_inputs, 0)
+    assert_equal(model.n_inputs, fitted_n_inputs)
     assert_equal(yhat.shape[0], horizon)
 
 
@@ -443,7 +434,8 @@ def test_basis_function_n_step_prediction_requires_initial_conditions():
     )
 
 
-def test_basis_function_n_step_prediction_without_input_uses_horizon():
+@pytest.mark.parametrize("steps_ahead", [2, 3, 10])
+def test_basis_function_n_step_prediction_without_input_uses_observed_y(steps_ahead):
     basis_function = Fourier(degree=2, n=1)
     model = AOLS(
         ylag=[1, 2],
@@ -451,35 +443,58 @@ def test_basis_function_n_step_prediction_without_input_uses_horizon():
         basis_function=basis_function,
         model_type="NAR",
     )
-    model.fit(X=X_train, y=y_train)
-    horizon = model.max_lag + 2
-    yhat = model._basis_function_n_step_prediction(
-        x=None,
-        y=y_test,
-        steps_ahead=1,
-        forecast_horizon=horizon,
+    model.fit(X=None, y=y_train)
+    y_window = y_test[: model.max_lag + 5]
+
+    yhat = model.predict(X=None, y=y_window, steps_ahead=steps_ahead)
+    with_ignored_horizon = model.predict(
+        X=None,
+        y=y_window,
+        steps_ahead=steps_ahead,
+        forecast_horizon=1,
     )
-    assert_equal(yhat.shape[0], horizon)
+    expected = _segmented_nar_reference(model, y_window, steps_ahead)
+
+    assert_equal(yhat.shape, y_window.shape)
+    np.testing.assert_array_equal(
+        yhat[: model.max_lag],
+        y_window[: model.max_lag],
+    )
+    np.testing.assert_allclose(yhat, expected, rtol=1e-10, atol=1e-12)
+    np.testing.assert_allclose(
+        with_ignored_horizon,
+        expected,
+        rtol=1e-10,
+        atol=1e-12,
+    )
 
 
-def test_basis_function_n_steps_horizon_returns_column_vector():
-    basis_function = Fourier(degree=2, n=1)
+def test_non_polynomial_predict_rejects_non_positive_steps():
+    model = AOLS(
+        ylag=[1, 2],
+        basis_function=Fourier(degree=1),
+        model_type="NAR",
+    ).fit(X=None, y=y_train)
+
+    with pytest.raises(ValueError, match="steps_ahead must be"):
+        model.predict(X=None, y=y_test[:5], steps_ahead=0)
+
+
+def test_nfir_prediction_modes_are_equivalent():
     model = AOLS(
         ylag=[1, 2],
         xlag=2,
-        basis_function=basis_function,
+        basis_function=Polynomial(degree=2),
+        model_type="NFIR",
     )
     model.fit(X=X_train, y=y_train)
-    window_len = model.max_lag + 3
-    steps_ahead = window_len - model.max_lag
-    forecast_horizon = window_len
-    yhat = model._basis_function_n_steps_horizon(
-        x=X_test[:window_len],
-        y=y_test[:window_len],
-        steps_ahead=steps_ahead,
-        forecast_horizon=forecast_horizon,
-    )
-    assert_equal(tuple(yhat.shape), (forecast_horizon - model.max_lag, 1))
+    free_run = model.predict(X=X_test, y=y_test)
+    one_step = model.predict(X=X_test, y=y_test, steps_ahead=1)
+    n_step = model.predict(X=X_test, y=y_test, steps_ahead=3)
+
+    np.testing.assert_allclose(one_step, free_run, rtol=1e-10, atol=1e-12)
+    np.testing.assert_allclose(n_step, free_run, rtol=1e-10, atol=1e-12)
+    np.testing.assert_array_equal(free_run[: model.max_lag], y_test[: model.max_lag])
 
 
 def test_aols_handles_zero_candidate_block():
