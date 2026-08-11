@@ -8,7 +8,7 @@ Um uso típico do método `predict` no SysIdentPy é
 yhat = model.predict(X=x_test, y=y_test)
 ```
 
-As explicações a seguir usam o FROLS com base polinomial, a mesma configuração adotada no restante do capítulo. Esse caminho oferece simulação livre e predições de um e de $n$ passos para modelos NAR e NARMAX. Em modelos NFIR não existe realimentação da saída; por isso, a distinção entre esses modos não tem o mesmo significado, e a predição de $n$ passos não está disponível nesse caminho.
+As explicações a seguir usam o FROLS com base polinomial, a mesma configuração adotada no restante do capítulo. Esse caminho oferece simulação livre e predições de um e de $n$ passos para modelos NAR e NARMAX. Em modelos NFIR não existe realimentação da saída; por isso, os três modos são equivalentes à mesma predição feed-forward.
 
 Duas dúvidas aparecem com frequência:
 
@@ -40,6 +40,10 @@ model = FROLS(
 )
 model.max_lag
 ```
+
+Essas `max_lag` amostras são as condições iniciais necessárias para começar a predição. O SysIdentPy as copia para o início de `yhat`; elas não são predições produzidas pelo modelo e, por isso, devem ser excluídas do cálculo das métricas de validação.
+
+Os dados que definem o intervalo de predição dependem do modo de validação. Na simulação livre, modelos com entradas seguem a sequência de entrada disponível, enquanto um modelo NAR usa `forecast_horizon`. Nas predições de um e de $n$ passos à frente, a sequência de saída medida define o intervalo, pois ela é usada para corrigir ou reiniciar a recursão. As próximas seções ilustram essas diferenças.
 
 Para o modelo NARMAX desse exemplo, `max_lag` é obtido a partir dos lags configurados em `xlag` e `ylag`, e não apenas dos termos que permaneceram no modelo final. Se `xlag=ylag=10`, por exemplo, ainda será necessário fornecer dez condições iniciais mesmo que o maior lag entre os regressores selecionados seja menor.
 
@@ -83,7 +87,7 @@ yhat_from_initial_conditions = model.predict(
 
 Nesse caso, um valor fornecido em `forecast_horizon` não substitui o comprimento de `X`: é `X.shape[0]` que determina quantas amostras serão retornadas, incluindo o prefixo das condições iniciais.
 
-Para modelos NAR, que não possuem entrada `X`, o horizonte deve ser informado por meio de `forecast_horizon`:
+Para modelos NAR, que não possuem entrada `X`, o horizonte normalmente deve ser informado por meio de `forecast_horizon`:
 
 ```python
 yhat = model.predict(
@@ -93,7 +97,7 @@ yhat = model.predict(
 )
 ```
 
-Nesse exemplo, o resultado contém as condições iniciais seguidas de 100 valores preditos. Portanto, `forecast_horizon` controla o comprimento da previsão quando não existe `X`; ele não altera quais saídas são realimentadas. Essa última escolha é feita por `steps_ahead`.
+Nesse exemplo, o resultado contém as condições iniciais seguidas de 100 valores preditos. Portanto, `forecast_horizon` controla o comprimento da previsão quando não existe `X`; ele não altera quais saídas são realimentadas. Essa última escolha é feita por `steps_ahead`. O valor de `forecast_horizon` deve ser um inteiro não negativo.
 
 ### Predição de Um Passo à Frente
 
@@ -113,7 +117,7 @@ O erro não é propagado indefinidamente porque a recursão é corrigida pela sa
 yhat = model.predict(X=x_test, y=y_test, steps_ahead=1)
 ```
 
-Neste caso, `y_test` precisa conter todo o intervalo que será avaliado. Resultados de um passo à frente costumam ser melhores do que resultados de simulação livre, mas respondem a uma pergunta menos exigente: quão bem o modelo prediz a próxima amostra quando conhece o histórico real da saída?
+Neste caso, `y_test` precisa conter todo o intervalo que será avaliado. Modelos NARMAX e NFIR também exigem `X` com o mesmo número de amostras. Resultados de um passo à frente costumam ser melhores do que resultados de simulação livre, mas respondem a uma pergunta menos exigente: quão bem o modelo prediz a próxima amostra quando conhece o histórico real da saída?
 
 ### Predição de n Passos à Frente
 
@@ -135,7 +139,9 @@ No SysIdentPy:
 yhat = model.predict(X=x_test, y=y_test, steps_ahead=2)
 ```
 
-`steps_ahead` deve ser um `int` positivo nativo do Python; escalares inteiros do NumPy não são aceitos pelo validador atual. Quanto maior o valor, mais o teste se aproxima da simulação livre e maior é a oportunidade para que erros sejam propagados.
+`steps_ahead` deve ser um inteiro positivo. Cada bloco usa as `max_lag` saídas medidas anteriores como condições iniciais. Se restarem menos de `steps_ahead` amostras, o último bloco é reduzido ao intervalo restante. Quanto maior o valor, mais o teste se aproxima da simulação livre e maior é a oportunidade para que erros sejam propagados.
+
+Em modelos NFIR não existe recursão da saída a reiniciar. Consequentemente, `steps_ahead=None`, `steps_ahead=1` e qualquer valor válido de $n$ passos usam o mesmo cálculo feed-forward. O argumento `y` continua obrigatório para o prefixo inicial e o alinhamento da saída, mas seus valores após `max_lag` não afetam as predições NFIR.
 
 ### Alinhando a Saída Antes da Avaliação
 

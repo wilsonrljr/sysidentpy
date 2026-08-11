@@ -418,7 +418,7 @@ model.fit(y=y_train)
 yhat = model.predict(y=y_valid, forecast_horizon=23)
 ```
 
-Para **NFIR** (apenas entradas):
+Para **NFIR** (apenas entradas), `y` continua sendo fornecido para que `predict` preserve as primeiras `max_lag` amostras como prefixo e mantenha o resultado alinhado com o intervalo de validação. As predições dependem apenas de `X`; os valores de `y` após o prefixo não são realimentados no modelo. Por isso, as predições NFIR livre, de um passo e de $n$ passos usam o mesmo cálculo feed-forward:
 
 ```python
 from sysidentpy.model_structure_selection import FROLS

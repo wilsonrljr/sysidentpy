@@ -33,6 +33,9 @@ from sysidentpy.model_structure_selection import (
 from sysidentpy.narmax_base import RegressorDictionary
 from sysidentpy.parameter_estimation.estimators import LeastSquares
 from sysidentpy.tests._array_api_asserts import assert_allclose as xp_assert_allclose
+from sysidentpy.tests._array_api_asserts import (
+    assert_array_equal as xp_assert_array_equal,
+)
 from sysidentpy.utils.information_matrix import build_input_output_matrix
 
 
@@ -660,6 +663,41 @@ def test_frols_nar_recursive_predictions_promote_integer_output(include_bias):
     assert_allclose(free_run, expected_free_run, rtol=1e-12, atol=1e-12)
 
 
+def test_frols_nar_integer_predictions_preserve_array_api_namespace():
+    xp = pytest.importorskip("array_api_strict")
+    model = _fit_exact_ar1_nar(include_bias=False)
+    y_integer = np.array([[3], [100], [100], [100], [100]])
+    expected_one_step = np.array([[3], [1.5], [50], [50], [50]])
+    expected_n_step = np.array([[3], [1.5], [0.75], [50], [25]])
+    expected_free_run = np.array([[3], [1.5], [0.75], [0.375], [0.1875]])
+
+    with config_context(array_api_dispatch=True):
+        one_step = model.predict(
+            X=None,
+            y=xp.asarray(y_integer),
+            steps_ahead=1,
+        )
+        n_step = model.predict(
+            X=None,
+            y=xp.asarray(y_integer),
+            steps_ahead=2,
+        )
+        free_run = model.predict(
+            X=None,
+            y=xp.asarray(y_integer[:1]),
+            forecast_horizon=4,
+        )
+
+    for prediction, expected in (
+        (one_step, expected_one_step),
+        (n_step, expected_n_step),
+        (free_run, expected_free_run),
+    ):
+        assert prediction.__array_namespace__() is xp
+        assert xp.isdtype(prediction.dtype, "real floating")
+        xp_assert_allclose(prediction, expected, rtol=1e-12, atol=1e-12)
+
+
 @pytest.mark.parametrize(
     "fit_model",
     [
@@ -786,11 +824,8 @@ def test_frols_non_polynomial_nar_n_step_validates_boundaries_and_integer_data()
     y_train, y_valid = _generate_nar_data()
     model = _fit_frols_non_polynomial_nar(y_train, Fourier(degree=2, n=1))
 
-    for invalid_steps in (0, -1, 1.5):
-        with pytest.raises(
-            ValueError,
-            match="steps_ahead must be integer and > zero",
-        ):
+    for invalid_steps in (0, -1, 1.5, True, np.bool_(False)):
+        with pytest.raises(ValueError, match="steps_ahead"):
             model.predict(X=None, y=y_valid, steps_ahead=invalid_steps)
 
     prefix_only = model.predict(
@@ -810,7 +845,7 @@ def test_frols_non_polynomial_nar_n_step_validates_boundaries_and_integer_data()
 
     y_integer = np.rint(100 * y_valid).astype(np.int64)
     expected = _segmented_nar_free_run_reference(model, y_integer, 2)
-    prediction = model.predict(X=None, y=y_integer, steps_ahead=2)
+    prediction = model.predict(X=None, y=y_integer, steps_ahead=np.int64(2))
 
     assert np.issubdtype(prediction.dtype, np.floating)
     assert_allclose(prediction, expected, rtol=1e-12, atol=1e-12)
@@ -832,6 +867,108 @@ def test_frols_non_polynomial_nar_n_step_preserves_array_api_namespace():
 
     assert prediction.__array_namespace__().__name__ == xp.__name__
     xp_assert_allclose(prediction, expected, rtol=1e-12, atol=1e-12)
+
+
+@pytest.mark.parametrize(
+    "basis_function",
+    [
+        pytest.param(Polynomial(degree=1), id="polynomial"),
+        pytest.param(Fourier(degree=1, n=1), id="fourier"),
+    ],
+)
+def test_frols_narmax_one_step_preserves_array_api_namespace(basis_function):
+    xp = pytest.importorskip("array_api_strict")
+    x_train, x_valid, y_train, y_valid = _generate_siso_data()
+    model = _fit_frols_model(basis_function, x_train, y_train)
+    expected = model.predict(X=x_valid, y=y_valid, steps_ahead=1)
+
+    with config_context(array_api_dispatch=True):
+        prediction = model.predict(
+            X=xp.asarray(x_valid),
+            y=xp.asarray(y_valid),
+            steps_ahead=1,
+        )
+
+    assert prediction.__array_namespace__() is xp
+    xp_assert_allclose(prediction, expected, rtol=1e-12, atol=1e-12)
+
+
+@pytest.mark.parametrize(
+    "basis_function",
+    [
+        pytest.param(Polynomial(degree=1), id="polynomial"),
+        pytest.param(Fourier(degree=1, n=1), id="fourier"),
+    ],
+)
+@pytest.mark.parametrize("steps_ahead", [None, 1, 3])
+def test_frols_nfir_prediction_preserves_array_api_namespace(
+    basis_function,
+    steps_ahead,
+):
+    xp = pytest.importorskip("array_api_strict")
+    x_train, x_valid, y_train, y_valid = _generate_siso_data()
+    model = FROLS(
+        xlag=2,
+        ylag=2,
+        model_type="NFIR",
+        n_terms=3,
+        order_selection=False,
+        estimator=LeastSquares(),
+        basis_function=basis_function,
+    ).fit(X=x_train, y=y_train)
+    expected = model.predict(
+        X=x_valid,
+        y=y_valid,
+        steps_ahead=steps_ahead,
+    )
+
+    with config_context(array_api_dispatch=True):
+        prediction = model.predict(
+            X=xp.asarray(x_valid),
+            y=xp.asarray(y_valid),
+            steps_ahead=steps_ahead,
+        )
+
+    assert prediction.__array_namespace__() is xp
+    xp_assert_allclose(prediction, expected, rtol=1e-12, atol=1e-12)
+
+
+def test_frols_nfir_array_api_preserves_wider_initial_conditions():
+    xp = pytest.importorskip("array_api_strict")
+    x_train, x_valid, y_train, y_valid = _generate_siso_data()
+    model = FROLS(
+        xlag=2,
+        ylag=2,
+        model_type="NFIR",
+        n_terms=3,
+        order_selection=False,
+        estimator=LeastSquares(),
+        basis_function=Polynomial(degree=1),
+    ).fit(X=x_train, y=y_train)
+    model.theta = model.theta.astype(np.float32)
+    x_valid = x_valid.astype(np.float32)
+    y_valid = y_valid.astype(np.float64)
+    y_valid[: model.max_lag] = 1e40
+
+    expected = model.predict(X=x_valid, y=y_valid)
+    with config_context(array_api_dispatch=True):
+        prediction = model.predict(
+            X=xp.asarray(x_valid),
+            y=xp.asarray(y_valid),
+        )
+
+    assert prediction.__array_namespace__() is xp
+    assert prediction.dtype == xp.float64
+    xp_assert_array_equal(
+        prediction[: int(model.max_lag), ...],
+        y_valid[: model.max_lag],
+    )
+    xp_assert_allclose(
+        prediction[int(model.max_lag) :, ...],
+        expected[model.max_lag :],
+        rtol=1e-6,
+        atol=1e-6,
+    )
 
 
 def test_rmss_without_bias_keeps_selection_and_parameters_aligned():
