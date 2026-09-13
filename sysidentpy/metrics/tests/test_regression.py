@@ -21,6 +21,52 @@ from sysidentpy.metrics import (
 from sysidentpy.tests._array_api_asserts import assert_allclose as xp_assert_allclose
 
 
+@pytest.mark.parametrize(
+    "metric",
+    [
+        forecast_error,
+        mean_forecast_error,
+        mean_squared_error,
+        root_mean_squared_error,
+        normalized_root_mean_squared_error,
+        root_relative_squared_error,
+        mean_absolute_error,
+        mean_absolute_scaled_error,
+        mean_squared_log_error,
+        median_absolute_error,
+        explained_variance_score,
+        r2_score,
+        symmetric_mean_absolute_percentage_error,
+    ],
+)
+@pytest.mark.parametrize("backend_name", ["numpy", "array_api_strict", "torch"])
+@pytest.mark.parametrize("shapes", [((3,), (3, 1)), ((3, 1), (3,)), ((3, 1), (1, 1))])
+def test_metrics_reject_broadcasting(metric, backend_name, shapes):
+    xp = pytest.importorskip(backend_name)
+    y = xp.asarray(np.ones(shapes[0]), dtype=xp.float64)
+    yhat = xp.asarray(np.ones(shapes[1]), dtype=xp.float64)
+    kwargs = (
+        {"y_train": xp.asarray([1.0, 2.0, 3.0])}
+        if metric is mean_absolute_scaled_error
+        else {}
+    )
+    with config_context(array_api_dispatch=True):
+        with pytest.raises(
+            ValueError, match="y and yhat must have the same shape"
+        ) as exc:
+            metric(y, yhat, **kwargs)
+    assert str(y.shape) in str(exc.value)
+    assert str(yhat.shape) in str(exc.value)
+
+
+def test_shape_validation_preserves_multivariate_aggregation():
+    y = np.array([[1.0, 2.0], [2.0, 4.0], [3.0, 6.0]])
+    yhat = y + np.array([[1.0, 0.0], [0.0, 2.0], [-1.0, 0.0]])
+    assert mean_squared_error(y, yhat) == 1.0
+    assert_allclose(r2_score(y, yhat), 0.25, rtol=0, atol=1e-15)
+    assert_array_equal(forecast_error(y, yhat), [[-1.0, 0.0], [0.0, -2.0], [1.0, 0.0]])
+
+
 def test_mean_forecast_error():
     y = np.array([3, -0.5, 2, 7])
     y_predicted = np.array([2.5, 0.0, 2, 8])

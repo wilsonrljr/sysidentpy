@@ -21,6 +21,7 @@ from ..utils.deprecation import deprecated
 from ..utils.check_arrays import check_linear_dependence_rows
 from .._lib._array_api import (
     _concat,
+    _copy,
     _diag,
     _lstsq,
     _require_numpy_namespace,
@@ -320,7 +321,9 @@ class TotalLeastSquares(BaseEstimator):
         check_linear_dependence_rows(psi)
         full = _concat(xp, [psi, y], axis=1)
         n = psi.shape[1]
-        _, _, v = xp.linalg.svd(full, full_matrices=True)
+        # A tall/square matrix retains every right singular vector in reduced SVD.
+        # Wide matrices need the complete right null space used by the TLS formula.
+        _, _, v = xp.linalg.svd(full, full_matrices=full.shape[0] < full.shape[1])
         theta = -v.T[:n, n:] / v.T[n:, n:]
         return xp.reshape(theta, (-1, 1))
 
@@ -451,7 +454,7 @@ class RecursiveLeastSquares(BaseEstimator):
             p_numerator = p - p1 / p2
             p = p_numerator / self.lam
 
-        self.theta_evolution = theta.copy()
+        self.theta_evolution = _copy(xp, theta)
         return xp.reshape(theta[:, -1], (-1, 1))
 
 

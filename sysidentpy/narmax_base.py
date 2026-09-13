@@ -810,9 +810,7 @@ class BaseMSS(RegressorDictionary, metaclass=ABCMeta):
             return np.zeros(self.max_lag * (1 + n_inputs))
 
         exponents = np.array([], dtype=float)
-        elements = np.round(np.divide(regressors, 1000), 0)[(regressors > 0)].astype(
-            int
-        )
+        elements = (regressors[regressors > 0] // 1000).astype(int)
 
         for j in range(1, n_inputs + 2):
             base_exponents = np.zeros(self.max_lag, dtype=float)

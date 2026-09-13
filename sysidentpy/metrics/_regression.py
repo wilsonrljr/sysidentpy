@@ -24,6 +24,16 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 
+def _check_same_shape(y, yhat):
+    """Reject broadcasting between observations without coercing their values."""
+    y_shape = np.shape(y)
+    yhat_shape = np.shape(yhat)
+    if y_shape != yhat_shape:
+        raise ValueError(
+            f"y and yhat must have the same shape. Got {y_shape} and {yhat_shape}."
+        )
+
+
 def _safe_variance_score(xp, numerator, denominator):
     """Return variance-style scores without boolean indexing."""
     nonzero_numerator = numerator != 0
@@ -77,7 +87,8 @@ def forecast_error(y: NDArray, yhat: NDArray) -> NDArray:
     y : array-like of shape = number_of_outputs
         Represent the target values.
     yhat : array-like of shape = number_of_outputs
-        Target values predicted by the model.
+        Target values predicted by the model. Must have the same shape as ``y``;
+        incompatible shapes raise ``ValueError`` instead of broadcasting.
 
     Returns
     -------
@@ -98,6 +109,7 @@ def forecast_error(y: NDArray, yhat: NDArray) -> NDArray:
     [0.5, -0.5, 0, -1]
 
     """
+    _check_same_shape(y, yhat)
     return y - yhat
 
 
@@ -109,7 +121,8 @@ def mean_forecast_error(y: NDArray, yhat: NDArray) -> NDArray:
     y : array-like of shape = number_of_outputs
         Represent the target values.
     yhat : array-like of shape = number_of_outputs
-        Target values predicted by the model.
+        Target values predicted by the model. Must have the same shape as ``y``;
+        incompatible shapes raise ``ValueError`` instead of broadcasting.
 
     Returns
     -------
@@ -131,6 +144,7 @@ def mean_forecast_error(y: NDArray, yhat: NDArray) -> NDArray:
     -0.25
 
     """
+    _check_same_shape(y, yhat)
     xp = get_namespace(y, yhat)
     return float(xp.mean(y - yhat))
 
@@ -143,7 +157,8 @@ def mean_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
     y : array-like of shape = number_of_outputs
         Represent the target values.
     yhat : array-like of shape = number_of_outputs
-        Target values predicted by the model.
+        Target values predicted by the model. Must have the same shape as ``y``;
+        incompatible shapes raise ``ValueError`` instead of broadcasting.
 
     Returns
     -------
@@ -164,6 +179,7 @@ def mean_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
     0.375
 
     """
+    _check_same_shape(y, yhat)
     xp = get_namespace(y, yhat)
     return float(xp.mean((y - yhat) ** 2))
 
@@ -176,7 +192,8 @@ def root_mean_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
     y : array-like of shape = number_of_outputs
         Represent the target values.
     yhat : array-like of shape = number_of_outputs
-        Target values predicted by the model.
+        Target values predicted by the model. Must have the same shape as ``y``;
+        incompatible shapes raise ``ValueError`` instead of broadcasting.
 
     Returns
     -------
@@ -208,7 +225,8 @@ def normalized_root_mean_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
     y : array-like of shape = number_of_outputs
         Represent the target values.
     yhat : array-like of shape = number_of_outputs
-        Target values predicted by the model.
+        Target values predicted by the model. Must have the same shape as ``y``;
+        incompatible shapes raise ``ValueError`` instead of broadcasting.
 
     Returns
     -------
@@ -252,7 +270,8 @@ def root_relative_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
     y : array-like of shape = number_of_outputs
         Represent the target values.
     yhat : array-like of shape = number_of_outputs
-        Target values predicted by the model.
+        Target values predicted by the model. Must have the same shape as ``y``;
+        incompatible shapes raise ``ValueError`` instead of broadcasting.
 
     Returns
     -------
@@ -272,6 +291,7 @@ def root_relative_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
     0.206
 
     """
+    _check_same_shape(y, yhat)
     xp = get_namespace(y, yhat)
     numerator = xp.sum((yhat - y) ** 2)
     denominator = xp.sum((y - xp.mean(y, axis=0)) ** 2)
@@ -293,7 +313,8 @@ def mean_absolute_error(y: NDArray, yhat: NDArray) -> NDArray:
     y : array-like of shape = number_of_outputs
         Represent the target values.
     yhat : array-like of shape = number_of_outputs
-        Target values predicted by the model.
+        Target values predicted by the model. Must have the same shape as ``y``;
+        incompatible shapes raise ``ValueError`` instead of broadcasting.
 
     Returns
     -------
@@ -314,6 +335,7 @@ def mean_absolute_error(y: NDArray, yhat: NDArray) -> NDArray:
     0.5
 
     """
+    _check_same_shape(y, yhat)
     xp = get_namespace(y, yhat)
     return float(xp.mean(xp.abs(y - yhat)))
 
@@ -334,8 +356,8 @@ def mean_absolute_scaled_error(
     y : array-like of shape (n_samples,) or (n_samples, 1)
         True target values for the forecast horizon.
     yhat : array-like of shape (n_samples,) or (n_samples, 1)
-        Target values predicted by the model. ``yhat`` must have the same
-        shape and temporal alignment as ``y``.
+        Target values predicted by the model. Must have the same shape and temporal
+        alignment as ``y``. Incompatible shapes raise ``ValueError``.
     y_train : array-like of shape (n_training_samples,) or (n_training_samples, 1)
         In-sample target values used to scale the forecast error.
     seasonal_period : int, default=1
@@ -396,11 +418,7 @@ def mean_absolute_scaled_error(
     yhat = _as_float_array(xp, yhat)
     y_train = _as_float_array(xp, y_train)
 
-    if y.shape != yhat.shape:
-        raise ValueError(
-            "y and yhat must have the same shape. "
-            f"Got {y.shape} and {yhat.shape}."
-        )
+    _check_same_shape(y, yhat)
     if y.ndim == 0 or y.shape[0] == 0:
         raise ValueError("y and yhat must contain at least one sample.")
     if y.ndim > 2 or (y.ndim == 2 and y.shape[1] != 1):
@@ -434,7 +452,8 @@ def mean_squared_log_error(y: NDArray, yhat: NDArray) -> NDArray:
     y : array-like of shape = number_of_outputs
         Represent the target values.
     yhat : array-like of shape = number_of_outputs
-        Target values predicted by the model.
+        Target values predicted by the model. Must have the same shape as ``y``;
+        incompatible shapes raise ``ValueError`` instead of broadcasting.
 
     Returns
     -------
@@ -474,7 +493,8 @@ def median_absolute_error(y: NDArray, yhat: NDArray) -> NDArray:
     y : array-like of shape = number_of_outputs
         Represent the target values.
     yhat : array-like of shape = number_of_outputs
-        Target values predicted by the model.
+        Target values predicted by the model. Must have the same shape as ``y``;
+        incompatible shapes raise ``ValueError`` instead of broadcasting.
 
     Returns
     -------
@@ -495,6 +515,7 @@ def median_absolute_error(y: NDArray, yhat: NDArray) -> NDArray:
     0.5
 
     """
+    _check_same_shape(y, yhat)
     xp = get_namespace(y, yhat)
     return float(_median(xp, xp.abs(y - yhat)))
 
@@ -507,7 +528,8 @@ def explained_variance_score(y: NDArray, yhat: NDArray) -> NDArray:
     y : array-like of shape = number_of_outputs
         Represent the target values.
     yhat : array-like of shape = number_of_outputs
-        Target values predicted by the model.
+        Target values predicted by the model. Must have the same shape as ``y``;
+        incompatible shapes raise ``ValueError`` instead of broadcasting.
 
     Returns
     -------
@@ -529,6 +551,7 @@ def explained_variance_score(y: NDArray, yhat: NDArray) -> NDArray:
     0.957
 
     """
+    _check_same_shape(y, yhat)
     xp = get_namespace(y, yhat)
     y_diff_avg = xp.mean(y - yhat)
     numerator = xp.mean((y - yhat - y_diff_avg) ** 2)
@@ -545,7 +568,8 @@ def r2_score(y: NDArray, yhat: NDArray) -> NDArray:
     y : array-like of shape = number_of_outputs
         Represent the target values.
     yhat : array-like of shape = number_of_outputs
-        Target values predicted by the model.
+        Target values predicted by the model. Must have the same shape as ``y``;
+        incompatible shapes raise ``ValueError`` instead of broadcasting.
 
     Returns
     -------
@@ -571,6 +595,7 @@ def r2_score(y: NDArray, yhat: NDArray) -> NDArray:
     0.948
 
     """
+    _check_same_shape(y, yhat)
     xp = get_namespace(y, yhat)
     if _is_numpy_namespace(xp):
         numerator = ((y - yhat) ** 2).sum(axis=0, dtype=np.float64)
@@ -590,7 +615,8 @@ def symmetric_mean_absolute_percentage_error(y: NDArray, yhat: NDArray) -> NDArr
     y : array-like of shape = number_of_outputs
         Represent the target values.
     yhat : array-like of shape = number_of_outputs
-        Target values predicted by the model.
+        Target values predicted by the model. Must have the same shape as ``y``;
+        incompatible shapes raise ``ValueError`` instead of broadcasting.
 
     Returns
     -------
@@ -618,6 +644,7 @@ def symmetric_mean_absolute_percentage_error(y: NDArray, yhat: NDArray) -> NDArr
     57.87
 
     """
+    _check_same_shape(y, yhat)
     xp = get_namespace(y, yhat)
     n = y.shape[0]
     denominator = xp.abs(y) + xp.abs(yhat)

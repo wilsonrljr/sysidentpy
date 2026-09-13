@@ -65,9 +65,9 @@ def get_lag_from_regressor_code(regressors):
         Maximum lag of list of regressors.
 
     """
-    lag_list = [int(i) for i in regressors.astype("str") for i in [np.sum(int(i[2:]))]]
+    lag_list = regressors % 1000
     if len(lag_list) != 0:
-        return max(lag_list)
+        return int(np.max(lag_list))
 
     return 1
 

@@ -8,6 +8,12 @@
 
 ### CHANGES
 
+- **ERR tolerance selection:** FROLS and UOFR now retain the winning regressor when `err_tol` stops selection, keeping the reported ERR paired with the selected model. Models can change when earlier versions stopped before recording that term; the selection rules and ERR equations are unchanged.
+- **Regressor decoding:** Fixed variable and lag decoding for delays of 100–999 and the ninth and later inputs, including shared prediction, simulation and AILS matrix-building paths. The code format and model-row ordering are unchanged; affected recursive predictions now use the intended histories.
+- **Array API compatibility:** Fixed independent RLS history copies and ordered column selection in OSF/OIF/OOS for strict Array API backends. This does not change RLS initialization or the floating-search scoring policy for rank-deficient subsets.
+- **Metric shape validation:** Regression metrics now reject incompatible `y` and `yhat` shapes with `ValueError`, consistently with MASE. In particular, `(N,)` and `(N, 1)` must be aligned explicitly. Compatible inputs retain their existing dtype, aggregation and numerical behavior.
+- **TLS memory usage:** TotalLeastSquares now uses reduced SVD for tall and square augmented matrices, avoiding an unused quadratic-size left-singular-vector matrix. Wide matrices retain full SVD so the right null space and existing TLS formula are preserved.
+
 - **Configurable Basis-Function Bias:**
     - Added `include_bias=True` to the Polynomial and Bilinear basis functions, matching the option already available in Bernstein, Legendre, Hermite, Hermite Normalized, and Laguerre.
     - Setting `include_bias=False` now removes the constant term from both the generated regressor matrix and the corresponding model-structure codes, keeping selected terms and estimated parameters aligned throughout fitting, prediction, and simulation.
