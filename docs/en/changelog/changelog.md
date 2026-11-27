@@ -5,7 +5,7 @@ template: overrides/main.html
 
 # Changes in SysIdentPy
 
-## v0.9.1 (Unreleased)
+## v0.9.1
 
 ### CONTRIBUTORS
 

@@ -5,7 +5,7 @@ title: Histórico de Alterações
 
 # Alterações no SysIdentPy
 
-## v0.9.1 (Não lançada)
+## v0.9.1
 
 ### COLABORADORES
 
