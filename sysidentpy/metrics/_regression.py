@@ -53,9 +53,7 @@ def _as_float_array(xp, values):
     values = xp.asarray(values)
     if _is_numpy_namespace(xp):
         return (
-            values.astype(float, copy=False)
-            if values.dtype.kind in "biu"
-            else values
+            values.astype(float, copy=False) if values.dtype.kind in "biu" else values
         )
     if xp.isdtype(values.dtype, ("bool", "integral")):
         return xp.astype(values, xp.asarray(1.0).dtype, copy=False)
@@ -66,6 +64,7 @@ __ALL__ = [
     "forecast_error",
     "mean_forecast_error",
     "mean_squared_error",
+    "log_mean_squared_error",
     "root_mean_squared_error",
     "normalized_root_mean_squared_error",
     "root_relative_squared_error",
@@ -182,6 +181,61 @@ def mean_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
     _check_same_shape(y, yhat)
     xp = get_namespace(y, yhat)
     return float(xp.mean((y - yhat) ** 2))
+
+
+def log_mean_squared_error(y: NDArray, yhat: NDArray) -> float:
+    """Calculate the natural logarithm of the Mean Squared Error.
+
+    Parameters
+    ----------
+    y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+        Observed target values.
+    yhat : array-like of the same shape as y
+        Predicted target values. Shapes must match without broadcasting.
+
+    Returns
+    -------
+    loss : float
+        Natural logarithm of the MSE over all observations and outputs.
+        An exact fit returns negative infinity. Non-finite residuals propagate
+        as NaN or positive infinity.
+
+    Raises
+    ------
+    ValueError
+        If the shapes differ or either array is empty.
+
+    Notes
+    -----
+    Residuals are scaled before squaring to avoid underflow and overflow in
+    their squares. Integer and boolean inputs are promoted to floating point.
+    Floating-point inputs retain their dtype and computations use their array
+    namespace. Unlike ``mean_squared_log_error``, this function takes the
+    logarithm after aggregating squared residuals, not before subtraction.
+
+    Examples
+    --------
+    >>> y = np.array([1.0, 2.0])
+    >>> yhat = np.array([0.0, 1.0])
+    >>> log_mean_squared_error(y, yhat)
+    0.0
+
+    """
+    _check_same_shape(y, yhat)
+    xp = get_namespace(y, yhat)
+    y = _as_float_array(xp, y)
+    yhat = _as_float_array(xp, yhat)
+    if any(length == 0 for length in y.shape):
+        raise ValueError("Log MSE requires at least one observation.")
+
+    errors = y - yhat
+    scale = xp.max(xp.abs(errors))
+    scale_value = float(scale)
+    if not np.isfinite(scale_value):
+        return scale_value
+    if scale_value == 0:
+        return float("-inf")
+    return float(2 * xp.log(scale) + xp.log(xp.mean((errors / scale) ** 2)))
 
 
 def root_mean_squared_error(y: NDArray, yhat: NDArray) -> NDArray:
@@ -409,8 +463,7 @@ def mean_absolute_scaled_error(
         )
     if seasonal_period <= 0:
         raise ValueError(
-            "seasonal_period must be a positive integer. "
-            f"Got {seasonal_period}."
+            f"seasonal_period must be a positive integer. Got {seasonal_period}."
         )
 
     xp = get_namespace(y, yhat, y_train)

@@ -8,6 +8,10 @@
 
 ### CHANGES
 
+- **MetaMSS and BPSOGSA:** Random-state handling now covers the full optimizer trajectory. MetaMSS computes its coefficient tests from identification residuals with full-rank OLS checks and a numerically stable QR-based covariance calculation. Candidate validation uses the training tail as initial conditions so candidates with different lags are scored on the same validation observations. Corrected the BIC parameter penalty to `n_parameters * log(n_samples)`. AIC and BIC compute log MSE using scaled residuals, preserving comparisons under changes of units without underflow or overflow when squaring finite residuals. Exact fits use a finite limiting convention without flooring positive errors.
+- **Entropic Regression:** Backward elimination now checks the conditional-information threshold before removing a regressor, retaining terms whose contribution exceeds the threshold. Forward and backward selection reuse the tolerance estimated for the fit.
+- **Forecast modes:** Centralized prediction dispatch and observation-anchored n-step blocks across model selectors, general estimators, and neural estimators. Corrected NAR n-step prediction for polynomial and non-polynomial bases, including incomplete final blocks. Initial conditions are prepended once, and NFIR prediction uses the input-only feature matrix consistently across forecast modes.
+- **Forecast metrics:** Added `log_mean_squared_error`, a backend-aware log MSE distinct from MSLE, with scaled residuals and negative infinity for exact fits. The finite exact-fit convention for model selection remains specific to MetaMSS. Added mean absolute scaled error (MASE), with the scale computed from the supplied training observations and seasonal period. Defined zero/zero SMAPE contributions as zero and rejected MSLE inputs outside its real logarithm domain.
 - **ERR tolerance selection:** FROLS and UOFR now retain the winning regressor when `err_tol` stops selection, keeping the reported ERR paired with the selected model. Models can change when earlier versions stopped before recording that term; the selection rules and ERR equations are unchanged.
 - **Regressor decoding:** Fixed variable and lag decoding for delays of 100–999 and the ninth and later inputs, including shared prediction, simulation and AILS matrix-building paths. The code format and model-row ordering are unchanged; affected recursive predictions now use the intended histories.
 - **Array API compatibility:** Fixed independent RLS history copies and ordered column selection in OSF/OIF/OOS for strict Array API backends. This does not change RLS initialization or the floating-search scoring policy for rank-deficient subsets.
@@ -25,6 +29,7 @@
 - **Neural NARX Early Stopping:**
     - Added optional validation-loss early stopping to `NARXNN` with configurable `patience` and `min_delta`.
     - Reused the existing `X_test` and `y_test` validation flow and automatically restored the network weights from the best validation epoch.
+    - NAR models can monitor validation loss and use early stopping with `y_test` alone; NARMAX and NFIR models still require validation inputs.
 - **Array API Testing:**
     - Updated the vendored `array-api-extra` tree from v0.10.1 to v0.11.0, replacing the experimental testing overlay with the complete upstream implementation while retaining the existing hook for vendored `array-api-compat` v1.14.0.
     - Added a narrow test-only assertion facade for SysIdentPy policies around NumPy baselines, Python literals, scalar values, dtype, shape, and namespace validation.
@@ -34,11 +39,15 @@
 
 ### IMPACT
 
+MetaMSS model choices and optimizer trajectories can change because identification statistics, validation alignment, and information criteria have been corrected. Entropic Regression can retain terms that backward elimination previously removed prematurely. Corrected NAR n-step predictions can also differ from earlier results. Regression metrics reject mismatched observation shapes instead of silently broadcasting them.
+
 The standard `pip install sysidentpy` installation remains unchanged. Array API testing dependencies continue to be development-only. Neural NARX early stopping is opt-in, so existing training behaviour remains unchanged by default. Basis functions continue to include the bias term by default wherever they did previously, preserving their default generated feature matrices; excluding it is an explicit opt-in. Corrected canonical codes can change `regressor_code` and `final_model` metadata for non-`Polynomial` bases whose earlier identifiers were misaligned with their feature columns. Entropic Regression results can also change when its former first-column bias assumption was incorrect. `SimulateNARMAX` code that supplied `theta` in the internal regressor-space order instead of the row order of `model_code` must reorder those values. `NARXNN` NFIR free-run predictions can change because they now use the intended input histories.
 
 ### TESTING
 
 Neural NARX tests cover disabled compatibility, validation requirements, patience, minimum improvement, stopping, and best-weight restoration.
+
+Regression tests cover AIC/BIC ranking under changes of units, errors whose squares underflow or overflow, exact fits, and invalid observation shapes. Neural NAR validation is exercised without exogenous inputs through real training and prediction.
 
 The assertion facade is covered with NumPy, `array-api-strict`, and PyTorch CPU arrays, including namespace, dtype, shape, scalar, zero-dimensional tolerance, and non-default-device cases.
 

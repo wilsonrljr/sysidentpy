@@ -14,7 +14,7 @@ from .._lib._array_api import get_namespace, _require_numpy_namespace
 from sysidentpy.utils.information_matrix import build_lagged_matrix
 from ..basis_function import Polynomial
 from ..metaheuristics import BPSOGSA
-from ..metrics import mean_squared_error, root_relative_squared_error
+from ..metrics import log_mean_squared_error, root_relative_squared_error
 from ..simulation import SimulateNARMAX
 from ..utils.check_arrays import (
     num_features,
@@ -749,10 +749,18 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         aic : float
             The Akaike Information Criterion
 
+        Notes
+        -----
+        Positive residuals are scaled before computing log MSE to preserve
+        comparisons across output units. Exact fits use the finite log MSE of
+        one smallest-subnormal float64 residual rather than negative infinity.
+
         """
-        mse = max(mean_squared_error(y_test, yhat), np.finfo(np.float64).eps)
+        log_mse = log_mean_squared_error(y_test, yhat)
+        if log_mse == -np.inf:
+            log_mse = 2 * np.log(np.nextafter(0.0, 1.0)) - np.log(y_test.size)
         n = y_test.shape[0]
-        return n * np.log(mse) + 2 * n_theta
+        return n * log_mse + 2 * n_theta
 
     def bic(self, y_test: np.ndarray, yhat: np.ndarray, n_theta: int) -> float:
         """Calculate the Bayesian Information Criterion.
@@ -771,10 +779,17 @@ class MetaMSS(SimulateNARMAX, BPSOGSA):
         bic : float
             The Bayesian Information Criterion
 
+        Notes
+        -----
+        Uses the same scaled log MSE and finite exact-fit convention as
+        :meth:`aic`, with the parameter penalty ``n_theta * log(n_samples)``.
+
         """
-        mse = max(mean_squared_error(y_test, yhat), np.finfo(np.float64).eps)
+        log_mse = log_mean_squared_error(y_test, yhat)
+        if log_mse == -np.inf:
+            log_mse = 2 * np.log(np.nextafter(0.0, 1.0)) - np.log(y_test.size)
         n = y_test.shape[0]
-        return n * np.log(mse) + n_theta * np.log(n)
+        return n * log_mse + n_theta * np.log(n)
 
     def metamss_loss(self, y_test: np.ndarray, yhat: np.ndarray, n_terms: int) -> float:
         """Calculate the MetaMSS loss function.
