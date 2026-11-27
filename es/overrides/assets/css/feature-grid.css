@@ -1,0 +1,42 @@
+/* Responsive grid for features */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+/* Individual feature card styling */
+.feature-card {
+    background-color: var(--md-default-bg-color);
+    color: var(--md-default-fg-color);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    border: 1px solid var(--md-accent-fg-color);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Ensure the link behaves like normal text within the card */
+.feature-link {
+    color: inherit; /* Inherit color from the card text */
+    text-decoration: none; /* Remove the underline */
+  }
+
+/* Optional: Change color on hover */
+.feature-link:hover h3 {
+color: var(--md-accent-fg-color); /* Change the color of the title on hover */
+}
+
+/* Dark mode adjustments */
+[data-md-color-scheme="slate"] .feature-card {
+    background-color: var(--md-default-bg-color-dark);
+    color: var(--md-default-fg-color-dark);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
