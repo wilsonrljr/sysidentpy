@@ -412,6 +412,39 @@ def test_bic_computation():
     assert pytest.approx(result) == expected
 
 
+@pytest.mark.parametrize("criterion", ["aic", "bic"])
+@pytest.mark.parametrize("scale", [1e-300, 1e-10, 1e10, 1e200])
+def test_information_criteria_preserve_ranking_after_unit_change(criterion, scale):
+    score = getattr(MetaMSS(), criterion)
+    y = np.arange(100, dtype=float).reshape(-1, 1)
+    predictions = [y + 1, y + 0.1]
+    baseline = np.array(
+        [score(y, prediction, k + 1) for k, prediction in enumerate(predictions)]
+    )
+    scaled = np.array(
+        [
+            score(y * scale, prediction * scale, k + 1)
+            for k, prediction in enumerate(predictions)
+        ]
+    )
+
+    assert np.all(np.isfinite(scaled))
+    assert np.argmin(baseline) == np.argmin(scaled) == 1
+    assert_allclose(scaled - baseline, 2 * len(y) * np.log(scale), rtol=1e-12)
+
+
+@pytest.mark.parametrize("criterion", ["aic", "bic"])
+def test_information_criteria_distinguish_tiny_errors_from_perfect_fit(criterion):
+    score = getattr(MetaMSS(), criterion)
+    y = np.zeros((10, 1))
+    exact = score(y, y.copy(), 1)
+    tiny_error = score(y, np.full_like(y, 1e-300), 1)
+    larger_error = score(y, np.full_like(y, 1e-200), 1)
+
+    assert np.isfinite(exact)
+    assert exact < tiny_error < larger_error
+
+
 def test_metamss_loss_returns_zero_for_perfect_constant_prediction():
     model = MetaMSS()
     model.dimension = 3

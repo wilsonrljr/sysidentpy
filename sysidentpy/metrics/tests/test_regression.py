@@ -7,6 +7,7 @@ from sysidentpy.metrics import (
     forecast_error,
     mean_forecast_error,
     mean_squared_error,
+    log_mean_squared_error,
     root_mean_squared_error,
     normalized_root_mean_squared_error,
     root_relative_squared_error,
@@ -19,6 +20,54 @@ from sysidentpy.metrics import (
     symmetric_mean_absolute_percentage_error,
 )
 from sysidentpy.tests._array_api_asserts import assert_allclose as xp_assert_allclose
+from sysidentpy.tests._array_api_asserts import assert_array_equal as xp_assert_equal
+
+
+@pytest.mark.parametrize(
+    "metric",
+    [
+        forecast_error,
+        mean_forecast_error,
+        mean_squared_error,
+        log_mean_squared_error,
+        root_mean_squared_error,
+        normalized_root_mean_squared_error,
+        root_relative_squared_error,
+        mean_absolute_error,
+        mean_absolute_scaled_error,
+        mean_squared_log_error,
+        median_absolute_error,
+        explained_variance_score,
+        r2_score,
+        symmetric_mean_absolute_percentage_error,
+    ],
+)
+@pytest.mark.parametrize("backend_name", ["numpy", "array_api_strict", "torch"])
+@pytest.mark.parametrize("shapes", [((3,), (3, 1)), ((3, 1), (3,)), ((3, 1), (1, 1))])
+def test_metrics_reject_broadcasting(metric, backend_name, shapes):
+    xp = pytest.importorskip(backend_name)
+    y = xp.asarray(np.ones(shapes[0]), dtype=xp.float64)
+    yhat = xp.asarray(np.ones(shapes[1]), dtype=xp.float64)
+    kwargs = (
+        {"y_train": xp.asarray([1.0, 2.0, 3.0])}
+        if metric is mean_absolute_scaled_error
+        else {}
+    )
+    with config_context(array_api_dispatch=True):
+        with pytest.raises(
+            ValueError, match="y and yhat must have the same shape"
+        ) as exc:
+            metric(y, yhat, **kwargs)
+    assert str(y.shape) in str(exc.value)
+    assert str(yhat.shape) in str(exc.value)
+
+
+def test_shape_validation_preserves_multivariate_aggregation():
+    y = np.array([[1.0, 2.0], [2.0, 4.0], [3.0, 6.0]])
+    yhat = y + np.array([[1.0, 0.0], [0.0, 2.0], [-1.0, 0.0]])
+    assert mean_squared_error(y, yhat) == 1.0
+    assert_allclose(r2_score(y, yhat), 0.25, rtol=0, atol=1e-15)
+    assert_array_equal(forecast_error(y, yhat), [[-1.0, 0.0], [0.0, -2.0], [1.0, 0.0]])
 
 
 def test_mean_forecast_error():
@@ -90,9 +139,7 @@ def test_mean_absolute_scaled_error_supports_seasonal_period():
     y = np.array([36.0, 16.0])
     yhat = np.array([35.0, 19.0])
 
-    result = mean_absolute_scaled_error(
-        y, yhat, y_train, seasonal_period=np.int64(2)
-    )
+    result = mean_absolute_scaled_error(y, yhat, y_train, seasonal_period=np.int64(2))
 
     # Both the forecast MAE and the two-step naive in-sample MAE equal 2.
     assert_allclose(result, 1.0)
@@ -455,3 +502,74 @@ def test_msle_domain_contract_with_array_api_strict():
         )
 
     assert np.isfinite(result)
+
+
+@pytest.mark.parametrize("backend_name", ["numpy", "array_api_strict", "torch"])
+@pytest.mark.parametrize("dtype_name", ["float32", "float64", "int64", "bool"])
+def test_log_mse_matches_direct_definition_without_mutating_inputs(
+    backend_name, dtype_name
+):
+    xp = pytest.importorskip(backend_name)
+    values = np.array([[0, 1], [1, 0]])
+    targets = np.array([[1, 1], [0, 0]])
+    dtype = (
+        np.bool_
+        if backend_name == "numpy" and dtype_name == "bool"
+        else getattr(xp, dtype_name)
+    )
+    y = xp.asarray(values, dtype=dtype)
+    yhat = xp.asarray(targets, dtype=dtype)
+    expected = np.log(np.mean((values - targets) ** 2))
+
+    with config_context(array_api_dispatch=True):
+        result = log_mean_squared_error(y, yhat)
+
+    assert isinstance(result, float)
+    assert result == pytest.approx(expected, rel=1e-6)
+    xp_assert_equal(y, xp.asarray(values, dtype=y.dtype))
+    xp_assert_equal(yhat, xp.asarray(targets, dtype=yhat.dtype))
+
+
+@pytest.mark.parametrize("backend_name", ["numpy", "array_api_strict", "torch"])
+@pytest.mark.parametrize("scale", [1e-300, 1e-10, 1.0, 1e200])
+def test_log_mse_handles_extreme_residual_scales(backend_name, scale):
+    xp = pytest.importorskip(backend_name)
+    y = xp.asarray([0.0, 0.0], dtype=xp.float64)
+    yhat = xp.asarray([scale, 2 * scale], dtype=xp.float64)
+    with config_context(array_api_dispatch=True):
+        result = log_mean_squared_error(y, yhat)
+    assert result == pytest.approx(2 * np.log(scale) + np.log(2.5), rel=1e-12)
+
+
+@pytest.mark.parametrize("backend_name", ["numpy", "array_api_strict", "torch"])
+@pytest.mark.parametrize("value", [0.0, np.nan, np.inf])
+def test_log_mse_zero_and_nonfinite_errors(backend_name, value):
+    xp = pytest.importorskip(backend_name)
+    y = xp.asarray([0.0, 0.0], dtype=xp.float64)
+    yhat = xp.asarray([0.0, value], dtype=xp.float64)
+    with config_context(array_api_dispatch=True):
+        result = log_mean_squared_error(y, yhat)
+    if np.isnan(value):
+        assert np.isnan(result)
+    else:
+        assert result == (-np.inf if value == 0 else np.inf)
+
+
+@pytest.mark.parametrize("backend_name", ["numpy", "array_api_strict", "torch"])
+def test_log_mse_rejects_empty_arrays(backend_name):
+    xp = pytest.importorskip(backend_name)
+    empty = xp.asarray(np.empty((0, 1)), dtype=xp.float64)
+    with config_context(array_api_dispatch=True):
+        with pytest.raises(ValueError, match="at least one observation"):
+            log_mean_squared_error(empty, empty)
+
+
+def test_log_mse_uses_the_input_device():
+    xp = pytest.importorskip("array_api_strict")
+    target = xp.Device("device1")
+    y = xp.asarray([0.0, 0.0], device=target)
+    yhat = xp.asarray([1.0, 2.0], device=target)
+    with config_context(array_api_dispatch=True):
+        result = log_mean_squared_error(y, yhat)
+    assert result == pytest.approx(np.log(2.5))
+    assert y.device == yhat.device == target

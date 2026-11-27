@@ -537,15 +537,6 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
                 break
 
             if _is_numpy_namespace(xp):
-                cumsum_val = float(err.cumsum()[i])
-            else:
-                cumsum_val = float(xp.sum(err[: i + 1]))
-            if (self.err_tol is not None) and (cumsum_val >= self.err_tol):
-                self.n_terms = i + 1
-                process_term_number = i + 1
-                break
-
-            if _is_numpy_namespace(xp):
                 tmp_psi[:, [piv_index, i]] = tmp_psi[:, [i, piv_index]]
             else:
                 tmp_psi = _swap_matrix_columns(xp, tmp_psi, piv_index, i)
@@ -558,6 +549,15 @@ class OFRBase(BaseMSS, metaclass=ABCMeta):
                 piv_p = _copy(xp, piv[piv_index])
                 piv = _set_element(xp, piv, piv_index, piv_i)
                 piv = _set_element(xp, piv, i, piv_p)
+            if _is_numpy_namespace(xp):
+                cumsum_val = float(err.cumsum()[i])
+            else:
+                cumsum_val = float(xp.sum(err[: i + 1]))
+            if (self.err_tol is not None) and (cumsum_val >= self.err_tol):
+                self.n_terms = i + 1
+                process_term_number = i + 1
+                break
+
             v = house(tmp_psi[i:, i])
             row_result = rowhouse(tmp_psi[i:, i:], v)
             y_slice = (slice(i, None), slice(None))

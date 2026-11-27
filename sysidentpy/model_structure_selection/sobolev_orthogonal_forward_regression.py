@@ -839,15 +839,15 @@ class UOFR(OFRBase):
             if step_idx == process_term_number:
                 break
 
-            if (self.err_tol is not None) and (err.cumsum()[step_idx] >= self.err_tol):
-                self.n_terms = step_idx + 1
-                process_term_number = step_idx + 1
-                break
-
             psi_working[:, [max_err_idx, step_idx]] = psi_working[
                 :, [step_idx, max_err_idx]
             ]
             piv[[max_err_idx, step_idx]] = piv[[step_idx, max_err_idx]]
+
+            if (self.err_tol is not None) and (err.cumsum()[step_idx] >= self.err_tol):
+                self.n_terms = step_idx + 1
+                process_term_number = step_idx + 1
+                break
 
             reflector = house(psi_working[step_idx:, step_idx])
             row_result = rowhouse(psi_working[step_idx:, step_idx:], reflector)

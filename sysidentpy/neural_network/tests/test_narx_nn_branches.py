@@ -387,6 +387,57 @@ def test_early_stopping_requires_validation_data(monkeypatch):
         model.fit(X=data, y=data)
 
 
+@pytest.mark.parametrize(
+    ("early_stopping", "verbose"), [(True, False), (True, True), (False, True)]
+)
+def test_nar_validation_without_exogenous_inputs(early_stopping, verbose):
+    net = torch.nn.Linear(1, 1, bias=False)
+    with torch.no_grad():
+        net.weight.fill_(0.5)
+    y = (0.5 ** np.arange(24)).astype(np.float32).reshape(-1, 1)
+    y_valid = y * 2
+    model = NARXNN(
+        model_type="NAR",
+        ylag=1,
+        xlag=1,
+        basis_function=Polynomial(degree=1),
+        net=net,
+        early_stopping=early_stopping,
+        verbose=verbose,
+        patience=2,
+        epochs=5,
+        optimizer="SGD",
+        learning_rate=0.01,
+    )
+
+    model.fit(y=y, y_test=y_valid)
+
+    assert len(model.val_loss) == (3 if early_stopping else 5)
+    np.testing.assert_allclose(model.val_loss, 0, atol=1e-12)
+    np.testing.assert_allclose(
+        model.predict(y=y_valid, steps_ahead=1), y_valid, rtol=1e-6
+    )
+
+
+@pytest.mark.parametrize("model_type", ["NAR", "NARMAX", "NFIR"])
+@pytest.mark.parametrize(("early_stopping", "verbose"), [(True, False), (False, True)])
+def test_validation_requires_outputs_and_exogenous_inputs_when_applicable(
+    model_type, early_stopping, verbose
+):
+    model = NARXNN(
+        model_type=model_type,
+        net=torch.nn.Linear(1, 1),
+        early_stopping=early_stopping,
+        verbose=verbose,
+    )
+    data = np.ones((8, 1), dtype=np.float32)
+    with pytest.raises(ValueError, match="y_test"):
+        model.fit(X=data, y=data, X_test=data)
+    if model_type != "NAR":
+        with pytest.raises(ValueError, match="X_test"):
+            model.fit(X=data, y=data, y_test=data)
+
+
 def test_invalid_early_stopping_fit_does_not_reset_network():
     net = torch.nn.Linear(2, 1)
     model = _make_model(

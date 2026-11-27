@@ -46,9 +46,7 @@ def list_output_regressor_code(model_code: List[int]) -> np.ndarray:
         Flattened list of output regressors.
 
     """
-    regressor_code = [
-        code for code in model_code.ravel() if (code != 0) and (str(code)[0] == "1")
-    ]
+    regressor_code = [code for code in model_code.ravel() if code // 1000 == 1]
 
     return np.asarray(regressor_code)
 
@@ -67,7 +65,5 @@ def list_input_regressor_code(model_code: List[int]) -> np.ndarray:
         Flattened list of output regressors.
 
     """
-    regressor_code = [
-        code for code in model_code.ravel() if (code != 0) and (str(code)[0] != "1")
-    ]
+    regressor_code = [code for code in model_code.ravel() if code // 1000 >= 2]
     return np.asarray(regressor_code)

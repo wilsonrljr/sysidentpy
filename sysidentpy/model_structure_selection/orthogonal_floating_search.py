@@ -16,10 +16,10 @@ from itertools import combinations
 
 import numpy as np
 
-from .._lib._array_api import get_namespace, _is_numpy_namespace
+from .._lib._array_api import get_namespace, _is_numpy_namespace, _zeros, device
 from ..basis_function import Fourier, Polynomial
 from ..parameter_estimation.estimators import RecursiveLeastSquares
-from .ofr_base import Estimators, OFRBase
+from .ofr_base import Estimators, OFRBase, _take_columns_by_index
 
 
 class _OrthogonalFloatingBase(OFRBase):
@@ -70,11 +70,11 @@ class _OrthogonalFloatingBase(OFRBase):
         """Return ERR score and per-term ERRs for the given subset."""
         xp = get_namespace(psi, target)
         if not subset:
-            return 0.0, xp.zeros(0, dtype=psi.dtype)
+            return 0.0, _zeros(xp, 0, dtype=psi.dtype, target_device=device(psi))
 
-        psi_sel = psi[:, subset]
-        if psi_sel.size == 0:
-            return 0.0, xp.zeros(0, dtype=psi.dtype)
+        psi_sel = self._select_columns(psi, subset)
+        if psi_sel.shape[0] == 0 or psi_sel.shape[1] == 0:
+            return 0.0, _zeros(xp, 0, dtype=psi.dtype, target_device=device(psi))
 
         q, _ = xp.linalg.qr(psi_sel)
         # For "reduced" mode, q has shape (n, min(n, k)); Array API qr
@@ -83,7 +83,7 @@ class _OrthogonalFloatingBase(OFRBase):
         q = q[:, :k]
         g = q.T @ target
 
-        err_vals = xp.zeros(len(subset), dtype=psi.dtype)
+        err_vals = _zeros(xp, len(subset), dtype=psi.dtype, target_device=device(psi))
         mapped = g.shape[0]
         if _is_numpy_namespace(xp):
             err_vals[:mapped] = xp.reshape(g, (-1,)) ** 2 / squared_y
@@ -92,6 +92,15 @@ class _OrthogonalFloatingBase(OFRBase):
             err_vals = xp.concat([vals, err_vals[mapped:]])
         score = float(xp.sum(err_vals))
         return score, err_vals
+
+    def _select_columns(self, psi: np.ndarray, indices) -> np.ndarray:
+        """Select ordered columns while preserving the data namespace and device."""
+        if len(indices) == 0:
+            return psi[:, :0]
+        xp = get_namespace(psi)
+        if _is_numpy_namespace(xp):
+            return psi[:, indices]
+        return _take_columns_by_index(xp, psi, np.asarray(indices, dtype=np.intp))
 
     def _compute_squared_y(self, target: np.ndarray) -> float:
         """Compute ||y||^2 with numerical floor to avoid division by zero."""
@@ -510,7 +519,7 @@ class OSF(_OrthogonalFloatingBase):
 
         _, err_vals = self._subset_err(psi, target, subset, squared_y)
         piv = np.array(subset, dtype=int)
-        psi_selected = psi[:, piv] if len(piv) else psi[:, :0]
+        psi_selected = self._select_columns(psi, piv)
         return err_vals, piv, psi_selected, target
 
 
@@ -552,7 +561,7 @@ class OIF(OSF):
 
         _, err_vals = self._subset_err(psi, target, subset, squared_y)
         piv = np.array(subset, dtype=int)
-        psi_selected = psi[:, piv] if len(piv) else psi[:, :0]
+        psi_selected = self._select_columns(psi, piv)
         return err_vals, piv, psi_selected, target
 
     def _swap_step(
@@ -852,7 +861,7 @@ class OOS(_OrthogonalFloatingBase):
 
         _, err_vals = self._subset_err(psi, target, subset, squared_y)
         piv = np.array(subset, dtype=int)
-        psi_selected = psi[:, piv] if len(piv) else psi[:, :0]
+        psi_selected = self._select_columns(psi, piv)
         return err_vals, piv, psi_selected, target
 
 

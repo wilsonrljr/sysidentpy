@@ -142,6 +142,7 @@ class NARXNN(BaseMSS):
     early_stopping : bool, default=False
         Whether to stop training when the validation loss stops improving. Validation
         data must be provided through ``X_test`` and ``y_test`` when calling ``fit``.
+        NAR models require only ``y_test``.
     patience : int, default=10
         Number of consecutive epochs without sufficient validation loss improvement
         before training is stopped. Only used when ``early_stopping=True``.
@@ -588,7 +589,7 @@ class NARXNN(BaseMSS):
             The output data to be used in the training process.
         X_test : ndarray of floats
             The input data to be used in the validation process. Required when
-            ``verbose=True`` or ``early_stopping=True``.
+            ``verbose=True`` or ``early_stopping=True``, except for NAR models.
         y_test : ndarray of floats
             The output data to be used in the validation process. Required when
             ``verbose=True`` or ``early_stopping=True``.
@@ -604,12 +605,15 @@ class NARXNN(BaseMSS):
 
         """
         monitor_validation = self.verbose or self.early_stopping
-        if monitor_validation and (X_test is None or y_test is None):
-            if self.early_stopping:
-                raise ValueError(
-                    "X_test and y_test cannot be None if you set early_stopping=True"
-                )
-            raise ValueError("X_test and y_test cannot be None if you set verbose=True")
+        requires_validation_input = self.model_type != "NAR"
+        if monitor_validation and (
+            y_test is None or (requires_validation_input and X_test is None)
+        ):
+            required_data = (
+                "X_test and y_test" if requires_validation_input else "y_test"
+            )
+            option = "early_stopping" if self.early_stopping else "verbose"
+            raise ValueError(f"{required_data} cannot be None if you set {option}=True")
 
         if self.net is None:
             raise ValueError("The neural network must be defined before training")

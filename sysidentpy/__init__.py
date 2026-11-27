@@ -1,4 +1,4 @@
-__version__ = "0.9.0"
+__version__ = "0.9.1"
 
 from sysidentpy._config import config_context, get_config, set_config
 
