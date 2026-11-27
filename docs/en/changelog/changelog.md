@@ -5,6 +5,114 @@ template: overrides/main.html
 
 # Changes in SysIdentPy
 
+## v0.9.1 (Unreleased)
+
+### CONTRIBUTORS
+
+- Wilson Rocha Lacerda Junior (wilsonrljr)
+
+### CHANGES
+
+This release adds configurable basis-function bias, neural-network early stopping, and new regression metrics. It also corrects model selection, prediction, simulation, and numerical behavior, with updated examples, book chapters, and development workflows.
+
+#### Basis Functions & Regressor Utilities
+
+- Added `include_bias=True` to Polynomial and Bilinear, matching the option already available in Bernstein, Legendre, Hermite, Hermite Normalized, and Laguerre. Bias flags are validated, including Bernstein's deprecated `bias` alias.
+- Setting `include_bias=False` removes the constant term from both the generated feature matrix and its regressor codes, keeping selected terms and coefficients aligned throughout fitting, prediction, and simulation. Bilinear rejects the degree-one, bias-free configuration because it generates no regressors.
+- Corrected feature-code generation for non-Polynomial bases, respecting transformation order, ensemble features, and the actual location or absence of the bias. Fourier retains its existing constructor and generated features; it does not gain an `include_bias` option.
+- Updated regressor-code utilities, feature counting, and equation formatting to respect the basis function, lag configuration, bias option, and NAR/NARMAX/NFIR model type. Neural feature counting removes the Polynomial intercept only when present.
+- Added feature-code shape checks while retaining compatibility paths for custom basis functions and existing `regressor_space` overrides.
+
+#### Neural NARX Early Stopping
+
+- Added optional validation-loss early stopping to `NARXNN`, with configurable `patience` and `min_delta`. Training restores the network weights from the best validation epoch.
+- Reused the existing validation-data flow. NAR models can monitor validation loss and use early stopping with `y_test` alone; NARMAX and NFIR models still require `X_test` and `y_test`.
+- Added validation for early-stopping parameters, missing validation data, non-finite validation loss, and training data without samples beyond the maximum lag.
+
+#### Model Structure Selection
+
+- Fixed FROLS and UOFR stopping with `err_tol`: the regressor that reaches the threshold is now retained, keeping the selected structure, estimated parameters, and reported ERR aligned.
+- Fixed Entropic Regression backward elimination to check the conditional-information threshold before removing a term. Forward and backward selection reuse the tolerance estimated for the fit.
+- Corrected ER intercept handling so it identifies the actual bias column instead of assuming that the first feature is always a constant.
+- Fixed ordered column selection, including duplicate and empty selections, in OSF/OIF/OOS for strict Array API backends, preserving the namespace and device. The scoring policy for rank-deficient subsets is unchanged.
+
+#### MetaMSS & BPSOGSA
+
+- Added consistent random-state handling throughout population generation and optimizer updates. Integer seeds reproduce trajectories on repeated fits or optimization calls; supplied generator instances advance their state.
+- Corrected BPSOGSA mass calculation and agent ordering, and improved handling of equal, extreme, and non-finite fitness values. Optimization fails explicitly when no candidate has finite fitness.
+- Preserved the configured MetaMSS search-space lags across candidate evaluation and repeated fits. Added checks for single-output data, sufficient identification samples, valid significance levels, and population probabilities, with bounded resampling of empty candidates.
+- MetaMSS now uses identification residuals for coefficient significance tests. Pruning is applied only to supported full-rank OLS designs with residual degrees of freedom, using a QR-based covariance calculation and scaled residual variance. The documentation describes these tests as a selection heuristic rather than confirmatory post-selection inference.
+- Candidate validation now prepends the training tail as initial conditions, so candidates with different lags are scored over the same validation observations. The selected model is re-estimated after optimization.
+- Corrected the MetaMSS BIC penalty to `n_parameters * log(n_samples)`. AIC and BIC now use scaled log MSE, preserving comparisons under changes of output units without flooring positive errors. Exact fits use a finite convention local to MetaMSS so they remain eligible for optimization.
+- Corrected MetaMSS complexity-penalty indexing for full-size models and handling of non-finite loss values.
+
+#### Prediction & Simulation
+
+- Centralized prediction validation, recursive block scheduling, dtype handling, exponent caching, and CPU fallback in `BaseMSS`, with model selectors, simulation, general estimators, and neural estimators using the shared workflow.
+- Fixed NAR n-step prediction for polynomial and non-polynomial bases, including incomplete final blocks. Each block restarts from the preceding observed outputs, and initial conditions are prepended exactly once.
+- Clarified and validated free-run, one-step, and n-step contracts, including output shapes, input-column counts, aligned observation lengths, integer step counts, and NAR forecast horizons. NFIR forecast modes consistently use the input-only feature matrix.
+- Corrected `NARXNN` NFIR recursive input-lag handling and preserved neural prediction dtype and individual module training modes. Prediction no longer changes the fitted NAR input count.
+- Improved prediction dtype promotion, exponent-cache invalidation, and non-NumPy fallback handling. CPU fallback operates on a model copy and returns predictions in the caller's namespace and device.
+- Fixed variable and lag decoding for delays of 100–999 and the ninth and later inputs, including shared prediction, simulation, and AILS matrix-building paths.
+- `SimulateNARMAX` now preserves the supplied `model_code` row order so each coefficient remains paired with its intended regressor. Added checks for missing, duplicate, and ambiguous regressor codes, and accepted parameter vectors with shape `(n_terms,)` or `(n_terms, 1)`.
+
+#### Regression Metrics
+
+- Added `mean_absolute_scaled_error` (MASE), using the supplied training observations and a configurable seasonal period for the naive-forecast scale, with validation of shapes and the seasonal period.
+- Added the public `log_mean_squared_error` metric with Array API support. Residual scaling avoids underflow or overflow when squaring finite residuals. This computes log(MSE), not MSLE, and returns negative infinity for exact fits; the finite model-selection convention remains in MetaMSS.
+- Regression metrics now reject incompatible `y` and `yhat` shapes instead of silently broadcasting them. In particular, `(N,)` and `(N, 1)` must be aligned explicitly.
+- Defined NRMSE and RRSE for constant targets: zero for a perfect prediction and infinity for an imperfect prediction, while preserving NaN errors.
+- Defined zero/zero SMAPE contributions as zero and rejected MSLE targets or predictions less than or equal to -1, outside its real logarithm domain.
+
+#### Parameter Estimation & Numerical Maintenance
+
+- TotalLeastSquares now uses reduced SVD for tall and square augmented matrices, avoiding an unused quadratic-size left-singular-vector matrix. Wide matrices retain full SVD to preserve the right null space and existing TLS formula.
+- Fixed independent copies of RLS parameter history for strict Array API backends. This does not change RLS initialization or its non-default-device allocation behavior.
+- Replaced deprecated NumPy operations in UOFR, multiobjective estimation, and simulation utilities.
+
+#### Array API Testing
+
+- Updated vendored `array-api-extra` from v0.10.1 to v0.11.0, replacing the experimental testing overlay with the complete upstream implementation while retaining vendored `array-api-compat` v1.14.0.
+- Adopted the public Array API testing assertions through a small test-only facade. Backend-aware tests avoid unnecessary NumPy materialization and check namespaces, shapes, and dtypes; intentional NumPy-only tests retain NumPy assertions.
+- Added coverage for assertion normalization, scalar and zero-dimensional cases, backend mismatches, and non-default devices. Retained a narrowly scoped expected failure for the known `array-api-strict` device-transfer issue under NumPy 1.x.
+- Corrected a FROLS prediction-prefix assertion and stabilized the Fourier neural-network test with an explicit learning rate.
+
+#### Documentation & Examples
+
+- Added and revised the Portuguese validation and case-study chapters and updated their English counterparts, including model evaluation, residual analysis, forecasting, and benchmark workflows.
+- Updated the Air Passenger, M4, PV forecasting, F-16, Silverbox, Bouc–Wen, Wiener–Hammerstein, coupled electric device (CE8), and electromechanical MetaMSS notebooks and their English/Portuguese tutorials, including refreshed results and figures where applicable.
+- Updated the existing-model simulation example to match the corrected coefficient ordering, and documented bias configuration, feature codes, neural early stopping, and forecast-mode semantics.
+- Corrected quickstart variable references, API docstring formatting, and mathematical rendering in the book. Updated installation examples to use version placeholders resolved from the package being documented.
+- Updated English and Portuguese book download links to the latest PDF/EPUB artifacts and removed outdated MOBI links.
+- Added a security policy with private vulnerability-reporting guidance and documented that loading `.syspy` or pickle model files can execute code and should be restricted to trusted sources.
+
+#### Tooling & CI
+
+- Added a workflow that requests book artifact builds in `sysidentpy-data` when book sources or MkDocs configuration change on `main`.
+- Prepared the documentation for external validation, added a strict MkDocs build before deployment, configured closest-reference resolution, and corrected localized theme settings.
+- Updated documentation hooks to render package-version placeholders while keeping the latest PyPI version separate from the version being documented.
+- Corrected CI extras installation and dependency quoting, restricted test-workflow permissions to read-only repository contents, and removed unused OIDC write permission from the PyPI publishing workflow.
+- Raised development-only minimums to `pytest-cov >=5.0.0` and `array-api-strict >=2.1.3`. Runtime dependency requirements are unchanged.
+- Treat package deprecation warnings as test failures and exclude vendored sources from Black and pre-commit formatting/lint hooks.
+
+### IMPACT
+
+Early stopping and bias exclusion are opt-in. Existing basis functions retain their default generated feature matrices, while corrected feature codes can change `regressor_code` and `final_model` metadata for non-Polynomial bases. Fourier retains its existing feature expansion.
+
+Selected structures, optimizer trajectories, coefficients, and predictions can change where previous behavior was incorrect, including MetaMSS validation and statistics, BPSOGSA updates, ER backward elimination, ERR-threshold stopping, regressor decoding, and NAR/NFIR prediction. Code supplying `theta` to `SimulateNARMAX` must follow the row order of `model_code`, rather than the internal regressor-space order.
+
+Regression metrics require matching observation shapes. Callers relying on broadcasting between `(N,)` and `(N, 1)` must align those arrays explicitly. Constant-target metrics and zero/zero SMAPE pairs now have defined results. The standard installation and runtime dependency requirements remain unchanged; Array API testing dependencies are development-only.
+
+### TESTING
+
+Expanded regression tests cover bias inclusion and exclusion across fitting, feature codes, equation formatting, simulation, and prediction; ERR-threshold selection; long-lag and multi-input decoding; polynomial and non-polynomial forecast modes; and TLS equivalence to the full-SVD formulation.
+
+MetaMSS and BPSOGSA tests cover seeded optimization, candidate validation alignment, coefficient statistics, repeated fits, invalid candidates, and information-criterion rankings across output scales. Neural tests cover validation requirements, patience, minimum improvement, best-weight restoration, repeated training, and NAR validation without exogenous inputs.
+
+Metric and assertion tests exercise NumPy, PyTorch CPU, and `array-api-strict`, including integer and boolean promotion, extreme residual scales, exact fits, non-finite inputs, shape validation, input preservation, and non-default devices.
+
+Local validation on Python 3.12 passed 1,558 tests with NumPy 2.3.5 (16 skipped) and 1,557 tests with NumPy 1.26.4 (16 skipped and one expected failure). Coverage was 98.66% in both environments. Ruff, Black, distribution builds, and wheel smoke tests passed. GPU execution was not part of this local validation. The CI test matrix continues to cover Python 3.10–3.14.
+
 ## v0.9.0
 
 ### CONTRIBUTORS
